@@ -17,8 +17,10 @@ class OracleRandomWriter(OracleWriter):
     decay-first scan (lambda = beta = 1), without re-normalizing the keys.
     """
 
-    def __init__(self, V: int, n_rel: int, seed: int = 17) -> None:
-        super().__init__(V, r_mem=32, seed=seed)
+    def __init__(self, V: int, n_rel: int, seed: int = 17, *, r_mem: int = 32) -> None:
+        if r_mem not in {32, 128}:
+            raise ValueError("P1-L oracle memory rank must be32 or128")
+        super().__init__(V, r_mem=r_mem, seed=seed)
         self.n_rel = n_rel
         generator = torch.Generator().manual_seed(derive_seed(seed, "oracle", "pair_codes"))
         self.register_buffer("pair_codes", F.normalize(

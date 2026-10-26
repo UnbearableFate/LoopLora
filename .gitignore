@@ -17,3 +17,4 @@ cache/
 *.pt
 *.safetensors
 .pytest_cache/
+.job-wakeup/

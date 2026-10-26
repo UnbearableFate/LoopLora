@@ -1,0 +1,23 @@
+{
+  "file_hash": "9a76963e9587ae51db52b29188c004d8",
+  "host": "mg0865",
+  "job_id": "3715870.opbs",
+  "layer": 14,
+  "model": "Qwen/Qwen3-0.6B-Base",
+  "names": 1024,
+  "question_ids_hash": "85611315bea6c47f0ee402c37b44abe3",
+  "question_mask_hash": "72fb3df72ec8985b76a751950b7ea2aa",
+  "questions": 512,
+  "revision": "da87bfb608c14b7cf20ba1ce41287e8de496c0cd",
+  "seconds": 932.2778757871129,
+  "status": "complete",
+  "tensor_hashes": {
+    "contrastive": "1b040265f83e7ad538d6b8e2681eb119",
+    "names": "83d0289cd6589af2e8adc156572e9646",
+    "random": "d6434d547e352d5e895722b66270f788",
+    "raw_logit": "8e9b69ec838a2e67bfba78e528d49d8d",
+    "raw_mean": "334752f04cb98ea1091cc63a465311e3"
+  },
+  "time": "2026-10-26T19:35:30.700367+00:00",
+  "trial": false
+}

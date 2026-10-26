@@ -1,0 +1,161 @@
+{
+  "S": 17000,
+  "lrs": {
+    "B1": 0.001,
+    "B2": 0.001,
+    "B3-L4": 0.001,
+    "B4": 0.001,
+    "B5-L4": 0.001,
+    "B8": 0.001,
+    "M1-L4": 0.003
+  },
+  "packing": "one GPU process; runs sequentially reuse backbone, prefetch2 per active run",
+  "projected_main_plus_pilot_node_hours": 23.476323789526266,
+  "rank": 32,
+  "rule": "val full-vocabulary EM, pooled hops1/2/3 at trained L; ties lower lr",
+  "selection": [
+    {
+      "candidates": [
+        {
+          "accuracy": 0.0006666666666666666,
+          "checkpoint_hash": "37b4afd15fa7129967c667a62d3b5d72",
+          "lr": 0.001,
+          "n": 3000,
+          "record": "/work/xg24i002/x10041/LoopLora/runs/p1l/main/pilot/B8/B8-lr0.001/record.json"
+        },
+        {
+          "accuracy": 0.0006666666666666666,
+          "checkpoint_hash": "e6b04e86a10703460ead6b4016872d63",
+          "lr": 0.003,
+          "n": 3000,
+          "record": "/work/xg24i002/x10041/LoopLora/runs/p1l/main/pilot/B8/B8-lr0.003/record.json"
+        }
+      ],
+      "label": "B8",
+      "selected_lr": 0.001
+    },
+    {
+      "candidates": [
+        {
+          "accuracy": 0.0006666666666666666,
+          "checkpoint_hash": "c0f0b3863df3d4aaca17f81f5eb3bf60",
+          "lr": 0.001,
+          "n": 3000,
+          "record": "/work/xg24i002/x10041/LoopLora/runs/p1l/main/pilot/M1-L4/M1-L4-lr0.001/record.json"
+        },
+        {
+          "accuracy": 0.0013333333333333333,
+          "checkpoint_hash": "28b1fe8d4c2feed745ccbbef94d62ab9",
+          "lr": 0.003,
+          "n": 3000,
+          "record": "/work/xg24i002/x10041/LoopLora/runs/p1l/main/pilot/M1-L4/M1-L4-lr0.003/record.json"
+        }
+      ],
+      "label": "M1-L4",
+      "selected_lr": 0.003
+    },
+    {
+      "candidates": [
+        {
+          "accuracy": 0.0006666666666666666,
+          "checkpoint_hash": "632809f6c63d79c1ee7e9a1fcc66b05e",
+          "lr": 0.001,
+          "n": 3000,
+          "record": "/work/xg24i002/x10041/LoopLora/runs/p1l/main/pilot/B4/B4-lr0.001/record.json"
+        },
+        {
+          "accuracy": 0.0003333333333333333,
+          "checkpoint_hash": "91ebaf1f5d87c1465ba18d6b6182f0ef",
+          "lr": 0.003,
+          "n": 3000,
+          "record": "/work/xg24i002/x10041/LoopLora/runs/p1l/main/pilot/B4/B4-lr0.003/record.json"
+        }
+      ],
+      "label": "B4",
+      "selected_lr": 0.001
+    },
+    {
+      "candidates": [
+        {
+          "accuracy": 0.001,
+          "checkpoint_hash": "4edec6cbe9bd0bcaf41b1e1f52dc3609",
+          "lr": 0.001,
+          "n": 3000,
+          "record": "/work/xg24i002/x10041/LoopLora/runs/p1l/main/pilot/B5-L4/B5-L4-lr0.001/record.json"
+        },
+        {
+          "accuracy": 0.0006666666666666666,
+          "checkpoint_hash": "18b2fc41211bdc6dde43871f281dcd32",
+          "lr": 0.003,
+          "n": 3000,
+          "record": "/work/xg24i002/x10041/LoopLora/runs/p1l/main/pilot/B5-L4/B5-L4-lr0.003/record.json"
+        }
+      ],
+      "label": "B5-L4",
+      "selected_lr": 0.001
+    },
+    {
+      "candidates": [
+        {
+          "accuracy": 0.0006666666666666666,
+          "checkpoint_hash": "7f4d1d316fd7df4da6a4a279ab2f2df4",
+          "lr": 0.001,
+          "n": 3000,
+          "record": "/work/xg24i002/x10041/LoopLora/runs/p1l/main/pilot/B3-L4/B3-L4-lr0.001/record.json"
+        },
+        {
+          "accuracy": 0.0006666666666666666,
+          "checkpoint_hash": "9dcb8fad0e33aea996e19e1639032c49",
+          "lr": 0.003,
+          "n": 3000,
+          "record": "/work/xg24i002/x10041/LoopLora/runs/p1l/main/pilot/B3-L4/B3-L4-lr0.003/record.json"
+        }
+      ],
+      "label": "B3-L4",
+      "selected_lr": 0.001
+    },
+    {
+      "candidates": [
+        {
+          "accuracy": 0.9966666666666667,
+          "checkpoint_hash": "7315168ac263736f3480e8c92ca9d4b6",
+          "lr": 0.001,
+          "n": 3000,
+          "record": "/work/xg24i002/x10041/LoopLora/runs/p1l/main/pilot/B1/B1-lr0.001/record.json"
+        },
+        {
+          "accuracy": 0.9933333333333333,
+          "checkpoint_hash": "eee584922619dccac8dc47aafb9a1e32",
+          "lr": 0.003,
+          "n": 3000,
+          "record": "/work/xg24i002/x10041/LoopLora/runs/p1l/main/pilot/B1/B1-lr0.003/record.json"
+        }
+      ],
+      "label": "B1",
+      "selected_lr": 0.001
+    },
+    {
+      "candidates": [
+        {
+          "accuracy": 0.9983333333333333,
+          "checkpoint_hash": "5c8c213fcb3756020fdcf72c9f2107ef",
+          "lr": 0.001,
+          "n": 3000,
+          "record": "/work/xg24i002/x10041/LoopLora/runs/p1l/main/pilot/B2/B2-lr0.001/record.json"
+        },
+        {
+          "accuracy": 0.9956666666666667,
+          "checkpoint_hash": "0f67642f2e156c8b20a84c0c43f297fe",
+          "lr": 0.003,
+          "n": 3000,
+          "record": "/work/xg24i002/x10041/LoopLora/runs/p1l/main/pilot/B2/B2-lr0.003/record.json"
+        }
+      ],
+      "label": "B2",
+      "selected_lr": 0.001
+    }
+  ],
+  "sizing_hash": "653d08f58e48fb3f151a4b5ecda2b6bc",
+  "status": "locked",
+  "time": "2026-10-26T20:27:40.863333+00:00"
+}
