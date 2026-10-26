@@ -63,6 +63,7 @@ class LLMExperiment:
         self._closed = False
         stage, variant = config["stage"], config["variant"]
         self.layer = config["model"]["layer"]
+        self.input_site = config["model"].get("input_site", "o_proj")
         self.adapter = None
         self.writer = None
         if variant == "B0":
@@ -79,7 +80,8 @@ class LLMExperiment:
                             gate=m.get("gate", "scalar"),
                             lambda_init=m.get("lambda_init", .99), beta_init=m.get("beta_init", .1))
         init_seed = derive_seed(config["seed"], "llm", stage, "reader", variant)
-        self.bank = attach_adapters(self.model, cfg, layers=(self.layer,), seed=init_seed)
+        self.bank = attach_adapters(self.model, cfg, layers=(self.layer,), seed=init_seed,
+                                    input_site=self.input_site)
         self.adapter = self.bank.modules[self.layer].adapter
         self.writer = self.adapter if self.adapter.has_memory else None
         try:
@@ -116,10 +118,13 @@ class LLMExperiment:
         if self.writer is None:
             return {}
         cfg = self.writer.cfg
-        return {"model": MODEL_ID, "revision": MODEL_REVISION, "layer": self.layer,
+        signature = {"model": MODEL_ID, "revision": MODEL_REVISION, "layer": self.layer,
                 "d_in": cfg.d_in, "d_out": cfg.d_out, "r": cfg.r, "r_mem": cfg.r_mem,
                 "gate": cfg.gate, "write_policy": self.config["write_policy"],
                 "V": self.config["task"]["V"]}
+        if self.input_site != "o_proj":
+            signature["input_site"] = self.input_site
+        return signature
 
     def writer_state(self) -> dict[str, Tensor]:
         if self.writer is None:
@@ -189,7 +194,8 @@ class LLMExperiment:
         B, Q, T = prepared.question_ids.shape
         snapshot = repeat_snapshot(prepared.snapshot, Q)
         captured = []
-        projection = self.model.model.layers[self.layer].self_attn.o_proj
+        layer = self.model.model.layers[self.layer]
+        projection = layer if self.input_site == "residual" else layer.self_attn.o_proj
         hook = None
         if capture_inputs:
             hook = projection.register_forward_pre_hook(lambda _, args: captured.append(args[0].clone()))
