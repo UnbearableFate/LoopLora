@@ -1,0 +1,17 @@
+# Synthetic lengths are throughput inputs, not rendered task lengths or scores.
+# One GH200; submit as a single debug-g job with 00:20:00 walltime.
+ranks: [16, 32]
+loop_steps: [0, 1, 2, 4, 8]
+batch_sizes: [16, 64]
+layers: [14]
+support_tokens: 64
+question_tokens: 16
+answer_tokens: 1
+warmup: 2
+repeats: 5
+seed: 20261026
+learning_rate: 0.001
+protocol: memory_only
+write_policy: all_tokens
+max_elapsed_seconds: 1080
+output_dir: runs/pilot
