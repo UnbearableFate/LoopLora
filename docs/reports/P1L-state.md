@@ -16,6 +16,8 @@ Armed wakeups (message mode,300s polling, no Goal):
   acknowledged; all seven jobs exit0 and all14 candidate records complete.
 - r128 pilot3716169: .job-wakeup/d921e843-f2a6-44ff-82e7-83cb3267c07f,
   worker PID2200345; also verify the other four pilot jobs on wake.
+- r32 main3716305: .job-wakeup/a101bbc0-d502-4bf4-8978-4e613b043510,
+  worker PID2276624; verify all19 jobs/22 run artifacts on wake.
 Read the event state and acknowledge with the exact argv from the wakeup
 message. Do not register duplicates or cancel the other pending watcher.
 
@@ -77,10 +79,11 @@ receipts; R/training-manifest.json maps all22 runs. Raw R/main/<GROUP>/<RUN>.
 Seed17:3716288B8,3716289M1,3716290B5,3716291B4+B3,3716292B1,3716293B2.
 Seed29:3716294B8,3716295M1,3716296B5,3716297B4+B3,3716298B1,3716299B2.
 Seed43:3716300B8,3716301M1,3716302B5,3716303B4+B3,3716304B1,3716305B2.
-B0 untrained checkpoint:3716306. Never rerun the launcher blindly or duplicate
+B0 untrained checkpoint:3716306, passed onmg0019, zero trainable parameters,
+hash6af601799a569397330e74196c99ebe8. Never rerun the launcher blindly or duplicate
 submitted groups. All main run records must complete before confirmation;
-main training performs no quality evaluation. Arrange wakeup on3716305 (late
-long job), then inspect all19 receipts/22 artifacts on wake, not only that job.
+main training performs no quality evaluation. Wakeup on3716305 (late long job)
+is armed above; inspect all19 receipts/22 artifacts on wake, not only that job.
 
 Probe full cache3715870, source d276308, R/jlens/directions.pt,512 fixed val
 questions only, frozen model, completed onmg0865 in932.28s. Small metadata
@@ -148,7 +151,7 @@ separately; unchanged regression passed3715942). No further blanket retests.
 1. Validation-only evaluation acceptance is complete; never read its raw scores.
 2. R32 pilot wakeup acknowledged; lock/configs committed and main submitted.
    R128 pilot3716169 has its own independent armed watcher above; retain it.
-3. Arrange r32 main3716305 wakeup before going idle. At either wake preserve
+3. R32 main3716305 wakeup armed. At either wake preserve
    the other pending event; independently advance whichever rank is ready.
 
 ## Next actions after each rank's pilot wakeup
