@@ -1,0 +1,63 @@
+{
+  "status": "passed",
+  "heads_checked": 24,
+  "head_seals_verified": 24,
+  "all_reader_hashes_unchanged": true,
+  "confirmation_started": false,
+  "design_hash": "93655f15c777e581e4c23d80f9712f6b",
+  "full_grid_rows": 152,
+  "theta_integer_count_ties_verified": [
+    {
+      "family": "joint/r32/M1",
+      "theta": 0.9,
+      "n_correct": 20621,
+      "n_queries": 48000
+    },
+    {
+      "family": "joint/r32/M1-lin",
+      "theta": 0.75,
+      "n_correct": 23114,
+      "n_queries": 48000
+    },
+    {
+      "family": "joint_fact/r32/M1",
+      "theta": 0.45,
+      "n_correct": 8215,
+      "n_queries": 48000
+    },
+    {
+      "family": "joint_fact/r32/M1-lin",
+      "theta": 0.4,
+      "n_correct": 9307,
+      "n_queries": 48000
+    },
+    {
+      "family": "oracle_random/r32/M1",
+      "theta": 0.25,
+      "n_correct": 10240,
+      "n_queries": 48000
+    },
+    {
+      "family": "oracle_random/r32/M1-lin",
+      "theta": 0.3,
+      "n_correct": 13976,
+      "n_queries": 48000
+    },
+    {
+      "family": "t1_frozen_fact/r32/M1",
+      "theta": 0.25,
+      "n_correct": 6247,
+      "n_queries": 48000
+    },
+    {
+      "family": "t1_frozen_fact/r32/M1-lin",
+      "theta": 0.35,
+      "n_correct": 6364,
+      "n_queries": 48000
+    }
+  ],
+  "theta_selection_split": "val",
+  "theta_selection_seed": 4242,
+  "theta_selection_episodes_per_seed": 2000,
+  "theta_locked_at": "2026-10-26T19:13:10.550537+00:00"
+}

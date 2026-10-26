@@ -1,0 +1,21 @@
+{
+  "status": "passed",
+  "study": "P4-S-L",
+  "runs": 24,
+  "families": 8,
+  "primary_families": 6,
+  "qualified_families": [],
+  "design_hash": "93655f15c777e581e4c23d80f9712f6b",
+  "design_lock_commit": "9366da4035aa15bfe97be14acec92574c6d3e894",
+  "theta_lock_commit": "6e4545e2a52fe420b7f66702fd1856d366fdac98",
+  "theta_blake2b": "c784b6d2ce4856c85d467f40e2147fe8",
+  "confidence": 0.9916666666666667,
+  "resamples": 2000,
+  "audited_queries": 768000,
+  "selected_and_executed_steps_separate": true,
+  "learned_read_calls": "executed_updates+1",
+  "model_inference_recomputed": false,
+  "training_recomputed": false,
+  "latency_rows": 72,
+  "analyzed_at": "2026-10-26T19:20:17.047828+00:00"
+}
