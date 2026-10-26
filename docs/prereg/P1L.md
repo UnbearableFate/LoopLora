@@ -73,4 +73,17 @@ Per writer condition:
 - G1-L passes and G2-L fails: report which comparator matches B8; no evolving-query claim for that condition.
 
 ## Budget
-Each job ≤ 8 nodes × 2 h (`--scale-up docs/prereg/P1L.md`); P1-L total ≤ 16 node·h; node·h recorded per job.
+Each job ≤ 8 nodes × 2 h (`--scale-up docs/prereg/P1L.md`); totals per writer condition as in Amendment B1; node·h recorded per job.
+
+## Amendment B1 — budget and S (2026-10-27 04:13 JST, before any Pilot-2 run or score)
+Information seen: timing-only preflight 3715826 (all 7 trained paths fit memory; B1/B2 context-retained ≈ 0.28
+s/step, oracle readers ≈ 0.13–0.20 s/step); no score. The fixed-S rule ("largest S fitting 2 h / 1.5") and the
+16 node·h total conflict: 21 main + 14 Pilot-2 trainings at that S exceed 16 node·h. The per-job limit (≤ 8 nodes
+× 2 h) is the user's rule; the total is this study's own budget. Change:
+- The `oracle_random` condition, including B0–B2, B3-L4, smoke, Pilot-2, confirmation and readout, has ≤ 16 node·h.
+  The `learned` condition, if added, has its own ≤ 8 node·h in its addendum.
+- S = the largest common S, rounded down to a multiple of 500, that satisfies both (a) the slowest run, timed under
+  the packing actually used (several runs per node where measured throughput justifies it), × 1.5 fits one 2 h
+  job, and (b) projected Pilot-2 + main node·h ≤ 13, keeping 3 node·h for smoke, startup, confirmation, J-lens
+  directions and failures. If that S is below 6000, the orchestrator decides before Pilot-2.
+- Pilot-2 still uses S/3; S stays identical for every reader.
