@@ -48,6 +48,21 @@ def test_capacity_rule_uses_best_lr_per_E_inclusive_threshold_and_lr_at_E():
     assert selection["selected"]["joint/r32"]["lr"] == 3e-4
 
 
+def test_capacity_lr_is_selected_at_chosen_E_and_separately_for_each_rank():
+    rows = capacity_rows()
+    for row in rows:
+        if row["writer"] != "joint":
+            continue
+        preferred = 3e-4 if row["E"] == 8 or row["r"] == 16 else 3e-3
+        row["accuracy"] = {8: .99, 12: .98, 16: .96, 24: .95}[row["E"]] \
+            if row["lr"] == preferred else .80
+    selection = select_pilot1(rows)
+    assert selection["E_star"] == 24
+    assert selection["joint_r32_best_by_E"][8]["lr"] == 3e-4
+    assert selection["selected"]["joint/r32"]["lr"] == 3e-3
+    assert selection["selected"]["joint/r16"]["lr"] == 3e-4
+
+
 @pytest.mark.parametrize("E", [12, 16, 24])
 def test_pilot2_and_replication_have_locked_shapes_budgets_and_shared_writer(E):
     selection1 = select_pilot1(capacity_rows())
