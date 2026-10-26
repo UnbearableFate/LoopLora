@@ -103,9 +103,15 @@ def select_theta(root: Path, runs: list[dict], design: dict) -> dict:
     """Validation-only family selection: accuracy, chosen steps, then theta."""
     families = _runs(runs)
     require(list(design['theta_grid']) == list(THETAS), 'Theta grid differs from registration')
-    scores = {}
+    scores, labels = {}, {}
     for run in sorted(runs, key=lambda r: r['name']):
         trace = load_trace(root, run, 'val', design)
+        family_labels = tuple(trace[key] for key in ('episode_id', 'hop', 'answer'))
+        if run['family'] in labels:
+            require(all(np.array_equal(a, b) for a, b in zip(labels[run['family']], family_labels)),
+                    'Validation episode/query labels differ across training seeds')
+        else:
+            labels[run['family']] = family_labels
         for theta in THETAS:
             selected, executed = learned_steps(trace['probabilities'], theta)
             scores.setdefault((run['family'], theta), []).append(
@@ -361,7 +367,8 @@ def analyze(root: Path, out: Path) -> dict:
                    theta_lock_commit=manifest['theta_lock_commit'], theta_blake2b=manifest['theta_blake2b'],
                    confidence=CONFIDENCE, resamples=2000, audited_queries=audited_queries,
                    selected_and_executed_steps_separate=True, learned_read_calls='executed_updates+1',
-                   runtime_recomputed=False, latency_rows=len(latency['per_seed']),
+                   model_inference_recomputed=False, training_recomputed=False,
+                   latency_rows=len(latency['per_seed']),
                    analyzed_at=datetime.now(timezone.utc).isoformat())
     _save(out / 'analysis.json', summary)
     return summary

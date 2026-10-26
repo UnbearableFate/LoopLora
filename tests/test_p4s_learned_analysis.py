@@ -115,6 +115,17 @@ def test_theta_validation_rejects_grid_or_design_drift_without_trace_io(tmp_path
         analysis.validate_theta(result, runs, dict(design, extra='drift'))
 
 
+def test_validation_selection_requires_identical_episode_labels_across_seeds(tmp_path):
+    root, runs, design = fixture(tmp_path)
+    run = next(r for r in runs if r['writer'] == 'joint_fact' and r['variant'] == 'M1' and r['seed'] == 29)
+    path = root / 'traces' / run['name'] / 'val.npz'
+    data = trace()
+    data['answer'][0, 0] = 99
+    np.savez(path, **data)
+    with pytest.raises(ValueError, match='Validation.*labels differ'):
+        analysis.select_theta(root, runs, design)
+
+
 @pytest.mark.parametrize('mutation', ['duplicate', 'missing', 'wrong_family'])
 def test_manifest_requires_all_24_reader_head_identities(tmp_path, mutation):
     _, runs, _ = fixture(tmp_path)
@@ -134,7 +145,7 @@ def test_best_label_free_is_locked_validation_choice_not_confirmation_choice(tmp
     assert all(row['criterion'] == 'read_norm' for row in best.values())
     altered = copy.deepcopy(design)
     first = next(iter(altered['best_label_free']))
-    altered['best_label_free'][first]['criterion'] = 'relative_change'
+    altered['best_label_free'][first] = dict(altered['best_label_free'][first], criterion='relative_change')
     with pytest.raises(ValueError, match='Best label-free'):
         analysis._references(altered, runs)
 

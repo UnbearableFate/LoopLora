@@ -82,6 +82,7 @@ def test_fit_head_samples_256_whole_episodes_and_optimizes_only_the_head(monkeyp
     class ObservedHead(head_class):
         def __init__(self, seed):
             super().__init__(seed=seed)
+            captured['init_seed'] = seed
             captured['initial_head'] = {name: value.detach().clone() for name, value in self.state_dict().items()}
 
         def logits(self, inputs):
@@ -118,6 +119,7 @@ def test_fit_head_samples_256_whole_episodes_and_optimizes_only_the_head(monkeyp
         assert torch.equal(inputs.reshape(256, 8, 16, 51), features[indices])
         assert torch.equal(labels.reshape(256, 8, 16), targets[indices].float())
     assert len(captured['indices']) == 2 and len(captured['optimizers']) == 1
+    assert captured['init_seed'] == derive_seed(17, 'p4s-l', run['family'], 'head_init')
     parameters, kwargs = captured['optimizers'][0]
     assert kwargs == {'lr': .001}
     assert {id(parameter) for parameter in parameters} == {id(parameter) for parameter in head.parameters()}
@@ -251,7 +253,8 @@ def locked_study(tmp_path):
 
 
 @pytest.mark.parametrize('failure', ['running', 'smoke', 'missing_theta_commit', 'unknown_theta_commit',
-                                      'theta_not_committed', 'design_not_committed', 'design_drift'])
+                                      'theta_not_committed', 'design_not_committed', 'design_drift',
+                                      'reader_seal', 'head_seal'])
 def test_confirm_rejects_unfinished_training_or_unlocked_inputs_before_model_or_confirmation(locked_study, monkeypatch, failure):
     study = locked_study
     trained = copy.deepcopy(study['trained'])
@@ -271,8 +274,11 @@ def test_confirm_rejects_unfinished_training_or_unlocked_inputs_before_model_or_
     elif failure == 'design_not_committed':
         with study['design_path'].open('a') as stream:
             stream.write('\n')
-    else:
+    elif failure == 'design_drift':
         design['training']['lr'] = .002
+    else:
+        changed = trained['runs'][0]['checkpoint' if failure == 'reader_seal' else 'head_checkpoint']
+        Path(changed).write_bytes(b'changed after locking')
     runner.save(study['root'] / 'train_manifest.json', trained)
     monkeypatch.setattr(runner, 'load_model', lambda *args: pytest.fail('model opened before training/theta lock checks'))
     monkeypatch.setattr(runner, 'collect', lambda *args, **kwargs: pytest.fail('confirmation evaluated before training/theta lock checks'))
