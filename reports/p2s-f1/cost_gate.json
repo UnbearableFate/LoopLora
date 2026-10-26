@@ -11,5 +11,21 @@
   "total_budget_node_hours": 2.5,
   "pilot_walltime": "00:11:00",
   "pilot_walltime_basis": "1.5 times 500-step smoke scaled to 5000, rounded up",
-  "main_walltime_policy": "1.5 times measured 5000-step pilot scaled to 15000"
+  "main_walltime_policy": "1.5 times measured 5000-step pilot scaled to 15000",
+  "pilot_jobs": [
+    "3714944",
+    "3714945",
+    "3714946"
+  ],
+  "pilot_suite_seconds": [
+    316.67,
+    316.46,
+    322.4
+  ],
+  "pilot_node_hours_observed_before_selection": 0.28944444444444445,
+  "main_projected_node_hours_from_pilot": 0.8059999999999999,
+  "main_walltime": "00:25:00",
+  "main_walltime_basis": "1.5 times slowest measured 5000-step pilot scaled to 15000, rounded up",
+  "selection_job": "3714974",
+  "expanded_tests_passed": 26
 }
