@@ -92,6 +92,29 @@ def decisions(rows: list[dict]) -> dict:
             if r['statistics']['gate']['ci_low']<=0])
 
 
+def write_tables(rows: list[dict],decision: dict,out: Path) -> None:
+    lines=['# P2-S-F1 paired contrasts','',
+        'Effects and intervals are percentage points; 97.5% pooled paired episode-bootstrap CIs. ',
+        'Per-seed effects are ordered 17 / 29 / 43. The confirmation episodes are reused from P2-S.',
+        'Intervals condition on these three trained seeds. F-E3 hop-1/long rows accompany the registered reach endpoint.',
+        '', '| Endpoint | Writer | Contrast | Hops | Estimate [97.5% CI], pp | Per seed, pp |',
+        '| --- | --- | --- | --- | --- | --- |']
+    for r in rows:
+        value=r['statistics']['gate']
+        contrast=('B8@4 - M1-L4@4' if r['endpoint']=='F-E1' else
+                  'M1-L4@4 - M1-mixed@4' if r['endpoint']=='F-E2' else
+                  f"M1-mixed@4 - {r['variant_b']}/r{r['r_b']}/m{r['r_mem_b']}@1")
+        interval=f"{100*value['difference']:+.3f} [{100*value['ci_low']:+.3f}, {100*value['ci_high']:+.3f}]"
+        seeds=' / '.join(f"{100*p['difference']:+.3f}" for p in value['per_seed'])
+        lines.append(f"| {r['endpoint']} | {r['writer']} | {contrast} | {r['subset']} | {interval} | {seeds} |")
+    lines.extend(['','Reader for P1-L: **'+decision['reader_for_P1L']+'**.','',
+        '| Carried writer | Training depth under F-E2 |','| --- | --- |'])
+    lines.extend(f'| {w} | {depth} |' for w,depth in decision['training_depth_by_writer'].items())
+    lines.extend(['','Writer selection remains with the P1-L protocol; apply the corresponding depth above.',
+        'Shortcut-free capability claim: **'+('passes' if decision['shortcut_free_capability_passed'] else 'fails; restricted to oracle codes')+'**.'])
+    (out/'tables.md').write_text('\n'.join(lines)+'\n')
+
+
 def analyze() -> None:
     plan,barrier=verify_release()
     raw=driver.RUNS/'analysis';out=driver.REPORTS
@@ -124,6 +147,7 @@ def analyze() -> None:
         chance_accuracy=fmean(r['chance_accuracy'] for r in rows)) for key,rows in sorted(pooled.items())])
     decision=decisions(stats)
     driver.write(out/'decision.json',decision)
+    write_tables(stats,decision,out)
     driver.write(out/'audit.json',dict(status='passed',training_stages=24,reference_checkpoints=18,
         confirmation_sets=42,sample_rows=sample_rows,all_samples_sealed=True,
         all_tables_reproduced=True,all_depth_snapshots_identical=True,all_query_labels_paired=True,
