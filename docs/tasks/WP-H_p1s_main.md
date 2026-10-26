@@ -46,3 +46,11 @@ M1 − M1-lin, with CIs) per condition.
 - Each PBS job ≤ 8 nodes × 1 h, walltime ≈ 1.5 × measured; record node·h per job and the WP-H total (≤ 8).
 - Do not change prereg thresholds, sets, seeds, lrs or steps beyond the prereg's own 15000-step rule. Anything
   unexpected goes into the report as observed; ask the orchestrator before deviating from this spec.
+
+## Addendum 1 (2026-10-26 21:30, prereg A5; diagnostic only, never gating)
+WP-B2 is merged (master `bbe2a24`, kind `swap_successors` in `looplora.data.relations.counterfactual`); merge
+`master` into `wp/sym` before the screening evaluation. For every primary and replication run, add
+`swap_successors` (counterfactual seed 4242) on its screening set (`t2_chain_end`, or `t2_typed` for typed
+replication) at L = 1, 4, 8 and keep sample-level files. Report per (condition, variant): the follow rate (share
+of rows predicting the new terminal) on the swapped rows, and the share predicting that same terminal on the
+matching unswapped row, both by original hop and by whether the new `q_hop_true` ≤ L. Never enters a gate.
