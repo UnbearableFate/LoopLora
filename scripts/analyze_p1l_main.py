@@ -9,22 +9,24 @@ import math
 from pathlib import Path
 import statistics
 
-from run_p1l_main import LABELS, ROOT, digest, save
+from run_p1l_main import LABELS, ROOT, digest, labels_for_rank, save
 
 
 def read(path: Path):
     return json.loads(path.read_text())
 
 
-def timings(root: Path) -> list[dict]:
+def timings(root: Path, rank: int = 32) -> list[dict]:
     rows = []
-    for label in LABELS:
+    for label in labels_for_rank(rank):
         directory = root / f"{label}-s17"
         if not directory.is_dir():
             parent = "smoke-context" if label in {"B1", "B2"} else "smoke-oracle"
             directory = root / parent / f"{label}-s17"
         record = read(directory / "record.json")
         cfg = record["config"]
+        if cfg["model"]["r"] != rank:
+            raise ValueError("timing configuration has the wrong rank")
         if record["status"] != "complete" or not cfg["smoke"]:
             raise ValueError(f"incomplete/non-smoke run: {directory}")
         if cfg["eval"]["splits"] != ["val"] or cfg["eval"]["allow_confirmation"]:
@@ -47,26 +49,26 @@ def timings(root: Path) -> list[dict]:
 
 
 def size(args) -> None:
-    rows = timings(args.root)
+    rows = timings(args.root, args.rank)
     # Two-hour job /1.5 margin, including a bounded load/export reserve.
     longest = max(row["step_seconds"] for row in rows)
     reserve = 60. + max(row["overhead_seconds"] for row in rows)
     job_cap = math.floor((7200 / 1.5 - reserve) / longest)
     # Amendment B2 restores per-job sizing; the former total cap is descriptive.
     # Sequential backbone reuse is the measured packing, with no GPU contention.
-    overhead = 5 * sum(row["overhead_seconds"] for row in rows) + 35 * 15.
+    overhead = 5 * sum(row["overhead_seconds"] for row in rows) + len(rows) * 5 * 15.
     step_sum = sum(row["step_seconds"] for row in rows)
-    budget_cap = math.floor((13 * 3600 - overhead) / ((3 + 2 / 3) * step_sum))
-    S = 17000  # B2 explicitly fixes S from the timing-only preflight.
+    S = 17000 if args.rank == 32 else min(17000, job_cap // 500 * 500)
     if S > job_cap:
         raise ValueError("smoke timing no longer supports preregistered S17000 under2h/1.5")
     if S < 30:
         raise ValueError("no feasible training budget")
     predicted = ((3 * S + 2 * (S // 3)) * step_sum + overhead) / 3600
-    result = dict(status="sized", S=S, pilot_steps=S // 3, smoke_steps=math.ceil(S / 10),
+    result = dict(status="sized", rank=args.rank, S=S, pilot_steps=S // 3,
+                  reduced_steps_flag=S != 17000, smoke_steps=math.ceil(S / 10),
                   longest_step_seconds=longest, reserve_seconds=reserve,
                   main_plus_pilot_node_hours=predicted,
-                  job_cap_steps=job_cap, budget_cap_steps=budget_cap,
+                  job_cap_steps=job_cap,
                   packing="one GPU process; runs sequentially reuse backbone, prefetch2 per active run",
                   overhead_seconds=overhead,
                   budget_rule="B2: no total cap; record every job's node-hours",
@@ -80,7 +82,7 @@ def size(args) -> None:
 def select(args) -> None:
     sizing = read(args.sizing)
     selections, lrs = [], {}
-    for label in LABELS:
+    for label in labels_for_rank(args.rank):
         candidates = []
         for rate in (.001, .003):
             directory = args.root / label / f"{label}-lr{rate:g}"
@@ -88,6 +90,7 @@ def select(args) -> None:
             cfg = record["config"]
             if (record["status"] != "complete" or cfg["seed"] != 17
                     or cfg["train"]["steps"] != sizing["pilot_steps"]
+                    or cfg["model"]["r"] != args.rank
                     or cfg["eval"]["splits"] != ["val"]
                     or cfg["eval"]["hops"] != [1, 2, 3]):
                 raise ValueError(f"pilot contract mismatch: {directory}")
@@ -104,7 +107,7 @@ def select(args) -> None:
         winner = max(candidates, key=lambda row: (row["accuracy"], -row["lr"]))
         lrs[label] = winner["lr"]
         selections.append(dict(label=label, selected_lr=winner["lr"], candidates=candidates))
-    result = dict(status="locked", S=sizing["S"], lrs=lrs, selection=selections,
+    result = dict(status="locked", rank=args.rank, S=sizing["S"], lrs=lrs, selection=selections,
                   rule="val full-vocabulary EM, pooled hops1/2/3 at trained L; ties lower lr",
                   sizing_hash=digest(args.sizing), time=datetime.now(timezone.utc).isoformat())
     result["packing"] = sizing["packing"]
@@ -119,6 +122,7 @@ def main() -> None:
     parser.add_argument("--root", type=Path, required=True)
     parser.add_argument("--out", type=Path, required=True)
     parser.add_argument("--sizing", type=Path)
+    parser.add_argument("--rank", type=int, choices=(32, 128), default=32)
     args = parser.parse_args()
     from audit_p4s_stopping import require_compute
     require_compute()

@@ -11,7 +11,8 @@ rule. Both remain fixed fp32 buffers. B0/B1/B2 are reused from r32, not retraine
 
 First a short training-only timing preflight of all5 variants. S17000 if the
 slowest measured run x1.5 fits2hours; otherwise largest feasible S rounded
-down to500, flagged for cross-rank step mismatch. Own Pilot-2 on val, seed17,
+down to500, flagged for cross-rank step mismatch. Then a10% timing-only smoke
+at that provisional S, verifying the real train path and memory. Own Pilot-2 on val, seed17,
 lr.001/.003, floor(S/3) steps; select full-vocabulary EM on hops1/2/3 at trained
 depth, ties lower lr. Commit its lrs/S before15 main runs. Pack sequential runs
 only when their measured summed time x1.5 fits2hours. Record every node-hour.

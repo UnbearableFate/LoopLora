@@ -13,7 +13,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
 from readout_p1l import (name_gradients, normalize_directions, path_entities,
                          read_batch, reader_states)
 import evaluate_p1l_main as evaluator
-from run_p1l_main import LABELS, config
+from run_p1l_main import LABELS, config, labels_for_rank
 from looplora.core.adapters import make_adapter
 from looplora.core.config import AdapterConfig
 from looplora.data.relations import generate
@@ -24,10 +24,12 @@ from looplora.llm.inject import configure_numerics, load_tokenizer
 from looplora.llm.train import LLMExperiment, make_task_spec
 
 
-def test_registered_runs_resolve_and_confirmation_is_held():
-    for label in (*LABELS, "B0"):
+@pytest.mark.parametrize("rank", [32, 128])
+def test_registered_runs_resolve_and_confirmation_is_held(rank):
+    for label in (*labels_for_rank(rank), *(("B0",) if rank == 32 else ())):
         for seed in ((17,) if label == "B0" else (17, 29, 43)):
-            cfg = resolve_config(config(label, seed))
+            cfg = resolve_config(config(label, seed, rank))
+            assert cfg["model"]["r"] == rank
             assert cfg["eval"]["splits"] == ["val"]
             assert not cfg["eval"]["allow_confirmation"]
             assert cfg["train"]["batch_size"] == 64 and cfg["task"]["E"] == 12

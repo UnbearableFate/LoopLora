@@ -9,7 +9,7 @@ import math
 from pathlib import Path
 import subprocess
 
-from run_p1l_main import LABELS, ROOT, SEEDS, save
+from run_p1l_main import LABELS, ROOT, SEEDS, labels_for_rank, save
 
 
 def walltime(expected: float) -> str:
@@ -40,26 +40,36 @@ def submit(name: str, source: str, expected: float, argv: list[str]) -> dict:
 def launch(args):
     source = subprocess.check_output(["git", "-C", str(ROOT), "rev-parse", "HEAD"], text=True).strip()
     sizing = json.loads(args.sizing.read_text())
+    if sizing.get("rank", 32) != args.rank:
+        raise ValueError("sizing rank differs from the requested condition")
     times = {row["label"]: row["step_seconds"] for row in sizing["timing_rows"]}
     overhead = {row["label"]: row["overhead_seconds"] for row in sizing["timing_rows"]}
     args.root.mkdir(parents=True, exist_ok=True)
     receipt_path = args.root / f"{args.stage}-jobs.json"
     state = json.loads(receipt_path.read_text()) if receipt_path.exists() else dict(stage=args.stage, jobs={})
     if args.stage == "pilot":
-        groups = [(label, [label], 17) for label in LABELS]
+        groups = [(label, [label], 17) for label in labels_for_rank(args.rank)]
     else:
-        lock_path = ROOT / "reports/p1l/lr-S-lock.json"
+        relative_lock = "reports/p1l/lr-S-lock.json" if args.rank == 32 else "reports/p1l/r128/lr-S-lock.json"
+        lock_path = ROOT / relative_lock
         lock = json.loads(lock_path.read_text())
-        committed = subprocess.check_output(["git", "-C", str(ROOT), "show", f"{source}:reports/p1l/lr-S-lock.json"], text=True)
-        if json.loads(committed) != lock or lock["S"] != 17000:
+        committed = subprocess.check_output(["git", "-C", str(ROOT), "show", f"{source}:{relative_lock}"], text=True)
+        if json.loads(committed) != lock or lock["S"] != sizing["S"]:
             raise ValueError("main requires the committed final S/lr lock")
         groups = []
         for seed in SEEDS:
-            for tag, labels in (("B8", ["B8"]), ("M1", ["M1-L4"]),
-                    ("B5", ["B5-L4"]), ("B4-B3", ["B4", "B3-L4"]),
-                    ("B1", ["B1"]), ("B2", ["B2"])):
+            candidates = [("B8", ["B8"]), ("M1", ["M1-L4"]),
+                          ("B5", ["B5-L4"]), ("B4-B3", ["B4", "B3-L4"])]
+            if args.rank == 32:
+                candidates.extend([("B1", ["B1"]), ("B2", ["B2"])])
+            for tag, labels in candidates:
+                expected = sum(lock["S"] * times[label] + overhead[label] for label in labels) + 30.
+                if tag == "B4-B3" and math.ceil(expected * 1.5 / 300) * 300 > 7200:
+                    groups.extend((f"{label}-s{seed}", [label], seed) for label in labels)
+                    continue
                 groups.append((f"{tag}-s{seed}", labels, seed))
-        groups.append(("B0-s17", ["B0"], 17))
+        if args.rank == 32:
+            groups.append(("B0-s17", ["B0"], 17))
     runs = {}
     for tag, labels, seed in groups:
         out = args.root / args.stage / tag
@@ -74,18 +84,19 @@ def launch(args):
             expected = 2 * steps * sum(times[label] for label in labels)
             expected += 2 * sum(overhead[label] for label in labels) + 210.
         else:
-            steps = 17000
+            steps = lock["S"]
             expected = sum(steps * times[label] + overhead[label] for label in labels if label != "B0") + 30.
         argv = ["scripts/run_p1l_main.py", args.stage, "--out", str(out),
-                "--seed", str(seed), "--labels", *labels]
+                "--seed", str(seed), "--rank", str(args.rank), "--labels", *labels]
         if args.stage == "pilot":
             argv += ["--steps", str(steps)]
-        receipt = submit(f"p1l-{args.stage[0]}-{tag}", source, expected, argv)
+        prefix = "p1l" if args.rank == 32 else "p1l-r128"
+        receipt = submit(f"{prefix}-{args.stage[0]}-{tag}", source, expected, argv)
         state["jobs"][tag] = receipt
         state["source"] = source
         save(receipt_path, state)
     if args.stage == "main":
-        save(args.root / "training-manifest.json", dict(S=lock["S"], lrs=lock["lrs"], runs=runs,
+        save(args.root / "training-manifest.json", dict(rank=args.rank, S=lock["S"], lrs=lock["lrs"], runs=runs,
             lock_commit=source, lock_file_hash=__import__("hashlib").blake2b(lock_path.read_bytes(), digest_size=16).hexdigest()))
 
 
@@ -94,6 +105,7 @@ def main():
     parser.add_argument("stage", choices=("pilot", "main"))
     parser.add_argument("--root", type=Path, required=True)
     parser.add_argument("--sizing", type=Path, required=True)
+    parser.add_argument("--rank", type=int, choices=(32, 128), default=32)
     args = parser.parse_args()
     launch(args)
 
