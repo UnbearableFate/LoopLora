@@ -1,6 +1,6 @@
 # P1-L pre-registration — single module in Qwen3-0.6B-Base (draft v2, 2026-10-27)
 
-Status: **draft v2** (2026-10-27 03:50 JST). Written after P2-S-F1 (`reports/decisions/P2S.md` §6) and before
+Status: **draft v2** (2026-10-27 03:19 JST). Written after P2-S-F1 (`reports/decisions/P2S.md` §6) and before
 any P1-L T2 run; no T2 result exists. Finalised (v2 final) only if WP-L3 / WP-L4 select a writer, by filling
 the ⟨writer⟩ fields from their registered rules, before Pilot-2. If neither selects a writer, P1-L stops and this
 draft is not used.

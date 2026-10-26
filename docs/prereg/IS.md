@@ -1,6 +1,6 @@
 # Study IS — memory load × read depth (symbolic), pre-registered
 
-Registered 2026-10-27 03:40 JST, before any run or evaluation below. Known then: P1-S, F1, F2, P2-S and
+Registered 2026-10-27 03:17 JST, before any run or evaluation below. Known then: P1-S, F1, F2, P2-S and
 P2-S-F1 results (`docs/paper/evidence_symbolic.md`); no load other than the trained one (E = 12, chains (8, 4))
 and the P1-S oracle replication (E = 18, chains (8, 8, 2)) has been evaluated.
 
