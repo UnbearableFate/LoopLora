@@ -36,12 +36,29 @@ def audit(suite_path: Path, root: Path, reports: Path) -> dict:
         record = json.loads((output / "record.json").read_text())
         if record["status"] != "complete" or suite["runs"][name]["status"] != "complete":
             raise AssertionError(f"incomplete run: {name}")
+        expected_config = dict(config)
+        # Suite workers address the one visible GPU as cuda:0.
+        if expected_config["device"].startswith("cuda"):
+            expected_config["device"] = "cuda:0"
+        saved_config = json.loads((output / "config.json").read_text())["config"]
+        if saved_config != expected_config:
+            raise AssertionError(f"saved configuration differs from requested suite: {name}")
         samples = load_samples(output / "samples.npz")
         metrics = json.loads((output / "metrics.json").read_text())
         if not config["smoke"] or set(samples["split"]) != {"val"}:
             raise AssertionError(f"non-smoke data in {name}")
         if aggregate_samples(samples) != metrics["table"]:
             raise AssertionError(f"sample/metric mismatch: {name}")
+        conditions = ["original"] + (["replace_key_fact", "swap_memory"]
+                                     if config["eval"]["counterfactuals"] else [])
+        expected_cells = {(f"{protocol}/{condition}", hop, depth)
+                          for protocol in config["eval"]["protocols"] for condition in conditions
+                          for hop in config["eval"]["hops"] for depth in config["eval"]["depths"]}
+        observed_cells = {(row["condition"], row["hop"], row["L"]) for row in metrics["table"]}
+        if observed_cells != expected_cells or any(
+            row["n"] != config["eval"]["episodes"] for row in metrics["table"]
+        ):
+            raise AssertionError(f"evaluation coverage differs from requested suite: {name}")
         if not np.array_equal(samples["correct"], samples["prediction"] == samples["answer"]):
             raise AssertionError(f"primary metric is not full-vocabulary EM: {name}")
         hashes = {}
