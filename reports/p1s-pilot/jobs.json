@@ -1,0 +1,258 @@
+{
+  "jobs": [
+    {
+      "job_id": "3711784.opbs",
+      "stage": "amendment tests and Pilot1 planning",
+      "nodes": 1,
+      "requested_seconds": 300,
+      "elapsed_seconds": 36,
+      "node_hours": 0.01,
+      "exit_code": 0,
+      "source": "worktree at e94ff2b implementation",
+      "log": "/work/xg24i002/x10041/LoopLora/logs/pbs/t-sym-d2-20261026-194101-1596542.log",
+      "host": "mg0852"
+    },
+    {
+      "job_id": "3711859.opbs",
+      "stage": "pilot1/shard-00",
+      "nodes": 1,
+      "requested_seconds": 2700,
+      "elapsed_seconds": 1986,
+      "node_hours": 0.5516666666666666,
+      "exit_code": 0,
+      "source": "e94ff2bcffce28d65bf08ca73d3249735d7fc379",
+      "log": "/work/xg24i002/x10041/LoopLora/logs/pbs/p1s-p1-00-20261026-194613-1624876.log",
+      "host": "mg0191"
+    },
+    {
+      "job_id": "3711860.opbs",
+      "stage": "pilot1/shard-01",
+      "nodes": 1,
+      "requested_seconds": 2700,
+      "elapsed_seconds": 1982,
+      "node_hours": 0.5505555555555556,
+      "exit_code": 0,
+      "source": "e94ff2bcffce28d65bf08ca73d3249735d7fc379",
+      "log": "/work/xg24i002/x10041/LoopLora/logs/pbs/p1s-p1-01-20261026-194614-1624976.log",
+      "host": "mg0660"
+    },
+    {
+      "job_id": "3711861.opbs",
+      "stage": "pilot1/shard-02",
+      "nodes": 1,
+      "requested_seconds": 2700,
+      "elapsed_seconds": 1989,
+      "node_hours": 0.5525,
+      "exit_code": 0,
+      "source": "e94ff2bcffce28d65bf08ca73d3249735d7fc379",
+      "log": "/work/xg24i002/x10041/LoopLora/logs/pbs/p1s-p1-02-20261026-194615-1625055.log",
+      "host": "mg0661"
+    },
+    {
+      "job_id": "3711957.opbs",
+      "stage": "A1 B5-lin/confidence tests",
+      "nodes": 1,
+      "requested_seconds": 300,
+      "elapsed_seconds": 36,
+      "node_hours": 0.01,
+      "exit_code": 0,
+      "source": "worktree at A1 implementation",
+      "log": "/work/xg24i002/x10041/LoopLora/logs/pbs/t-sym-d2-a1-20261026-195644-1676672.log",
+      "host": "mg0921"
+    },
+    {
+      "job_id": "3712017.opbs",
+      "stage": "stage-specific plan regression tests",
+      "nodes": 1,
+      "requested_seconds": 180,
+      "elapsed_seconds": 8,
+      "node_hours": 0.0022222222222222222,
+      "exit_code": 0,
+      "source": "7ffe2356077f76f5e676480be1453f671135b4f5",
+      "log": "/work/xg24i002/x10041/LoopLora/logs/pbs/t-sym-pilot-plan-20261026-200800-1747135.log",
+      "host": "mg0268"
+    },
+    {
+      "job_id": "3712100.opbs",
+      "stage": "Pilot1 tables, writer diagnosis, Pilot2 planning",
+      "nodes": 1,
+      "requested_seconds": 300,
+      "elapsed_seconds": 15,
+      "node_hours": 0.004166666666666667,
+      "exit_code": 0,
+      "source": "0ac181310fb567d246a7f170ae47e9f6503eaa4d",
+      "log": "/work/xg24i002/x10041/LoopLora/logs/pbs/p1s-p1-report-20261026-202234-1816981.log",
+      "host": "mg0755"
+    },
+    {
+      "job_id": "3712115.opbs",
+      "stage": "pilot2/shard-00",
+      "nodes": 1,
+      "requested_seconds": 2700,
+      "elapsed_seconds": 1194,
+      "node_hours": 0.33166666666666667,
+      "exit_code": 0,
+      "source": "0ac181310fb567d246a7f170ae47e9f6503eaa4d",
+      "log": "/work/xg24i002/x10041/LoopLora/logs/pbs/p1s-p2-00-20261026-202459-1827904.log",
+      "host": "mg0755"
+    },
+    {
+      "job_id": "3712116.opbs",
+      "stage": "pilot2/shard-01",
+      "nodes": 1,
+      "requested_seconds": 2700,
+      "elapsed_seconds": 1191,
+      "node_hours": 0.3308333333333333,
+      "exit_code": 0,
+      "source": "0ac181310fb567d246a7f170ae47e9f6503eaa4d",
+      "log": "/work/xg24i002/x10041/LoopLora/logs/pbs/p1s-p2-01-20261026-202500-1828057.log",
+      "host": "mg0757"
+    },
+    {
+      "job_id": "3712117.opbs",
+      "stage": "pilot2/shard-02",
+      "nodes": 1,
+      "requested_seconds": 2700,
+      "elapsed_seconds": 1192,
+      "node_hours": 0.33111111111111113,
+      "exit_code": 0,
+      "source": "0ac181310fb567d246a7f170ae47e9f6503eaa4d",
+      "log": "/work/xg24i002/x10041/LoopLora/logs/pbs/p1s-p2-02-20261026-202501-1828105.log",
+      "host": "mg0758"
+    },
+    {
+      "job_id": "3712118.opbs",
+      "stage": "pilot2/shard-03",
+      "nodes": 1,
+      "requested_seconds": 2700,
+      "elapsed_seconds": 1224,
+      "node_hours": 0.34,
+      "exit_code": 0,
+      "source": "0ac181310fb567d246a7f170ae47e9f6503eaa4d",
+      "log": "/work/xg24i002/x10041/LoopLora/logs/pbs/p1s-p2-03-20261026-202502-1828290.log",
+      "host": "mg0759"
+    },
+    {
+      "job_id": "3712119.opbs",
+      "stage": "pilot2/shard-04",
+      "nodes": 1,
+      "requested_seconds": 2700,
+      "elapsed_seconds": 1223,
+      "node_hours": 0.3397222222222222,
+      "exit_code": 0,
+      "source": "0ac181310fb567d246a7f170ae47e9f6503eaa4d",
+      "log": "/work/xg24i002/x10041/LoopLora/logs/pbs/p1s-p2-04-20261026-202504-1828394.log",
+      "host": "mg0760"
+    },
+    {
+      "job_id": "3712120.opbs",
+      "stage": "pilot2/shard-05",
+      "nodes": 1,
+      "requested_seconds": 2700,
+      "elapsed_seconds": 1226,
+      "node_hours": 0.34055555555555556,
+      "exit_code": 0,
+      "source": "0ac181310fb567d246a7f170ae47e9f6503eaa4d",
+      "log": "/work/xg24i002/x10041/LoopLora/logs/pbs/p1s-p2-05-20261026-202505-1828482.log",
+      "host": "mg0763"
+    },
+    {
+      "job_id": "3712318.opbs",
+      "stage": "Pilot2 audit, LR selection, replication planning, 2000-episode timing",
+      "nodes": 1,
+      "requested_seconds": 300,
+      "elapsed_seconds": 34,
+      "node_hours": 0.009444444444444445,
+      "exit_code": 0,
+      "source": "3769148a4e1a59f47f5c5e12b49916112b35c4a9",
+      "log": "/work/xg24i002/x10041/LoopLora/logs/pbs/p1s-p2-audit-20261026-205249-1985185.log",
+      "host": "mg0919"
+    },
+    {
+      "job_id": "3712328.opbs",
+      "stage": "replication/shard-00",
+      "nodes": 1,
+      "requested_seconds": 900,
+      "elapsed_seconds": 317,
+      "node_hours": 0.08805555555555555,
+      "exit_code": 0,
+      "source": "3769148a4e1a59f47f5c5e12b49916112b35c4a9",
+      "log": "/work/xg24i002/x10041/LoopLora/logs/pbs/p1s-rep-00-20261026-205504-2049227.log",
+      "host": "mg0712"
+    },
+    {
+      "job_id": "3712329.opbs",
+      "stage": "replication/shard-01",
+      "nodes": 1,
+      "requested_seconds": 900,
+      "elapsed_seconds": 292,
+      "node_hours": 0.0811111111111111,
+      "exit_code": 0,
+      "source": "3769148a4e1a59f47f5c5e12b49916112b35c4a9",
+      "log": "/work/xg24i002/x10041/LoopLora/logs/pbs/p1s-rep-01-20261026-205505-2049343.log",
+      "host": "mg0714"
+    },
+    {
+      "job_id": "3712330.opbs",
+      "stage": "replication/shard-02",
+      "nodes": 1,
+      "requested_seconds": 900,
+      "elapsed_seconds": 310,
+      "node_hours": 0.08611111111111111,
+      "exit_code": 0,
+      "source": "3769148a4e1a59f47f5c5e12b49916112b35c4a9",
+      "log": "/work/xg24i002/x10041/LoopLora/logs/pbs/p1s-rep-02-20261026-205506-2049500.log",
+      "host": "mg0191"
+    },
+    {
+      "job_id": "3712357.opbs",
+      "stage": "Replication tables, all-run audit, registry",
+      "nodes": 1,
+      "requested_seconds": 300,
+      "elapsed_seconds": 23,
+      "node_hours": 0.006388888888888889,
+      "exit_code": 0,
+      "source": "3769148a4e1a59f47f5c5e12b49916112b35c4a9",
+      "log": "/work/xg24i002/x10041/LoopLora/logs/pbs/p1s-final-audit-20261026-210250-2105623.log",
+      "host": "mg0904"
+    }
+  ],
+  "prior_wp_d_node_seconds": 269,
+  "prior_wp_d_job_ids": [
+    "3711498",
+    "3711517",
+    "3711546",
+    "3711572"
+  ],
+  "budget_node_hours": 12,
+  "elapsed_seconds_source": "Miyabi qstat -ll -H (qstat_json.py); node-hours = allocated nodes * elapsed seconds / 3600",
+  "wp_d2_node_hours": 3.966111111111111,
+  "including_prior_wp_d_node_hours": 4.0408333333333335,
+  "remaining_node_hours": 7.9591666666666665,
+  "prior_wp_d_jobs": [
+    {
+      "job_id": "3711498",
+      "elapsed_seconds": 30,
+      "nodes": 1,
+      "node_hours": 0.008333333333333333
+    },
+    {
+      "job_id": "3711517",
+      "elapsed_seconds": 23,
+      "nodes": 1,
+      "node_hours": 0.006388888888888889
+    },
+    {
+      "job_id": "3711546",
+      "elapsed_seconds": 22,
+      "nodes": 1,
+      "node_hours": 0.006111111111111111
+    },
+    {
+      "job_id": "3711572",
+      "elapsed_seconds": 194,
+      "nodes": 1,
+      "node_hours": 0.05388888888888889
+    }
+  ]
+}
