@@ -52,6 +52,8 @@ def audit(root: Path,out: Path,jobs: Path | None):
             cfg = rec['config']
             assert rec['status']=='complete' and rec['source_dirty'] is False
             assert rec['diagnostic']==kind and cfg['seed']==17 and cfg['stage']=='writer'
+            expected_site = 'residual' if kind=='D4' else 'o_proj'
+            assert rec['input_site']==expected_site and cfg['model'].get('input_site','o_proj')==expected_site
             assert cfg['variant']=='M1' and cfg['protocol']=='memory_only' and cfg['write_policy']=='fact_final'
             assert cfg['model']['r']==32 and cfg['model']['layer']==14
             assert cfg['task']['E']==16 and cfg['task']['n_rel']==4 and cfg['task']['head_sharing']==.3
@@ -117,6 +119,11 @@ def audit(root: Path,out: Path,jobs: Path | None):
         D2_best_em=max(r['em'] for r in rows if r['diagnostic']=='D2' and r['step']!='B0'),
         D3_best_em=max(r['em'] for r in rows if r['diagnostic']=='D3'),
         D4_ran=any(r['diagnostic']=='D4' for r in rows),run_records=run_records)
+    result['D4_oracle_budget_trigger'] = result['D2_best_em']>=.95 and result['D3_best_em']<.95
+    if result['D4_oracle_budget_trigger']:
+        assert result['D4_ran'],'D2 passed while D3 failed: required D4 is missing'
+    if result['D4_ran']:
+        result['D4_best_em']=max(r['em'] for r in rows if r['diagnostic']=='D4')
     if jobs is not None:
         job_rows = json.loads(jobs.read_text())
         assert len({r['job_id'] for r in job_rows})==len(job_rows)
