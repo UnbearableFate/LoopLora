@@ -1,0 +1,14 @@
+{
+  "status": "diagnostic_reference_only",
+  "input_site": "o_proj",
+  "layer": 14,
+  "rank": 32,
+  "steps": 1500,
+  "batch_size": 32,
+  "lr": 0.0003,
+  "write_policy": "fact_final",
+  "seed": 17,
+  "feasible_for_T2": false,
+  "reason": "Retain the preregistered Pilot-1 reference: neither 6400 steps nor residual input improved writer EM beyond the existing 0.5pp tie band. No tested writer is feasible.",
+  "next_diagnosis": "Learned task-conditioned key/query alignment and shared-A interference; direct key similarity is suggestive, not proof of a unique causal failure."
+}
