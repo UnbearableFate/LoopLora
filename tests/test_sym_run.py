@@ -62,7 +62,7 @@ def test_invalid_experiment_configs_fail_before_execution(updates):
 def test_smoke_matrix_has_all_variants_and_one_shared_writer(tmp_path):
     defaults = load_config(ROOT / "configs/p1s/default.yaml")
     jobs = run.load_suite(ROOT / "configs/p1s/smoke.yaml", tmp_path)
-    assert len(jobs) == 22
+    assert len(jobs) == 24
     for task in ("t1", "t2_chain_end"):
         main = [job for job in jobs if job["config"]["task"]["name"] == task
                 and job["config"]["writer"] != "t1_frozen"]
@@ -74,6 +74,23 @@ def test_smoke_matrix_has_all_variants_and_one_shared_writer(tmp_path):
     assert len(consumers) == 5
     assert {job["config"]["pretrain"]["writer_checkpoint"] for job in consumers} == {
         str(tmp_path / "t1-shared-writer/writer.pt")}
+    for task in ("t1", "t2"):
+        fixed = next(job for job in jobs if job["name"] == f"{task}-M1-L4")
+        assert fixed["config"]["train"]["depths"] == [4]
+
+
+@pytest.mark.parametrize("device", ["cuda", "cuda:0"])
+def test_cuda_runner_initializes_device_in_fresh_process(tmp_path, device):
+    assert torch.cuda.is_available(), "runner acceptance needs the allocated GPU"
+    config = small_config(device=device)
+    path = tmp_path / "cuda.json"
+    path.write_text(json.dumps(config))
+    result = subprocess.run([sys.executable, "-m", "looplora.sym.run", "--config", str(path),
+                             "--out", str(tmp_path / "run")], capture_output=True, text=True)
+    assert result.returncode == 0, result.stdout + result.stderr
+    record = json.loads((tmp_path / "run" / "record.json").read_text())
+    assert record["status"] == "complete"
+    assert record["peak_memory_bytes"] > 0
 
 
 def _suite(tmp_path, entries):

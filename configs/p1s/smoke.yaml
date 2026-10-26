@@ -48,6 +48,16 @@
 - name: t2-B8
   config: smoke_base.yaml
   overrides: {variant: B8}
+# Fixed-L=4 starts complement the fixed-L=1 B4 smoke; main readers remain mixed.
+- name: t1-M1-L4
+  config: smoke_base.yaml
+  overrides:
+    variant: M1
+    task: {name: t1, chain_lengths: null, hops: [1]}
+    train: {depths: [4]}
+- name: t2-M1-L4
+  config: smoke_base.yaml
+  overrides: {variant: M1, train: {depths: [4]}}
 # The five learned readers below depend on one exact pretrained writer artifact.
 - name: t1-shared-writer
   config: smoke_base.yaml

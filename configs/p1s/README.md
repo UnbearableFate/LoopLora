@@ -1,7 +1,8 @@
 Symbolic mechanism configurations use `config.resolve_config` defaults. `default.yaml`
 records the 3000-step main configuration; it is preparation only, not authorization
-for a pilot or screening run. `smoke.yaml` contains 22 runs: both T1 and T2 for all
-eight variants, plus one shared T1 writer and five readers using that exact artifact.
+for a pilot or screening run. `smoke.yaml` contains 24 runs: both T1 and T2 for all
+eight variants, two fixed-L=4 M1 smokes, plus one shared T1 writer and five readers
+using that exact artifact. B4 also supplies the fixed-L=1 iterative-reader smoke.
 Every training/pretraining stage is 300 steps, one seed (17), with 32 evaluation
 episodes per split/hop; training and pretraining keep the default batch size 32.
 The 10% ratio applies to train/pretrain steps. T1 evaluates only hop 1. B4/B6/B7 fix L=1; B8 fixes L=4.

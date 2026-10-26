@@ -6,6 +6,7 @@ import hashlib
 import json
 import os
 import re
+import socket
 import subprocess
 import sys
 import time
@@ -119,7 +120,16 @@ def run_one(config: dict[str, Any], out: str | Path) -> dict[str, Any]:
 
         device = torch.device(config["device"])
         if device.type == "cuda":
+            torch.cuda.init()
+            if device.index is not None:
+                torch.cuda.set_device(device)
             torch.cuda.reset_peak_memory_stats(device)
+        record["runtime"] = {
+            "python": sys.version.split()[0], "torch": torch.__version__,
+            "host": socket.gethostname(), "job_id": os.environ.get("PBS_JOBID"),
+            "device": str(device), "dtype": "float32", "threads": torch.get_num_threads(),
+            "gpu": torch.cuda.get_device_name(device) if device.type == "cuda" else None,
+        }
         model, summary = train(config, out)
         metrics, timing = evaluate(model, config, out)
         with np.load(out / "samples.npz", allow_pickle=False) as archive:
@@ -131,6 +141,12 @@ def run_one(config: dict[str, Any], out: str | Path) -> dict[str, Any]:
         timing.update({key: summary[key] for key in
                        ("train_seconds", "train_step_seconds", "pretrain_seconds") if key in summary})
         timing["total_seconds"] = time.perf_counter() - started
+        timing["measurement"] = {
+            "synchronization": "CUDA synchronize before and after each timed pass" if device.type == "cuda" else "host clock",
+            "writer_scope": "evaluation preparation, including feature projection and codebooks",
+            "reader_scope": "core read, branch, vocabulary logits, and first-read diagnostic",
+            "train_step_scope": "episode generation, forward, backward, clipping, AdamW; no warmup steps excluded",
+        }
         _write_json(out / "timing.json", timing)
         parameters = list(model.parameters())
         record.update({
