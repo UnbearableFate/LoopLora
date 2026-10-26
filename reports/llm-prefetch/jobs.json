@@ -1,0 +1,44 @@
+{
+  "task": "WP-B4",
+  "system": "Miyabi-G",
+  "submission": "scripts/submit.py",
+  "cap_node_seconds": 1800,
+  "total_node_seconds": 1569,
+  "total_node_hours": 0.43583333333333335,
+  "accounting": "qstat history elapsed_seconds times nodes; includes PBS setup and cleanup, excludes queue wait",
+  "jobs": [
+    {
+      "job_id": "3714692.opbs",
+      "role": "95 exactness and regression tests",
+      "host": "mg0028",
+      "source_commit": "e55f1341f420f89f4971c0559950ae830f25ae84",
+      "nodes": 1,
+      "walltime_limit_seconds": 240,
+      "elapsed_seconds": 191,
+      "exit_code": 0,
+      "log": "/work/xg24i002/x10041/LoopLora/logs/pbs/t-wpb4-20261027-004302-3729935.log"
+    },
+    {
+      "job_id": "3714701.opbs",
+      "role": "eight-cell smoke and full-sweep cost estimate",
+      "host": "mg0021",
+      "source_commit": "65c2ccb612d9d35b5d1245583590c4d4196bccda",
+      "nodes": 1,
+      "walltime_limit_seconds": 300,
+      "elapsed_seconds": 141,
+      "exit_code": 0,
+      "log": "/work/xg24i002/x10041/LoopLora/logs/pbs/smoke-wpb4-20261027-004513-3740690.log"
+    },
+    {
+      "job_id": "3714713.opbs",
+      "role": "48-cell full benchmark, 1440 measured worker steps",
+      "host": "mg0005",
+      "source_commit": "65c2ccb612d9d35b5d1245583590c4d4196bccda",
+      "nodes": 1,
+      "walltime_limit_seconds": 1440,
+      "elapsed_seconds": 1237,
+      "exit_code": 0,
+      "log": "/work/xg24i002/x10041/LoopLora/logs/pbs/bench-wpb4-20261027-004820-3757351.log"
+    }
+  ]
+}
