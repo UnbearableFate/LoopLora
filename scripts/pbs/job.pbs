@@ -1,0 +1,74 @@
+#!/bin/bash
+#PBS -W group_list=xg24i002
+#PBS -j oe
+# Generic LoopLora compute job. Submit only through scripts/submit.py, which
+# enforces the per-experiment resource cap and passes:
+#   LL_SPEC  absolute path of a JSON job spec written by submit.py
+# The spec names the source (a git commit snapshot or a working tree), the
+# command (argv list) and the log path. Nothing here changes the scheduler.
+set -eEuo pipefail
+trap 'echo "[ERROR] job.pbs failed at line $LINENO" >&2' ERR
+: "${LL_SPEC:?}"
+
+/usr/bin/python3 -I /home/x10041/.claude/skills/miyabi-pbs-cmd/scripts/context.py \
+  --target-system Miyabi-G --require-compute >/dev/null
+
+export PAGER=cat MODULES_PAGER=cat LMOD_PAGER=cat
+module load nvidia/25.9 nv-hpcx/25.9 cuda/13.2 >/dev/null 2>&1
+GCC14=/opt/rh/gcc-toolset-14/root/usr
+export CC="$GCC14/bin/gcc" CXX="$GCC14/bin/g++"
+export COMPILER_PATH="$GCC14/bin${COMPILER_PATH:+:$COMPILER_PATH}"
+export LD_LIBRARY_PATH="$GCC14/lib64:$GCC14/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
+export LIBRARY_PATH="$GCC14/lib64:$GCC14/lib${LIBRARY_PATH:+:$LIBRARY_PATH}"
+
+REPO=/work/xg24i002/x10041/LoopLora
+PYTHON_BIN="$REPO/.venv/bin/python"
+export PYTHON_BIN
+export HF_HOME=/work/xg24i002/x10041/hf_home HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1
+export OMP_NUM_THREADS="${OMP_NUM_THREADS:-8}" OPENBLAS_NUM_THREADS=1 TOKENIZERS_PARALLELISM=false
+export PYTHONDONTWRITEBYTECODE=1
+
+SCRATCH="/local/$USER/looplora/${PBS_JOBID%%.*}"
+mkdir -p "$SCRATCH"
+trap 'rm -rf "$SCRATCH"' EXIT
+export TORCHINDUCTOR_CACHE_DIR="$SCRATCH/inductor" TRITON_CACHE_DIR="$SCRATCH/triton"
+export LL_SCRATCH="$SCRATCH"
+
+# Resolve the spec (stdlib python, no project imports).
+eval "$(/usr/bin/python3 -I - "$LL_SPEC" <<'PY'
+import json, shlex, sys
+s = json.load(open(sys.argv[1]))
+print("LL_LOG=" + shlex.quote(s["log"]))
+print("LL_SOURCE_KIND=" + shlex.quote(s["source"]["kind"]))
+print("LL_SOURCE_REF=" + shlex.quote(s["source"]["ref"]))
+print("LL_ARGV_JSON=" + shlex.quote(json.dumps(s["argv"])))
+PY
+)"
+mkdir -p "$(dirname "$LL_LOG")"
+exec > >(tee -a "$LL_LOG") 2>&1
+echo "[job] host=$(hostname -s) job=$PBS_JOBID spec=$LL_SPEC start=$(date -Is)"
+
+if [[ "$LL_SOURCE_KIND" == commit ]]; then
+  SRC="$SCRATCH/src"
+  mkdir -p "$SRC"
+  git -C "$REPO" archive "$LL_SOURCE_REF" | tar -x -C "$SRC"
+  echo "[job] source=commit:$LL_SOURCE_REF"
+else
+  SRC="$LL_SOURCE_REF"
+  echo "[job] source=worktree:$SRC (development only)"
+fi
+export LL_SOURCE_ROOT="$SRC" PYTHONPATH="$SRC/src"
+cd "$SRC"
+
+mapfile -d '' -t ARGV < <(/usr/bin/python3 -I -c \
+  'import json,sys; sys.stdout.write("".join(a + "\0" for a in json.loads(sys.argv[1])))' "$LL_ARGV_JSON")
+echo "[job] argv=${ARGV[*]}"
+"$PYTHON_BIN" -c 'import torch; print("[job] torch", torch.__version__, "cuda", torch.cuda.is_available())'
+touch "$LL_LOG.started"
+set +e
+"$PYTHON_BIN" "${ARGV[@]}"
+rc=$?
+set -e
+echo "[job] exit=$rc end=$(date -Is)"
+echo "$rc" > "$LL_LOG.exit"
+exit "$rc"
