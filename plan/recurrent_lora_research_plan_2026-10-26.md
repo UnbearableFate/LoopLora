@@ -59,7 +59,7 @@
 | T-04/T-05 LLM 单模块流水线 | 流水线完成（WP-G，合并 2bf5d6d；`docs/reports/WP-G.md`）：writer/冻结 reader/联合训练、B0/B1/B2 基线、全词表 EM、反事实、确定性 GPU 执行；611 项测试与 14 个 smoke 运行通过；实测 280–550 s/千步（batch 8）。P1-L 预注册草稿 `docs/prereg/P1L.md`，待 P1-S 结论后定稿。Pilot-1（WP-L1，合并 9eb0e10，`docs/reports/P1L-pilot1.md`，1.09 node·h）：layer-14 `o_proj` 单模块、r=32、memory-only 的 T1 writer 在 1500 步×batch 32 内未学会单跳检索（val 全词表 EM ≤ 0.3%，候选准确率约为随机水平，loss 约 200 步后停在 7.3–7.5）；按预注册规则，P1-L 的 T2 运行暂停，先做 writer 诊断（WP-L2：输入位置的信息探针、输出通路 oracle、训练预算、输入位置替代） |
 | §6 理论分析（命题、证明、反例、预测） | 完成（WP-T，`docs/theory.md`，`docs/reports/WP-T.md`）：9 个命题；要点：线性 reader 的精确链终点构造需 ργ>1（ρ=0.25 时 γ>4），不是欧氏收缩；单次读取在对齐首跳读取下 h≥2 的条件上界 1/(N−2)，但无约束 Q 无普适上界；无偏置 ReLU 的 Qφ(Uv) 像位于 r 生成元锥内，不能对正张成全空间的编码做恒等传递（宽度 2r 可以，单独隐藏偏置不行）；双 BA 在 B=0 一阶梯度为零，skip 形式可启动。36 项确定性检查在计算节点通过 |
 | T-08 真实任务处理 | 进行中（WP-B3，`docs/tasks/WP-B3_musique.md`）：MuSiQue-Ans（给定支持段落）划分、指标、`answer_substitution` 反事实与普通能力保留子集；数据准备不消耗训练预算，P3 是否运行仍由门槛决定 |
-| §6 补充：learned writer 的终点集合捷径 | 进行中（WP-T2）：线性 writer 的 value 同时含 head 与 tail 时，单次读取可得 Σ(终点−起点)（望远镜求和），各 hop 约 1/链数；分析分解式 writer（key 仅含 head/关系、value 仅含 tail）与 LLM 中的对应设计 |
+| §6 补充：learned writer 的终点集合捷径 | 完成（WP-T2，合并 0c63cdc，`docs/theory.md` 命题 10）：共享关系分量的 key 使 delta 存储近似为 value 的 EMA；λ≈1、β 小时可近似望远镜求和 Σ(终点−起点)，构造的 r=32 例子与深度无关（实测 β≈0.565 不在该构造的区间内）；理想“猜终点”预测各 hop 平坦的 50%/50%/33.3%（三种布局），swap_successors 配对提升为 0；value 仅含 tail 可去除直接的 head 相减，但不能普遍排除终点推断；A3 能拒绝已列出的通用过滤策略，但 A3 与 swap 均不能识别所有内部算法。LLM 对应设计：key 取 tail 之前的前缀位置，value 取 tail 的原始 token embedding（仅为预测） |
 | T-06、T-09、T-10 | 未开始；按阶段门槛决定。文献核查（T-10 前置）已完成：`docs/reports/lit_check.md` |
 
 ---
