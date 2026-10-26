@@ -30,7 +30,7 @@ the audit, every curve and OAρ's outcome. No further writer screens after WP-L4
 Val only; seed 17; no T2, reader or joint runs. Each job ≤ 1 node × 1 h (≤ 2 h under Amendment A1); WP-L4 total ≤ 8 node·h (A1); record node·h per
 job. Final line: `WP-L4 done: docs/reports/P1L-read-fix.md`.
 
-## Amendment A1 (2026-10-27 03:45 JST, after WP-L3's final report, before any WP-L4 arm was trained or scored)
+## Amendment A1 (2026-10-27 03:39 JST, after WP-L3's final report, before any WP-L4 arm was trained or scored)
 Information seen: WP-L3 final curves (`docs/reports/P1L-writer-fix.md`): OA 33.7 / 55.9 / 65.2 / 70.3% val EM at
 6,580 / 13,160 / 19,740 / 32,900 steps, W5 8.5 → 14.4%, both still rising at the end; WP-L4 smoke timing only.
 Reason: the 8,225-step schedule ends where OA was still below 40%, so an arm that fixes the read could fail the
