@@ -21,7 +21,8 @@ class OracleWriter(nn.Module):
         self.register_buffer("global_codes", codes)
 
     def codes(self, facts: Tensor, valid: Tensor, episode_seed: np.ndarray,
-              include_insufficient: bool = False) -> Tensor:
+              include_insufficient: bool = False,
+              extra_entities: list[list[int]] | None = None) -> Tensor:
         if not self.orthogonal:
             return self.global_codes.unsqueeze(0).expand(facts.shape[0], -1, -1)
         result = []
@@ -30,12 +31,16 @@ class OracleWriter(nn.Module):
             entities = facts[i, valid[i]][:, (0, 2)].unique().cpu()
             if include_insufficient:
                 entities = torch.cat((entities, torch.tensor([self.V], dtype=entities.dtype))).unique()
+            if extra_entities is not None:
+                original = set(entities.tolist())
+                added = sorted(set(extra_entities[i]) - original)
+                entities = torch.cat((entities, torch.tensor(added, dtype=entities.dtype)))
             if entities.numel() > self.r_mem:
                 raise ValueError("oracle_orth requires episode entities <= r_mem")
             generator = torch.Generator().manual_seed(derive_seed(self.seed, "oracle_orth", int(episode)))
-            basis, _ = torch.linalg.qr(torch.randn(self.r_mem, len(entities), generator=generator))
+            basis, _ = torch.linalg.qr(torch.randn(self.r_mem, self.r_mem, generator=generator))
             table = self.global_codes.clone()
-            table[entities.to(table.device)] = basis.T.to(table.device)
+            table[entities.to(table.device)] = basis[:, :len(entities)].T.to(table.device)
             result.append(table)
         return torch.stack(result)
 

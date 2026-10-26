@@ -87,7 +87,22 @@ class SymbolicModel(nn.Module):
                 "V": self.backbone.V, "n_rel": len(self.backbone.relations),
                 "backbone_seed": self.config["backbone_seed"]}
 
-    def prepare(self, arrays: EpisodeArrays) -> PreparedBatch:
+    def orthogonal_codebooks(self, arrays: EpisodeArrays,
+                             replacement: EpisodeArrays | None = None) -> Tensor:
+        """Fix source-episode codebooks for both factual and replacement contexts."""
+        if not isinstance(self.writer, OracleWriter) or not self.writer.orthogonal:
+            raise ValueError("shared episode codebooks require oracle_orth")
+        extras: list[list[int]] = [[] for _ in arrays.episode_seed]
+        if replacement is not None:
+            for i, source in enumerate(replacement.meta["source_episode"]):
+                facts = replacement.facts[i, replacement.fact_valid[i]]
+                extras[int(source)].extend(facts[:, (0, 2)].ravel().tolist())
+        facts = torch.as_tensor(arrays.facts, dtype=torch.long, device=self.device)
+        valid = torch.as_tensor(arrays.fact_valid, dtype=torch.bool, device=self.device)
+        return self.writer.codes(facts, valid, arrays.episode_seed,
+                                 self.config["task"]["name"] == "t3_missing", extras)
+
+    def prepare(self, arrays: EpisodeArrays, *, oracle_codes: Tensor | None = None) -> PreparedBatch:
         facts = torch.as_tensor(arrays.facts, dtype=torch.long, device=self.device)
         valid = torch.as_tensor(arrays.fact_valid, dtype=torch.bool, device=self.device)
         facts = torch.where(valid[..., None], facts, torch.zeros_like(facts))
@@ -108,7 +123,9 @@ class SymbolicModel(nn.Module):
         if insufficient:
             candidate[:, self.backbone.V] = True
         if isinstance(self.writer, OracleWriter):
-            codes = self.writer.codes(facts, valid, arrays.episode_seed, insufficient)
+            codes = self.writer.codes(facts, valid, arrays.episode_seed, insufficient) if oracle_codes is None else oracle_codes
+            if codes.shape != (B, self.backbone.V + 1, self.r_mem) or codes.device != self.device:
+                raise ValueError("oracle codebook shape/device does not match the episode batch")
             memory = self.writer(facts, valid, codes)
             u = codes[rows[:, None], start]
             values = codes[rows[:, None], facts[..., 2]]
