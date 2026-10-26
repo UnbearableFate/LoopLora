@@ -7,10 +7,10 @@ import copy
 from datetime import datetime, timezone
 import hashlib
 import json
-import math
 import os
 from pathlib import Path
 import socket
+import statistics
 import time
 
 
@@ -61,9 +61,14 @@ def fit(cfg: dict, out: Path, model, tokenizer, *, expose_scores: bool) -> dict:
     experiment = None
     try:
         experiment, summary = train(cfg, out, model=model, tokenizer=tokenizer)
+        # Never inspect the timing-smoke loss/accuracy fields.
+        with (out / "train_log.jsonl").open() as stream:
+            durations = [row["step_seconds"] for line in stream
+                         if (row := json.loads(line))["step"] > 5]
         record = dict(status="complete", config=cfg, **runtime(), **source_metadata(),
                       train_seconds=summary["train_seconds"],
                       mean_step_seconds=summary["train_step_seconds"],
+                      steady_step_seconds=statistics.mean(durations) if durations else None,
                       p95_step_seconds=summary.get("train_step_p95_seconds"),
                       peak_memory_bytes=torch.cuda.max_memory_allocated(),
                       checkpoint_hash=digest(out / "checkpoint.pt"),
