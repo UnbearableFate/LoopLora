@@ -1,6 +1,6 @@
 # P1-L pre-registration — single module in Qwen3-0.6B-Base (draft v2, 2026-10-27)
 
-Status: **v2 final for the `oracle_random` condition** (2026-10-27 04:05 JST, after WP-C7 passed its tests,
+Status: **v2 final for the `oracle_random` condition** (2026-10-27 04:03 JST, after WP-C7 passed its tests,
 `docs/reports/WP-C7.md`; drafted 03:19, writer conditions revised 03:43). Written after P2-S-F1
 (`reports/decisions/P2S.md` §6) and WP-L3 (`docs/reports/P1L-writer-fix.md`), before any P1-L T2 run; no T2 result
 exists. The `learned` condition is added by an addendum filled from WP-L4's registered rule before its own
