@@ -13,6 +13,7 @@
       "nodes": 1,
       "mig": null,
       "role": "original tests",
+      "exit_status": 0,
       "node_hours": 0.008888888888888889
     },
     {
@@ -28,6 +29,7 @@
       "nodes": 1,
       "mig": null,
       "role": "pre-tail probes",
+      "exit_status": 0,
       "node_hours": 0.009166666666666667
     },
     {
@@ -43,6 +45,7 @@
       "nodes": 1,
       "mig": null,
       "role": "screen OA/W0",
+      "exit_status": 0,
       "node_hours": 0.4161111111111111
     },
     {
@@ -58,6 +61,7 @@
       "nodes": 1,
       "mig": null,
       "role": "screen W1/W4",
+      "exit_status": 0,
       "node_hours": 0.44083333333333335
     },
     {
@@ -73,6 +77,7 @@
       "nodes": 1,
       "mig": null,
       "role": "screen W2/W3",
+      "exit_status": 0,
       "node_hours": 0.45666666666666667
     },
     {
@@ -88,6 +93,7 @@
       "nodes": 1,
       "mig": null,
       "role": "screen W5",
+      "exit_status": 0,
       "node_hours": 0.2861111111111111
     },
     {
@@ -102,19 +108,45 @@
       "token_estimate": null,
       "nodes": 1,
       "mig": null,
-      "role": "A1 tests/screen audit/equality/timing",
+      "role": "A1 tests/audit/timing",
+      "exit_status": 0,
       "node_hours": 0.08055555555555556
-    }
-  ],
-  "pending": [
+    },
     {
-      "job_id": "3714914.opbs",
-      "role": "A1 OA/W5 rerun",
+      "job_id": "3714914",
+      "job_name": "r-l3-A1",
+      "status": "FINISH",
+      "project": "xg24i002",
+      "queue": "small-g",
+      "start_date": "10/27 01:39:13",
+      "elapsed_seconds": 6550,
+      "token": 1.8,
+      "token_estimate": null,
       "nodes": 1,
-      "requested_seconds": 7200,
-      "source": "0713cfb"
+      "mig": null,
+      "role": "A1 OA/W5 rerun",
+      "exit_status": 0,
+      "node_hours": 1.8194444444444444
+    },
+    {
+      "job_id": "3715599",
+      "job_name": "a-l3-final",
+      "status": "FINISH",
+      "project": "xg24i002",
+      "queue": "small-g",
+      "start_date": "10/27 03:34:07",
+      "elapsed_seconds": 37,
+      "token": 0.0,
+      "token_estimate": null,
+      "nodes": 1,
+      "mig": null,
+      "role": "final sample/export audit",
+      "exit_status": 0,
+      "node_hours": 0.010277777777777778
     }
   ],
-  "completed_node_hours": 1.698333333333333,
-  "max_total_node_hours": 4
+  "total_seconds": 12701,
+  "total_node_hours": 3.5280555555555555,
+  "max_total_node_hours": 4,
+  "all_exit_zero": true
 }

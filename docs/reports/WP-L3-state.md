@@ -62,3 +62,10 @@ Keep A1 job/wake unchanged. Read docs/reports/WP-L4-state.md on continuation.
 When A1 wakes FINISH WP-L3 FIRST (report/commit, exact WP-L3 done line), THEN
 continue WP-L4 if its final decision selects no writer. WP-L4 tests/smoke may
 already be running; do not confuse their separate4nodeh ledger with WP-L3.
+
+COMPLETED: A1 job3714914 mg0705 finished32900steps both arms,6550s,exit0.
+Final W5EM.144, OAEM.703; no writer selected. Final audit3715599 mg0844,37s,
+exit0 reproduced all samples/labels and exact1000-prediction exports for BOTH.
+Total12701s=3.52806/4nodeh. Final report P1L-writer-fix.md committed with full
+31checkpoint table, probes/curves/costs. This negative final decision opens the
+separately authorized WP-L4 gate AFTER emitting the exact WP-L3 done line.
