@@ -56,3 +56,9 @@ spec same stem under logs/pbs/specs/ with.json. Await terminal event and verify
 application status for BOTH rerun arms; FINISH/exit0 alone is insufficient.
 All cost IDs:3714689,3714703,3714716,3714717,3714718,3714719,3714886,3714914,
 plus final audit. jobs.json records the6114s completed before rerun.
+
+User steering while A1 runs: WP-L4 preparation authorized (master4a27457 merged).
+Keep A1 job/wake unchanged. Read docs/reports/WP-L4-state.md on continuation.
+When A1 wakes FINISH WP-L3 FIRST (report/commit, exact WP-L3 done line), THEN
+continue WP-L4 if its final decision selects no writer. WP-L4 tests/smoke may
+already be running; do not confuse their separate4nodeh ledger with WP-L3.
