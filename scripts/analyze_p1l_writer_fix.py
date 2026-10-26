@@ -41,17 +41,20 @@ def audit_run(folder,arm,release,reference,*,extension=False):
     assert rec['status']=='complete' and rec['arm']==arm and rec['extension']==extension
     assert rec['git_commit']==release['science_commit'] and rec['source_dirty'] is False
     assert rec['backend']=='core.scan_final' and rec['seed']==17 and rec['eval_seed']==4242
-    assert rec['config']==configuration(arm,100000 if extension else 4800)
+    steps=release['steps'] if extension else 4800
+    expected_config=configuration(arm,steps,prefetch_workers=2 if extension else 0)
+    if not extension:
+        # The frozen screen predates WP-B4's explicit zero-worker default.
+        expected_config['train'].pop('prefetch_workers')
+    assert rec['config']==expected_config
     assert rec['config_hash']==stable_hash(rec['config'])
     assert rec['runtime']['deterministic_algorithms'] is True
     assert rec['runtime']['cublas_workspace_config']==':4096:8'
     training=rec['training']; actual=training['actual_steps']
-    if extension:
-        assert actual>4800 and training['termination']=='elapsed_budget'
-    else:
-        assert actual==4800 and training['termination']=='steps'
+    assert actual==steps and training['termination']=='steps'
     assert training['training_episodes']==actual*32 and training['training_queries']==actual*128
-    assert set(training['metrics'])=={str(s) for s in (1200,2400,4800,actual)}
+    expected_steps=([steps*k//5 for k in range(1,6)] if extension else [1200,2400,4800])
+    assert set(training['metrics'])=={str(s) for s in expected_steps}
     exported=torch.load(folder/'writer.pt',map_location='cpu',weights_only=True)
     assert exported['writer_fix_version']==1 and exported['arm']==arm and exported['step']==actual
     assert 'optimizer' not in exported and 'value_head' not in exported
@@ -95,7 +98,7 @@ def audit_run(folder,arm,release,reference,*,extension=False):
     return rec,rows,[dict(arm=arm,extension=extension,**r) for r in logs],exported
 
 
-def run(root,out,release_path,*,screen_only=False,verify_export=False):
+def run(root,out,release_path,*,screen_only=False,verify_export=False,rerun_release_path=None):
     out.mkdir(parents=True,exist_ok=True)
     release=json.loads(release_path.read_text())
     probes=audit_probes(root,out,release)
@@ -106,9 +109,12 @@ def run(root,out,release_path,*,screen_only=False,verify_export=False):
         records.append(rec); rows.extend(r); logs.extend(l); exports[arm]=e
     for key in ('input_mean','input_std'):
         assert torch.equal(exports['W1']['adapter'][key],exports['W5']['adapter'][key])
+    final_main_losses={arm:next(r['main_loss'] for r in reversed(logs)
+                               if r['arm']==arm and r['step']==4800) for arm in ARMS}
     context=[dict(arm=r['arm'],config_hash=r['config_hash'],git_commit=r['git_commit'],
-                  correct=r['training']['metrics']['4800']['correct']) for r in records]
-    choice=choose(records)
+                  correct=r['training']['metrics']['4800']['correct'],
+                  final_main_loss=final_main_losses[r['arm']]) for r in records]
+    choice=choose(records,final_main_losses)
     lock_path=out/'selection.json'
     if lock_path.exists():
         lock=json.loads(lock_path.read_text())
@@ -118,16 +124,22 @@ def run(root,out,release_path,*,screen_only=False,verify_export=False):
                   source_commit=release['science_commit'],choice=choice,screen=context)
         _write_json(lock_path,lock)
     selected=choice['arm'] if choice['action']=='select' else None
-    if choice['action']=='extend' and not screen_only:
-        arm=choice['arm']; folder=root/'extension'/arm
-        assert {p.name for p in (root/'extension').iterdir() if p.is_dir()}=={arm}
-        rec,r,l,e=audit_run(folder,arm,release,reference,extension=True)
-        assert datetime.fromisoformat(rec['created_at'])>=datetime.fromisoformat(lock['created_at'])
-        records.append(rec); rows.extend(r); logs.extend(l)
-        final=rec['training']['metrics'][str(rec['training']['actual_steps'])]
-        selected=arm if final['correct']>=800 else None
-    elif choice['action']!='extend':
-        assert not (root/'extension').exists(),'extension is not authorized by the completed screen'
+    if choice['action']=='rerun' and not screen_only:
+        assert rerun_release_path is not None,'A1 rerun needs its separate frozen release'
+        rerun_release=json.loads(rerun_release_path.read_text())
+        assert rerun_release['arms']==choice['arms'] and rerun_release['amendment']=='A1'
+        assert {p.name for p in (root/'rerun').iterdir() if p.is_dir()}==set(choice['arms'])
+        assert json.loads((root/'rerun/selection.json').read_text())==lock
+        rerun_records={}
+        for arm in choice['arms']:
+            rec,r,l,e=audit_run(root/'rerun'/arm,arm,rerun_release,reference,extension=True)
+            assert datetime.fromisoformat(rec['created_at'])>=datetime.fromisoformat(lock['created_at'])
+            records.append(rec); rows.extend(r); logs.extend(l); rerun_records[arm]=rec
+        from looplora.llm.writer_fix import SIMPLICITY
+        selected=next((a for a in SIMPLICITY if a in rerun_records and
+            rerun_records[a]['training']['metrics'][str(rerun_release['steps'])]['correct']>=800),None)
+    elif choice['action']!='rerun':
+        assert not (root/'rerun').exists(),'rerun is not authorized by the completed screen'
     for name,data in (('runs.csv',rows),('loss_curves.csv',logs)):
         with (out/name).open('w') as file:
             writer=csv.DictWriter(file,fieldnames=list(data[0]),lineterminator='\n')
@@ -143,14 +155,14 @@ def run(root,out,release_path,*,screen_only=False,verify_export=False):
             for field,label,color in (('main_loss','answer','C0'),('address_loss','address','C1'),('value_loss','value','C2')):
                 if field!='main_loss' and not any(r[field] for r in subset): continue
                 ax.plot([r['step'] for r in subset],[r[field] for r in subset],
-                        label=label+(' extended' if extended else ''),color=color,
+                        label=label+(' A1 rerun' if extended else ''),color=color,
                         linestyle='--' if extended else '-',lw=1)
         ax.set(title=arm,xlabel='Steps',ylabel='CE'); ax.grid(alpha=.2); ax.legend(fontsize=8)
     axes.flat[-1].axis('off'); fig.tight_layout(); fig.savefig(out/'loss_curves.png',dpi=160); plt.close(fig)
     check=None
     if verify_export and not screen_only:
         arm=selected or 'OA'
-        folder=(root/'extension'/arm if choice['action']=='extend' and selected else root/'screen'/arm)
+        folder=(root/'rerun'/arm if choice['action']=='rerun' else root/'screen'/arm)
         rec=next(r for r in reversed(records) if r['arm']==arm)
         experiment=load_inference(folder/'writer.pt')
         try:
@@ -165,7 +177,7 @@ def run(root,out,release_path,*,screen_only=False,verify_export=False):
     result=dict(**source_metadata(),all_sample_tables_reproduced=True,paired_labels_verified=True,
         normalization_buffers_identical=True,probes=probes,records=records,rows=rows,
         selection=lock,selected_arm=selected,screen_only=screen_only,
-        decision_pending_extension=choice['action']=='extend' and screen_only,
+        decision_pending_rerun=choice['action']=='rerun' and screen_only,
         stop_P1L=selected is None and not screen_only,export_check=check)
     _write_json(out/('screen-summary.json' if screen_only else 'summary.json'),result)
     print(json.dumps(dict(choice=choice,selected_arm=selected,screen_only=screen_only)),flush=True)
@@ -178,5 +190,7 @@ if __name__=='__main__':
     parser.add_argument('--release',required=True,type=Path)
     parser.add_argument('--screen-only',action='store_true')
     parser.add_argument('--verify-export',action='store_true')
+    parser.add_argument('--rerun-release',type=Path)
     args=parser.parse_args()
-    run(args.root,args.out,args.release,screen_only=args.screen_only,verify_export=args.verify_export)
+    run(args.root,args.out,args.release,screen_only=args.screen_only,verify_export=args.verify_export,
+        rerun_release_path=args.rerun_release)

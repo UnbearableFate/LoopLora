@@ -16,6 +16,7 @@ from looplora.llm.inject import load_tokenizer
 from looplora.llm.train import LLMExperiment,make_task_spec
 from looplora.llm.writer_fix import (FixAdapter,WriterFixExperiment,fact_positions,auxiliary_losses,alignment)
 from looplora.llm.writer_fix_run import configuration,choose,save_checkpoint,load_inference
+from looplora.llm.batching import tokenize_batch
 
 
 @pytest.fixture(scope='module')
@@ -183,7 +184,42 @@ def records(scores):
 def test_selection_thresholds_simplicity_and_oracle_exclusion():
     assert choose(records({'OA':1000,'W1':800,'W4':990,'W5':999}))['arm']=='W1'
     assert choose(records({'W4':800,'W3':999}))['arm']=='W4'
-    assert choose(records({'OA':1000,'W0':299}))['action']=='stop'
-    assert choose(records({'W0':300,'W5':799}))['arm']=='W5'
-    assert choose(records({'W0':300,'W1':300}))['arm']=='W0'
+    losses={a:7. for a in ('OA','W0','W1','W2','W3','W4','W5')}
+    assert choose(records({'OA':1000,'W0':299}),losses)['arms']==['OA','W0']
+    assert choose(records({'W0':300,'W5':799}),losses)['arms']==['W5','W0','OA']
+    losses['W1']=6.
+    assert choose(records({'W0':300,'W1':300}),losses)['arms']==['W1','W0','OA']
+    assert choose(records({'OA':221,'W5':78,'W3':6}),losses)['action']=='rerun'
+    with pytest.raises(ValueError): choose(records({}))
     with pytest.raises(ValueError): choose(records({})[:-1])
+
+
+@pytest.mark.parametrize('arm',['OA','W4','W5'])
+def test_prefetched_tokens_preserve_positions_losses_and_gradients(model,tokenizer,arm):
+    from looplora.llm.writer_fix import token_fact_positions
+    config=cfg(arm); a=arrays(config)
+    tokens=tokenize_batch(a,tokenizer,device='cpu')
+    rendered=render_episodes(a,tokenizer=tokenizer)
+    assert torch.equal(token_fact_positions(a,tokens),fact_positions(a,rendered))
+    experiment=WriterFixExperiment(config,arm,model=model,tokenizer=tokenizer)
+    try:
+        with torch.no_grad():
+            experiment.adapter.B.fill_(.01)
+        observed=[]
+        for prefetched in (None,tokens):
+            experiment.model.zero_grad(set_to_none=True)
+            if experiment.value_head is not None:
+                experiment.value_head.zero_grad(set_to_none=True)
+            batch=experiment.prepare(a,tokens=prefetched)
+            logits,x=experiment.score(batch,1,capture_inputs=True)
+            address,value=auxiliary_losses(experiment,batch,x)
+            loss=torch.nn.functional.cross_entropy(logits.float().flatten(0,1),batch.answer_ids.flatten())+address+value
+            loss.backward()
+            observed.append((logits.detach().clone(),batch.positions.clone(),
+                [None if p.grad is None else p.grad.clone() for p in experiment.trainable_parameters()]))
+        assert torch.equal(observed[0][0],observed[1][0])
+        assert torch.equal(observed[0][1],observed[1][1])
+        for a,b in zip(observed[0][2],observed[1][2]):
+            assert (a is None and b is None) or torch.equal(a,b)
+    finally:
+        experiment.close()

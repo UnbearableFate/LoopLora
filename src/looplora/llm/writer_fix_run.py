@@ -1,4 +1,4 @@
-"""WP-L3 fixed seven-arm screen and its single conditional extension."""
+"""WP-L3 fixed seven-arm screen and Amendment A1 locked fast rerun."""
 from __future__ import annotations
 
 import argparse
@@ -22,16 +22,19 @@ from looplora.sym.evaluate import stratify_queries
 from looplora.sym.stats import load_samples
 from .evaluate import _slice,aggregate_samples
 from .pilot1_select import writer_config
+from .prefetch import BatchStream
 from .run import _write_json,source_metadata
 from .train import make_task_spec,synchronize
 from .writer_fix import (ARMS,SIMPLICITY,WriterFixExperiment,alignment,auxiliary_losses)
 
 
-def configuration(arm: str,steps=4800):
+def configuration(arm: str,steps=4800,*,prefetch_workers=0):
     if arm not in ARMS:
         raise ValueError('unknown WP-L3 arm')
     cfg = writer_config(f'writer-fix-{arm}',16,'fact_final',.003,32,steps)
     cfg['train']['log_every']=50
+    if prefetch_workers:
+        cfg['train']['prefetch_workers']=prefetch_workers
     cfg['writer_fix'] = dict(arm=arm,backend='core.scan_final',
         effective_write_policy='paired_pre_tail_tail' if arm=='W4' else 'fact_final',
         standardization=arm in {'W1','W5'},address_weight=1 if arm in {'W2','W5'} else 0,
@@ -119,23 +122,26 @@ def load_inference(path: Path,*,model=None,tokenizer=None):
     return experiment
 
 
-def fit(experiment,out: Path,*,steps=4800,extension=False,max_seconds=3450):
+def fit(experiment,out: Path,*,steps=4800,extension=False,max_seconds=3450,eval_steps=None):
     options = experiment.config['train']
     spec = make_task_spec(experiment.config)
     seed = derive_seed(17,'llm','writer-data')
     params = experiment.trainable_parameters()
     optimizer = torch.optim.AdamW(params,lr=.003,weight_decay=options['weight_decay'])
     metrics,durations = {},[]
+    eval_steps=set((1200,2400,4800) if eval_steps is None else eval_steps)
     synchronize(experiment.device)
     started = time.perf_counter()
-    with (out/'train_log.jsonl').open('w') as log:
+    stream=BatchStream(spec,'train',32,seed,steps,tokenizer=experiment.tokenizer,
+                       workers=options.get('prefetch_workers',0))
+    with stream, (out/'train_log.jsonl').open('w') as log:
         for step in range(1,steps+1):
             begin = time.perf_counter()
-            arrays = generate(spec,'train',(step-1)*32,32,seed)
+            arrays,tokens = next(stream)
             for group in optimizer.param_groups:
                 group['lr']=.003*min(1.,step/20)
             optimizer.zero_grad(set_to_none=True)
-            batch = experiment.prepare(arrays)
+            batch = experiment.prepare(arrays,tokens=tokens)
             logits,x = experiment.score(batch,1,capture_inputs=experiment.arm in {'W2','W5'})
             main = F.cross_entropy(logits.float().flatten(0,1),batch.answer_ids.flatten())
             address,value = auxiliary_losses(experiment,batch,x)
@@ -148,33 +154,34 @@ def fit(experiment,out: Path,*,steps=4800,extension=False,max_seconds=3450):
             synchronize(experiment.device)
             seconds = time.perf_counter()-begin
             durations.append(seconds)
-            done = time.perf_counter()-started>=max_seconds or step==steps
+            done = step==steps
+            if max_seconds is not None and time.perf_counter()-started>=max_seconds and not done:
+                raise RuntimeError('fixed schedule exceeded its measured walltime allowance')
             if step==1 or step%50==0 or done:
                 row = dict(step=step,loss=float(loss.detach()),main_loss=float(main.detach()),
                     address_loss=float(address.detach()),value_loss=float(value.detach()),
                     grad_norm=float(grad),lr=optimizer.param_groups[0]['lr'],step_seconds=seconds,data_seed=seed)
                 log.write(json.dumps(row,allow_nan=False)+'\n'); log.flush()
                 print(json.dumps(row),flush=True)
-            if step in {1200,2400,4800} or done:
+            if step in eval_steps:
                 metrics[str(step)] = validate(experiment,out/f'val-{step}')
             if done:
-                if not extension and step!=steps:
-                    raise RuntimeError('screen cannot truncate its fixed4800-step budget')
                 break
     save_checkpoint(experiment,optimizer,out,step)
     result = dict(actual_steps=step,requested_steps=steps,training_episodes=step*32,
         training_queries=step*128,data_seed=seed,extension=extension,
-        termination='elapsed_budget' if extension and step!=steps else 'steps',
+        termination='steps',eval_steps=sorted(eval_steps),
         seconds=time.perf_counter()-started,step_mean_seconds=float(np.mean(durations)),
+        steady_step_mean_seconds=float(np.mean(durations[min(10,len(durations)-1):])),
         step_p95_seconds=float(np.quantile(durations,.95)),metrics=metrics)
     _write_json(out/'training.json',result)
     return result
 
 
-def run_one(arm,out,extension=False):
+def run_one(arm,out,extension=False,steps=4800):
     out = Path(out)
     out.mkdir(parents=True,exist_ok=False)
-    cfg = configuration(arm,100000 if extension else 4800)
+    cfg = configuration(arm,steps,prefetch_workers=2 if extension else 0)
     record = dict(experiment_id=cfg['name'],status='running',arm=arm,config=cfg,
         config_hash=stable_hash(cfg),**source_metadata(),created_at=datetime.now(timezone.utc).isoformat(),
         seed=17,eval_seed=4242,stage='writer',variant='M1',protocol='memory_only',rank=32,layer=14,L=1,
@@ -188,7 +195,9 @@ def run_one(arm,out,extension=False):
         record['inference_parameters']=sum(p.numel() for p in experiment.adapter.parameters())
         record['training_only_parameters']=(0 if experiment.value_head is None else
                                             sum(p.numel() for p in experiment.value_head.parameters()))
-        record['training']=fit(experiment,out,steps=cfg['train']['steps'],extension=extension)
+        evaluation=[steps*k//5 for k in range(1,6)] if extension else [1200,2400,4800]
+        record['training']=fit(experiment,out,steps=steps,extension=extension,
+                              max_seconds=7000 if extension else 3450,eval_steps=evaluation)
         record['runtime']=dict(torch=torch.__version__,gpu=torch.cuda.get_device_name(),
             deterministic_algorithms=torch.are_deterministic_algorithms_enabled(),
             cublas_workspace_config=os.environ.get('CUBLAS_WORKSPACE_CONFIG'))
@@ -216,33 +225,55 @@ def screen(arms,out: Path):
     _write_json(out/('shard-'+'-'.join(arms)+'.json'),dict(procs=min(2,len(arms)),runs=records))
 
 
-def choose(records):
+def choose(records,final_main_losses=None):
     if len(records)!=7 or {r['arm'] for r in records}!=set(ARMS):
         raise ValueError('decision requires all seven distinct complete screen arms')
     by_arm={r['arm']:r for r in records}
     for rec in records:
         if rec['status']!='complete' or rec['training']['actual_steps']!=4800 or rec['extension']:
             raise ValueError('decision requires the complete fixed4800-step screen')
-    correct={arm:by_arm[arm]['training']['metrics']['4800']['correct'] for arm in SIMPLICITY}
+    correct={arm:by_arm[arm]['training']['metrics']['4800']['correct'] for arm in ARMS}
     passed=[arm for arm in SIMPLICITY if correct[arm]>=800]
     if passed:
         return dict(action='select',arm=passed[0],screen_correct=correct)
-    candidates=[arm for arm in SIMPLICITY if correct[arm]>=300]
-    if candidates:
-        selected=max(candidates,key=lambda arm:(correct[arm],-SIMPLICITY.index(arm)))
-        return dict(action='extend',arm=selected,screen_correct=correct)
-    return dict(action='stop',arm=None,screen_correct=correct)
+    if final_main_losses is None or set(final_main_losses)!=set(ARMS):
+        raise ValueError('A1 ranking requires final main losses for all seven arms')
+    if not all(np.isfinite(v) for v in final_main_losses.values()):
+        raise ValueError('A1 ranking requires finite final main losses')
+    ranked=sorted(ARMS,key=lambda arm:(-correct[arm],final_main_losses[arm],ARMS.index(arm)))
+    arms=ranked[:2]
+    if 'OA' not in arms:
+        arms.append('OA')
+    return dict(action='rerun',arm=None,arms=arms,screen_correct=correct,
+                final_main_losses=final_main_losses,amendment='A1')
+
+
+def rerun(selection: Path,out: Path,steps: int):
+    lock=json.loads(selection.read_text())
+    arms=lock['choice'].get('arms',[])
+    if lock['choice']['action']!='rerun' or lock['choice'].get('amendment')!='A1':
+        raise ValueError('rerun requires an audited A1 selection lock')
+    if not 2<=len(arms)<=3 or len(set(arms))!=len(arms) or 'OA' not in arms or any(a not in ARMS for a in arms):
+        raise ValueError('A1 requires the top two arms plus OA if absent')
+    if steps<=4800 or steps%5:
+        raise ValueError('A1 rerun steps must exceed4800 and divide into five equal intervals')
+    out.mkdir(parents=True,exist_ok=False)
+    _write_json(out/'selection.json',lock)
+    with ProcessPoolExecutor(max_workers=2,mp_context=multiprocessing.get_context('spawn')) as pool:
+        records=list(pool.map(_task,[(a,str(out/a),True,steps) for a in arms]))
+    _write_json(out/'rerun.json',dict(procs=2,steps=steps,runs=records,selection=lock))
 
 
 if __name__=='__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--arms',choices=ARMS,nargs='+')
     parser.add_argument('--out',type=Path,required=True)
-    parser.add_argument('--extension',choices=SIMPLICITY)
+    parser.add_argument('--rerun-selection',type=Path)
+    parser.add_argument('--steps',type=int,default=4800)
     args=parser.parse_args()
-    if bool(args.arms)==bool(args.extension):
-        raise ValueError('specify screen arms or exactly one selected extension')
-    if args.extension:
-        run_one(args.extension,args.out,True)
+    if bool(args.arms)==bool(args.rerun_selection):
+        raise ValueError('specify screen arms or an audited A1 selection lock')
+    if args.rerun_selection:
+        rerun(args.rerun_selection,args.out,args.steps)
     else:
         screen(args.arms,args.out)

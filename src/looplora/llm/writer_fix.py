@@ -42,6 +42,28 @@ def gather_positions(x: Tensor,indices: Tensor) -> Tensor:
     return x.gather(1,indices[...,None].expand(-1,-1,x.shape[-1]))
 
 
+def token_fact_positions(arrays,tokens,device='cpu') -> Tensor:
+    """Recover the same spans from prefetched CPU tokens, without retokenizing."""
+    if tokens.support_ids.device.type!='cpu':
+        raise ValueError('prefetched position alignment requires CPU tokens')
+    pool=load_name_pool()
+    positions=torch.full((*arrays.facts.shape[:2],3),-1,dtype=torch.long)
+    for b in range(len(arrays.facts)):
+        finals=tokens.fact_final[b].nonzero(as_tuple=True)[0].tolist()
+        if len(finals)!=arrays.facts.shape[1] or not arrays.fact_valid[b].all():
+            raise ValueError('WP-L3 requires all E fact slots to be valid')
+        begin=0
+        for j,final in enumerate(finals):
+            tail_id=pool.token_ids[int(arrays.facts[b,j,2])]
+            hits=(tokens.support_ids[b,begin:final+1]==tail_id).nonzero(as_tuple=True)[0]
+            if not len(hits) or int(hits[-1])==0:
+                raise ValueError('fact tail must follow its prefix')
+            tail=begin+int(hits[-1])
+            positions[b,j]=torch.tensor((final,tail-1,tail))
+            begin=final+1
+    return positions.to(device)
+
+
 def true_fact_indices(arrays,device) -> Tensor:
     facts = torch.as_tensor(arrays.facts,device=device)
     head = torch.as_tensor(arrays.q_start,device=device)
@@ -144,14 +166,18 @@ class WriterFixExperiment(LLMExperiment):
                 torch.random.default_generator.manual_seed(derive_seed(17,'writer-fix-value-head'))
                 self.value_head = nn.Linear(adapter.cfg.r_mem,config['task']['V']).to(self.device)
 
-    def prepare(self,arrays,protocol=None,*,truncate=True):
+    def prepare(self,arrays,protocol=None,*,truncate=True,tokens=None):
         if self._closed:
             raise RuntimeError('experiment is closed')
         if protocol not in {None,'memory_only'} or not truncate:
             raise ValueError('WP-L3 only defines truncated memory-only support')
-        rendered = render_episodes(arrays,tokenizer=self.tokenizer)
-        tokens = tokenize_batch(arrays,self.tokenizer,device=self.device,rendered=rendered)
-        positions = fact_positions(arrays,rendered,self.device)
+        if tokens is None:
+            rendered = render_episodes(arrays,tokenizer=self.tokenizer)
+            tokens = tokenize_batch(arrays,self.tokenizer,device=self.device,rendered=rendered)
+            positions = fact_positions(arrays,rendered,self.device)
+        else:
+            positions = token_fact_positions(arrays,tokens,self.device)
+            tokens = tokens.to(self.device)
         write_mask = tokens.fact_final
         if self.arm=='W4':
             write_mask = torch.zeros_like(tokens.fact_final).scatter(1,positions[:,:,2],True)
