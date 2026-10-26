@@ -14,19 +14,19 @@ from looplora.data.render import load_name_pool
 from .batching import TokenBatch, tokenize_batch
 
 
-def _initialize(spec, split, batch_size, seed, tokenizer):
+def _initialize(spec, split, batch_size, seed, tokenizer, include_support):
     global _settings
     # Spawn never inherits a CUDA context. Tokenization and tensor assembly use
     # one CPU thread per worker, independently of the training process's settings.
     os.environ["TOKENIZERS_PARALLELISM"] = "false"
     torch.set_num_threads(1)
-    _settings = spec, split, batch_size, seed, tokenizer, load_name_pool()
+    _settings = spec, split, batch_size, seed, tokenizer, load_name_pool(), include_support
 
 
 def _produce(step):
-    spec, split, batch_size, seed, tokenizer, pool = _settings
+    spec, split, batch_size, seed, tokenizer, pool, include_support = _settings
     arrays = generate(spec, split, step * batch_size, batch_size, seed)
-    tokens = tokenize_batch(arrays, tokenizer, device="cpu", name_pool=pool)
+    tokens = tokenize_batch(arrays, tokenizer, device="cpu", name_pool=pool, include_support=include_support)
     return arrays, tokens
 
 
@@ -40,7 +40,8 @@ class BatchStream(AbstractContextManager):
     """
 
     def __init__(self, spec: TaskSpec, split: str, batch_size: int, seed: int,
-                 steps: int, *, tokenizer, workers: int = 0, start_step: int = 0):
+                 steps: int, *, tokenizer, workers: int = 0, start_step: int = 0,
+                 include_support: bool = True):
         for name, value, minimum in (("workers", workers, 0), ("steps", steps, 0),
                                      ("start_step", start_step, 0), ("batch_size", batch_size, 1)):
             if isinstance(value, bool) or not isinstance(value, int) or value < minimum:
@@ -49,6 +50,7 @@ class BatchStream(AbstractContextManager):
             raise ValueError("start_step must not exceed steps")
         self.spec, self.split, self.batch_size, self.seed = spec, split, batch_size, seed
         self.steps, self.workers, self.tokenizer = steps, workers, tokenizer
+        self.include_support = include_support
         self._step = self._submit_step = start_step
         self._pool = None
         self._pending = deque()
@@ -61,7 +63,7 @@ class BatchStream(AbstractContextManager):
             self._pool = ProcessPoolExecutor(
                 max_workers=self.workers, mp_context=mp.get_context("spawn"),
                 initializer=_initialize,
-                initargs=(self.spec, self.split, self.batch_size, self.seed, self.tokenizer),
+                initargs=(self.spec, self.split, self.batch_size, self.seed, self.tokenizer, self.include_support),
             )
             try:
                 self._fill()
