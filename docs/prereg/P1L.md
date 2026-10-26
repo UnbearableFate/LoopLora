@@ -75,7 +75,7 @@ Per writer condition:
 ## Budget
 Each job ≤ 8 nodes × 2 h (`--scale-up docs/prereg/P1L.md`); totals per writer condition as in Amendment B1; node·h recorded per job.
 
-## Amendment B1 — budget and S (2026-10-27 04:13 JST, before any Pilot-2 run or score)
+## Amendment B1 — budget and S (2026-10-27 04:12 JST, before any Pilot-2 run or score)
 Information seen: timing-only preflight 3715826 (all 7 trained paths fit memory; B1/B2 context-retained ≈ 0.28
 s/step, oracle readers ≈ 0.13–0.20 s/step); no score. The fixed-S rule ("largest S fitting 2 h / 1.5") and the
 16 node·h total conflict: 21 main + 14 Pilot-2 trainings at that S exceed 16 node·h. The per-job limit (≤ 8 nodes
