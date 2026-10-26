@@ -21,7 +21,7 @@ Armed wakeups (message mode,300s polling, no Goal):
 - r128 main3716407: .job-wakeup/404cd2e5-fa6f-482e-beb3-11f09a424a15,
   worker PID2354422; verify all12 jobs/15 run artifacts on wake.
 - early queue-progress3716290: .job-wakeup/e098924a-8adc-43d9-b03c-063317e048ab,
-  worker PID2354519; recheck queued jobs as running jobs release slots.
+  acknowledged; queue movement verified06:17JST. No replacement needed.
 Read the event state and acknowledge with the exact argv from the wakeup
 message. Do not register duplicates or cancel the other pending watcher.
 
@@ -129,7 +129,7 @@ seed43:3716404B8,3716405M1,3716406B5,3716407B4+B3.
 R/r128/main-jobs.json and R/r128/training-manifest.json retain receipts/map.
 Each1node,1h10–2h requested. B4/B3 sequential packing measured; no repeat B0–B2.
 Rank128 end watcher3716407 and early progress watcher3716290 (r32 B5) are
-armed above to recheck queued jobs as slots release; retain r32 end watcher.
+listed above; early progress is acknowledged and both end watchers remain armed.
 
 Scheduler05:39JST: regular project limit16 active jobs; queued r32 seeds43
 have placeholder/predicted starts after maintenance. Detail3716304 states
@@ -137,6 +137,14 @@ the group njobs-g limit as the blocker. Fourteen r32 main runs and two WP-L4
 jobs already run, with expected slot releases around06:10–07:00JST. Recheck
 queued jobs at the main wakeup and do not assume those estimates prove a run
 will start. All work must still finish before2026-10-28 09:00JST.
+Progress06:17JST: queue movement is verified. R32 B5-s17/B5-s29 jobs3716290/
+3716296 exited0 with complete records, as did B0. B4-s17/s29 records are complete
+inside still-running B4+B3 packs. Total5/22 r32 run records complete; twelve
+r32 jobs running and four queued. R128 jobs3716398(B5-s17),3716400(B8-s29),
+3716396(B8-s17) actually started06:13–06:15JST, replacing finished jobs;
+three running/nine queued,0/15 records complete. No main failure records.
+One WP-L4 job still running; no orchestrator decision received. Preserve both
+end watchers; no new watcher is necessary solely for this progress event.
 
 Validation-only full-evaluation timing acceptance: script
 scripts/benchmark_p1l_evaluation.py loads the immutable completed M1-L4
@@ -179,9 +187,8 @@ separately; unchanged regression passed3715942). No further blanket retests.
    R128 lock/configs committed; main submitted. Both condition manifests exist.
 3. R32 main3716305 wakeup armed. At either wake preserve
    the other pending event; independently advance whichever rank is ready.
-4. Rank128 end3716407 and early running r32 progress3716290 are armed.
-   Early progress is needed because PBS currently predicts queued starts after
-   maintenance while reporting the group16-job limit as the blocker.
+4. Rank128 end3716407 is armed; early progress3716290 acknowledged and queue
+   movement verified06:17. Keep both end watchers and return idle while training.
 
 ## Next actions after each rank's pilot wakeup
 

@@ -19,6 +19,9 @@ sizing3716162 locked S17000(e955765), and Pilot-2 jobs3716168–3716172 passed.
 Selection3716392 onmg0021 fixed lr.003 for B8/M1/B4/B5, lr.001 for B3;
 lock1d1bbfd precedes all12 main jobs3716396–3716407 (15runs, one node/job,
 maximum2h; B4/B3 packed sequentially). See P1L-state.md for continuation.
+At06:17JST, B0 and two r32 B5 jobs exited0; two B4 records completed inside
+ongoing packs. Three r128 main jobs started as slots freed; other jobs are
+running/queued under the project16-job limit. Both end wakeups remain armed.
 No test or confirmation data have been accessed.
 
 Raw root: /work/xg24i002/x10041/LoopLora/runs/p1l/main/.
