@@ -1,8 +1,8 @@
 # WP-H throughput benchmark preparation
 
-`scripts/benchmark_p1s_main.py` is ready; no runtime measurement has been executed
-by this worker. Run the first throughput job on one Miyabi-G node with walltime
-at most 10 minutes, through `scripts/submit.py`, before starting the main matrix:
+`scripts/benchmark_p1s_main.py` measured the main workload before matrix execution;
+results and the selected budget are recorded below. The first throughput job used
+one Miyabi-G node with walltime at most 10 minutes through `scripts/submit.py`:
 
 ```bash
 scripts/submit.py --name p1s-throughput --queue regular-g --walltime 00:10:00 \
@@ -59,5 +59,26 @@ the whole-matrix node-hour bound does not establish per-job feasibility. Use
 selects a compatible job mix and cutoff. Class assumptions and all arithmetic
 remain in the JSON.
 
-Static compilation passed. Actual throughput, cutoff and PBS job/node accounting
-remain pending the first compute job; this note contains no measured timings.
+The root subsequently ran the original 2/4/8-process benchmark in PBS 3712623
+(220 allocated seconds). Its conservative projection triggered the preregistered
+15,000-step fallback before any main training. Batched orthogonal-codebook transfers
+then passed exact CPU/CUDA equivalence checks within the 335-test symbolic suite
+(3712766). The repeated 4/8-process benchmark (3712797, 67 allocated seconds)
+reduced the eight-process phase from 59.85 to 24.83 seconds.
+
+The main job packing uses at most two orthogonal r32 and one orthogonal r16
+workloads per eight-process wave, co-scheduling other classes in the remaining
+slots. The selected budgets and full arithmetic are in
+[`training_budget.json`](../../reports/p1s/training_budget.json); the unmodified
+[original](../../reports/p1s/throughput-original.json) and
+[optimized](../../reports/p1s/throughput-batched.json) measurements are retained.
+The standalone class-serial upper bound and the mixed-job projection deliberately
+have different packing assumptions. Neither benchmark evaluated a scientific set.
+
+A separate synthetic full-size analysis benchmark (3713034, 15 allocated seconds)
+projects 442.32 seconds for the 204 reader archives, 1,032 bootstrap calls, and a
+120-second reporting allowance. This supports a 12-minute final analysis request
+(at least 1.5 times the projection). It opened no experiment sample files.
+[`analysis-benchmark.json`](../../reports/p1s/analysis-benchmark.json) records its
+timings and limitations. Final per-job actual usage is recorded in
+[`jobs.json`](../../reports/p1s/jobs.json).

@@ -1,0 +1,8253 @@
+{
+  "status": "passed",
+  "plan_hash": "badd390003095b54e8cc3df07d75f035",
+  "barrier_created_at": "2026-10-26T13:32:07.282165+00:00",
+  "runs_checked": 105,
+  "reader_runs_checked": 102,
+  "frozen_writers_checked": 24,
+  "sample_rows": 92451000,
+  "evaluations": [
+    {
+      "name": "writer-joint-B4-r32-s17",
+      "dataset": "writer_validation",
+      "rows": 1000,
+      "episodes": 1000,
+      "depths": [
+        1
+      ],
+      "hops": [
+        1
+      ],
+      "groups": [
+        "val/original"
+      ],
+      "data_fingerprints": {
+        "val/original": "e79ecb0f4277b00717c2f78acb90158e"
+      }
+    },
+    {
+      "name": "writer-joint-B4-r32-s29",
+      "dataset": "writer_validation",
+      "rows": 1000,
+      "episodes": 1000,
+      "depths": [
+        1
+      ],
+      "hops": [
+        1
+      ],
+      "groups": [
+        "val/original"
+      ],
+      "data_fingerprints": {
+        "val/original": "e79ecb0f4277b00717c2f78acb90158e"
+      }
+    },
+    {
+      "name": "writer-joint-B4-r32-s43",
+      "dataset": "writer_validation",
+      "rows": 1000,
+      "episodes": 1000,
+      "depths": [
+        1
+      ],
+      "hops": [
+        1
+      ],
+      "groups": [
+        "val/original"
+      ],
+      "data_fingerprints": {
+        "val/original": "e79ecb0f4277b00717c2f78acb90158e"
+      }
+    },
+    {
+      "name": "primary-oracle_random-M1-r32-s17",
+      "dataset": "screening",
+      "rows": 768000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original",
+        "test/remove_required_fact",
+        "test/replace_key_fact",
+        "test/swap_memory",
+        "test/swap_successors",
+        "test_unseen/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "e6c438ec2ff690d4704f7e842115c4ef",
+        "test/remove_required_fact": "2a99a7c4440159ea332c04457a580711",
+        "test/replace_key_fact": "70076d39d7d5fcb499796d15b1233000",
+        "test/swap_memory": "e03178002cc17f33dd7d6f678ac96199",
+        "test/swap_successors": "dacb5a9107b173726b5eed5c88c85498",
+        "test_unseen/original": "8d6df77728a982d92fcbc58bee11cd72"
+      }
+    },
+    {
+      "name": "primary-oracle_random-M1-r32-s17",
+      "dataset": "confirmation",
+      "rows": 144000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "0c9cb1ea4686f5870da5ad5da3f06538"
+      }
+    },
+    {
+      "name": "primary-oracle_random-M1-r32-s29",
+      "dataset": "screening",
+      "rows": 768000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original",
+        "test/remove_required_fact",
+        "test/replace_key_fact",
+        "test/swap_memory",
+        "test/swap_successors",
+        "test_unseen/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "e6c438ec2ff690d4704f7e842115c4ef",
+        "test/remove_required_fact": "2a99a7c4440159ea332c04457a580711",
+        "test/replace_key_fact": "70076d39d7d5fcb499796d15b1233000",
+        "test/swap_memory": "e03178002cc17f33dd7d6f678ac96199",
+        "test/swap_successors": "dacb5a9107b173726b5eed5c88c85498",
+        "test_unseen/original": "8d6df77728a982d92fcbc58bee11cd72"
+      }
+    },
+    {
+      "name": "primary-oracle_random-M1-r32-s29",
+      "dataset": "confirmation",
+      "rows": 144000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "0c9cb1ea4686f5870da5ad5da3f06538"
+      }
+    },
+    {
+      "name": "primary-oracle_random-M1-r32-s43",
+      "dataset": "screening",
+      "rows": 768000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original",
+        "test/remove_required_fact",
+        "test/replace_key_fact",
+        "test/swap_memory",
+        "test/swap_successors",
+        "test_unseen/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "e6c438ec2ff690d4704f7e842115c4ef",
+        "test/remove_required_fact": "2a99a7c4440159ea332c04457a580711",
+        "test/replace_key_fact": "70076d39d7d5fcb499796d15b1233000",
+        "test/swap_memory": "e03178002cc17f33dd7d6f678ac96199",
+        "test/swap_successors": "dacb5a9107b173726b5eed5c88c85498",
+        "test_unseen/original": "8d6df77728a982d92fcbc58bee11cd72"
+      }
+    },
+    {
+      "name": "primary-oracle_random-M1-r32-s43",
+      "dataset": "confirmation",
+      "rows": 144000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "0c9cb1ea4686f5870da5ad5da3f06538"
+      }
+    },
+    {
+      "name": "primary-oracle_random-M1-lin-r32-s17",
+      "dataset": "screening",
+      "rows": 768000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original",
+        "test/remove_required_fact",
+        "test/replace_key_fact",
+        "test/swap_memory",
+        "test/swap_successors",
+        "test_unseen/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "e6c438ec2ff690d4704f7e842115c4ef",
+        "test/remove_required_fact": "2a99a7c4440159ea332c04457a580711",
+        "test/replace_key_fact": "70076d39d7d5fcb499796d15b1233000",
+        "test/swap_memory": "e03178002cc17f33dd7d6f678ac96199",
+        "test/swap_successors": "dacb5a9107b173726b5eed5c88c85498",
+        "test_unseen/original": "8d6df77728a982d92fcbc58bee11cd72"
+      }
+    },
+    {
+      "name": "primary-oracle_random-M1-lin-r32-s17",
+      "dataset": "confirmation",
+      "rows": 144000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "0c9cb1ea4686f5870da5ad5da3f06538"
+      }
+    },
+    {
+      "name": "primary-oracle_random-M1-lin-r32-s29",
+      "dataset": "screening",
+      "rows": 768000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original",
+        "test/remove_required_fact",
+        "test/replace_key_fact",
+        "test/swap_memory",
+        "test/swap_successors",
+        "test_unseen/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "e6c438ec2ff690d4704f7e842115c4ef",
+        "test/remove_required_fact": "2a99a7c4440159ea332c04457a580711",
+        "test/replace_key_fact": "70076d39d7d5fcb499796d15b1233000",
+        "test/swap_memory": "e03178002cc17f33dd7d6f678ac96199",
+        "test/swap_successors": "dacb5a9107b173726b5eed5c88c85498",
+        "test_unseen/original": "8d6df77728a982d92fcbc58bee11cd72"
+      }
+    },
+    {
+      "name": "primary-oracle_random-M1-lin-r32-s29",
+      "dataset": "confirmation",
+      "rows": 144000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "0c9cb1ea4686f5870da5ad5da3f06538"
+      }
+    },
+    {
+      "name": "primary-oracle_random-M1-lin-r32-s43",
+      "dataset": "screening",
+      "rows": 768000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original",
+        "test/remove_required_fact",
+        "test/replace_key_fact",
+        "test/swap_memory",
+        "test/swap_successors",
+        "test_unseen/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "e6c438ec2ff690d4704f7e842115c4ef",
+        "test/remove_required_fact": "2a99a7c4440159ea332c04457a580711",
+        "test/replace_key_fact": "70076d39d7d5fcb499796d15b1233000",
+        "test/swap_memory": "e03178002cc17f33dd7d6f678ac96199",
+        "test/swap_successors": "dacb5a9107b173726b5eed5c88c85498",
+        "test_unseen/original": "8d6df77728a982d92fcbc58bee11cd72"
+      }
+    },
+    {
+      "name": "primary-oracle_random-M1-lin-r32-s43",
+      "dataset": "confirmation",
+      "rows": 144000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "0c9cb1ea4686f5870da5ad5da3f06538"
+      }
+    },
+    {
+      "name": "primary-oracle_random-B5-r32-s17",
+      "dataset": "screening",
+      "rows": 768000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original",
+        "test/remove_required_fact",
+        "test/replace_key_fact",
+        "test/swap_memory",
+        "test/swap_successors",
+        "test_unseen/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "e6c438ec2ff690d4704f7e842115c4ef",
+        "test/remove_required_fact": "2a99a7c4440159ea332c04457a580711",
+        "test/replace_key_fact": "70076d39d7d5fcb499796d15b1233000",
+        "test/swap_memory": "e03178002cc17f33dd7d6f678ac96199",
+        "test/swap_successors": "dacb5a9107b173726b5eed5c88c85498",
+        "test_unseen/original": "8d6df77728a982d92fcbc58bee11cd72"
+      }
+    },
+    {
+      "name": "primary-oracle_random-B5-r32-s17",
+      "dataset": "confirmation",
+      "rows": 144000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "0c9cb1ea4686f5870da5ad5da3f06538"
+      }
+    },
+    {
+      "name": "primary-oracle_random-B5-r32-s29",
+      "dataset": "screening",
+      "rows": 768000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original",
+        "test/remove_required_fact",
+        "test/replace_key_fact",
+        "test/swap_memory",
+        "test/swap_successors",
+        "test_unseen/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "e6c438ec2ff690d4704f7e842115c4ef",
+        "test/remove_required_fact": "2a99a7c4440159ea332c04457a580711",
+        "test/replace_key_fact": "70076d39d7d5fcb499796d15b1233000",
+        "test/swap_memory": "e03178002cc17f33dd7d6f678ac96199",
+        "test/swap_successors": "dacb5a9107b173726b5eed5c88c85498",
+        "test_unseen/original": "8d6df77728a982d92fcbc58bee11cd72"
+      }
+    },
+    {
+      "name": "primary-oracle_random-B5-r32-s29",
+      "dataset": "confirmation",
+      "rows": 144000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "0c9cb1ea4686f5870da5ad5da3f06538"
+      }
+    },
+    {
+      "name": "primary-oracle_random-B5-r32-s43",
+      "dataset": "screening",
+      "rows": 768000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original",
+        "test/remove_required_fact",
+        "test/replace_key_fact",
+        "test/swap_memory",
+        "test/swap_successors",
+        "test_unseen/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "e6c438ec2ff690d4704f7e842115c4ef",
+        "test/remove_required_fact": "2a99a7c4440159ea332c04457a580711",
+        "test/replace_key_fact": "70076d39d7d5fcb499796d15b1233000",
+        "test/swap_memory": "e03178002cc17f33dd7d6f678ac96199",
+        "test/swap_successors": "dacb5a9107b173726b5eed5c88c85498",
+        "test_unseen/original": "8d6df77728a982d92fcbc58bee11cd72"
+      }
+    },
+    {
+      "name": "primary-oracle_random-B5-r32-s43",
+      "dataset": "confirmation",
+      "rows": 144000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "0c9cb1ea4686f5870da5ad5da3f06538"
+      }
+    },
+    {
+      "name": "primary-oracle_random-B5-lin-r32-s17",
+      "dataset": "screening",
+      "rows": 768000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original",
+        "test/remove_required_fact",
+        "test/replace_key_fact",
+        "test/swap_memory",
+        "test/swap_successors",
+        "test_unseen/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "e6c438ec2ff690d4704f7e842115c4ef",
+        "test/remove_required_fact": "2a99a7c4440159ea332c04457a580711",
+        "test/replace_key_fact": "70076d39d7d5fcb499796d15b1233000",
+        "test/swap_memory": "e03178002cc17f33dd7d6f678ac96199",
+        "test/swap_successors": "dacb5a9107b173726b5eed5c88c85498",
+        "test_unseen/original": "8d6df77728a982d92fcbc58bee11cd72"
+      }
+    },
+    {
+      "name": "primary-oracle_random-B5-lin-r32-s17",
+      "dataset": "confirmation",
+      "rows": 144000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "0c9cb1ea4686f5870da5ad5da3f06538"
+      }
+    },
+    {
+      "name": "primary-oracle_random-B5-lin-r32-s29",
+      "dataset": "screening",
+      "rows": 768000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original",
+        "test/remove_required_fact",
+        "test/replace_key_fact",
+        "test/swap_memory",
+        "test/swap_successors",
+        "test_unseen/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "e6c438ec2ff690d4704f7e842115c4ef",
+        "test/remove_required_fact": "2a99a7c4440159ea332c04457a580711",
+        "test/replace_key_fact": "70076d39d7d5fcb499796d15b1233000",
+        "test/swap_memory": "e03178002cc17f33dd7d6f678ac96199",
+        "test/swap_successors": "dacb5a9107b173726b5eed5c88c85498",
+        "test_unseen/original": "8d6df77728a982d92fcbc58bee11cd72"
+      }
+    },
+    {
+      "name": "primary-oracle_random-B5-lin-r32-s29",
+      "dataset": "confirmation",
+      "rows": 144000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "0c9cb1ea4686f5870da5ad5da3f06538"
+      }
+    },
+    {
+      "name": "primary-oracle_random-B5-lin-r32-s43",
+      "dataset": "screening",
+      "rows": 768000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original",
+        "test/remove_required_fact",
+        "test/replace_key_fact",
+        "test/swap_memory",
+        "test/swap_successors",
+        "test_unseen/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "e6c438ec2ff690d4704f7e842115c4ef",
+        "test/remove_required_fact": "2a99a7c4440159ea332c04457a580711",
+        "test/replace_key_fact": "70076d39d7d5fcb499796d15b1233000",
+        "test/swap_memory": "e03178002cc17f33dd7d6f678ac96199",
+        "test/swap_successors": "dacb5a9107b173726b5eed5c88c85498",
+        "test_unseen/original": "8d6df77728a982d92fcbc58bee11cd72"
+      }
+    },
+    {
+      "name": "primary-oracle_random-B5-lin-r32-s43",
+      "dataset": "confirmation",
+      "rows": 144000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "0c9cb1ea4686f5870da5ad5da3f06538"
+      }
+    },
+    {
+      "name": "primary-oracle_random-B3-r32-s17",
+      "dataset": "screening",
+      "rows": 768000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original",
+        "test/remove_required_fact",
+        "test/replace_key_fact",
+        "test/swap_memory",
+        "test/swap_successors",
+        "test_unseen/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "e6c438ec2ff690d4704f7e842115c4ef",
+        "test/remove_required_fact": "2a99a7c4440159ea332c04457a580711",
+        "test/replace_key_fact": "70076d39d7d5fcb499796d15b1233000",
+        "test/swap_memory": "e03178002cc17f33dd7d6f678ac96199",
+        "test/swap_successors": "dacb5a9107b173726b5eed5c88c85498",
+        "test_unseen/original": "8d6df77728a982d92fcbc58bee11cd72"
+      }
+    },
+    {
+      "name": "primary-oracle_random-B3-r32-s17",
+      "dataset": "confirmation",
+      "rows": 144000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "0c9cb1ea4686f5870da5ad5da3f06538"
+      }
+    },
+    {
+      "name": "primary-oracle_random-B3-r32-s29",
+      "dataset": "screening",
+      "rows": 768000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original",
+        "test/remove_required_fact",
+        "test/replace_key_fact",
+        "test/swap_memory",
+        "test/swap_successors",
+        "test_unseen/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "e6c438ec2ff690d4704f7e842115c4ef",
+        "test/remove_required_fact": "2a99a7c4440159ea332c04457a580711",
+        "test/replace_key_fact": "70076d39d7d5fcb499796d15b1233000",
+        "test/swap_memory": "e03178002cc17f33dd7d6f678ac96199",
+        "test/swap_successors": "dacb5a9107b173726b5eed5c88c85498",
+        "test_unseen/original": "8d6df77728a982d92fcbc58bee11cd72"
+      }
+    },
+    {
+      "name": "primary-oracle_random-B3-r32-s29",
+      "dataset": "confirmation",
+      "rows": 144000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "0c9cb1ea4686f5870da5ad5da3f06538"
+      }
+    },
+    {
+      "name": "primary-oracle_random-B3-r32-s43",
+      "dataset": "screening",
+      "rows": 768000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original",
+        "test/remove_required_fact",
+        "test/replace_key_fact",
+        "test/swap_memory",
+        "test/swap_successors",
+        "test_unseen/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "e6c438ec2ff690d4704f7e842115c4ef",
+        "test/remove_required_fact": "2a99a7c4440159ea332c04457a580711",
+        "test/replace_key_fact": "70076d39d7d5fcb499796d15b1233000",
+        "test/swap_memory": "e03178002cc17f33dd7d6f678ac96199",
+        "test/swap_successors": "dacb5a9107b173726b5eed5c88c85498",
+        "test_unseen/original": "8d6df77728a982d92fcbc58bee11cd72"
+      }
+    },
+    {
+      "name": "primary-oracle_random-B3-r32-s43",
+      "dataset": "confirmation",
+      "rows": 144000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "0c9cb1ea4686f5870da5ad5da3f06538"
+      }
+    },
+    {
+      "name": "primary-oracle_random-B4-r32-s17",
+      "dataset": "screening",
+      "rows": 768000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original",
+        "test/remove_required_fact",
+        "test/replace_key_fact",
+        "test/swap_memory",
+        "test/swap_successors",
+        "test_unseen/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "e6c438ec2ff690d4704f7e842115c4ef",
+        "test/remove_required_fact": "2a99a7c4440159ea332c04457a580711",
+        "test/replace_key_fact": "70076d39d7d5fcb499796d15b1233000",
+        "test/swap_memory": "e03178002cc17f33dd7d6f678ac96199",
+        "test/swap_successors": "dacb5a9107b173726b5eed5c88c85498",
+        "test_unseen/original": "8d6df77728a982d92fcbc58bee11cd72"
+      }
+    },
+    {
+      "name": "primary-oracle_random-B4-r32-s17",
+      "dataset": "confirmation",
+      "rows": 144000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "0c9cb1ea4686f5870da5ad5da3f06538"
+      }
+    },
+    {
+      "name": "primary-oracle_random-B4-r32-s29",
+      "dataset": "screening",
+      "rows": 768000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original",
+        "test/remove_required_fact",
+        "test/replace_key_fact",
+        "test/swap_memory",
+        "test/swap_successors",
+        "test_unseen/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "e6c438ec2ff690d4704f7e842115c4ef",
+        "test/remove_required_fact": "2a99a7c4440159ea332c04457a580711",
+        "test/replace_key_fact": "70076d39d7d5fcb499796d15b1233000",
+        "test/swap_memory": "e03178002cc17f33dd7d6f678ac96199",
+        "test/swap_successors": "dacb5a9107b173726b5eed5c88c85498",
+        "test_unseen/original": "8d6df77728a982d92fcbc58bee11cd72"
+      }
+    },
+    {
+      "name": "primary-oracle_random-B4-r32-s29",
+      "dataset": "confirmation",
+      "rows": 144000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "0c9cb1ea4686f5870da5ad5da3f06538"
+      }
+    },
+    {
+      "name": "primary-oracle_random-B4-r32-s43",
+      "dataset": "screening",
+      "rows": 768000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original",
+        "test/remove_required_fact",
+        "test/replace_key_fact",
+        "test/swap_memory",
+        "test/swap_successors",
+        "test_unseen/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "e6c438ec2ff690d4704f7e842115c4ef",
+        "test/remove_required_fact": "2a99a7c4440159ea332c04457a580711",
+        "test/replace_key_fact": "70076d39d7d5fcb499796d15b1233000",
+        "test/swap_memory": "e03178002cc17f33dd7d6f678ac96199",
+        "test/swap_successors": "dacb5a9107b173726b5eed5c88c85498",
+        "test_unseen/original": "8d6df77728a982d92fcbc58bee11cd72"
+      }
+    },
+    {
+      "name": "primary-oracle_random-B4-r32-s43",
+      "dataset": "confirmation",
+      "rows": 144000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "0c9cb1ea4686f5870da5ad5da3f06538"
+      }
+    },
+    {
+      "name": "primary-oracle_orth-M1-r32-s17",
+      "dataset": "screening",
+      "rows": 768000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original",
+        "test/remove_required_fact",
+        "test/replace_key_fact",
+        "test/swap_memory",
+        "test/swap_successors",
+        "test_unseen/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "e6c438ec2ff690d4704f7e842115c4ef",
+        "test/remove_required_fact": "2a99a7c4440159ea332c04457a580711",
+        "test/replace_key_fact": "70076d39d7d5fcb499796d15b1233000",
+        "test/swap_memory": "e03178002cc17f33dd7d6f678ac96199",
+        "test/swap_successors": "dacb5a9107b173726b5eed5c88c85498",
+        "test_unseen/original": "8d6df77728a982d92fcbc58bee11cd72"
+      }
+    },
+    {
+      "name": "primary-oracle_orth-M1-r32-s17",
+      "dataset": "confirmation",
+      "rows": 144000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "0c9cb1ea4686f5870da5ad5da3f06538"
+      }
+    },
+    {
+      "name": "primary-oracle_orth-M1-r32-s29",
+      "dataset": "screening",
+      "rows": 768000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original",
+        "test/remove_required_fact",
+        "test/replace_key_fact",
+        "test/swap_memory",
+        "test/swap_successors",
+        "test_unseen/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "e6c438ec2ff690d4704f7e842115c4ef",
+        "test/remove_required_fact": "2a99a7c4440159ea332c04457a580711",
+        "test/replace_key_fact": "70076d39d7d5fcb499796d15b1233000",
+        "test/swap_memory": "e03178002cc17f33dd7d6f678ac96199",
+        "test/swap_successors": "dacb5a9107b173726b5eed5c88c85498",
+        "test_unseen/original": "8d6df77728a982d92fcbc58bee11cd72"
+      }
+    },
+    {
+      "name": "primary-oracle_orth-M1-r32-s29",
+      "dataset": "confirmation",
+      "rows": 144000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "0c9cb1ea4686f5870da5ad5da3f06538"
+      }
+    },
+    {
+      "name": "primary-oracle_orth-M1-r32-s43",
+      "dataset": "screening",
+      "rows": 768000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original",
+        "test/remove_required_fact",
+        "test/replace_key_fact",
+        "test/swap_memory",
+        "test/swap_successors",
+        "test_unseen/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "e6c438ec2ff690d4704f7e842115c4ef",
+        "test/remove_required_fact": "2a99a7c4440159ea332c04457a580711",
+        "test/replace_key_fact": "70076d39d7d5fcb499796d15b1233000",
+        "test/swap_memory": "e03178002cc17f33dd7d6f678ac96199",
+        "test/swap_successors": "dacb5a9107b173726b5eed5c88c85498",
+        "test_unseen/original": "8d6df77728a982d92fcbc58bee11cd72"
+      }
+    },
+    {
+      "name": "primary-oracle_orth-M1-r32-s43",
+      "dataset": "confirmation",
+      "rows": 144000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "0c9cb1ea4686f5870da5ad5da3f06538"
+      }
+    },
+    {
+      "name": "primary-oracle_orth-M1-lin-r32-s17",
+      "dataset": "screening",
+      "rows": 768000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original",
+        "test/remove_required_fact",
+        "test/replace_key_fact",
+        "test/swap_memory",
+        "test/swap_successors",
+        "test_unseen/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "e6c438ec2ff690d4704f7e842115c4ef",
+        "test/remove_required_fact": "2a99a7c4440159ea332c04457a580711",
+        "test/replace_key_fact": "70076d39d7d5fcb499796d15b1233000",
+        "test/swap_memory": "e03178002cc17f33dd7d6f678ac96199",
+        "test/swap_successors": "dacb5a9107b173726b5eed5c88c85498",
+        "test_unseen/original": "8d6df77728a982d92fcbc58bee11cd72"
+      }
+    },
+    {
+      "name": "primary-oracle_orth-M1-lin-r32-s17",
+      "dataset": "confirmation",
+      "rows": 144000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "0c9cb1ea4686f5870da5ad5da3f06538"
+      }
+    },
+    {
+      "name": "primary-oracle_orth-M1-lin-r32-s29",
+      "dataset": "screening",
+      "rows": 768000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original",
+        "test/remove_required_fact",
+        "test/replace_key_fact",
+        "test/swap_memory",
+        "test/swap_successors",
+        "test_unseen/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "e6c438ec2ff690d4704f7e842115c4ef",
+        "test/remove_required_fact": "2a99a7c4440159ea332c04457a580711",
+        "test/replace_key_fact": "70076d39d7d5fcb499796d15b1233000",
+        "test/swap_memory": "e03178002cc17f33dd7d6f678ac96199",
+        "test/swap_successors": "dacb5a9107b173726b5eed5c88c85498",
+        "test_unseen/original": "8d6df77728a982d92fcbc58bee11cd72"
+      }
+    },
+    {
+      "name": "primary-oracle_orth-M1-lin-r32-s29",
+      "dataset": "confirmation",
+      "rows": 144000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "0c9cb1ea4686f5870da5ad5da3f06538"
+      }
+    },
+    {
+      "name": "primary-oracle_orth-M1-lin-r32-s43",
+      "dataset": "screening",
+      "rows": 768000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original",
+        "test/remove_required_fact",
+        "test/replace_key_fact",
+        "test/swap_memory",
+        "test/swap_successors",
+        "test_unseen/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "e6c438ec2ff690d4704f7e842115c4ef",
+        "test/remove_required_fact": "2a99a7c4440159ea332c04457a580711",
+        "test/replace_key_fact": "70076d39d7d5fcb499796d15b1233000",
+        "test/swap_memory": "e03178002cc17f33dd7d6f678ac96199",
+        "test/swap_successors": "dacb5a9107b173726b5eed5c88c85498",
+        "test_unseen/original": "8d6df77728a982d92fcbc58bee11cd72"
+      }
+    },
+    {
+      "name": "primary-oracle_orth-M1-lin-r32-s43",
+      "dataset": "confirmation",
+      "rows": 144000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "0c9cb1ea4686f5870da5ad5da3f06538"
+      }
+    },
+    {
+      "name": "primary-oracle_orth-B5-r32-s17",
+      "dataset": "screening",
+      "rows": 768000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original",
+        "test/remove_required_fact",
+        "test/replace_key_fact",
+        "test/swap_memory",
+        "test/swap_successors",
+        "test_unseen/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "e6c438ec2ff690d4704f7e842115c4ef",
+        "test/remove_required_fact": "2a99a7c4440159ea332c04457a580711",
+        "test/replace_key_fact": "70076d39d7d5fcb499796d15b1233000",
+        "test/swap_memory": "e03178002cc17f33dd7d6f678ac96199",
+        "test/swap_successors": "dacb5a9107b173726b5eed5c88c85498",
+        "test_unseen/original": "8d6df77728a982d92fcbc58bee11cd72"
+      }
+    },
+    {
+      "name": "primary-oracle_orth-B5-r32-s17",
+      "dataset": "confirmation",
+      "rows": 144000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "0c9cb1ea4686f5870da5ad5da3f06538"
+      }
+    },
+    {
+      "name": "primary-oracle_orth-B5-r32-s29",
+      "dataset": "screening",
+      "rows": 768000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original",
+        "test/remove_required_fact",
+        "test/replace_key_fact",
+        "test/swap_memory",
+        "test/swap_successors",
+        "test_unseen/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "e6c438ec2ff690d4704f7e842115c4ef",
+        "test/remove_required_fact": "2a99a7c4440159ea332c04457a580711",
+        "test/replace_key_fact": "70076d39d7d5fcb499796d15b1233000",
+        "test/swap_memory": "e03178002cc17f33dd7d6f678ac96199",
+        "test/swap_successors": "dacb5a9107b173726b5eed5c88c85498",
+        "test_unseen/original": "8d6df77728a982d92fcbc58bee11cd72"
+      }
+    },
+    {
+      "name": "primary-oracle_orth-B5-r32-s29",
+      "dataset": "confirmation",
+      "rows": 144000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "0c9cb1ea4686f5870da5ad5da3f06538"
+      }
+    },
+    {
+      "name": "primary-oracle_orth-B5-r32-s43",
+      "dataset": "screening",
+      "rows": 768000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original",
+        "test/remove_required_fact",
+        "test/replace_key_fact",
+        "test/swap_memory",
+        "test/swap_successors",
+        "test_unseen/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "e6c438ec2ff690d4704f7e842115c4ef",
+        "test/remove_required_fact": "2a99a7c4440159ea332c04457a580711",
+        "test/replace_key_fact": "70076d39d7d5fcb499796d15b1233000",
+        "test/swap_memory": "e03178002cc17f33dd7d6f678ac96199",
+        "test/swap_successors": "dacb5a9107b173726b5eed5c88c85498",
+        "test_unseen/original": "8d6df77728a982d92fcbc58bee11cd72"
+      }
+    },
+    {
+      "name": "primary-oracle_orth-B5-r32-s43",
+      "dataset": "confirmation",
+      "rows": 144000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "0c9cb1ea4686f5870da5ad5da3f06538"
+      }
+    },
+    {
+      "name": "primary-oracle_orth-B5-lin-r32-s17",
+      "dataset": "screening",
+      "rows": 768000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original",
+        "test/remove_required_fact",
+        "test/replace_key_fact",
+        "test/swap_memory",
+        "test/swap_successors",
+        "test_unseen/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "e6c438ec2ff690d4704f7e842115c4ef",
+        "test/remove_required_fact": "2a99a7c4440159ea332c04457a580711",
+        "test/replace_key_fact": "70076d39d7d5fcb499796d15b1233000",
+        "test/swap_memory": "e03178002cc17f33dd7d6f678ac96199",
+        "test/swap_successors": "dacb5a9107b173726b5eed5c88c85498",
+        "test_unseen/original": "8d6df77728a982d92fcbc58bee11cd72"
+      }
+    },
+    {
+      "name": "primary-oracle_orth-B5-lin-r32-s17",
+      "dataset": "confirmation",
+      "rows": 144000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "0c9cb1ea4686f5870da5ad5da3f06538"
+      }
+    },
+    {
+      "name": "primary-oracle_orth-B5-lin-r32-s29",
+      "dataset": "screening",
+      "rows": 768000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original",
+        "test/remove_required_fact",
+        "test/replace_key_fact",
+        "test/swap_memory",
+        "test/swap_successors",
+        "test_unseen/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "e6c438ec2ff690d4704f7e842115c4ef",
+        "test/remove_required_fact": "2a99a7c4440159ea332c04457a580711",
+        "test/replace_key_fact": "70076d39d7d5fcb499796d15b1233000",
+        "test/swap_memory": "e03178002cc17f33dd7d6f678ac96199",
+        "test/swap_successors": "dacb5a9107b173726b5eed5c88c85498",
+        "test_unseen/original": "8d6df77728a982d92fcbc58bee11cd72"
+      }
+    },
+    {
+      "name": "primary-oracle_orth-B5-lin-r32-s29",
+      "dataset": "confirmation",
+      "rows": 144000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "0c9cb1ea4686f5870da5ad5da3f06538"
+      }
+    },
+    {
+      "name": "primary-oracle_orth-B5-lin-r32-s43",
+      "dataset": "screening",
+      "rows": 768000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original",
+        "test/remove_required_fact",
+        "test/replace_key_fact",
+        "test/swap_memory",
+        "test/swap_successors",
+        "test_unseen/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "e6c438ec2ff690d4704f7e842115c4ef",
+        "test/remove_required_fact": "2a99a7c4440159ea332c04457a580711",
+        "test/replace_key_fact": "70076d39d7d5fcb499796d15b1233000",
+        "test/swap_memory": "e03178002cc17f33dd7d6f678ac96199",
+        "test/swap_successors": "dacb5a9107b173726b5eed5c88c85498",
+        "test_unseen/original": "8d6df77728a982d92fcbc58bee11cd72"
+      }
+    },
+    {
+      "name": "primary-oracle_orth-B5-lin-r32-s43",
+      "dataset": "confirmation",
+      "rows": 144000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "0c9cb1ea4686f5870da5ad5da3f06538"
+      }
+    },
+    {
+      "name": "primary-oracle_orth-B3-r32-s17",
+      "dataset": "screening",
+      "rows": 768000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original",
+        "test/remove_required_fact",
+        "test/replace_key_fact",
+        "test/swap_memory",
+        "test/swap_successors",
+        "test_unseen/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "e6c438ec2ff690d4704f7e842115c4ef",
+        "test/remove_required_fact": "2a99a7c4440159ea332c04457a580711",
+        "test/replace_key_fact": "70076d39d7d5fcb499796d15b1233000",
+        "test/swap_memory": "e03178002cc17f33dd7d6f678ac96199",
+        "test/swap_successors": "dacb5a9107b173726b5eed5c88c85498",
+        "test_unseen/original": "8d6df77728a982d92fcbc58bee11cd72"
+      }
+    },
+    {
+      "name": "primary-oracle_orth-B3-r32-s17",
+      "dataset": "confirmation",
+      "rows": 144000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "0c9cb1ea4686f5870da5ad5da3f06538"
+      }
+    },
+    {
+      "name": "primary-oracle_orth-B3-r32-s29",
+      "dataset": "screening",
+      "rows": 768000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original",
+        "test/remove_required_fact",
+        "test/replace_key_fact",
+        "test/swap_memory",
+        "test/swap_successors",
+        "test_unseen/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "e6c438ec2ff690d4704f7e842115c4ef",
+        "test/remove_required_fact": "2a99a7c4440159ea332c04457a580711",
+        "test/replace_key_fact": "70076d39d7d5fcb499796d15b1233000",
+        "test/swap_memory": "e03178002cc17f33dd7d6f678ac96199",
+        "test/swap_successors": "dacb5a9107b173726b5eed5c88c85498",
+        "test_unseen/original": "8d6df77728a982d92fcbc58bee11cd72"
+      }
+    },
+    {
+      "name": "primary-oracle_orth-B3-r32-s29",
+      "dataset": "confirmation",
+      "rows": 144000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "0c9cb1ea4686f5870da5ad5da3f06538"
+      }
+    },
+    {
+      "name": "primary-oracle_orth-B3-r32-s43",
+      "dataset": "screening",
+      "rows": 768000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original",
+        "test/remove_required_fact",
+        "test/replace_key_fact",
+        "test/swap_memory",
+        "test/swap_successors",
+        "test_unseen/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "e6c438ec2ff690d4704f7e842115c4ef",
+        "test/remove_required_fact": "2a99a7c4440159ea332c04457a580711",
+        "test/replace_key_fact": "70076d39d7d5fcb499796d15b1233000",
+        "test/swap_memory": "e03178002cc17f33dd7d6f678ac96199",
+        "test/swap_successors": "dacb5a9107b173726b5eed5c88c85498",
+        "test_unseen/original": "8d6df77728a982d92fcbc58bee11cd72"
+      }
+    },
+    {
+      "name": "primary-oracle_orth-B3-r32-s43",
+      "dataset": "confirmation",
+      "rows": 144000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "0c9cb1ea4686f5870da5ad5da3f06538"
+      }
+    },
+    {
+      "name": "primary-oracle_orth-B4-r32-s17",
+      "dataset": "screening",
+      "rows": 768000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original",
+        "test/remove_required_fact",
+        "test/replace_key_fact",
+        "test/swap_memory",
+        "test/swap_successors",
+        "test_unseen/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "e6c438ec2ff690d4704f7e842115c4ef",
+        "test/remove_required_fact": "2a99a7c4440159ea332c04457a580711",
+        "test/replace_key_fact": "70076d39d7d5fcb499796d15b1233000",
+        "test/swap_memory": "e03178002cc17f33dd7d6f678ac96199",
+        "test/swap_successors": "dacb5a9107b173726b5eed5c88c85498",
+        "test_unseen/original": "8d6df77728a982d92fcbc58bee11cd72"
+      }
+    },
+    {
+      "name": "primary-oracle_orth-B4-r32-s17",
+      "dataset": "confirmation",
+      "rows": 144000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "0c9cb1ea4686f5870da5ad5da3f06538"
+      }
+    },
+    {
+      "name": "primary-oracle_orth-B4-r32-s29",
+      "dataset": "screening",
+      "rows": 768000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original",
+        "test/remove_required_fact",
+        "test/replace_key_fact",
+        "test/swap_memory",
+        "test/swap_successors",
+        "test_unseen/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "e6c438ec2ff690d4704f7e842115c4ef",
+        "test/remove_required_fact": "2a99a7c4440159ea332c04457a580711",
+        "test/replace_key_fact": "70076d39d7d5fcb499796d15b1233000",
+        "test/swap_memory": "e03178002cc17f33dd7d6f678ac96199",
+        "test/swap_successors": "dacb5a9107b173726b5eed5c88c85498",
+        "test_unseen/original": "8d6df77728a982d92fcbc58bee11cd72"
+      }
+    },
+    {
+      "name": "primary-oracle_orth-B4-r32-s29",
+      "dataset": "confirmation",
+      "rows": 144000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "0c9cb1ea4686f5870da5ad5da3f06538"
+      }
+    },
+    {
+      "name": "primary-oracle_orth-B4-r32-s43",
+      "dataset": "screening",
+      "rows": 768000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original",
+        "test/remove_required_fact",
+        "test/replace_key_fact",
+        "test/swap_memory",
+        "test/swap_successors",
+        "test_unseen/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "e6c438ec2ff690d4704f7e842115c4ef",
+        "test/remove_required_fact": "2a99a7c4440159ea332c04457a580711",
+        "test/replace_key_fact": "70076d39d7d5fcb499796d15b1233000",
+        "test/swap_memory": "e03178002cc17f33dd7d6f678ac96199",
+        "test/swap_successors": "dacb5a9107b173726b5eed5c88c85498",
+        "test_unseen/original": "8d6df77728a982d92fcbc58bee11cd72"
+      }
+    },
+    {
+      "name": "primary-oracle_orth-B4-r32-s43",
+      "dataset": "confirmation",
+      "rows": 144000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "0c9cb1ea4686f5870da5ad5da3f06538"
+      }
+    },
+    {
+      "name": "primary-t1_frozen-M1-r32-s17",
+      "dataset": "screening",
+      "rows": 768000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original",
+        "test/remove_required_fact",
+        "test/replace_key_fact",
+        "test/swap_memory",
+        "test/swap_successors",
+        "test_unseen/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "e6c438ec2ff690d4704f7e842115c4ef",
+        "test/remove_required_fact": "2a99a7c4440159ea332c04457a580711",
+        "test/replace_key_fact": "70076d39d7d5fcb499796d15b1233000",
+        "test/swap_memory": "e03178002cc17f33dd7d6f678ac96199",
+        "test/swap_successors": "dacb5a9107b173726b5eed5c88c85498",
+        "test_unseen/original": "8d6df77728a982d92fcbc58bee11cd72"
+      }
+    },
+    {
+      "name": "primary-t1_frozen-M1-r32-s17",
+      "dataset": "confirmation",
+      "rows": 144000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "0c9cb1ea4686f5870da5ad5da3f06538"
+      }
+    },
+    {
+      "name": "primary-t1_frozen-M1-r32-s29",
+      "dataset": "screening",
+      "rows": 768000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original",
+        "test/remove_required_fact",
+        "test/replace_key_fact",
+        "test/swap_memory",
+        "test/swap_successors",
+        "test_unseen/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "e6c438ec2ff690d4704f7e842115c4ef",
+        "test/remove_required_fact": "2a99a7c4440159ea332c04457a580711",
+        "test/replace_key_fact": "70076d39d7d5fcb499796d15b1233000",
+        "test/swap_memory": "e03178002cc17f33dd7d6f678ac96199",
+        "test/swap_successors": "dacb5a9107b173726b5eed5c88c85498",
+        "test_unseen/original": "8d6df77728a982d92fcbc58bee11cd72"
+      }
+    },
+    {
+      "name": "primary-t1_frozen-M1-r32-s29",
+      "dataset": "confirmation",
+      "rows": 144000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "0c9cb1ea4686f5870da5ad5da3f06538"
+      }
+    },
+    {
+      "name": "primary-t1_frozen-M1-r32-s43",
+      "dataset": "screening",
+      "rows": 768000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original",
+        "test/remove_required_fact",
+        "test/replace_key_fact",
+        "test/swap_memory",
+        "test/swap_successors",
+        "test_unseen/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "e6c438ec2ff690d4704f7e842115c4ef",
+        "test/remove_required_fact": "2a99a7c4440159ea332c04457a580711",
+        "test/replace_key_fact": "70076d39d7d5fcb499796d15b1233000",
+        "test/swap_memory": "e03178002cc17f33dd7d6f678ac96199",
+        "test/swap_successors": "dacb5a9107b173726b5eed5c88c85498",
+        "test_unseen/original": "8d6df77728a982d92fcbc58bee11cd72"
+      }
+    },
+    {
+      "name": "primary-t1_frozen-M1-r32-s43",
+      "dataset": "confirmation",
+      "rows": 144000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "0c9cb1ea4686f5870da5ad5da3f06538"
+      }
+    },
+    {
+      "name": "primary-t1_frozen-M1-lin-r32-s17",
+      "dataset": "screening",
+      "rows": 768000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original",
+        "test/remove_required_fact",
+        "test/replace_key_fact",
+        "test/swap_memory",
+        "test/swap_successors",
+        "test_unseen/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "e6c438ec2ff690d4704f7e842115c4ef",
+        "test/remove_required_fact": "2a99a7c4440159ea332c04457a580711",
+        "test/replace_key_fact": "70076d39d7d5fcb499796d15b1233000",
+        "test/swap_memory": "e03178002cc17f33dd7d6f678ac96199",
+        "test/swap_successors": "dacb5a9107b173726b5eed5c88c85498",
+        "test_unseen/original": "8d6df77728a982d92fcbc58bee11cd72"
+      }
+    },
+    {
+      "name": "primary-t1_frozen-M1-lin-r32-s17",
+      "dataset": "confirmation",
+      "rows": 144000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "0c9cb1ea4686f5870da5ad5da3f06538"
+      }
+    },
+    {
+      "name": "primary-t1_frozen-M1-lin-r32-s29",
+      "dataset": "screening",
+      "rows": 768000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original",
+        "test/remove_required_fact",
+        "test/replace_key_fact",
+        "test/swap_memory",
+        "test/swap_successors",
+        "test_unseen/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "e6c438ec2ff690d4704f7e842115c4ef",
+        "test/remove_required_fact": "2a99a7c4440159ea332c04457a580711",
+        "test/replace_key_fact": "70076d39d7d5fcb499796d15b1233000",
+        "test/swap_memory": "e03178002cc17f33dd7d6f678ac96199",
+        "test/swap_successors": "dacb5a9107b173726b5eed5c88c85498",
+        "test_unseen/original": "8d6df77728a982d92fcbc58bee11cd72"
+      }
+    },
+    {
+      "name": "primary-t1_frozen-M1-lin-r32-s29",
+      "dataset": "confirmation",
+      "rows": 144000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "0c9cb1ea4686f5870da5ad5da3f06538"
+      }
+    },
+    {
+      "name": "primary-t1_frozen-M1-lin-r32-s43",
+      "dataset": "screening",
+      "rows": 768000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original",
+        "test/remove_required_fact",
+        "test/replace_key_fact",
+        "test/swap_memory",
+        "test/swap_successors",
+        "test_unseen/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "e6c438ec2ff690d4704f7e842115c4ef",
+        "test/remove_required_fact": "2a99a7c4440159ea332c04457a580711",
+        "test/replace_key_fact": "70076d39d7d5fcb499796d15b1233000",
+        "test/swap_memory": "e03178002cc17f33dd7d6f678ac96199",
+        "test/swap_successors": "dacb5a9107b173726b5eed5c88c85498",
+        "test_unseen/original": "8d6df77728a982d92fcbc58bee11cd72"
+      }
+    },
+    {
+      "name": "primary-t1_frozen-M1-lin-r32-s43",
+      "dataset": "confirmation",
+      "rows": 144000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "0c9cb1ea4686f5870da5ad5da3f06538"
+      }
+    },
+    {
+      "name": "primary-t1_frozen-B5-r32-s17",
+      "dataset": "screening",
+      "rows": 768000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original",
+        "test/remove_required_fact",
+        "test/replace_key_fact",
+        "test/swap_memory",
+        "test/swap_successors",
+        "test_unseen/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "e6c438ec2ff690d4704f7e842115c4ef",
+        "test/remove_required_fact": "2a99a7c4440159ea332c04457a580711",
+        "test/replace_key_fact": "70076d39d7d5fcb499796d15b1233000",
+        "test/swap_memory": "e03178002cc17f33dd7d6f678ac96199",
+        "test/swap_successors": "dacb5a9107b173726b5eed5c88c85498",
+        "test_unseen/original": "8d6df77728a982d92fcbc58bee11cd72"
+      }
+    },
+    {
+      "name": "primary-t1_frozen-B5-r32-s17",
+      "dataset": "confirmation",
+      "rows": 144000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "0c9cb1ea4686f5870da5ad5da3f06538"
+      }
+    },
+    {
+      "name": "primary-t1_frozen-B5-r32-s29",
+      "dataset": "screening",
+      "rows": 768000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original",
+        "test/remove_required_fact",
+        "test/replace_key_fact",
+        "test/swap_memory",
+        "test/swap_successors",
+        "test_unseen/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "e6c438ec2ff690d4704f7e842115c4ef",
+        "test/remove_required_fact": "2a99a7c4440159ea332c04457a580711",
+        "test/replace_key_fact": "70076d39d7d5fcb499796d15b1233000",
+        "test/swap_memory": "e03178002cc17f33dd7d6f678ac96199",
+        "test/swap_successors": "dacb5a9107b173726b5eed5c88c85498",
+        "test_unseen/original": "8d6df77728a982d92fcbc58bee11cd72"
+      }
+    },
+    {
+      "name": "primary-t1_frozen-B5-r32-s29",
+      "dataset": "confirmation",
+      "rows": 144000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "0c9cb1ea4686f5870da5ad5da3f06538"
+      }
+    },
+    {
+      "name": "primary-t1_frozen-B5-r32-s43",
+      "dataset": "screening",
+      "rows": 768000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original",
+        "test/remove_required_fact",
+        "test/replace_key_fact",
+        "test/swap_memory",
+        "test/swap_successors",
+        "test_unseen/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "e6c438ec2ff690d4704f7e842115c4ef",
+        "test/remove_required_fact": "2a99a7c4440159ea332c04457a580711",
+        "test/replace_key_fact": "70076d39d7d5fcb499796d15b1233000",
+        "test/swap_memory": "e03178002cc17f33dd7d6f678ac96199",
+        "test/swap_successors": "dacb5a9107b173726b5eed5c88c85498",
+        "test_unseen/original": "8d6df77728a982d92fcbc58bee11cd72"
+      }
+    },
+    {
+      "name": "primary-t1_frozen-B5-r32-s43",
+      "dataset": "confirmation",
+      "rows": 144000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "0c9cb1ea4686f5870da5ad5da3f06538"
+      }
+    },
+    {
+      "name": "primary-t1_frozen-B5-lin-r32-s17",
+      "dataset": "screening",
+      "rows": 768000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original",
+        "test/remove_required_fact",
+        "test/replace_key_fact",
+        "test/swap_memory",
+        "test/swap_successors",
+        "test_unseen/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "e6c438ec2ff690d4704f7e842115c4ef",
+        "test/remove_required_fact": "2a99a7c4440159ea332c04457a580711",
+        "test/replace_key_fact": "70076d39d7d5fcb499796d15b1233000",
+        "test/swap_memory": "e03178002cc17f33dd7d6f678ac96199",
+        "test/swap_successors": "dacb5a9107b173726b5eed5c88c85498",
+        "test_unseen/original": "8d6df77728a982d92fcbc58bee11cd72"
+      }
+    },
+    {
+      "name": "primary-t1_frozen-B5-lin-r32-s17",
+      "dataset": "confirmation",
+      "rows": 144000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "0c9cb1ea4686f5870da5ad5da3f06538"
+      }
+    },
+    {
+      "name": "primary-t1_frozen-B5-lin-r32-s29",
+      "dataset": "screening",
+      "rows": 768000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original",
+        "test/remove_required_fact",
+        "test/replace_key_fact",
+        "test/swap_memory",
+        "test/swap_successors",
+        "test_unseen/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "e6c438ec2ff690d4704f7e842115c4ef",
+        "test/remove_required_fact": "2a99a7c4440159ea332c04457a580711",
+        "test/replace_key_fact": "70076d39d7d5fcb499796d15b1233000",
+        "test/swap_memory": "e03178002cc17f33dd7d6f678ac96199",
+        "test/swap_successors": "dacb5a9107b173726b5eed5c88c85498",
+        "test_unseen/original": "8d6df77728a982d92fcbc58bee11cd72"
+      }
+    },
+    {
+      "name": "primary-t1_frozen-B5-lin-r32-s29",
+      "dataset": "confirmation",
+      "rows": 144000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "0c9cb1ea4686f5870da5ad5da3f06538"
+      }
+    },
+    {
+      "name": "primary-t1_frozen-B5-lin-r32-s43",
+      "dataset": "screening",
+      "rows": 768000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original",
+        "test/remove_required_fact",
+        "test/replace_key_fact",
+        "test/swap_memory",
+        "test/swap_successors",
+        "test_unseen/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "e6c438ec2ff690d4704f7e842115c4ef",
+        "test/remove_required_fact": "2a99a7c4440159ea332c04457a580711",
+        "test/replace_key_fact": "70076d39d7d5fcb499796d15b1233000",
+        "test/swap_memory": "e03178002cc17f33dd7d6f678ac96199",
+        "test/swap_successors": "dacb5a9107b173726b5eed5c88c85498",
+        "test_unseen/original": "8d6df77728a982d92fcbc58bee11cd72"
+      }
+    },
+    {
+      "name": "primary-t1_frozen-B5-lin-r32-s43",
+      "dataset": "confirmation",
+      "rows": 144000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "0c9cb1ea4686f5870da5ad5da3f06538"
+      }
+    },
+    {
+      "name": "primary-t1_frozen-B3-r32-s17",
+      "dataset": "screening",
+      "rows": 768000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original",
+        "test/remove_required_fact",
+        "test/replace_key_fact",
+        "test/swap_memory",
+        "test/swap_successors",
+        "test_unseen/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "e6c438ec2ff690d4704f7e842115c4ef",
+        "test/remove_required_fact": "2a99a7c4440159ea332c04457a580711",
+        "test/replace_key_fact": "70076d39d7d5fcb499796d15b1233000",
+        "test/swap_memory": "e03178002cc17f33dd7d6f678ac96199",
+        "test/swap_successors": "dacb5a9107b173726b5eed5c88c85498",
+        "test_unseen/original": "8d6df77728a982d92fcbc58bee11cd72"
+      }
+    },
+    {
+      "name": "primary-t1_frozen-B3-r32-s17",
+      "dataset": "confirmation",
+      "rows": 144000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "0c9cb1ea4686f5870da5ad5da3f06538"
+      }
+    },
+    {
+      "name": "primary-t1_frozen-B3-r32-s29",
+      "dataset": "screening",
+      "rows": 768000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original",
+        "test/remove_required_fact",
+        "test/replace_key_fact",
+        "test/swap_memory",
+        "test/swap_successors",
+        "test_unseen/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "e6c438ec2ff690d4704f7e842115c4ef",
+        "test/remove_required_fact": "2a99a7c4440159ea332c04457a580711",
+        "test/replace_key_fact": "70076d39d7d5fcb499796d15b1233000",
+        "test/swap_memory": "e03178002cc17f33dd7d6f678ac96199",
+        "test/swap_successors": "dacb5a9107b173726b5eed5c88c85498",
+        "test_unseen/original": "8d6df77728a982d92fcbc58bee11cd72"
+      }
+    },
+    {
+      "name": "primary-t1_frozen-B3-r32-s29",
+      "dataset": "confirmation",
+      "rows": 144000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "0c9cb1ea4686f5870da5ad5da3f06538"
+      }
+    },
+    {
+      "name": "primary-t1_frozen-B3-r32-s43",
+      "dataset": "screening",
+      "rows": 768000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original",
+        "test/remove_required_fact",
+        "test/replace_key_fact",
+        "test/swap_memory",
+        "test/swap_successors",
+        "test_unseen/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "e6c438ec2ff690d4704f7e842115c4ef",
+        "test/remove_required_fact": "2a99a7c4440159ea332c04457a580711",
+        "test/replace_key_fact": "70076d39d7d5fcb499796d15b1233000",
+        "test/swap_memory": "e03178002cc17f33dd7d6f678ac96199",
+        "test/swap_successors": "dacb5a9107b173726b5eed5c88c85498",
+        "test_unseen/original": "8d6df77728a982d92fcbc58bee11cd72"
+      }
+    },
+    {
+      "name": "primary-t1_frozen-B3-r32-s43",
+      "dataset": "confirmation",
+      "rows": 144000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "0c9cb1ea4686f5870da5ad5da3f06538"
+      }
+    },
+    {
+      "name": "primary-t1_frozen-B4-r32-s17",
+      "dataset": "screening",
+      "rows": 768000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original",
+        "test/remove_required_fact",
+        "test/replace_key_fact",
+        "test/swap_memory",
+        "test/swap_successors",
+        "test_unseen/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "e6c438ec2ff690d4704f7e842115c4ef",
+        "test/remove_required_fact": "2a99a7c4440159ea332c04457a580711",
+        "test/replace_key_fact": "70076d39d7d5fcb499796d15b1233000",
+        "test/swap_memory": "e03178002cc17f33dd7d6f678ac96199",
+        "test/swap_successors": "dacb5a9107b173726b5eed5c88c85498",
+        "test_unseen/original": "8d6df77728a982d92fcbc58bee11cd72"
+      }
+    },
+    {
+      "name": "primary-t1_frozen-B4-r32-s17",
+      "dataset": "confirmation",
+      "rows": 144000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "0c9cb1ea4686f5870da5ad5da3f06538"
+      }
+    },
+    {
+      "name": "primary-t1_frozen-B4-r32-s29",
+      "dataset": "screening",
+      "rows": 768000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original",
+        "test/remove_required_fact",
+        "test/replace_key_fact",
+        "test/swap_memory",
+        "test/swap_successors",
+        "test_unseen/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "e6c438ec2ff690d4704f7e842115c4ef",
+        "test/remove_required_fact": "2a99a7c4440159ea332c04457a580711",
+        "test/replace_key_fact": "70076d39d7d5fcb499796d15b1233000",
+        "test/swap_memory": "e03178002cc17f33dd7d6f678ac96199",
+        "test/swap_successors": "dacb5a9107b173726b5eed5c88c85498",
+        "test_unseen/original": "8d6df77728a982d92fcbc58bee11cd72"
+      }
+    },
+    {
+      "name": "primary-t1_frozen-B4-r32-s29",
+      "dataset": "confirmation",
+      "rows": 144000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "0c9cb1ea4686f5870da5ad5da3f06538"
+      }
+    },
+    {
+      "name": "primary-t1_frozen-B4-r32-s43",
+      "dataset": "screening",
+      "rows": 768000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original",
+        "test/remove_required_fact",
+        "test/replace_key_fact",
+        "test/swap_memory",
+        "test/swap_successors",
+        "test_unseen/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "e6c438ec2ff690d4704f7e842115c4ef",
+        "test/remove_required_fact": "2a99a7c4440159ea332c04457a580711",
+        "test/replace_key_fact": "70076d39d7d5fcb499796d15b1233000",
+        "test/swap_memory": "e03178002cc17f33dd7d6f678ac96199",
+        "test/swap_successors": "dacb5a9107b173726b5eed5c88c85498",
+        "test_unseen/original": "8d6df77728a982d92fcbc58bee11cd72"
+      }
+    },
+    {
+      "name": "primary-t1_frozen-B4-r32-s43",
+      "dataset": "confirmation",
+      "rows": 144000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "0c9cb1ea4686f5870da5ad5da3f06538"
+      }
+    },
+    {
+      "name": "primary-joint-M1-r32-s17",
+      "dataset": "screening",
+      "rows": 768000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original",
+        "test/remove_required_fact",
+        "test/replace_key_fact",
+        "test/swap_memory",
+        "test/swap_successors",
+        "test_unseen/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "e6c438ec2ff690d4704f7e842115c4ef",
+        "test/remove_required_fact": "2a99a7c4440159ea332c04457a580711",
+        "test/replace_key_fact": "70076d39d7d5fcb499796d15b1233000",
+        "test/swap_memory": "e03178002cc17f33dd7d6f678ac96199",
+        "test/swap_successors": "dacb5a9107b173726b5eed5c88c85498",
+        "test_unseen/original": "8d6df77728a982d92fcbc58bee11cd72"
+      }
+    },
+    {
+      "name": "primary-joint-M1-r32-s17",
+      "dataset": "confirmation",
+      "rows": 144000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "0c9cb1ea4686f5870da5ad5da3f06538"
+      }
+    },
+    {
+      "name": "primary-joint-M1-r32-s29",
+      "dataset": "screening",
+      "rows": 768000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original",
+        "test/remove_required_fact",
+        "test/replace_key_fact",
+        "test/swap_memory",
+        "test/swap_successors",
+        "test_unseen/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "e6c438ec2ff690d4704f7e842115c4ef",
+        "test/remove_required_fact": "2a99a7c4440159ea332c04457a580711",
+        "test/replace_key_fact": "70076d39d7d5fcb499796d15b1233000",
+        "test/swap_memory": "e03178002cc17f33dd7d6f678ac96199",
+        "test/swap_successors": "dacb5a9107b173726b5eed5c88c85498",
+        "test_unseen/original": "8d6df77728a982d92fcbc58bee11cd72"
+      }
+    },
+    {
+      "name": "primary-joint-M1-r32-s29",
+      "dataset": "confirmation",
+      "rows": 144000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "0c9cb1ea4686f5870da5ad5da3f06538"
+      }
+    },
+    {
+      "name": "primary-joint-M1-r32-s43",
+      "dataset": "screening",
+      "rows": 768000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original",
+        "test/remove_required_fact",
+        "test/replace_key_fact",
+        "test/swap_memory",
+        "test/swap_successors",
+        "test_unseen/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "e6c438ec2ff690d4704f7e842115c4ef",
+        "test/remove_required_fact": "2a99a7c4440159ea332c04457a580711",
+        "test/replace_key_fact": "70076d39d7d5fcb499796d15b1233000",
+        "test/swap_memory": "e03178002cc17f33dd7d6f678ac96199",
+        "test/swap_successors": "dacb5a9107b173726b5eed5c88c85498",
+        "test_unseen/original": "8d6df77728a982d92fcbc58bee11cd72"
+      }
+    },
+    {
+      "name": "primary-joint-M1-r32-s43",
+      "dataset": "confirmation",
+      "rows": 144000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "0c9cb1ea4686f5870da5ad5da3f06538"
+      }
+    },
+    {
+      "name": "primary-joint-M1-lin-r32-s17",
+      "dataset": "screening",
+      "rows": 768000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original",
+        "test/remove_required_fact",
+        "test/replace_key_fact",
+        "test/swap_memory",
+        "test/swap_successors",
+        "test_unseen/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "e6c438ec2ff690d4704f7e842115c4ef",
+        "test/remove_required_fact": "2a99a7c4440159ea332c04457a580711",
+        "test/replace_key_fact": "70076d39d7d5fcb499796d15b1233000",
+        "test/swap_memory": "e03178002cc17f33dd7d6f678ac96199",
+        "test/swap_successors": "dacb5a9107b173726b5eed5c88c85498",
+        "test_unseen/original": "8d6df77728a982d92fcbc58bee11cd72"
+      }
+    },
+    {
+      "name": "primary-joint-M1-lin-r32-s17",
+      "dataset": "confirmation",
+      "rows": 144000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "0c9cb1ea4686f5870da5ad5da3f06538"
+      }
+    },
+    {
+      "name": "primary-joint-M1-lin-r32-s29",
+      "dataset": "screening",
+      "rows": 768000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original",
+        "test/remove_required_fact",
+        "test/replace_key_fact",
+        "test/swap_memory",
+        "test/swap_successors",
+        "test_unseen/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "e6c438ec2ff690d4704f7e842115c4ef",
+        "test/remove_required_fact": "2a99a7c4440159ea332c04457a580711",
+        "test/replace_key_fact": "70076d39d7d5fcb499796d15b1233000",
+        "test/swap_memory": "e03178002cc17f33dd7d6f678ac96199",
+        "test/swap_successors": "dacb5a9107b173726b5eed5c88c85498",
+        "test_unseen/original": "8d6df77728a982d92fcbc58bee11cd72"
+      }
+    },
+    {
+      "name": "primary-joint-M1-lin-r32-s29",
+      "dataset": "confirmation",
+      "rows": 144000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "0c9cb1ea4686f5870da5ad5da3f06538"
+      }
+    },
+    {
+      "name": "primary-joint-M1-lin-r32-s43",
+      "dataset": "screening",
+      "rows": 768000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original",
+        "test/remove_required_fact",
+        "test/replace_key_fact",
+        "test/swap_memory",
+        "test/swap_successors",
+        "test_unseen/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "e6c438ec2ff690d4704f7e842115c4ef",
+        "test/remove_required_fact": "2a99a7c4440159ea332c04457a580711",
+        "test/replace_key_fact": "70076d39d7d5fcb499796d15b1233000",
+        "test/swap_memory": "e03178002cc17f33dd7d6f678ac96199",
+        "test/swap_successors": "dacb5a9107b173726b5eed5c88c85498",
+        "test_unseen/original": "8d6df77728a982d92fcbc58bee11cd72"
+      }
+    },
+    {
+      "name": "primary-joint-M1-lin-r32-s43",
+      "dataset": "confirmation",
+      "rows": 144000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "0c9cb1ea4686f5870da5ad5da3f06538"
+      }
+    },
+    {
+      "name": "primary-joint-B5-r32-s17",
+      "dataset": "screening",
+      "rows": 768000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original",
+        "test/remove_required_fact",
+        "test/replace_key_fact",
+        "test/swap_memory",
+        "test/swap_successors",
+        "test_unseen/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "e6c438ec2ff690d4704f7e842115c4ef",
+        "test/remove_required_fact": "2a99a7c4440159ea332c04457a580711",
+        "test/replace_key_fact": "70076d39d7d5fcb499796d15b1233000",
+        "test/swap_memory": "e03178002cc17f33dd7d6f678ac96199",
+        "test/swap_successors": "dacb5a9107b173726b5eed5c88c85498",
+        "test_unseen/original": "8d6df77728a982d92fcbc58bee11cd72"
+      }
+    },
+    {
+      "name": "primary-joint-B5-r32-s17",
+      "dataset": "confirmation",
+      "rows": 144000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "0c9cb1ea4686f5870da5ad5da3f06538"
+      }
+    },
+    {
+      "name": "primary-joint-B5-r32-s29",
+      "dataset": "screening",
+      "rows": 768000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original",
+        "test/remove_required_fact",
+        "test/replace_key_fact",
+        "test/swap_memory",
+        "test/swap_successors",
+        "test_unseen/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "e6c438ec2ff690d4704f7e842115c4ef",
+        "test/remove_required_fact": "2a99a7c4440159ea332c04457a580711",
+        "test/replace_key_fact": "70076d39d7d5fcb499796d15b1233000",
+        "test/swap_memory": "e03178002cc17f33dd7d6f678ac96199",
+        "test/swap_successors": "dacb5a9107b173726b5eed5c88c85498",
+        "test_unseen/original": "8d6df77728a982d92fcbc58bee11cd72"
+      }
+    },
+    {
+      "name": "primary-joint-B5-r32-s29",
+      "dataset": "confirmation",
+      "rows": 144000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "0c9cb1ea4686f5870da5ad5da3f06538"
+      }
+    },
+    {
+      "name": "primary-joint-B5-r32-s43",
+      "dataset": "screening",
+      "rows": 768000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original",
+        "test/remove_required_fact",
+        "test/replace_key_fact",
+        "test/swap_memory",
+        "test/swap_successors",
+        "test_unseen/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "e6c438ec2ff690d4704f7e842115c4ef",
+        "test/remove_required_fact": "2a99a7c4440159ea332c04457a580711",
+        "test/replace_key_fact": "70076d39d7d5fcb499796d15b1233000",
+        "test/swap_memory": "e03178002cc17f33dd7d6f678ac96199",
+        "test/swap_successors": "dacb5a9107b173726b5eed5c88c85498",
+        "test_unseen/original": "8d6df77728a982d92fcbc58bee11cd72"
+      }
+    },
+    {
+      "name": "primary-joint-B5-r32-s43",
+      "dataset": "confirmation",
+      "rows": 144000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "0c9cb1ea4686f5870da5ad5da3f06538"
+      }
+    },
+    {
+      "name": "primary-joint-B5-lin-r32-s17",
+      "dataset": "screening",
+      "rows": 768000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original",
+        "test/remove_required_fact",
+        "test/replace_key_fact",
+        "test/swap_memory",
+        "test/swap_successors",
+        "test_unseen/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "e6c438ec2ff690d4704f7e842115c4ef",
+        "test/remove_required_fact": "2a99a7c4440159ea332c04457a580711",
+        "test/replace_key_fact": "70076d39d7d5fcb499796d15b1233000",
+        "test/swap_memory": "e03178002cc17f33dd7d6f678ac96199",
+        "test/swap_successors": "dacb5a9107b173726b5eed5c88c85498",
+        "test_unseen/original": "8d6df77728a982d92fcbc58bee11cd72"
+      }
+    },
+    {
+      "name": "primary-joint-B5-lin-r32-s17",
+      "dataset": "confirmation",
+      "rows": 144000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "0c9cb1ea4686f5870da5ad5da3f06538"
+      }
+    },
+    {
+      "name": "primary-joint-B5-lin-r32-s29",
+      "dataset": "screening",
+      "rows": 768000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original",
+        "test/remove_required_fact",
+        "test/replace_key_fact",
+        "test/swap_memory",
+        "test/swap_successors",
+        "test_unseen/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "e6c438ec2ff690d4704f7e842115c4ef",
+        "test/remove_required_fact": "2a99a7c4440159ea332c04457a580711",
+        "test/replace_key_fact": "70076d39d7d5fcb499796d15b1233000",
+        "test/swap_memory": "e03178002cc17f33dd7d6f678ac96199",
+        "test/swap_successors": "dacb5a9107b173726b5eed5c88c85498",
+        "test_unseen/original": "8d6df77728a982d92fcbc58bee11cd72"
+      }
+    },
+    {
+      "name": "primary-joint-B5-lin-r32-s29",
+      "dataset": "confirmation",
+      "rows": 144000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "0c9cb1ea4686f5870da5ad5da3f06538"
+      }
+    },
+    {
+      "name": "primary-joint-B5-lin-r32-s43",
+      "dataset": "screening",
+      "rows": 768000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original",
+        "test/remove_required_fact",
+        "test/replace_key_fact",
+        "test/swap_memory",
+        "test/swap_successors",
+        "test_unseen/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "e6c438ec2ff690d4704f7e842115c4ef",
+        "test/remove_required_fact": "2a99a7c4440159ea332c04457a580711",
+        "test/replace_key_fact": "70076d39d7d5fcb499796d15b1233000",
+        "test/swap_memory": "e03178002cc17f33dd7d6f678ac96199",
+        "test/swap_successors": "dacb5a9107b173726b5eed5c88c85498",
+        "test_unseen/original": "8d6df77728a982d92fcbc58bee11cd72"
+      }
+    },
+    {
+      "name": "primary-joint-B5-lin-r32-s43",
+      "dataset": "confirmation",
+      "rows": 144000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "0c9cb1ea4686f5870da5ad5da3f06538"
+      }
+    },
+    {
+      "name": "primary-joint-B3-r32-s17",
+      "dataset": "screening",
+      "rows": 768000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original",
+        "test/remove_required_fact",
+        "test/replace_key_fact",
+        "test/swap_memory",
+        "test/swap_successors",
+        "test_unseen/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "e6c438ec2ff690d4704f7e842115c4ef",
+        "test/remove_required_fact": "2a99a7c4440159ea332c04457a580711",
+        "test/replace_key_fact": "70076d39d7d5fcb499796d15b1233000",
+        "test/swap_memory": "e03178002cc17f33dd7d6f678ac96199",
+        "test/swap_successors": "dacb5a9107b173726b5eed5c88c85498",
+        "test_unseen/original": "8d6df77728a982d92fcbc58bee11cd72"
+      }
+    },
+    {
+      "name": "primary-joint-B3-r32-s17",
+      "dataset": "confirmation",
+      "rows": 144000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "0c9cb1ea4686f5870da5ad5da3f06538"
+      }
+    },
+    {
+      "name": "primary-joint-B3-r32-s29",
+      "dataset": "screening",
+      "rows": 768000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original",
+        "test/remove_required_fact",
+        "test/replace_key_fact",
+        "test/swap_memory",
+        "test/swap_successors",
+        "test_unseen/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "e6c438ec2ff690d4704f7e842115c4ef",
+        "test/remove_required_fact": "2a99a7c4440159ea332c04457a580711",
+        "test/replace_key_fact": "70076d39d7d5fcb499796d15b1233000",
+        "test/swap_memory": "e03178002cc17f33dd7d6f678ac96199",
+        "test/swap_successors": "dacb5a9107b173726b5eed5c88c85498",
+        "test_unseen/original": "8d6df77728a982d92fcbc58bee11cd72"
+      }
+    },
+    {
+      "name": "primary-joint-B3-r32-s29",
+      "dataset": "confirmation",
+      "rows": 144000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "0c9cb1ea4686f5870da5ad5da3f06538"
+      }
+    },
+    {
+      "name": "primary-joint-B3-r32-s43",
+      "dataset": "screening",
+      "rows": 768000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original",
+        "test/remove_required_fact",
+        "test/replace_key_fact",
+        "test/swap_memory",
+        "test/swap_successors",
+        "test_unseen/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "e6c438ec2ff690d4704f7e842115c4ef",
+        "test/remove_required_fact": "2a99a7c4440159ea332c04457a580711",
+        "test/replace_key_fact": "70076d39d7d5fcb499796d15b1233000",
+        "test/swap_memory": "e03178002cc17f33dd7d6f678ac96199",
+        "test/swap_successors": "dacb5a9107b173726b5eed5c88c85498",
+        "test_unseen/original": "8d6df77728a982d92fcbc58bee11cd72"
+      }
+    },
+    {
+      "name": "primary-joint-B3-r32-s43",
+      "dataset": "confirmation",
+      "rows": 144000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "0c9cb1ea4686f5870da5ad5da3f06538"
+      }
+    },
+    {
+      "name": "primary-joint-B4-r32-s17",
+      "dataset": "screening",
+      "rows": 768000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original",
+        "test/remove_required_fact",
+        "test/replace_key_fact",
+        "test/swap_memory",
+        "test/swap_successors",
+        "test_unseen/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "e6c438ec2ff690d4704f7e842115c4ef",
+        "test/remove_required_fact": "2a99a7c4440159ea332c04457a580711",
+        "test/replace_key_fact": "70076d39d7d5fcb499796d15b1233000",
+        "test/swap_memory": "e03178002cc17f33dd7d6f678ac96199",
+        "test/swap_successors": "dacb5a9107b173726b5eed5c88c85498",
+        "test_unseen/original": "8d6df77728a982d92fcbc58bee11cd72"
+      }
+    },
+    {
+      "name": "primary-joint-B4-r32-s17",
+      "dataset": "confirmation",
+      "rows": 144000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "0c9cb1ea4686f5870da5ad5da3f06538"
+      }
+    },
+    {
+      "name": "primary-joint-B4-r32-s29",
+      "dataset": "screening",
+      "rows": 768000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original",
+        "test/remove_required_fact",
+        "test/replace_key_fact",
+        "test/swap_memory",
+        "test/swap_successors",
+        "test_unseen/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "e6c438ec2ff690d4704f7e842115c4ef",
+        "test/remove_required_fact": "2a99a7c4440159ea332c04457a580711",
+        "test/replace_key_fact": "70076d39d7d5fcb499796d15b1233000",
+        "test/swap_memory": "e03178002cc17f33dd7d6f678ac96199",
+        "test/swap_successors": "dacb5a9107b173726b5eed5c88c85498",
+        "test_unseen/original": "8d6df77728a982d92fcbc58bee11cd72"
+      }
+    },
+    {
+      "name": "primary-joint-B4-r32-s29",
+      "dataset": "confirmation",
+      "rows": 144000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "0c9cb1ea4686f5870da5ad5da3f06538"
+      }
+    },
+    {
+      "name": "primary-joint-B4-r32-s43",
+      "dataset": "screening",
+      "rows": 768000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original",
+        "test/remove_required_fact",
+        "test/replace_key_fact",
+        "test/swap_memory",
+        "test/swap_successors",
+        "test_unseen/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "e6c438ec2ff690d4704f7e842115c4ef",
+        "test/remove_required_fact": "2a99a7c4440159ea332c04457a580711",
+        "test/replace_key_fact": "70076d39d7d5fcb499796d15b1233000",
+        "test/swap_memory": "e03178002cc17f33dd7d6f678ac96199",
+        "test/swap_successors": "dacb5a9107b173726b5eed5c88c85498",
+        "test_unseen/original": "8d6df77728a982d92fcbc58bee11cd72"
+      }
+    },
+    {
+      "name": "primary-joint-B4-r32-s43",
+      "dataset": "confirmation",
+      "rows": 144000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "0c9cb1ea4686f5870da5ad5da3f06538"
+      }
+    },
+    {
+      "name": "replication-t1_frozen-M1-r32-s17",
+      "dataset": "screening",
+      "rows": 768000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original",
+        "test/remove_required_fact",
+        "test/replace_key_fact",
+        "test/swap_memory",
+        "test/swap_successors",
+        "test_unseen/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "c7f0f9094e65efbdaae57ea1177444d1",
+        "test/remove_required_fact": "5c642949c616ba8829da4af735255c0d",
+        "test/replace_key_fact": "e4ffa7575af381af7e634938b1f2a420",
+        "test/swap_memory": "538a16b358845adf6e72a0ee7d31abbf",
+        "test/swap_successors": "77b02df28e606070816343b012eb647b",
+        "test_unseen/original": "d485c037e8c69ec2ee273d7eb4ce1a88"
+      }
+    },
+    {
+      "name": "replication-t1_frozen-M1-r32-s17",
+      "dataset": "confirmation",
+      "rows": 144000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "79ec16093398929013db6d09d93bb231"
+      }
+    },
+    {
+      "name": "replication-t1_frozen-M1-r32-s29",
+      "dataset": "screening",
+      "rows": 768000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original",
+        "test/remove_required_fact",
+        "test/replace_key_fact",
+        "test/swap_memory",
+        "test/swap_successors",
+        "test_unseen/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "c7f0f9094e65efbdaae57ea1177444d1",
+        "test/remove_required_fact": "5c642949c616ba8829da4af735255c0d",
+        "test/replace_key_fact": "e4ffa7575af381af7e634938b1f2a420",
+        "test/swap_memory": "538a16b358845adf6e72a0ee7d31abbf",
+        "test/swap_successors": "77b02df28e606070816343b012eb647b",
+        "test_unseen/original": "d485c037e8c69ec2ee273d7eb4ce1a88"
+      }
+    },
+    {
+      "name": "replication-t1_frozen-M1-r32-s29",
+      "dataset": "confirmation",
+      "rows": 144000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "79ec16093398929013db6d09d93bb231"
+      }
+    },
+    {
+      "name": "replication-t1_frozen-M1-r32-s43",
+      "dataset": "screening",
+      "rows": 768000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original",
+        "test/remove_required_fact",
+        "test/replace_key_fact",
+        "test/swap_memory",
+        "test/swap_successors",
+        "test_unseen/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "c7f0f9094e65efbdaae57ea1177444d1",
+        "test/remove_required_fact": "5c642949c616ba8829da4af735255c0d",
+        "test/replace_key_fact": "e4ffa7575af381af7e634938b1f2a420",
+        "test/swap_memory": "538a16b358845adf6e72a0ee7d31abbf",
+        "test/swap_successors": "77b02df28e606070816343b012eb647b",
+        "test_unseen/original": "d485c037e8c69ec2ee273d7eb4ce1a88"
+      }
+    },
+    {
+      "name": "replication-t1_frozen-M1-r32-s43",
+      "dataset": "confirmation",
+      "rows": 144000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "79ec16093398929013db6d09d93bb231"
+      }
+    },
+    {
+      "name": "replication-t1_frozen-M1-lin-r32-s17",
+      "dataset": "screening",
+      "rows": 768000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original",
+        "test/remove_required_fact",
+        "test/replace_key_fact",
+        "test/swap_memory",
+        "test/swap_successors",
+        "test_unseen/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "c7f0f9094e65efbdaae57ea1177444d1",
+        "test/remove_required_fact": "5c642949c616ba8829da4af735255c0d",
+        "test/replace_key_fact": "e4ffa7575af381af7e634938b1f2a420",
+        "test/swap_memory": "538a16b358845adf6e72a0ee7d31abbf",
+        "test/swap_successors": "77b02df28e606070816343b012eb647b",
+        "test_unseen/original": "d485c037e8c69ec2ee273d7eb4ce1a88"
+      }
+    },
+    {
+      "name": "replication-t1_frozen-M1-lin-r32-s17",
+      "dataset": "confirmation",
+      "rows": 144000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "79ec16093398929013db6d09d93bb231"
+      }
+    },
+    {
+      "name": "replication-t1_frozen-M1-lin-r32-s29",
+      "dataset": "screening",
+      "rows": 768000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original",
+        "test/remove_required_fact",
+        "test/replace_key_fact",
+        "test/swap_memory",
+        "test/swap_successors",
+        "test_unseen/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "c7f0f9094e65efbdaae57ea1177444d1",
+        "test/remove_required_fact": "5c642949c616ba8829da4af735255c0d",
+        "test/replace_key_fact": "e4ffa7575af381af7e634938b1f2a420",
+        "test/swap_memory": "538a16b358845adf6e72a0ee7d31abbf",
+        "test/swap_successors": "77b02df28e606070816343b012eb647b",
+        "test_unseen/original": "d485c037e8c69ec2ee273d7eb4ce1a88"
+      }
+    },
+    {
+      "name": "replication-t1_frozen-M1-lin-r32-s29",
+      "dataset": "confirmation",
+      "rows": 144000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "79ec16093398929013db6d09d93bb231"
+      }
+    },
+    {
+      "name": "replication-t1_frozen-M1-lin-r32-s43",
+      "dataset": "screening",
+      "rows": 768000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original",
+        "test/remove_required_fact",
+        "test/replace_key_fact",
+        "test/swap_memory",
+        "test/swap_successors",
+        "test_unseen/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "c7f0f9094e65efbdaae57ea1177444d1",
+        "test/remove_required_fact": "5c642949c616ba8829da4af735255c0d",
+        "test/replace_key_fact": "e4ffa7575af381af7e634938b1f2a420",
+        "test/swap_memory": "538a16b358845adf6e72a0ee7d31abbf",
+        "test/swap_successors": "77b02df28e606070816343b012eb647b",
+        "test_unseen/original": "d485c037e8c69ec2ee273d7eb4ce1a88"
+      }
+    },
+    {
+      "name": "replication-t1_frozen-M1-lin-r32-s43",
+      "dataset": "confirmation",
+      "rows": 144000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "79ec16093398929013db6d09d93bb231"
+      }
+    },
+    {
+      "name": "replication-joint-M1-r32-s17",
+      "dataset": "screening",
+      "rows": 768000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original",
+        "test/remove_required_fact",
+        "test/replace_key_fact",
+        "test/swap_memory",
+        "test/swap_successors",
+        "test_unseen/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "c7f0f9094e65efbdaae57ea1177444d1",
+        "test/remove_required_fact": "5c642949c616ba8829da4af735255c0d",
+        "test/replace_key_fact": "e4ffa7575af381af7e634938b1f2a420",
+        "test/swap_memory": "538a16b358845adf6e72a0ee7d31abbf",
+        "test/swap_successors": "77b02df28e606070816343b012eb647b",
+        "test_unseen/original": "d485c037e8c69ec2ee273d7eb4ce1a88"
+      }
+    },
+    {
+      "name": "replication-joint-M1-r32-s17",
+      "dataset": "confirmation",
+      "rows": 144000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "79ec16093398929013db6d09d93bb231"
+      }
+    },
+    {
+      "name": "replication-joint-M1-r32-s29",
+      "dataset": "screening",
+      "rows": 768000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original",
+        "test/remove_required_fact",
+        "test/replace_key_fact",
+        "test/swap_memory",
+        "test/swap_successors",
+        "test_unseen/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "c7f0f9094e65efbdaae57ea1177444d1",
+        "test/remove_required_fact": "5c642949c616ba8829da4af735255c0d",
+        "test/replace_key_fact": "e4ffa7575af381af7e634938b1f2a420",
+        "test/swap_memory": "538a16b358845adf6e72a0ee7d31abbf",
+        "test/swap_successors": "77b02df28e606070816343b012eb647b",
+        "test_unseen/original": "d485c037e8c69ec2ee273d7eb4ce1a88"
+      }
+    },
+    {
+      "name": "replication-joint-M1-r32-s29",
+      "dataset": "confirmation",
+      "rows": 144000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "79ec16093398929013db6d09d93bb231"
+      }
+    },
+    {
+      "name": "replication-joint-M1-r32-s43",
+      "dataset": "screening",
+      "rows": 768000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original",
+        "test/remove_required_fact",
+        "test/replace_key_fact",
+        "test/swap_memory",
+        "test/swap_successors",
+        "test_unseen/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "c7f0f9094e65efbdaae57ea1177444d1",
+        "test/remove_required_fact": "5c642949c616ba8829da4af735255c0d",
+        "test/replace_key_fact": "e4ffa7575af381af7e634938b1f2a420",
+        "test/swap_memory": "538a16b358845adf6e72a0ee7d31abbf",
+        "test/swap_successors": "77b02df28e606070816343b012eb647b",
+        "test_unseen/original": "d485c037e8c69ec2ee273d7eb4ce1a88"
+      }
+    },
+    {
+      "name": "replication-joint-M1-r32-s43",
+      "dataset": "confirmation",
+      "rows": 144000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "79ec16093398929013db6d09d93bb231"
+      }
+    },
+    {
+      "name": "replication-joint-M1-lin-r32-s17",
+      "dataset": "screening",
+      "rows": 768000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original",
+        "test/remove_required_fact",
+        "test/replace_key_fact",
+        "test/swap_memory",
+        "test/swap_successors",
+        "test_unseen/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "c7f0f9094e65efbdaae57ea1177444d1",
+        "test/remove_required_fact": "5c642949c616ba8829da4af735255c0d",
+        "test/replace_key_fact": "e4ffa7575af381af7e634938b1f2a420",
+        "test/swap_memory": "538a16b358845adf6e72a0ee7d31abbf",
+        "test/swap_successors": "77b02df28e606070816343b012eb647b",
+        "test_unseen/original": "d485c037e8c69ec2ee273d7eb4ce1a88"
+      }
+    },
+    {
+      "name": "replication-joint-M1-lin-r32-s17",
+      "dataset": "confirmation",
+      "rows": 144000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "79ec16093398929013db6d09d93bb231"
+      }
+    },
+    {
+      "name": "replication-joint-M1-lin-r32-s29",
+      "dataset": "screening",
+      "rows": 768000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original",
+        "test/remove_required_fact",
+        "test/replace_key_fact",
+        "test/swap_memory",
+        "test/swap_successors",
+        "test_unseen/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "c7f0f9094e65efbdaae57ea1177444d1",
+        "test/remove_required_fact": "5c642949c616ba8829da4af735255c0d",
+        "test/replace_key_fact": "e4ffa7575af381af7e634938b1f2a420",
+        "test/swap_memory": "538a16b358845adf6e72a0ee7d31abbf",
+        "test/swap_successors": "77b02df28e606070816343b012eb647b",
+        "test_unseen/original": "d485c037e8c69ec2ee273d7eb4ce1a88"
+      }
+    },
+    {
+      "name": "replication-joint-M1-lin-r32-s29",
+      "dataset": "confirmation",
+      "rows": 144000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "79ec16093398929013db6d09d93bb231"
+      }
+    },
+    {
+      "name": "replication-joint-M1-lin-r32-s43",
+      "dataset": "screening",
+      "rows": 768000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original",
+        "test/remove_required_fact",
+        "test/replace_key_fact",
+        "test/swap_memory",
+        "test/swap_successors",
+        "test_unseen/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "c7f0f9094e65efbdaae57ea1177444d1",
+        "test/remove_required_fact": "5c642949c616ba8829da4af735255c0d",
+        "test/replace_key_fact": "e4ffa7575af381af7e634938b1f2a420",
+        "test/swap_memory": "538a16b358845adf6e72a0ee7d31abbf",
+        "test/swap_successors": "77b02df28e606070816343b012eb647b",
+        "test_unseen/original": "d485c037e8c69ec2ee273d7eb4ce1a88"
+      }
+    },
+    {
+      "name": "replication-joint-M1-lin-r32-s43",
+      "dataset": "confirmation",
+      "rows": 144000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "79ec16093398929013db6d09d93bb231"
+      }
+    },
+    {
+      "name": "replication-oracle_random-M1-r32-s17",
+      "dataset": "screening",
+      "rows": 768000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original",
+        "test/remove_required_fact",
+        "test/replace_key_fact",
+        "test/swap_memory",
+        "test/swap_successors",
+        "test_unseen/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "c6c5b2530d608ebe9b712247b3b1bc5f",
+        "test/remove_required_fact": "d37961677859d036e492527dddc08043",
+        "test/replace_key_fact": "cd098bfe2451353d79e5b2622e6e58c3",
+        "test/swap_memory": "b6619b72c67c70e24f31442684f4a9cf",
+        "test/swap_successors": "56f45142e526b3e2200adfc59accbd49",
+        "test_unseen/original": "a4affd9274c92f54f98af84c1993ddfe"
+      }
+    },
+    {
+      "name": "replication-oracle_random-M1-r32-s17",
+      "dataset": "confirmation",
+      "rows": 144000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "c173bc15314c02316144a466e2ca5de6"
+      }
+    },
+    {
+      "name": "replication-oracle_random-M1-r32-s29",
+      "dataset": "screening",
+      "rows": 768000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original",
+        "test/remove_required_fact",
+        "test/replace_key_fact",
+        "test/swap_memory",
+        "test/swap_successors",
+        "test_unseen/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "c6c5b2530d608ebe9b712247b3b1bc5f",
+        "test/remove_required_fact": "d37961677859d036e492527dddc08043",
+        "test/replace_key_fact": "cd098bfe2451353d79e5b2622e6e58c3",
+        "test/swap_memory": "b6619b72c67c70e24f31442684f4a9cf",
+        "test/swap_successors": "56f45142e526b3e2200adfc59accbd49",
+        "test_unseen/original": "a4affd9274c92f54f98af84c1993ddfe"
+      }
+    },
+    {
+      "name": "replication-oracle_random-M1-r32-s29",
+      "dataset": "confirmation",
+      "rows": 144000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "c173bc15314c02316144a466e2ca5de6"
+      }
+    },
+    {
+      "name": "replication-oracle_random-M1-r32-s43",
+      "dataset": "screening",
+      "rows": 768000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original",
+        "test/remove_required_fact",
+        "test/replace_key_fact",
+        "test/swap_memory",
+        "test/swap_successors",
+        "test_unseen/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "c6c5b2530d608ebe9b712247b3b1bc5f",
+        "test/remove_required_fact": "d37961677859d036e492527dddc08043",
+        "test/replace_key_fact": "cd098bfe2451353d79e5b2622e6e58c3",
+        "test/swap_memory": "b6619b72c67c70e24f31442684f4a9cf",
+        "test/swap_successors": "56f45142e526b3e2200adfc59accbd49",
+        "test_unseen/original": "a4affd9274c92f54f98af84c1993ddfe"
+      }
+    },
+    {
+      "name": "replication-oracle_random-M1-r32-s43",
+      "dataset": "confirmation",
+      "rows": 144000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "c173bc15314c02316144a466e2ca5de6"
+      }
+    },
+    {
+      "name": "replication-oracle_random-M1-lin-r32-s17",
+      "dataset": "screening",
+      "rows": 768000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original",
+        "test/remove_required_fact",
+        "test/replace_key_fact",
+        "test/swap_memory",
+        "test/swap_successors",
+        "test_unseen/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "c6c5b2530d608ebe9b712247b3b1bc5f",
+        "test/remove_required_fact": "d37961677859d036e492527dddc08043",
+        "test/replace_key_fact": "cd098bfe2451353d79e5b2622e6e58c3",
+        "test/swap_memory": "b6619b72c67c70e24f31442684f4a9cf",
+        "test/swap_successors": "56f45142e526b3e2200adfc59accbd49",
+        "test_unseen/original": "a4affd9274c92f54f98af84c1993ddfe"
+      }
+    },
+    {
+      "name": "replication-oracle_random-M1-lin-r32-s17",
+      "dataset": "confirmation",
+      "rows": 144000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "c173bc15314c02316144a466e2ca5de6"
+      }
+    },
+    {
+      "name": "replication-oracle_random-M1-lin-r32-s29",
+      "dataset": "screening",
+      "rows": 768000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original",
+        "test/remove_required_fact",
+        "test/replace_key_fact",
+        "test/swap_memory",
+        "test/swap_successors",
+        "test_unseen/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "c6c5b2530d608ebe9b712247b3b1bc5f",
+        "test/remove_required_fact": "d37961677859d036e492527dddc08043",
+        "test/replace_key_fact": "cd098bfe2451353d79e5b2622e6e58c3",
+        "test/swap_memory": "b6619b72c67c70e24f31442684f4a9cf",
+        "test/swap_successors": "56f45142e526b3e2200adfc59accbd49",
+        "test_unseen/original": "a4affd9274c92f54f98af84c1993ddfe"
+      }
+    },
+    {
+      "name": "replication-oracle_random-M1-lin-r32-s29",
+      "dataset": "confirmation",
+      "rows": 144000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "c173bc15314c02316144a466e2ca5de6"
+      }
+    },
+    {
+      "name": "replication-oracle_random-M1-lin-r32-s43",
+      "dataset": "screening",
+      "rows": 768000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original",
+        "test/remove_required_fact",
+        "test/replace_key_fact",
+        "test/swap_memory",
+        "test/swap_successors",
+        "test_unseen/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "c6c5b2530d608ebe9b712247b3b1bc5f",
+        "test/remove_required_fact": "d37961677859d036e492527dddc08043",
+        "test/replace_key_fact": "cd098bfe2451353d79e5b2622e6e58c3",
+        "test/swap_memory": "b6619b72c67c70e24f31442684f4a9cf",
+        "test/swap_successors": "56f45142e526b3e2200adfc59accbd49",
+        "test_unseen/original": "a4affd9274c92f54f98af84c1993ddfe"
+      }
+    },
+    {
+      "name": "replication-oracle_random-M1-lin-r32-s43",
+      "dataset": "confirmation",
+      "rows": 144000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "c173bc15314c02316144a466e2ca5de6"
+      }
+    },
+    {
+      "name": "secondary-oracle_random-M1-r16-s17",
+      "dataset": "screening",
+      "rows": 720000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original",
+        "test/remove_required_fact",
+        "test/replace_key_fact",
+        "test/swap_memory",
+        "test_unseen/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "e6c438ec2ff690d4704f7e842115c4ef",
+        "test/remove_required_fact": "2a99a7c4440159ea332c04457a580711",
+        "test/replace_key_fact": "70076d39d7d5fcb499796d15b1233000",
+        "test/swap_memory": "e03178002cc17f33dd7d6f678ac96199",
+        "test_unseen/original": "8d6df77728a982d92fcbc58bee11cd72"
+      }
+    },
+    {
+      "name": "secondary-oracle_random-M1-r16-s17",
+      "dataset": "confirmation",
+      "rows": 144000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "0c9cb1ea4686f5870da5ad5da3f06538"
+      }
+    },
+    {
+      "name": "secondary-oracle_random-M1-lin-r16-s17",
+      "dataset": "screening",
+      "rows": 720000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original",
+        "test/remove_required_fact",
+        "test/replace_key_fact",
+        "test/swap_memory",
+        "test_unseen/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "e6c438ec2ff690d4704f7e842115c4ef",
+        "test/remove_required_fact": "2a99a7c4440159ea332c04457a580711",
+        "test/replace_key_fact": "70076d39d7d5fcb499796d15b1233000",
+        "test/swap_memory": "e03178002cc17f33dd7d6f678ac96199",
+        "test_unseen/original": "8d6df77728a982d92fcbc58bee11cd72"
+      }
+    },
+    {
+      "name": "secondary-oracle_random-M1-lin-r16-s17",
+      "dataset": "confirmation",
+      "rows": 144000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "0c9cb1ea4686f5870da5ad5da3f06538"
+      }
+    },
+    {
+      "name": "secondary-oracle_random-B5-r16-s17",
+      "dataset": "screening",
+      "rows": 720000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original",
+        "test/remove_required_fact",
+        "test/replace_key_fact",
+        "test/swap_memory",
+        "test_unseen/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "e6c438ec2ff690d4704f7e842115c4ef",
+        "test/remove_required_fact": "2a99a7c4440159ea332c04457a580711",
+        "test/replace_key_fact": "70076d39d7d5fcb499796d15b1233000",
+        "test/swap_memory": "e03178002cc17f33dd7d6f678ac96199",
+        "test_unseen/original": "8d6df77728a982d92fcbc58bee11cd72"
+      }
+    },
+    {
+      "name": "secondary-oracle_random-B5-r16-s17",
+      "dataset": "confirmation",
+      "rows": 144000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "0c9cb1ea4686f5870da5ad5da3f06538"
+      }
+    },
+    {
+      "name": "secondary-oracle_random-B5-lin-r16-s17",
+      "dataset": "screening",
+      "rows": 720000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original",
+        "test/remove_required_fact",
+        "test/replace_key_fact",
+        "test/swap_memory",
+        "test_unseen/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "e6c438ec2ff690d4704f7e842115c4ef",
+        "test/remove_required_fact": "2a99a7c4440159ea332c04457a580711",
+        "test/replace_key_fact": "70076d39d7d5fcb499796d15b1233000",
+        "test/swap_memory": "e03178002cc17f33dd7d6f678ac96199",
+        "test_unseen/original": "8d6df77728a982d92fcbc58bee11cd72"
+      }
+    },
+    {
+      "name": "secondary-oracle_random-B5-lin-r16-s17",
+      "dataset": "confirmation",
+      "rows": 144000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "0c9cb1ea4686f5870da5ad5da3f06538"
+      }
+    },
+    {
+      "name": "secondary-oracle_orth-M1-r16-s17",
+      "dataset": "screening",
+      "rows": 720000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original",
+        "test/remove_required_fact",
+        "test/replace_key_fact",
+        "test/swap_memory",
+        "test_unseen/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "e6c438ec2ff690d4704f7e842115c4ef",
+        "test/remove_required_fact": "2a99a7c4440159ea332c04457a580711",
+        "test/replace_key_fact": "70076d39d7d5fcb499796d15b1233000",
+        "test/swap_memory": "e03178002cc17f33dd7d6f678ac96199",
+        "test_unseen/original": "8d6df77728a982d92fcbc58bee11cd72"
+      }
+    },
+    {
+      "name": "secondary-oracle_orth-M1-r16-s17",
+      "dataset": "confirmation",
+      "rows": 144000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "0c9cb1ea4686f5870da5ad5da3f06538"
+      }
+    },
+    {
+      "name": "secondary-oracle_orth-M1-lin-r16-s17",
+      "dataset": "screening",
+      "rows": 720000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original",
+        "test/remove_required_fact",
+        "test/replace_key_fact",
+        "test/swap_memory",
+        "test_unseen/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "e6c438ec2ff690d4704f7e842115c4ef",
+        "test/remove_required_fact": "2a99a7c4440159ea332c04457a580711",
+        "test/replace_key_fact": "70076d39d7d5fcb499796d15b1233000",
+        "test/swap_memory": "e03178002cc17f33dd7d6f678ac96199",
+        "test_unseen/original": "8d6df77728a982d92fcbc58bee11cd72"
+      }
+    },
+    {
+      "name": "secondary-oracle_orth-M1-lin-r16-s17",
+      "dataset": "confirmation",
+      "rows": 144000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "0c9cb1ea4686f5870da5ad5da3f06538"
+      }
+    },
+    {
+      "name": "secondary-oracle_orth-B5-r16-s17",
+      "dataset": "screening",
+      "rows": 720000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original",
+        "test/remove_required_fact",
+        "test/replace_key_fact",
+        "test/swap_memory",
+        "test_unseen/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "e6c438ec2ff690d4704f7e842115c4ef",
+        "test/remove_required_fact": "2a99a7c4440159ea332c04457a580711",
+        "test/replace_key_fact": "70076d39d7d5fcb499796d15b1233000",
+        "test/swap_memory": "e03178002cc17f33dd7d6f678ac96199",
+        "test_unseen/original": "8d6df77728a982d92fcbc58bee11cd72"
+      }
+    },
+    {
+      "name": "secondary-oracle_orth-B5-r16-s17",
+      "dataset": "confirmation",
+      "rows": 144000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "0c9cb1ea4686f5870da5ad5da3f06538"
+      }
+    },
+    {
+      "name": "secondary-oracle_orth-B5-lin-r16-s17",
+      "dataset": "screening",
+      "rows": 720000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original",
+        "test/remove_required_fact",
+        "test/replace_key_fact",
+        "test/swap_memory",
+        "test_unseen/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "e6c438ec2ff690d4704f7e842115c4ef",
+        "test/remove_required_fact": "2a99a7c4440159ea332c04457a580711",
+        "test/replace_key_fact": "70076d39d7d5fcb499796d15b1233000",
+        "test/swap_memory": "e03178002cc17f33dd7d6f678ac96199",
+        "test_unseen/original": "8d6df77728a982d92fcbc58bee11cd72"
+      }
+    },
+    {
+      "name": "secondary-oracle_orth-B5-lin-r16-s17",
+      "dataset": "confirmation",
+      "rows": 144000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "0c9cb1ea4686f5870da5ad5da3f06538"
+      }
+    },
+    {
+      "name": "secondary-joint-M1-r16-s17",
+      "dataset": "screening",
+      "rows": 720000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original",
+        "test/remove_required_fact",
+        "test/replace_key_fact",
+        "test/swap_memory",
+        "test_unseen/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "e6c438ec2ff690d4704f7e842115c4ef",
+        "test/remove_required_fact": "2a99a7c4440159ea332c04457a580711",
+        "test/replace_key_fact": "70076d39d7d5fcb499796d15b1233000",
+        "test/swap_memory": "e03178002cc17f33dd7d6f678ac96199",
+        "test_unseen/original": "8d6df77728a982d92fcbc58bee11cd72"
+      }
+    },
+    {
+      "name": "secondary-joint-M1-r16-s17",
+      "dataset": "confirmation",
+      "rows": 144000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "0c9cb1ea4686f5870da5ad5da3f06538"
+      }
+    },
+    {
+      "name": "secondary-joint-M1-lin-r16-s17",
+      "dataset": "screening",
+      "rows": 720000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original",
+        "test/remove_required_fact",
+        "test/replace_key_fact",
+        "test/swap_memory",
+        "test_unseen/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "e6c438ec2ff690d4704f7e842115c4ef",
+        "test/remove_required_fact": "2a99a7c4440159ea332c04457a580711",
+        "test/replace_key_fact": "70076d39d7d5fcb499796d15b1233000",
+        "test/swap_memory": "e03178002cc17f33dd7d6f678ac96199",
+        "test_unseen/original": "8d6df77728a982d92fcbc58bee11cd72"
+      }
+    },
+    {
+      "name": "secondary-joint-M1-lin-r16-s17",
+      "dataset": "confirmation",
+      "rows": 144000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "0c9cb1ea4686f5870da5ad5da3f06538"
+      }
+    },
+    {
+      "name": "secondary-joint-B5-r16-s17",
+      "dataset": "screening",
+      "rows": 720000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original",
+        "test/remove_required_fact",
+        "test/replace_key_fact",
+        "test/swap_memory",
+        "test_unseen/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "e6c438ec2ff690d4704f7e842115c4ef",
+        "test/remove_required_fact": "2a99a7c4440159ea332c04457a580711",
+        "test/replace_key_fact": "70076d39d7d5fcb499796d15b1233000",
+        "test/swap_memory": "e03178002cc17f33dd7d6f678ac96199",
+        "test_unseen/original": "8d6df77728a982d92fcbc58bee11cd72"
+      }
+    },
+    {
+      "name": "secondary-joint-B5-r16-s17",
+      "dataset": "confirmation",
+      "rows": 144000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "0c9cb1ea4686f5870da5ad5da3f06538"
+      }
+    },
+    {
+      "name": "secondary-joint-B5-lin-r16-s17",
+      "dataset": "screening",
+      "rows": 720000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original",
+        "test/remove_required_fact",
+        "test/replace_key_fact",
+        "test/swap_memory",
+        "test_unseen/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "e6c438ec2ff690d4704f7e842115c4ef",
+        "test/remove_required_fact": "2a99a7c4440159ea332c04457a580711",
+        "test/replace_key_fact": "70076d39d7d5fcb499796d15b1233000",
+        "test/swap_memory": "e03178002cc17f33dd7d6f678ac96199",
+        "test_unseen/original": "8d6df77728a982d92fcbc58bee11cd72"
+      }
+    },
+    {
+      "name": "secondary-joint-B5-lin-r16-s17",
+      "dataset": "confirmation",
+      "rows": 144000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "0c9cb1ea4686f5870da5ad5da3f06538"
+      }
+    }
+  ],
+  "controlled_writer_groups": [
+    {
+      "writer": "oracle_random",
+      "seed": 17,
+      "dataset": "screening",
+      "r": 32,
+      "fingerprint": "bcc7c523d4c43bcffbf93274263b6593",
+      "members": [
+        "primary-oracle_random-M1-r32-s17",
+        "primary-oracle_random-M1-lin-r32-s17",
+        "primary-oracle_random-B5-r32-s17",
+        "primary-oracle_random-B5-lin-r32-s17",
+        "primary-oracle_random-B3-r32-s17",
+        "primary-oracle_random-B4-r32-s17"
+      ]
+    },
+    {
+      "writer": "oracle_random",
+      "seed": 17,
+      "dataset": "confirmation",
+      "r": 32,
+      "fingerprint": "35458921cf69d751e9e2079f85cc366b",
+      "members": [
+        "primary-oracle_random-M1-r32-s17",
+        "primary-oracle_random-M1-lin-r32-s17",
+        "primary-oracle_random-B5-r32-s17",
+        "primary-oracle_random-B5-lin-r32-s17",
+        "primary-oracle_random-B3-r32-s17",
+        "primary-oracle_random-B4-r32-s17"
+      ]
+    },
+    {
+      "writer": "oracle_random",
+      "seed": 29,
+      "dataset": "screening",
+      "r": 32,
+      "fingerprint": "bcc7c523d4c43bcffbf93274263b6593",
+      "members": [
+        "primary-oracle_random-M1-r32-s29",
+        "primary-oracle_random-M1-lin-r32-s29",
+        "primary-oracle_random-B5-r32-s29",
+        "primary-oracle_random-B5-lin-r32-s29",
+        "primary-oracle_random-B3-r32-s29",
+        "primary-oracle_random-B4-r32-s29"
+      ]
+    },
+    {
+      "writer": "oracle_random",
+      "seed": 29,
+      "dataset": "confirmation",
+      "r": 32,
+      "fingerprint": "35458921cf69d751e9e2079f85cc366b",
+      "members": [
+        "primary-oracle_random-M1-r32-s29",
+        "primary-oracle_random-M1-lin-r32-s29",
+        "primary-oracle_random-B5-r32-s29",
+        "primary-oracle_random-B5-lin-r32-s29",
+        "primary-oracle_random-B3-r32-s29",
+        "primary-oracle_random-B4-r32-s29"
+      ]
+    },
+    {
+      "writer": "oracle_random",
+      "seed": 43,
+      "dataset": "screening",
+      "r": 32,
+      "fingerprint": "bcc7c523d4c43bcffbf93274263b6593",
+      "members": [
+        "primary-oracle_random-M1-r32-s43",
+        "primary-oracle_random-M1-lin-r32-s43",
+        "primary-oracle_random-B5-r32-s43",
+        "primary-oracle_random-B5-lin-r32-s43",
+        "primary-oracle_random-B3-r32-s43",
+        "primary-oracle_random-B4-r32-s43"
+      ]
+    },
+    {
+      "writer": "oracle_random",
+      "seed": 43,
+      "dataset": "confirmation",
+      "r": 32,
+      "fingerprint": "35458921cf69d751e9e2079f85cc366b",
+      "members": [
+        "primary-oracle_random-M1-r32-s43",
+        "primary-oracle_random-M1-lin-r32-s43",
+        "primary-oracle_random-B5-r32-s43",
+        "primary-oracle_random-B5-lin-r32-s43",
+        "primary-oracle_random-B3-r32-s43",
+        "primary-oracle_random-B4-r32-s43"
+      ]
+    },
+    {
+      "writer": "oracle_orth",
+      "seed": 17,
+      "dataset": "screening",
+      "r": 32,
+      "fingerprint": "78e6a4a860608a7825954015474434c3",
+      "members": [
+        "primary-oracle_orth-M1-r32-s17",
+        "primary-oracle_orth-M1-lin-r32-s17",
+        "primary-oracle_orth-B5-r32-s17",
+        "primary-oracle_orth-B5-lin-r32-s17",
+        "primary-oracle_orth-B3-r32-s17",
+        "primary-oracle_orth-B4-r32-s17"
+      ]
+    },
+    {
+      "writer": "oracle_orth",
+      "seed": 17,
+      "dataset": "confirmation",
+      "r": 32,
+      "fingerprint": "b5130c25bfb2c34d14d174d4b7ee9d71",
+      "members": [
+        "primary-oracle_orth-M1-r32-s17",
+        "primary-oracle_orth-M1-lin-r32-s17",
+        "primary-oracle_orth-B5-r32-s17",
+        "primary-oracle_orth-B5-lin-r32-s17",
+        "primary-oracle_orth-B3-r32-s17",
+        "primary-oracle_orth-B4-r32-s17"
+      ]
+    },
+    {
+      "writer": "oracle_orth",
+      "seed": 29,
+      "dataset": "screening",
+      "r": 32,
+      "fingerprint": "78e6a4a860608a7825954015474434c3",
+      "members": [
+        "primary-oracle_orth-M1-r32-s29",
+        "primary-oracle_orth-M1-lin-r32-s29",
+        "primary-oracle_orth-B5-r32-s29",
+        "primary-oracle_orth-B5-lin-r32-s29",
+        "primary-oracle_orth-B3-r32-s29",
+        "primary-oracle_orth-B4-r32-s29"
+      ]
+    },
+    {
+      "writer": "oracle_orth",
+      "seed": 29,
+      "dataset": "confirmation",
+      "r": 32,
+      "fingerprint": "b5130c25bfb2c34d14d174d4b7ee9d71",
+      "members": [
+        "primary-oracle_orth-M1-r32-s29",
+        "primary-oracle_orth-M1-lin-r32-s29",
+        "primary-oracle_orth-B5-r32-s29",
+        "primary-oracle_orth-B5-lin-r32-s29",
+        "primary-oracle_orth-B3-r32-s29",
+        "primary-oracle_orth-B4-r32-s29"
+      ]
+    },
+    {
+      "writer": "oracle_orth",
+      "seed": 43,
+      "dataset": "screening",
+      "r": 32,
+      "fingerprint": "78e6a4a860608a7825954015474434c3",
+      "members": [
+        "primary-oracle_orth-M1-r32-s43",
+        "primary-oracle_orth-M1-lin-r32-s43",
+        "primary-oracle_orth-B5-r32-s43",
+        "primary-oracle_orth-B5-lin-r32-s43",
+        "primary-oracle_orth-B3-r32-s43",
+        "primary-oracle_orth-B4-r32-s43"
+      ]
+    },
+    {
+      "writer": "oracle_orth",
+      "seed": 43,
+      "dataset": "confirmation",
+      "r": 32,
+      "fingerprint": "b5130c25bfb2c34d14d174d4b7ee9d71",
+      "members": [
+        "primary-oracle_orth-M1-r32-s43",
+        "primary-oracle_orth-M1-lin-r32-s43",
+        "primary-oracle_orth-B5-r32-s43",
+        "primary-oracle_orth-B5-lin-r32-s43",
+        "primary-oracle_orth-B3-r32-s43",
+        "primary-oracle_orth-B4-r32-s43"
+      ]
+    },
+    {
+      "writer": "t1_frozen",
+      "seed": 17,
+      "dataset": "screening",
+      "r": 32,
+      "fingerprint": "0ec0a068c913967a76f19ac553599796",
+      "members": [
+        "primary-t1_frozen-M1-r32-s17",
+        "primary-t1_frozen-M1-lin-r32-s17",
+        "primary-t1_frozen-B5-r32-s17",
+        "primary-t1_frozen-B5-lin-r32-s17",
+        "primary-t1_frozen-B3-r32-s17",
+        "primary-t1_frozen-B4-r32-s17"
+      ]
+    },
+    {
+      "writer": "t1_frozen",
+      "seed": 17,
+      "dataset": "confirmation",
+      "r": 32,
+      "fingerprint": "7ba94ad73b65774f7693f8c877a16192",
+      "members": [
+        "primary-t1_frozen-M1-r32-s17",
+        "primary-t1_frozen-M1-lin-r32-s17",
+        "primary-t1_frozen-B5-r32-s17",
+        "primary-t1_frozen-B5-lin-r32-s17",
+        "primary-t1_frozen-B3-r32-s17",
+        "primary-t1_frozen-B4-r32-s17"
+      ]
+    },
+    {
+      "writer": "t1_frozen",
+      "seed": 29,
+      "dataset": "screening",
+      "r": 32,
+      "fingerprint": "b4e55ebe40ebbf346354697b3e05290b",
+      "members": [
+        "primary-t1_frozen-M1-r32-s29",
+        "primary-t1_frozen-M1-lin-r32-s29",
+        "primary-t1_frozen-B5-r32-s29",
+        "primary-t1_frozen-B5-lin-r32-s29",
+        "primary-t1_frozen-B3-r32-s29",
+        "primary-t1_frozen-B4-r32-s29"
+      ]
+    },
+    {
+      "writer": "t1_frozen",
+      "seed": 29,
+      "dataset": "confirmation",
+      "r": 32,
+      "fingerprint": "da0c4ac00fb77c8a063f8cea921ebd81",
+      "members": [
+        "primary-t1_frozen-M1-r32-s29",
+        "primary-t1_frozen-M1-lin-r32-s29",
+        "primary-t1_frozen-B5-r32-s29",
+        "primary-t1_frozen-B5-lin-r32-s29",
+        "primary-t1_frozen-B3-r32-s29",
+        "primary-t1_frozen-B4-r32-s29"
+      ]
+    },
+    {
+      "writer": "t1_frozen",
+      "seed": 43,
+      "dataset": "screening",
+      "r": 32,
+      "fingerprint": "eca56d0af0f4fe00bac58bf2cf51beab",
+      "members": [
+        "primary-t1_frozen-M1-r32-s43",
+        "primary-t1_frozen-M1-lin-r32-s43",
+        "primary-t1_frozen-B5-r32-s43",
+        "primary-t1_frozen-B5-lin-r32-s43",
+        "primary-t1_frozen-B3-r32-s43",
+        "primary-t1_frozen-B4-r32-s43"
+      ]
+    },
+    {
+      "writer": "t1_frozen",
+      "seed": 43,
+      "dataset": "confirmation",
+      "r": 32,
+      "fingerprint": "2d11a14febe76c3270233f2e8e870dc1",
+      "members": [
+        "primary-t1_frozen-M1-r32-s43",
+        "primary-t1_frozen-M1-lin-r32-s43",
+        "primary-t1_frozen-B5-r32-s43",
+        "primary-t1_frozen-B5-lin-r32-s43",
+        "primary-t1_frozen-B3-r32-s43",
+        "primary-t1_frozen-B4-r32-s43"
+      ]
+    },
+    {
+      "writer": "t1_frozen",
+      "seed": 17,
+      "dataset": "screening",
+      "r": 32,
+      "fingerprint": "dbea4b6d25776221dd4ad8404aed6cad",
+      "members": [
+        "replication-t1_frozen-M1-r32-s17",
+        "replication-t1_frozen-M1-lin-r32-s17"
+      ]
+    },
+    {
+      "writer": "t1_frozen",
+      "seed": 17,
+      "dataset": "confirmation",
+      "r": 32,
+      "fingerprint": "7512ebcf1ae17034fa31f8f139f49bcd",
+      "members": [
+        "replication-t1_frozen-M1-r32-s17",
+        "replication-t1_frozen-M1-lin-r32-s17"
+      ]
+    },
+    {
+      "writer": "t1_frozen",
+      "seed": 29,
+      "dataset": "screening",
+      "r": 32,
+      "fingerprint": "a4ef180da514e51c4c609566be4d8faa",
+      "members": [
+        "replication-t1_frozen-M1-r32-s29",
+        "replication-t1_frozen-M1-lin-r32-s29"
+      ]
+    },
+    {
+      "writer": "t1_frozen",
+      "seed": 29,
+      "dataset": "confirmation",
+      "r": 32,
+      "fingerprint": "5b21f888500261a5db4c91cb033b23ad",
+      "members": [
+        "replication-t1_frozen-M1-r32-s29",
+        "replication-t1_frozen-M1-lin-r32-s29"
+      ]
+    },
+    {
+      "writer": "t1_frozen",
+      "seed": 43,
+      "dataset": "screening",
+      "r": 32,
+      "fingerprint": "b5980afb484cf446c46ac079587829c7",
+      "members": [
+        "replication-t1_frozen-M1-r32-s43",
+        "replication-t1_frozen-M1-lin-r32-s43"
+      ]
+    },
+    {
+      "writer": "t1_frozen",
+      "seed": 43,
+      "dataset": "confirmation",
+      "r": 32,
+      "fingerprint": "7b0b12e30a6c3d71fe472a04e79b6740",
+      "members": [
+        "replication-t1_frozen-M1-r32-s43",
+        "replication-t1_frozen-M1-lin-r32-s43"
+      ]
+    },
+    {
+      "writer": "oracle_random",
+      "seed": 17,
+      "dataset": "screening",
+      "r": 32,
+      "fingerprint": "a7d9f8be0f0a5844d57e6eb1a0788173",
+      "members": [
+        "replication-oracle_random-M1-r32-s17",
+        "replication-oracle_random-M1-lin-r32-s17"
+      ]
+    },
+    {
+      "writer": "oracle_random",
+      "seed": 17,
+      "dataset": "confirmation",
+      "r": 32,
+      "fingerprint": "5f3d11265d84870f415130a613e115c2",
+      "members": [
+        "replication-oracle_random-M1-r32-s17",
+        "replication-oracle_random-M1-lin-r32-s17"
+      ]
+    },
+    {
+      "writer": "oracle_random",
+      "seed": 29,
+      "dataset": "screening",
+      "r": 32,
+      "fingerprint": "a7d9f8be0f0a5844d57e6eb1a0788173",
+      "members": [
+        "replication-oracle_random-M1-r32-s29",
+        "replication-oracle_random-M1-lin-r32-s29"
+      ]
+    },
+    {
+      "writer": "oracle_random",
+      "seed": 29,
+      "dataset": "confirmation",
+      "r": 32,
+      "fingerprint": "5f3d11265d84870f415130a613e115c2",
+      "members": [
+        "replication-oracle_random-M1-r32-s29",
+        "replication-oracle_random-M1-lin-r32-s29"
+      ]
+    },
+    {
+      "writer": "oracle_random",
+      "seed": 43,
+      "dataset": "screening",
+      "r": 32,
+      "fingerprint": "a7d9f8be0f0a5844d57e6eb1a0788173",
+      "members": [
+        "replication-oracle_random-M1-r32-s43",
+        "replication-oracle_random-M1-lin-r32-s43"
+      ]
+    },
+    {
+      "writer": "oracle_random",
+      "seed": 43,
+      "dataset": "confirmation",
+      "r": 32,
+      "fingerprint": "5f3d11265d84870f415130a613e115c2",
+      "members": [
+        "replication-oracle_random-M1-r32-s43",
+        "replication-oracle_random-M1-lin-r32-s43"
+      ]
+    },
+    {
+      "writer": "oracle_random",
+      "seed": 17,
+      "dataset": "screening",
+      "r": 16,
+      "fingerprint": "b2943401ab1b1eb421bb44d447b6fb67",
+      "members": [
+        "secondary-oracle_random-M1-r16-s17",
+        "secondary-oracle_random-M1-lin-r16-s17",
+        "secondary-oracle_random-B5-r16-s17",
+        "secondary-oracle_random-B5-lin-r16-s17"
+      ]
+    },
+    {
+      "writer": "oracle_random",
+      "seed": 17,
+      "dataset": "confirmation",
+      "r": 16,
+      "fingerprint": "471594051ab39c9674e70efe9d06e0ca",
+      "members": [
+        "secondary-oracle_random-M1-r16-s17",
+        "secondary-oracle_random-M1-lin-r16-s17",
+        "secondary-oracle_random-B5-r16-s17",
+        "secondary-oracle_random-B5-lin-r16-s17"
+      ]
+    },
+    {
+      "writer": "oracle_orth",
+      "seed": 17,
+      "dataset": "screening",
+      "r": 16,
+      "fingerprint": "a8f5a49f86e753259f1f5a76843e20c6",
+      "members": [
+        "secondary-oracle_orth-M1-r16-s17",
+        "secondary-oracle_orth-M1-lin-r16-s17",
+        "secondary-oracle_orth-B5-r16-s17",
+        "secondary-oracle_orth-B5-lin-r16-s17"
+      ]
+    },
+    {
+      "writer": "oracle_orth",
+      "seed": 17,
+      "dataset": "confirmation",
+      "r": 16,
+      "fingerprint": "10b6fadd641dcf55bdb5b16b193506f2",
+      "members": [
+        "secondary-oracle_orth-M1-r16-s17",
+        "secondary-oracle_orth-M1-lin-r16-s17",
+        "secondary-oracle_orth-B5-r16-s17",
+        "secondary-oracle_orth-B5-lin-r16-s17"
+      ]
+    }
+  ],
+  "all_sample_tables_reproduced": true,
+  "all_depth_snapshots_identical": true,
+  "all_controlled_groups_identical": true,
+  "all_frozen_writers_match_source": true
+}
