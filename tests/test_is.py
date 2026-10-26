@@ -130,3 +130,44 @@ def test_three_point_capability_threshold_and_strict_ci():
     assert capability_passes(s)
     s['ci_low']=0;assert not capability_passes(s)
     s['ci_low']=.001;s['difference']=359/12000;assert not capability_passes(s)
+
+
+def test_independent_load_bootstraps_reproduce_shared_intervals(tmp_path):
+    from analyze_is import Cache,paired,episode_bootstrap
+    cache=Cache(tmp_path);runs={}
+    for E in (12,36):
+        runs[E]=[]
+        for seed in driver.SEEDS:
+            name=f'E{E}-s{seed}';runs[E].append(dict(name=name,seed=seed))
+            ids=np.repeat(np.arange(8,dtype=np.int64)+2**55+E*100,2)
+            query=np.tile(np.array([0,1],dtype=np.int16),8)
+            base=dict(episode_id=np.tile(ids,2),query_id=np.tile(query,2),hop=np.tile(query+2,2),
+                L=np.repeat(np.array([1,4],dtype=np.int16),16),answer=np.ones(32,dtype=np.int32),prediction=np.ones(32,dtype=np.int32))
+            base['correct']=np.r_[np.zeros(16,dtype=bool),np.arange(16)% (2 if E==12 else 4)==0]
+            cache.save(name,'confirmation',base,'test')
+    stats={E:paired(cache,runs[E],runs[E],4,1,(2,3),E) for E in runs}
+    assert stats[12]['bootstrap_seed']!=stats[36]['bootstrap_seed']
+    boot={E:episode_bootstrap(cache,runs[E],runs[E],4,1,(2,3),stats[E]) for E in runs}
+    assert np.mean(boot[36]-boot[12])<0
+    assert stats[12]['difference']==.5 and stats[36]['difference']==.25
+
+
+def test_all_360_sets_before_any_archive_load(tmp_path,monkeypatch):
+    import analyze_is as analysis
+    from looplora.infra.seeds import stable_hash
+    monkeypatch.setattr(driver,'RUNS',tmp_path)
+    trained=dict(runs=[dict(name=f'train-{i}') for i in range(36)])
+    monkeypatch.setattr(driver,'all_training',lambda:trained)
+    runs=[];paths=[]
+    for i in range(360):
+        folder=tmp_path/'evaluation'/str(i);c=driver.new_config('joint_fact','M1',24,17,.003)
+        row=dict(name=str(i),run_dir=str(folder),config=c,eval_E=24,update=False,reader='M1-mixed');runs.append(row)
+        driver.write(folder/'record.json',dict(status='complete',checkpoint_unchanged=True))
+        driver.write(folder/'confirmation/evaluation.json',dict(aggregation_deferred=True,checkpoint_config=c,config=driver.evaluation_config(row,24)))
+        path=folder/'confirmation/samples.npz';path.touch();paths.append(str(path))
+    plan=dict(runs=runs,training_plan_hash=stable_hash(trained))
+    driver.write(tmp_path/'evaluation_plan.json',plan)
+    driver.write(tmp_path/'training_barrier.json',dict(status='passed',training_stages=36,evaluation_plan_hash=stable_hash(plan)))
+    driver.write(tmp_path/'barrier.json',dict(status='passed',evaluation_plan_hash=stable_hash(plan),runs=[r['name'] for r in runs],samples=paths[:-1]))
+    monkeypatch.setattr(np,'load',lambda *a,**k:pytest.fail('opened archive before full barrier'))
+    with pytest.raises(ValueError,match='sample membership'): analysis.verify_release()

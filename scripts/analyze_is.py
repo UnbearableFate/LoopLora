@@ -226,6 +226,24 @@ def update_table(events,labels,out):
     return len(pooled)
 
 
+def tables(rows,decision,out):
+    lines=['# IS registered contrasts','',
+        'All effects and 97.5% intervals are percentage points. Per-seed effects are ordered 17 / 29 / 43.',
+        'Reach: hops2/3; far: hops6/7/8 (unavailable at E6). Joint is descriptive only.',
+        'DeltaD uses independently bootstrapped D36 minus D12; all other contrasts pair episodes within load.',
+        '', '| Endpoint | Writer | Reader | E | Hops | Estimate [97.5% CI], pp | Per seed, pp |',
+        '| --- | --- | --- | --- | --- | --- | --- |']
+    for r in rows:
+        value=r['statistics'];effect=f"{100*value['difference']:+.3f} [{100*value['ci_low']:+.3f}, {100*value['ci_high']:+.3f}]"
+        seeds=' / '.join(f"{100*p['difference']:+.3f}" for p in value['per_seed'])
+        lines.append(f"| {r['endpoint']} | {r['writer']} | {r['reader']} | {r['E']} | {r['subset']} | {effect} | {seeds} |")
+    lines.extend(['','Interpretation of each primary writer:',''])
+    for r in decision:
+        value=r.get('interpretation') or f"largest qualifying trained E={r['largest_qualifying_trained_E']}; qualifying={r['qualifying_E']}"
+        lines.append(f"- {r['writer']} / {r['reader']} / {r['endpoint']}: {value}.")
+    (out/'tables.md').write_text('\n'.join(lines)+'\n')
+
+
 def analyze():
     plan,barrier=verify_release();raw=driver.RUNS/'analysis';out=driver.REPORTS
     shared.require(not (raw/'started.json').exists(),'IS analysis already started')
@@ -262,7 +280,7 @@ def analyze():
             points=[dict(L=L,n=sum(r['n'] for r in cells if r['L']==L),correct=sum(r['correct'] for r in cells if r['L']==L)) for L in range(1,9)]
             choice=max(points,key=lambda r:(r['correct']/r['n'],-r['L']))
             best.append(dict(writer=w,E=E,best_L=choice['L'],accuracy=choice['correct']/choice['n'],n=choice['n'],descriptive_only=True))
-    driver.csv_table(out/'best_L.csv',best);decision=decision_rows(rows);driver.write(out/'decision.json',decision)
+    driver.csv_table(out/'best_L.csv',best);decision=decision_rows(rows);driver.write(out/'decision.json',decision);tables(rows,decision,out)
     updates=update_table(events,labels,out);plot_accuracy(accuracy,out)
     driver.write(out/'audit.json',dict(status='passed',training_stages=36,reference_checkpoints=54,confirmation_sets=360,sample_rows=sample_rows,
         all_samples_sealed=True,all_depth_snapshots_identical=True,all_within_load_labels_paired=True,checkpoints_unchanged=True,
