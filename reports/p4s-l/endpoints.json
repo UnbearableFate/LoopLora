@@ -1,0 +1,4170 @@
+[
+  {
+    "family": "joint/r32/M1",
+    "writer": "joint",
+    "variant": "M1",
+    "r": 32,
+    "theta": 0.9,
+    "best_label_free": {
+      "criterion": "read_norm",
+      "family": "joint/r32/M1",
+      "source": {
+        "blake2b": "c0969330c6e87372a2c39bc844f99c81",
+        "episodes_per_seed": 2000,
+        "generator_seed": 4242,
+        "kind": "reused_C4",
+        "path": "/work/xg24i002/x10041/LoopLora-wt/sym/reports/p4s-r32/thresholds.csv",
+        "selected_before_any_head_training": true,
+        "selection_split": "val",
+        "training_seeds": [
+          17,
+          29,
+          43
+        ]
+      },
+      "threshold": 0.3,
+      "validation_accuracy": 0.43375,
+      "validation_mean_steps": 15.998541666666668
+    },
+    "statistics": {
+      "hop1": {
+        "comparison": "learned - fixed_1",
+        "split": "test",
+        "condition": "original",
+        "hops": [
+          1
+        ],
+        "depth_a": 4,
+        "depth_b": 1,
+        "training_seeds": [
+          17,
+          29,
+          43
+        ],
+        "n_seeds": 3,
+        "per_seed": [
+          {
+            "seed": 17,
+            "accuracy_a": 0.7555,
+            "accuracy_b": 0.6595,
+            "difference": 0.096
+          },
+          {
+            "seed": 29,
+            "accuracy_a": 0.2605,
+            "accuracy_b": 0.243,
+            "difference": 0.0175
+          },
+          {
+            "seed": 43,
+            "accuracy_a": 0.7165,
+            "accuracy_b": 0.6485,
+            "difference": 0.068
+          }
+        ],
+        "n_episodes": 2000,
+        "n_queries_per_seed": 2000,
+        "accuracy_a": 0.5775,
+        "accuracy_b": 0.517,
+        "difference": 0.0605,
+        "ci_low": 0.04694305555555555,
+        "ci_high": 0.07394722222222222,
+        "confidence": 0.9916666666666667,
+        "resamples": 2000,
+        "seed": 2718,
+        "bootstrap_seed": 6003928049163486095,
+        "cluster_unit": "episode",
+        "joint_episode_resampling": true,
+        "statistic": "mean_per_seed_paired_accuracy_difference",
+        "method": "paired_multiseed_percentile_bootstrap",
+        "method_a": "learned",
+        "method_b": "fixed_1",
+        "depth_labels_are_synthetic": true
+      },
+      "reach": {
+        "comparison": "learned - fixed_1",
+        "split": "test",
+        "condition": "original",
+        "hops": [
+          2,
+          3
+        ],
+        "depth_a": 4,
+        "depth_b": 1,
+        "training_seeds": [
+          17,
+          29,
+          43
+        ],
+        "n_seeds": 3,
+        "per_seed": [
+          {
+            "seed": 17,
+            "accuracy_a": 0.538,
+            "accuracy_b": 0.39425,
+            "difference": 0.14375
+          },
+          {
+            "seed": 29,
+            "accuracy_a": 0.2685,
+            "accuracy_b": 0.2515,
+            "difference": 0.017
+          },
+          {
+            "seed": 43,
+            "accuracy_a": 0.51775,
+            "accuracy_b": 0.41625,
+            "difference": 0.1015
+          }
+        ],
+        "n_episodes": 2000,
+        "n_queries_per_seed": 4000,
+        "accuracy_a": 0.44141666666666673,
+        "accuracy_b": 0.35400000000000004,
+        "difference": 0.08741666666666666,
+        "ci_low": 0.07699895833333334,
+        "ci_high": 0.09822256944444444,
+        "confidence": 0.9916666666666667,
+        "resamples": 2000,
+        "seed": 2718,
+        "bootstrap_seed": 5099405047334943193,
+        "cluster_unit": "episode",
+        "joint_episode_resampling": true,
+        "statistic": "mean_per_seed_paired_accuracy_difference",
+        "method": "paired_multiseed_percentile_bootstrap",
+        "method_a": "learned",
+        "method_b": "fixed_1",
+        "depth_labels_are_synthetic": true
+      },
+      "far": {
+        "comparison": "learned - fixed_1",
+        "split": "test",
+        "condition": "original",
+        "hops": [
+          6,
+          7,
+          8
+        ],
+        "depth_a": 4,
+        "depth_b": 1,
+        "training_seeds": [
+          17,
+          29,
+          43
+        ],
+        "n_seeds": 3,
+        "per_seed": [
+          {
+            "seed": 17,
+            "accuracy_a": 0.478,
+            "accuracy_b": 0.37766666666666665,
+            "difference": 0.10033333333333333
+          },
+          {
+            "seed": 29,
+            "accuracy_a": 0.2565,
+            "accuracy_b": 0.24433333333333335,
+            "difference": 0.012166666666666666
+          },
+          {
+            "seed": 43,
+            "accuracy_a": 0.4658333333333333,
+            "accuracy_b": 0.4078333333333333,
+            "difference": 0.058
+          }
+        ],
+        "n_episodes": 2000,
+        "n_queries_per_seed": 6000,
+        "accuracy_a": 0.4001111111111111,
+        "accuracy_b": 0.3432777777777778,
+        "difference": 0.056833333333333326,
+        "ci_low": 0.04644444444444445,
+        "ci_high": 0.06777847222222223,
+        "confidence": 0.9916666666666667,
+        "resamples": 2000,
+        "seed": 2718,
+        "bootstrap_seed": 1497105699633018986,
+        "cluster_unit": "episode",
+        "joint_episode_resampling": true,
+        "statistic": "mean_per_seed_paired_accuracy_difference",
+        "method": "paired_multiseed_percentile_bootstrap",
+        "method_a": "learned",
+        "method_b": "fixed_1",
+        "depth_labels_are_synthetic": true
+      },
+      "overall": {
+        "comparison": "learned - fixed_1",
+        "split": "test",
+        "condition": "original",
+        "hops": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8
+        ],
+        "depth_a": 4,
+        "depth_b": 1,
+        "training_seeds": [
+          17,
+          29,
+          43
+        ],
+        "n_seeds": 3,
+        "per_seed": [
+          {
+            "seed": 17,
+            "accuracy_a": 0.52925,
+            "accuracy_b": 0.4165,
+            "difference": 0.11275
+          },
+          {
+            "seed": 29,
+            "accuracy_a": 0.2570625,
+            "accuracy_b": 0.242625,
+            "difference": 0.0144375
+          },
+          {
+            "seed": 43,
+            "accuracy_a": 0.5110625,
+            "accuracy_b": 0.4395625,
+            "difference": 0.0715
+          }
+        ],
+        "n_episodes": 2000,
+        "n_queries_per_seed": 16000,
+        "accuracy_a": 0.43245833333333333,
+        "accuracy_b": 0.36622916666666666,
+        "difference": 0.06622916666666667,
+        "ci_low": 0.05994435763888889,
+        "ci_high": 0.07241666666666667,
+        "confidence": 0.9916666666666667,
+        "resamples": 2000,
+        "seed": 2718,
+        "bootstrap_seed": 3101671494551718245,
+        "cluster_unit": "episode",
+        "joint_episode_resampling": true,
+        "statistic": "mean_per_seed_paired_accuracy_difference",
+        "method": "paired_multiseed_percentile_bootstrap",
+        "method_a": "learned",
+        "method_b": "fixed_1",
+        "depth_labels_are_synthetic": true
+      },
+      "specificity": {
+        "comparison": "reachable depth effect - far depth effect",
+        "split": "test",
+        "condition": "original",
+        "depth_a": 4,
+        "depth_b": 1,
+        "reach_hops": [
+          2,
+          3
+        ],
+        "far_hops": [
+          6,
+          7,
+          8
+        ],
+        "training_seeds": [
+          17,
+          29,
+          43
+        ],
+        "n_seeds": 3,
+        "n_episodes": 2000,
+        "n_queries_per_seed": 10000,
+        "query_counts_by_subset": {
+          "reach": 4000,
+          "far": 6000
+        },
+        "episode_weighting": "equal",
+        "reach_difference": 0.08741666666666667,
+        "far_difference": 0.05683333333333333,
+        "difference": 0.030583333333333334,
+        "ci_low": 0.016666666666666653,
+        "ci_high": 0.04500138888888892,
+        "confidence": 0.9916666666666667,
+        "resamples": 2000,
+        "seed": 2718,
+        "bootstrap_seed": 7815940970160892980,
+        "cluster_unit": "episode",
+        "joint_episode_resampling": true,
+        "statistic": "mean_per_seed_episode_walk_specificity",
+        "method": "paired_multiseed_percentile_bootstrap",
+        "per_seed": [
+          {
+            "seed": 17,
+            "reach_difference": 0.14375,
+            "far_difference": 0.10033333333333333,
+            "difference": 0.04341666666666667
+          },
+          {
+            "seed": 29,
+            "reach_difference": 0.017,
+            "far_difference": 0.012166666666666666,
+            "difference": 0.004833333333333334
+          },
+          {
+            "seed": 43,
+            "reach_difference": 0.1015,
+            "far_difference": 0.058,
+            "difference": 0.0435
+          }
+        ],
+        "method_a": "learned",
+        "method_b": "fixed_1",
+        "depth_labels_are_synthetic": true
+      }
+    },
+    "descriptive": {
+      "learned_minus_best_label_free": {
+        "overall": {
+          "comparison": "learned - read_norm",
+          "split": "test",
+          "condition": "original",
+          "hops": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8
+          ],
+          "depth_a": 4,
+          "depth_b": 1,
+          "training_seeds": [
+            17,
+            29,
+            43
+          ],
+          "n_seeds": 3,
+          "per_seed": [
+            {
+              "seed": 17,
+              "accuracy_a": 0.52925,
+              "accuracy_b": 0.538875,
+              "difference": -0.009625
+            },
+            {
+              "seed": 29,
+              "accuracy_a": 0.2570625,
+              "accuracy_b": 0.256625,
+              "difference": 0.0004375
+            },
+            {
+              "seed": 43,
+              "accuracy_a": 0.5110625,
+              "accuracy_b": 0.517375,
+              "difference": -0.0063125
+            }
+          ],
+          "n_episodes": 2000,
+          "n_queries_per_seed": 16000,
+          "accuracy_a": 0.43245833333333333,
+          "accuracy_b": 0.437625,
+          "difference": -0.005166666666666667,
+          "ci_low": -0.008076475694444444,
+          "ci_high": -0.0023678819444444437,
+          "confidence": 0.9916666666666667,
+          "resamples": 2000,
+          "seed": 2718,
+          "bootstrap_seed": 3101671494551718245,
+          "cluster_unit": "episode",
+          "joint_episode_resampling": true,
+          "statistic": "mean_per_seed_paired_accuracy_difference",
+          "method": "paired_multiseed_percentile_bootstrap",
+          "method_a": "learned",
+          "method_b": "read_norm",
+          "depth_labels_are_synthetic": true
+        }
+      },
+      "any_step_oracle_minus_learned": {
+        "overall": {
+          "comparison": "oracle_any_step - learned",
+          "split": "test",
+          "condition": "original",
+          "hops": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8
+          ],
+          "depth_a": 4,
+          "depth_b": 1,
+          "training_seeds": [
+            17,
+            29,
+            43
+          ],
+          "n_seeds": 3,
+          "per_seed": [
+            {
+              "seed": 17,
+              "accuracy_a": 0.6564375,
+              "accuracy_b": 0.52925,
+              "difference": 0.1271875
+            },
+            {
+              "seed": 29,
+              "accuracy_a": 0.3035,
+              "accuracy_b": 0.2570625,
+              "difference": 0.0464375
+            },
+            {
+              "seed": 43,
+              "accuracy_a": 0.6374375,
+              "accuracy_b": 0.5110625,
+              "difference": 0.126375
+            }
+          ],
+          "n_episodes": 2000,
+          "n_queries_per_seed": 16000,
+          "accuracy_a": 0.5324583333333334,
+          "accuracy_b": 0.43245833333333333,
+          "difference": 0.09999999999999999,
+          "ci_low": 0.0954509548611111,
+          "ci_high": 0.10495147569444445,
+          "confidence": 0.9916666666666667,
+          "resamples": 2000,
+          "seed": 2718,
+          "bootstrap_seed": 3101671494551718245,
+          "cluster_unit": "episode",
+          "joint_episode_resampling": true,
+          "statistic": "mean_per_seed_paired_accuracy_difference",
+          "method": "paired_multiseed_percentile_bootstrap",
+          "method_a": "oracle_any_step",
+          "method_b": "learned",
+          "depth_labels_are_synthetic": true
+        }
+      },
+      "learned_minus_true_hop": {
+        "overall": {
+          "comparison": "learned - oracle_true_hop",
+          "split": "test",
+          "condition": "original",
+          "hops": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8
+          ],
+          "depth_a": 4,
+          "depth_b": 1,
+          "training_seeds": [
+            17,
+            29,
+            43
+          ],
+          "n_seeds": 3,
+          "per_seed": [
+            {
+              "seed": 17,
+              "accuracy_a": 0.52925,
+              "accuracy_b": 0.5138125,
+              "difference": 0.0154375
+            },
+            {
+              "seed": 29,
+              "accuracy_a": 0.2570625,
+              "accuracy_b": 0.25425,
+              "difference": 0.0028125
+            },
+            {
+              "seed": 43,
+              "accuracy_a": 0.5110625,
+              "accuracy_b": 0.499875,
+              "difference": 0.0111875
+            }
+          ],
+          "n_episodes": 2000,
+          "n_queries_per_seed": 16000,
+          "accuracy_a": 0.43245833333333333,
+          "accuracy_b": 0.42264583333333333,
+          "difference": 0.0098125,
+          "ci_low": 0.0063125,
+          "ci_high": 0.013326736111111112,
+          "confidence": 0.9916666666666667,
+          "resamples": 2000,
+          "seed": 2718,
+          "bootstrap_seed": 3101671494551718245,
+          "cluster_unit": "episode",
+          "joint_episode_resampling": true,
+          "statistic": "mean_per_seed_paired_accuracy_difference",
+          "method": "paired_multiseed_percentile_bootstrap",
+          "method_a": "learned",
+          "method_b": "oracle_true_hop",
+          "depth_labels_are_synthetic": true
+        }
+      }
+    },
+    "primary": false,
+    "criteria": {
+      "hop1_preserved": true,
+      "reach_at_least_3pp": true,
+      "reach_ci_positive": true,
+      "specificity_ci_positive": true
+    },
+    "endpoints_satisfied": true,
+    "qualifies": false
+  },
+  {
+    "family": "joint/r32/M1-lin",
+    "writer": "joint",
+    "variant": "M1-lin",
+    "r": 32,
+    "theta": 0.75,
+    "best_label_free": {
+      "criterion": "relative_change",
+      "family": "joint/r32/M1-lin",
+      "source": {
+        "blake2b": "c0969330c6e87372a2c39bc844f99c81",
+        "episodes_per_seed": 2000,
+        "generator_seed": 4242,
+        "kind": "reused_C4",
+        "path": "/work/xg24i002/x10041/LoopLora-wt/sym/reports/p4s-r32/thresholds.csv",
+        "selected_before_any_head_training": true,
+        "selection_split": "val",
+        "training_seeds": [
+          17,
+          29,
+          43
+        ]
+      },
+      "threshold": 0.03,
+      "validation_accuracy": 0.4852708333333333,
+      "validation_mean_steps": 6.1840625000000005
+    },
+    "statistics": {
+      "hop1": {
+        "comparison": "learned - fixed_1",
+        "split": "test",
+        "condition": "original",
+        "hops": [
+          1
+        ],
+        "depth_a": 4,
+        "depth_b": 1,
+        "training_seeds": [
+          17,
+          29,
+          43
+        ],
+        "n_seeds": 3,
+        "per_seed": [
+          {
+            "seed": 17,
+            "accuracy_a": 0.4815,
+            "accuracy_b": 0.4505,
+            "difference": 0.031
+          },
+          {
+            "seed": 29,
+            "accuracy_a": 0.478,
+            "accuracy_b": 0.4485,
+            "difference": 0.0295
+          },
+          {
+            "seed": 43,
+            "accuracy_a": 0.4825,
+            "accuracy_b": 0.454,
+            "difference": 0.0285
+          }
+        ],
+        "n_episodes": 2000,
+        "n_queries_per_seed": 2000,
+        "accuracy_a": 0.48066666666666663,
+        "accuracy_b": 0.451,
+        "difference": 0.029666666666666664,
+        "ci_low": 0.016888194444444442,
+        "ci_high": 0.04077847222222222,
+        "confidence": 0.9916666666666667,
+        "resamples": 2000,
+        "seed": 2718,
+        "bootstrap_seed": 6003928049163486095,
+        "cluster_unit": "episode",
+        "joint_episode_resampling": true,
+        "statistic": "mean_per_seed_paired_accuracy_difference",
+        "method": "paired_multiseed_percentile_bootstrap",
+        "method_a": "learned",
+        "method_b": "fixed_1",
+        "depth_labels_are_synthetic": true
+      },
+      "reach": {
+        "comparison": "learned - fixed_1",
+        "split": "test",
+        "condition": "original",
+        "hops": [
+          2,
+          3
+        ],
+        "depth_a": 4,
+        "depth_b": 1,
+        "training_seeds": [
+          17,
+          29,
+          43
+        ],
+        "n_seeds": 3,
+        "per_seed": [
+          {
+            "seed": 17,
+            "accuracy_a": 0.47975,
+            "accuracy_b": 0.4515,
+            "difference": 0.02825
+          },
+          {
+            "seed": 29,
+            "accuracy_a": 0.489,
+            "accuracy_b": 0.46075,
+            "difference": 0.02825
+          },
+          {
+            "seed": 43,
+            "accuracy_a": 0.4855,
+            "accuracy_b": 0.4515,
+            "difference": 0.034
+          }
+        ],
+        "n_episodes": 2000,
+        "n_queries_per_seed": 4000,
+        "accuracy_a": 0.48475,
+        "accuracy_b": 0.45458333333333334,
+        "difference": 0.030166666666666665,
+        "ci_low": 0.020277430555555552,
+        "ci_high": 0.03944513888888889,
+        "confidence": 0.9916666666666667,
+        "resamples": 2000,
+        "seed": 2718,
+        "bootstrap_seed": 5099405047334943193,
+        "cluster_unit": "episode",
+        "joint_episode_resampling": true,
+        "statistic": "mean_per_seed_paired_accuracy_difference",
+        "method": "paired_multiseed_percentile_bootstrap",
+        "method_a": "learned",
+        "method_b": "fixed_1",
+        "depth_labels_are_synthetic": true
+      },
+      "far": {
+        "comparison": "learned - fixed_1",
+        "split": "test",
+        "condition": "original",
+        "hops": [
+          6,
+          7,
+          8
+        ],
+        "depth_a": 4,
+        "depth_b": 1,
+        "training_seeds": [
+          17,
+          29,
+          43
+        ],
+        "n_seeds": 3,
+        "per_seed": [
+          {
+            "seed": 17,
+            "accuracy_a": 0.47383333333333333,
+            "accuracy_b": 0.4495,
+            "difference": 0.024333333333333332
+          },
+          {
+            "seed": 29,
+            "accuracy_a": 0.4816666666666667,
+            "accuracy_b": 0.4653333333333333,
+            "difference": 0.01633333333333333
+          },
+          {
+            "seed": 43,
+            "accuracy_a": 0.4871666666666667,
+            "accuracy_b": 0.4651666666666667,
+            "difference": 0.022
+          }
+        ],
+        "n_episodes": 2000,
+        "n_queries_per_seed": 6000,
+        "accuracy_a": 0.4808888888888889,
+        "accuracy_b": 0.46,
+        "difference": 0.020888888888888887,
+        "ci_low": 0.011740509259259258,
+        "ci_high": 0.03087060185185185,
+        "confidence": 0.9916666666666667,
+        "resamples": 2000,
+        "seed": 2718,
+        "bootstrap_seed": 1497105699633018986,
+        "cluster_unit": "episode",
+        "joint_episode_resampling": true,
+        "statistic": "mean_per_seed_paired_accuracy_difference",
+        "method": "paired_multiseed_percentile_bootstrap",
+        "method_a": "learned",
+        "method_b": "fixed_1",
+        "depth_labels_are_synthetic": true
+      },
+      "overall": {
+        "comparison": "learned - fixed_1",
+        "split": "test",
+        "condition": "original",
+        "hops": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8
+        ],
+        "depth_a": 4,
+        "depth_b": 1,
+        "training_seeds": [
+          17,
+          29,
+          43
+        ],
+        "n_seeds": 3,
+        "per_seed": [
+          {
+            "seed": 17,
+            "accuracy_a": 0.4763125,
+            "accuracy_b": 0.452125,
+            "difference": 0.0241875
+          },
+          {
+            "seed": 29,
+            "accuracy_a": 0.483,
+            "accuracy_b": 0.459125,
+            "difference": 0.023875
+          },
+          {
+            "seed": 43,
+            "accuracy_a": 0.4845625,
+            "accuracy_b": 0.4598125,
+            "difference": 0.02475
+          }
+        ],
+        "n_episodes": 2000,
+        "n_queries_per_seed": 16000,
+        "accuracy_a": 0.4812916666666667,
+        "accuracy_b": 0.4570208333333334,
+        "difference": 0.024270833333333335,
+        "ci_low": 0.018319357638888888,
+        "ci_high": 0.03103506944444445,
+        "confidence": 0.9916666666666667,
+        "resamples": 2000,
+        "seed": 2718,
+        "bootstrap_seed": 3101671494551718245,
+        "cluster_unit": "episode",
+        "joint_episode_resampling": true,
+        "statistic": "mean_per_seed_paired_accuracy_difference",
+        "method": "paired_multiseed_percentile_bootstrap",
+        "method_a": "learned",
+        "method_b": "fixed_1",
+        "depth_labels_are_synthetic": true
+      },
+      "specificity": {
+        "comparison": "reachable depth effect - far depth effect",
+        "split": "test",
+        "condition": "original",
+        "depth_a": 4,
+        "depth_b": 1,
+        "reach_hops": [
+          2,
+          3
+        ],
+        "far_hops": [
+          6,
+          7,
+          8
+        ],
+        "training_seeds": [
+          17,
+          29,
+          43
+        ],
+        "n_seeds": 3,
+        "n_episodes": 2000,
+        "n_queries_per_seed": 10000,
+        "query_counts_by_subset": {
+          "reach": 4000,
+          "far": 6000
+        },
+        "episode_weighting": "equal",
+        "reach_difference": 0.030166666666666668,
+        "far_difference": 0.02088888888888889,
+        "difference": 0.009277777777777779,
+        "ci_low": -0.0026023148148148173,
+        "ci_high": 0.021620601851851863,
+        "confidence": 0.9916666666666667,
+        "resamples": 2000,
+        "seed": 2718,
+        "bootstrap_seed": 7815940970160892980,
+        "cluster_unit": "episode",
+        "joint_episode_resampling": true,
+        "statistic": "mean_per_seed_episode_walk_specificity",
+        "method": "paired_multiseed_percentile_bootstrap",
+        "per_seed": [
+          {
+            "seed": 17,
+            "reach_difference": 0.02825,
+            "far_difference": 0.024333333333333332,
+            "difference": 0.003916666666666668
+          },
+          {
+            "seed": 29,
+            "reach_difference": 0.02825,
+            "far_difference": 0.01633333333333333,
+            "difference": 0.011916666666666667
+          },
+          {
+            "seed": 43,
+            "reach_difference": 0.034,
+            "far_difference": 0.022,
+            "difference": 0.012000000000000002
+          }
+        ],
+        "method_a": "learned",
+        "method_b": "fixed_1",
+        "depth_labels_are_synthetic": true
+      }
+    },
+    "descriptive": {
+      "learned_minus_best_label_free": {
+        "overall": {
+          "comparison": "learned - relative_change",
+          "split": "test",
+          "condition": "original",
+          "hops": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8
+          ],
+          "depth_a": 4,
+          "depth_b": 1,
+          "training_seeds": [
+            17,
+            29,
+            43
+          ],
+          "n_seeds": 3,
+          "per_seed": [
+            {
+              "seed": 17,
+              "accuracy_a": 0.4763125,
+              "accuracy_b": 0.4774375,
+              "difference": -0.001125
+            },
+            {
+              "seed": 29,
+              "accuracy_a": 0.483,
+              "accuracy_b": 0.487125,
+              "difference": -0.004125
+            },
+            {
+              "seed": 43,
+              "accuracy_a": 0.4845625,
+              "accuracy_b": 0.48375,
+              "difference": 0.0008125
+            }
+          ],
+          "n_episodes": 2000,
+          "n_queries_per_seed": 16000,
+          "accuracy_a": 0.4812916666666667,
+          "accuracy_b": 0.48277083333333337,
+          "difference": -0.0014791666666666668,
+          "ci_low": -0.004361284722222224,
+          "ci_high": 0.0011669270833333343,
+          "confidence": 0.9916666666666667,
+          "resamples": 2000,
+          "seed": 2718,
+          "bootstrap_seed": 3101671494551718245,
+          "cluster_unit": "episode",
+          "joint_episode_resampling": true,
+          "statistic": "mean_per_seed_paired_accuracy_difference",
+          "method": "paired_multiseed_percentile_bootstrap",
+          "method_a": "learned",
+          "method_b": "relative_change",
+          "depth_labels_are_synthetic": true
+        }
+      },
+      "any_step_oracle_minus_learned": {
+        "overall": {
+          "comparison": "oracle_any_step - learned",
+          "split": "test",
+          "condition": "original",
+          "hops": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8
+          ],
+          "depth_a": 4,
+          "depth_b": 1,
+          "training_seeds": [
+            17,
+            29,
+            43
+          ],
+          "n_seeds": 3,
+          "per_seed": [
+            {
+              "seed": 17,
+              "accuracy_a": 0.5388125,
+              "accuracy_b": 0.4763125,
+              "difference": 0.0625
+            },
+            {
+              "seed": 29,
+              "accuracy_a": 0.5520625,
+              "accuracy_b": 0.483,
+              "difference": 0.0690625
+            },
+            {
+              "seed": 43,
+              "accuracy_a": 0.554625,
+              "accuracy_b": 0.4845625,
+              "difference": 0.0700625
+            }
+          ],
+          "n_episodes": 2000,
+          "n_queries_per_seed": 16000,
+          "accuracy_a": 0.5485000000000001,
+          "accuracy_b": 0.4812916666666667,
+          "difference": 0.06720833333333333,
+          "ci_low": 0.06173524305555555,
+          "ci_high": 0.07284730902777779,
+          "confidence": 0.9916666666666667,
+          "resamples": 2000,
+          "seed": 2718,
+          "bootstrap_seed": 3101671494551718245,
+          "cluster_unit": "episode",
+          "joint_episode_resampling": true,
+          "statistic": "mean_per_seed_paired_accuracy_difference",
+          "method": "paired_multiseed_percentile_bootstrap",
+          "method_a": "oracle_any_step",
+          "method_b": "learned",
+          "depth_labels_are_synthetic": true
+        }
+      },
+      "learned_minus_true_hop": {
+        "overall": {
+          "comparison": "learned - oracle_true_hop",
+          "split": "test",
+          "condition": "original",
+          "hops": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8
+          ],
+          "depth_a": 4,
+          "depth_b": 1,
+          "training_seeds": [
+            17,
+            29,
+            43
+          ],
+          "n_seeds": 3,
+          "per_seed": [
+            {
+              "seed": 17,
+              "accuracy_a": 0.4763125,
+              "accuracy_b": 0.475375,
+              "difference": 0.0009375
+            },
+            {
+              "seed": 29,
+              "accuracy_a": 0.483,
+              "accuracy_b": 0.483375,
+              "difference": -0.000375
+            },
+            {
+              "seed": 43,
+              "accuracy_a": 0.4845625,
+              "accuracy_b": 0.481375,
+              "difference": 0.0031875
+            }
+          ],
+          "n_episodes": 2000,
+          "n_queries_per_seed": 16000,
+          "accuracy_a": 0.4812916666666667,
+          "accuracy_b": 0.4800416666666667,
+          "difference": 0.00125,
+          "ci_low": -0.001722569444444447,
+          "ci_high": 0.004007378472222224,
+          "confidence": 0.9916666666666667,
+          "resamples": 2000,
+          "seed": 2718,
+          "bootstrap_seed": 3101671494551718245,
+          "cluster_unit": "episode",
+          "joint_episode_resampling": true,
+          "statistic": "mean_per_seed_paired_accuracy_difference",
+          "method": "paired_multiseed_percentile_bootstrap",
+          "method_a": "learned",
+          "method_b": "oracle_true_hop",
+          "depth_labels_are_synthetic": true
+        }
+      }
+    },
+    "primary": false,
+    "criteria": {
+      "hop1_preserved": true,
+      "reach_at_least_3pp": true,
+      "reach_ci_positive": true,
+      "specificity_ci_positive": false
+    },
+    "endpoints_satisfied": false,
+    "qualifies": false
+  },
+  {
+    "family": "joint_fact/r32/M1",
+    "writer": "joint_fact",
+    "variant": "M1",
+    "r": 32,
+    "theta": 0.45,
+    "best_label_free": {
+      "criterion": "output_stability",
+      "family": "joint_fact/r32/M1",
+      "source": {
+        "blake2b": "c0969330c6e87372a2c39bc844f99c81",
+        "episodes_per_seed": 2000,
+        "generator_seed": 4242,
+        "kind": "reused_C4",
+        "path": "/work/xg24i002/x10041/LoopLora-wt/sym/reports/p4s-r32/thresholds.csv",
+        "selected_before_any_head_training": true,
+        "selection_split": "val",
+        "training_seeds": [
+          17,
+          29,
+          43
+        ]
+      },
+      "threshold": 4,
+      "validation_accuracy": 0.1620625,
+      "validation_mean_steps": 9.9076875
+    },
+    "statistics": {
+      "hop1": {
+        "comparison": "learned - fixed_1",
+        "split": "test",
+        "condition": "original",
+        "hops": [
+          1
+        ],
+        "depth_a": 4,
+        "depth_b": 1,
+        "training_seeds": [
+          17,
+          29,
+          43
+        ],
+        "n_seeds": 3,
+        "per_seed": [
+          {
+            "seed": 17,
+            "accuracy_a": 0.502,
+            "accuracy_b": 0.8405,
+            "difference": -0.3385
+          },
+          {
+            "seed": 29,
+            "accuracy_a": 0.4945,
+            "accuracy_b": 0.844,
+            "difference": -0.3495
+          },
+          {
+            "seed": 43,
+            "accuracy_a": 0.4925,
+            "accuracy_b": 0.8215,
+            "difference": -0.329
+          }
+        ],
+        "n_episodes": 2000,
+        "n_queries_per_seed": 2000,
+        "accuracy_a": 0.4963333333333333,
+        "accuracy_b": 0.8353333333333333,
+        "difference": -0.33899999999999997,
+        "ci_low": -0.35777847222222225,
+        "ci_high": -0.3187215277777778,
+        "confidence": 0.9916666666666667,
+        "resamples": 2000,
+        "seed": 2718,
+        "bootstrap_seed": 6003928049163486095,
+        "cluster_unit": "episode",
+        "joint_episode_resampling": true,
+        "statistic": "mean_per_seed_paired_accuracy_difference",
+        "method": "paired_multiseed_percentile_bootstrap",
+        "method_a": "learned",
+        "method_b": "fixed_1",
+        "depth_labels_are_synthetic": true
+      },
+      "reach": {
+        "comparison": "learned - fixed_1",
+        "split": "test",
+        "condition": "original",
+        "hops": [
+          2,
+          3
+        ],
+        "depth_a": 4,
+        "depth_b": 1,
+        "training_seeds": [
+          17,
+          29,
+          43
+        ],
+        "n_seeds": 3,
+        "per_seed": [
+          {
+            "seed": 17,
+            "accuracy_a": 0.2285,
+            "accuracy_b": 0.0165,
+            "difference": 0.212
+          },
+          {
+            "seed": 29,
+            "accuracy_a": 0.2325,
+            "accuracy_b": 0.01425,
+            "difference": 0.21825
+          },
+          {
+            "seed": 43,
+            "accuracy_a": 0.233,
+            "accuracy_b": 0.01575,
+            "difference": 0.21725
+          }
+        ],
+        "n_episodes": 2000,
+        "n_queries_per_seed": 4000,
+        "accuracy_a": 0.23133333333333336,
+        "accuracy_b": 0.0155,
+        "difference": 0.21583333333333332,
+        "ci_low": 0.20433333333333334,
+        "ci_high": 0.2275559027777778,
+        "confidence": 0.9916666666666667,
+        "resamples": 2000,
+        "seed": 2718,
+        "bootstrap_seed": 5099405047334943193,
+        "cluster_unit": "episode",
+        "joint_episode_resampling": true,
+        "statistic": "mean_per_seed_paired_accuracy_difference",
+        "method": "paired_multiseed_percentile_bootstrap",
+        "method_a": "learned",
+        "method_b": "fixed_1",
+        "depth_labels_are_synthetic": true
+      },
+      "far": {
+        "comparison": "learned - fixed_1",
+        "split": "test",
+        "condition": "original",
+        "hops": [
+          6,
+          7,
+          8
+        ],
+        "depth_a": 4,
+        "depth_b": 1,
+        "training_seeds": [
+          17,
+          29,
+          43
+        ],
+        "n_seeds": 3,
+        "per_seed": [
+          {
+            "seed": 17,
+            "accuracy_a": 0.06766666666666667,
+            "accuracy_b": 0.011833333333333333,
+            "difference": 0.05583333333333333
+          },
+          {
+            "seed": 29,
+            "accuracy_a": 0.06116666666666667,
+            "accuracy_b": 0.014333333333333333,
+            "difference": 0.04683333333333333
+          },
+          {
+            "seed": 43,
+            "accuracy_a": 0.06333333333333334,
+            "accuracy_b": 0.014,
+            "difference": 0.04933333333333333
+          }
+        ],
+        "n_episodes": 2000,
+        "n_queries_per_seed": 6000,
+        "accuracy_a": 0.06405555555555555,
+        "accuracy_b": 0.013388888888888888,
+        "difference": 0.050666666666666665,
+        "ci_low": 0.04472222222222222,
+        "ci_high": 0.057092824074074074,
+        "confidence": 0.9916666666666667,
+        "resamples": 2000,
+        "seed": 2718,
+        "bootstrap_seed": 1497105699633018986,
+        "cluster_unit": "episode",
+        "joint_episode_resampling": true,
+        "statistic": "mean_per_seed_paired_accuracy_difference",
+        "method": "paired_multiseed_percentile_bootstrap",
+        "method_a": "learned",
+        "method_b": "fixed_1",
+        "depth_labels_are_synthetic": true
+      },
+      "overall": {
+        "comparison": "learned - fixed_1",
+        "split": "test",
+        "condition": "original",
+        "hops": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8
+        ],
+        "depth_a": 4,
+        "depth_b": 1,
+        "training_seeds": [
+          17,
+          29,
+          43
+        ],
+        "n_seeds": 3,
+        "per_seed": [
+          {
+            "seed": 17,
+            "accuracy_a": 0.17475,
+            "accuracy_b": 0.1174375,
+            "difference": 0.0573125
+          },
+          {
+            "seed": 29,
+            "accuracy_a": 0.171125,
+            "accuracy_b": 0.1173125,
+            "difference": 0.0538125
+          },
+          {
+            "seed": 43,
+            "accuracy_a": 0.170375,
+            "accuracy_b": 0.115,
+            "difference": 0.055375
+          }
+        ],
+        "n_episodes": 2000,
+        "n_queries_per_seed": 16000,
+        "accuracy_a": 0.17208333333333334,
+        "accuracy_b": 0.11658333333333333,
+        "difference": 0.0555,
+        "ci_low": 0.04945807291666666,
+        "ci_high": 0.0613125,
+        "confidence": 0.9916666666666667,
+        "resamples": 2000,
+        "seed": 2718,
+        "bootstrap_seed": 3101671494551718245,
+        "cluster_unit": "episode",
+        "joint_episode_resampling": true,
+        "statistic": "mean_per_seed_paired_accuracy_difference",
+        "method": "paired_multiseed_percentile_bootstrap",
+        "method_a": "learned",
+        "method_b": "fixed_1",
+        "depth_labels_are_synthetic": true
+      },
+      "specificity": {
+        "comparison": "reachable depth effect - far depth effect",
+        "split": "test",
+        "condition": "original",
+        "depth_a": 4,
+        "depth_b": 1,
+        "reach_hops": [
+          2,
+          3
+        ],
+        "far_hops": [
+          6,
+          7,
+          8
+        ],
+        "training_seeds": [
+          17,
+          29,
+          43
+        ],
+        "n_seeds": 3,
+        "n_episodes": 2000,
+        "n_queries_per_seed": 10000,
+        "query_counts_by_subset": {
+          "reach": 4000,
+          "far": 6000
+        },
+        "episode_weighting": "equal",
+        "reach_difference": 0.21583333333333332,
+        "far_difference": 0.050666666666666665,
+        "difference": 0.16516666666666666,
+        "ci_low": 0.15262800925925926,
+        "ci_high": 0.1766575231481483,
+        "confidence": 0.9916666666666667,
+        "resamples": 2000,
+        "seed": 2718,
+        "bootstrap_seed": 7815940970160892980,
+        "cluster_unit": "episode",
+        "joint_episode_resampling": true,
+        "statistic": "mean_per_seed_episode_walk_specificity",
+        "method": "paired_multiseed_percentile_bootstrap",
+        "per_seed": [
+          {
+            "seed": 17,
+            "reach_difference": 0.212,
+            "far_difference": 0.05583333333333333,
+            "difference": 0.15616666666666668
+          },
+          {
+            "seed": 29,
+            "reach_difference": 0.21825,
+            "far_difference": 0.04683333333333333,
+            "difference": 0.1714166666666667
+          },
+          {
+            "seed": 43,
+            "reach_difference": 0.21725,
+            "far_difference": 0.049333333333333326,
+            "difference": 0.1679166666666667
+          }
+        ],
+        "method_a": "learned",
+        "method_b": "fixed_1",
+        "depth_labels_are_synthetic": true
+      }
+    },
+    "descriptive": {
+      "learned_minus_best_label_free": {
+        "overall": {
+          "comparison": "learned - output_stability",
+          "split": "test",
+          "condition": "original",
+          "hops": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8
+          ],
+          "depth_a": 4,
+          "depth_b": 1,
+          "training_seeds": [
+            17,
+            29,
+            43
+          ],
+          "n_seeds": 3,
+          "per_seed": [
+            {
+              "seed": 17,
+              "accuracy_a": 0.17475,
+              "accuracy_b": 0.16175,
+              "difference": 0.013
+            },
+            {
+              "seed": 29,
+              "accuracy_a": 0.171125,
+              "accuracy_b": 0.16375,
+              "difference": 0.007375
+            },
+            {
+              "seed": 43,
+              "accuracy_a": 0.170375,
+              "accuracy_b": 0.16425,
+              "difference": 0.006125
+            }
+          ],
+          "n_episodes": 2000,
+          "n_queries_per_seed": 16000,
+          "accuracy_a": 0.17208333333333334,
+          "accuracy_b": 0.16325,
+          "difference": 0.008833333333333332,
+          "ci_low": 0.004631597222222219,
+          "ci_high": 0.013034809027777778,
+          "confidence": 0.9916666666666667,
+          "resamples": 2000,
+          "seed": 2718,
+          "bootstrap_seed": 3101671494551718245,
+          "cluster_unit": "episode",
+          "joint_episode_resampling": true,
+          "statistic": "mean_per_seed_paired_accuracy_difference",
+          "method": "paired_multiseed_percentile_bootstrap",
+          "method_a": "learned",
+          "method_b": "output_stability",
+          "depth_labels_are_synthetic": true
+        }
+      },
+      "any_step_oracle_minus_learned": {
+        "overall": {
+          "comparison": "oracle_any_step - learned",
+          "split": "test",
+          "condition": "original",
+          "hops": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8
+          ],
+          "depth_a": 4,
+          "depth_b": 1,
+          "training_seeds": [
+            17,
+            29,
+            43
+          ],
+          "n_seeds": 3,
+          "per_seed": [
+            {
+              "seed": 17,
+              "accuracy_a": 0.3855625,
+              "accuracy_b": 0.17475,
+              "difference": 0.2108125
+            },
+            {
+              "seed": 29,
+              "accuracy_a": 0.3944375,
+              "accuracy_b": 0.171125,
+              "difference": 0.2233125
+            },
+            {
+              "seed": 43,
+              "accuracy_a": 0.3709375,
+              "accuracy_b": 0.170375,
+              "difference": 0.2005625
+            }
+          ],
+          "n_episodes": 2000,
+          "n_queries_per_seed": 16000,
+          "accuracy_a": 0.3836458333333333,
+          "accuracy_b": 0.17208333333333334,
+          "difference": 0.2115625,
+          "ci_low": 0.2055068576388889,
+          "ci_high": 0.21827847222222224,
+          "confidence": 0.9916666666666667,
+          "resamples": 2000,
+          "seed": 2718,
+          "bootstrap_seed": 3101671494551718245,
+          "cluster_unit": "episode",
+          "joint_episode_resampling": true,
+          "statistic": "mean_per_seed_paired_accuracy_difference",
+          "method": "paired_multiseed_percentile_bootstrap",
+          "method_a": "oracle_any_step",
+          "method_b": "learned",
+          "depth_labels_are_synthetic": true
+        }
+      },
+      "learned_minus_true_hop": {
+        "overall": {
+          "comparison": "learned - oracle_true_hop",
+          "split": "test",
+          "condition": "original",
+          "hops": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8
+          ],
+          "depth_a": 4,
+          "depth_b": 1,
+          "training_seeds": [
+            17,
+            29,
+            43
+          ],
+          "n_seeds": 3,
+          "per_seed": [
+            {
+              "seed": 17,
+              "accuracy_a": 0.17475,
+              "accuracy_b": 0.1616875,
+              "difference": 0.0130625
+            },
+            {
+              "seed": 29,
+              "accuracy_a": 0.171125,
+              "accuracy_b": 0.165375,
+              "difference": 0.00575
+            },
+            {
+              "seed": 43,
+              "accuracy_a": 0.170375,
+              "accuracy_b": 0.1598125,
+              "difference": 0.0105625
+            }
+          ],
+          "n_episodes": 2000,
+          "n_queries_per_seed": 16000,
+          "accuracy_a": 0.17208333333333334,
+          "accuracy_b": 0.1622916666666667,
+          "difference": 0.009791666666666666,
+          "ci_low": 0.0045625,
+          "ci_high": 0.014938020833333334,
+          "confidence": 0.9916666666666667,
+          "resamples": 2000,
+          "seed": 2718,
+          "bootstrap_seed": 3101671494551718245,
+          "cluster_unit": "episode",
+          "joint_episode_resampling": true,
+          "statistic": "mean_per_seed_paired_accuracy_difference",
+          "method": "paired_multiseed_percentile_bootstrap",
+          "method_a": "learned",
+          "method_b": "oracle_true_hop",
+          "depth_labels_are_synthetic": true
+        }
+      }
+    },
+    "primary": true,
+    "criteria": {
+      "hop1_preserved": false,
+      "reach_at_least_3pp": true,
+      "reach_ci_positive": true,
+      "specificity_ci_positive": true
+    },
+    "endpoints_satisfied": false,
+    "qualifies": false
+  },
+  {
+    "family": "joint_fact/r32/M1-lin",
+    "writer": "joint_fact",
+    "variant": "M1-lin",
+    "r": 32,
+    "theta": 0.4,
+    "best_label_free": {
+      "criterion": "output_stability",
+      "family": "joint_fact/r32/M1-lin",
+      "source": {
+        "blake2b": "c0969330c6e87372a2c39bc844f99c81",
+        "episodes_per_seed": 2000,
+        "generator_seed": 4242,
+        "kind": "reused_C4",
+        "path": "/work/xg24i002/x10041/LoopLora-wt/sym/reports/p4s-r32/thresholds.csv",
+        "selected_before_any_head_training": true,
+        "selection_split": "val",
+        "training_seeds": [
+          17,
+          29,
+          43
+        ]
+      },
+      "threshold": 4,
+      "validation_accuracy": 0.17933333333333334,
+      "validation_mean_steps": 10.579041666666667
+    },
+    "statistics": {
+      "hop1": {
+        "comparison": "learned - fixed_1",
+        "split": "test",
+        "condition": "original",
+        "hops": [
+          1
+        ],
+        "depth_a": 4,
+        "depth_b": 1,
+        "training_seeds": [
+          17,
+          29,
+          43
+        ],
+        "n_seeds": 3,
+        "per_seed": [
+          {
+            "seed": 17,
+            "accuracy_a": 0.3655,
+            "accuracy_b": 0.886,
+            "difference": -0.5205
+          },
+          {
+            "seed": 29,
+            "accuracy_a": 0.425,
+            "accuracy_b": 0.887,
+            "difference": -0.462
+          },
+          {
+            "seed": 43,
+            "accuracy_a": 0.4025,
+            "accuracy_b": 0.8945,
+            "difference": -0.492
+          }
+        ],
+        "n_episodes": 2000,
+        "n_queries_per_seed": 2000,
+        "accuracy_a": 0.39766666666666667,
+        "accuracy_b": 0.8891666666666667,
+        "difference": -0.4915,
+        "ci_low": -0.5101118055555556,
+        "ci_high": -0.4721666666666666,
+        "confidence": 0.9916666666666667,
+        "resamples": 2000,
+        "seed": 2718,
+        "bootstrap_seed": 6003928049163486095,
+        "cluster_unit": "episode",
+        "joint_episode_resampling": true,
+        "statistic": "mean_per_seed_paired_accuracy_difference",
+        "method": "paired_multiseed_percentile_bootstrap",
+        "method_a": "learned",
+        "method_b": "fixed_1",
+        "depth_labels_are_synthetic": true
+      },
+      "reach": {
+        "comparison": "learned - fixed_1",
+        "split": "test",
+        "condition": "original",
+        "hops": [
+          2,
+          3
+        ],
+        "depth_a": 4,
+        "depth_b": 1,
+        "training_seeds": [
+          17,
+          29,
+          43
+        ],
+        "n_seeds": 3,
+        "per_seed": [
+          {
+            "seed": 17,
+            "accuracy_a": 0.25675,
+            "accuracy_b": 0.0145,
+            "difference": 0.24225
+          },
+          {
+            "seed": 29,
+            "accuracy_a": 0.25025,
+            "accuracy_b": 0.0085,
+            "difference": 0.24175
+          },
+          {
+            "seed": 43,
+            "accuracy_a": 0.271,
+            "accuracy_b": 0.013,
+            "difference": 0.258
+          }
+        ],
+        "n_episodes": 2000,
+        "n_queries_per_seed": 4000,
+        "accuracy_a": 0.2593333333333333,
+        "accuracy_b": 0.011999999999999999,
+        "difference": 0.24733333333333332,
+        "ci_low": 0.23463715277777777,
+        "ci_high": 0.2602510416666667,
+        "confidence": 0.9916666666666667,
+        "resamples": 2000,
+        "seed": 2718,
+        "bootstrap_seed": 5099405047334943193,
+        "cluster_unit": "episode",
+        "joint_episode_resampling": true,
+        "statistic": "mean_per_seed_paired_accuracy_difference",
+        "method": "paired_multiseed_percentile_bootstrap",
+        "method_a": "learned",
+        "method_b": "fixed_1",
+        "depth_labels_are_synthetic": true
+      },
+      "far": {
+        "comparison": "learned - fixed_1",
+        "split": "test",
+        "condition": "original",
+        "hops": [
+          6,
+          7,
+          8
+        ],
+        "depth_a": 4,
+        "depth_b": 1,
+        "training_seeds": [
+          17,
+          29,
+          43
+        ],
+        "n_seeds": 3,
+        "per_seed": [
+          {
+            "seed": 17,
+            "accuracy_a": 0.09716666666666667,
+            "accuracy_b": 0.007666666666666666,
+            "difference": 0.0895
+          },
+          {
+            "seed": 29,
+            "accuracy_a": 0.094,
+            "accuracy_b": 0.010666666666666666,
+            "difference": 0.08333333333333333
+          },
+          {
+            "seed": 43,
+            "accuracy_a": 0.11433333333333333,
+            "accuracy_b": 0.008333333333333333,
+            "difference": 0.106
+          }
+        ],
+        "n_episodes": 2000,
+        "n_queries_per_seed": 6000,
+        "accuracy_a": 0.10183333333333333,
+        "accuracy_b": 0.008888888888888889,
+        "difference": 0.09294444444444444,
+        "ci_low": 0.08396273148148148,
+        "ci_high": 0.10248240740740741,
+        "confidence": 0.9916666666666667,
+        "resamples": 2000,
+        "seed": 2718,
+        "bootstrap_seed": 1497105699633018986,
+        "cluster_unit": "episode",
+        "joint_episode_resampling": true,
+        "statistic": "mean_per_seed_paired_accuracy_difference",
+        "method": "paired_multiseed_percentile_bootstrap",
+        "method_a": "learned",
+        "method_b": "fixed_1",
+        "depth_labels_are_synthetic": true
+      },
+      "overall": {
+        "comparison": "learned - fixed_1",
+        "split": "test",
+        "condition": "original",
+        "hops": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8
+        ],
+        "depth_a": 4,
+        "depth_b": 1,
+        "training_seeds": [
+          17,
+          29,
+          43
+        ],
+        "n_seeds": 3,
+        "per_seed": [
+          {
+            "seed": 17,
+            "accuracy_a": 0.19025,
+            "accuracy_b": 0.119375,
+            "difference": 0.070875
+          },
+          {
+            "seed": 29,
+            "accuracy_a": 0.186375,
+            "accuracy_b": 0.1194375,
+            "difference": 0.0669375
+          },
+          {
+            "seed": 43,
+            "accuracy_a": 0.204,
+            "accuracy_b": 0.120125,
+            "difference": 0.083875
+          }
+        ],
+        "n_episodes": 2000,
+        "n_queries_per_seed": 16000,
+        "accuracy_a": 0.19354166666666664,
+        "accuracy_b": 0.11964583333333333,
+        "difference": 0.07389583333333334,
+        "ci_low": 0.06680512152777776,
+        "ci_high": 0.08111180555555556,
+        "confidence": 0.9916666666666667,
+        "resamples": 2000,
+        "seed": 2718,
+        "bootstrap_seed": 3101671494551718245,
+        "cluster_unit": "episode",
+        "joint_episode_resampling": true,
+        "statistic": "mean_per_seed_paired_accuracy_difference",
+        "method": "paired_multiseed_percentile_bootstrap",
+        "method_a": "learned",
+        "method_b": "fixed_1",
+        "depth_labels_are_synthetic": true
+      },
+      "specificity": {
+        "comparison": "reachable depth effect - far depth effect",
+        "split": "test",
+        "condition": "original",
+        "depth_a": 4,
+        "depth_b": 1,
+        "reach_hops": [
+          2,
+          3
+        ],
+        "far_hops": [
+          6,
+          7,
+          8
+        ],
+        "training_seeds": [
+          17,
+          29,
+          43
+        ],
+        "n_seeds": 3,
+        "n_episodes": 2000,
+        "n_queries_per_seed": 10000,
+        "query_counts_by_subset": {
+          "reach": 4000,
+          "far": 6000
+        },
+        "episode_weighting": "equal",
+        "reach_difference": 0.24733333333333332,
+        "far_difference": 0.09294444444444444,
+        "difference": 0.1543888888888889,
+        "ci_low": 0.14025914351851848,
+        "ci_high": 0.16886111111111124,
+        "confidence": 0.9916666666666667,
+        "resamples": 2000,
+        "seed": 2718,
+        "bootstrap_seed": 7815940970160892980,
+        "cluster_unit": "episode",
+        "joint_episode_resampling": true,
+        "statistic": "mean_per_seed_episode_walk_specificity",
+        "method": "paired_multiseed_percentile_bootstrap",
+        "per_seed": [
+          {
+            "seed": 17,
+            "reach_difference": 0.24225,
+            "far_difference": 0.0895,
+            "difference": 0.15275
+          },
+          {
+            "seed": 29,
+            "reach_difference": 0.24175,
+            "far_difference": 0.08333333333333331,
+            "difference": 0.15841666666666668
+          },
+          {
+            "seed": 43,
+            "reach_difference": 0.258,
+            "far_difference": 0.106,
+            "difference": 0.152
+          }
+        ],
+        "method_a": "learned",
+        "method_b": "fixed_1",
+        "depth_labels_are_synthetic": true
+      }
+    },
+    "descriptive": {
+      "learned_minus_best_label_free": {
+        "overall": {
+          "comparison": "learned - output_stability",
+          "split": "test",
+          "condition": "original",
+          "hops": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8
+          ],
+          "depth_a": 4,
+          "depth_b": 1,
+          "training_seeds": [
+            17,
+            29,
+            43
+          ],
+          "n_seeds": 3,
+          "per_seed": [
+            {
+              "seed": 17,
+              "accuracy_a": 0.19025,
+              "accuracy_b": 0.1745625,
+              "difference": 0.0156875
+            },
+            {
+              "seed": 29,
+              "accuracy_a": 0.186375,
+              "accuracy_b": 0.1720625,
+              "difference": 0.0143125
+            },
+            {
+              "seed": 43,
+              "accuracy_a": 0.204,
+              "accuracy_b": 0.1855625,
+              "difference": 0.0184375
+            }
+          ],
+          "n_episodes": 2000,
+          "n_queries_per_seed": 16000,
+          "accuracy_a": 0.19354166666666664,
+          "accuracy_b": 0.17739583333333334,
+          "difference": 0.01614583333333333,
+          "ci_low": 0.011250000000000001,
+          "ci_high": 0.021452517361111114,
+          "confidence": 0.9916666666666667,
+          "resamples": 2000,
+          "seed": 2718,
+          "bootstrap_seed": 3101671494551718245,
+          "cluster_unit": "episode",
+          "joint_episode_resampling": true,
+          "statistic": "mean_per_seed_paired_accuracy_difference",
+          "method": "paired_multiseed_percentile_bootstrap",
+          "method_a": "learned",
+          "method_b": "output_stability",
+          "depth_labels_are_synthetic": true
+        }
+      },
+      "any_step_oracle_minus_learned": {
+        "overall": {
+          "comparison": "oracle_any_step - learned",
+          "split": "test",
+          "condition": "original",
+          "hops": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8
+          ],
+          "depth_a": 4,
+          "depth_b": 1,
+          "training_seeds": [
+            17,
+            29,
+            43
+          ],
+          "n_seeds": 3,
+          "per_seed": [
+            {
+              "seed": 17,
+              "accuracy_a": 0.4719375,
+              "accuracy_b": 0.19025,
+              "difference": 0.2816875
+            },
+            {
+              "seed": 29,
+              "accuracy_a": 0.4601875,
+              "accuracy_b": 0.186375,
+              "difference": 0.2738125
+            },
+            {
+              "seed": 43,
+              "accuracy_a": 0.502125,
+              "accuracy_b": 0.204,
+              "difference": 0.298125
+            }
+          ],
+          "n_episodes": 2000,
+          "n_queries_per_seed": 16000,
+          "accuracy_a": 0.47808333333333336,
+          "accuracy_b": 0.19354166666666664,
+          "difference": 0.28454166666666664,
+          "ci_low": 0.2758747395833333,
+          "ci_high": 0.29335416666666664,
+          "confidence": 0.9916666666666667,
+          "resamples": 2000,
+          "seed": 2718,
+          "bootstrap_seed": 3101671494551718245,
+          "cluster_unit": "episode",
+          "joint_episode_resampling": true,
+          "statistic": "mean_per_seed_paired_accuracy_difference",
+          "method": "paired_multiseed_percentile_bootstrap",
+          "method_a": "oracle_any_step",
+          "method_b": "learned",
+          "depth_labels_are_synthetic": true
+        }
+      },
+      "learned_minus_true_hop": {
+        "overall": {
+          "comparison": "learned - oracle_true_hop",
+          "split": "test",
+          "condition": "original",
+          "hops": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8
+          ],
+          "depth_a": 4,
+          "depth_b": 1,
+          "training_seeds": [
+            17,
+            29,
+            43
+          ],
+          "n_seeds": 3,
+          "per_seed": [
+            {
+              "seed": 17,
+              "accuracy_a": 0.19025,
+              "accuracy_b": 0.165625,
+              "difference": 0.024625
+            },
+            {
+              "seed": 29,
+              "accuracy_a": 0.186375,
+              "accuracy_b": 0.16625,
+              "difference": 0.020125
+            },
+            {
+              "seed": 43,
+              "accuracy_a": 0.204,
+              "accuracy_b": 0.1731875,
+              "difference": 0.0308125
+            }
+          ],
+          "n_episodes": 2000,
+          "n_queries_per_seed": 16000,
+          "accuracy_a": 0.19354166666666664,
+          "accuracy_b": 0.16835416666666667,
+          "difference": 0.0251875,
+          "ci_low": 0.018596788194444443,
+          "ci_high": 0.031785069444444446,
+          "confidence": 0.9916666666666667,
+          "resamples": 2000,
+          "seed": 2718,
+          "bootstrap_seed": 3101671494551718245,
+          "cluster_unit": "episode",
+          "joint_episode_resampling": true,
+          "statistic": "mean_per_seed_paired_accuracy_difference",
+          "method": "paired_multiseed_percentile_bootstrap",
+          "method_a": "learned",
+          "method_b": "oracle_true_hop",
+          "depth_labels_are_synthetic": true
+        }
+      }
+    },
+    "primary": true,
+    "criteria": {
+      "hop1_preserved": false,
+      "reach_at_least_3pp": true,
+      "reach_ci_positive": true,
+      "specificity_ci_positive": true
+    },
+    "endpoints_satisfied": false,
+    "qualifies": false
+  },
+  {
+    "family": "oracle_random/r32/M1",
+    "writer": "oracle_random",
+    "variant": "M1",
+    "r": 32,
+    "theta": 0.25,
+    "best_label_free": {
+      "criterion": "relative_change",
+      "family": "oracle_random/r32/M1",
+      "source": {
+        "blake2b": "08e1ae9fcc774a9b0dc98d3ffbb38a9f",
+        "episodes_per_seed": 2000,
+        "generator_seed": 4242,
+        "kind": "new_random_r32_validation_before_head_training",
+        "path": "/work/xg24i002/x10041/LoopLora/runs/p4s-l/20261027/preparation/thresholds.json",
+        "selected_before_any_head_training": true,
+        "selection_split": "val",
+        "training_seeds": [
+          17,
+          29,
+          43
+        ]
+      },
+      "threshold": 0.7,
+      "validation_accuracy": 0.20200000000000004,
+      "validation_mean_steps": 8.7773125
+    },
+    "statistics": {
+      "hop1": {
+        "comparison": "learned - fixed_1",
+        "split": "test",
+        "condition": "original",
+        "hops": [
+          1
+        ],
+        "depth_a": 4,
+        "depth_b": 1,
+        "training_seeds": [
+          17,
+          29,
+          43
+        ],
+        "n_seeds": 3,
+        "per_seed": [
+          {
+            "seed": 17,
+            "accuracy_a": 0.5585,
+            "accuracy_b": 0.682,
+            "difference": -0.1235
+          },
+          {
+            "seed": 29,
+            "accuracy_a": 0.5025,
+            "accuracy_b": 0.695,
+            "difference": -0.1925
+          },
+          {
+            "seed": 43,
+            "accuracy_a": 0.5395,
+            "accuracy_b": 0.6945,
+            "difference": -0.155
+          }
+        ],
+        "n_episodes": 2000,
+        "n_queries_per_seed": 2000,
+        "accuracy_a": 0.5335,
+        "accuracy_b": 0.6905,
+        "difference": -0.157,
+        "ci_low": -0.1822784722222222,
+        "ci_high": -0.13688819444444444,
+        "confidence": 0.9916666666666667,
+        "resamples": 2000,
+        "seed": 2718,
+        "bootstrap_seed": 6003928049163486095,
+        "cluster_unit": "episode",
+        "joint_episode_resampling": true,
+        "statistic": "mean_per_seed_paired_accuracy_difference",
+        "method": "paired_multiseed_percentile_bootstrap",
+        "method_a": "learned",
+        "method_b": "fixed_1",
+        "depth_labels_are_synthetic": true
+      },
+      "reach": {
+        "comparison": "learned - fixed_1",
+        "split": "test",
+        "condition": "original",
+        "hops": [
+          2,
+          3
+        ],
+        "depth_a": 4,
+        "depth_b": 1,
+        "training_seeds": [
+          17,
+          29,
+          43
+        ],
+        "n_seeds": 3,
+        "per_seed": [
+          {
+            "seed": 17,
+            "accuracy_a": 0.347,
+            "accuracy_b": 0.0095,
+            "difference": 0.3375
+          },
+          {
+            "seed": 29,
+            "accuracy_a": 0.31825,
+            "accuracy_b": 0.0105,
+            "difference": 0.30775
+          },
+          {
+            "seed": 43,
+            "accuracy_a": 0.34075,
+            "accuracy_b": 0.01075,
+            "difference": 0.33
+          }
+        ],
+        "n_episodes": 2000,
+        "n_queries_per_seed": 4000,
+        "accuracy_a": 0.33533333333333326,
+        "accuracy_b": 0.01025,
+        "difference": 0.3250833333333334,
+        "ci_low": 0.31019305555555554,
+        "ci_high": 0.3393892361111111,
+        "confidence": 0.9916666666666667,
+        "resamples": 2000,
+        "seed": 2718,
+        "bootstrap_seed": 5099405047334943193,
+        "cluster_unit": "episode",
+        "joint_episode_resampling": true,
+        "statistic": "mean_per_seed_paired_accuracy_difference",
+        "method": "paired_multiseed_percentile_bootstrap",
+        "method_a": "learned",
+        "method_b": "fixed_1",
+        "depth_labels_are_synthetic": true
+      },
+      "far": {
+        "comparison": "learned - fixed_1",
+        "split": "test",
+        "condition": "original",
+        "hops": [
+          6,
+          7,
+          8
+        ],
+        "depth_a": 4,
+        "depth_b": 1,
+        "training_seeds": [
+          17,
+          29,
+          43
+        ],
+        "n_seeds": 3,
+        "per_seed": [
+          {
+            "seed": 17,
+            "accuracy_a": 0.0445,
+            "accuracy_b": 0.011166666666666667,
+            "difference": 0.03333333333333333
+          },
+          {
+            "seed": 29,
+            "accuracy_a": 0.06766666666666667,
+            "accuracy_b": 0.0185,
+            "difference": 0.049166666666666664
+          },
+          {
+            "seed": 43,
+            "accuracy_a": 0.06466666666666666,
+            "accuracy_b": 0.011166666666666667,
+            "difference": 0.0535
+          }
+        ],
+        "n_episodes": 2000,
+        "n_queries_per_seed": 6000,
+        "accuracy_a": 0.058944444444444445,
+        "accuracy_b": 0.01361111111111111,
+        "difference": 0.04533333333333333,
+        "ci_low": 0.03829606481481481,
+        "ci_high": 0.05144444444444444,
+        "confidence": 0.9916666666666667,
+        "resamples": 2000,
+        "seed": 2718,
+        "bootstrap_seed": 1497105699633018986,
+        "cluster_unit": "episode",
+        "joint_episode_resampling": true,
+        "statistic": "mean_per_seed_paired_accuracy_difference",
+        "method": "paired_multiseed_percentile_bootstrap",
+        "method_a": "learned",
+        "method_b": "fixed_1",
+        "depth_labels_are_synthetic": true
+      },
+      "overall": {
+        "comparison": "learned - fixed_1",
+        "split": "test",
+        "condition": "original",
+        "hops": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8
+        ],
+        "depth_a": 4,
+        "depth_b": 1,
+        "training_seeds": [
+          17,
+          29,
+          43
+        ],
+        "n_seeds": 3,
+        "per_seed": [
+          {
+            "seed": 17,
+            "accuracy_a": 0.2096875,
+            "accuracy_b": 0.094625,
+            "difference": 0.1150625
+          },
+          {
+            "seed": 29,
+            "accuracy_a": 0.2115625,
+            "accuracy_b": 0.1004375,
+            "difference": 0.111125
+          },
+          {
+            "seed": 43,
+            "accuracy_a": 0.2223125,
+            "accuracy_b": 0.0970625,
+            "difference": 0.12525
+          }
+        ],
+        "n_episodes": 2000,
+        "n_queries_per_seed": 16000,
+        "accuracy_a": 0.21452083333333336,
+        "accuracy_b": 0.09737499999999999,
+        "difference": 0.11714583333333332,
+        "ci_low": 0.10992960069444442,
+        "ci_high": 0.12455694444444444,
+        "confidence": 0.9916666666666667,
+        "resamples": 2000,
+        "seed": 2718,
+        "bootstrap_seed": 3101671494551718245,
+        "cluster_unit": "episode",
+        "joint_episode_resampling": true,
+        "statistic": "mean_per_seed_paired_accuracy_difference",
+        "method": "paired_multiseed_percentile_bootstrap",
+        "method_a": "learned",
+        "method_b": "fixed_1",
+        "depth_labels_are_synthetic": true
+      },
+      "specificity": {
+        "comparison": "reachable depth effect - far depth effect",
+        "split": "test",
+        "condition": "original",
+        "depth_a": 4,
+        "depth_b": 1,
+        "reach_hops": [
+          2,
+          3
+        ],
+        "far_hops": [
+          6,
+          7,
+          8
+        ],
+        "training_seeds": [
+          17,
+          29,
+          43
+        ],
+        "n_seeds": 3,
+        "n_episodes": 2000,
+        "n_queries_per_seed": 10000,
+        "query_counts_by_subset": {
+          "reach": 4000,
+          "far": 6000
+        },
+        "episode_weighting": "equal",
+        "reach_difference": 0.32508333333333334,
+        "far_difference": 0.04533333333333334,
+        "difference": 0.27975,
+        "ci_low": 0.2637865740740743,
+        "ci_high": 0.2957506944444444,
+        "confidence": 0.9916666666666667,
+        "resamples": 2000,
+        "seed": 2718,
+        "bootstrap_seed": 7815940970160892980,
+        "cluster_unit": "episode",
+        "joint_episode_resampling": true,
+        "statistic": "mean_per_seed_episode_walk_specificity",
+        "method": "paired_multiseed_percentile_bootstrap",
+        "per_seed": [
+          {
+            "seed": 17,
+            "reach_difference": 0.3375,
+            "far_difference": 0.03333333333333333,
+            "difference": 0.30416666666666664
+          },
+          {
+            "seed": 29,
+            "reach_difference": 0.30775,
+            "far_difference": 0.049166666666666664,
+            "difference": 0.2585833333333334
+          },
+          {
+            "seed": 43,
+            "reach_difference": 0.33,
+            "far_difference": 0.0535,
+            "difference": 0.2765
+          }
+        ],
+        "method_a": "learned",
+        "method_b": "fixed_1",
+        "depth_labels_are_synthetic": true
+      }
+    },
+    "descriptive": {
+      "learned_minus_best_label_free": {
+        "overall": {
+          "comparison": "learned - relative_change",
+          "split": "test",
+          "condition": "original",
+          "hops": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8
+          ],
+          "depth_a": 4,
+          "depth_b": 1,
+          "training_seeds": [
+            17,
+            29,
+            43
+          ],
+          "n_seeds": 3,
+          "per_seed": [
+            {
+              "seed": 17,
+              "accuracy_a": 0.2096875,
+              "accuracy_b": 0.1826875,
+              "difference": 0.027
+            },
+            {
+              "seed": 29,
+              "accuracy_a": 0.2115625,
+              "accuracy_b": 0.205,
+              "difference": 0.0065625
+            },
+            {
+              "seed": 43,
+              "accuracy_a": 0.2223125,
+              "accuracy_b": 0.218125,
+              "difference": 0.0041875
+            }
+          ],
+          "n_episodes": 2000,
+          "n_queries_per_seed": 16000,
+          "accuracy_a": 0.21452083333333336,
+          "accuracy_b": 0.2019375,
+          "difference": 0.012583333333333335,
+          "ci_low": 0.007054861111111106,
+          "ci_high": 0.018513975694444445,
+          "confidence": 0.9916666666666667,
+          "resamples": 2000,
+          "seed": 2718,
+          "bootstrap_seed": 3101671494551718245,
+          "cluster_unit": "episode",
+          "joint_episode_resampling": true,
+          "statistic": "mean_per_seed_paired_accuracy_difference",
+          "method": "paired_multiseed_percentile_bootstrap",
+          "method_a": "learned",
+          "method_b": "relative_change",
+          "depth_labels_are_synthetic": true
+        }
+      },
+      "any_step_oracle_minus_learned": {
+        "overall": {
+          "comparison": "oracle_any_step - learned",
+          "split": "test",
+          "condition": "original",
+          "hops": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8
+          ],
+          "depth_a": 4,
+          "depth_b": 1,
+          "training_seeds": [
+            17,
+            29,
+            43
+          ],
+          "n_seeds": 3,
+          "per_seed": [
+            {
+              "seed": 17,
+              "accuracy_a": 0.5741875,
+              "accuracy_b": 0.2096875,
+              "difference": 0.3645
+            },
+            {
+              "seed": 29,
+              "accuracy_a": 0.5733125,
+              "accuracy_b": 0.2115625,
+              "difference": 0.36175
+            },
+            {
+              "seed": 43,
+              "accuracy_a": 0.5861875,
+              "accuracy_b": 0.2223125,
+              "difference": 0.363875
+            }
+          ],
+          "n_episodes": 2000,
+          "n_queries_per_seed": 16000,
+          "accuracy_a": 0.5778958333333333,
+          "accuracy_b": 0.21452083333333336,
+          "difference": 0.363375,
+          "ci_low": 0.35279826388888885,
+          "ci_high": 0.37350026041666673,
+          "confidence": 0.9916666666666667,
+          "resamples": 2000,
+          "seed": 2718,
+          "bootstrap_seed": 3101671494551718245,
+          "cluster_unit": "episode",
+          "joint_episode_resampling": true,
+          "statistic": "mean_per_seed_paired_accuracy_difference",
+          "method": "paired_multiseed_percentile_bootstrap",
+          "method_a": "oracle_any_step",
+          "method_b": "learned",
+          "depth_labels_are_synthetic": true
+        }
+      },
+      "learned_minus_true_hop": {
+        "overall": {
+          "comparison": "learned - oracle_true_hop",
+          "split": "test",
+          "condition": "original",
+          "hops": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8
+          ],
+          "depth_a": 4,
+          "depth_b": 1,
+          "training_seeds": [
+            17,
+            29,
+            43
+          ],
+          "n_seeds": 3,
+          "per_seed": [
+            {
+              "seed": 17,
+              "accuracy_a": 0.2096875,
+              "accuracy_b": 0.148625,
+              "difference": 0.0610625
+            },
+            {
+              "seed": 29,
+              "accuracy_a": 0.2115625,
+              "accuracy_b": 0.150375,
+              "difference": 0.0611875
+            },
+            {
+              "seed": 43,
+              "accuracy_a": 0.2223125,
+              "accuracy_b": 0.1518125,
+              "difference": 0.0705
+            }
+          ],
+          "n_episodes": 2000,
+          "n_queries_per_seed": 16000,
+          "accuracy_a": 0.21452083333333336,
+          "accuracy_b": 0.15027083333333335,
+          "difference": 0.06424999999999999,
+          "ci_low": 0.058326215277777774,
+          "ci_high": 0.07066666666666667,
+          "confidence": 0.9916666666666667,
+          "resamples": 2000,
+          "seed": 2718,
+          "bootstrap_seed": 3101671494551718245,
+          "cluster_unit": "episode",
+          "joint_episode_resampling": true,
+          "statistic": "mean_per_seed_paired_accuracy_difference",
+          "method": "paired_multiseed_percentile_bootstrap",
+          "method_a": "learned",
+          "method_b": "oracle_true_hop",
+          "depth_labels_are_synthetic": true
+        }
+      }
+    },
+    "primary": true,
+    "criteria": {
+      "hop1_preserved": false,
+      "reach_at_least_3pp": true,
+      "reach_ci_positive": true,
+      "specificity_ci_positive": true
+    },
+    "endpoints_satisfied": false,
+    "qualifies": false
+  },
+  {
+    "family": "oracle_random/r32/M1-lin",
+    "writer": "oracle_random",
+    "variant": "M1-lin",
+    "r": 32,
+    "theta": 0.3,
+    "best_label_free": {
+      "criterion": "relative_change",
+      "family": "oracle_random/r32/M1-lin",
+      "source": {
+        "blake2b": "08e1ae9fcc774a9b0dc98d3ffbb38a9f",
+        "episodes_per_seed": 2000,
+        "generator_seed": 4242,
+        "kind": "new_random_r32_validation_before_head_training",
+        "path": "/work/xg24i002/x10041/LoopLora/runs/p4s-l/20261027/preparation/thresholds.json",
+        "selected_before_any_head_training": true,
+        "selection_split": "val",
+        "training_seeds": [
+          17,
+          29,
+          43
+        ]
+      },
+      "threshold": 0.7,
+      "validation_accuracy": 0.27902083333333333,
+      "validation_mean_steps": 8.300375
+    },
+    "statistics": {
+      "hop1": {
+        "comparison": "learned - fixed_1",
+        "split": "test",
+        "condition": "original",
+        "hops": [
+          1
+        ],
+        "depth_a": 4,
+        "depth_b": 1,
+        "training_seeds": [
+          17,
+          29,
+          43
+        ],
+        "n_seeds": 3,
+        "per_seed": [
+          {
+            "seed": 17,
+            "accuracy_a": 0.603,
+            "accuracy_b": 0.781,
+            "difference": -0.178
+          },
+          {
+            "seed": 29,
+            "accuracy_a": 0.5725,
+            "accuracy_b": 0.776,
+            "difference": -0.2035
+          },
+          {
+            "seed": 43,
+            "accuracy_a": 0.5315,
+            "accuracy_b": 0.7755,
+            "difference": -0.244
+          }
+        ],
+        "n_episodes": 2000,
+        "n_queries_per_seed": 2000,
+        "accuracy_a": 0.569,
+        "accuracy_b": 0.7775,
+        "difference": -0.2085,
+        "ci_low": -0.23205902777777782,
+        "ci_high": -0.1865548611111111,
+        "confidence": 0.9916666666666667,
+        "resamples": 2000,
+        "seed": 2718,
+        "bootstrap_seed": 6003928049163486095,
+        "cluster_unit": "episode",
+        "joint_episode_resampling": true,
+        "statistic": "mean_per_seed_paired_accuracy_difference",
+        "method": "paired_multiseed_percentile_bootstrap",
+        "method_a": "learned",
+        "method_b": "fixed_1",
+        "depth_labels_are_synthetic": true
+      },
+      "reach": {
+        "comparison": "learned - fixed_1",
+        "split": "test",
+        "condition": "original",
+        "hops": [
+          2,
+          3
+        ],
+        "depth_a": 4,
+        "depth_b": 1,
+        "training_seeds": [
+          17,
+          29,
+          43
+        ],
+        "n_seeds": 3,
+        "per_seed": [
+          {
+            "seed": 17,
+            "accuracy_a": 0.3725,
+            "accuracy_b": 0.00425,
+            "difference": 0.36825
+          },
+          {
+            "seed": 29,
+            "accuracy_a": 0.37875,
+            "accuracy_b": 0.00325,
+            "difference": 0.3755
+          },
+          {
+            "seed": 43,
+            "accuracy_a": 0.384,
+            "accuracy_b": 0.00275,
+            "difference": 0.38125
+          }
+        ],
+        "n_episodes": 2000,
+        "n_queries_per_seed": 4000,
+        "accuracy_a": 0.3784166666666667,
+        "accuracy_b": 0.0034166666666666664,
+        "difference": 0.375,
+        "ci_low": 0.35841666666666666,
+        "ci_high": 0.3920559027777778,
+        "confidence": 0.9916666666666667,
+        "resamples": 2000,
+        "seed": 2718,
+        "bootstrap_seed": 5099405047334943193,
+        "cluster_unit": "episode",
+        "joint_episode_resampling": true,
+        "statistic": "mean_per_seed_paired_accuracy_difference",
+        "method": "paired_multiseed_percentile_bootstrap",
+        "method_a": "learned",
+        "method_b": "fixed_1",
+        "depth_labels_are_synthetic": true
+      },
+      "far": {
+        "comparison": "learned - fixed_1",
+        "split": "test",
+        "condition": "original",
+        "hops": [
+          6,
+          7,
+          8
+        ],
+        "depth_a": 4,
+        "depth_b": 1,
+        "training_seeds": [
+          17,
+          29,
+          43
+        ],
+        "n_seeds": 3,
+        "per_seed": [
+          {
+            "seed": 17,
+            "accuracy_a": 0.1845,
+            "accuracy_b": 0.0055,
+            "difference": 0.179
+          },
+          {
+            "seed": 29,
+            "accuracy_a": 0.1875,
+            "accuracy_b": 0.0035,
+            "difference": 0.184
+          },
+          {
+            "seed": 43,
+            "accuracy_a": 0.20116666666666666,
+            "accuracy_b": 0.004333333333333333,
+            "difference": 0.19683333333333333
+          }
+        ],
+        "n_episodes": 2000,
+        "n_queries_per_seed": 6000,
+        "accuracy_a": 0.19105555555555553,
+        "accuracy_b": 0.0044444444444444444,
+        "difference": 0.1866111111111111,
+        "ci_low": 0.1736476851851852,
+        "ci_high": 0.19977916666666667,
+        "confidence": 0.9916666666666667,
+        "resamples": 2000,
+        "seed": 2718,
+        "bootstrap_seed": 1497105699633018986,
+        "cluster_unit": "episode",
+        "joint_episode_resampling": true,
+        "statistic": "mean_per_seed_paired_accuracy_difference",
+        "method": "paired_multiseed_percentile_bootstrap",
+        "method_a": "learned",
+        "method_b": "fixed_1",
+        "depth_labels_are_synthetic": true
+      },
+      "overall": {
+        "comparison": "learned - fixed_1",
+        "split": "test",
+        "condition": "original",
+        "hops": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8
+        ],
+        "depth_a": 4,
+        "depth_b": 1,
+        "training_seeds": [
+          17,
+          29,
+          43
+        ],
+        "n_seeds": 3,
+        "per_seed": [
+          {
+            "seed": 17,
+            "accuracy_a": 0.2974375,
+            "accuracy_b": 0.1021875,
+            "difference": 0.19525
+          },
+          {
+            "seed": 29,
+            "accuracy_a": 0.3010625,
+            "accuracy_b": 0.0999375,
+            "difference": 0.201125
+          },
+          {
+            "seed": 43,
+            "accuracy_a": 0.3044375,
+            "accuracy_b": 0.10075,
+            "difference": 0.2036875
+          }
+        ],
+        "n_episodes": 2000,
+        "n_queries_per_seed": 16000,
+        "accuracy_a": 0.3009791666666667,
+        "accuracy_b": 0.10095833333333333,
+        "difference": 0.20002083333333334,
+        "ci_low": 0.1885901909722222,
+        "ci_high": 0.21037578125000003,
+        "confidence": 0.9916666666666667,
+        "resamples": 2000,
+        "seed": 2718,
+        "bootstrap_seed": 3101671494551718245,
+        "cluster_unit": "episode",
+        "joint_episode_resampling": true,
+        "statistic": "mean_per_seed_paired_accuracy_difference",
+        "method": "paired_multiseed_percentile_bootstrap",
+        "method_a": "learned",
+        "method_b": "fixed_1",
+        "depth_labels_are_synthetic": true
+      },
+      "specificity": {
+        "comparison": "reachable depth effect - far depth effect",
+        "split": "test",
+        "condition": "original",
+        "depth_a": 4,
+        "depth_b": 1,
+        "reach_hops": [
+          2,
+          3
+        ],
+        "far_hops": [
+          6,
+          7,
+          8
+        ],
+        "training_seeds": [
+          17,
+          29,
+          43
+        ],
+        "n_seeds": 3,
+        "n_episodes": 2000,
+        "n_queries_per_seed": 10000,
+        "query_counts_by_subset": {
+          "reach": 4000,
+          "far": 6000
+        },
+        "episode_weighting": "equal",
+        "reach_difference": 0.375,
+        "far_difference": 0.1866111111111111,
+        "difference": 0.1883888888888889,
+        "ci_low": 0.16947187500000008,
+        "ci_high": 0.20677847222222245,
+        "confidence": 0.9916666666666667,
+        "resamples": 2000,
+        "seed": 2718,
+        "bootstrap_seed": 7815940970160892980,
+        "cluster_unit": "episode",
+        "joint_episode_resampling": true,
+        "statistic": "mean_per_seed_episode_walk_specificity",
+        "method": "paired_multiseed_percentile_bootstrap",
+        "per_seed": [
+          {
+            "seed": 17,
+            "reach_difference": 0.36825,
+            "far_difference": 0.179,
+            "difference": 0.18925
+          },
+          {
+            "seed": 29,
+            "reach_difference": 0.3755,
+            "far_difference": 0.184,
+            "difference": 0.19150000000000003
+          },
+          {
+            "seed": 43,
+            "reach_difference": 0.38125,
+            "far_difference": 0.1968333333333333,
+            "difference": 0.18441666666666667
+          }
+        ],
+        "method_a": "learned",
+        "method_b": "fixed_1",
+        "depth_labels_are_synthetic": true
+      }
+    },
+    "descriptive": {
+      "learned_minus_best_label_free": {
+        "overall": {
+          "comparison": "learned - relative_change",
+          "split": "test",
+          "condition": "original",
+          "hops": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8
+          ],
+          "depth_a": 4,
+          "depth_b": 1,
+          "training_seeds": [
+            17,
+            29,
+            43
+          ],
+          "n_seeds": 3,
+          "per_seed": [
+            {
+              "seed": 17,
+              "accuracy_a": 0.2974375,
+              "accuracy_b": 0.2846875,
+              "difference": 0.01275
+            },
+            {
+              "seed": 29,
+              "accuracy_a": 0.3010625,
+              "accuracy_b": 0.28425,
+              "difference": 0.0168125
+            },
+            {
+              "seed": 43,
+              "accuracy_a": 0.3044375,
+              "accuracy_b": 0.2883125,
+              "difference": 0.016125
+            }
+          ],
+          "n_episodes": 2000,
+          "n_queries_per_seed": 16000,
+          "accuracy_a": 0.3009791666666667,
+          "accuracy_b": 0.28575,
+          "difference": 0.015229166666666667,
+          "ci_low": 0.008673003472222217,
+          "ci_high": 0.022340711805555555,
+          "confidence": 0.9916666666666667,
+          "resamples": 2000,
+          "seed": 2718,
+          "bootstrap_seed": 3101671494551718245,
+          "cluster_unit": "episode",
+          "joint_episode_resampling": true,
+          "statistic": "mean_per_seed_paired_accuracy_difference",
+          "method": "paired_multiseed_percentile_bootstrap",
+          "method_a": "learned",
+          "method_b": "relative_change",
+          "depth_labels_are_synthetic": true
+        }
+      },
+      "any_step_oracle_minus_learned": {
+        "overall": {
+          "comparison": "oracle_any_step - learned",
+          "split": "test",
+          "condition": "original",
+          "hops": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8
+          ],
+          "depth_a": 4,
+          "depth_b": 1,
+          "training_seeds": [
+            17,
+            29,
+            43
+          ],
+          "n_seeds": 3,
+          "per_seed": [
+            {
+              "seed": 17,
+              "accuracy_a": 0.65425,
+              "accuracy_b": 0.2974375,
+              "difference": 0.3568125
+            },
+            {
+              "seed": 29,
+              "accuracy_a": 0.6530625,
+              "accuracy_b": 0.3010625,
+              "difference": 0.352
+            },
+            {
+              "seed": 43,
+              "accuracy_a": 0.6628125,
+              "accuracy_b": 0.3044375,
+              "difference": 0.358375
+            }
+          ],
+          "n_episodes": 2000,
+          "n_queries_per_seed": 16000,
+          "accuracy_a": 0.6567083333333333,
+          "accuracy_b": 0.3009791666666667,
+          "difference": 0.35572916666666665,
+          "ci_low": 0.3451247395833333,
+          "ci_high": 0.36584782986111114,
+          "confidence": 0.9916666666666667,
+          "resamples": 2000,
+          "seed": 2718,
+          "bootstrap_seed": 3101671494551718245,
+          "cluster_unit": "episode",
+          "joint_episode_resampling": true,
+          "statistic": "mean_per_seed_paired_accuracy_difference",
+          "method": "paired_multiseed_percentile_bootstrap",
+          "method_a": "oracle_any_step",
+          "method_b": "learned",
+          "depth_labels_are_synthetic": true
+        }
+      },
+      "learned_minus_true_hop": {
+        "overall": {
+          "comparison": "learned - oracle_true_hop",
+          "split": "test",
+          "condition": "original",
+          "hops": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8
+          ],
+          "depth_a": 4,
+          "depth_b": 1,
+          "training_seeds": [
+            17,
+            29,
+            43
+          ],
+          "n_seeds": 3,
+          "per_seed": [
+            {
+              "seed": 17,
+              "accuracy_a": 0.2974375,
+              "accuracy_b": 0.1694375,
+              "difference": 0.128
+            },
+            {
+              "seed": 29,
+              "accuracy_a": 0.3010625,
+              "accuracy_b": 0.163,
+              "difference": 0.1380625
+            },
+            {
+              "seed": 43,
+              "accuracy_a": 0.3044375,
+              "accuracy_b": 0.168125,
+              "difference": 0.1363125
+            }
+          ],
+          "n_episodes": 2000,
+          "n_queries_per_seed": 16000,
+          "accuracy_a": 0.3009791666666667,
+          "accuracy_b": 0.16685416666666666,
+          "difference": 0.134125,
+          "ci_low": 0.12354062499999999,
+          "ci_high": 0.1442154513888889,
+          "confidence": 0.9916666666666667,
+          "resamples": 2000,
+          "seed": 2718,
+          "bootstrap_seed": 3101671494551718245,
+          "cluster_unit": "episode",
+          "joint_episode_resampling": true,
+          "statistic": "mean_per_seed_paired_accuracy_difference",
+          "method": "paired_multiseed_percentile_bootstrap",
+          "method_a": "learned",
+          "method_b": "oracle_true_hop",
+          "depth_labels_are_synthetic": true
+        }
+      }
+    },
+    "primary": true,
+    "criteria": {
+      "hop1_preserved": false,
+      "reach_at_least_3pp": true,
+      "reach_ci_positive": true,
+      "specificity_ci_positive": true
+    },
+    "endpoints_satisfied": false,
+    "qualifies": false
+  },
+  {
+    "family": "t1_frozen_fact/r32/M1",
+    "writer": "t1_frozen_fact",
+    "variant": "M1",
+    "r": 32,
+    "theta": 0.25,
+    "best_label_free": {
+      "criterion": "output_stability",
+      "family": "t1_frozen_fact/r32/M1",
+      "source": {
+        "blake2b": "c0969330c6e87372a2c39bc844f99c81",
+        "episodes_per_seed": 2000,
+        "generator_seed": 4242,
+        "kind": "reused_C4",
+        "path": "/work/xg24i002/x10041/LoopLora-wt/sym/reports/p4s-r32/thresholds.csv",
+        "selected_before_any_head_training": true,
+        "selection_split": "val",
+        "training_seeds": [
+          17,
+          29,
+          43
+        ]
+      },
+      "threshold": 4,
+      "validation_accuracy": 0.13060416666666666,
+      "validation_mean_steps": 7.443437500000001
+    },
+    "statistics": {
+      "hop1": {
+        "comparison": "learned - fixed_1",
+        "split": "test",
+        "condition": "original",
+        "hops": [
+          1
+        ],
+        "depth_a": 4,
+        "depth_b": 1,
+        "training_seeds": [
+          17,
+          29,
+          43
+        ],
+        "n_seeds": 3,
+        "per_seed": [
+          {
+            "seed": 17,
+            "accuracy_a": 0.6295,
+            "accuracy_b": 0.8525,
+            "difference": -0.223
+          },
+          {
+            "seed": 29,
+            "accuracy_a": 0.632,
+            "accuracy_b": 0.8365,
+            "difference": -0.2045
+          },
+          {
+            "seed": 43,
+            "accuracy_a": 0.615,
+            "accuracy_b": 0.8445,
+            "difference": -0.2295
+          }
+        ],
+        "n_episodes": 2000,
+        "n_queries_per_seed": 2000,
+        "accuracy_a": 0.6255,
+        "accuracy_b": 0.8445,
+        "difference": -0.219,
+        "ci_low": -0.23627847222222226,
+        "ci_high": -0.2021666666666667,
+        "confidence": 0.9916666666666667,
+        "resamples": 2000,
+        "seed": 2718,
+        "bootstrap_seed": 6003928049163486095,
+        "cluster_unit": "episode",
+        "joint_episode_resampling": true,
+        "statistic": "mean_per_seed_paired_accuracy_difference",
+        "method": "paired_multiseed_percentile_bootstrap",
+        "method_a": "learned",
+        "method_b": "fixed_1",
+        "depth_labels_are_synthetic": true
+      },
+      "reach": {
+        "comparison": "learned - fixed_1",
+        "split": "test",
+        "condition": "original",
+        "hops": [
+          2,
+          3
+        ],
+        "depth_a": 4,
+        "depth_b": 1,
+        "training_seeds": [
+          17,
+          29,
+          43
+        ],
+        "n_seeds": 3,
+        "per_seed": [
+          {
+            "seed": 17,
+            "accuracy_a": 0.11725,
+            "accuracy_b": 0.01475,
+            "difference": 0.1025
+          },
+          {
+            "seed": 29,
+            "accuracy_a": 0.09975,
+            "accuracy_b": 0.016,
+            "difference": 0.08375
+          },
+          {
+            "seed": 43,
+            "accuracy_a": 0.11525,
+            "accuracy_b": 0.01825,
+            "difference": 0.097
+          }
+        ],
+        "n_episodes": 2000,
+        "n_queries_per_seed": 4000,
+        "accuracy_a": 0.11075,
+        "accuracy_b": 0.016333333333333335,
+        "difference": 0.09441666666666666,
+        "ci_low": 0.08677743055555555,
+        "ci_high": 0.102834375,
+        "confidence": 0.9916666666666667,
+        "resamples": 2000,
+        "seed": 2718,
+        "bootstrap_seed": 5099405047334943193,
+        "cluster_unit": "episode",
+        "joint_episode_resampling": true,
+        "statistic": "mean_per_seed_paired_accuracy_difference",
+        "method": "paired_multiseed_percentile_bootstrap",
+        "method_a": "learned",
+        "method_b": "fixed_1",
+        "depth_labels_are_synthetic": true
+      },
+      "far": {
+        "comparison": "learned - fixed_1",
+        "split": "test",
+        "condition": "original",
+        "hops": [
+          6,
+          7,
+          8
+        ],
+        "depth_a": 4,
+        "depth_b": 1,
+        "training_seeds": [
+          17,
+          29,
+          43
+        ],
+        "n_seeds": 3,
+        "per_seed": [
+          {
+            "seed": 17,
+            "accuracy_a": 0.04133333333333333,
+            "accuracy_b": 0.011666666666666667,
+            "difference": 0.029666666666666668
+          },
+          {
+            "seed": 29,
+            "accuracy_a": 0.0335,
+            "accuracy_b": 0.011166666666666667,
+            "difference": 0.022333333333333334
+          },
+          {
+            "seed": 43,
+            "accuracy_a": 0.035666666666666666,
+            "accuracy_b": 0.011166666666666667,
+            "difference": 0.0245
+          }
+        ],
+        "n_episodes": 2000,
+        "n_queries_per_seed": 6000,
+        "accuracy_a": 0.036833333333333336,
+        "accuracy_b": 0.011333333333333334,
+        "difference": 0.025500000000000005,
+        "ci_low": 0.021184953703703702,
+        "ci_high": 0.029741898148148153,
+        "confidence": 0.9916666666666667,
+        "resamples": 2000,
+        "seed": 2718,
+        "bootstrap_seed": 1497105699633018986,
+        "cluster_unit": "episode",
+        "joint_episode_resampling": true,
+        "statistic": "mean_per_seed_paired_accuracy_difference",
+        "method": "paired_multiseed_percentile_bootstrap",
+        "method_a": "learned",
+        "method_b": "fixed_1",
+        "depth_labels_are_synthetic": true
+      },
+      "overall": {
+        "comparison": "learned - fixed_1",
+        "split": "test",
+        "condition": "original",
+        "hops": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8
+        ],
+        "depth_a": 4,
+        "depth_b": 1,
+        "training_seeds": [
+          17,
+          29,
+          43
+        ],
+        "n_seeds": 3,
+        "per_seed": [
+          {
+            "seed": 17,
+            "accuracy_a": 0.135375,
+            "accuracy_b": 0.1170625,
+            "difference": 0.0183125
+          },
+          {
+            "seed": 29,
+            "accuracy_a": 0.1269375,
+            "accuracy_b": 0.115875,
+            "difference": 0.0110625
+          },
+          {
+            "seed": 43,
+            "accuracy_a": 0.1283125,
+            "accuracy_b": 0.1175,
+            "difference": 0.0108125
+          }
+        ],
+        "n_episodes": 2000,
+        "n_queries_per_seed": 16000,
+        "accuracy_a": 0.13020833333333334,
+        "accuracy_b": 0.1168125,
+        "difference": 0.013395833333333334,
+        "ci_low": 0.009159288194444441,
+        "ci_high": 0.01729878472222222,
+        "confidence": 0.9916666666666667,
+        "resamples": 2000,
+        "seed": 2718,
+        "bootstrap_seed": 3101671494551718245,
+        "cluster_unit": "episode",
+        "joint_episode_resampling": true,
+        "statistic": "mean_per_seed_paired_accuracy_difference",
+        "method": "paired_multiseed_percentile_bootstrap",
+        "method_a": "learned",
+        "method_b": "fixed_1",
+        "depth_labels_are_synthetic": true
+      },
+      "specificity": {
+        "comparison": "reachable depth effect - far depth effect",
+        "split": "test",
+        "condition": "original",
+        "depth_a": 4,
+        "depth_b": 1,
+        "reach_hops": [
+          2,
+          3
+        ],
+        "far_hops": [
+          6,
+          7,
+          8
+        ],
+        "training_seeds": [
+          17,
+          29,
+          43
+        ],
+        "n_seeds": 3,
+        "n_episodes": 2000,
+        "n_queries_per_seed": 10000,
+        "query_counts_by_subset": {
+          "reach": 4000,
+          "far": 6000
+        },
+        "episode_weighting": "equal",
+        "reach_difference": 0.09441666666666666,
+        "far_difference": 0.0255,
+        "difference": 0.06891666666666667,
+        "ci_low": 0.05996273148148157,
+        "ci_high": 0.0777412037037037,
+        "confidence": 0.9916666666666667,
+        "resamples": 2000,
+        "seed": 2718,
+        "bootstrap_seed": 7815940970160892980,
+        "cluster_unit": "episode",
+        "joint_episode_resampling": true,
+        "statistic": "mean_per_seed_episode_walk_specificity",
+        "method": "paired_multiseed_percentile_bootstrap",
+        "per_seed": [
+          {
+            "seed": 17,
+            "reach_difference": 0.1025,
+            "far_difference": 0.029666666666666664,
+            "difference": 0.07283333333333335
+          },
+          {
+            "seed": 29,
+            "reach_difference": 0.08375,
+            "far_difference": 0.022333333333333334,
+            "difference": 0.06141666666666667
+          },
+          {
+            "seed": 43,
+            "reach_difference": 0.097,
+            "far_difference": 0.024499999999999997,
+            "difference": 0.0725
+          }
+        ],
+        "method_a": "learned",
+        "method_b": "fixed_1",
+        "depth_labels_are_synthetic": true
+      }
+    },
+    "descriptive": {
+      "learned_minus_best_label_free": {
+        "overall": {
+          "comparison": "learned - output_stability",
+          "split": "test",
+          "condition": "original",
+          "hops": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8
+          ],
+          "depth_a": 4,
+          "depth_b": 1,
+          "training_seeds": [
+            17,
+            29,
+            43
+          ],
+          "n_seeds": 3,
+          "per_seed": [
+            {
+              "seed": 17,
+              "accuracy_a": 0.135375,
+              "accuracy_b": 0.1366875,
+              "difference": -0.0013125
+            },
+            {
+              "seed": 29,
+              "accuracy_a": 0.1269375,
+              "accuracy_b": 0.128625,
+              "difference": -0.0016875
+            },
+            {
+              "seed": 43,
+              "accuracy_a": 0.1283125,
+              "accuracy_b": 0.128375,
+              "difference": -6.25e-05
+            }
+          ],
+          "n_episodes": 2000,
+          "n_queries_per_seed": 16000,
+          "accuracy_a": 0.13020833333333334,
+          "accuracy_b": 0.13122916666666665,
+          "difference": -0.0010208333333333334,
+          "ci_low": -0.0039098090277777785,
+          "ci_high": 0.001757118055555556,
+          "confidence": 0.9916666666666667,
+          "resamples": 2000,
+          "seed": 2718,
+          "bootstrap_seed": 3101671494551718245,
+          "cluster_unit": "episode",
+          "joint_episode_resampling": true,
+          "statistic": "mean_per_seed_paired_accuracy_difference",
+          "method": "paired_multiseed_percentile_bootstrap",
+          "method_a": "learned",
+          "method_b": "output_stability",
+          "depth_labels_are_synthetic": true
+        }
+      },
+      "any_step_oracle_minus_learned": {
+        "overall": {
+          "comparison": "oracle_any_step - learned",
+          "split": "test",
+          "condition": "original",
+          "hops": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8
+          ],
+          "depth_a": 4,
+          "depth_b": 1,
+          "training_seeds": [
+            17,
+            29,
+            43
+          ],
+          "n_seeds": 3,
+          "per_seed": [
+            {
+              "seed": 17,
+              "accuracy_a": 0.242875,
+              "accuracy_b": 0.135375,
+              "difference": 0.1075
+            },
+            {
+              "seed": 29,
+              "accuracy_a": 0.219875,
+              "accuracy_b": 0.1269375,
+              "difference": 0.0929375
+            },
+            {
+              "seed": 43,
+              "accuracy_a": 0.235375,
+              "accuracy_b": 0.1283125,
+              "difference": 0.1070625
+            }
+          ],
+          "n_episodes": 2000,
+          "n_queries_per_seed": 16000,
+          "accuracy_a": 0.23270833333333332,
+          "accuracy_b": 0.13020833333333334,
+          "difference": 0.1025,
+          "ci_low": 0.09848602430555556,
+          "ci_high": 0.10647256944444444,
+          "confidence": 0.9916666666666667,
+          "resamples": 2000,
+          "seed": 2718,
+          "bootstrap_seed": 3101671494551718245,
+          "cluster_unit": "episode",
+          "joint_episode_resampling": true,
+          "statistic": "mean_per_seed_paired_accuracy_difference",
+          "method": "paired_multiseed_percentile_bootstrap",
+          "method_a": "oracle_any_step",
+          "method_b": "learned",
+          "depth_labels_are_synthetic": true
+        }
+      },
+      "learned_minus_true_hop": {
+        "overall": {
+          "comparison": "learned - oracle_true_hop",
+          "split": "test",
+          "condition": "original",
+          "hops": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8
+          ],
+          "depth_a": 4,
+          "depth_b": 1,
+          "training_seeds": [
+            17,
+            29,
+            43
+          ],
+          "n_seeds": 3,
+          "per_seed": [
+            {
+              "seed": 17,
+              "accuracy_a": 0.135375,
+              "accuracy_b": 0.1591875,
+              "difference": -0.0238125
+            },
+            {
+              "seed": 29,
+              "accuracy_a": 0.1269375,
+              "accuracy_b": 0.150625,
+              "difference": -0.0236875
+            },
+            {
+              "seed": 43,
+              "accuracy_a": 0.1283125,
+              "accuracy_b": 0.1555625,
+              "difference": -0.02725
+            }
+          ],
+          "n_episodes": 2000,
+          "n_queries_per_seed": 16000,
+          "accuracy_a": 0.13020833333333334,
+          "accuracy_b": 0.155125,
+          "difference": -0.024916666666666667,
+          "ci_low": -0.028159809027777774,
+          "ci_high": -0.02146519097222222,
+          "confidence": 0.9916666666666667,
+          "resamples": 2000,
+          "seed": 2718,
+          "bootstrap_seed": 3101671494551718245,
+          "cluster_unit": "episode",
+          "joint_episode_resampling": true,
+          "statistic": "mean_per_seed_paired_accuracy_difference",
+          "method": "paired_multiseed_percentile_bootstrap",
+          "method_a": "learned",
+          "method_b": "oracle_true_hop",
+          "depth_labels_are_synthetic": true
+        }
+      }
+    },
+    "primary": true,
+    "criteria": {
+      "hop1_preserved": false,
+      "reach_at_least_3pp": true,
+      "reach_ci_positive": true,
+      "specificity_ci_positive": true
+    },
+    "endpoints_satisfied": false,
+    "qualifies": false
+  },
+  {
+    "family": "t1_frozen_fact/r32/M1-lin",
+    "writer": "t1_frozen_fact",
+    "variant": "M1-lin",
+    "r": 32,
+    "theta": 0.35,
+    "best_label_free": {
+      "criterion": "read_norm",
+      "family": "t1_frozen_fact/r32/M1-lin",
+      "source": {
+        "blake2b": "c0969330c6e87372a2c39bc844f99c81",
+        "episodes_per_seed": 2000,
+        "generator_seed": 4242,
+        "kind": "reused_C4",
+        "path": "/work/xg24i002/x10041/LoopLora-wt/sym/reports/p4s-r32/thresholds.csv",
+        "selected_before_any_head_training": true,
+        "selection_split": "val",
+        "training_seeds": [
+          17,
+          29,
+          43
+        ]
+      },
+      "threshold": 1.0,
+      "validation_accuracy": 0.13479166666666667,
+      "validation_mean_steps": 8.987041666666668
+    },
+    "statistics": {
+      "hop1": {
+        "comparison": "learned - fixed_1",
+        "split": "test",
+        "condition": "original",
+        "hops": [
+          1
+        ],
+        "depth_a": 4,
+        "depth_b": 1,
+        "training_seeds": [
+          17,
+          29,
+          43
+        ],
+        "n_seeds": 3,
+        "per_seed": [
+          {
+            "seed": 17,
+            "accuracy_a": 0.6,
+            "accuracy_b": 0.8635,
+            "difference": -0.2635
+          },
+          {
+            "seed": 29,
+            "accuracy_a": 0.622,
+            "accuracy_b": 0.877,
+            "difference": -0.255
+          },
+          {
+            "seed": 43,
+            "accuracy_a": 0.5895,
+            "accuracy_b": 0.856,
+            "difference": -0.2665
+          }
+        ],
+        "n_episodes": 2000,
+        "n_queries_per_seed": 2000,
+        "accuracy_a": 0.6038333333333333,
+        "accuracy_b": 0.8654999999999999,
+        "difference": -0.26166666666666666,
+        "ci_low": -0.27911180555555554,
+        "ci_high": -0.24338819444444443,
+        "confidence": 0.9916666666666667,
+        "resamples": 2000,
+        "seed": 2718,
+        "bootstrap_seed": 6003928049163486095,
+        "cluster_unit": "episode",
+        "joint_episode_resampling": true,
+        "statistic": "mean_per_seed_paired_accuracy_difference",
+        "method": "paired_multiseed_percentile_bootstrap",
+        "method_a": "learned",
+        "method_b": "fixed_1",
+        "depth_labels_are_synthetic": true
+      },
+      "reach": {
+        "comparison": "learned - fixed_1",
+        "split": "test",
+        "condition": "original",
+        "hops": [
+          2,
+          3
+        ],
+        "depth_a": 4,
+        "depth_b": 1,
+        "training_seeds": [
+          17,
+          29,
+          43
+        ],
+        "n_seeds": 3,
+        "per_seed": [
+          {
+            "seed": 17,
+            "accuracy_a": 0.127,
+            "accuracy_b": 0.015,
+            "difference": 0.112
+          },
+          {
+            "seed": 29,
+            "accuracy_a": 0.10225,
+            "accuracy_b": 0.01325,
+            "difference": 0.089
+          },
+          {
+            "seed": 43,
+            "accuracy_a": 0.12125,
+            "accuracy_b": 0.01575,
+            "difference": 0.1055
+          }
+        ],
+        "n_episodes": 2000,
+        "n_queries_per_seed": 4000,
+        "accuracy_a": 0.11683333333333334,
+        "accuracy_b": 0.014666666666666666,
+        "difference": 0.10216666666666667,
+        "ci_low": 0.09436076388888888,
+        "ci_high": 0.11116666666666668,
+        "confidence": 0.9916666666666667,
+        "resamples": 2000,
+        "seed": 2718,
+        "bootstrap_seed": 5099405047334943193,
+        "cluster_unit": "episode",
+        "joint_episode_resampling": true,
+        "statistic": "mean_per_seed_paired_accuracy_difference",
+        "method": "paired_multiseed_percentile_bootstrap",
+        "method_a": "learned",
+        "method_b": "fixed_1",
+        "depth_labels_are_synthetic": true
+      },
+      "far": {
+        "comparison": "learned - fixed_1",
+        "split": "test",
+        "condition": "original",
+        "hops": [
+          6,
+          7,
+          8
+        ],
+        "depth_a": 4,
+        "depth_b": 1,
+        "training_seeds": [
+          17,
+          29,
+          43
+        ],
+        "n_seeds": 3,
+        "per_seed": [
+          {
+            "seed": 17,
+            "accuracy_a": 0.04466666666666667,
+            "accuracy_b": 0.011166666666666667,
+            "difference": 0.0335
+          },
+          {
+            "seed": 29,
+            "accuracy_a": 0.0365,
+            "accuracy_b": 0.013666666666666667,
+            "difference": 0.022833333333333334
+          },
+          {
+            "seed": 43,
+            "accuracy_a": 0.035333333333333335,
+            "accuracy_b": 0.011666666666666667,
+            "difference": 0.023666666666666666
+          }
+        ],
+        "n_episodes": 2000,
+        "n_queries_per_seed": 6000,
+        "accuracy_a": 0.03883333333333333,
+        "accuracy_b": 0.012166666666666666,
+        "difference": 0.02666666666666667,
+        "ci_low": 0.022351620370370365,
+        "ci_high": 0.03088888888888889,
+        "confidence": 0.9916666666666667,
+        "resamples": 2000,
+        "seed": 2718,
+        "bootstrap_seed": 1497105699633018986,
+        "cluster_unit": "episode",
+        "joint_episode_resampling": true,
+        "statistic": "mean_per_seed_paired_accuracy_difference",
+        "method": "paired_multiseed_percentile_bootstrap",
+        "method_a": "learned",
+        "method_b": "fixed_1",
+        "depth_labels_are_synthetic": true
+      },
+      "overall": {
+        "comparison": "learned - fixed_1",
+        "split": "test",
+        "condition": "original",
+        "hops": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8
+        ],
+        "depth_a": 4,
+        "depth_b": 1,
+        "training_seeds": [
+          17,
+          29,
+          43
+        ],
+        "n_seeds": 3,
+        "per_seed": [
+          {
+            "seed": 17,
+            "accuracy_a": 0.1374375,
+            "accuracy_b": 0.1189375,
+            "difference": 0.0185
+          },
+          {
+            "seed": 29,
+            "accuracy_a": 0.12775,
+            "accuracy_b": 0.1214375,
+            "difference": 0.0063125
+          },
+          {
+            "seed": 43,
+            "accuracy_a": 0.12925,
+            "accuracy_b": 0.118625,
+            "difference": 0.010625
+          }
+        ],
+        "n_episodes": 2000,
+        "n_queries_per_seed": 16000,
+        "accuracy_a": 0.13147916666666667,
+        "accuracy_b": 0.11966666666666666,
+        "difference": 0.011812500000000002,
+        "ci_low": 0.0075540798611111,
+        "ci_high": 0.015854687500000002,
+        "confidence": 0.9916666666666667,
+        "resamples": 2000,
+        "seed": 2718,
+        "bootstrap_seed": 3101671494551718245,
+        "cluster_unit": "episode",
+        "joint_episode_resampling": true,
+        "statistic": "mean_per_seed_paired_accuracy_difference",
+        "method": "paired_multiseed_percentile_bootstrap",
+        "method_a": "learned",
+        "method_b": "fixed_1",
+        "depth_labels_are_synthetic": true
+      },
+      "specificity": {
+        "comparison": "reachable depth effect - far depth effect",
+        "split": "test",
+        "condition": "original",
+        "depth_a": 4,
+        "depth_b": 1,
+        "reach_hops": [
+          2,
+          3
+        ],
+        "far_hops": [
+          6,
+          7,
+          8
+        ],
+        "training_seeds": [
+          17,
+          29,
+          43
+        ],
+        "n_seeds": 3,
+        "n_episodes": 2000,
+        "n_queries_per_seed": 10000,
+        "query_counts_by_subset": {
+          "reach": 4000,
+          "far": 6000
+        },
+        "episode_weighting": "equal",
+        "reach_difference": 0.10216666666666667,
+        "far_difference": 0.02666666666666667,
+        "difference": 0.0755,
+        "ci_low": 0.06661076388888898,
+        "ci_high": 0.08447361111111105,
+        "confidence": 0.9916666666666667,
+        "resamples": 2000,
+        "seed": 2718,
+        "bootstrap_seed": 7815940970160892980,
+        "cluster_unit": "episode",
+        "joint_episode_resampling": true,
+        "statistic": "mean_per_seed_episode_walk_specificity",
+        "method": "paired_multiseed_percentile_bootstrap",
+        "per_seed": [
+          {
+            "seed": 17,
+            "reach_difference": 0.112,
+            "far_difference": 0.0335,
+            "difference": 0.0785
+          },
+          {
+            "seed": 29,
+            "reach_difference": 0.089,
+            "far_difference": 0.022833333333333327,
+            "difference": 0.06616666666666667
+          },
+          {
+            "seed": 43,
+            "reach_difference": 0.1055,
+            "far_difference": 0.02366666666666667,
+            "difference": 0.08183333333333334
+          }
+        ],
+        "method_a": "learned",
+        "method_b": "fixed_1",
+        "depth_labels_are_synthetic": true
+      }
+    },
+    "descriptive": {
+      "learned_minus_best_label_free": {
+        "overall": {
+          "comparison": "learned - read_norm",
+          "split": "test",
+          "condition": "original",
+          "hops": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8
+          ],
+          "depth_a": 4,
+          "depth_b": 1,
+          "training_seeds": [
+            17,
+            29,
+            43
+          ],
+          "n_seeds": 3,
+          "per_seed": [
+            {
+              "seed": 17,
+              "accuracy_a": 0.1374375,
+              "accuracy_b": 0.1366875,
+              "difference": 0.00075
+            },
+            {
+              "seed": 29,
+              "accuracy_a": 0.12775,
+              "accuracy_b": 0.1289375,
+              "difference": -0.0011875
+            },
+            {
+              "seed": 43,
+              "accuracy_a": 0.12925,
+              "accuracy_b": 0.13175,
+              "difference": -0.0025
+            }
+          ],
+          "n_episodes": 2000,
+          "n_queries_per_seed": 16000,
+          "accuracy_a": 0.13147916666666667,
+          "accuracy_b": 0.13245833333333334,
+          "difference": -0.0009791666666666666,
+          "ci_low": -0.004493142361111112,
+          "ci_high": 0.0025696180555555563,
+          "confidence": 0.9916666666666667,
+          "resamples": 2000,
+          "seed": 2718,
+          "bootstrap_seed": 3101671494551718245,
+          "cluster_unit": "episode",
+          "joint_episode_resampling": true,
+          "statistic": "mean_per_seed_paired_accuracy_difference",
+          "method": "paired_multiseed_percentile_bootstrap",
+          "method_a": "learned",
+          "method_b": "read_norm",
+          "depth_labels_are_synthetic": true
+        }
+      },
+      "any_step_oracle_minus_learned": {
+        "overall": {
+          "comparison": "oracle_any_step - learned",
+          "split": "test",
+          "condition": "original",
+          "hops": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8
+          ],
+          "depth_a": 4,
+          "depth_b": 1,
+          "training_seeds": [
+            17,
+            29,
+            43
+          ],
+          "n_seeds": 3,
+          "per_seed": [
+            {
+              "seed": 17,
+              "accuracy_a": 0.25,
+              "accuracy_b": 0.1374375,
+              "difference": 0.1125625
+            },
+            {
+              "seed": 29,
+              "accuracy_a": 0.226375,
+              "accuracy_b": 0.12775,
+              "difference": 0.098625
+            },
+            {
+              "seed": 43,
+              "accuracy_a": 0.2465625,
+              "accuracy_b": 0.12925,
+              "difference": 0.1173125
+            }
+          ],
+          "n_episodes": 2000,
+          "n_queries_per_seed": 16000,
+          "accuracy_a": 0.24097916666666666,
+          "accuracy_b": 0.13147916666666667,
+          "difference": 0.1095,
+          "ci_low": 0.1050828125,
+          "ci_high": 0.11401397569444445,
+          "confidence": 0.9916666666666667,
+          "resamples": 2000,
+          "seed": 2718,
+          "bootstrap_seed": 3101671494551718245,
+          "cluster_unit": "episode",
+          "joint_episode_resampling": true,
+          "statistic": "mean_per_seed_paired_accuracy_difference",
+          "method": "paired_multiseed_percentile_bootstrap",
+          "method_a": "oracle_any_step",
+          "method_b": "learned",
+          "depth_labels_are_synthetic": true
+        }
+      },
+      "learned_minus_true_hop": {
+        "overall": {
+          "comparison": "learned - oracle_true_hop",
+          "split": "test",
+          "condition": "original",
+          "hops": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8
+          ],
+          "depth_a": 4,
+          "depth_b": 1,
+          "training_seeds": [
+            17,
+            29,
+            43
+          ],
+          "n_seeds": 3,
+          "per_seed": [
+            {
+              "seed": 17,
+              "accuracy_a": 0.1374375,
+              "accuracy_b": 0.1575,
+              "difference": -0.0200625
+            },
+            {
+              "seed": 29,
+              "accuracy_a": 0.12775,
+              "accuracy_b": 0.154625,
+              "difference": -0.026875
+            },
+            {
+              "seed": 43,
+              "accuracy_a": 0.12925,
+              "accuracy_b": 0.1535,
+              "difference": -0.02425
+            }
+          ],
+          "n_episodes": 2000,
+          "n_queries_per_seed": 16000,
+          "accuracy_a": 0.13147916666666667,
+          "accuracy_b": 0.1552083333333333,
+          "difference": -0.023729166666666666,
+          "ci_low": -0.027236284722222222,
+          "ci_high": -0.02021519097222222,
+          "confidence": 0.9916666666666667,
+          "resamples": 2000,
+          "seed": 2718,
+          "bootstrap_seed": 3101671494551718245,
+          "cluster_unit": "episode",
+          "joint_episode_resampling": true,
+          "statistic": "mean_per_seed_paired_accuracy_difference",
+          "method": "paired_multiseed_percentile_bootstrap",
+          "method_a": "learned",
+          "method_b": "oracle_true_hop",
+          "depth_labels_are_synthetic": true
+        }
+      }
+    },
+    "primary": true,
+    "criteria": {
+      "hop1_preserved": false,
+      "reach_at_least_3pp": true,
+      "reach_ci_positive": true,
+      "specificity_ci_positive": true
+    },
+    "endpoints_satisfied": false,
+    "qualifies": false
+  }
+]

@@ -1,0 +1,9 @@
+family,primary,hop1_preserved,reach_at_least_3pp,reach_ci_positive,specificity_ci_positive,endpoints_satisfied,qualifies
+joint/r32/M1,False,True,True,True,True,True,False
+joint/r32/M1-lin,False,True,True,True,False,False,False
+joint_fact/r32/M1,True,False,True,True,True,False,False
+joint_fact/r32/M1-lin,True,False,True,True,True,False,False
+oracle_random/r32/M1,True,False,True,True,True,False,False
+oracle_random/r32/M1-lin,True,False,True,True,True,False,False
+t1_frozen_fact/r32/M1,True,False,True,True,True,False,False
+t1_frozen_fact/r32/M1-lin,True,False,True,True,True,False,False

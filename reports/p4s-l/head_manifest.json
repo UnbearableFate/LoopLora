@@ -128,7 +128,8 @@
         "trace_seconds": 0.5463268053717911
       },
       "variant": "M1-lin",
-      "writer": "joint_fact"
+      "writer": "joint_fact",
+      "exported_head_checkpoint": "reports/p4s-l/heads/f2-main-joint_fact-M1-lin-s17.pt"
     },
     {
       "checkpoint": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p1s/f2/main-readers/shard-01/f2-main-joint_fact-M1-lin-s29/checkpoint.pt",
@@ -257,7 +258,8 @@
         "trace_seconds": 0.500642959959805
       },
       "variant": "M1-lin",
-      "writer": "joint_fact"
+      "writer": "joint_fact",
+      "exported_head_checkpoint": "reports/p4s-l/heads/f2-main-joint_fact-M1-lin-s29.pt"
     },
     {
       "checkpoint": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p1s/f2/main-readers/shard-03/f2-main-joint_fact-M1-lin-s43/checkpoint.pt",
@@ -386,7 +388,8 @@
         "trace_seconds": 0.5069705490022898
       },
       "variant": "M1-lin",
-      "writer": "joint_fact"
+      "writer": "joint_fact",
+      "exported_head_checkpoint": "reports/p4s-l/heads/f2-main-joint_fact-M1-lin-s43.pt"
     },
     {
       "checkpoint": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p1s/f2/main-readers/shard-02/f2-main-joint_fact-M1-s17/checkpoint.pt",
@@ -515,7 +518,8 @@
         "trace_seconds": 0.5098971631377935
       },
       "variant": "M1",
-      "writer": "joint_fact"
+      "writer": "joint_fact",
+      "exported_head_checkpoint": "reports/p4s-l/heads/f2-main-joint_fact-M1-s17.pt"
     },
     {
       "checkpoint": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p1s/f2/main-readers/shard-00/f2-main-joint_fact-M1-s29/checkpoint.pt",
@@ -644,7 +648,8 @@
         "trace_seconds": 0.5175226842984557
       },
       "variant": "M1",
-      "writer": "joint_fact"
+      "writer": "joint_fact",
+      "exported_head_checkpoint": "reports/p4s-l/heads/f2-main-joint_fact-M1-s29.pt"
     },
     {
       "checkpoint": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p1s/f2/main-readers/shard-02/f2-main-joint_fact-M1-s43/checkpoint.pt",
@@ -773,7 +778,8 @@
         "trace_seconds": 0.5070199808105826
       },
       "variant": "M1",
-      "writer": "joint_fact"
+      "writer": "joint_fact",
+      "exported_head_checkpoint": "reports/p4s-l/heads/f2-main-joint_fact-M1-s43.pt"
     },
     {
       "checkpoint": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p1s/f2/main-readers/shard-01/f2-main-t1_frozen_fact-M1-lin-s17/checkpoint.pt",
@@ -902,7 +908,8 @@
         "trace_seconds": 0.5025762976147234
       },
       "variant": "M1-lin",
-      "writer": "t1_frozen_fact"
+      "writer": "t1_frozen_fact",
+      "exported_head_checkpoint": "reports/p4s-l/heads/f2-main-t1_frozen_fact-M1-lin-s17.pt"
     },
     {
       "checkpoint": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p1s/f2/main-readers/shard-03/f2-main-t1_frozen_fact-M1-lin-s29/checkpoint.pt",
@@ -1031,7 +1038,8 @@
         "trace_seconds": 0.5037256847135723
       },
       "variant": "M1-lin",
-      "writer": "t1_frozen_fact"
+      "writer": "t1_frozen_fact",
+      "exported_head_checkpoint": "reports/p4s-l/heads/f2-main-t1_frozen_fact-M1-lin-s29.pt"
     },
     {
       "checkpoint": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p1s/f2/main-readers/shard-01/f2-main-t1_frozen_fact-M1-lin-s43/checkpoint.pt",
@@ -1160,7 +1168,8 @@
         "trace_seconds": 0.5023938366211951
       },
       "variant": "M1-lin",
-      "writer": "t1_frozen_fact"
+      "writer": "t1_frozen_fact",
+      "exported_head_checkpoint": "reports/p4s-l/heads/f2-main-t1_frozen_fact-M1-lin-s43.pt"
     },
     {
       "checkpoint": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p1s/f2/main-readers/shard-00/f2-main-t1_frozen_fact-M1-s17/checkpoint.pt",
@@ -1289,7 +1298,8 @@
         "trace_seconds": 0.5163452392444015
       },
       "variant": "M1",
-      "writer": "t1_frozen_fact"
+      "writer": "t1_frozen_fact",
+      "exported_head_checkpoint": "reports/p4s-l/heads/f2-main-t1_frozen_fact-M1-s17.pt"
     },
     {
       "checkpoint": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p1s/f2/main-readers/shard-02/f2-main-t1_frozen_fact-M1-s29/checkpoint.pt",
@@ -1418,7 +1428,8 @@
         "trace_seconds": 0.5301365051418543
       },
       "variant": "M1",
-      "writer": "t1_frozen_fact"
+      "writer": "t1_frozen_fact",
+      "exported_head_checkpoint": "reports/p4s-l/heads/f2-main-t1_frozen_fact-M1-s29.pt"
     },
     {
       "checkpoint": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p1s/f2/main-readers/shard-00/f2-main-t1_frozen_fact-M1-s43/checkpoint.pt",
@@ -1547,7 +1558,8 @@
         "trace_seconds": 0.5169943305663764
       },
       "variant": "M1",
-      "writer": "t1_frozen_fact"
+      "writer": "t1_frozen_fact",
+      "exported_head_checkpoint": "reports/p4s-l/heads/f2-main-t1_frozen_fact-M1-s43.pt"
     },
     {
       "checkpoint": "/work/xg24i002/x10041/LoopLora/runs/p1s/main/20261026/runs/primary-joint-M1-lin-r32-s17/checkpoint.pt",
@@ -1676,7 +1688,8 @@
         "trace_seconds": 0.5008171014487743
       },
       "variant": "M1-lin",
-      "writer": "joint"
+      "writer": "joint",
+      "exported_head_checkpoint": "reports/p4s-l/heads/primary-joint-M1-lin-r32-s17.pt"
     },
     {
       "checkpoint": "/work/xg24i002/x10041/LoopLora/runs/p1s/main/20261026/runs/primary-joint-M1-lin-r32-s29/checkpoint.pt",
@@ -1805,7 +1818,8 @@
         "trace_seconds": 0.5060766390524805
       },
       "variant": "M1-lin",
-      "writer": "joint"
+      "writer": "joint",
+      "exported_head_checkpoint": "reports/p4s-l/heads/primary-joint-M1-lin-r32-s29.pt"
     },
     {
       "checkpoint": "/work/xg24i002/x10041/LoopLora/runs/p1s/main/20261026/runs/primary-joint-M1-lin-r32-s43/checkpoint.pt",
@@ -1934,7 +1948,8 @@
         "trace_seconds": 0.5053390483371913
       },
       "variant": "M1-lin",
-      "writer": "joint"
+      "writer": "joint",
+      "exported_head_checkpoint": "reports/p4s-l/heads/primary-joint-M1-lin-r32-s43.pt"
     },
     {
       "checkpoint": "/work/xg24i002/x10041/LoopLora/runs/p1s/main/20261026/runs/primary-joint-M1-r32-s17/checkpoint.pt",
@@ -2063,7 +2078,8 @@
         "trace_seconds": 0.5069110225886106
       },
       "variant": "M1",
-      "writer": "joint"
+      "writer": "joint",
+      "exported_head_checkpoint": "reports/p4s-l/heads/primary-joint-M1-r32-s17.pt"
     },
     {
       "checkpoint": "/work/xg24i002/x10041/LoopLora/runs/p1s/main/20261026/runs/primary-joint-M1-r32-s29/checkpoint.pt",
@@ -2192,7 +2208,8 @@
         "trace_seconds": 0.5132890627719462
       },
       "variant": "M1",
-      "writer": "joint"
+      "writer": "joint",
+      "exported_head_checkpoint": "reports/p4s-l/heads/primary-joint-M1-r32-s29.pt"
     },
     {
       "checkpoint": "/work/xg24i002/x10041/LoopLora/runs/p1s/main/20261026/runs/primary-joint-M1-r32-s43/checkpoint.pt",
@@ -2321,7 +2338,8 @@
         "trace_seconds": 0.5124274338595569
       },
       "variant": "M1",
-      "writer": "joint"
+      "writer": "joint",
+      "exported_head_checkpoint": "reports/p4s-l/heads/primary-joint-M1-r32-s43.pt"
     },
     {
       "checkpoint": "/work/xg24i002/x10041/LoopLora/runs/p1s/main/20261026/runs/primary-oracle_random-M1-lin-r32-s17/checkpoint.pt",
@@ -2449,7 +2467,8 @@
         "trace_seconds": 0.5006302115507424
       },
       "variant": "M1-lin",
-      "writer": "oracle_random"
+      "writer": "oracle_random",
+      "exported_head_checkpoint": "reports/p4s-l/heads/primary-oracle_random-M1-lin-r32-s17.pt"
     },
     {
       "checkpoint": "/work/xg24i002/x10041/LoopLora/runs/p1s/main/20261026/runs/primary-oracle_random-M1-lin-r32-s29/checkpoint.pt",
@@ -2577,7 +2596,8 @@
         "trace_seconds": 0.49721032846719027
       },
       "variant": "M1-lin",
-      "writer": "oracle_random"
+      "writer": "oracle_random",
+      "exported_head_checkpoint": "reports/p4s-l/heads/primary-oracle_random-M1-lin-r32-s29.pt"
     },
     {
       "checkpoint": "/work/xg24i002/x10041/LoopLora/runs/p1s/main/20261026/runs/primary-oracle_random-M1-lin-r32-s43/checkpoint.pt",
@@ -2705,7 +2725,8 @@
         "trace_seconds": 0.498145439196378
       },
       "variant": "M1-lin",
-      "writer": "oracle_random"
+      "writer": "oracle_random",
+      "exported_head_checkpoint": "reports/p4s-l/heads/primary-oracle_random-M1-lin-r32-s43.pt"
     },
     {
       "checkpoint": "/work/xg24i002/x10041/LoopLora/runs/p1s/main/20261026/runs/primary-oracle_random-M1-r32-s17/checkpoint.pt",
@@ -2833,7 +2854,8 @@
         "trace_seconds": 0.5011447193101048
       },
       "variant": "M1",
-      "writer": "oracle_random"
+      "writer": "oracle_random",
+      "exported_head_checkpoint": "reports/p4s-l/heads/primary-oracle_random-M1-r32-s17.pt"
     },
     {
       "checkpoint": "/work/xg24i002/x10041/LoopLora/runs/p1s/main/20261026/runs/primary-oracle_random-M1-r32-s29/checkpoint.pt",
@@ -2961,7 +2983,8 @@
         "trace_seconds": 0.5022581950761378
       },
       "variant": "M1",
-      "writer": "oracle_random"
+      "writer": "oracle_random",
+      "exported_head_checkpoint": "reports/p4s-l/heads/primary-oracle_random-M1-r32-s29.pt"
     },
     {
       "checkpoint": "/work/xg24i002/x10041/LoopLora/runs/p1s/main/20261026/runs/primary-oracle_random-M1-r32-s43/checkpoint.pt",
@@ -3089,7 +3112,8 @@
         "trace_seconds": 0.5067290193401277
       },
       "variant": "M1",
-      "writer": "oracle_random"
+      "writer": "oracle_random",
+      "exported_head_checkpoint": "reports/p4s-l/heads/primary-oracle_random-M1-r32-s43.pt"
     }
   ],
   "source": "ccb4ec55ba85ab051d394181fd619a240d1c4094",
@@ -3097,5 +3121,6 @@
   "design_lock_commit": "9366da4035aa15bfe97be14acec92574c6d3e894",
   "all_readers_unchanged": true,
   "training_episodes_per_head": 20000,
-  "head_steps": 2000
+  "head_steps": 2000,
+  "exported_heads_verified": 24
 }
