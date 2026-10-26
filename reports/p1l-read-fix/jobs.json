@@ -79,13 +79,46 @@
       "role": "smoke artifact/timing audit",
       "exit_status": 0,
       "node_hours": 0.005555555555555556
+    },
+    {
+      "job_id": "3715621",
+      "job_name": "a-l4-A1",
+      "status": "FINISH",
+      "project": "xg24i002",
+      "queue": "small-g",
+      "start_date": "10/27 03:38:37",
+      "elapsed_seconds": 64,
+      "token": 0.0,
+      "token_estimate": null,
+      "nodes": 1,
+      "mig": null,
+      "role": "no-training final A1 checkpoint audit",
+      "exit_status": 0,
+      "node_hours": 0.017777777777777778
+    },
+    {
+      "job_id": "3715659",
+      "job_name": "v-l4-A1",
+      "status": "FINISH",
+      "project": "xg24i002",
+      "queue": "small-g",
+      "start_date": "10/27 03:48:32",
+      "elapsed_seconds": 43,
+      "token": 0.0,
+      "token_estimate": null,
+      "nodes": 1,
+      "mig": null,
+      "role": "A1 tests and independent audit/schedule release",
+      "exit_status": 0,
+      "node_hours": 0.011944444444444445
     }
   ],
-  "completed_node_hours": 0.1486111111111111,
-  "max_total_node_hours": 4,
+  "completed_node_hours": 0.17833333333333334,
+  "max_total_node_hours": 8,
   "separate_from": "WP-L3 costs",
   "pending_roles": [
-    "conditional no-training A1 audit",
-    "conditional scientific arms/E8/final audit"
+    "A1 scientific R/Rrho",
+    "A1 scientific RK/OArho",
+    "conditional E8 and final audits"
   ]
 }

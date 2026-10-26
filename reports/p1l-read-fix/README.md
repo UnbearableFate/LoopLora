@@ -1,48 +1,68 @@
-# WP-L4 read-fix preparation
+# WP-L4 read-fix, Amendment A1
 
 Task `docs/tasks/WP-L4_p1l_read_fix.md`; choices `docs/reports/WP-L4-plan.md`;
 continuation `docs/reports/WP-L4-state.md`. Persistent root:
 `/work/xg24i002/x10041/LoopLora/runs/p1l/read-fix-20261027/`.
 
-Tests55passed on3715437 mg0379, sourceb1c64c1. Initial3715417 had two failures
-(fixed bf16 audit export and a faulty quantized-shuffle-effect assertion);
-both XML reports remain. Four-arm 10% smoke (823/8225 steps,100/1000 eval episodes)
-passed in3715461/3715462. Audit3715504 reproduced every smoke sample label,
-checked all finite diagnostics, exact shared normalization buffers and inference
-exports. `smoke-timing.json` deliberately exposes no quality scores. The 1.5×
-training margin plus five extrapolated full evaluations and90s reserve predicts
-2781s; use one50min job for each pair R/Rρ and RK/OAρ. Costs in `jobs.json`.
+WP-L3 finished and reported first (`cd5a45c`): no writer selected. Its final
+A1 checkpoints are audited here, with identical original predictions, zero
+repeat-logit drift, and independently verified Gram read reconstruction.
+`audit.csv`, `audit-age.csv` and `audit-summary.json` preserve scalar measurements;
+per-query vectors/samples remain under the persistent root's `audit/` directory.
+The task mentions a third A1 arm; none exists because OA was among its top two.
 
-`release.json` freezes source/schedule before any new scientific score.
-Science waits for final audited WP-L3 selecting no writer and its committed
-report. Existing A1 job3714914 and its armed wake-up remain unchanged.
+Initial test3715417 had two failures, fixed before science; corrected3715437
+passed55. Initial10% smoke823/8225steps,100/1000evalepisodes passed all4 arms
+in3715461/3715462; timing/artifact audit3715504 verified all samples, exports and
+shared normalization. No smoke quality score selected settings. A1 was received
+BEFORE ANY scientific submission and superseded8225steps/1h/4nodeh. No scientific
+jobs were canceled. Reuse those measured timings for the new budgets; the
+initial smoke is a smaller fraction of A1's expanded schedule, explicitly recorded.
+A1 tests3715659 passed57, including maximal budget and nested E8-lock handling.
 
-All commands below must run ON COMPUTE through `scripts/submit.py`, with an
-explicit commit hash (submit.py resolves HEAD in the main checkout):
+`release.json` freezes per-arm schedules, source0b03d60 and the A1 budget rule:
+largest multiple5 satisfying1.5*(S*measured mean step + N_eval*conservative full
+validation time)+90s setup<=7200s. Validation time is the maximum per-arm100episode
+smoke evaluation x10. Primary checkpoints are five equal intervals. OAρ also
+has one predeclared6580-step diagnostic, reserved in its6evaluation budget, to
+fulfill its matched-step OA comparison; only the final primary checkpoint selects.
+ML tensor math/data/initialization are unchanged from smoke b1c64c1.
+
+| Arm | Steps | Primary checkpoints |
+| --- | ---: | --- |
+| R | 23590 | 4718 / 9436 / 14154 / 18872 / 23590 |
+| Rρ | 24220 | 4844 / 9688 / 14532 / 19376 / 24220 |
+| RK | 21980 | 4396 / 8792 / 13188 / 17584 / 21980 |
+| OAρ | 27040 | 5408 / 10816 / 16224 / 21632 / 27040 |
+
+Every command below runs ON COMPUTE through scripts/submit.py. Scientific pairs
+use source0b03d60,1node/02:00:00 and
+`--scale-up docs/tasks/WP-L4_p1l_read_fix.md`; total WP-L4<=8nodeh.
 
 ```sh
-scripts/audit_p1l_read_fix.py --root <WP-L3-root> --out <WP-L4-root>/audit \
-  --prior-decision <WP-L3-summary.json> --prior-report <P1L-writer-fix.md>
+-m looplora.llm.read_fix_run --arms R Rrho --schedule <absolute-release.json> \
+  --out <root>/arms --prior-decision <WP-L3-summary.json> \
+  --prior-report <P1L-writer-fix.md>
+-m looplora.llm.read_fix_run --arms RK OArho --schedule <absolute-release.json> \
+  --out <root>/arms --prior-decision <WP-L3-summary.json> \
+  --prior-report <P1L-writer-fix.md>
 
--m looplora.llm.read_fix_run --arms R Rrho --steps 8225 --out <WP-L4-root>/arms \
-  --prior-decision <WP-L3-summary.json> --prior-report <P1L-writer-fix.md>
--m looplora.llm.read_fix_run --arms RK OArho --steps 8225 --out <WP-L4-root>/arms \
-  --prior-decision <WP-L3-summary.json> --prior-report <P1L-writer-fix.md>
-
-scripts/analyze_p1l_read_fix.py --root <WP-L4-root> --out <reports-directory> \
+scripts/analyze_p1l_read_fix.py --root <root> --out <reports-directory> \
   --release <release.json> --e16-only
 ```
 
-The immutable selection.json permits at most one E8 retrain (same8225 steps),
-using `--arms <selected-arm> --e8-decision <selection.json> --out <root>/e8`
-and the same prior-decision/report arguments. Only a best final EM>=.50 with no
-E16writer>=.80 authorizes this. Final audit omits `--e16-only`, adds
-`--verify-export`, verifies all inference predictions, and writes curves/CSVs.
-The fourth validation checkpoint6580 matches A1 OA's first checkpoint exactly.
+The immutable selection.json permits at most ONE E8 retrain, only if no E16writer
+reaches.80 and the best reaches.50 (ties simplicity). Size its own A1 schedule
+from E8 smoke without reading quality, save separate e8-release.json (do not
+overwrite the E16 release), then use `--arms <eligible-arm> --e8-decision
+<selection.json> --schedule <e8-release.json> --out <root>/e8` and the same prior
+arguments. Same seed17/LR/objective, five fixed primary checkpoints,2h job cap.
+Final audit omits `--e16-only`, adds `--verify-export` and, if triggered,
+`--e8-release <e8-release.json>`. It verifies all inference predictions and
+writes curves/CSVs. No further writer screen/extension follows WP-L4.
 
-No-training audit saves per-query scalar samples and dense b/a/d/Gram/keys/
-values/raw query/matrix/read reconstructions; headless OA is explicitly labeled.
-It measures repeated-logit noise, zero/shuffled ACTUAL deployed memory (OA:
-oracle value), age-stratified SIR, memory-output contrast, and per-loss gradients
-on128 train episodes with zero optimizer steps. The task mentions a third A1
-arm; none exists because OA is already among A1's two highest-EM arms.
+No-training audit measures b/a/d, exact Gram reconstruction, raw norms, gM/BgM,
+clean/read value-head decoding (unavailable for headless OA), age-stratified
+SIR/interference, zero/shuffled ACTUAL deployed memory (OA: supplied value), and
+per-loss gradients on128train episodes with zero optimizer steps. Failed tests
+and all audits/smokes count in `jobs.json`, separately from completed WP-L3 costs.
