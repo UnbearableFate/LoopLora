@@ -16,6 +16,7 @@ import time
 
 ROOT = Path(__file__).resolve().parents[1]
 LABELS = ("B8", "M1-L4", "B4", "B5-L4", "B3-L4", "B1", "B2")
+SEEDS = (17, 29, 43)
 
 
 def save(path: Path, value) -> None:
@@ -124,7 +125,7 @@ def train_stage(args) -> None:
             if lock["status"] != "locked":
                 raise ValueError("main requires a committed lr/S lock")
             base["train"]["steps"] = lock["S"]
-            base["train"]["lr"] = lock["lrs"][label]
+            base["train"]["lr"] = lock["lrs"].get(label, base["train"]["lr"])
         rates = [0.001, 0.003] if args.stage == "pilot" else [base["train"]["lr"]]
         for rate in rates:
             cfg = copy.deepcopy(base)
@@ -144,7 +145,7 @@ def main() -> None:
     parser.add_argument("--out", type=Path, required=True)
     parser.add_argument("--steps", type=int)
     parser.add_argument("--seed", type=int, choices=(17, 29, 43), default=17)
-    parser.add_argument("--labels", nargs="+", choices=LABELS)
+    parser.add_argument("--labels", nargs="+", choices=(*LABELS, "B0"))
     args = parser.parse_args()
     if args.stage in {"preflight", "smoke"} and (args.steps is None or args.steps < 10):
         parser.error("timing stages require --steps >= 10")

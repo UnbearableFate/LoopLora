@@ -20,6 +20,9 @@ def timings(root: Path) -> list[dict]:
     rows = []
     for label in LABELS:
         directory = root / f"{label}-s17"
+        if not directory.is_dir():
+            parent = "smoke-context" if label in {"B1", "B2"} else "smoke-oracle"
+            directory = root / parent / f"{label}-s17"
         record = read(directory / "record.json")
         cfg = record["config"]
         if record["status"] != "complete" or not cfg["smoke"]:
@@ -101,6 +104,8 @@ def select(args) -> None:
     result = dict(status="locked", S=sizing["S"], lrs=lrs, selection=selections,
                   rule="val full-vocabulary EM, pooled hops1/2/3 at trained L; ties lower lr",
                   sizing_hash=digest(args.sizing), time=datetime.now(timezone.utc).isoformat())
+    result["packing"] = sizing["packing"]
+    result["projected_main_plus_pilot_node_hours"] = sizing["main_plus_pilot_node_hours"]
     save(args.out, result)
     print(json.dumps(result), flush=True)
 
