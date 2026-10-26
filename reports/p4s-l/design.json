@@ -1,0 +1,1108 @@
+{
+  "best_label_free": {
+    "joint/r32/M1": {
+      "criterion": "read_norm",
+      "family": "joint/r32/M1",
+      "source": {
+        "blake2b": "c0969330c6e87372a2c39bc844f99c81",
+        "episodes_per_seed": 2000,
+        "generator_seed": 4242,
+        "kind": "reused_C4",
+        "path": "/work/xg24i002/x10041/LoopLora-wt/sym/reports/p4s-r32/thresholds.csv",
+        "selected_before_any_head_training": true,
+        "selection_split": "val",
+        "training_seeds": [
+          17,
+          29,
+          43
+        ]
+      },
+      "threshold": 0.3,
+      "validation_accuracy": 0.43375,
+      "validation_mean_steps": 15.998541666666668
+    },
+    "joint/r32/M1-lin": {
+      "criterion": "relative_change",
+      "family": "joint/r32/M1-lin",
+      "source": {
+        "blake2b": "c0969330c6e87372a2c39bc844f99c81",
+        "episodes_per_seed": 2000,
+        "generator_seed": 4242,
+        "kind": "reused_C4",
+        "path": "/work/xg24i002/x10041/LoopLora-wt/sym/reports/p4s-r32/thresholds.csv",
+        "selected_before_any_head_training": true,
+        "selection_split": "val",
+        "training_seeds": [
+          17,
+          29,
+          43
+        ]
+      },
+      "threshold": 0.03,
+      "validation_accuracy": 0.4852708333333333,
+      "validation_mean_steps": 6.1840625000000005
+    },
+    "joint_fact/r32/M1": {
+      "criterion": "output_stability",
+      "family": "joint_fact/r32/M1",
+      "source": {
+        "blake2b": "c0969330c6e87372a2c39bc844f99c81",
+        "episodes_per_seed": 2000,
+        "generator_seed": 4242,
+        "kind": "reused_C4",
+        "path": "/work/xg24i002/x10041/LoopLora-wt/sym/reports/p4s-r32/thresholds.csv",
+        "selected_before_any_head_training": true,
+        "selection_split": "val",
+        "training_seeds": [
+          17,
+          29,
+          43
+        ]
+      },
+      "threshold": 4,
+      "validation_accuracy": 0.1620625,
+      "validation_mean_steps": 9.9076875
+    },
+    "joint_fact/r32/M1-lin": {
+      "criterion": "output_stability",
+      "family": "joint_fact/r32/M1-lin",
+      "source": {
+        "blake2b": "c0969330c6e87372a2c39bc844f99c81",
+        "episodes_per_seed": 2000,
+        "generator_seed": 4242,
+        "kind": "reused_C4",
+        "path": "/work/xg24i002/x10041/LoopLora-wt/sym/reports/p4s-r32/thresholds.csv",
+        "selected_before_any_head_training": true,
+        "selection_split": "val",
+        "training_seeds": [
+          17,
+          29,
+          43
+        ]
+      },
+      "threshold": 4,
+      "validation_accuracy": 0.17933333333333334,
+      "validation_mean_steps": 10.579041666666667
+    },
+    "oracle_random/r32/M1": {
+      "criterion": "relative_change",
+      "family": "oracle_random/r32/M1",
+      "source": {
+        "blake2b": "08e1ae9fcc774a9b0dc98d3ffbb38a9f",
+        "episodes_per_seed": 2000,
+        "generator_seed": 4242,
+        "kind": "new_random_r32_validation_before_head_training",
+        "path": "/work/xg24i002/x10041/LoopLora/runs/p4s-l/20261027/preparation/thresholds.json",
+        "selected_before_any_head_training": true,
+        "selection_split": "val",
+        "training_seeds": [
+          17,
+          29,
+          43
+        ]
+      },
+      "threshold": 0.7,
+      "validation_accuracy": 0.20200000000000004,
+      "validation_mean_steps": 8.7773125
+    },
+    "oracle_random/r32/M1-lin": {
+      "criterion": "relative_change",
+      "family": "oracle_random/r32/M1-lin",
+      "source": {
+        "blake2b": "08e1ae9fcc774a9b0dc98d3ffbb38a9f",
+        "episodes_per_seed": 2000,
+        "generator_seed": 4242,
+        "kind": "new_random_r32_validation_before_head_training",
+        "path": "/work/xg24i002/x10041/LoopLora/runs/p4s-l/20261027/preparation/thresholds.json",
+        "selected_before_any_head_training": true,
+        "selection_split": "val",
+        "training_seeds": [
+          17,
+          29,
+          43
+        ]
+      },
+      "threshold": 0.7,
+      "validation_accuracy": 0.27902083333333333,
+      "validation_mean_steps": 8.300375
+    },
+    "t1_frozen_fact/r32/M1": {
+      "criterion": "output_stability",
+      "family": "t1_frozen_fact/r32/M1",
+      "source": {
+        "blake2b": "c0969330c6e87372a2c39bc844f99c81",
+        "episodes_per_seed": 2000,
+        "generator_seed": 4242,
+        "kind": "reused_C4",
+        "path": "/work/xg24i002/x10041/LoopLora-wt/sym/reports/p4s-r32/thresholds.csv",
+        "selected_before_any_head_training": true,
+        "selection_split": "val",
+        "training_seeds": [
+          17,
+          29,
+          43
+        ]
+      },
+      "threshold": 4,
+      "validation_accuracy": 0.13060416666666666,
+      "validation_mean_steps": 7.443437500000001
+    },
+    "t1_frozen_fact/r32/M1-lin": {
+      "criterion": "read_norm",
+      "family": "t1_frozen_fact/r32/M1-lin",
+      "source": {
+        "blake2b": "c0969330c6e87372a2c39bc844f99c81",
+        "episodes_per_seed": 2000,
+        "generator_seed": 4242,
+        "kind": "reused_C4",
+        "path": "/work/xg24i002/x10041/LoopLora-wt/sym/reports/p4s-r32/thresholds.csv",
+        "selected_before_any_head_training": true,
+        "selection_split": "val",
+        "training_seeds": [
+          17,
+          29,
+          43
+        ]
+      },
+      "threshold": 1.0,
+      "validation_accuracy": 0.13479166666666667,
+      "validation_mean_steps": 8.987041666666668
+    }
+  },
+  "bootstrap": {
+    "confidence": 0.9916666666666667,
+    "resamples": 2000,
+    "resampling": "paired episode bootstrap, shared episode draws across three seeds",
+    "seed": 2718
+  },
+  "confirmation": {
+    "episodes": 2000,
+    "generator_seed": 999002,
+    "split": "test"
+  },
+  "descriptive_families": [
+    "joint/r32/M1",
+    "joint/r32/M1-lin"
+  ],
+  "head": {
+    "features": [
+      {
+        "name": "post_update_state",
+        "width": 32
+      },
+      {
+        "name": "state_l2_norm",
+        "width": 1
+      },
+      {
+        "name": "relative_change",
+        "width": 1
+      },
+      {
+        "name": "read_norm_ratio",
+        "width": 1
+      },
+      {
+        "name": "one_hot_step1..16",
+        "width": 16
+      }
+    ],
+    "hidden_activation": "relu",
+    "hidden_dim": 64,
+    "input_dim": 51,
+    "output_activation": "sigmoid",
+    "output_dim": 1,
+    "read_norm_ratio": "post-state read norm / max(initial-state read norm,EPS)",
+    "relative_change": "norm(z_s-z_previous)/max(norm(z_previous),EPS)",
+    "target": "candidate argmax at this post-update step equals the answer"
+  },
+  "hops": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8
+  ],
+  "label_free_selection": {
+    "best_rule_tiebreak": [
+      "read_norm",
+      "relative_change",
+      "output_stability"
+    ],
+    "c4_families": "reuse all18 existing rows unchanged; no reselection",
+    "grid": "unchanged WP-C3 grids",
+    "oracle_random": "select only two r32 families on validation before head training",
+    "tiebreak": [
+      "higher_accuracy",
+      "fewer_mean_selected_steps",
+      "smaller_threshold"
+    ]
+  },
+  "label_free_thresholds": [
+    {
+      "criterion": "read_norm",
+      "family": "joint/r32/M1",
+      "source": {
+        "blake2b": "c0969330c6e87372a2c39bc844f99c81",
+        "episodes_per_seed": 2000,
+        "generator_seed": 4242,
+        "kind": "reused_C4",
+        "path": "/work/xg24i002/x10041/LoopLora-wt/sym/reports/p4s-r32/thresholds.csv",
+        "selected_before_any_head_training": true,
+        "selection_split": "val",
+        "training_seeds": [
+          17,
+          29,
+          43
+        ]
+      },
+      "threshold": 0.3,
+      "validation_accuracy": 0.43375,
+      "validation_mean_steps": 15.998541666666668
+    },
+    {
+      "criterion": "relative_change",
+      "family": "joint/r32/M1",
+      "source": {
+        "blake2b": "c0969330c6e87372a2c39bc844f99c81",
+        "episodes_per_seed": 2000,
+        "generator_seed": 4242,
+        "kind": "reused_C4",
+        "path": "/work/xg24i002/x10041/LoopLora-wt/sym/reports/p4s-r32/thresholds.csv",
+        "selected_before_any_head_training": true,
+        "selection_split": "val",
+        "training_seeds": [
+          17,
+          29,
+          43
+        ]
+      },
+      "threshold": 0.0,
+      "validation_accuracy": 0.43372916666666667,
+      "validation_mean_steps": 16.0
+    },
+    {
+      "criterion": "output_stability",
+      "family": "joint/r32/M1",
+      "source": {
+        "blake2b": "c0969330c6e87372a2c39bc844f99c81",
+        "episodes_per_seed": 2000,
+        "generator_seed": 4242,
+        "kind": "reused_C4",
+        "path": "/work/xg24i002/x10041/LoopLora-wt/sym/reports/p4s-r32/thresholds.csv",
+        "selected_before_any_head_training": true,
+        "selection_split": "val",
+        "training_seeds": [
+          17,
+          29,
+          43
+        ]
+      },
+      "threshold": 16,
+      "validation_accuracy": 0.43372916666666667,
+      "validation_mean_steps": 16.0
+    },
+    {
+      "criterion": "read_norm",
+      "family": "joint/r32/M1-lin",
+      "source": {
+        "blake2b": "c0969330c6e87372a2c39bc844f99c81",
+        "episodes_per_seed": 2000,
+        "generator_seed": 4242,
+        "kind": "reused_C4",
+        "path": "/work/xg24i002/x10041/LoopLora-wt/sym/reports/p4s-r32/thresholds.csv",
+        "selected_before_any_head_training": true,
+        "selection_split": "val",
+        "training_seeds": [
+          17,
+          29,
+          43
+        ]
+      },
+      "threshold": 0.0,
+      "validation_accuracy": 0.4848958333333333,
+      "validation_mean_steps": 16.0
+    },
+    {
+      "criterion": "relative_change",
+      "family": "joint/r32/M1-lin",
+      "source": {
+        "blake2b": "c0969330c6e87372a2c39bc844f99c81",
+        "episodes_per_seed": 2000,
+        "generator_seed": 4242,
+        "kind": "reused_C4",
+        "path": "/work/xg24i002/x10041/LoopLora-wt/sym/reports/p4s-r32/thresholds.csv",
+        "selected_before_any_head_training": true,
+        "selection_split": "val",
+        "training_seeds": [
+          17,
+          29,
+          43
+        ]
+      },
+      "threshold": 0.03,
+      "validation_accuracy": 0.4852708333333333,
+      "validation_mean_steps": 6.1840625000000005
+    },
+    {
+      "criterion": "output_stability",
+      "family": "joint/r32/M1-lin",
+      "source": {
+        "blake2b": "c0969330c6e87372a2c39bc844f99c81",
+        "episodes_per_seed": 2000,
+        "generator_seed": 4242,
+        "kind": "reused_C4",
+        "path": "/work/xg24i002/x10041/LoopLora-wt/sym/reports/p4s-r32/thresholds.csv",
+        "selected_before_any_head_training": true,
+        "selection_split": "val",
+        "training_seeds": [
+          17,
+          29,
+          43
+        ]
+      },
+      "threshold": 3,
+      "validation_accuracy": 0.48491666666666666,
+      "validation_mean_steps": 4.3295
+    },
+    {
+      "criterion": "read_norm",
+      "family": "joint_fact/r32/M1",
+      "source": {
+        "blake2b": "c0969330c6e87372a2c39bc844f99c81",
+        "episodes_per_seed": 2000,
+        "generator_seed": 4242,
+        "kind": "reused_C4",
+        "path": "/work/xg24i002/x10041/LoopLora-wt/sym/reports/p4s-r32/thresholds.csv",
+        "selected_before_any_head_training": true,
+        "selection_split": "val",
+        "training_seeds": [
+          17,
+          29,
+          43
+        ]
+      },
+      "threshold": 1.0,
+      "validation_accuracy": 0.15854166666666666,
+      "validation_mean_steps": 13.275458333333333
+    },
+    {
+      "criterion": "relative_change",
+      "family": "joint_fact/r32/M1",
+      "source": {
+        "blake2b": "c0969330c6e87372a2c39bc844f99c81",
+        "episodes_per_seed": 2000,
+        "generator_seed": 4242,
+        "kind": "reused_C4",
+        "path": "/work/xg24i002/x10041/LoopLora-wt/sym/reports/p4s-r32/thresholds.csv",
+        "selected_before_any_head_training": true,
+        "selection_split": "val",
+        "training_seeds": [
+          17,
+          29,
+          43
+        ]
+      },
+      "threshold": 0.3,
+      "validation_accuracy": 0.15956250000000002,
+      "validation_mean_steps": 6.687104166666667
+    },
+    {
+      "criterion": "output_stability",
+      "family": "joint_fact/r32/M1",
+      "source": {
+        "blake2b": "c0969330c6e87372a2c39bc844f99c81",
+        "episodes_per_seed": 2000,
+        "generator_seed": 4242,
+        "kind": "reused_C4",
+        "path": "/work/xg24i002/x10041/LoopLora-wt/sym/reports/p4s-r32/thresholds.csv",
+        "selected_before_any_head_training": true,
+        "selection_split": "val",
+        "training_seeds": [
+          17,
+          29,
+          43
+        ]
+      },
+      "threshold": 4,
+      "validation_accuracy": 0.1620625,
+      "validation_mean_steps": 9.9076875
+    },
+    {
+      "criterion": "read_norm",
+      "family": "joint_fact/r32/M1-lin",
+      "source": {
+        "blake2b": "c0969330c6e87372a2c39bc844f99c81",
+        "episodes_per_seed": 2000,
+        "generator_seed": 4242,
+        "kind": "reused_C4",
+        "path": "/work/xg24i002/x10041/LoopLora-wt/sym/reports/p4s-r32/thresholds.csv",
+        "selected_before_any_head_training": true,
+        "selection_split": "val",
+        "training_seeds": [
+          17,
+          29,
+          43
+        ]
+      },
+      "threshold": 1.0,
+      "validation_accuracy": 0.16247916666666667,
+      "validation_mean_steps": 13.221895833333335
+    },
+    {
+      "criterion": "relative_change",
+      "family": "joint_fact/r32/M1-lin",
+      "source": {
+        "blake2b": "c0969330c6e87372a2c39bc844f99c81",
+        "episodes_per_seed": 2000,
+        "generator_seed": 4242,
+        "kind": "reused_C4",
+        "path": "/work/xg24i002/x10041/LoopLora-wt/sym/reports/p4s-r32/thresholds.csv",
+        "selected_before_any_head_training": true,
+        "selection_split": "val",
+        "training_seeds": [
+          17,
+          29,
+          43
+        ]
+      },
+      "threshold": 0.3,
+      "validation_accuracy": 0.1728333333333333,
+      "validation_mean_steps": 10.489166666666668
+    },
+    {
+      "criterion": "output_stability",
+      "family": "joint_fact/r32/M1-lin",
+      "source": {
+        "blake2b": "c0969330c6e87372a2c39bc844f99c81",
+        "episodes_per_seed": 2000,
+        "generator_seed": 4242,
+        "kind": "reused_C4",
+        "path": "/work/xg24i002/x10041/LoopLora-wt/sym/reports/p4s-r32/thresholds.csv",
+        "selected_before_any_head_training": true,
+        "selection_split": "val",
+        "training_seeds": [
+          17,
+          29,
+          43
+        ]
+      },
+      "threshold": 4,
+      "validation_accuracy": 0.17933333333333334,
+      "validation_mean_steps": 10.579041666666667
+    },
+    {
+      "criterion": "read_norm",
+      "family": "oracle_random/r32/M1",
+      "source": {
+        "blake2b": "08e1ae9fcc774a9b0dc98d3ffbb38a9f",
+        "episodes_per_seed": 2000,
+        "generator_seed": 4242,
+        "kind": "new_random_r32_validation_before_head_training",
+        "path": "/work/xg24i002/x10041/LoopLora/runs/p4s-l/20261027/preparation/thresholds.json",
+        "selected_before_any_head_training": true,
+        "selection_split": "val",
+        "training_seeds": [
+          17,
+          29,
+          43
+        ]
+      },
+      "threshold": 1,
+      "validation_accuracy": 0.14002083333333334,
+      "validation_mean_steps": 15.072916666666666
+    },
+    {
+      "criterion": "relative_change",
+      "family": "oracle_random/r32/M1",
+      "source": {
+        "blake2b": "08e1ae9fcc774a9b0dc98d3ffbb38a9f",
+        "episodes_per_seed": 2000,
+        "generator_seed": 4242,
+        "kind": "new_random_r32_validation_before_head_training",
+        "path": "/work/xg24i002/x10041/LoopLora/runs/p4s-l/20261027/preparation/thresholds.json",
+        "selected_before_any_head_training": true,
+        "selection_split": "val",
+        "training_seeds": [
+          17,
+          29,
+          43
+        ]
+      },
+      "threshold": 0.7,
+      "validation_accuracy": 0.20200000000000004,
+      "validation_mean_steps": 8.7773125
+    },
+    {
+      "criterion": "output_stability",
+      "family": "oracle_random/r32/M1",
+      "source": {
+        "blake2b": "08e1ae9fcc774a9b0dc98d3ffbb38a9f",
+        "episodes_per_seed": 2000,
+        "generator_seed": 4242,
+        "kind": "new_random_r32_validation_before_head_training",
+        "path": "/work/xg24i002/x10041/LoopLora/runs/p4s-l/20261027/preparation/thresholds.json",
+        "selected_before_any_head_training": true,
+        "selection_split": "val",
+        "training_seeds": [
+          17,
+          29,
+          43
+        ]
+      },
+      "threshold": 3,
+      "validation_accuracy": 0.18860416666666668,
+      "validation_mean_steps": 9.582958333333332
+    },
+    {
+      "criterion": "read_norm",
+      "family": "oracle_random/r32/M1-lin",
+      "source": {
+        "blake2b": "08e1ae9fcc774a9b0dc98d3ffbb38a9f",
+        "episodes_per_seed": 2000,
+        "generator_seed": 4242,
+        "kind": "new_random_r32_validation_before_head_training",
+        "path": "/work/xg24i002/x10041/LoopLora/runs/p4s-l/20261027/preparation/thresholds.json",
+        "selected_before_any_head_training": true,
+        "selection_split": "val",
+        "training_seeds": [
+          17,
+          29,
+          43
+        ]
+      },
+      "threshold": 1.5,
+      "validation_accuracy": 0.1950625,
+      "validation_mean_steps": 13.999333333333334
+    },
+    {
+      "criterion": "relative_change",
+      "family": "oracle_random/r32/M1-lin",
+      "source": {
+        "blake2b": "08e1ae9fcc774a9b0dc98d3ffbb38a9f",
+        "episodes_per_seed": 2000,
+        "generator_seed": 4242,
+        "kind": "new_random_r32_validation_before_head_training",
+        "path": "/work/xg24i002/x10041/LoopLora/runs/p4s-l/20261027/preparation/thresholds.json",
+        "selected_before_any_head_training": true,
+        "selection_split": "val",
+        "training_seeds": [
+          17,
+          29,
+          43
+        ]
+      },
+      "threshold": 0.7,
+      "validation_accuracy": 0.27902083333333333,
+      "validation_mean_steps": 8.300375
+    },
+    {
+      "criterion": "output_stability",
+      "family": "oracle_random/r32/M1-lin",
+      "source": {
+        "blake2b": "08e1ae9fcc774a9b0dc98d3ffbb38a9f",
+        "episodes_per_seed": 2000,
+        "generator_seed": 4242,
+        "kind": "new_random_r32_validation_before_head_training",
+        "path": "/work/xg24i002/x10041/LoopLora/runs/p4s-l/20261027/preparation/thresholds.json",
+        "selected_before_any_head_training": true,
+        "selection_split": "val",
+        "training_seeds": [
+          17,
+          29,
+          43
+        ]
+      },
+      "threshold": 3,
+      "validation_accuracy": 0.2508958333333333,
+      "validation_mean_steps": 10.131791666666667
+    },
+    {
+      "criterion": "read_norm",
+      "family": "t1_frozen_fact/r32/M1",
+      "source": {
+        "blake2b": "c0969330c6e87372a2c39bc844f99c81",
+        "episodes_per_seed": 2000,
+        "generator_seed": 4242,
+        "kind": "reused_C4",
+        "path": "/work/xg24i002/x10041/LoopLora-wt/sym/reports/p4s-r32/thresholds.csv",
+        "selected_before_any_head_training": true,
+        "selection_split": "val",
+        "training_seeds": [
+          17,
+          29,
+          43
+        ]
+      },
+      "threshold": 0.7,
+      "validation_accuracy": 0.1304375,
+      "validation_mean_steps": 14.7035
+    },
+    {
+      "criterion": "relative_change",
+      "family": "t1_frozen_fact/r32/M1",
+      "source": {
+        "blake2b": "c0969330c6e87372a2c39bc844f99c81",
+        "episodes_per_seed": 2000,
+        "generator_seed": 4242,
+        "kind": "reused_C4",
+        "path": "/work/xg24i002/x10041/LoopLora-wt/sym/reports/p4s-r32/thresholds.csv",
+        "selected_before_any_head_training": true,
+        "selection_split": "val",
+        "training_seeds": [
+          17,
+          29,
+          43
+        ]
+      },
+      "threshold": 0.003,
+      "validation_accuracy": 0.12989583333333332,
+      "validation_mean_steps": 15.138395833333334
+    },
+    {
+      "criterion": "output_stability",
+      "family": "t1_frozen_fact/r32/M1",
+      "source": {
+        "blake2b": "c0969330c6e87372a2c39bc844f99c81",
+        "episodes_per_seed": 2000,
+        "generator_seed": 4242,
+        "kind": "reused_C4",
+        "path": "/work/xg24i002/x10041/LoopLora-wt/sym/reports/p4s-r32/thresholds.csv",
+        "selected_before_any_head_training": true,
+        "selection_split": "val",
+        "training_seeds": [
+          17,
+          29,
+          43
+        ]
+      },
+      "threshold": 4,
+      "validation_accuracy": 0.13060416666666666,
+      "validation_mean_steps": 7.443437500000001
+    },
+    {
+      "criterion": "read_norm",
+      "family": "t1_frozen_fact/r32/M1-lin",
+      "source": {
+        "blake2b": "c0969330c6e87372a2c39bc844f99c81",
+        "episodes_per_seed": 2000,
+        "generator_seed": 4242,
+        "kind": "reused_C4",
+        "path": "/work/xg24i002/x10041/LoopLora-wt/sym/reports/p4s-r32/thresholds.csv",
+        "selected_before_any_head_training": true,
+        "selection_split": "val",
+        "training_seeds": [
+          17,
+          29,
+          43
+        ]
+      },
+      "threshold": 1.0,
+      "validation_accuracy": 0.13479166666666667,
+      "validation_mean_steps": 8.987041666666668
+    },
+    {
+      "criterion": "relative_change",
+      "family": "t1_frozen_fact/r32/M1-lin",
+      "source": {
+        "blake2b": "c0969330c6e87372a2c39bc844f99c81",
+        "episodes_per_seed": 2000,
+        "generator_seed": 4242,
+        "kind": "reused_C4",
+        "path": "/work/xg24i002/x10041/LoopLora-wt/sym/reports/p4s-r32/thresholds.csv",
+        "selected_before_any_head_training": true,
+        "selection_split": "val",
+        "training_seeds": [
+          17,
+          29,
+          43
+        ]
+      },
+      "threshold": 0.03,
+      "validation_accuracy": 0.13252083333333334,
+      "validation_mean_steps": 12.937479166666668
+    },
+    {
+      "criterion": "output_stability",
+      "family": "t1_frozen_fact/r32/M1-lin",
+      "source": {
+        "blake2b": "c0969330c6e87372a2c39bc844f99c81",
+        "episodes_per_seed": 2000,
+        "generator_seed": 4242,
+        "kind": "reused_C4",
+        "path": "/work/xg24i002/x10041/LoopLora-wt/sym/reports/p4s-r32/thresholds.csv",
+        "selected_before_any_head_training": true,
+        "selection_split": "val",
+        "training_seeds": [
+          17,
+          29,
+          43
+        ]
+      },
+      "threshold": 8,
+      "validation_accuracy": 0.13293750000000001,
+      "validation_mean_steps": 11.823791666666665
+    }
+  ],
+  "latency": {
+    "batch_size": 64,
+    "repeats": 20,
+    "warmup": 5
+  },
+  "max_steps": 16,
+  "minimum_steps": 1,
+  "next_required_action": "commit this full design and reference rows before any head training",
+  "normalization_epsilon": 1e-12,
+  "preparation_root": "/work/xg24i002/x10041/LoopLora/runs/p4s-l/20261027/preparation",
+  "prepared_at": "2026-10-26T18:57:18.116141+00:00",
+  "primary_families": [
+    "joint_fact/r32/M1",
+    "joint_fact/r32/M1-lin",
+    "oracle_random/r32/M1",
+    "oracle_random/r32/M1-lin",
+    "t1_frozen_fact/r32/M1",
+    "t1_frozen_fact/r32/M1-lin"
+  ],
+  "r": 32,
+  "runs": [
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p1s/f2/main-readers/shard-03/f2-main-joint_fact-M1-lin-s17/checkpoint.pt",
+      "checkpoint_blake2b": "bd49fc38af1ab0c88e9c0999d41804ee",
+      "family": "joint_fact/r32/M1-lin",
+      "name": "f2-main-joint_fact-M1-lin-s17",
+      "r": 32,
+      "reference_metrics": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p1s/f2/evaluation/f2-main-joint_fact-M1-lin-s17/screening/metrics.json",
+      "seed": 17,
+      "variant": "M1-lin",
+      "writer": "joint_fact"
+    },
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p1s/f2/main-readers/shard-01/f2-main-joint_fact-M1-lin-s29/checkpoint.pt",
+      "checkpoint_blake2b": "20e1231170f42c5d2f162313918435b9",
+      "family": "joint_fact/r32/M1-lin",
+      "name": "f2-main-joint_fact-M1-lin-s29",
+      "r": 32,
+      "reference_metrics": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p1s/f2/evaluation/f2-main-joint_fact-M1-lin-s29/screening/metrics.json",
+      "seed": 29,
+      "variant": "M1-lin",
+      "writer": "joint_fact"
+    },
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p1s/f2/main-readers/shard-03/f2-main-joint_fact-M1-lin-s43/checkpoint.pt",
+      "checkpoint_blake2b": "cd0e05a9ab30809d1d9b58507ccd92ee",
+      "family": "joint_fact/r32/M1-lin",
+      "name": "f2-main-joint_fact-M1-lin-s43",
+      "r": 32,
+      "reference_metrics": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p1s/f2/evaluation/f2-main-joint_fact-M1-lin-s43/screening/metrics.json",
+      "seed": 43,
+      "variant": "M1-lin",
+      "writer": "joint_fact"
+    },
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p1s/f2/main-readers/shard-02/f2-main-joint_fact-M1-s17/checkpoint.pt",
+      "checkpoint_blake2b": "1ca5fabe8741942ee947d643d24581f1",
+      "family": "joint_fact/r32/M1",
+      "name": "f2-main-joint_fact-M1-s17",
+      "r": 32,
+      "reference_metrics": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p1s/f2/evaluation/f2-main-joint_fact-M1-s17/screening/metrics.json",
+      "seed": 17,
+      "variant": "M1",
+      "writer": "joint_fact"
+    },
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p1s/f2/main-readers/shard-00/f2-main-joint_fact-M1-s29/checkpoint.pt",
+      "checkpoint_blake2b": "020f263d1a74cb51aebf85b666984312",
+      "family": "joint_fact/r32/M1",
+      "name": "f2-main-joint_fact-M1-s29",
+      "r": 32,
+      "reference_metrics": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p1s/f2/evaluation/f2-main-joint_fact-M1-s29/screening/metrics.json",
+      "seed": 29,
+      "variant": "M1",
+      "writer": "joint_fact"
+    },
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p1s/f2/main-readers/shard-02/f2-main-joint_fact-M1-s43/checkpoint.pt",
+      "checkpoint_blake2b": "645cbdf31dd2853499361c3cd0f1923a",
+      "family": "joint_fact/r32/M1",
+      "name": "f2-main-joint_fact-M1-s43",
+      "r": 32,
+      "reference_metrics": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p1s/f2/evaluation/f2-main-joint_fact-M1-s43/screening/metrics.json",
+      "seed": 43,
+      "variant": "M1",
+      "writer": "joint_fact"
+    },
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p1s/f2/main-readers/shard-01/f2-main-t1_frozen_fact-M1-lin-s17/checkpoint.pt",
+      "checkpoint_blake2b": "64576c9bd27b8ec4fdd77e2b56a5401e",
+      "family": "t1_frozen_fact/r32/M1-lin",
+      "name": "f2-main-t1_frozen_fact-M1-lin-s17",
+      "r": 32,
+      "reference_metrics": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p1s/f2/evaluation/f2-main-t1_frozen_fact-M1-lin-s17/screening/metrics.json",
+      "seed": 17,
+      "variant": "M1-lin",
+      "writer": "t1_frozen_fact"
+    },
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p1s/f2/main-readers/shard-03/f2-main-t1_frozen_fact-M1-lin-s29/checkpoint.pt",
+      "checkpoint_blake2b": "dc549ca93b3004e8172ae72b647b30cd",
+      "family": "t1_frozen_fact/r32/M1-lin",
+      "name": "f2-main-t1_frozen_fact-M1-lin-s29",
+      "r": 32,
+      "reference_metrics": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p1s/f2/evaluation/f2-main-t1_frozen_fact-M1-lin-s29/screening/metrics.json",
+      "seed": 29,
+      "variant": "M1-lin",
+      "writer": "t1_frozen_fact"
+    },
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p1s/f2/main-readers/shard-01/f2-main-t1_frozen_fact-M1-lin-s43/checkpoint.pt",
+      "checkpoint_blake2b": "090156e155ab77dad0c1cb6c6b019df3",
+      "family": "t1_frozen_fact/r32/M1-lin",
+      "name": "f2-main-t1_frozen_fact-M1-lin-s43",
+      "r": 32,
+      "reference_metrics": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p1s/f2/evaluation/f2-main-t1_frozen_fact-M1-lin-s43/screening/metrics.json",
+      "seed": 43,
+      "variant": "M1-lin",
+      "writer": "t1_frozen_fact"
+    },
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p1s/f2/main-readers/shard-00/f2-main-t1_frozen_fact-M1-s17/checkpoint.pt",
+      "checkpoint_blake2b": "ee3a2f31ae93b974609d2f70bdf9cde6",
+      "family": "t1_frozen_fact/r32/M1",
+      "name": "f2-main-t1_frozen_fact-M1-s17",
+      "r": 32,
+      "reference_metrics": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p1s/f2/evaluation/f2-main-t1_frozen_fact-M1-s17/screening/metrics.json",
+      "seed": 17,
+      "variant": "M1",
+      "writer": "t1_frozen_fact"
+    },
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p1s/f2/main-readers/shard-02/f2-main-t1_frozen_fact-M1-s29/checkpoint.pt",
+      "checkpoint_blake2b": "ce44f0d0d1e50abf704c30ef6c7a305c",
+      "family": "t1_frozen_fact/r32/M1",
+      "name": "f2-main-t1_frozen_fact-M1-s29",
+      "r": 32,
+      "reference_metrics": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p1s/f2/evaluation/f2-main-t1_frozen_fact-M1-s29/screening/metrics.json",
+      "seed": 29,
+      "variant": "M1",
+      "writer": "t1_frozen_fact"
+    },
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p1s/f2/main-readers/shard-00/f2-main-t1_frozen_fact-M1-s43/checkpoint.pt",
+      "checkpoint_blake2b": "55d47d87777814bc0ac31dc9cb50bf1f",
+      "family": "t1_frozen_fact/r32/M1",
+      "name": "f2-main-t1_frozen_fact-M1-s43",
+      "r": 32,
+      "reference_metrics": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p1s/f2/evaluation/f2-main-t1_frozen_fact-M1-s43/screening/metrics.json",
+      "seed": 43,
+      "variant": "M1",
+      "writer": "t1_frozen_fact"
+    },
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora/runs/p1s/main/20261026/runs/primary-joint-M1-lin-r32-s17/checkpoint.pt",
+      "checkpoint_blake2b": "fc4a58c026f0ab2f4b45e0b93201ffbb",
+      "family": "joint/r32/M1-lin",
+      "name": "primary-joint-M1-lin-r32-s17",
+      "r": 32,
+      "reference_metrics": "/work/xg24i002/x10041/LoopLora/runs/p1s/main/20261026/runs/primary-joint-M1-lin-r32-s17/screening/metrics.json",
+      "seed": 17,
+      "variant": "M1-lin",
+      "writer": "joint"
+    },
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora/runs/p1s/main/20261026/runs/primary-joint-M1-lin-r32-s29/checkpoint.pt",
+      "checkpoint_blake2b": "ad8eef507a068deca4d4eef84536ed81",
+      "family": "joint/r32/M1-lin",
+      "name": "primary-joint-M1-lin-r32-s29",
+      "r": 32,
+      "reference_metrics": "/work/xg24i002/x10041/LoopLora/runs/p1s/main/20261026/runs/primary-joint-M1-lin-r32-s29/screening/metrics.json",
+      "seed": 29,
+      "variant": "M1-lin",
+      "writer": "joint"
+    },
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora/runs/p1s/main/20261026/runs/primary-joint-M1-lin-r32-s43/checkpoint.pt",
+      "checkpoint_blake2b": "7b55c7818d5928d012999bd6952027f4",
+      "family": "joint/r32/M1-lin",
+      "name": "primary-joint-M1-lin-r32-s43",
+      "r": 32,
+      "reference_metrics": "/work/xg24i002/x10041/LoopLora/runs/p1s/main/20261026/runs/primary-joint-M1-lin-r32-s43/screening/metrics.json",
+      "seed": 43,
+      "variant": "M1-lin",
+      "writer": "joint"
+    },
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora/runs/p1s/main/20261026/runs/primary-joint-M1-r32-s17/checkpoint.pt",
+      "checkpoint_blake2b": "6e18bec6997ce261a00f2697fc441c73",
+      "family": "joint/r32/M1",
+      "name": "primary-joint-M1-r32-s17",
+      "r": 32,
+      "reference_metrics": "/work/xg24i002/x10041/LoopLora/runs/p1s/main/20261026/runs/primary-joint-M1-r32-s17/screening/metrics.json",
+      "seed": 17,
+      "variant": "M1",
+      "writer": "joint"
+    },
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora/runs/p1s/main/20261026/runs/primary-joint-M1-r32-s29/checkpoint.pt",
+      "checkpoint_blake2b": "7153919166a10705afe093414f2b1339",
+      "family": "joint/r32/M1",
+      "name": "primary-joint-M1-r32-s29",
+      "r": 32,
+      "reference_metrics": "/work/xg24i002/x10041/LoopLora/runs/p1s/main/20261026/runs/primary-joint-M1-r32-s29/screening/metrics.json",
+      "seed": 29,
+      "variant": "M1",
+      "writer": "joint"
+    },
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora/runs/p1s/main/20261026/runs/primary-joint-M1-r32-s43/checkpoint.pt",
+      "checkpoint_blake2b": "74052cf2cd30f1327dda605aeca37a89",
+      "family": "joint/r32/M1",
+      "name": "primary-joint-M1-r32-s43",
+      "r": 32,
+      "reference_metrics": "/work/xg24i002/x10041/LoopLora/runs/p1s/main/20261026/runs/primary-joint-M1-r32-s43/screening/metrics.json",
+      "seed": 43,
+      "variant": "M1",
+      "writer": "joint"
+    },
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora/runs/p1s/main/20261026/runs/primary-oracle_random-M1-lin-r32-s17/checkpoint.pt",
+      "checkpoint_blake2b": "b584d51998018871b258488df490292e",
+      "family": "oracle_random/r32/M1-lin",
+      "name": "primary-oracle_random-M1-lin-r32-s17",
+      "r": 32,
+      "seed": 17,
+      "variant": "M1-lin",
+      "writer": "oracle_random"
+    },
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora/runs/p1s/main/20261026/runs/primary-oracle_random-M1-lin-r32-s29/checkpoint.pt",
+      "checkpoint_blake2b": "76394efd949d2614f3e5a4cfe8b53c58",
+      "family": "oracle_random/r32/M1-lin",
+      "name": "primary-oracle_random-M1-lin-r32-s29",
+      "r": 32,
+      "seed": 29,
+      "variant": "M1-lin",
+      "writer": "oracle_random"
+    },
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora/runs/p1s/main/20261026/runs/primary-oracle_random-M1-lin-r32-s43/checkpoint.pt",
+      "checkpoint_blake2b": "dd93370b54b6cc90909905fcad428e76",
+      "family": "oracle_random/r32/M1-lin",
+      "name": "primary-oracle_random-M1-lin-r32-s43",
+      "r": 32,
+      "seed": 43,
+      "variant": "M1-lin",
+      "writer": "oracle_random"
+    },
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora/runs/p1s/main/20261026/runs/primary-oracle_random-M1-r32-s17/checkpoint.pt",
+      "checkpoint_blake2b": "5cfcfa0a8530ec2da3d01c84ba76754b",
+      "family": "oracle_random/r32/M1",
+      "name": "primary-oracle_random-M1-r32-s17",
+      "r": 32,
+      "seed": 17,
+      "variant": "M1",
+      "writer": "oracle_random"
+    },
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora/runs/p1s/main/20261026/runs/primary-oracle_random-M1-r32-s29/checkpoint.pt",
+      "checkpoint_blake2b": "f6b35c6f243797d3fd77548de37e374a",
+      "family": "oracle_random/r32/M1",
+      "name": "primary-oracle_random-M1-r32-s29",
+      "r": 32,
+      "seed": 29,
+      "variant": "M1",
+      "writer": "oracle_random"
+    },
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora/runs/p1s/main/20261026/runs/primary-oracle_random-M1-r32-s43/checkpoint.pt",
+      "checkpoint_blake2b": "3f9b21f8658f2c86f3ae8c074589b7b2",
+      "family": "oracle_random/r32/M1",
+      "name": "primary-oracle_random-M1-r32-s43",
+      "r": 32,
+      "seed": 43,
+      "variant": "M1",
+      "writer": "oracle_random"
+    }
+  ],
+  "schema_version": 1,
+  "seed_derivation": {
+    "episode_sampler": "derive_seed(seed,'p4s-l',family,'episode_sampler')",
+    "head_init": "derive_seed(seed,'p4s-l',family,'head_init')"
+  },
+  "sources": {
+    "c4_manifest": {
+      "blake2b": "f5e8937d4f3b67d56be79a576c9092aa",
+      "path": "/work/xg24i002/x10041/LoopLora-wt/sym/reports/p4s-r32/manifest.json"
+    },
+    "c4_thresholds": {
+      "blake2b": "c0969330c6e87372a2c39bc844f99c81",
+      "path": "/work/xg24i002/x10041/LoopLora-wt/sym/reports/p4s-r32/thresholds.csv"
+    },
+    "random_selection": {
+      "blake2b": "08e1ae9fcc774a9b0dc98d3ffbb38a9f",
+      "path": "/work/xg24i002/x10041/LoopLora/runs/p4s-l/20261027/preparation/thresholds.json"
+    }
+  },
+  "status": "prepared_for_commit",
+  "study": "P4-S-L",
+  "task": "WP-P4L",
+  "theta_grid": [
+    0.05,
+    0.1,
+    0.15,
+    0.2,
+    0.25,
+    0.3,
+    0.35,
+    0.4,
+    0.45,
+    0.5,
+    0.55,
+    0.6,
+    0.65,
+    0.7,
+    0.75,
+    0.8,
+    0.85,
+    0.9,
+    0.95
+  ],
+  "theta_selection": {
+    "accuracy": "equal mean over hops1..8 and three training seeds",
+    "barrier": "commit theta lock before any confirmation evaluation",
+    "inference": "first s in1..16 with p_s>=theta; otherwise earliest argmax_s p_s",
+    "split": "val",
+    "tiebreak": [
+      "higher_accuracy",
+      "fewer_mean_selected_steps",
+      "smaller_threshold"
+    ]
+  },
+  "training": {
+    "batch_episodes": 256,
+    "episodes": 20000,
+    "generator_seed": 31337,
+    "hops_per_episode": 8,
+    "loss": "binary_cross_entropy",
+    "lr": 0.001,
+    "minibatch": "all eight queries and all sixteen post-update steps for each sampled episode",
+    "optimizer": "adam",
+    "split": "train",
+    "steps": 2000,
+    "steps_per_query": 16
+  },
+  "training_seeds": [
+    17,
+    29,
+    43
+  ],
+  "user_clarification": "No oracle_random/r32 label-free thresholds existed. Select them on 2000 validation episodes with generator seed 4242 using the unchanged WP-C3 grids and tie rule BEFORE ANY HEAD TRAINING; reuse WP-C4's 18 threshold rows for the other six families.",
+  "validation": {
+    "episodes": 2000,
+    "generator_seed": 4242,
+    "split": "val"
+  }
+}
