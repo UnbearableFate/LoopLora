@@ -38,6 +38,6 @@ Open or resume (new tab, worktree cwd):
 | WP-B2 swap_successors counterfactual | wk-data | bbe2a24 |
 | WP-B3 MuSiQue data and retention suite (T-08) | wk-data | ba2b2e8 |
 | WP-T2 terminal-set shortcut and writer designs | wk-theory | 0c63cdc |
-| WP-F1 P1-S rank follow-up | wk-symf | (running) |
+| WP-F1 P1-S rank follow-up | wk-symf | 7155dc1 |
 | WP-C2 factorized writer code for F2 | wk-core | 132fc71 |
 | WP-F2 P1-S factorized-writer follow-up | wk-symf | (queued after WP-F1) |
