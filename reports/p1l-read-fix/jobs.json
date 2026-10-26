@@ -127,9 +127,41 @@
       "role": "A2 tests:69passed,182.079s pytest on mg0851",
       "exit_status": 0,
       "node_hours": 0.05305555555555556
+    },
+    {
+      "job_id": "3716039",
+      "job_name": "s-l4-128-W5-R",
+      "status": "FINISH",
+      "project": "xg24i002",
+      "queue": "small-g",
+      "start_date": "10/27 04:44:32",
+      "elapsed_seconds": 510,
+      "token": 0.1,
+      "token_estimate": null,
+      "nodes": 1,
+      "mig": null,
+      "role": "A2 rank128 smoke W5/R,2400steps",
+      "exit_status": 0,
+      "node_hours": 0.14166666666666666
+    },
+    {
+      "job_id": "3716040",
+      "job_name": "s-l4-128-OA",
+      "status": "FINISH",
+      "project": "xg24i002",
+      "queue": "small-g",
+      "start_date": "10/27 04:44:32",
+      "elapsed_seconds": 412,
+      "token": 0.1,
+      "token_estimate": null,
+      "nodes": 1,
+      "mig": null,
+      "role": "A2 rank128 smoke OA,2400steps",
+      "exit_status": 0,
+      "node_hours": 0.11444444444444445
     }
   ],
-  "completed_node_hours": 0.2313888888888889,
+  "completed_node_hours": 0.48750000000000004,
   "max_total_node_hours": null,
   "separate_from": "WP-L3 costs",
   "pending_roles": [
@@ -153,18 +185,11 @@
       "requested_seconds": 7200
     },
     {
-      "job_id": "3716039.opbs",
-      "role": "A2 rank128 2400-step smoke W5/R",
-      "source": "be07f7f",
+      "job_id": "3716145.opbs",
+      "role": "A2 smoke artifact/export audit and immutable timing release",
+      "source": "7e776bd",
       "nodes": 1,
-      "requested_seconds": 1200
-    },
-    {
-      "job_id": "3716040.opbs",
-      "role": "A2 rank128 2400-step smoke OA",
-      "source": "be07f7f",
-      "nodes": 1,
-      "requested_seconds": 1200
+      "requested_seconds": 300
     }
   ],
   "budget_amendment": "A2: user removed total cap; every job <=1node2h"

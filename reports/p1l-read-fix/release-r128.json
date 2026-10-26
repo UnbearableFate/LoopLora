@@ -1,0 +1,87 @@
+{
+  "E": 16,
+  "amendment": "A2",
+  "e8_rule": "one best learned arm across both ranks; fresh same seed/lr/objective; own smoke-sized schedule",
+  "eval_seed": 4242,
+  "lr": 0.003,
+  "lr_note": "rank128 retains lr3e-3 by user request; no new search",
+  "lr_search": false,
+  "matched_eval_steps_by_arm": {
+    "OA": [],
+    "R": [],
+    "W5": []
+  },
+  "max_job_seconds": 7200,
+  "max_total_node_hours": null,
+  "primary_eval_steps_by_arm": {
+    "OA": [
+      6235,
+      12470,
+      18705,
+      24940,
+      31175
+    ],
+    "R": [
+      4929,
+      9858,
+      14787,
+      19716,
+      24645
+    ],
+    "W5": [
+      4927,
+      9854,
+      14781,
+      19708,
+      24635
+    ]
+  },
+  "prior_report_commit": "cd5a45c",
+  "rank": 128,
+  "scale_up": "docs/tasks/WP-L4_p1l_read_fix.md",
+  "science_commit": "be07f7fb34c1cdd14b64f65b7f687364fcd6e36f",
+  "seed": 17,
+  "selection_order": [
+    "r32/R",
+    "r32/Rrho",
+    "r32/RK",
+    "r128/W5",
+    "r128/R"
+  ],
+  "sizing_by_arm": {
+    "OA": {
+      "eval1000_seconds": 9.852846791036427,
+      "evaluations": 5,
+      "expected_seconds_with_margin": 7199.236860461906,
+      "margin": 1.5,
+      "setup_reserve_seconds": 90,
+      "smoke_fraction_of_fixed_steps": 0.07698476343223737,
+      "step_seconds": 0.1504483402198157
+    },
+    "R": {
+      "eval1000_seconds": 10.69871723651886,
+      "evaluations": 5,
+      "expected_seconds_with_margin": 7198.729804375198,
+      "margin": 1.5,
+      "setup_reserve_seconds": 90,
+      "smoke_fraction_of_fixed_steps": 0.09738283627510651,
+      "step_seconds": 0.19012617637387721
+    },
+    "W5": {
+      "eval1000_seconds": 11.57676599919796,
+      "evaluations": 5,
+      "expected_seconds_with_margin": 7199.783791758308,
+      "margin": 1.5,
+      "setup_reserve_seconds": 90,
+      "smoke_fraction_of_fixed_steps": 0.09742236655165415,
+      "step_seconds": 0.19005366475243418
+    }
+  },
+  "status": "released_after_smoke_artifact_and_timing_gate",
+  "steps_by_arm": {
+    "OA": 31175,
+    "R": 24645,
+    "W5": 24635
+  },
+  "walltime": "02:00:00"
+}
