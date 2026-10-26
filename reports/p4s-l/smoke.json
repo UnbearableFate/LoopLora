@@ -1,0 +1,567 @@
+{
+  "status": "passed",
+  "runs": 24,
+  "train_episodes_per_reader": 2000,
+  "head_steps": 200,
+  "validation_episodes": 200,
+  "scientific_scores_inspected": false,
+  "heads_retained": false,
+  "confirmation_evaluated": false,
+  "total_seconds": 37.07238767296076,
+  "source": "afda7abd3dd1022f2a066fa857c82d1776b8c747",
+  "peak_memory_bytes": 186009088,
+  "timing": [
+    {
+      "head_training_seconds": 0.2723369630984962,
+      "name": "f2-main-joint_fact-M1-lin-s17",
+      "peak_memory_bytes": 152146432,
+      "training_trace": {
+        "episodes": 2000,
+        "generator_seed": 31337,
+        "prepare_seconds": 0.3128515398129821,
+        "queries": 16000,
+        "split": "train",
+        "total_seconds": 1.1628983840346336,
+        "trace_seconds": 0.45042381808161736
+      },
+      "validation": {
+        "episodes": 200,
+        "generator_seed": 4242,
+        "prepare_seconds": 0.022362664807587862,
+        "queries": 1600,
+        "split": "val",
+        "total_seconds": 0.144080625846982,
+        "trace_seconds": 0.08231084002181888
+      }
+    },
+    {
+      "head_training_seconds": 0.23371144710108638,
+      "name": "f2-main-joint_fact-M1-lin-s29",
+      "peak_memory_bytes": 181576704,
+      "training_trace": {
+        "episodes": 2000,
+        "generator_seed": 31337,
+        "prepare_seconds": 0.1690213824622333,
+        "queries": 16000,
+        "split": "train",
+        "total_seconds": 1.0134868118911982,
+        "trace_seconds": 0.45785272726789117
+      },
+      "validation": {
+        "episodes": 200,
+        "generator_seed": 4242,
+        "prepare_seconds": 0.021376931108534336,
+        "queries": 1600,
+        "split": "val",
+        "total_seconds": 0.12662999099120498,
+        "trace_seconds": 0.06658059963956475
+      }
+    },
+    {
+      "head_training_seconds": 0.2970521217212081,
+      "name": "f2-main-joint_fact-M1-lin-s43",
+      "peak_memory_bytes": 181576704,
+      "training_trace": {
+        "episodes": 2000,
+        "generator_seed": 31337,
+        "prepare_seconds": 0.16865965444594622,
+        "queries": 16000,
+        "split": "train",
+        "total_seconds": 1.0073308711871505,
+        "trace_seconds": 0.4580197646282613
+      },
+      "validation": {
+        "episodes": 200,
+        "generator_seed": 4242,
+        "prepare_seconds": 0.021427171770483255,
+        "queries": 1600,
+        "split": "val",
+        "total_seconds": 0.12673565605655313,
+        "trace_seconds": 0.06675877701491117
+      }
+    },
+    {
+      "head_training_seconds": 0.23160583386197686,
+      "name": "f2-main-joint_fact-M1-s17",
+      "peak_memory_bytes": 181576704,
+      "training_trace": {
+        "episodes": 2000,
+        "generator_seed": 31337,
+        "prepare_seconds": 0.16807123692706227,
+        "queries": 16000,
+        "split": "train",
+        "total_seconds": 1.021031660027802,
+        "trace_seconds": 0.4688229341991246
+      },
+      "validation": {
+        "episodes": 200,
+        "generator_seed": 4242,
+        "prepare_seconds": 0.02110953675583005,
+        "queries": 1600,
+        "split": "val",
+        "total_seconds": 0.1275996919721365,
+        "trace_seconds": 0.06792480032891035
+      }
+    },
+    {
+      "head_training_seconds": 0.23171325819566846,
+      "name": "f2-main-joint_fact-M1-s29",
+      "peak_memory_bytes": 181576704,
+      "training_trace": {
+        "episodes": 2000,
+        "generator_seed": 31337,
+        "prepare_seconds": 0.1671262108720839,
+        "queries": 16000,
+        "split": "train",
+        "total_seconds": 1.008652159012854,
+        "trace_seconds": 0.46240164525806904
+      },
+      "validation": {
+        "episodes": 200,
+        "generator_seed": 4242,
+        "prepare_seconds": 0.021162208169698715,
+        "queries": 1600,
+        "split": "val",
+        "total_seconds": 0.12699834583327174,
+        "trace_seconds": 0.06749609299004078
+      }
+    },
+    {
+      "head_training_seconds": 0.23080645827576518,
+      "name": "f2-main-joint_fact-M1-s43",
+      "peak_memory_bytes": 181576704,
+      "training_trace": {
+        "episodes": 2000,
+        "generator_seed": 31337,
+        "prepare_seconds": 0.1672321716323495,
+        "queries": 16000,
+        "split": "train",
+        "total_seconds": 1.0071743056178093,
+        "trace_seconds": 0.46398643497377634
+      },
+      "validation": {
+        "episodes": 200,
+        "generator_seed": 4242,
+        "prepare_seconds": 0.021229912526905537,
+        "queries": 1600,
+        "split": "val",
+        "total_seconds": 0.12737120175734162,
+        "trace_seconds": 0.06788650574162602
+      }
+    },
+    {
+      "head_training_seconds": 0.23272691667079926,
+      "name": "f2-main-t1_frozen_fact-M1-lin-s17",
+      "peak_memory_bytes": 181576704,
+      "training_trace": {
+        "episodes": 2000,
+        "generator_seed": 31337,
+        "prepare_seconds": 0.16848580772057176,
+        "queries": 16000,
+        "split": "train",
+        "total_seconds": 1.0089498488232493,
+        "trace_seconds": 0.4602670194581151
+      },
+      "validation": {
+        "episodes": 200,
+        "generator_seed": 4242,
+        "prepare_seconds": 0.021210073959082365,
+        "queries": 1600,
+        "split": "val",
+        "total_seconds": 0.12616646010428667,
+        "trace_seconds": 0.06651981128379703
+      }
+    },
+    {
+      "head_training_seconds": 0.23141506919637322,
+      "name": "f2-main-t1_frozen_fact-M1-lin-s29",
+      "peak_memory_bytes": 181576704,
+      "training_trace": {
+        "episodes": 2000,
+        "generator_seed": 31337,
+        "prepare_seconds": 0.16614099545404315,
+        "queries": 16000,
+        "split": "train",
+        "total_seconds": 0.995516202878207,
+        "trace_seconds": 0.4510895274579525
+      },
+      "validation": {
+        "episodes": 200,
+        "generator_seed": 4242,
+        "prepare_seconds": 0.020970490761101246,
+        "queries": 1600,
+        "split": "val",
+        "total_seconds": 0.12532690400257707,
+        "trace_seconds": 0.06593033391982317
+      }
+    },
+    {
+      "head_training_seconds": 0.2312529250048101,
+      "name": "f2-main-t1_frozen_fact-M1-lin-s43",
+      "peak_memory_bytes": 181576704,
+      "training_trace": {
+        "episodes": 2000,
+        "generator_seed": 31337,
+        "prepare_seconds": 0.165917600505054,
+        "queries": 16000,
+        "split": "train",
+        "total_seconds": 0.9999097962863743,
+        "trace_seconds": 0.4513163468800485
+      },
+      "validation": {
+        "episodes": 200,
+        "generator_seed": 4242,
+        "prepare_seconds": 0.021332283038645983,
+        "queries": 1600,
+        "split": "val",
+        "total_seconds": 0.12637625308707356,
+        "trace_seconds": 0.06655369885265827
+      }
+    },
+    {
+      "head_training_seconds": 0.23106706701219082,
+      "name": "f2-main-t1_frozen_fact-M1-s17",
+      "peak_memory_bytes": 181576704,
+      "training_trace": {
+        "episodes": 2000,
+        "generator_seed": 31337,
+        "prepare_seconds": 0.16855659242719412,
+        "queries": 16000,
+        "split": "train",
+        "total_seconds": 1.013291315175593,
+        "trace_seconds": 0.4671290423721075
+      },
+      "validation": {
+        "episodes": 200,
+        "generator_seed": 4242,
+        "prepare_seconds": 0.021289916709065437,
+        "queries": 1600,
+        "split": "val",
+        "total_seconds": 0.12786883674561977,
+        "trace_seconds": 0.06773117557168007
+      }
+    },
+    {
+      "head_training_seconds": 0.23139241291210055,
+      "name": "f2-main-t1_frozen_fact-M1-s29",
+      "peak_memory_bytes": 181576704,
+      "training_trace": {
+        "episodes": 2000,
+        "generator_seed": 31337,
+        "prepare_seconds": 0.1677117864601314,
+        "queries": 16000,
+        "split": "train",
+        "total_seconds": 1.0142574650235474,
+        "trace_seconds": 0.46617921674624085
+      },
+      "validation": {
+        "episodes": 200,
+        "generator_seed": 4242,
+        "prepare_seconds": 0.021241531241685152,
+        "queries": 1600,
+        "split": "val",
+        "total_seconds": 0.1275188187137246,
+        "trace_seconds": 0.06774343317374587
+      }
+    },
+    {
+      "head_training_seconds": 0.23126969300210476,
+      "name": "f2-main-t1_frozen_fact-M1-s43",
+      "peak_memory_bytes": 181576704,
+      "training_trace": {
+        "episodes": 2000,
+        "generator_seed": 31337,
+        "prepare_seconds": 0.16831057285889983,
+        "queries": 16000,
+        "split": "train",
+        "total_seconds": 1.0166525184176862,
+        "trace_seconds": 0.4671477279625833
+      },
+      "validation": {
+        "episodes": 200,
+        "generator_seed": 4242,
+        "prepare_seconds": 0.021226266399025917,
+        "queries": 1600,
+        "split": "val",
+        "total_seconds": 0.12713776109740138,
+        "trace_seconds": 0.06766685657203197
+      }
+    },
+    {
+      "head_training_seconds": 0.23275539698079228,
+      "name": "primary-joint-M1-lin-r32-s17",
+      "peak_memory_bytes": 181576704,
+      "training_trace": {
+        "episodes": 2000,
+        "generator_seed": 31337,
+        "prepare_seconds": 0.27112601697444916,
+        "queries": 16000,
+        "split": "train",
+        "total_seconds": 1.1111348890699446,
+        "trace_seconds": 0.45979873184114695
+      },
+      "validation": {
+        "episodes": 200,
+        "generator_seed": 4242,
+        "prepare_seconds": 0.03396413195878267,
+        "queries": 1600,
+        "split": "val",
+        "total_seconds": 0.1393638150766492,
+        "trace_seconds": 0.06670214561745524
+      }
+    },
+    {
+      "head_training_seconds": 0.23245971510186791,
+      "name": "primary-joint-M1-lin-r32-s29",
+      "peak_memory_bytes": 181576704,
+      "training_trace": {
+        "episodes": 2000,
+        "generator_seed": 31337,
+        "prepare_seconds": 0.2643260769546032,
+        "queries": 16000,
+        "split": "train",
+        "total_seconds": 1.0964691727422178,
+        "trace_seconds": 0.4526428789831698
+      },
+      "validation": {
+        "episodes": 200,
+        "generator_seed": 4242,
+        "prepare_seconds": 0.0337663060054183,
+        "queries": 1600,
+        "split": "val",
+        "total_seconds": 0.13895040517672896,
+        "trace_seconds": 0.06656217854470015
+      }
+    },
+    {
+      "head_training_seconds": 0.2310007312335074,
+      "name": "primary-joint-M1-lin-r32-s43",
+      "peak_memory_bytes": 181576704,
+      "training_trace": {
+        "episodes": 2000,
+        "generator_seed": 31337,
+        "prepare_seconds": 0.26858095033094287,
+        "queries": 16000,
+        "split": "train",
+        "total_seconds": 1.1081336881034076,
+        "trace_seconds": 0.46089274948462844
+      },
+      "validation": {
+        "episodes": 200,
+        "generator_seed": 4242,
+        "prepare_seconds": 0.03410263219848275,
+        "queries": 1600,
+        "split": "val",
+        "total_seconds": 0.13996298797428608,
+        "trace_seconds": 0.06718925200402737
+      }
+    },
+    {
+      "head_training_seconds": 0.23151398077607155,
+      "name": "primary-joint-M1-r32-s17",
+      "peak_memory_bytes": 181576704,
+      "training_trace": {
+        "episodes": 2000,
+        "generator_seed": 31337,
+        "prepare_seconds": 0.26959868613630533,
+        "queries": 16000,
+        "split": "train",
+        "total_seconds": 1.1199725409969687,
+        "trace_seconds": 0.4690209273248911
+      },
+      "validation": {
+        "episodes": 200,
+        "generator_seed": 4242,
+        "prepare_seconds": 0.03371641831472516,
+        "queries": 1600,
+        "split": "val",
+        "total_seconds": 0.14022007724270225,
+        "trace_seconds": 0.06760851852595806
+      }
+    },
+    {
+      "head_training_seconds": 0.23168502422049642,
+      "name": "primary-joint-M1-r32-s29",
+      "peak_memory_bytes": 181576704,
+      "training_trace": {
+        "episodes": 2000,
+        "generator_seed": 31337,
+        "prepare_seconds": 0.2661145990714431,
+        "queries": 16000,
+        "split": "train",
+        "total_seconds": 1.1040049600414932,
+        "trace_seconds": 0.46159300906583667
+      },
+      "validation": {
+        "episodes": 200,
+        "generator_seed": 4242,
+        "prepare_seconds": 0.033301857765764,
+        "queries": 1600,
+        "split": "val",
+        "total_seconds": 0.13905482087284327,
+        "trace_seconds": 0.06731037190183997
+      }
+    },
+    {
+      "head_training_seconds": 0.2315913257189095,
+      "name": "primary-joint-M1-r32-s43",
+      "peak_memory_bytes": 181576704,
+      "training_trace": {
+        "episodes": 2000,
+        "generator_seed": 31337,
+        "prepare_seconds": 0.26594028901308775,
+        "queries": 16000,
+        "split": "train",
+        "total_seconds": 1.1074139093980193,
+        "trace_seconds": 0.46281238039955497
+      },
+      "validation": {
+        "episodes": 200,
+        "generator_seed": 4242,
+        "prepare_seconds": 0.033818754367530346,
+        "queries": 1600,
+        "split": "val",
+        "total_seconds": 0.14064148720353842,
+        "trace_seconds": 0.0680869254283607
+      }
+    },
+    {
+      "head_training_seconds": 0.2312600603327155,
+      "name": "primary-oracle_random-M1-lin-r32-s17",
+      "peak_memory_bytes": 186009088,
+      "training_trace": {
+        "episodes": 2000,
+        "generator_seed": 31337,
+        "prepare_seconds": 0.19803285971283913,
+        "queries": 16000,
+        "split": "train",
+        "total_seconds": 1.0284349219873548,
+        "trace_seconds": 0.4525527637451887
+      },
+      "validation": {
+        "episodes": 200,
+        "generator_seed": 4242,
+        "prepare_seconds": 0.025059218052774668,
+        "queries": 1600,
+        "split": "val",
+        "total_seconds": 0.1297471201978624,
+        "trace_seconds": 0.06599318142980337
+      }
+    },
+    {
+      "head_training_seconds": 0.23188729584217072,
+      "name": "primary-oracle_random-M1-lin-r32-s29",
+      "peak_memory_bytes": 185894400,
+      "training_trace": {
+        "episodes": 2000,
+        "generator_seed": 31337,
+        "prepare_seconds": 0.19744636164978147,
+        "queries": 16000,
+        "split": "train",
+        "total_seconds": 1.0258645080029964,
+        "trace_seconds": 0.4508627401664853
+      },
+      "validation": {
+        "episodes": 200,
+        "generator_seed": 4242,
+        "prepare_seconds": 0.025028847623616457,
+        "queries": 1600,
+        "split": "val",
+        "total_seconds": 0.12923012394458055,
+        "trace_seconds": 0.06565369293093681
+      }
+    },
+    {
+      "head_training_seconds": 0.23157958267256618,
+      "name": "primary-oracle_random-M1-lin-r32-s43",
+      "peak_memory_bytes": 185894400,
+      "training_trace": {
+        "episodes": 2000,
+        "generator_seed": 31337,
+        "prepare_seconds": 0.1960225747898221,
+        "queries": 16000,
+        "split": "train",
+        "total_seconds": 1.023684622719884,
+        "trace_seconds": 0.4476513024419546
+      },
+      "validation": {
+        "episodes": 200,
+        "generator_seed": 4242,
+        "prepare_seconds": 0.02530376287177205,
+        "queries": 1600,
+        "split": "val",
+        "total_seconds": 0.1309630312025547,
+        "trace_seconds": 0.06666829204186797
+      }
+    },
+    {
+      "head_training_seconds": 0.23220892902463675,
+      "name": "primary-oracle_random-M1-r32-s17",
+      "peak_memory_bytes": 185894400,
+      "training_trace": {
+        "episodes": 2000,
+        "generator_seed": 31337,
+        "prepare_seconds": 0.19801871618255973,
+        "queries": 16000,
+        "split": "train",
+        "total_seconds": 1.0386444851756096,
+        "trace_seconds": 0.46126203052699566
+      },
+      "validation": {
+        "episodes": 200,
+        "generator_seed": 4242,
+        "prepare_seconds": 0.024947375990450382,
+        "queries": 1600,
+        "split": "val",
+        "total_seconds": 0.13002456165850163,
+        "trace_seconds": 0.0667185322381556
+      }
+    },
+    {
+      "head_training_seconds": 0.23240448394790292,
+      "name": "primary-oracle_random-M1-r32-s29",
+      "peak_memory_bytes": 185894400,
+      "training_trace": {
+        "episodes": 2000,
+        "generator_seed": 31337,
+        "prepare_seconds": 0.1940523567609489,
+        "queries": 16000,
+        "split": "train",
+        "total_seconds": 1.0233644279651344,
+        "trace_seconds": 0.45024843560531735
+      },
+      "validation": {
+        "episodes": 200,
+        "generator_seed": 4242,
+        "prepare_seconds": 0.024832784663885832,
+        "queries": 1600,
+        "split": "val",
+        "total_seconds": 0.13042830815538764,
+        "trace_seconds": 0.0669793956913054
+      }
+    },
+    {
+      "head_training_seconds": 0.2325436188839376,
+      "name": "primary-oracle_random-M1-r32-s43",
+      "peak_memory_bytes": 185894400,
+      "training_trace": {
+        "episodes": 2000,
+        "generator_seed": 31337,
+        "prepare_seconds": 0.1969756348989904,
+        "queries": 16000,
+        "split": "train",
+        "total_seconds": 1.032710530795157,
+        "trace_seconds": 0.45706668496131897
+      },
+      "validation": {
+        "episodes": 200,
+        "generator_seed": 4242,
+        "prepare_seconds": 0.02504779351875186,
+        "queries": 1600,
+        "split": "val",
+        "total_seconds": 0.1307904222048819,
+        "trace_seconds": 0.06732086883857846
+      }
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "smoke_job": "3715743.opbs",
+  "uniform_smoke_fraction": 0.1,
+  "smoke_scaled_stage_seconds": 33.91741201328114,
+  "smoke_fixed_overhead_seconds": 3.1549756596796215,
+  "formal_stage_projection_seconds": 339.17412013281137,
+  "selection_and_export_allowance_seconds": 30,
+  "formal_expected_seconds": 372.329095792491,
+  "walltime_margin": 1.5,
+  "formal_walltime_seconds": 600,
+  "requested_walltime": "00:10:00",
+  "study_budget_node_hours": 1,
+  "remaining_confirmation_timing_analysis_reserve_seconds": 300,
+  "notes": "Same24readers, all training examples and steps scaled10x fromsmoke; serialoneprocess, unchangedbatch256episodes. No scientific smoke scores inspected."
+}

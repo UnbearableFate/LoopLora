@@ -96,3 +96,15 @@ run under the packing actually used × 1.5 fits one 2 h job (preflight 3715826 a
 `reports/p1l/preflight-B1-sizing.json` on wp/p1l: job cap 17,413 steps → **S = 17,000**, Pilot-2 at ⌊S/3⌋).
 Projected Pilot-2 + main ≈ 24 node·h plus smoke, confirmation and readout; node·h recorded per job. The learned
 condition, if added, uses the same rule. Information seen: timing only; no score.
+
+## Amendment B3 — r = 128 replication of the oracle condition (2026-10-27 04:32 JST, user request "并行验证 r = 128";
+## before any P1-L validation or confirmation score is read)
+- New condition `oracle_random` at **r = r_mem = 128**, run in parallel: B8, M1-L4, B4, B5-L4, B3-L4 × seeds
+  17/29/43, everything else as the r = 32 condition (same oracle seed, task, protocol, readout). Its own Pilot-2
+  (lr ∈ {1e-3, 3e-3} at ⌊S/3⌋); S = 17,000 if the per-job rule holds at r = 128, otherwise the largest S that does
+  (flagged, since cross-rank contrasts then differ in steps). B0–B2 are not repeated.
+- Endpoints: G1-L and G2-L per rank condition. Added, secondary: the LLM analog of P2-S E1 — B8(r = 32)@4 −
+  B4(r = 128)@1 and M1-L4(r = 32)@4 − B4(r = 128)@1 on hops {2, 3} — and B8(r = 128)@4 − B8(r = 32)@4, descriptive.
+- CI level for every gate: 1 − 0.05/k, where k is the number of gated conditions (oracle r = 32, oracle r = 128,
+  plus any learned condition), fixed before the first confirmation evaluation. Confirmation stays held until
+  every condition's runs have finished training.
