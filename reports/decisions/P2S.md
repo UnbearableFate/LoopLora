@@ -39,3 +39,19 @@ leave no shortcut; with unfactorized learned codes, a larger single read exploit
 P2-S-F1 (`docs/prereg/P2S-F1.md`): at matched training depth, does sharing cost accuracy (M1 trained at L = 4 vs
 B8), and with shortcut-free codes do larger single reads still fail to match M1? Its answer fixes the reader
 (shared M1 or unshared B8) and training-depth distribution carried into P1-L.
+
+## 6. P2-S-F1 outcome (2026-10-27 02:20 JST, merge f7d2aed; `docs/reports/P2S-F1.md`, 1.10 node·h)
+Same confirmation set (seed 888001, reused as registered), 97.5% CIs, hops {2, 3} unless stated.
+- Sharing at matched training depth (B8@4 − M1-L4@4): joint +13.2 [12.0, 14.5], joint_fact +5.5 [4.2, 6.8],
+  oracle_random +3.2 [2.0, 4.5]; B8 is also better on hop 1 but worse on hops 4–8 for every writer (joint −5.5):
+  step-specific reads fit the trained depths better, shared reads extrapolate further.
+- Training depth (M1-L4@4 − M1-mixed@4): joint +20.5, joint_fact +3.5, oracle_random +8.2 (all CI > 0); this
+  includes separately tuned lrs. About 60% of the joint B8 − M1 gap was training depth (33.7 → 13.2 pp).
+- Shortcut-free capability (joint_fact M1-mixed@4 − larger single read): +23.6 to +24.2 pp against B6 r = 64, 128
+  and B7 r_mem = 64, 128, every seed positive; the single reads answer 0.2–0.9% of hops 2–3.
+
+Decisions (registered rules): **P1-L carries B8 trained at fixed L = 4**, with M1 trained at L = 4 as the shared
+variant; the capability claim (one read cannot replace several, at up to 16× the state or 8.6× the parameters)
+holds for oracle codes and for shortcut-free learned codes, not for unfactorized learned codes. Because B8 has
+no depth scan, P1-L endpoints must compare separately trained models (B8@4 vs B4, B5 and B3 trained at L = 4);
+this is fixed in the P1-L prereg before Pilot-2.
