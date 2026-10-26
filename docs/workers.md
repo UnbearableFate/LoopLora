@@ -15,7 +15,7 @@ Open or resume (new tab, worktree cwd):
 
 | worker | role (owns) | worktree, branch | context to inject | session | state |
 | --- | --- | --- | --- | --- | --- |
-| wk-sym | symbolic mechanism experiments: `src/looplora/sym`, `configs/p1s`, runs under `runs/p1s` | LoopLora-wt/sym, wp/sym | `docs/prereg/P1S.md`, `docs/reports/WP-D.md`, `docs/reports/P1S-pilot.md` | 01a177a0-f742-7c63-8800-0983d801fc19 | active: WP-D2 |
+| wk-sym | symbolic mechanism experiments: `src/looplora/sym`, `configs/p1s`, runs under `runs/p1s` | LoopLora-wt/sym, wp/sym | `docs/prereg/P1S.md`, `docs/reports/WP-D.md`, `docs/reports/P1S-pilot.md` | 01a177a0-f742-7c63-8800-0983d801fc19 | active: WP-H |
 | wk-llm | LLM module experiments: `src/looplora/llm`, `configs/p1l`, runs under `runs/p1l` | LoopLora-wt/llm, wp/llm | `docs/prereg/P1L.md`, `docs/reports/WP-E.md`, `docs/reports/WP-G.md` | 01a1779d-c123-75a1-9458-ae849ee0fcde (resumed, GPT-6.1-sol) | active: WP-L1 |
 | wk-theory | theory and analytical checks: `docs/theory.md`, `tests/test_theory_examples.py` | LoopLora-wt/theory, wp/theory | `docs/theory.md`, `docs/reports/WP-T.md` | 01a177c4-57fb-7f42-a920-533e74680115 | dormant (tab closed under the earlier rule); resume when needed |
 | wk-core | core adapters, memory, accounting: `src/looplora/core` | LoopLora-wt/core, wp/core | `docs/notation.md`, `docs/reports/WP-A.md` | 01a1779d-747b-7df1-8492-b517a9be8c6a | dormant; resume when needed |
@@ -30,5 +30,6 @@ Open or resume (new tab, worktree cwd):
 | WP-D symbolic pipeline | wk-sym | c86d72b |
 | WP-T theory | wk-theory | d897f02 |
 | WP-G P1-L pipeline | wk-llm | 2bf5d6d |
-| WP-D2 P1-S pilots | wk-sym | (running) |
+| WP-D2 P1-S pilots | wk-sym | 633f37c |
+| WP-H P1-S main runs | wk-sym | (running) |
 | WP-L1 P1-L Pilot-1 | wk-llm | (running) |
