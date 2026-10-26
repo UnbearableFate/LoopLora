@@ -1,0 +1,88 @@
+{
+  "S": 9000,
+  "budget_cap_steps": 9236,
+  "excludes": "smoke, validation, confirmation, J-lens and failed jobs (3nodeh reserve)",
+  "job_cap_steps": 17413,
+  "longest_step_seconds": 0.27133156365016475,
+  "main_plus_pilot_node_hours": 12.673944020509307,
+  "overhead_seconds": 991.7260660254396,
+  "packing": "one GPU process; runs sequentially reuse backbone, prefetch2 per active run",
+  "pilot_steps": 3000,
+  "reserve_seconds": 75.21103984722868,
+  "smoke_steps": 900,
+  "source": "/work/xg24i002/x10041/LoopLora/runs/p1l/main/preflight",
+  "status": "sized",
+  "time": "2026-10-26T19:13:31.468629+00:00",
+  "timing_rows": [
+    {
+      "checkpoint_hash": "a617c03c3a4f11d45cf47b5a45346f25",
+      "host": "mg0024",
+      "job_id": "3715826.opbs",
+      "label": "B8",
+      "overhead_seconds": 15.211039847228676,
+      "peak_memory_bytes": 7176106496,
+      "step_seconds": 0.19551923574181274,
+      "steps": 20
+    },
+    {
+      "checkpoint_hash": "007d72978abde21a080b6831313ef7c7",
+      "host": "mg0024",
+      "job_id": "3715826.opbs",
+      "label": "M1-L4",
+      "overhead_seconds": 12.98701110901311,
+      "peak_memory_bytes": 7175799296,
+      "step_seconds": 0.1954519236460328,
+      "steps": 20
+    },
+    {
+      "checkpoint_hash": "9e61bd970f5c05f9ef828e934cd6e76b",
+      "host": "mg0024",
+      "job_id": "3715826.opbs",
+      "label": "B4",
+      "overhead_seconds": 12.86844793392811,
+      "peak_memory_bytes": 7167246848,
+      "step_seconds": 0.1324908398964908,
+      "steps": 20
+    },
+    {
+      "checkpoint_hash": "05f961d9d3dc110bb2b18f32cf902642",
+      "host": "mg0024",
+      "job_id": "3715826.opbs",
+      "label": "B5-L4",
+      "overhead_seconds": 13.02867332403548,
+      "peak_memory_bytes": 7172948480,
+      "step_seconds": 0.15661075100069866,
+      "steps": 20
+    },
+    {
+      "checkpoint_hash": "a993fb8b9b18cf6a0752f2a0e5bd681f",
+      "host": "mg0024",
+      "job_id": "3715826.opbs",
+      "label": "B3-L4",
+      "overhead_seconds": 13.033098736777902,
+      "peak_memory_bytes": 7141555712,
+      "step_seconds": 0.13466181425610557,
+      "steps": 20
+    },
+    {
+      "checkpoint_hash": "f42fa2cab72eb0706797b749cd6d91f3",
+      "host": "mg0024",
+      "job_id": "3715826.opbs",
+      "label": "B1",
+      "overhead_seconds": 13.239272827166133,
+      "peak_memory_bytes": 17177536000,
+      "step_seconds": 0.2664936417422723,
+      "steps": 20
+    },
+    {
+      "checkpoint_hash": "b3755a7998f5ce993a84fb2b06aac818",
+      "host": "mg0024",
+      "job_id": "3715826.opbs",
+      "label": "B2",
+      "overhead_seconds": 12.977669426938519,
+      "peak_memory_bytes": 17178715648,
+      "step_seconds": 0.27133156365016475,
+      "steps": 20
+    }
+  ]
+}
