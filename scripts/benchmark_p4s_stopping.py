@@ -41,7 +41,7 @@ def _audit_adaptive(
     adapter: IterativeQueryAdapter,
     batch: ReaderBatch,
     thresholds: dict[str, float | int],
-) -> dict[str, tuple[float, float]]:
+) -> dict[str, tuple[float, float, float, float]]:
     """Check the actual masked reader against untimed, full-depth references."""
     trace = trace_reader(adapter, batch, max_steps=_MAX_STEPS)
     counters = {}
@@ -58,20 +58,26 @@ def _audit_adaptive(
         expected_reads = expected_steps + int(criterion == "read_norm")
         if not torch.equal(actual.read_calls, expected_reads):
             raise AssertionError(f"{criterion}: memory-read counters do not match the stopping convention")
-        # Compare terminal states as well as argmax predictions. Different active
-        # batch shapes can change floating-point GEMM rounding slightly.
+        # Active compaction and grouped replay use different GEMM batch shapes.
+        # Measure whole-state error: componentwise relative error is misleading
+        # near cancellation. The F1 GPU probe agrees to 1.4e-14 in FP64 while
+        # FP32 vector error reaches 8e-6 at L16; predictions/halts remain exact.
+        relative_errors, absolute_errors = [], []
         for step in expected_steps.unique().tolist():
             indices = (expected_steps == step).nonzero(as_tuple=True)[0]
             selected = batch.take(indices)
             expected_states = adapter.read(selected.u, selected.memory, int(step))
-            torch.testing.assert_close(
-                actual.states.index_select(0, indices), expected_states,
-                rtol=1e-4, atol=1e-6,
-                msg=f"{criterion}: terminal states differ from fixed-depth reader at L={step}",
-            )
+            difference = actual.states.index_select(0, indices) - expected_states
+            error = torch.linalg.vector_norm(difference, dim=-1)
+            reference_norm = torch.linalg.vector_norm(expected_states, dim=-1)
+            if not bool((error <= 1e-6 + 1e-4 * reference_norm).all()):
+                raise AssertionError(f"{criterion}: vector state error exceeds tolerance at L={step}")
+            relative_errors.append(float((error / reference_norm.clamp_min(1e-12)).max()))
+            absolute_errors.append(float(difference.abs().max()))
         counters[criterion] = (
             float(actual.steps.double().mean().item()),
             float(actual.read_calls.double().mean().item()),
+            max(relative_errors), max(absolute_errors),
         )
     # Audit the fixed baseline's complete prediction path, too.
     for step in _FIXED_STEPS:
@@ -165,7 +171,7 @@ def benchmark_reader(
                 float(step), float(step),
             ))
         for criterion in _CRITERIA:
-            mean_steps, mean_reads = counters[criterion]
+            mean_steps, mean_reads, _, _ = counters[criterion]
             methods.append((
                 criterion,
                 lambda criterion=criterion: adaptive_read(
@@ -181,6 +187,8 @@ def benchmark_reader(
                 "batch_size": int(batch.u.shape[0]),
                 "mean_steps": mean_steps,
                 "mean_reads": mean_reads,
+                "audit_state_rel_l2_max": counters[method][2] if method in counters else None,
+                "audit_state_abs_max": counters[method][3] if method in counters else None,
                 **measurements,
                 "warmup": warmup,
                 "repeats": repeats,

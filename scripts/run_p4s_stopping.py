@@ -201,12 +201,12 @@ def main() -> None:
             del model
     save(root / "latency.json", latency)
     save(root / "timing.json", timing)
+    if not args.smoke:
+        summarize(root, runs, design, selection, args.summary_out or root / "summaries")
     metadata.update(status="complete", total_seconds=time.perf_counter() - started,
                     finished_at=datetime.now(timezone.utc).isoformat(),
                     design_hash=stable_hash(design), peak_memory_bytes=torch.cuda.max_memory_allocated())
     save(root / "manifest.json", metadata)
-    if not args.smoke:
-        summarize(root, runs, design, selection, args.summary_out or root / "summaries")
     print(json.dumps({"status": "complete", "smoke": args.smoke,
                       "seconds": metadata["total_seconds"], "root": str(root)}), flush=True)
 
