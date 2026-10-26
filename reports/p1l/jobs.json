@@ -1,7 +1,7 @@
 {
   "accounting": "qstat observed elapsed_seconds times nodes; failed jobs included; live totals provisional",
-  "allocated_node_hours": 19.329722222222223,
-  "allocated_node_seconds": 69587,
+  "allocated_node_hours": 27.709444444444443,
+  "allocated_node_seconds": 99754,
   "budget_rule": "B2: per-job8nodes x2h; no total cap",
   "final": false,
   "jobs": [
@@ -1115,7 +1115,7 @@
       "status": "FINISH"
     },
     {
-      "allocated_seconds": 2911,
+      "allocated_seconds": 3368,
       "argv": [
         "scripts/run_p1l_main.py",
         "main",
@@ -1128,22 +1128,22 @@
         "--labels",
         "B8"
       ],
-      "exit_code": null,
+      "exit_code": 0,
       "host": "mg0843",
       "job_id": "3716288.opbs",
       "log": "/work/xg24i002/x10041/LoopLora/logs/pbs/p1l-m-B8-s17-20261027-052827-2270669.log",
       "name": "p1l-m-B8-s17",
-      "node_hours": 0.8086111111111111,
+      "node_hours": 0.9355555555555556,
       "nodes": 1,
       "requested_walltime": "01:25:00",
       "source": {
         "kind": "commit",
         "ref": "d644b9ba3b30f7fcc2f13020272f457ee60aae40"
       },
-      "status": "RUNNING"
+      "status": "FINISH"
     },
     {
-      "allocated_seconds": 2913,
+      "allocated_seconds": 3419,
       "argv": [
         "scripts/run_p1l_main.py",
         "main",
@@ -1156,19 +1156,19 @@
         "--labels",
         "M1-L4"
       ],
-      "exit_code": null,
+      "exit_code": 0,
       "host": "mg0847",
       "job_id": "3716289.opbs",
       "log": "/work/xg24i002/x10041/LoopLora/logs/pbs/p1l-m-M1-s17-20261027-052827-2270682.log",
       "name": "p1l-m-M1-s17",
-      "node_hours": 0.8091666666666667,
+      "node_hours": 0.9497222222222222,
       "nodes": 1,
       "requested_walltime": "01:25:00",
       "source": {
         "kind": "commit",
         "ref": "d644b9ba3b30f7fcc2f13020272f457ee60aae40"
       },
-      "status": "RUNNING"
+      "status": "FINISH"
     },
     {
       "allocated_seconds": 2628,
@@ -1199,7 +1199,7 @@
       "status": "FINISH"
     },
     {
-      "allocated_seconds": 2912,
+      "allocated_seconds": 4610,
       "argv": [
         "scripts/run_p1l_main.py",
         "main",
@@ -1213,22 +1213,22 @@
         "B4",
         "B3-L4"
       ],
-      "exit_code": null,
+      "exit_code": 0,
       "host": "mg0857",
       "job_id": "3716291.opbs",
       "log": "/work/xg24i002/x10041/LoopLora/logs/pbs/p1l-m-B4-B3-s17-20261027-052827-2270692.log",
       "name": "p1l-m-B4-B3-s17",
-      "node_hours": 0.8088888888888889,
+      "node_hours": 1.2805555555555554,
       "nodes": 1,
       "requested_walltime": "01:55:00",
       "source": {
         "kind": "commit",
         "ref": "d644b9ba3b30f7fcc2f13020272f457ee60aae40"
       },
-      "status": "RUNNING"
+      "status": "FINISH"
     },
     {
-      "allocated_seconds": 2909,
+      "allocated_seconds": 4576,
       "argv": [
         "scripts/run_p1l_main.py",
         "main",
@@ -1241,22 +1241,22 @@
         "--labels",
         "B1"
       ],
-      "exit_code": null,
+      "exit_code": 0,
       "host": "mg0859",
       "job_id": "3716292.opbs",
       "log": "/work/xg24i002/x10041/LoopLora/logs/pbs/p1l-m-B1-s17-20261027-052827-2270698.log",
       "name": "p1l-m-B1-s17",
-      "node_hours": 0.8080555555555555,
+      "node_hours": 1.271111111111111,
       "nodes": 1,
       "requested_walltime": "01:55:00",
       "source": {
         "kind": "commit",
         "ref": "d644b9ba3b30f7fcc2f13020272f457ee60aae40"
       },
-      "status": "RUNNING"
+      "status": "FINISH"
     },
     {
-      "allocated_seconds": 2911,
+      "allocated_seconds": 4758,
       "argv": [
         "scripts/run_p1l_main.py",
         "main",
@@ -1269,22 +1269,22 @@
         "--labels",
         "B2"
       ],
-      "exit_code": null,
+      "exit_code": 0,
       "host": "mg0865",
       "job_id": "3716293.opbs",
       "log": "/work/xg24i002/x10041/LoopLora/logs/pbs/p1l-m-B2-s17-20261027-052827-2270711.log",
       "name": "p1l-m-B2-s17",
-      "node_hours": 0.8086111111111111,
+      "node_hours": 1.3216666666666668,
       "nodes": 1,
       "requested_walltime": "01:55:00",
       "source": {
         "kind": "commit",
         "ref": "d644b9ba3b30f7fcc2f13020272f457ee60aae40"
       },
-      "status": "RUNNING"
+      "status": "FINISH"
     },
     {
-      "allocated_seconds": 2910,
+      "allocated_seconds": 3347,
       "argv": [
         "scripts/run_p1l_main.py",
         "main",
@@ -1297,22 +1297,22 @@
         "--labels",
         "B8"
       ],
-      "exit_code": null,
+      "exit_code": 0,
       "host": "mg0898",
       "job_id": "3716294.opbs",
       "log": "/work/xg24i002/x10041/LoopLora/logs/pbs/p1l-m-B8-s29-20261027-052827-2270726.log",
       "name": "p1l-m-B8-s29",
-      "node_hours": 0.8083333333333333,
+      "node_hours": 0.9297222222222222,
       "nodes": 1,
       "requested_walltime": "01:25:00",
       "source": {
         "kind": "commit",
         "ref": "d644b9ba3b30f7fcc2f13020272f457ee60aae40"
       },
-      "status": "RUNNING"
+      "status": "FINISH"
     },
     {
-      "allocated_seconds": 2913,
+      "allocated_seconds": 3323,
       "argv": [
         "scripts/run_p1l_main.py",
         "main",
@@ -1325,19 +1325,19 @@
         "--labels",
         "M1-L4"
       ],
-      "exit_code": null,
+      "exit_code": 0,
       "host": "mg0899",
       "job_id": "3716295.opbs",
       "log": "/work/xg24i002/x10041/LoopLora/logs/pbs/p1l-m-M1-s29-20261027-052828-2270745.log",
       "name": "p1l-m-M1-s29",
-      "node_hours": 0.8091666666666667,
+      "node_hours": 0.9230555555555555,
       "nodes": 1,
       "requested_walltime": "01:25:00",
       "source": {
         "kind": "commit",
         "ref": "d644b9ba3b30f7fcc2f13020272f457ee60aae40"
       },
-      "status": "RUNNING"
+      "status": "FINISH"
     },
     {
       "allocated_seconds": 2618,
@@ -1368,7 +1368,7 @@
       "status": "FINISH"
     },
     {
-      "allocated_seconds": 2913,
+      "allocated_seconds": 4672,
       "argv": [
         "scripts/run_p1l_main.py",
         "main",
@@ -1382,22 +1382,22 @@
         "B4",
         "B3-L4"
       ],
-      "exit_code": null,
+      "exit_code": 0,
       "host": "mg0911",
       "job_id": "3716297.opbs",
       "log": "/work/xg24i002/x10041/LoopLora/logs/pbs/p1l-m-B4-B3-s29-20261027-052828-2270763.log",
       "name": "p1l-m-B4-B3-s29",
-      "node_hours": 0.8091666666666667,
+      "node_hours": 1.2977777777777777,
       "nodes": 1,
       "requested_walltime": "01:55:00",
       "source": {
         "kind": "commit",
         "ref": "d644b9ba3b30f7fcc2f13020272f457ee60aae40"
       },
-      "status": "RUNNING"
+      "status": "FINISH"
     },
     {
-      "allocated_seconds": 2911,
+      "allocated_seconds": 4554,
       "argv": [
         "scripts/run_p1l_main.py",
         "main",
@@ -1410,22 +1410,22 @@
         "--labels",
         "B1"
       ],
-      "exit_code": null,
+      "exit_code": 0,
       "host": "mg0913",
       "job_id": "3716298.opbs",
       "log": "/work/xg24i002/x10041/LoopLora/logs/pbs/p1l-m-B1-s29-20261027-052828-2270775.log",
       "name": "p1l-m-B1-s29",
-      "node_hours": 0.8086111111111111,
+      "node_hours": 1.265,
       "nodes": 1,
       "requested_walltime": "01:55:00",
       "source": {
         "kind": "commit",
         "ref": "d644b9ba3b30f7fcc2f13020272f457ee60aae40"
       },
-      "status": "RUNNING"
+      "status": "FINISH"
     },
     {
-      "allocated_seconds": 2791,
+      "allocated_seconds": 4595,
       "argv": [
         "scripts/run_p1l_main.py",
         "main",
@@ -1438,22 +1438,22 @@
         "--labels",
         "B2"
       ],
-      "exit_code": null,
+      "exit_code": 0,
       "host": "mg0835",
       "job_id": "3716299.opbs",
       "log": "/work/xg24i002/x10041/LoopLora/logs/pbs/p1l-m-B2-s29-20261027-052828-2270784.log",
       "name": "p1l-m-B2-s29",
-      "node_hours": 0.7752777777777777,
+      "node_hours": 1.2763888888888888,
       "nodes": 1,
       "requested_walltime": "01:55:00",
       "source": {
         "kind": "commit",
         "ref": "d644b9ba3b30f7fcc2f13020272f457ee60aae40"
       },
-      "status": "RUNNING"
+      "status": "FINISH"
     },
     {
-      "allocated_seconds": 2416,
+      "allocated_seconds": 3197,
       "argv": [
         "scripts/run_p1l_main.py",
         "main",
@@ -1466,22 +1466,22 @@
         "--labels",
         "B8"
       ],
-      "exit_code": null,
+      "exit_code": 0,
       "host": "mg0845",
       "job_id": "3716300.opbs",
       "log": "/work/xg24i002/x10041/LoopLora/logs/pbs/p1l-m-B8-s43-20261027-052828-2270793.log",
       "name": "p1l-m-B8-s43",
-      "node_hours": 0.6711111111111111,
+      "node_hours": 0.8880555555555556,
       "nodes": 1,
       "requested_walltime": "01:25:00",
       "source": {
         "kind": "commit",
         "ref": "d644b9ba3b30f7fcc2f13020272f457ee60aae40"
       },
-      "status": "RUNNING"
+      "status": "FINISH"
     },
     {
-      "allocated_seconds": 2420,
+      "allocated_seconds": 3239,
       "argv": [
         "scripts/run_p1l_main.py",
         "main",
@@ -1494,22 +1494,22 @@
         "--labels",
         "M1-L4"
       ],
-      "exit_code": null,
+      "exit_code": 0,
       "host": "mg0855",
       "job_id": "3716301.opbs",
       "log": "/work/xg24i002/x10041/LoopLora/logs/pbs/p1l-m-M1-s43-20261027-052828-2270857.log",
       "name": "p1l-m-M1-s43",
-      "node_hours": 0.6722222222222223,
+      "node_hours": 0.8997222222222222,
       "nodes": 1,
       "requested_walltime": "01:25:00",
       "source": {
         "kind": "commit",
         "ref": "d644b9ba3b30f7fcc2f13020272f457ee60aae40"
       },
-      "status": "RUNNING"
+      "status": "FINISH"
     },
     {
-      "allocated_seconds": 0,
+      "allocated_seconds": 1101,
       "argv": [
         "scripts/run_p1l_main.py",
         "main",
@@ -1523,18 +1523,18 @@
         "B5-L4"
       ],
       "exit_code": null,
-      "host": null,
+      "host": "mg0855",
       "job_id": "3716302.opbs",
       "log": "/work/xg24i002/x10041/LoopLora/logs/pbs/p1l-m-B5-s43-20261027-052829-2270870.log",
       "name": "p1l-m-B5-s43",
-      "node_hours": 0.0,
+      "node_hours": 0.30583333333333335,
       "nodes": 1,
       "requested_walltime": "01:10:00",
       "source": {
         "kind": "commit",
         "ref": "d644b9ba3b30f7fcc2f13020272f457ee60aae40"
       },
-      "status": "QUEUED"
+      "status": "RUNNING"
     },
     {
       "allocated_seconds": 0,
@@ -1557,13 +1557,13 @@
       "log": "/work/xg24i002/x10041/LoopLora/logs/pbs/p1l-m-B4-B3-s43-20261027-052829-2270873.log",
       "name": "p1l-m-B4-B3-s43",
       "node_hours": 0.0,
-      "nodes": 1,
+      "nodes": 0,
       "requested_walltime": "01:55:00",
       "source": {
         "kind": "commit",
         "ref": "d644b9ba3b30f7fcc2f13020272f457ee60aae40"
       },
-      "status": "QUEUED"
+      "status": "FINISH"
     },
     {
       "allocated_seconds": 0,
@@ -1678,7 +1678,7 @@
       "status": "FINISH"
     },
     {
-      "allocated_seconds": 140,
+      "allocated_seconds": 2179,
       "argv": [
         "scripts/run_p1l_main.py",
         "main",
@@ -1696,7 +1696,7 @@
       "job_id": "3716396.opbs",
       "log": "/work/xg24i002/x10041/LoopLora/logs/pbs/p1l-r128-m-B8-s17-20261027-054034-2348220.log",
       "name": "p1l-r128-m-B8-s17",
-      "node_hours": 0.03888888888888889,
+      "node_hours": 0.6052777777777778,
       "nodes": 1,
       "requested_walltime": "01:30:00",
       "source": {
@@ -1706,7 +1706,7 @@
       "status": "RUNNING"
     },
     {
-      "allocated_seconds": 0,
+      "allocated_seconds": 1937,
       "argv": [
         "scripts/run_p1l_main.py",
         "main",
@@ -1720,21 +1720,21 @@
         "M1-L4"
       ],
       "exit_code": null,
-      "host": null,
+      "host": "mg0852",
       "job_id": "3716397.opbs",
       "log": "/work/xg24i002/x10041/LoopLora/logs/pbs/p1l-r128-m-M1-s17-20261027-054034-2348227.log",
       "name": "p1l-r128-m-M1-s17",
-      "node_hours": 0.0,
+      "node_hours": 0.5380555555555555,
       "nodes": 1,
       "requested_walltime": "01:30:00",
       "source": {
         "kind": "commit",
         "ref": "1d1bbfd6958bfac2cd35054a24abeebcfdb7da1b"
       },
-      "status": "QUEUED"
+      "status": "RUNNING"
     },
     {
-      "allocated_seconds": 249,
+      "allocated_seconds": 2308,
       "argv": [
         "scripts/run_p1l_main.py",
         "main",
@@ -1752,7 +1752,7 @@
       "job_id": "3716398.opbs",
       "log": "/work/xg24i002/x10041/LoopLora/logs/pbs/p1l-r128-m-B5-s17-20261027-054034-2348250.log",
       "name": "p1l-r128-m-B5-s17",
-      "node_hours": 0.06916666666666667,
+      "node_hours": 0.6411111111111111,
       "nodes": 1,
       "requested_walltime": "01:10:00",
       "source": {
@@ -1782,16 +1782,16 @@
       "log": "/work/xg24i002/x10041/LoopLora/logs/pbs/p1l-r128-m-B4-B3-s17-20261027-054034-2348253.log",
       "name": "p1l-r128-m-B4-B3-s17",
       "node_hours": 0.0,
-      "nodes": 1,
+      "nodes": 0,
       "requested_walltime": "02:00:00",
       "source": {
         "kind": "commit",
         "ref": "1d1bbfd6958bfac2cd35054a24abeebcfdb7da1b"
       },
-      "status": "QUEUED"
+      "status": "FINISH"
     },
     {
-      "allocated_seconds": 194,
+      "allocated_seconds": 2183,
       "argv": [
         "scripts/run_p1l_main.py",
         "main",
@@ -1809,7 +1809,7 @@
       "job_id": "3716400.opbs",
       "log": "/work/xg24i002/x10041/LoopLora/logs/pbs/p1l-r128-m-B8-s29-20261027-054034-2348259.log",
       "name": "p1l-r128-m-B8-s29",
-      "node_hours": 0.05388888888888889,
+      "node_hours": 0.6063888888888889,
       "nodes": 1,
       "requested_walltime": "01:30:00",
       "source": {
@@ -1819,7 +1819,7 @@
       "status": "RUNNING"
     },
     {
-      "allocated_seconds": 0,
+      "allocated_seconds": 1574,
       "argv": [
         "scripts/run_p1l_main.py",
         "main",
@@ -1833,21 +1833,21 @@
         "M1-L4"
       ],
       "exit_code": null,
-      "host": null,
+      "host": "mg0899",
       "job_id": "3716401.opbs",
       "log": "/work/xg24i002/x10041/LoopLora/logs/pbs/p1l-r128-m-M1-s29-20261027-054035-2348266.log",
       "name": "p1l-r128-m-M1-s29",
-      "node_hours": 0.0,
+      "node_hours": 0.43722222222222223,
       "nodes": 1,
       "requested_walltime": "01:30:00",
       "source": {
         "kind": "commit",
         "ref": "1d1bbfd6958bfac2cd35054a24abeebcfdb7da1b"
       },
-      "status": "QUEUED"
+      "status": "RUNNING"
     },
     {
-      "allocated_seconds": 0,
+      "allocated_seconds": 1465,
       "argv": [
         "scripts/run_p1l_main.py",
         "main",
@@ -1861,18 +1861,18 @@
         "B5-L4"
       ],
       "exit_code": null,
-      "host": null,
+      "host": "mg0843",
       "job_id": "3716402.opbs",
       "log": "/work/xg24i002/x10041/LoopLora/logs/pbs/p1l-r128-m-B5-s29-20261027-054035-2348277.log",
       "name": "p1l-r128-m-B5-s29",
-      "node_hours": 0.0,
+      "node_hours": 0.40694444444444444,
       "nodes": 1,
       "requested_walltime": "01:10:00",
       "source": {
         "kind": "commit",
         "ref": "1d1bbfd6958bfac2cd35054a24abeebcfdb7da1b"
       },
-      "status": "QUEUED"
+      "status": "RUNNING"
     },
     {
       "allocated_seconds": 0,
@@ -1895,16 +1895,16 @@
       "log": "/work/xg24i002/x10041/LoopLora/logs/pbs/p1l-r128-m-B4-B3-s29-20261027-054035-2348295.log",
       "name": "p1l-r128-m-B4-B3-s29",
       "node_hours": 0.0,
-      "nodes": 1,
+      "nodes": 0,
       "requested_walltime": "02:00:00",
       "source": {
         "kind": "commit",
         "ref": "1d1bbfd6958bfac2cd35054a24abeebcfdb7da1b"
       },
-      "status": "QUEUED"
+      "status": "FINISH"
     },
     {
-      "allocated_seconds": 0,
+      "allocated_seconds": 1457,
       "argv": [
         "scripts/run_p1l_main.py",
         "main",
@@ -1918,21 +1918,21 @@
         "B8"
       ],
       "exit_code": null,
-      "host": null,
+      "host": "mg0846",
       "job_id": "3716404.opbs",
       "log": "/work/xg24i002/x10041/LoopLora/logs/pbs/p1l-r128-m-B8-s43-20261027-054035-2348309.log",
       "name": "p1l-r128-m-B8-s43",
-      "node_hours": 0.0,
+      "node_hours": 0.4047222222222222,
       "nodes": 1,
       "requested_walltime": "01:30:00",
       "source": {
         "kind": "commit",
         "ref": "1d1bbfd6958bfac2cd35054a24abeebcfdb7da1b"
       },
-      "status": "QUEUED"
+      "status": "RUNNING"
     },
     {
-      "allocated_seconds": 0,
+      "allocated_seconds": 1452,
       "argv": [
         "scripts/run_p1l_main.py",
         "main",
@@ -1946,21 +1946,21 @@
         "M1-L4"
       ],
       "exit_code": null,
-      "host": null,
+      "host": "mg0847",
       "job_id": "3716405.opbs",
       "log": "/work/xg24i002/x10041/LoopLora/logs/pbs/p1l-r128-m-M1-s43-20261027-054035-2348374.log",
       "name": "p1l-r128-m-M1-s43",
-      "node_hours": 0.0,
+      "node_hours": 0.4033333333333333,
       "nodes": 1,
       "requested_walltime": "01:30:00",
       "source": {
         "kind": "commit",
         "ref": "1d1bbfd6958bfac2cd35054a24abeebcfdb7da1b"
       },
-      "status": "QUEUED"
+      "status": "RUNNING"
     },
     {
-      "allocated_seconds": 0,
+      "allocated_seconds": 1215,
       "argv": [
         "scripts/run_p1l_main.py",
         "main",
@@ -1974,18 +1974,18 @@
         "B5-L4"
       ],
       "exit_code": null,
-      "host": null,
+      "host": "mg0845",
       "job_id": "3716406.opbs",
       "log": "/work/xg24i002/x10041/LoopLora/logs/pbs/p1l-r128-m-B5-s43-20261027-054035-2348390.log",
       "name": "p1l-r128-m-B5-s43",
-      "node_hours": 0.0,
+      "node_hours": 0.3375,
       "nodes": 1,
       "requested_walltime": "01:10:00",
       "source": {
         "kind": "commit",
         "ref": "1d1bbfd6958bfac2cd35054a24abeebcfdb7da1b"
       },
-      "status": "QUEUED"
+      "status": "RUNNING"
     },
     {
       "allocated_seconds": 0,
@@ -2008,8 +2008,232 @@
       "log": "/work/xg24i002/x10041/LoopLora/logs/pbs/p1l-r128-m-B4-B3-s43-20261027-054035-2348393.log",
       "name": "p1l-r128-m-B4-B3-s43",
       "node_hours": 0.0,
-      "nodes": 1,
+      "nodes": 0,
       "requested_walltime": "02:00:00",
+      "source": {
+        "kind": "commit",
+        "ref": "1d1bbfd6958bfac2cd35054a24abeebcfdb7da1b"
+      },
+      "status": "FINISH"
+    },
+    {
+      "allocated_seconds": 8,
+      "argv": [
+        "scripts/run_p1l_main.py",
+        "main",
+        "--out",
+        "/work/xg24i002/x10041/LoopLora/runs/p1l/main/main/B4-s43",
+        "--seed",
+        "43",
+        "--rank",
+        "32",
+        "--labels",
+        "B4"
+      ],
+      "exit_code": null,
+      "host": "mg0835",
+      "job_id": "3716612.opbs",
+      "log": "/work/xg24i002/x10041/LoopLora/logs/pbs/p1l-r32-one-B4-s43-20261027-065122-2745408.log",
+      "name": "p1l-r32-one-B4-s43",
+      "node_hours": 0.0022222222222222222,
+      "nodes": 1,
+      "requested_walltime": "00:57:26",
+      "source": {
+        "kind": "commit",
+        "ref": "d644b9ba3b30f7fcc2f13020272f457ee60aae40"
+      },
+      "status": "RUNNING"
+    },
+    {
+      "allocated_seconds": 9,
+      "argv": [
+        "scripts/run_p1l_main.py",
+        "main",
+        "--out",
+        "/work/xg24i002/x10041/LoopLora/runs/p1l/main/main/B3-L4-s43",
+        "--seed",
+        "43",
+        "--rank",
+        "32",
+        "--labels",
+        "B3-L4"
+      ],
+      "exit_code": null,
+      "host": "mg0854",
+      "job_id": "3716613.opbs",
+      "log": "/work/xg24i002/x10041/LoopLora/logs/pbs/p1l-r32-one-B3-L4-s43-20261027-065122-2745421.log",
+      "name": "p1l-r32-one-B3-L4-s43",
+      "node_hours": 0.0025,
+      "nodes": 1,
+      "requested_walltime": "00:58:20",
+      "source": {
+        "kind": "commit",
+        "ref": "d644b9ba3b30f7fcc2f13020272f457ee60aae40"
+      },
+      "status": "RUNNING"
+    },
+    {
+      "allocated_seconds": 8,
+      "argv": [
+        "scripts/run_p1l_main.py",
+        "main",
+        "--out",
+        "/work/xg24i002/x10041/LoopLora/runs/p1l/main/r128/main/B4-s17",
+        "--seed",
+        "17",
+        "--rank",
+        "128",
+        "--labels",
+        "B4"
+      ],
+      "exit_code": null,
+      "host": "mg0857",
+      "job_id": "3716614.opbs",
+      "log": "/work/xg24i002/x10041/LoopLora/logs/pbs/p1l-r128-one-B4-s17-20261027-065124-2745526.log",
+      "name": "p1l-r128-one-B4-s17",
+      "node_hours": 0.0022222222222222222,
+      "nodes": 1,
+      "requested_walltime": "00:57:38",
+      "source": {
+        "kind": "commit",
+        "ref": "1d1bbfd6958bfac2cd35054a24abeebcfdb7da1b"
+      },
+      "status": "RUNNING"
+    },
+    {
+      "allocated_seconds": 8,
+      "argv": [
+        "scripts/run_p1l_main.py",
+        "main",
+        "--out",
+        "/work/xg24i002/x10041/LoopLora/runs/p1l/main/r128/main/B3-L4-s17",
+        "--seed",
+        "17",
+        "--rank",
+        "128",
+        "--labels",
+        "B3-L4"
+      ],
+      "exit_code": null,
+      "host": "mg0859",
+      "job_id": "3716615.opbs",
+      "log": "/work/xg24i002/x10041/LoopLora/logs/pbs/p1l-r128-one-B3-L4-s17-20261027-065124-2745576.log",
+      "name": "p1l-r128-one-B3-L4-s17",
+      "node_hours": 0.0022222222222222222,
+      "nodes": 1,
+      "requested_walltime": "00:58:21",
+      "source": {
+        "kind": "commit",
+        "ref": "1d1bbfd6958bfac2cd35054a24abeebcfdb7da1b"
+      },
+      "status": "RUNNING"
+    },
+    {
+      "allocated_seconds": 8,
+      "argv": [
+        "scripts/run_p1l_main.py",
+        "main",
+        "--out",
+        "/work/xg24i002/x10041/LoopLora/runs/p1l/main/r128/main/B4-s29",
+        "--seed",
+        "29",
+        "--rank",
+        "128",
+        "--labels",
+        "B4"
+      ],
+      "exit_code": null,
+      "host": "mg0860",
+      "job_id": "3716616.opbs",
+      "log": "/work/xg24i002/x10041/LoopLora/logs/pbs/p1l-r128-one-B4-s29-20261027-065125-2745680.log",
+      "name": "p1l-r128-one-B4-s29",
+      "node_hours": 0.0022222222222222222,
+      "nodes": 1,
+      "requested_walltime": "00:57:38",
+      "source": {
+        "kind": "commit",
+        "ref": "1d1bbfd6958bfac2cd35054a24abeebcfdb7da1b"
+      },
+      "status": "RUNNING"
+    },
+    {
+      "allocated_seconds": 10,
+      "argv": [
+        "scripts/run_p1l_main.py",
+        "main",
+        "--out",
+        "/work/xg24i002/x10041/LoopLora/runs/p1l/main/r128/main/B3-L4-s29",
+        "--seed",
+        "29",
+        "--rank",
+        "128",
+        "--labels",
+        "B3-L4"
+      ],
+      "exit_code": null,
+      "host": "mg0865",
+      "job_id": "3716617.opbs",
+      "log": "/work/xg24i002/x10041/LoopLora/logs/pbs/p1l-r128-one-B3-L4-s29-20261027-065125-2745690.log",
+      "name": "p1l-r128-one-B3-L4-s29",
+      "node_hours": 0.002777777777777778,
+      "nodes": 1,
+      "requested_walltime": "00:58:21",
+      "source": {
+        "kind": "commit",
+        "ref": "1d1bbfd6958bfac2cd35054a24abeebcfdb7da1b"
+      },
+      "status": "RUNNING"
+    },
+    {
+      "allocated_seconds": 0,
+      "argv": [
+        "scripts/run_p1l_main.py",
+        "main",
+        "--out",
+        "/work/xg24i002/x10041/LoopLora/runs/p1l/main/r128/main/B4-s43",
+        "--seed",
+        "43",
+        "--rank",
+        "128",
+        "--labels",
+        "B4"
+      ],
+      "exit_code": null,
+      "host": null,
+      "job_id": "3716618.opbs",
+      "log": "/work/xg24i002/x10041/LoopLora/logs/pbs/p1l-r128-one-B4-s43-20261027-065127-2745852.log",
+      "name": "p1l-r128-one-B4-s43",
+      "node_hours": 0.0,
+      "nodes": 1,
+      "requested_walltime": "00:57:38",
+      "source": {
+        "kind": "commit",
+        "ref": "1d1bbfd6958bfac2cd35054a24abeebcfdb7da1b"
+      },
+      "status": "QUEUED"
+    },
+    {
+      "allocated_seconds": 0,
+      "argv": [
+        "scripts/run_p1l_main.py",
+        "main",
+        "--out",
+        "/work/xg24i002/x10041/LoopLora/runs/p1l/main/r128/main/B3-L4-s43",
+        "--seed",
+        "43",
+        "--rank",
+        "128",
+        "--labels",
+        "B3-L4"
+      ],
+      "exit_code": null,
+      "host": null,
+      "job_id": "3716619.opbs",
+      "log": "/work/xg24i002/x10041/LoopLora/logs/pbs/p1l-r128-one-B3-L4-s43-20261027-065127-2745857.log",
+      "name": "p1l-r128-one-B3-L4-s43",
+      "node_hours": 0.0,
+      "nodes": 1,
+      "requested_walltime": "00:58:21",
       "source": {
         "kind": "commit",
         "ref": "1d1bbfd6958bfac2cd35054a24abeebcfdb7da1b"

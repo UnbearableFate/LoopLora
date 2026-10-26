@@ -18,6 +18,11 @@ Requested walltimes include ceil1.5*(S*measured_step+measured_overhead+30s
 load reserve): r32 B4 57m26s/B3 58m20s; r128 B4 57m38s/B3 58m21s.
 Each fit a07:58JST finish when submitted. Project11/16 running at submission;
 eight new jobs await assignment, so check which start before about06:59JST.
+At06:52:12–13, six replacements3716612–3716617 actually started (r32s43 both;
+r128s17/s29 both). Their requested ends are07:49:38–07:50:34JST. R128s43
+3716618/3716619 remain queued at the16-job limit; a further slot is expected
+when r128 B5-s17 finishes around06:58. Check whether either can start by the
+07:58 margin cutoff; keep any that cannot fit queued for post-maintenance.
 Do not cancel/alter B1/B2s43 jobs3716304/3716305: retain for10/28 22:00.
 Exact evidence reports/p1l/dedicated-boundary-splits.json; one-time stdlib
 control script scripts/split_p1l_packed_jobs.py. It must NOT be rerun blindly.
@@ -61,8 +66,10 @@ message. Do not register duplicates or cancel the other pending watcher.
   name-contrastive gradients primary, raw secondary, unit-normalize after mean
   over512 fixed val questions. Final-step faithfulness vs actual name argmax.
 - Master Amendment B2 (merged7bfaf16) supersedes B1 and the original total cap.
-  S17000, Pilot5666, no study-total cap. Every job<=8nodes x2h, must finish
-  before2026-10-28 09:00JST. B2 explicitly accepts the900-step timing smokes.
+  S17000, Pilot5666, no study-total cap. Every job<=8nodes x2h. Its original
+  finish-before10/28 09:00 rule is superseded by the urgent operation-window
+  correction above: eligible work before10/27 08:00, remaining training and
+  confirmation after10/28 22:00. B2 accepts the900-step timing smokes.
 - Single GPU process, sequential backbone reuse, prefetch2. Oracle seed17 fixed.
   Main will pack B4/B3 sequentially; other trained variants separate jobs.
 - Confirmation is HELD. Orchestrator has NOT decided WP-L4; it promises to
