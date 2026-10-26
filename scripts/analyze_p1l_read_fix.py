@@ -21,14 +21,17 @@ def audit_run(folder,arm,release,reference,E=16):
     rec=json.loads((folder/'record.json').read_text())
     assert rec['status']=='complete' and rec['arm']==arm and rec['smoke'] is False
     assert rec['git_commit']==release['science_commit'] and rec['source_dirty'] is False
-    steps=release['steps']
+    steps=release['steps_by_arm'][arm]
     assert rec['config']==configuration(arm,steps,E=E)
     assert rec['config_hash']==stable_hash(rec['config'])
     assert rec['runtime']['deterministic_algorithms'] and rec['runtime']['cublas_workspace_config']==':4096:8'
     training=rec['training']
     assert training['actual_steps']==steps and training['training_episodes']==steps*32
     assert training['training_queries']==steps*128 and training['data_seed']==derive_seed(17,'llm','writer-data')
-    assert set(training['metrics'])=={str(steps*k//5) for k in range(1,6)}
+    primary=[steps*k//5 for k in range(1,6)]
+    matched=[6580] if arm=='OArho' and steps>=6580 else []
+    assert training['primary_eval_steps']==primary and training['matched_eval_steps']==matched
+    assert set(training['metrics'])=={str(s) for s in primary+matched}
     exported=torch.load(folder/'writer.pt',map_location='cpu',weights_only=True)
     assert exported['read_fix_version']==1 and exported['arm']==arm and exported['step']==steps
     assert 'value_head' not in exported and 'optimizer' not in exported
@@ -71,7 +74,7 @@ def write_csv(path,data):
         writer.writeheader(); writer.writerows(data)
 
 
-def run(root,out,release_path,*,e16_only=False,verify_export=False):
+def run(root,out,release_path,*,e16_only=False,verify_export=False,e8_release_path=None):
     out.mkdir(parents=True,exist_ok=True)
     release=json.loads(release_path.read_text())
     records,rows,logs,reference=[],[],[],{}
@@ -79,7 +82,8 @@ def run(root,out,release_path,*,e16_only=False,verify_export=False):
         rec,r,l=audit_run(root/'arms'/arm,arm,release,reference)
         records.append(rec); rows.extend(r); logs.extend(l)
     context=[dict(arm=r['arm'],config_hash=r['config_hash'],git_commit=r['git_commit'],
-        correct=r['training']['metrics'][str(release['steps'])]['correct']) for r in records]
+        steps=r['training']['actual_steps'],
+        correct=r['training']['metrics'][str(r['training']['actual_steps'])]['correct']) for r in records]
     choice=choose(records)
     lock_path=out/'selection.json'
     if lock_path.exists():
@@ -94,10 +98,12 @@ def run(root,out,release_path,*,e16_only=False,verify_export=False):
     if choice['action']=='retry_e8' and not e16_only:
         arm=choice['arm']
         assert {p.name for p in (root/'e8').iterdir() if p.is_dir()}=={arm}
-        rec,r,l=audit_run(root/'e8'/arm,arm,release,{},E=8)
+        assert e8_release_path is not None,'conditional E8 requires its own smoke-sized A1 release'
+        e8_release=json.loads(e8_release_path.read_text())
+        rec,r,l=audit_run(root/'e8'/arm,arm,e8_release,{},E=8)
         assert datetime.fromisoformat(rec['created_at'])>=datetime.fromisoformat(lock['created_at'])
         records.append(rec); rows.extend(r); logs.extend(l)
-        if rec['training']['metrics'][str(release['steps'])]['correct']>=800: selected,capacity=arm,8
+        if rec['training']['metrics'][str(rec['training']['actual_steps'])]['correct']>=800: selected,capacity=arm,8
     elif choice['action']!='retry_e8': assert not (root/'e8').exists()
     write_csv(out/'runs.csv',rows); write_csv(out/'loss_curves.csv',logs)
     import matplotlib
@@ -130,7 +136,7 @@ def run(root,out,release_path,*,e16_only=False,verify_export=False):
             try: metric=validate(experiment,out/f'export-check-{arm}-E{E}')
             finally: experiment.close()
             actual=load_samples(out/f'export-check-{arm}-E{E}'/'samples.npz')
-            expected=load_samples(folder/f"val-{release['steps']}"/'samples.npz')
+            expected=load_samples(folder/f"val-{rec['training']['actual_steps']}"/'samples.npz')
             assert np.array_equal(actual['prediction'],expected['prediction'])
             checks.append(dict(arm=arm,E=E,identical_predictions=True,training_head_absent=True,em=metric['em']))
     result=dict(**source_metadata(),records=records,rows=rows,selection=lock,
@@ -148,5 +154,7 @@ if __name__=='__main__':
     parser.add_argument('--release',type=Path,required=True)
     parser.add_argument('--e16-only',action='store_true')
     parser.add_argument('--verify-export',action='store_true')
+    parser.add_argument('--e8-release',type=Path)
     args=parser.parse_args()
-    run(args.root,args.out,args.release,e16_only=args.e16_only,verify_export=args.verify_export)
+    run(args.root,args.out,args.release,e16_only=args.e16_only,verify_export=args.verify_export,
+        e8_release_path=args.e8_release)

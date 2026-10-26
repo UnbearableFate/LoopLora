@@ -12,7 +12,8 @@ from looplora.infra.seeds import derive_seed
 from looplora.llm.inject import load_tokenizer
 from looplora.llm.read_fix import (ReadFixExperiment,configuration,gram_read,raw_read_loss,
     key_decorrelation,question_terms,extra_losses,controlled_score,diagnostics)
-from looplora.llm.read_fix_run import save_checkpoint,load_inference,require_prior,choose
+from looplora.llm.read_fix_run import (save_checkpoint,load_inference,require_prior,choose,
+    largest_schedule,scheduled_steps,eligible_e8)
 from looplora.llm.train import make_task_spec
 from looplora.llm.writer_fix import auxiliary_losses
 
@@ -175,6 +176,27 @@ def test_selection_oracle_exclusion_and_single_E8_gate():
     assert choose(records({'OArho':1000,'RK':499}))['action']=='stop'
     assert choose(records({'R':500,'Rrho':500}))==dict(action='retry_e8',arm='R',E=8,correct={'R':500,'Rrho':500,'RK':0})
     assert choose(records({'Rrho':799,'RK':700}))['arm']=='Rrho'
+
+
+def test_A1_schedule_is_maximal_with_five_integer_intervals():
+    step,evaluation=.213,12.
+    steps=largest_schedule(step,evaluation)
+    assert steps%5==0 and (steps*step+5*evaluation)*1.5+90<=7200
+    assert ((steps+5)*step+5*evaluation)*1.5+90>7200
+    with pytest.raises(ValueError): largest_schedule(float('nan'),12.)
+    with pytest.raises(ValueError): largest_schedule(.2,10000.)
+    schedule=dict(amendment='A1',E=16,steps_by_arm={'R':20000,'RK':19000})
+    assert scheduled_steps(['R','RK'],None,schedule)=={'R':20000,'RK':19000}
+    with pytest.raises(ValueError): scheduled_steps(['R'],8225,schedule)
+    with pytest.raises(ValueError): scheduled_steps(['R'],None,schedule,E=8)
+    with pytest.raises(ValueError): scheduled_steps(['R'],None,None)
+
+
+def test_E8_consumes_the_auditor_nested_selection_lock():
+    lock=dict(choice=choose(records({'R':600,'RK':700})),context_hash='locked')
+    assert eligible_e8(lock,['RK'])==8
+    with pytest.raises(ValueError): eligible_e8(lock,['R'])
+    with pytest.raises(ValueError): eligible_e8(dict(choice=choose(records({'R':800}))),['R'])
 
 
 def test_full_checkpoint_audit_without_optimizer_steps(model,tokenizer,tmp_path):

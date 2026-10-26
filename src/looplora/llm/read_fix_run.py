@@ -5,6 +5,7 @@ import argparse
 from concurrent.futures import ProcessPoolExecutor
 from datetime import datetime,timezone
 import json
+import math
 import multiprocessing
 import os
 from pathlib import Path
@@ -96,12 +97,47 @@ def validate(experiment,out,count=1000):
     return metrics
 
 
+def largest_schedule(step_seconds,eval_seconds,*,evaluations=5,wall_seconds=7200,reserve=90,margin=1.5):
+    if not all(math.isfinite(v) and v>0 for v in (step_seconds,eval_seconds,wall_seconds,margin)) or reserve<0:
+        raise ValueError('schedule requires positive finite timings and nonnegative reserve')
+    available=(wall_seconds-reserve)/margin-evaluations*eval_seconds
+    steps=5*math.floor(available/step_seconds/5)
+    if steps<5:
+        raise ValueError('evaluations/setup leave no training budget')
+    return steps
+
+
+def scheduled_steps(arms,steps,schedule,*,smoke=False,E=16):
+    if smoke:
+        if schedule is not None or steps is None or steps<5:
+            raise ValueError('smoke requires its explicit step count')
+        return {arm:steps for arm in arms}
+    if steps is not None or schedule is None:
+        raise ValueError('scientific arms require an immutable A1 schedule release')
+    if schedule['amendment']!='A1' or schedule['E']!=E:
+        raise ValueError('schedule amendment/capacity mismatch')
+    result={arm:schedule['steps_by_arm'][arm] for arm in arms}
+    if any(isinstance(v,bool) or not isinstance(v,int) or v<5 or v%5 for v in result.values()):
+        raise ValueError('scientific schedules require five equal integer intervals')
+    return result
+
+
+def eligible_e8(lock,arms):
+    choice=lock['choice']
+    if choice['action']!='retry_e8' or choice['arm'] not in SIMPLICITY or arms!=[choice['arm']]:
+        raise ValueError('E8 requires the one audited eligible arm')
+    return 8
+
+
 def fit(experiment,out,steps,*,evaluate=True):
     options=experiment.config['train']
     seed=derive_seed(17,'llm','writer-data')
     params=experiment.trainable_parameters()
     optimizer=torch.optim.AdamW(params,lr=.003,weight_decay=.01)
-    checkpoints={round(steps*k/5) for k in range(1,6)}
+    primary={round(steps*k/5) for k in range(1,6)}
+    # Preserve the task's matched-step OA comparison under A1's different budgets.
+    matched={6580} if experiment.read_arm=='OArho' and not experiment.config['smoke'] and steps>=6580 else set()
+    checkpoints=primary|matched
     stream=BatchStream(make_task_spec(experiment.config),'train',32,seed,steps,
                        tokenizer=experiment.tokenizer,workers=2)
     metrics,durations={},[]
@@ -133,11 +169,12 @@ def fit(experiment,out,steps,*,evaluate=True):
                 print(json.dumps(dict(arm=experiment.read_arm,**row)),flush=True)
             if evaluate and step in checkpoints:
                 metrics[str(step)]=validate(experiment,out/f'val-{step}',experiment.config['eval']['episodes'])
-            if time.perf_counter()-tick>3450 and step!=steps:
+            if time.perf_counter()-tick>7000 and step!=steps:
                 raise RuntimeError('fixed WP-L4 schedule exceeded its measured allowance')
     save_checkpoint(experiment,optimizer,out,steps)
     result=dict(actual_steps=steps,training_episodes=steps*32,training_queries=steps*128,
-        eval_steps=sorted(checkpoints) if evaluate else [],metrics=metrics,data_seed=seed,
+        eval_steps=sorted(checkpoints) if evaluate else [],primary_eval_steps=sorted(primary),
+        matched_eval_steps=sorted(matched),metrics=metrics,data_seed=seed,
         seconds=time.perf_counter()-tick,
         steady_step_mean_seconds=float(np.mean(durations[min(10,len(durations)-1):])),
         step_p95_seconds=float(np.quantile(durations,.95)))
@@ -200,23 +237,25 @@ if __name__=='__main__':
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--arms',nargs='+',choices=ARMS,required=True)
     parser.add_argument('--out',type=Path,required=True)
-    parser.add_argument('--steps',type=int,required=True)
+    budget=parser.add_mutually_exclusive_group(required=True)
+    budget.add_argument('--steps',type=int)
+    budget.add_argument('--schedule',type=Path)
     parser.add_argument('--smoke',action='store_true')
     parser.add_argument('--prior-decision',type=Path)
     parser.add_argument('--prior-report',type=Path)
     parser.add_argument('--e8-decision',type=Path)
     args=parser.parse_args()
-    if not 1<=len(args.arms)<=2 or len(set(args.arms))!=len(args.arms) or args.steps<5:
+    if not 1<=len(args.arms)<=2 or len(set(args.arms))!=len(args.arms):
         raise ValueError('one job runs one or two distinct arms for at least five steps')
     E=16
-    if not args.smoke:
+    if not args.smoke or args.e8_decision:
         require_prior(args.prior_decision,args.prior_report)
-        if args.steps%5: raise ValueError('scientific schedule requires five equal intervals')
-        if args.e8_decision:
-            decision=json.loads(args.e8_decision.read_text())
-            if decision['action']!='retry_e8' or args.arms!=[decision['arm']]:
-                raise ValueError('E8 requires the one locked eligible arm')
-            E=8
+    if args.e8_decision:
+        E=eligible_e8(json.loads(args.e8_decision.read_text()),args.arms)
+    schedule=None if args.schedule is None else json.loads(args.schedule.read_text())
+    steps=scheduled_steps(args.arms,args.steps,schedule,smoke=args.smoke,E=E)
+    if schedule is not None and schedule['science_commit']!=source_metadata()['git_commit']:
+        raise ValueError('scientific code must match its frozen schedule release')
     with ProcessPoolExecutor(max_workers=2,mp_context=multiprocessing.get_context('spawn')) as pool:
-        records=list(pool.map(_task,[(a,str(args.out/a),args.steps,E,args.smoke) for a in args.arms]))
+        records=list(pool.map(_task,[(a,str(args.out/a),steps[a],E,args.smoke) for a in args.arms]))
     _write_json(args.out/('shard-'+'-'.join(args.arms)+'.json'),dict(runs=records,procs=len(args.arms)))
