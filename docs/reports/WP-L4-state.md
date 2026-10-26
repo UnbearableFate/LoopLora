@@ -1,5 +1,13 @@
 # WP-L4 CURRENT — Amendment A2, all science submitted
 
+CURRENT ARMED WAKE-UP: job3716160.opbs, event
+.job-wakeup/ab5a16c0-aff3-4f80-b5b2-603b100b891a, worker2095488, message-mode,
+5minpoll; thread01a1779d-c123-75a1-9458-ae849ee0fcde. NoGoal. Previous smoke
+eventdebda6d3 acknowledged. Scientificreceipt/state commita5e5aa6; current
+analyzercode can be run from this orlaterexplicitwp/llmhash. Firstinspect/ack
+new event, then checkALL4jobs/ALL7records before selectionaudit; no newtraining
+except the singleconditionalE8 prescribed below. Allscienceimmutablesources.
+
 All three r128scientific arms SUBMITTED04:56:45JST, before ANY WP-L4 quality
 score was read; none read yet even after that boundary. Both newjobs started
 04:57:31JST, in parallel with unchangedrank32jobs. NoPBSjob was canceled.
