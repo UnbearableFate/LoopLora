@@ -26,6 +26,11 @@ P4_LATENCY = "reports/p4s/latency.csv"
 IS_DESIGN = "reports/is/design.json"
 IS_ACCURACY = "reports/is/accuracy.csv"
 IS_ENDPOINTS = "reports/is/endpoints.csv"
+JS_DESIGN = "reports/js/design.json"
+JS_ACCURACY = "reports/js/accuracy.csv"
+JS_ENDPOINTS = "reports/js/endpoints.csv"
+JS_TRAINING = "reports/js/training_manifest.csv"
+JS_CHECKPOINTS = "reports/js/checkpoint_manifest.csv"
 DEPTHS = [0, 1, 2, 3, 4, 6, 8, 12, 16]
 SEEDS = [17, 29, 43]
 F2_LIMIT = (
@@ -443,6 +448,138 @@ class Figures:
                          "No E24/E36-trained models, fixed-L4 retraining, updated-fact episodes, or descriptive joint-writer rows are included."],
                   points=points)
 
+    def js_overshoot(self) -> None:
+        design = self.data.load(JS_DESIGN)
+        rows = self.data.load(JS_ACCURACY)
+        endpoints = self.data.load(JS_ENDPOINTS)
+        training = self.data.load(JS_TRAINING)
+        checkpoints = self.data.load(JS_CHECKPOINTS)
+        depths = list(range(1, 17))
+        confirmation = design["confirmation"]
+        if (confirmation["seed"] != 999003 or confirmation["episodes"] != 2000
+                or confirmation["hops"] != list(range(1, 9))
+                or confirmation["depths"] != depths or design["seeds"] != SEEDS
+                or design["model"]["r"] != 32 or design["model"]["r_mem"] != 32):
+            raise ValueError("JS figure requires the committed rank 32 C999003 design with three training seeds")
+        if (design["training"]["steps"] != 15000
+                or design["training"]["loop_sampling"] != "one independent Uniform{4,5,6,7,8} draw per batch"
+                or design["penalty"]["gamma"] != .9 or design["penalty"]["lambda_J"] != 1
+                or design["penalty"]["method"]["method"] != "exact_eigvals"):
+            raise ValueError("JS random-depth/exact-Jacobian penalty protocol differs from the figure")
+        styles = [("RS", "RS: sampled L = 4–8", "#D55E00", "-"),
+                  ("RS+J", "RS+J: sampled L = 4–8 + penalty", "#0072B2", "-"),
+                  ("M1-L4", "M1-L4 reference", "#009E73", "--"),
+                  ("M1-mixed", "M1-mixed reference", "0.4", ":")]
+        subsets = [("1–3", list(range(1, 4))), ("4–8", list(range(4, 9)))]
+        fig, axes = self.plt.subplots(2, 2, figsize=(10.4, 7.2), sharex=True, sharey="col")
+        points, selectors, checkpoint_ids = [], [], []
+        column_maxima = [0., 0.]
+        for index, writer in enumerate(("oracle_random", "joint_fact")):
+            writer_label = "Random oracle" if writer == "oracle_random" else "Factorized joint"
+            for condition, label, color, linestyle in styles:
+                for seed in SEEDS:
+                    checkpoint = one(checkpoints, writer=writer, condition=condition, seed=seed)
+                    checkpoint_ids.append({key: checkpoint[key] for key in
+                                           ("name", "writer", "condition", "seed", "checkpoint_hash")})
+                    if condition in ("RS", "RS+J"):
+                        entry = one(training, writer=writer, condition=condition, seed=seed)
+                        if (entry["steps"] != "15000" or entry["batch_size"] != "64"
+                                or entry["lr"] != "0.003"):
+                            raise ValueError("JS new conditions require 15,000 steps, batch size 64 and learning rate 0.003")
+                for column, (hop_label, hops) in enumerate(subsets):
+                    means = []
+                    selectors.append(dict(source=JS_ACCURACY, selector=dict(
+                        writer=writer, condition=condition, seed=SEEDS, hop=hops, L=depths)))
+                    for depth in depths:
+                        per_seed = []
+                        for seed in SEEDS:
+                            cells = [one(rows, writer=writer, condition=condition,
+                                         seed=seed, hop=hop, L=depth) for hop in hops]
+                            if any(cell["n"] != "2000" for cell in cells):
+                                raise ValueError("JS accuracy cells must contain 2,000 episodes per seed and hop")
+                            per_seed.append(dict(seed=seed, source_cells=cells,
+                                accuracy=sum(float(cell["accuracy"]) for cell in cells) / len(hops)))
+                        mean = sum(point["accuracy"] for point in per_seed) / len(SEEDS)
+                        means.append(100 * mean)
+                        points.append(dict(kind="absolute_depth_profile", source=JS_ACCURACY,
+                            writer=writer, condition=condition, L=depth, hops=hops,
+                            accuracy=mean, n_queries=2000 * len(SEEDS) * len(hops),
+                            ci_available=False, training_seeds=SEEDS, per_seed=per_seed))
+                    column_maxima[column] = max(column_maxima[column], max(means))
+                    axes[index, column].plot(depths, means, label=label, color=color,
+                        linestyle=linestyle, linewidth=1.9 if condition == "RS+J" else 1.5,
+                        marker="o" if condition in ("RS", "RS+J") else None,
+                        markersize=2.5, markevery=[0, 3, 7, 11, 15])
+                    suffix = " (zoomed)" if column == 1 else ""
+                    axes[index, column].set(title=f"{writer_label}: hops {hop_label}{suffix}")
+            short_summary = ["S = A(16) − A(4), hops 1–3 (pp)"]
+            for condition in ("RS", "RS+J"):
+                selector = dict(endpoint="JS-E1-S", writer=writer, condition=condition,
+                                comparator=condition, L_a=16, L_b=4, hops="1-3", confidence="0.975")
+                endpoint = one(endpoints, **selector)
+                value, low, high = (100 * float(endpoint[key])
+                                    for key in ("difference", "ci_low", "ci_high"))
+                short_summary.append(f"{condition}: {value:+.2f} [{low:+.2f}, {high:+.2f}]")
+                points.append(dict(kind="registered_overshoot", source=JS_ENDPOINTS, source_row=endpoint))
+                selectors.append(dict(source=JS_ENDPOINTS, selector=selector))
+            axes[index, 0].text(.98, .96, "\n".join(short_summary), transform=axes[index, 0].transAxes,
+                va="top", ha="right", fontsize=7.3,
+                bbox=dict(boxstyle="round,pad=.4", facecolor="white", alpha=.9, edgecolor="0.85"))
+            selector = dict(endpoint="JS-E3", writer=writer, condition="RS+J", comparator="RS",
+                            L_a=16, L_b=16, hops="4-8", confidence="0.975")
+            endpoint = one(endpoints, **selector)
+            value, low, high = (100 * float(endpoint[key])
+                                for key in ("difference", "ci_low", "ci_high"))
+            axes[index, 1].text(.98, .96,
+                f"L = 16, RS+J − RS (pp)\n{value:+.2f} [{low:+.2f}, {high:+.2f}]",
+                transform=axes[index, 1].transAxes, va="top", ha="right", fontsize=7.3,
+                bbox=dict(boxstyle="round,pad=.4", facecolor="white", alpha=.9, edgecolor="0.85"))
+            points.append(dict(kind="registered_long_hop_contrast", source=JS_ENDPOINTS, source_row=endpoint))
+            selectors.append(dict(source=JS_ENDPOINTS, selector=selector))
+            for ax in axes[index]:
+                ax.axvspan(4, 8, color="0.85", alpha=.3, zorder=-1)
+                ax.set(xlim=(.7, 16.3), xticks=[1, 4, 8, 12, 16],
+                       ylabel="Candidate accuracy (%)")
+                ax.tick_params(axis="y", labelleft=True)
+                ax.grid(axis="y", color="0.91", linewidth=.6)
+        # Leave room for the callouts while sharing each hop subset's scale across writers.
+        long_limit = min(102, max(10, 5 * (int(1.2 * column_maxima[1] / 5) + 1)))
+        for index in range(2):
+            axes[index, 0].set_ylim(0, 102)
+            axes[index, 1].set_ylim(0, long_limit)
+        for ax in axes[1]:
+            ax.set_xlabel("Reader updates L")
+        fig.suptitle("JS: depth profiles with a final-state Jacobian penalty", y=1.01, fontsize=12)
+        fig.legend(*axes[0, 0].get_legend_handles_labels(), loc="lower center", ncol=2,
+                   bbox_to_anchor=(.5, -.015), frameon=False)
+        fig.tight_layout(rect=(0, .09, 1, 1))
+        fig.text(.5, -.14, "C999003: test seed 999003; equal means over training seeds 17/29/43 and the stated hops. "
+                 "Curves: no supplied absolute CIs; callouts: existing 97.5% paired intervals.\n"
+                 "RS/RS+J: 15,000 steps, sampled L = 4–8 (shaded). References: fixed L = 4 or mixed L = 1/2/4. "
+                 "All models: rank 32, shared-step M1.\n"
+                 "RS+J penalizes the exact Jacobian spectral radius at reached z_L (gamma = 0.9, weight = 1); "
+                 "this is not a contraction or answer-correctness certificate.\n"
+                 "Y scales differ by column, start at zero, and are shared across writers; long-hop panels are zoomed.",
+                 ha="center", fontsize=8)
+        selectors.extend([
+            dict(source=JS_DESIGN, selector=dict(fields=["confirmation", "seeds", "model", "training", "penalty"])),
+            dict(source=JS_TRAINING, selector=dict(writer=["oracle_random", "joint_fact"],
+                 condition=["RS", "RS+J"], seed=SEEDS, steps=15000, batch_size=64)),
+            dict(source=JS_CHECKPOINTS, selector=dict(checkpoints=checkpoint_ids))])
+        self.save(fig, "js_overshoot", claims=["JS1", "JS3", "JS5"],
+            scope="C999003; three fixed training seeds; absolute profiles and existing 97.5% contrasts",
+            selectors=selectors,
+            notes=["All scientific input comes from committed reports/js summaries; checkpoint paths are never opened.",
+                   "Two writers × short hops 1–3/long hops 4–8; each curve equally averages seeds 17/29/43 and its hop subset.",
+                   "RS/RS+J use 15,000 steps, batch size 64, learning rate 0.003 and one uniform L = 4–8 draw per batch, with paired data/depth RNG streams.",
+                   "M1-L4 and M1-mixed are unchanged registered references with distinct training-depth protocols.",
+                   "Curves have no supplied absolute CIs; callouts reuse JS-E1-S and JS-E3 at confidence 0.975 exactly. No bootstrap rerun.",
+                   "S is A(16) − A(4) on hops 1–3; a negative S denotes retained depth damage. Do not equate reduced overshoot with removal.",
+                   "RS+J uses exact eigenvalues for the penalty relu(radius(J(z_L)) − 0.9)^2 with weight 1, not a fixed-point/contraction/correctness certificate.",
+                   f"Y scales start at zero and are shared within each column: short hops 0–102%, long hops 0–{long_limit:g}%; the long-hop column is explicitly labeled zoomed.",
+                   "Stopped-policy rows are excluded; no sentinel depth is treated as an extra read. No per-query radii or models are recomputed."],
+            points=points)
+
     def write_provenance(self) -> None:
         manifest = {"source_revision": self.data.revision,
                     "scientific_input_policy": "git show resolved-commit:path; no workspace scientific inputs",
@@ -501,6 +638,7 @@ def main() -> None:
     figures.budget_latency()
     figures.stopping_latency()
     figures.memory_load_depth()
+    figures.js_overshoot()
     figures.write_provenance()
     print(json.dumps({"status": "complete", "source_revision": data.revision,
                       "output": str(figures.destination), "figures": [entry["name"] for entry in figures.entries],
