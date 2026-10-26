@@ -1,0 +1,21 @@
+{
+  "task": "WP-C5",
+  "budget_node_hours": 0.5,
+  "allocated_seconds": 572,
+  "allocated_node_hours": 0.15888888888888889,
+  "cost_source": "qstat_json.py -H elapsed_seconds for the eight exact job IDs; application exits verified from logs",
+  "jobs": [
+    {"job_id": "3714405.opbs", "purpose": "initial core and integration tests", "host": "mg0027", "requested_seconds": 300, "allocated_seconds": 30, "exit_code": 0, "result": "150 passed in 22.15s; initial bulk-projection implementation"},
+    {"job_id": "3714416.opbs", "purpose": "initial pinned-model smoke", "host": "mg0023", "requested_seconds": 180, "allocated_seconds": 24, "exit_code": 1, "source_commit": "3919bac", "result": "Residual/all_tokens fixed loss exceeded the original relative 1e-5 tolerance; investigated, not suppressed"},
+    {"job_id": "3714443.opbs", "purpose": "reference-repeat and projection drift probe", "host": "mg0018", "requested_seconds": 180, "allocated_seconds": 22, "exit_code": 0, "result": "o_proj/fact_final loss repeat exact; FP32 bulk-versus-token projection differences observed"},
+    {"job_id": "3714447.opbs", "purpose": "four-case diagnostic, first attempt", "host": "mg0018", "requested_seconds": 180, "allocated_seconds": 22, "exit_code": 1, "result": "Diagnostic-only gather omitted clamping padded positions; corrected without a production change"},
+    {"job_id": "3714454.opbs", "purpose": "four-case numerical probe", "host": "mg0024", "requested_seconds": 180, "allocated_seconds": 23, "exit_code": 0, "result": "Isolated residual/all_tokens mismatch; reference and fast each repeat exactly; bulk projection error 4.96e-5, relative state drift 3.44e-7; TF32 disabled, highest FP32 precision"},
+    {"job_id": "3714480.opbs", "purpose": "final tests and pinned-model/timing smoke", "host": "mg0002", "requested_seconds": 300, "allocated_seconds": 49, "exit_code": 0, "source_commit": "e60169f", "result": "150 passed in 22.55s; four real-model loss/state checks passed; both policies batch32 smoke complete in 17.55 application seconds"},
+    {"job_id": "3714489.opbs", "purpose": "full 24-cell benchmark, one and two processes", "host": "mg0002", "requested_seconds": 600, "allocated_seconds": 395, "exit_code": 0, "source_commit": "e60169f", "result": "All cells fit; 720 measured worker steps plus warmup/profiles; 387.616 application seconds"},
+    {"job_id": "3714538.opbs", "purpose": "final audit and compact report export", "host": "mg0016", "requested_seconds": 180, "allocated_seconds": 7, "exit_code": 0, "source_commit": "a8371ac", "result": "24-cell coverage, throughput/peak accounting, four fixed losses, profiling coverage and phase partitions passed"}
+  ],
+  "all_jobs_one_node": true,
+  "all_jobs_within_one_hour": true,
+  "logs_root": "/work/xg24i002/x10041/LoopLora/logs/pbs/",
+  "raw_root": "/work/xg24i002/x10041/LoopLora/runs/fast-write/"
+}
