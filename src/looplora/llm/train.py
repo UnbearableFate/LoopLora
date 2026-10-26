@@ -16,12 +16,13 @@ from torch.nn import functional as F
 
 from looplora.core.adapters import make_adapter
 from looplora.core.config import AdapterConfig, validate_steps
-from looplora.data.relations import TaskSpec, generate
+from looplora.data.relations import TaskSpec
 from looplora.infra.seeds import derive_seed
 from .batching import PreparedBatch, repeat_snapshot, tokenize_batch
 from .inject import (MODEL_ID, MODEL_REVISION, AdapterBank, attach_adapters,
                      configure_numerics, detach_adapters, load_model, load_tokenizer)
 from .protocols import SupportSnapshot, answer_scores, encode_support
+from .prefetch import BatchStream
 
 WRITER_NAMES = ("A", "K", "V", "a_lambda", "a_beta", "w_lambda", "w_beta")
 
@@ -161,13 +162,14 @@ class LLMExperiment:
         finally:
             module.adapter = reader
 
-    def prepare(self, arrays, protocol=None, *, truncate=True) -> PreparedBatch:
+    def prepare(self, arrays, protocol=None, *, truncate=True, tokens=None) -> PreparedBatch:
         if self._closed:
             raise RuntimeError("experiment is closed")
         protocol = self.config["protocol"] if protocol is None else protocol
         if protocol not in {"memory_only", "context_retained"}:
             raise ValueError(f"unknown protocol: {protocol}")
-        tokens = tokenize_batch(arrays, self.tokenizer, device=self.device)
+        tokens = (tokenize_batch(arrays, self.tokenizer, device=self.device)
+                  if tokens is None else tokens.to(self.device))
         B = tokens.support_ids.shape[0]
         if protocol == "memory_only" and self.writer is None:
             # Support never enters either the backbone attention or a writer.
@@ -239,17 +241,20 @@ def _fit(experiment: LLMExperiment, out: Path) -> dict[str, Any]:
     final_loss, train_tokens = None, 0
     synchronize(experiment.device)
     started = time.perf_counter()
-    with (out / "train_log.jsonl").open("w") as log:
+    with (out / "train_log.jsonl").open("w") as log, BatchStream(
+        spec, "train", options["batch_size"], data_seed, steps,
+        tokenizer=experiment.tokenizer, workers=options.get("prefetch_workers", 0),
+    ) as batches:
         for step in range(steps):
             synchronize(experiment.device)
             begin = time.perf_counter()
-            arrays = generate(spec, "train", step * options["batch_size"], options["batch_size"], data_seed)
+            arrays, tokens = next(batches)
             L = int(depth_rng.choice(depths))
             warmup = min(1., (step + 1) / max(1, options["warmup_steps"]))
             for group in optimizer.param_groups:
                 group["lr"] = options["lr"] * warmup
             optimizer.zero_grad(set_to_none=True)
-            batch = experiment.prepare(arrays)
+            batch = experiment.prepare(arrays, tokens=tokens)
             logits, _ = experiment.score(batch, L)
             loss = F.cross_entropy(logits.float().flatten(0, 1), batch.answer_ids.flatten())
             if not torch.isfinite(loss):

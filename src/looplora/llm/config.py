@@ -21,7 +21,8 @@ DEFAULTS: dict[str, Any] = {
     "task": {"name": "t2_chain_end", "E": 24, "Q": 4, "V": 1024, "n_rel": 4,
              "chain_lengths": [8, 8, 8], "hops": [1, 2, 3]},
     "train": {"steps": 1000, "batch_size": 8, "lr": .0003, "weight_decay": .01,
-              "grad_clip": 1., "warmup_steps": 20, "depths": [1, 2, 4], "log_every": 10},
+              "grad_clip": 1., "warmup_steps": 20, "depths": [1, 2, 4], "log_every": 10,
+              "prefetch_workers": 0},
     "eval": {"episodes": 2000, "batch_size": 16, "depths": [0, 1, 2, 3, 4, 6, 8],
              "splits": ["val"], "hops": list(range(1, 9)), "seed": 4242,
              "counterfactuals": True, "protocols": ["memory_only"],
@@ -117,6 +118,7 @@ def resolve_config(mapping: Mapping[str, Any]) -> dict[str, Any]:
     for key in ("steps", "batch_size", "log_every"):
         _integer(config["train"][key], f"train.{key}")
     _integer(config["train"]["warmup_steps"], "train.warmup_steps", 0)
+    _integer(config["train"]["prefetch_workers"], "train.prefetch_workers", 0)
     _distinct(config["train"]["depths"], "train.depths", 1)
     if stage in ("writer", "lora_ctx") or variant == "B4":
         config["train"]["depths"] = [1]
