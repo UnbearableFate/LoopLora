@@ -1,0 +1,78 @@
+{
+  "activation": "relu",
+  "device": "cuda:0",
+  "eval": {
+    "allow_confirmation": false,
+    "batch_size": 16,
+    "counterfactuals": false,
+    "depths": [
+      1
+    ],
+    "episodes": 1000,
+    "hops": [
+      1
+    ],
+    "protocols": [
+      "memory_only"
+    ],
+    "seed": 4242,
+    "splits": [
+      "val"
+    ]
+  },
+  "model": {
+    "alpha": 1.0,
+    "layer": 14,
+    "r": 32,
+    "rho": 0.25
+  },
+  "name": "E12-fact_final-lr3e-4",
+  "protocol": "memory_only",
+  "seed": 17,
+  "smoke": false,
+  "stage": "writer",
+  "stats": {
+    "resamples": 2000,
+    "seed": 2718
+  },
+  "task": {
+    "E": 12,
+    "Q": 4,
+    "V": 1024,
+    "base": null,
+    "chain_lengths": null,
+    "head_sharing": 0.3,
+    "hops": [
+      1
+    ],
+    "missing_rate": 0.5,
+    "n_distract": 0,
+    "n_rel": 4,
+    "n_updates": 2,
+    "name": "t1",
+    "seen": [
+      0,
+      768
+    ],
+    "unseen": [
+      768,
+      1024
+    ],
+    "update_query_rate": 0.5
+  },
+  "train": {
+    "batch_size": 32,
+    "depths": [
+      1
+    ],
+    "grad_clip": 1.0,
+    "log_every": 10,
+    "lr": 0.0003,
+    "steps": 1500,
+    "warmup_steps": 20,
+    "weight_decay": 0.01
+  },
+  "variant": "M1",
+  "write_policy": "fact_final",
+  "writer_checkpoint": null
+}

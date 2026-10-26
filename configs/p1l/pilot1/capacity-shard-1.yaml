@@ -1,0 +1,14 @@
+[
+  {
+    "name": "E24-fact_final-lr3e-4",
+    "config": "E24-fact_final-lr3e-4.yaml"
+  },
+  {
+    "name": "E8-fact_final-lr3e-4",
+    "config": "E8-fact_final-lr3e-4.yaml"
+  },
+  {
+    "name": "E12-fact_final-lr3e-4",
+    "config": "E12-fact_final-lr3e-4.yaml"
+  }
+]
