@@ -1,0 +1,41 @@
+- name: writer
+  config: smoke-writer.yaml
+- name: frozen-M1
+  config: smoke-reader.yaml
+  writer_from: writer
+- name: frozen-M1-lin
+  config: smoke-reader.yaml
+  writer_from: writer
+  overrides: {variant: M1-lin}
+- name: frozen-B5
+  config: smoke-reader.yaml
+  writer_from: writer
+  overrides: {variant: B5}
+- name: frozen-B3
+  config: smoke-reader.yaml
+  writer_from: writer
+  overrides: {variant: B3}
+- name: frozen-B4
+  config: smoke-reader.yaml
+  writer_from: writer
+  overrides: {variant: B4}
+- name: joint-M1
+  config: smoke-joint.yaml
+- name: joint-M1-lin
+  config: smoke-joint.yaml
+  overrides: {variant: M1-lin}
+- name: joint-B5
+  config: smoke-joint.yaml
+  overrides: {variant: B5}
+- name: joint-B3
+  config: smoke-joint.yaml
+  overrides: {variant: B3}
+- name: joint-B4
+  config: smoke-joint.yaml
+  overrides: {variant: B4}
+- name: lora-context
+  config: smoke-lora.yaml
+- name: parallel-context
+  config: smoke-parallel.yaml
+- name: baseline-both-protocols
+  config: smoke-baseline.yaml

@@ -1,0 +1,13 @@
+name: smoke-writer
+seed: 20261027
+stage: writer
+variant: M1
+protocol: memory_only
+write_policy: fact_final
+smoke: true
+train:
+  steps: 100
+  warmup_steps: 2
+eval:
+  episodes: 200
+  splits: [val]

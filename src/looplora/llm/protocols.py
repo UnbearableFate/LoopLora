@@ -29,6 +29,10 @@ class AnswerScores:
     token_loss: Tensor
 
 
+class _SupportComplete(Exception):
+    """Internal control flow: the single memory writer has finished its work."""
+
+
 def _mask(ids: Tensor, mask: Tensor | None, name: str) -> Tensor:
     if ids.ndim != 2 or ids.shape[1] == 0:
         raise ValueError(f"{name} ids must be nonempty [batch, tokens]")
@@ -65,13 +69,15 @@ def _support_attention(valid: Tensor, reset: Tensor | None, dtype: torch.dtype):
 def encode_support(
     model, context_ids: Tensor, attn_mask: Tensor, write_policy: str = "all_tokens", *,
     fact_final: Tensor | None = None, protocol: str = "memory_only", loop_steps: int = 1,
-    reset: Tensor | None = None,
+    reset: Tensor | None = None, truncate: bool = False,
 ) -> SupportSnapshot:
     """Write support and retain only M, or M plus a forkable backbone cache.
 
     Optional reset masks also isolate backbone attention between packed episodes;
     the returned cache exposes only the final episode in each row.
     Gradients are preserved; inference callers can use torch.no_grad().
+    With one adapter, truncate=True stops after its support write. This is only
+    valid for memory-only: no upper-layer output or backbone KV is requested.
     """
     if protocol not in {"memory_only", "context_retained"}:
         raise ValueError(f"unknown protocol: {protocol}")
@@ -89,12 +95,33 @@ def encode_support(
     attention, positions, retained_valid = _support_attention(valid, reset, model.dtype)
     bank = model.looplora_adapters
     keep_cache = protocol == "context_retained"
-    with bank.use(loop_steps=loop_steps, valid=valid, write=write, reset=reset, mode="online"):
-        output = model.model(
-            input_ids=context_ids, attention_mask=attention, position_ids=positions,
-            use_cache=keep_cache,
-        )
-        states = bank.states()
+    if truncate and (keep_cache or len(bank.modules) != 1):
+        raise ValueError("truncated support requires memory_only and exactly one adapter")
+    hook = None
+    if truncate:
+        def stop_after_write(module, inputs, output):
+            raise _SupportComplete
+
+        hook = next(iter(bank.modules.values())).register_forward_hook(stop_after_write)
+    try:
+        mode = "write_only" if truncate else "online"
+        with bank.use(loop_steps=loop_steps, valid=valid, write=write, reset=reset, mode=mode):
+            try:
+                output = model.model(
+                    input_ids=context_ids, attention_mask=attention, position_ids=positions,
+                    use_cache=keep_cache,
+                )
+            except _SupportComplete:
+                if not truncate:
+                    raise
+                output = None
+            else:
+                if truncate:
+                    raise RuntimeError("support forward did not reach the installed adapter")
+            states = bank.states()
+    finally:
+        if hook is not None:
+            hook.remove()
     cache = output.past_key_values.to_legacy_cache() if keep_cache else None
     return SupportSnapshot(states, cache, retained_valid.clone(), protocol)
 

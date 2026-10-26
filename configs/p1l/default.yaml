@@ -1,0 +1,12 @@
+# Formal defaults are resolved in looplora.llm.config; this is not an execution authorization.
+name: p1l-default
+stage: joint
+variant: M1
+seed: 17
+protocol: memory_only
+smoke: false
+train:
+  steps: 1000
+eval:
+  episodes: 2000
+  splits: [val]
