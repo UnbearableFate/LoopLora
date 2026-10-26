@@ -388,6 +388,7 @@ def plot_depth_profiles(out: Path,reference_accuracy: list[dict]) -> None:
         fact=[r for r in csv.DictReader(f) if r['group']=='primary' and r['dataset']=='confirmation'
               and r['condition']=='original']
     fig,axes=plt.subplots(2,2,figsize=(9,6),sharex=True,sharey=True)
+    max_accuracy=0.
     for i,writer in enumerate(WRITERS):
         for j,reader in enumerate(READERS):
             ax=axes[i,j]
@@ -398,14 +399,15 @@ def plot_depth_profiles(out: Path,reference_accuracy: list[dict]) -> None:
                     values=[np.mean([float(r['accuracy']) for r in source if r['writer']==w
                                     and r[pkey]==reader and int(r['L'])==d and int(r['hop']) in hops])
                             for d in driver.DEPTHS]
+                    max_accuracy=max(max_accuracy,max(values))
                     ax.plot(driver.DEPTHS,values,style,color=color,marker='.',
                             label=f'{family}, {label}')
             ax.set_title(f'{writer}, {reader}',fontsize=10)
             ax.grid(alpha=.2)
-            ax.set_ylim(bottom=0)
             ax.set_xticks([0,1,4,8,12,16])
             if i==1: ax.set_xlabel('Reader depth L')
             if j==0: ax.set_ylabel('Confirmation accuracy')
+    axes[0,0].set_ylim(0,min(1,max_accuracy*1.08+.02))
     handles,labels=axes[0,0].get_legend_handles_labels()
     fig.legend(handles,labels,loc='lower center',ncol=2,fontsize=8)
     fig.suptitle('Three-seed means; F2 has no replication setting',fontsize=11)

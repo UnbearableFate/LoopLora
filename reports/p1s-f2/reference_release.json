@@ -6,6 +6,13 @@
   "barrier": "reports/p1s/barrier.json",
   "raw_root": "/work/xg24i002/x10041/LoopLora/runs/p1s/main/20261026",
   "f2_embargo": "Read WP-H confirmation inputs only after every F2 main stage has passed the F2 training barrier.",
-  "contrasts": ["factorized_minus_unfactorized_L4_reach", "factorized_minus_unfactorized_depth_effect_reach"],
-  "gating": false
+  "contrasts": [
+    "factorized_minus_unfactorized_L4_reach",
+    "factorized_minus_unfactorized_depth_effect_reach"
+  ],
+  "gating": false,
+  "first_reference_metadata_read_at": "2026-10-26T14:22:13.011825+00:00",
+  "f2_training_barrier_receipt": "runs/p1s/f2/training_barriers/shard-00.json",
+  "f2_training_barrier_created_at": "2026-10-26T14:19:14.692222+00:00",
+  "f2_training_stages_passed": 39
 }
