@@ -26,8 +26,9 @@ Cached `refs/main` selects the revision when present; without it exactly one
 snapshot is required. Manifest records the revision, raw relative Parquet paths
 and blake2b-128 hashes, source and unique counts, duplicate counts, selected IDs,
 configuration names, explicit policy overrides, and output hashes. Selection is
-ascending blake2b-128 of each UTF-8 ID, with an ID tie-break. ARC IDs and HellaSwag
-`ind` are retained. Missing IDs use canonical context/choices/config content;
+ascending blake2b-128 of each UTF-8 ID, with an ID tie-break. ARC IDs are retained.
+HellaSwag uses `ind:blake2b(context,choices,config)` because its raw `ind` repeats
+for distinct examples. Missing IDs use canonical context/choices/config content;
 MMLU IDs also carry the subject. Identical duplicate rows collapse; conflicting
 labels/content for one ID fail. The loader verifies artifact hashes and IDs.
 
@@ -41,7 +42,7 @@ All six suites validate before output writes, so source/policy errors leave no
 partially prepared new output directory. No network or model calls are present;
 PyArrow is imported lazily during preparation.
 
-## Evidence, validation, remaining work
+## Evidence and validation
 
 Inspected cache revisions: ARC `210d026faf9955653af8916fad021475a3f00453`;
 PIQA `142f6d7367fd9877f0fb3b5734ea6a545f54cdd1`;
@@ -49,14 +50,25 @@ HellaSwag `218ec52e09a7e7462a5400043bb9a69a41d06b76`;
 WinoGrande `01e74176c63542e6b0bcb004dcdea22d94fb67b5`;
 MMLU `c30699e8356da336a370243923dbaf21066bb9fe`. ARC-Challenge's card
 states 299 validation rows. MMLU initially has only six subject directories;
-default preparation correctly rejects it. Parent owns the pending policy and
-download decisions. The contracted API required no extension.
+default preparation correctly rejects it. The orchestrator subsequently approved
+the complete validation shard at that revision and all 299 ARC-Challenge
+validation items, with no test items. The contracted API required no extension.
 
 Login/control plane: `miyabi-g2`, no allocation. Static checks passed:
 `python -m py_compile src/looplora/data/retention.py tests/test_retention.py`
 and `git diff --check`. No runtime imports, pytest, or real-data preparation
 ran here. Parent must run `tests/test_retention.py` through `scripts/submit.py`
-after approved PyArrow installation and record the compute job/result in the
-main WP-B3 report. Tests cover deterministic order-independent subsets, all six
+after approved PyArrow installation. Tests cover deterministic order-independent subsets, all six
 formats, label mapping, exact continuations, semantic IDs, manifest/raw hashes,
 split policies, MMLU completeness, missing shards, duplicates, and corruption.
+
+Parent validation: PyArrow 21.0.0 was installed by the orchestrator and brought
+into this branch through master; no worker-side `uv sync` ran. The 25 retention
+tests passed in 2.11s on Miyabi-G `mg0981`, job `3713065.opbs`, exit 0, using
+`scripts/submit.py --queue regular-g --walltime 00:03:00 --commit c12f7db --wait -- -m pytest -q -o addopts= tests/test_retention.py`.
+Real-cache preparation exposed repeated HellaSwag `ind` values: compute probe
+`3713105.opbs` on `mg0841` found 10,042 rows but 9,609 unique indices, including
+distinct contexts for index 180. The content-qualified identity fixes this without
+including labels in IDs or suppressing conflicting annotations. A focused
+regression and repeated-index integration fixtures cover this boundary.
+The final real-cache result is recorded in `WP-B3.md` and both cache manifests.

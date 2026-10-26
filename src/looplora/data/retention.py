@@ -217,9 +217,12 @@ def _convert(name: str, row: Mapping[str, Any], config: str, split: str) -> MCIt
         label = _label(row["answer"], len(choices))
     else:
         raise ValueError(f"Unknown retention dataset {name!r}")
-    if explicit_id is None:
+    if explicit_id is None or name == "hellaswag":
         identity = {"context": context, "choices": choices, "config": config}
         item_id = _digest(_json(identity).encode("utf-8"))
+        if name == "hellaswag" and explicit_id is not None:
+            # HellaSwag reuses ind for distinct contexts, so it is not an ID alone.
+            item_id = f"{explicit_id}:{item_id}"
     else:
         item_id = str(explicit_id)
     if name == "mmlu":

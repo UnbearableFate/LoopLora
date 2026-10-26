@@ -22,11 +22,13 @@ existing generators/rendering remain unchanged. Runtime work goes through
   sentence suffix as its choice, so likelihood scoring compares full continuations.
 - Main script owns CLI and invokes retention preparation; retention worker owns
   only its module, tests and `docs/reports/WP-B3_retention_notes.md`.
-- Pending orchestrator answers: PyArrow wheel installation; incomplete cached
-  MMLU subjects (download remaining validation versus medical-only test); and
-  ARC-Challenge's 299 validation examples (smaller subset versus test override).
-  Do not install/download dependent extras before approval. Code/test authoring
-  and inspection can proceed.
+- Orchestrator decisions: PyArrow 21.0.0 approved and installed in the shared
+  venv; dependency files come from master, with no worker-side `uv sync`.
+  ARC-Challenge uses all 299 validation items, with no test items. MMLU uses the
+  complete validation shard downloaded at cached revision
+  `c30699e8356da336a370243923dbaf21066bb9fe`, then 500 items by ID hash rank.
+  Preparation therefore passes `--allow-smaller-retention arc_challenge`;
+  no split override or restricted MMLU subject selection is used.
 
 MuSiQue API for independent tests:
 - Frozen `Paragraph(index, title, text, is_supporting)`; frozen

@@ -52,7 +52,7 @@ def cached_sources(tmp_path):
         for index in range(3)
     ])
     _write(snapshots["Rowan/hellaswag"] / "data" / "validation-00000-of-00001.parquet", [
-        {"ind": index, "ctx": f"A person {index} prepares", "endings": ["food", "nothing"],
+        {"ind": index // 2, "ctx": f"A person {index} prepares", "endings": ["food", "nothing"],
          "label": "1", "source_id": "same-video"}
         for index in range(3)
     ])
@@ -127,6 +127,16 @@ def test_semantic_ids_ignore_label_and_include_mmlu_subject():
     assert original.id == _convert("piqa", {**row, "label": 1}, "default", "validation").id
     mmlu_row = {"question": "Same?", "choices": ["Yes", "No"], "answer": 0}
     assert _convert("mmlu", mmlu_row, "anatomy", "validation").id != _convert("mmlu", mmlu_row, "astronomy", "validation").id
+
+
+def test_hellaswag_repeated_indices_identify_distinct_content_without_hiding_label_conflicts():
+    row = {"ind": 180, "ctx": "A person prepares", "endings": ["food", "nothing"], "label": "0"}
+    original = _convert("hellaswag", row, "default", "validation")
+    other = _convert("hellaswag", {**row, "ctx": "Another person prepares"}, "default", "validation")
+    relabeled = _convert("hellaswag", {**row, "label": "1"}, "default", "validation")
+    assert original.id.startswith("180:")
+    assert original.id != other.id
+    assert original.id == relabeled.id
 
 
 def test_too_small_never_silently_switches_split(cached_sources, tmp_path):
