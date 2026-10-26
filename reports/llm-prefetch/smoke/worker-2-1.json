@@ -1,0 +1,181 @@
+{
+  "status": "complete",
+  "worker": 1,
+  "procs": 2,
+  "rows": [
+    {
+      "worker": 1,
+      "procs": 2,
+      "batch": 128,
+      "policy": "fact_final",
+      "workers": 0,
+      "worker_mean_ms": 836.5761376917362,
+      "worker_p95_ms": 840.1515393285081,
+      "worker_data_wait_mean_ms": 10.385899416481456,
+      "stream_enter_seconds": 1.6319099813699722e-06,
+      "first_batch_wait_seconds": 0.011203268077224493,
+      "time_to_first_batch_seconds": 0.011204899987205863,
+      "first_step_seconds": 1.624038435984403,
+      "time_to_first_step_seconds": 1.6352433359716088,
+      "close_seconds": 5.152076482772827e-06,
+      "cell_seconds": 7.540233179926872,
+      "synchronized_measured_seconds": 2.5108037758618593,
+      "peak_allocated_bytes": 8314561024,
+      "peak_reserved_bytes": 9053405184,
+      "durations_seconds": [
+        0.830233195098117,
+        0.839242696063593,
+        0.8402525219134986
+      ],
+      "data_wait_seconds": [
+        0.010401345090940595,
+        0.010438081109896302,
+        0.010318272048607469
+      ],
+      "losses": [
+        10.616304397583008,
+        10.643172264099121,
+        10.529045104980469,
+        10.540630340576172,
+        10.380657196044922,
+        10.347503662109375,
+        10.17264461517334,
+        9.815413475036621
+      ],
+      "loss_max_absolute_error_vs_workers0": 0.0,
+      "loss_max_relative_error_vs_workers0": 0.0
+    },
+    {
+      "worker": 1,
+      "procs": 2,
+      "batch": 128,
+      "policy": "fact_final",
+      "workers": 8,
+      "worker_mean_ms": 362.20394299986464,
+      "worker_p95_ms": 364.9359522154555,
+      "worker_data_wait_mean_ms": 0.007807975634932518,
+      "stream_enter_seconds": 18.38403124595061,
+      "first_batch_wait_seconds": 1.7215963453054428e-05,
+      "time_to_first_batch_seconds": 18.384048461914062,
+      "first_step_seconds": 0.3776677430141717,
+      "time_to_first_step_seconds": 18.761716204928234,
+      "close_seconds": 0.5645002829842269,
+      "cell_seconds": 21.88344988389872,
+      "synchronized_measured_seconds": 1.0934306299313903,
+      "peak_allocated_bytes": 8314561024,
+      "peak_reserved_bytes": 9082765312,
+      "durations_seconds": [
+        0.36518575390800834,
+        0.3587383381091058,
+        0.3626877369824797
+      ],
+      "data_wait_seconds": [
+        7.903901860117912e-06,
+        7.743947207927704e-06,
+        7.776077836751938e-06
+      ],
+      "losses": [
+        10.616304397583008,
+        10.643172264099121,
+        10.529045104980469,
+        10.540630340576172,
+        10.380657196044922,
+        10.347503662109375,
+        10.17264461517334,
+        9.815413475036621
+      ],
+      "loss_max_absolute_error_vs_workers0": 0.0,
+      "loss_max_relative_error_vs_workers0": 0.0
+    },
+    {
+      "worker": 1,
+      "procs": 2,
+      "batch": 128,
+      "policy": "all_tokens",
+      "workers": 8,
+      "worker_mean_ms": 468.7852233958741,
+      "worker_p95_ms": 472.64685209374875,
+      "worker_data_wait_mean_ms": 0.00716792419552803,
+      "stream_enter_seconds": 18.367604581872,
+      "first_batch_wait_seconds": 8.672010153532028e-06,
+      "time_to_first_batch_seconds": 18.367613253882155,
+      "first_step_seconds": 0.4839903488755226,
+      "time_to_first_step_seconds": 18.851603602757677,
+      "close_seconds": 0.5631931750103831,
+      "cell_seconds": 22.718615059973672,
+      "synchronized_measured_seconds": 1.408795579103753,
+      "peak_allocated_bytes": 8396113408,
+      "peak_reserved_bytes": 9166651392,
+      "durations_seconds": [
+        0.47314664209261537,
+        0.4681487421039492,
+        0.46506028599105775
+      ],
+      "data_wait_seconds": [
+        7.2319526225328445e-06,
+        7.391907274723053e-06,
+        6.879912689328194e-06
+      ],
+      "losses": [
+        10.616304397583008,
+        10.640869140625,
+        10.531227111816406,
+        10.537437438964844,
+        10.379555702209473,
+        10.34872055053711,
+        10.175090789794922,
+        9.815757751464844
+      ],
+      "loss_max_absolute_error_vs_workers0": 0.0,
+      "loss_max_relative_error_vs_workers0": 0.0
+    },
+    {
+      "worker": 1,
+      "procs": 2,
+      "batch": 128,
+      "policy": "all_tokens",
+      "workers": 0,
+      "worker_mean_ms": 932.1800867716471,
+      "worker_p95_ms": 936.7214432917535,
+      "worker_data_wait_mean_ms": 10.369032000501951,
+      "stream_enter_seconds": 2.751825377345085e-06,
+      "first_batch_wait_seconds": 0.010672250995412469,
+      "time_to_first_batch_seconds": 0.010675002820789814,
+      "first_step_seconds": 0.9515209449455142,
+      "time_to_first_step_seconds": 0.962195947766304,
+      "close_seconds": 2.4640467017889023e-06,
+      "cell_seconds": 7.4829966789111495,
+      "synchronized_measured_seconds": 2.797789255855605,
+      "peak_allocated_bytes": 8396113408,
+      "peak_reserved_bytes": 9166651392,
+      "durations_seconds": [
+        0.9353662161156535,
+        0.936872024089098,
+        0.9243020201101899
+      ],
+      "data_wait_seconds": [
+        0.010417339159175754,
+        0.010314777959138155,
+        0.010374978883191943
+      ],
+      "losses": [
+        10.616304397583008,
+        10.640869140625,
+        10.531227111816406,
+        10.537437438964844,
+        10.379555702209473,
+        10.34872055053711,
+        10.175090789794922,
+        9.815757751464844
+      ],
+      "loss_max_absolute_error_vs_workers0": 0.0,
+      "loss_max_relative_error_vs_workers0": 0.0
+    }
+  ],
+  "model_load_seconds": 0.9934765549842268,
+  "process_ready_seconds": 8.530730620957911,
+  "gpu": "NVIDIA GH200 120GB",
+  "torch": "2.14.0+cu132",
+  "host": "mg0021",
+  "job_id": "3714701.opbs"
+}
