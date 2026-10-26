@@ -58,6 +58,16 @@ corrected wrapper3715942 passed with unchanged assertions, retaining source
 episode/query/hop labels and recording new path lengths separately. Both tests
 used validation fixtures, with the scientific test generator intercepted.
 
+Full-model validation-only evaluation acceptance3716226 (mg0022, source2823982)
+passed exact deployed-residual capture; five tiny-model replay/capture/batching
+checks passed3716225. Readout captures actual alpha B z_s during each prefix
+replay, avoiding changed FP32 shapes from separately recomputing last tokens.
+Timing-only artifacts evaluation-timing-M1.json (200episodes, all8depths,
+primary+typed+swap+readout,72.89s) and evaluation-timing-B1.json (both protocols,
+primary+typed,18.05s) size later confirmation packing; no quality score consumed.
+Original development failures3716191 (batch bounds) and3716221 (centralHEAD
+resolved instead of explicit worker source) remain in the job ledger.
+
 Refresh node-hours on login with
 `/usr/bin/python3 scripts/p1l_job_ledger.py --out reports/p1l/jobs.json`.
 Every job goes through submit.py; each request includes measured1.5margin,

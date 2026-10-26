@@ -1,4 +1,4 @@
-# wk-p1l continuation card — r32 Pilot-2 and r128 smoke running
+# wk-p1l continuation card — both ranks' Pilot-2 running
 
 Worktree /work/xg24i002/x10041/LoopLora-wt/p1l, branchwp/p1l. User assigned
 WP-P1L; finish docs/reports/P1L.md and only then reply exactly
@@ -11,7 +11,7 @@ on login. Read docs/README.md, task/prereg, this card before continuing.
 
 Armed wakeups (message mode,300s polling, no Goal):
 - r128 smoke3716021: .job-wakeup/27808c33-f6d6-4f4d-b9d7-ca4e673c498b,
-  worker PID2012956; also verify3716020 on wake.
+  acknowledged; both smoke jobs verified complete, exit0.
 - r32 pilot3715965: .job-wakeup/ee3ad75d-7773-4f90-92d8-b0bc5660b157,
   worker PID2041468; also verify the other six pilot jobs on wake.
 Read the event state and acknowledge with the exact argv from the wakeup
@@ -80,8 +80,42 @@ R128 preflight3716009(mg0022) exit0, all5paths20steps, peak<=7.70GB;
 sizing3716015 gives
 S17000/Pilot5666, no reduced-steps flag, slowest.20183s/step. Committed
 reports/p1l/r128/preflight-sizing.json and design. Full10% smokes1700steps:
-3716020(B8,M1-L4),3716021(B4,B5-L4,B3-L4), source16bef08. BOTH running.
-No r128 Pilot-2 has been launched; no pilot quality score of either rank read.
+3716020(B8,M1-L4),3716021(B4,B5-L4,B3-L4), source16bef08. BOTH exit0.
+Full-smoke sizing3716162 (mg0024), reports/p1l/r128/smoke-sizing.json,
+committed e955765: S17000/Pilot5666, slowest .199397s, no reduced-steps flag,
+projected Pilot-2+main14.408nodeh. No pilot quality score of either rank read.
+R128 Pilot-2 launched source e95576527c46cc1798d97c5af83384fc62bd0e06:
+3716168B8,3716169M1-L4,3716170B4,3716171B5-L4,3716172B3-L4.
+Receipts R/r128/pilot-jobs.json, two sequential lrs per label under
+R/r128/pilot/<LABEL>/<LABEL>-lr0.001 or -lr0.003. Requested45–65min,
+started04:59JST. Arrange an independent watcher for3716169 before going idle.
+
+Validation-only full-evaluation timing acceptance: script
+scripts/benchmark_p1l_evaluation.py loads the immutable completed M1-L4
+lr.001 r32 pilot checkpoint and fixed probe cache. Uses val[0,200),
+allow_confirmationFalse, smokeTrue; primary+typed,swap,readout,timing only.
+Never read its quality artifacts. Job3716191(mg0026) failed before readout
+completion: faithfulness counter shadowed episode count and truncated later
+batch slices. Fixed b88a742 with a multibatch/partial-tail regression.
+Regression job3716212 passed onmg0030, exit0. Rerun3716213 passed onmg0031,
+revealed max2.29e-5 FP32 error from recomputing only last-token states in another
+matrix shape. Fixed2823982: capture actual alpha B z_s during prefix replay.
+No direction, endpoint or selection rule changes. Exact capture+replay tests
+3716225 passed5 onmg0023; full-model validation-only rerun3716226 passed onmg0022.
+R/evaluation-preflight-v3/timing.json reports captured_bitwise_equalTrue;
+its recomputed_bitwise_equalFalse documents why manual recomputation was removed.
+Compact timing-only copies reports/p1l/evaluation-timing-M1.json and
+evaluation-timing-B1.json retain source checkpoint hashes and compute evidence.
+M1 total72.89s for200episodes: primary12.12s,typed10.03s,swap43.51s,
+readout5.21s. For later confirmation sizing multiply episode-dependent phases
+by10 for2000episodes, add load/reserve and1.5margin. Three M1 seeds fit one1h
+evaluation job under this measurement. Baseline both-protocol total18.05s.
+Baseline timing3716223 passed onmg0030, primary+typed, both protocols,200val
+episodes, total18.05s. Wrong-source submission3716221 endedexit2 in8s (central
+HEAD lacked script); replacement uses explicit3801bb2. Never use --commit HEAD
+in submit.py: it resolves refs in the CENTRAL checkout. Use explicit worker
+hash or wp/p1l. Main launcher already resolves its own ROOT hash explicitly.
+Timings and regression outputs only have been read; no quality score read.
 
 Passed: readout/oracle33checks3715857; gates/authorization4checks3715889;
 swap-wrapper1check3715942. Failed development jobs, included in ledger:
@@ -89,19 +123,11 @@ swap-wrapper1check3715942. Failed development jobs, included in ledger:
 by rewired hop (fixed; source episode/query/hop now retained and new hop kept
 separately; unchanged regression passed3715942). No further blanket retests.
 
-## Immediate next actions after r128 smoke wakeup
+## Immediate next actions
 
-1. Read/ack the exact wakeup event per skill. Check BOTH3716020/3716021 exit0
-   and all5 complete records before reading timing. Never read smoke losses.
-2. Through submit.py on compute: scripts/analyze_p1l_main.py size --rank 128
-   --root R/r128 --out ABS/reports/p1l/r128/smoke-sizing.json. Collects smoke-a/b.
-   S17000 if1.5margin fits; otherwise flags a lower multiple-of500. Commit.
-3. On login: scripts/launch_p1l_main.py pilot --rank 128 --root R/r128
-   --sizing reports/p1l/r128/smoke-sizing.json.
-   Five jobs, two lrs each. Source and log receipts R/r128/pilot-jobs.json.
-4. If r32 pilots still running, retain their armed3715965 watcher; if no
-   watcher exists, register one exact job in message mode and return idle.
-   For r128 pilots arrange an independent watcher on a late/slow job.
+1. Validation-only evaluation acceptance is complete; never read its raw scores.
+2. Retain the armed r32 watcher3715965; do not duplicate or cancel it.
+   Arrange an independent watcher on r128 pilot3716169 before going idle.
 
 ## Next actions after each rank's pilot wakeup
 

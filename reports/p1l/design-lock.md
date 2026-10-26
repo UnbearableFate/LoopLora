@@ -56,6 +56,13 @@ models/seeds. The baseline is1024 independent unit Gaussian residual-space
 directions, using derive_seed(2718,"p1l","readout-random-directions"). Report
 J-lens-inspired name-gradient probe and random-direction ranks/top1 by hop, reader step and entity step.
 
+Implementation acceptance (validation only, before confirmation): capture the
+actual alpha B z_s emitted by each prefix replay at its final real question
+token. Do not recompute z_s in a separate last-token batch: full-model check
+3716213 found a maximum2.29e-5 FP32 difference from changed matrix shapes.
+The registered residual space, direction cache and scientific endpoints are
+unchanged. Require exact final-step logit replay and deployed-residual capture.
+
 ### Amendment A1 — orchestrator instruction, before Pilot-2 scores
 
 The primary J-lens-inspired name-gradient probe is name-contrastive: for each question subtract the uniform

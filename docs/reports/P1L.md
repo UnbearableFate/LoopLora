@@ -11,8 +11,9 @@ Confirmation remains held for all main runs and the WP-L4 decision.
 Amendment B3 adds oracle r128 (15runs, own Pilot-2, B0–B2 reused); confirmation
 is now held for ALL conditions, with confidence1-.05/k fixed beforehand.
 B4 removes cross-rank single-read contrasts and adds descriptive adapter counts/
-inference timing; wrapper3716084 passed onmg0025. Wakeups for r128 smoke and
-r32 Pilot-2 are armed; see P1L-state.md for continuation.
+inference timing; wrapper3716084 passed onmg0025. R128 smokes completed,
+sizing3716162 locked S17000(e955765), and Pilot-2 jobs3716168–3716172 are
+running. R32 Pilot-2 watcher remains armed; see P1L-state.md for continuation.
 No test or confirmation data have been accessed.
 
 Raw root: /work/xg24i002/x10041/LoopLora/runs/p1l/main/.
@@ -21,10 +22,18 @@ Smoke3715854/3715855 passed (900steps, timing only; B2 accepts this ratio).
 Readout/oracle tests3715857 passed33checks onmg0022. J-lens-inspired name-gradient probe trial3715862 passed;
 full512-question validation-only gradient cache3715870 completed onmg0865 in932s.
 R128 support/exact reload tests3716000 passed34; short preflight3716009 passed,
-S17000 feasible. Its1700-step smokes3716020/3716021 are running. Gates/
+S17000 feasible. Its1700-step smokes3716020/3716021 passed. Gates/
 authorization tests3715889 passed4checks. A validation-only swap-wrapper test
 3715928 caught grouping by rewired hop rather than source hop; fixed and passed
 3715942 with source episode/query/hop retained and raw counterfactual samples.
 Initial
 sizing3715842 failed on sparse preflight timing logs; fixed/rechecked3715847.
+Validation-only full-model evaluation3716191 caught readout batch-bound
+shadowing; regression3716212 passed. Timing acceptance3716213 exposed a2.29e-5
+FP32 difference from separately recomputed residuals; actual deployed residual
+capture replaces recomputation(2823982), with5 exact replay/capture checks
+passed3716225 onmg0023. Full-model recheck3716226 passed onmg0022 with bit-exact
+deployed residual capture. A baseline timing submission
+3716221 used the central HEAD and failed before runtime; explicit-source
+replacement3716223 passed both protocols on validation only.
 Reproduction: reports/p1l/README.md. Final ledger/results/limitations pending.
