@@ -1,0 +1,62 @@
+{
+  "task": "WP-C7",
+  "limit_node_hours": 0.3,
+  "allocated_seconds": 466,
+  "allocated_node_hours": 0.12944444444444445,
+  "accounting": "qstat_json.py -H elapsed_seconds times nodes; includes failed development check, startup and shutdown",
+  "validated_source": "b54ec3a21cc4037910396663f3c9b717bcaefbc9",
+  "jobs": [
+    {
+      "job_id": "3715661.opbs",
+      "host": "mg0029",
+      "name": "t-c7",
+      "source": "development worktree",
+      "nodes": 1,
+      "walltime": "00:05:00",
+      "allocated_seconds": 222,
+      "exit_code": 1,
+      "result": "187 passed, 1 failed in 214.58 s; oracle vocabulary integer V was counted as a parameter; fixed in b54ec3a",
+      "log": "/work/xg24i002/x10041/LoopLora/logs/pbs/t-c7-20261027-034752-1679113.log"
+    },
+    {
+      "job_id": "3715693.opbs",
+      "host": "mg0036",
+      "name": "t-c7-final",
+      "source": "b54ec3a21cc4037910396663f3c9b717bcaefbc9",
+      "nodes": 1,
+      "walltime": "00:02:00",
+      "allocated_seconds": 47,
+      "exit_code": 0,
+      "result": "All 64 oracle and run-interface tests passed in 37.94 s",
+      "log": "/work/xg24i002/x10041/LoopLora/logs/pbs/t-c7-final-20261027-035204-1700624.log"
+    },
+    {
+      "job_id": "3715702.opbs",
+      "host": "mg0037",
+      "name": "smoke-c7-trial",
+      "source": "b54ec3a21cc4037910396663f3c9b717bcaefbc9",
+      "nodes": 1,
+      "walltime": "00:02:00",
+      "allocated_seconds": 77,
+      "exit_code": 0,
+      "application_seconds": 57.631730906898156,
+      "result": "10 steps each: M1-L4, B8@4, B4@1, batch64, prefetch2; all guards passed",
+      "raw": "/work/xg24i002/x10041/LoopLora/runs/llm-oracle/trial-v1",
+      "log": "/work/xg24i002/x10041/LoopLora/logs/pbs/smoke-c7-trial-20261027-035306-1705805.log"
+    },
+    {
+      "job_id": "3715715.opbs",
+      "host": "mg0036",
+      "name": "smoke-c7-100",
+      "source": "b54ec3a21cc4037910396663f3c9b717bcaefbc9",
+      "nodes": 1,
+      "walltime": "00:03:30",
+      "allocated_seconds": 120,
+      "exit_code": 0,
+      "application_seconds": 101.91554498998448,
+      "result": "100 steps each: M1-L4, B8@4, B4@1, batch64, prefetch2; all guards passed",
+      "raw": "/work/xg24i002/x10041/LoopLora/runs/llm-oracle/acceptance-v1",
+      "log": "/work/xg24i002/x10041/LoopLora/logs/pbs/smoke-c7-100-20261027-035451-1714431.log"
+    }
+  ]
+}
