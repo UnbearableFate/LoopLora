@@ -1,0 +1,332 @@
+{
+  "checkpoints_unchanged": true,
+  "design": {
+    "bootstrap": "none; not implemented in WP-C3; no new intervals or significance claims",
+    "budget_node_hours": 1,
+    "collect_certificates": false,
+    "endpoints": {
+      "far_delta": "rule minus L1 averaged over hops 6,7,8",
+      "hop1_delta": "rule minus L1 at hop 1",
+      "reach_delta": "rule minus L1 averaged over hops 2,3",
+      "walk_specificity": "reach_delta minus far_delta"
+    },
+    "episode_batch_size": 64,
+    "episodes_per_split": 2000,
+    "evaluation_seed": 4242,
+    "families": {
+      "r": [
+        32
+      ],
+      "variant": [
+        "M1",
+        "M1-lin"
+      ],
+      "writer": [
+        "joint_fact",
+        "t1_frozen_fact",
+        "joint"
+      ]
+    },
+    "fixed_references": [
+      1,
+      4,
+      8,
+      16
+    ],
+    "git_artifact_max_bytes": 1000000,
+    "halting_convention": "predict at first qualifying post-update state z^L, 1<=L<=16; unchanged WP-C3 rules",
+    "hops": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "job_max_hours": 1,
+    "job_max_nodes": 1,
+    "latency": false,
+    "max_steps": 16,
+    "minimum_steps": 1,
+    "normalization_epsilon": 1e-12,
+    "oracle_reference": "true-hop stop is label-informed, not an accuracy upper bound",
+    "output_stability_thresholds": [
+      1,
+      2,
+      3,
+      4,
+      8,
+      16
+    ],
+    "read_norm_cost": "L+1 memory reads including final diagnostic; other rules cost L reads",
+    "read_norm_thresholds": [
+      0,
+      0.001,
+      0.003,
+      0.01,
+      0.03,
+      0.1,
+      0.2,
+      0.3,
+      0.5,
+      0.7,
+      1,
+      1.5,
+      2,
+      4
+    ],
+    "relative_change_thresholds": [
+      0,
+      0.001,
+      0.003,
+      0.01,
+      0.03,
+      0.1,
+      0.2,
+      0.3,
+      0.5,
+      0.7,
+      1,
+      1.5,
+      2,
+      4
+    ],
+    "scope": "evaluation only; released F2 and WP-H r32 checkpoints; no confirmation episodes",
+    "screening_candidate": "hop1_delta >= -0.01, reach_delta > 0, walk_specificity > 0; point estimates only, not formal G1 acceptance",
+    "selection": "WP-C3 maximum validation mean accuracy over eight hops and three seeds; ties: fewer mean steps, then smaller threshold",
+    "selection_barrier": "save thresholds after all validation traces and before any screening-test trace",
+    "smoke": "six families, seed17, 200 validation episodes, no selection or screening scores",
+    "source_master": "28d3668",
+    "splits": [
+      "val",
+      "test"
+    ],
+    "task": "WP-C4",
+    "threshold_scope": "one per writer/rank/variant family and criterion, shared across three seeds",
+    "training_seeds": [
+      17,
+      29,
+      43
+    ]
+  },
+  "design_hash": "465bfaa6f8240885cceed59f6a9cfae8",
+  "finished_at": "2026-10-26T15:01:31.067524+00:00",
+  "git_commit": "613376b266f063a62b25979baccd7137009f42d1",
+  "peak_memory_bytes": 46343680,
+  "runs": [
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p1s/f2/main-readers/shard-03/f2-main-joint_fact-M1-lin-s17/checkpoint.pt",
+      "checkpoint_blake2b": "bd49fc38af1ab0c88e9c0999d41804ee",
+      "family": "joint_fact/r32/M1-lin",
+      "name": "f2-main-joint_fact-M1-lin-s17",
+      "r": 32,
+      "reference_metrics": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p1s/f2/evaluation/f2-main-joint_fact-M1-lin-s17/screening/metrics.json",
+      "seed": 17,
+      "variant": "M1-lin",
+      "writer": "joint_fact"
+    },
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p1s/f2/main-readers/shard-01/f2-main-joint_fact-M1-lin-s29/checkpoint.pt",
+      "checkpoint_blake2b": "20e1231170f42c5d2f162313918435b9",
+      "family": "joint_fact/r32/M1-lin",
+      "name": "f2-main-joint_fact-M1-lin-s29",
+      "r": 32,
+      "reference_metrics": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p1s/f2/evaluation/f2-main-joint_fact-M1-lin-s29/screening/metrics.json",
+      "seed": 29,
+      "variant": "M1-lin",
+      "writer": "joint_fact"
+    },
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p1s/f2/main-readers/shard-03/f2-main-joint_fact-M1-lin-s43/checkpoint.pt",
+      "checkpoint_blake2b": "cd0e05a9ab30809d1d9b58507ccd92ee",
+      "family": "joint_fact/r32/M1-lin",
+      "name": "f2-main-joint_fact-M1-lin-s43",
+      "r": 32,
+      "reference_metrics": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p1s/f2/evaluation/f2-main-joint_fact-M1-lin-s43/screening/metrics.json",
+      "seed": 43,
+      "variant": "M1-lin",
+      "writer": "joint_fact"
+    },
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p1s/f2/main-readers/shard-02/f2-main-joint_fact-M1-s17/checkpoint.pt",
+      "checkpoint_blake2b": "1ca5fabe8741942ee947d643d24581f1",
+      "family": "joint_fact/r32/M1",
+      "name": "f2-main-joint_fact-M1-s17",
+      "r": 32,
+      "reference_metrics": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p1s/f2/evaluation/f2-main-joint_fact-M1-s17/screening/metrics.json",
+      "seed": 17,
+      "variant": "M1",
+      "writer": "joint_fact"
+    },
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p1s/f2/main-readers/shard-00/f2-main-joint_fact-M1-s29/checkpoint.pt",
+      "checkpoint_blake2b": "020f263d1a74cb51aebf85b666984312",
+      "family": "joint_fact/r32/M1",
+      "name": "f2-main-joint_fact-M1-s29",
+      "r": 32,
+      "reference_metrics": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p1s/f2/evaluation/f2-main-joint_fact-M1-s29/screening/metrics.json",
+      "seed": 29,
+      "variant": "M1",
+      "writer": "joint_fact"
+    },
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p1s/f2/main-readers/shard-02/f2-main-joint_fact-M1-s43/checkpoint.pt",
+      "checkpoint_blake2b": "645cbdf31dd2853499361c3cd0f1923a",
+      "family": "joint_fact/r32/M1",
+      "name": "f2-main-joint_fact-M1-s43",
+      "r": 32,
+      "reference_metrics": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p1s/f2/evaluation/f2-main-joint_fact-M1-s43/screening/metrics.json",
+      "seed": 43,
+      "variant": "M1",
+      "writer": "joint_fact"
+    },
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p1s/f2/main-readers/shard-01/f2-main-t1_frozen_fact-M1-lin-s17/checkpoint.pt",
+      "checkpoint_blake2b": "64576c9bd27b8ec4fdd77e2b56a5401e",
+      "family": "t1_frozen_fact/r32/M1-lin",
+      "name": "f2-main-t1_frozen_fact-M1-lin-s17",
+      "r": 32,
+      "reference_metrics": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p1s/f2/evaluation/f2-main-t1_frozen_fact-M1-lin-s17/screening/metrics.json",
+      "seed": 17,
+      "variant": "M1-lin",
+      "writer": "t1_frozen_fact"
+    },
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p1s/f2/main-readers/shard-03/f2-main-t1_frozen_fact-M1-lin-s29/checkpoint.pt",
+      "checkpoint_blake2b": "dc549ca93b3004e8172ae72b647b30cd",
+      "family": "t1_frozen_fact/r32/M1-lin",
+      "name": "f2-main-t1_frozen_fact-M1-lin-s29",
+      "r": 32,
+      "reference_metrics": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p1s/f2/evaluation/f2-main-t1_frozen_fact-M1-lin-s29/screening/metrics.json",
+      "seed": 29,
+      "variant": "M1-lin",
+      "writer": "t1_frozen_fact"
+    },
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p1s/f2/main-readers/shard-01/f2-main-t1_frozen_fact-M1-lin-s43/checkpoint.pt",
+      "checkpoint_blake2b": "090156e155ab77dad0c1cb6c6b019df3",
+      "family": "t1_frozen_fact/r32/M1-lin",
+      "name": "f2-main-t1_frozen_fact-M1-lin-s43",
+      "r": 32,
+      "reference_metrics": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p1s/f2/evaluation/f2-main-t1_frozen_fact-M1-lin-s43/screening/metrics.json",
+      "seed": 43,
+      "variant": "M1-lin",
+      "writer": "t1_frozen_fact"
+    },
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p1s/f2/main-readers/shard-00/f2-main-t1_frozen_fact-M1-s17/checkpoint.pt",
+      "checkpoint_blake2b": "ee3a2f31ae93b974609d2f70bdf9cde6",
+      "family": "t1_frozen_fact/r32/M1",
+      "name": "f2-main-t1_frozen_fact-M1-s17",
+      "r": 32,
+      "reference_metrics": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p1s/f2/evaluation/f2-main-t1_frozen_fact-M1-s17/screening/metrics.json",
+      "seed": 17,
+      "variant": "M1",
+      "writer": "t1_frozen_fact"
+    },
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p1s/f2/main-readers/shard-02/f2-main-t1_frozen_fact-M1-s29/checkpoint.pt",
+      "checkpoint_blake2b": "ce44f0d0d1e50abf704c30ef6c7a305c",
+      "family": "t1_frozen_fact/r32/M1",
+      "name": "f2-main-t1_frozen_fact-M1-s29",
+      "r": 32,
+      "reference_metrics": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p1s/f2/evaluation/f2-main-t1_frozen_fact-M1-s29/screening/metrics.json",
+      "seed": 29,
+      "variant": "M1",
+      "writer": "t1_frozen_fact"
+    },
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p1s/f2/main-readers/shard-00/f2-main-t1_frozen_fact-M1-s43/checkpoint.pt",
+      "checkpoint_blake2b": "55d47d87777814bc0ac31dc9cb50bf1f",
+      "family": "t1_frozen_fact/r32/M1",
+      "name": "f2-main-t1_frozen_fact-M1-s43",
+      "r": 32,
+      "reference_metrics": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p1s/f2/evaluation/f2-main-t1_frozen_fact-M1-s43/screening/metrics.json",
+      "seed": 43,
+      "variant": "M1",
+      "writer": "t1_frozen_fact"
+    },
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora/runs/p1s/main/20261026/runs/primary-joint-M1-lin-r32-s17/checkpoint.pt",
+      "checkpoint_blake2b": "fc4a58c026f0ab2f4b45e0b93201ffbb",
+      "family": "joint/r32/M1-lin",
+      "name": "primary-joint-M1-lin-r32-s17",
+      "r": 32,
+      "reference_metrics": "/work/xg24i002/x10041/LoopLora/runs/p1s/main/20261026/runs/primary-joint-M1-lin-r32-s17/screening/metrics.json",
+      "seed": 17,
+      "variant": "M1-lin",
+      "writer": "joint"
+    },
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora/runs/p1s/main/20261026/runs/primary-joint-M1-lin-r32-s29/checkpoint.pt",
+      "checkpoint_blake2b": "ad8eef507a068deca4d4eef84536ed81",
+      "family": "joint/r32/M1-lin",
+      "name": "primary-joint-M1-lin-r32-s29",
+      "r": 32,
+      "reference_metrics": "/work/xg24i002/x10041/LoopLora/runs/p1s/main/20261026/runs/primary-joint-M1-lin-r32-s29/screening/metrics.json",
+      "seed": 29,
+      "variant": "M1-lin",
+      "writer": "joint"
+    },
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora/runs/p1s/main/20261026/runs/primary-joint-M1-lin-r32-s43/checkpoint.pt",
+      "checkpoint_blake2b": "7b55c7818d5928d012999bd6952027f4",
+      "family": "joint/r32/M1-lin",
+      "name": "primary-joint-M1-lin-r32-s43",
+      "r": 32,
+      "reference_metrics": "/work/xg24i002/x10041/LoopLora/runs/p1s/main/20261026/runs/primary-joint-M1-lin-r32-s43/screening/metrics.json",
+      "seed": 43,
+      "variant": "M1-lin",
+      "writer": "joint"
+    },
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora/runs/p1s/main/20261026/runs/primary-joint-M1-r32-s17/checkpoint.pt",
+      "checkpoint_blake2b": "6e18bec6997ce261a00f2697fc441c73",
+      "family": "joint/r32/M1",
+      "name": "primary-joint-M1-r32-s17",
+      "r": 32,
+      "reference_metrics": "/work/xg24i002/x10041/LoopLora/runs/p1s/main/20261026/runs/primary-joint-M1-r32-s17/screening/metrics.json",
+      "seed": 17,
+      "variant": "M1",
+      "writer": "joint"
+    },
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora/runs/p1s/main/20261026/runs/primary-joint-M1-r32-s29/checkpoint.pt",
+      "checkpoint_blake2b": "7153919166a10705afe093414f2b1339",
+      "family": "joint/r32/M1",
+      "name": "primary-joint-M1-r32-s29",
+      "r": 32,
+      "reference_metrics": "/work/xg24i002/x10041/LoopLora/runs/p1s/main/20261026/runs/primary-joint-M1-r32-s29/screening/metrics.json",
+      "seed": 29,
+      "variant": "M1",
+      "writer": "joint"
+    },
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora/runs/p1s/main/20261026/runs/primary-joint-M1-r32-s43/checkpoint.pt",
+      "checkpoint_blake2b": "74052cf2cd30f1327dda605aeca37a89",
+      "family": "joint/r32/M1",
+      "name": "primary-joint-M1-r32-s43",
+      "r": 32,
+      "reference_metrics": "/work/xg24i002/x10041/LoopLora/runs/p1s/main/20261026/runs/primary-joint-M1-r32-s43/screening/metrics.json",
+      "seed": 43,
+      "variant": "M1",
+      "writer": "joint"
+    }
+  ],
+  "runtime": {
+    "dtype": "float32",
+    "gpu": "NVIDIA GH200 120GB",
+    "host": "mg0005",
+    "job_id": "3714230.opbs",
+    "threads": 1,
+    "torch": "2.14.0+cu132"
+  },
+  "smoke": false,
+  "source_dirty": false,
+  "source_hash": "21bd1c33bedc40c508a872e11c6cbf1d",
+  "started_at": "2026-10-26T15:00:57.560423+00:00",
+  "status": "complete",
+  "total_seconds": 33.51417085621506
+}
