@@ -1,0 +1,175 @@
+{
+  "task": "WP-C6",
+  "status": "complete",
+  "smoke": true,
+  "settings": {
+    "variants": [
+      "M1",
+      "B8"
+    ],
+    "depth": 4,
+    "batches": [
+      32,
+      128
+    ],
+    "processes": 1,
+    "prefetch_workers": 2,
+    "warmup": 1,
+    "repeats": 2,
+    "stage": "joint",
+    "protocol": "memory_only",
+    "input_site": "o_proj",
+    "E": 16,
+    "Q": 4,
+    "r": 32,
+    "layer": 14
+  },
+  "model": "Qwen/Qwen3-0.6B-Base",
+  "revision": "da87bfb608c14b7cf20ba1ce41287e8de496c0cd",
+  "dtypes": "bf16 backbone, fp32 adapter/state",
+  "measurement": "CUDA-synchronized production train() step durations, including batch wait, support forward/write, question forward/backward, clipping and AdamW. Discard warmup steps; startup and checkpoint export remain in cell time.",
+  "started_at": "2026-10-26T17:26:11.043157+00:00",
+  "runtime": {
+    "host": "mg0040",
+    "job_id": "3715157.opbs",
+    "torch": "2.14.0+cu132",
+    "gpu": "NVIDIA GH200 120GB"
+  },
+  "git_commit": "46746c3d0b79490badd49334f4094482504e5ba3",
+  "source_dirty": false,
+  "source_hash": "e65bde8365fa32308fef8143a10eab36",
+  "cells": [
+    {
+      "variant": "M1",
+      "batch": 32,
+      "steps": 3,
+      "L": 4,
+      "prefetch_workers": 2,
+      "mean_step_ms": 254.51703544240445,
+      "median_step_ms": 254.51703544240445,
+      "episodes_per_second": 125.72832283849775,
+      "scan_final_calls": 3,
+      "scan_prewrite_calls": 0,
+      "step_seconds": [
+        0.2552161091007292,
+        0.25381796178407967
+      ],
+      "all_logged_depths": [
+        4,
+        4,
+        4
+      ],
+      "final_loss": 10.620356559753418,
+      "per_step_gradient_norms": {},
+      "peak_allocated_bytes": 4251640320,
+      "cell_seconds": 19.37670708913356,
+      "train_seconds": 19.31542471400462
+    },
+    {
+      "variant": "B8",
+      "batch": 32,
+      "steps": 3,
+      "L": 4,
+      "prefetch_workers": 2,
+      "mean_step_ms": 261.1959620844573,
+      "median_step_ms": 261.1959620844573,
+      "episodes_per_second": 122.51337939769856,
+      "scan_final_calls": 3,
+      "scan_prewrite_calls": 0,
+      "step_seconds": [
+        0.2578644349705428,
+        0.26452748919837177
+      ],
+      "all_logged_depths": [
+        4,
+        4,
+        4
+      ],
+      "final_loss": 10.608816146850586,
+      "per_step_gradient_norms": {
+        "R.0": 4.2874312384810764e-06,
+        "R.1": 5.6497796322219074e-05,
+        "R.2": 0.0005710541154257953,
+        "R.3": 0.00863464642316103,
+        "U.0": 3.0116456173345796e-07,
+        "U.1": 6.499722530861618e-06,
+        "U.2": 4.241629721946083e-05,
+        "U.3": 0.0026552448980510235,
+        "Q.0": 2.5903651135195105e-07,
+        "Q.1": 2.5210497369698714e-06,
+        "Q.2": 2.2881014956510626e-05,
+        "Q.3": 0.0002457585942465812
+      },
+      "peak_allocated_bytes": 4251493376,
+      "cell_seconds": 16.955067404080182,
+      "train_seconds": 16.938640135107562
+    },
+    {
+      "variant": "B8",
+      "batch": 128,
+      "steps": 3,
+      "L": 4,
+      "prefetch_workers": 2,
+      "mean_step_ms": 361.7084854049608,
+      "median_step_ms": 361.7084854049608,
+      "episodes_per_second": 353.8761327556196,
+      "scan_final_calls": 3,
+      "scan_prewrite_calls": 0,
+      "step_seconds": [
+        0.36253522289916873,
+        0.3608817479107529
+      ],
+      "all_logged_depths": [
+        4,
+        4,
+        4
+      ],
+      "final_loss": 10.4098482131958,
+      "per_step_gradient_norms": {
+        "R.0": 4.23874007537961e-06,
+        "R.1": 5.6372897233814e-05,
+        "R.2": 0.0005682664923369884,
+        "R.3": 0.008620807901024818,
+        "U.0": 2.988826679484191e-07,
+        "U.1": 6.616509836021578e-06,
+        "U.2": 4.1855160816339776e-05,
+        "U.3": 0.0027582792099565268,
+        "Q.0": 2.752144041551219e-07,
+        "Q.1": 2.822043825290166e-06,
+        "Q.2": 2.2728025214746594e-05,
+        "Q.3": 0.0002328565897187218
+      },
+      "peak_allocated_bytes": 13153717760,
+      "cell_seconds": 17.101725002983585,
+      "train_seconds": 17.087208428187296
+    },
+    {
+      "variant": "M1",
+      "batch": 128,
+      "steps": 3,
+      "L": 4,
+      "prefetch_workers": 2,
+      "mean_step_ms": 355.7015125406906,
+      "median_step_ms": 355.7015125406906,
+      "episodes_per_second": 359.8522791925362,
+      "scan_final_calls": 3,
+      "scan_prewrite_calls": 0,
+      "step_seconds": [
+        0.3540939420927316,
+        0.3573090829886496
+      ],
+      "all_logged_depths": [
+        4,
+        4,
+        4
+      ],
+      "final_loss": 10.415029525756836,
+      "per_step_gradient_norms": {},
+      "peak_allocated_bytes": 13146126848,
+      "cell_seconds": 17.16069084010087,
+      "train_seconds": 17.150031170109287
+    }
+  ],
+  "seconds": 71.78461792482994,
+  "finished_at": "2026-10-26T17:27:22.838520+00:00"
+}

@@ -1,0 +1,53 @@
+{
+  "amendment": "A1",
+  "science_commit": "0713cfb66fc9d1ee5f075f3bbc886167722292de",
+  "master_merged": "3548d6e",
+  "arms": [
+    "OA",
+    "W5"
+  ],
+  "selection_context_hash": "8060625ae5220f2e720be1ad47c64a0c",
+  "selection_commit": "a4afc80",
+  "steps": 32900,
+  "eval_steps": [
+    6580,
+    13160,
+    19740,
+    26320,
+    32900
+  ],
+  "seed": 17,
+  "eval_seed": 4242,
+  "val_episodes": 1000,
+  "E": 16,
+  "rank": 32,
+  "layer": 14,
+  "L": 1,
+  "train_batch": 32,
+  "train_Q": 4,
+  "lr": 0.003,
+  "prefetch_workers": 2,
+  "backend": "core.scan_final",
+  "restart": "fresh same initialization and absolute episode stream; not resume",
+  "gate": "final fixed checkpoint EM>=.80; OA diagnostic only",
+  "timing": {
+    "job_id": "3714886.opbs",
+    "slow_arm_step_p95_seconds": 0.2091571442550048,
+    "step_budget_seconds": 7000,
+    "within_fit_reserve_seconds": 100,
+    "rounding": "largest multiple100 fitting (7000-100)/slow-p95",
+    "p95_training_seconds": 6881.270045989659
+  },
+  "max_job_nodes": 1,
+  "max_job_seconds": 7200,
+  "max_total_node_hours": 4,
+  "spent_seconds_before_rerun": 6114,
+  "remaining_seconds_after_full_rerun": 1086,
+  "tests": {
+    "job_id": "3714886.opbs",
+    "host": "mg0848",
+    "passed": 68,
+    "command": "-m pytest -q tests/test_llm_writer_fix.py tests/test_llm_prefetch.py tests/test_llm_train.py",
+    "real_model_equality_steps_per_setting": 100
+  }
+}

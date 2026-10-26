@@ -1,0 +1,52 @@
+{
+  "git_commit": "0713cfb66fc9d1ee5f075f3bbc886167722292de",
+  "host": "mg0848",
+  "job_id": "3714886.opbs",
+  "purpose": "systems timing/equality only; no validation or selection scores",
+  "records": [
+    {
+      "arm": "OA",
+      "identical_final_parameters": true,
+      "identical_logged_losses": true,
+      "rows": [
+        {
+          "seconds": 31.22997970506549,
+          "steady_step_mean_seconds": 0.3090376435416854,
+          "step_p95_seconds": 0.31126718791201713,
+          "steps": 100,
+          "workers": 0
+        },
+        {
+          "seconds": 32.726431160699576,
+          "steady_step_mean_seconds": 0.16680909391596085,
+          "step_p95_seconds": 0.17510909514967352,
+          "steps": 100,
+          "workers": 2
+        }
+      ]
+    },
+    {
+      "arm": "W5",
+      "identical_final_parameters": true,
+      "identical_logged_losses": true,
+      "rows": [
+        {
+          "seconds": 30.34694712003693,
+          "steady_step_mean_seconds": 0.29967936458480027,
+          "step_p95_seconds": 0.3136389404302463,
+          "steps": 100,
+          "workers": 0
+        },
+        {
+          "seconds": 35.90646938793361,
+          "steady_step_mean_seconds": 0.19915462461714115,
+          "step_p95_seconds": 0.2091571442550048,
+          "steps": 100,
+          "workers": 2
+        }
+      ]
+    }
+  ],
+  "source_dirty": false,
+  "source_hash": "e76d76b6fdb4c4f8eb7826644e4bacd7"
+}

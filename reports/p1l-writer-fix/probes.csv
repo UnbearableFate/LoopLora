@@ -1,0 +1,5 @@
+site,position,target,rank,classes,dimensions,train_n,train_accuracy,n,correct,accuracy
+o14,pre_tail,head,,1024,2048,65536,0.999603271484375,16000,13436,0.83975
+o14,pre_tail,head,32,1024,2048,65536,0.9993896484375,16000,15298,0.956125
+o14,pre_tail,relation,,4,2048,65536,1.0,16000,15999,0.9999375
+o14,pre_tail,relation,32,4,2048,65536,1.0,16000,15998,0.999875

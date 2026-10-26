@@ -73,3 +73,20 @@ Residual writer checkpoints record the site and input dimensions and cannot be
 loaded into the default site. Existing default-site checkpoints retain their
 signature and remain loadable. This option alone grants no experiment scope;
 WP-L2's decision is recorded in `docs/reports/P1L-diagnosis.md`.
+
+WP-C6 adds `variant: B8`: four step-specific R/U/Q readers of the same memory
+snapshot, with training and evaluation fixed at L=4 in writer, joint and reader
+stages. Both input sites and evaluation protocols are supported. Writer
+signatures remain independent of reader sharing, so ordinary M1 and B8 writers
+can be consumed by either reader when their site, dimensions and writer settings
+match. M1, B5 and B3 reader/joint training accepts `train.depths: [4]` without
+resampling other depths. `train.prefetch_workers: 2` uses the existing CPU batch
+stream; memory-only support writes use `scan_final`.
+
+WP-L3's `configuration(arm, variant="B8")` and `WriterFixExperiment` support the
+same seven interventions with B8. The addressing auxiliary uses Q[0] z⁰; oracle
+addressing uses each step's own R/U. Standardization, paired-position writes,
+training-only value heads and inference exports keep their existing behavior.
+These diagnostic interventions retain WP-L3's truncated memory-only scope.
+The default `configuration(arm)` and all existing variants remain unchanged.
+This implementation support does not authorize a new scientific run.

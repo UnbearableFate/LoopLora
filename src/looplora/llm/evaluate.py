@@ -91,6 +91,8 @@ def _settings(config: dict[str, Any]) -> tuple[list[int], list[str], list[str], 
     depths = list(settings["depths"])
     if config["variant"] == "B4":
         depths = [1]
+    elif config["variant"] == "B8":
+        depths = [4]
     if (not depths or any(isinstance(depth, bool) or not isinstance(depth, int) or depth < 0
                           for depth in depths) or len(set(depths)) != len(depths)):
         raise ValueError("evaluation depths must be distinct nonnegative integers")
