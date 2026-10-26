@@ -70,7 +70,8 @@ def _spec(name="t2_chain_end"):
 def _config():
     return {"variant": "M1", "eval": {"episodes": 4, "batch_size": 3,
             "depths": [0, 1, 4], "splits": ["val", "test", "test_unseen"],
-            "hops": list(range(1, 9)), "seed": 42, "counterfactuals": True}}
+            "hops": list(range(1, 9)), "seed": 42, "counterfactuals": True,
+            "fixed_depth_sweep": False, "swap_successors": False}}
 
 
 def _patch_spec(monkeypatch, spec):
@@ -273,19 +274,20 @@ def test_orthogonal_counterfactual_keeps_query_and_original_entity_codes(monkeyp
         captured.append((arrays, result))
         return result
 
-    def make_codebooks(original, replacements):
+    def make_codebooks(original, replacements=None, **options):
         codebook_calls.append((original, replacements))
-        return real_codebooks(original, replacements)
+        return real_codebooks(original, replacements, **options)
 
     monkeypatch.setattr(model, "prepare", prepare)
     monkeypatch.setattr(model, "orthogonal_codebooks", make_codebooks)
     metrics, _ = evaluate(model, config, tmp_path)
-    assert len(codebook_calls) == 1
-    assert codebook_calls[0][1] is not None
+    assert codebook_calls[0][1] is None
+    assert any(replacement is not None for _, replacement in codebook_calls)
     assert metrics["codebook_policy"] == "fixed_source_episode_basis_with_replacement_entity_slots"
     original_arrays, original = captured[0]
     offset = 0
-    replacements = codebook_calls[0][1]
+    replacements = next(arrays for arrays, _ in captured
+                        if arrays.meta.get("counterfactual", {}).get("kind") == "replace_key_fact")
     source_episodes = np.asarray(replacements.meta["source_episode"])
     source_queries = np.asarray(replacements.meta["source_query"])
     for arrays, prepared in captured:
@@ -298,4 +300,4 @@ def test_orthogonal_counterfactual_keeps_query_and_original_entity_codes(monkeyp
             entities = np.unique(original_arrays.facts[source, :, (0, 2)])
             assert torch.equal(prepared.codes[row, entities], original.codes[source, entities])
         offset += len(arrays.episode_seed)
-    assert offset == len(replacements.episode_seed)
+    assert offset == len(source_episodes)

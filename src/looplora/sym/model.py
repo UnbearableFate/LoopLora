@@ -88,7 +88,8 @@ class SymbolicModel(nn.Module):
                 "backbone_seed": self.config["backbone_seed"]}
 
     def orthogonal_codebooks(self, arrays: EpisodeArrays,
-                             replacement: EpisodeArrays | None = None) -> Tensor:
+                             replacement: EpisodeArrays | None = None, *,
+                             include_insufficient: bool = False) -> Tensor:
         """Fix source-episode codebooks for both factual and replacement contexts."""
         if not isinstance(self.writer, OracleWriter) or not self.writer.orthogonal:
             raise ValueError("shared episode codebooks require oracle_orth")
@@ -100,7 +101,7 @@ class SymbolicModel(nn.Module):
         facts = torch.as_tensor(arrays.facts, dtype=torch.long, device=self.device)
         valid = torch.as_tensor(arrays.fact_valid, dtype=torch.bool, device=self.device)
         return self.writer.codes(facts, valid, arrays.episode_seed,
-                                 self.config["task"]["name"] == "t3_missing", extras)
+                                 include_insufficient or self.config["task"]["name"] == "t3_missing", extras)
 
     def prepare(self, arrays: EpisodeArrays, *, oracle_codes: Tensor | None = None) -> PreparedBatch:
         facts = torch.as_tensor(arrays.facts, dtype=torch.long, device=self.device)

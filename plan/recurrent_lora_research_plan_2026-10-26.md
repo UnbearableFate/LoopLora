@@ -53,12 +53,14 @@
 | --- | --- |
 | T-01 符号表 | 完成（2026-10-26）：`docs/notation.md` |
 | T-02 参考实现与 Gate 0 测试 | 完成（WP-A，`docs/reports/WP-A.md`）：7 种变体、函数式 delta 记忆、写前快照 scan、Appendix-A oracle、混合精度 wrapper、记账与收缩界；304 项测试在计算节点通过 |
-| T-03 关系数据生成器 | 完成（WP-B，`docs/reports/WP-B.md`）：t1/t2_chain_end/t2_walk/t2_typed/t3_update/t3_missing 与三类反事实；105 项测试通过；≥ 20k episodes/s |
+| T-03 关系数据生成器 | 完成（WP-B，`docs/reports/WP-B.md`）：t1/t2_chain_end/t2_walk/t2_typed/t3_update/t3_missing 与三类反事实；105 项测试通过；≥ 20k episodes/s；补充反事实 `swap_successors`（保持终点集合、改变正确终点，区分“沿链走”与“猜终点”；WP-B2，合并 bbe2a24，120 项测试通过） |
 | T-07 LLM 注入与吞吐 pilot | 完成（WP-E，`docs/reports/WP-E.md`）：Qwen3-0.6B-Base 注入、memory-only/context-retained 协议、teacher forcing 与增量解码一致、1024 个单 token 名字；54 项测试通过；吞吐 pilot 见报告 |
-| T-04/T-05 符号机制流水线与首轮实验 | 流水线完成（WP-D，c86d72b）；验证集 pilot 完成（WP-D2，633f37c，`docs/reports/P1S-pilot.md`）：T1 learned writer 单跳 val 最高 84.7%（r=32,E=12），按规则 E*=12、链 (8,4) 并标记；oracle_orth 下 M1-lin 在 hops 1–3 达 94%、M1 68%，单次读取变体恰为 33.3%（只答对 hop 1）；learned writer 条件下所有变体（含 B4）在各 hop 约 41–50%，呈“在两个链终点间猜测”的捷径特征。预注册定稿 v1（修订 A2 步数 20000、A3 walk-specificity 判据、A4 主矩阵）；正式运行进行中（WP-H） |
+| T-04/T-05 符号机制流水线与首轮实验 | 流水线完成（WP-D，c86d72b）；验证集 pilot 完成（WP-D2，633f37c，`docs/reports/P1S-pilot.md`）：T1 learned writer 单跳 val 最高 84.7%（r=32,E=12），按规则 E*=12、链 (8,4) 并标记；oracle_orth 下 M1-lin 在 hops 1–3 达 94%、M1 68%，单次读取变体恰为 33.3%（只答对 hop 1）；learned writer 条件下所有变体（含 B4）在各 hop 约 41–50%，呈“在两个链终点间猜测”的捷径特征。预注册定稿 v1（修订 A2 步数 20000、A3 walk-specificity 判据、A4 主矩阵）；正式运行进行中（WP-H）；同时预注册并运行唯一后续研究 F1（`docs/prereg/P1S-F1.md`：r=r_m∈{64,128} 下 oracle_random 与 joint 的干扰—秩关系，WP-F1），在任何 WP-H 结果之前登记 |
 | T-04/T-05 LLM 单模块流水线 | 流水线完成（WP-G，合并 2bf5d6d；`docs/reports/WP-G.md`）：writer/冻结 reader/联合训练、B0/B1/B2 基线、全词表 EM、反事实、确定性 GPU 执行；611 项测试与 14 个 smoke 运行通过；实测 280–550 s/千步（batch 8）。P1-L 预注册草稿 `docs/prereg/P1L.md`，待 P1-S 结论后定稿 |
 | §6 理论分析（命题、证明、反例、预测） | 完成（WP-T，`docs/theory.md`，`docs/reports/WP-T.md`）：9 个命题；要点：线性 reader 的精确链终点构造需 ργ>1（ρ=0.25 时 γ>4），不是欧氏收缩；单次读取在对齐首跳读取下 h≥2 的条件上界 1/(N−2)，但无约束 Q 无普适上界；无偏置 ReLU 的 Qφ(Uv) 像位于 r 生成元锥内，不能对正张成全空间的编码做恒等传递（宽度 2r 可以，单独隐藏偏置不行）；双 BA 在 B=0 一阶梯度为零，skip 形式可启动。36 项确定性检查在计算节点通过 |
-| T-06、T-08、T-09、T-10 | 未开始；按阶段门槛决定。文献核查（T-10 前置）已完成：`docs/reports/lit_check.md` |
+| T-08 真实任务处理 | 进行中（WP-B3，`docs/tasks/WP-B3_musique.md`）：MuSiQue-Ans（给定支持段落）划分、指标、`answer_substitution` 反事实与普通能力保留子集；数据准备不消耗训练预算，P3 是否运行仍由门槛决定 |
+| §6 补充：learned writer 的终点集合捷径 | 进行中（WP-T2）：线性 writer 的 value 同时含 head 与 tail 时，单次读取可得 Σ(终点−起点)（望远镜求和），各 hop 约 1/链数；分析分解式 writer（key 仅含 head/关系、value 仅含 tail）与 LLM 中的对应设计 |
+| T-06、T-09、T-10 | 未开始；按阶段门槛决定。文献核查（T-10 前置）已完成：`docs/reports/lit_check.md` |
 
 ---
 

@@ -25,10 +25,14 @@ class OracleWriter(nn.Module):
               extra_entities: list[list[int]] | None = None) -> Tensor:
         if not self.orthogonal:
             return self.global_codes.unsqueeze(0).expand(facts.shape[0], -1, -1)
+        # Stage each batch once: per-episode CUDA indexing/unique and basis
+        # assignment otherwise force many small host/device round trips.
+        facts_cpu, valid_cpu = facts.cpu(), valid.cpu()
+        global_codes_cpu = self.global_codes.cpu()
         result = []
-        # QR on CPU makes the fixed episode codebook independent of GPU lanes.
+        # Keep the original per-episode RNG/QR order and entity slot ordering.
         for i, episode in enumerate(episode_seed):
-            entities = facts[i, valid[i]][:, (0, 2)].unique().cpu()
+            entities = facts_cpu[i, valid_cpu[i]][:, (0, 2)].unique()
             if include_insufficient:
                 entities = torch.cat((entities, torch.tensor([self.V], dtype=entities.dtype))).unique()
             if extra_entities is not None:
@@ -39,10 +43,10 @@ class OracleWriter(nn.Module):
                 raise ValueError("oracle_orth requires episode entities <= r_mem")
             generator = torch.Generator().manual_seed(derive_seed(self.seed, "oracle_orth", int(episode)))
             basis, _ = torch.linalg.qr(torch.randn(self.r_mem, self.r_mem, generator=generator))
-            table = self.global_codes.clone()
-            table[entities.to(table.device)] = basis[:, :len(entities)].T.to(table.device)
+            table = global_codes_cpu.clone()
+            table[entities] = basis[:, :len(entities)].T
             result.append(table)
-        return torch.stack(result)
+        return torch.stack(result).to(self.global_codes.device)
 
     def forward(self, facts: Tensor, valid: Tensor, codes: Tensor) -> Tensor:
         state = zeros_state(len(facts), self.r_mem, codes.dtype, codes.device)

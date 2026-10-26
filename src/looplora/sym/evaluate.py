@@ -181,17 +181,62 @@ def aggregate_samples(samples: dict[str, np.ndarray]) -> list[dict[str, Any]]:
     return table
 
 
+def _aggregate_diagnostics(samples: dict[str, np.ndarray]) -> list[dict[str, Any]]:
+    diagnostics = []
+    for split, condition, depth in sorted(set(zip(samples["split"], samples["condition"], samples["L"]))):
+        mask = (samples["split"] == split) & (samples["condition"] == condition) & (samples["L"] == depth)
+        cosine = samples["first_read_cosine"][mask]
+        valid = np.isfinite(cosine)
+        diagnostics.append(dict(split=str(split), condition=str(condition), L=int(depth),
+                                z_norm=float(samples["z_norm"][mask].mean()),
+                                memory_frobenius=float(samples["memory_norm"][mask].mean()),
+                                first_read_cosine=float(cosine[valid].mean()) if valid.any() else None,
+                                first_read_count=int(valid.sum())))
+    return diagnostics
+
+
+def _file_hash(path: Path) -> str:
+    digest = hashlib.blake2b(digest_size=16)
+    with path.open("rb") as stream:
+        for chunk in iter(lambda: stream.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def finalize_evaluation(out: Path, *, barrier_passed: bool = False) -> dict[str, Any]:
+    """Aggregate saved samples only after the caller attests the global barrier."""
+    if barrier_passed is not True:
+        raise ValueError("finalization requires explicit global training-and-confirmation-samples barrier clearance")
+    out = Path(out)
+    if (out / "metrics.json").exists():
+        raise FileExistsError(f"evaluation metrics already exist: {out}")
+    metadata = json.loads((out / "evaluation.json").read_text())
+    if not metadata.get("aggregation_deferred"):
+        raise ValueError("evaluation was not generated in samples-only mode")
+    if _file_hash(out / "samples.npz") != metadata["samples_hash"]:
+        raise ValueError("saved evaluation samples changed after generation")
+    with np.load(out / "samples.npz", allow_pickle=False) as archive:
+        samples = {key: archive[key] for key in archive.files}
+    metrics = {**metadata, "aggregation_deferred": False, "finalized_after_global_barrier": True,
+               "table": aggregate_samples(samples), "diagnostics": _aggregate_diagnostics(samples)}
+    (out / "metrics.json").write_text(json.dumps(metrics, indent=2, allow_nan=False) + "\n")
+    return metrics
+
+
 @torch.no_grad()
-def evaluate(model: Any, config: dict[str, Any], out: Path) -> tuple[dict[str, Any], dict[str, Any]]:
+def evaluate(model: Any, config: dict[str, Any], out: Path, *, samples_only: bool = False,
+             provenance: dict[str, Any] | None = None) -> tuple[dict[str, Any], dict[str, Any]]:
     """Write immutable-depth paired samples, metrics, diagnostics, and Gate 0 hashes."""
     from looplora.sym.model import make_task_spec
 
     out = Path(out)
     out.mkdir(parents=True, exist_ok=True)
+    if samples_only and ((out / "metrics.json").exists() or (out / "samples.npz").exists()):
+        raise FileExistsError(f"samples-only evaluation output already exists: {out}")
     settings = config["eval"]
     depths = [int(depth) for depth in settings["depths"]]
     fixed_depth = {"B4": 1, "B6": 1, "B7": 1, "B8": 4}.get(config["variant"])
-    if fixed_depth is not None:
+    if fixed_depth is not None and (config["variant"] == "B8" or not settings.get("fixed_depth_sweep", False)):
         depths = [fixed_depth]
     if not depths or len(set(depths)) != len(depths) or any(depth < 0 for depth in depths):
         raise ValueError("evaluation depths must be distinct nonnegative integers")
@@ -200,10 +245,13 @@ def evaluate(model: Any, config: dict[str, Any], out: Path) -> tuple[dict[str, A
         raise ValueError("evaluation episodes and batch_size must be positive")
     if settings.get("counterfactuals", True) and "test" in settings["splits"] and count < 2:
         raise ValueError("swap_memory requires at least two evaluation episodes")
+    if (settings.get("swap_successors", False) and settings.get("counterfactuals", True)
+            and "test" in settings["splits"] and not {1, 4, 8}.issubset(depths)):
+        raise ValueError("swap_successors requires evaluation depths 1, 4, 8")
     spec = make_task_spec(config, evaluation=True)
     seed = int(settings["seed"])
     chunks: dict[str, list[np.ndarray]] = {}
-    hashes, diagnostics = [], []
+    hashes = []
     timing: dict[str, Any] = {"writer_seconds": 0.0, "reader_seconds": {str(depth): 0.0 for depth in depths}}
     previous_mode = model.training
     model.eval()
@@ -215,31 +263,61 @@ def evaluate(model: Any, config: dict[str, Any], out: Path) -> tuple[dict[str, A
             n, q = arrays.answer.shape
             original_predictions: dict[tuple[int, int, int], int] = {}
             conditions = [("original", arrays, np.arange(n), None)]
-            replaced = None
             if split == "test" and settings.get("counterfactuals", True):
                 replaced, _ = counterfactual(arrays, "replace_key_fact", derive_seed(seed, "eval-replace", split))
+                removed, _ = counterfactual(arrays, "remove_required_fact", derive_seed(seed, "eval-remove", split))
                 swapped, _ = counterfactual(arrays, "swap_memory", derive_seed(seed, "eval-swap", split))
                 conditions.extend([
                     ("replace_key_fact", replaced, np.asarray(replaced.meta["source_episode"]),
                      np.asarray(replaced.meta["source_query"])),
+                    ("remove_required_fact", removed, np.asarray(removed.meta["source_episode"]),
+                     np.asarray(removed.meta["source_query"])),
                     ("swap_memory", arrays, np.arange(n), np.asarray(swapped.meta["pairing"])),
                 ])
+                if settings.get("swap_successors", False):
+                    successors, _ = counterfactual(arrays, "swap_successors", seed)
+                    sources = np.asarray(successors.meta["source_episode"])
+                    questions = np.asarray(successors.meta["source_query"])
+                    if not np.all(successors.answer[:, 0] != arrays.answer[sources, questions]):
+                        raise AssertionError("swap_successors did not change every terminal answer")
+                    conditions.append(("swap_successors", successors, sources, questions))
             codebooks = None
             if config.get("writer") == "oracle_orth":
                 _sync(model)
                 before_codes = time.perf_counter()
-                codebooks = model.orthogonal_codebooks(arrays, replaced)
+                codebooks = model.orthogonal_codebooks(arrays)
                 _sync(model)
                 timing["writer_seconds"] += time.perf_counter() - before_codes
             for condition, dataset, source_episodes, query_or_pairing in conditions:
+                condition_depths = [1, 4, 8] if condition == "swap_successors" else depths
                 for begin in range(0, len(dataset.episode_seed), batch_size):
                     end = min(begin + batch_size, len(dataset.episode_seed))
                     part = _slice(dataset, slice(begin, end))
+                    src = source_episodes[begin:end]
+                    path_condition = condition in {"replace_key_fact", "remove_required_fact"}
+                    fork_condition = path_condition or condition == "swap_successors"
+                    insufficient = condition == "remove_required_fact" and spec.kind in {"t1", "t2_walk"}
                     _sync(model)
                     before_prepare = time.perf_counter()
                     options = ({} if codebooks is None else {"oracle_codes": codebooks[
-                        torch.as_tensor(source_episodes[begin:end], dtype=torch.long, device=codebooks.device)]})
+                        torch.as_tensor(src, dtype=torch.long, device=codebooks.device)]})
+                    if codebooks is not None and path_condition:
+                        # Give each query fork its own fresh-entity slots, keeping
+                        # the original episode's basis and entity slots unchanged.
+                        extras = replace(part, meta={**part.meta, "source_episode": list(range(end - begin))})
+                        options = {"oracle_codes": model.orthogonal_codebooks(
+                            _slice(arrays, src), extras, include_insufficient=insufficient)}
                     prepared = model.prepare(part, **options)
+                    if condition == "remove_required_fact":
+                        # A chain cut may return the query start, whose only fact
+                        # was removed. Keep source entities as candidates as well.
+                        candidate = prepared.candidate_mask.clone()
+                        for row, source in enumerate(src):
+                            entities = arrays.facts[source, arrays.fact_valid[source]][:, (0, 2)].ravel()
+                            candidate[row, torch.as_tensor(entities, device=candidate.device, dtype=torch.long)] = True
+                        if insufficient:
+                            candidate[:, spec.V] = True
+                        prepared = replace(prepared, candidate_mask=candidate)
                     if condition == "swap_memory":
                         donor_options = ({} if codebooks is None else {"oracle_codes": codebooks[
                             torch.as_tensor(query_or_pairing[begin:end], dtype=torch.long, device=codebooks.device)]})
@@ -251,9 +329,8 @@ def evaluate(model: Any, config: dict[str, Any], out: Path) -> tuple[dict[str, A
                     for name in ("x", "u", "memory"):
                         _require_finite(getattr(prepared, name), name, context)
                     snapshot = _snapshot(prepared)
-                    src = source_episodes[begin:end]
                     shape = part.answer.shape
-                    source_q = (query_or_pairing[begin:end, None] if condition == "replace_key_fact"
+                    source_q = (query_or_pairing[begin:end, None] if fork_condition
                                 else np.broadcast_to(np.arange(q), shape))
                     source_i = np.broadcast_to(src[:, None], shape)
                     episode_ids = np.broadcast_to(arrays.episode_seed[src, None], shape)
@@ -267,7 +344,7 @@ def evaluate(model: Any, config: dict[str, Any], out: Path) -> tuple[dict[str, A
                     if np.any(candidate_size < 1):
                         raise AssertionError("empty candidate set")
                     candidate_size = np.broadcast_to(candidate_size[:, None], shape)
-                    for depth in depths:
+                    for depth in condition_depths:
                         _sync(model)
                         before_read = time.perf_counter()
                         result = model.read(prepared, depth)
@@ -296,6 +373,7 @@ def evaluate(model: Any, config: dict[str, Any], out: Path) -> tuple[dict[str, A
                             raise FloatingPointError(f"non-finite evaluation diagnostic ({context}, L={depth})")
                         values = dict(split=np.full(shape, split), condition=np.full(shape, condition),
                                       episode_id=episode_ids, query_id=source_q, hop=hops,
+                                      counterfactual_hop_true=part.q_hop_true,
                                       L=np.full(shape, depth, dtype=np.int64), prediction=prediction,
                                       answer=answers, correct=prediction == answers,
                                       full_prediction=full_prediction, full_correct=full_prediction == answers,
@@ -310,27 +388,40 @@ def evaluate(model: Any, config: dict[str, Any], out: Path) -> tuple[dict[str, A
                         for name, value in values.items():
                             chunks.setdefault(name, []).append(np.asarray(value).ravel().copy())
         samples = {name: np.concatenate(value) for name, value in chunks.items()}
-        for split, condition, depth in sorted(set(zip(samples["split"], samples["condition"], samples["L"]))):
-            mask = (samples["split"] == split) & (samples["condition"] == condition) & (samples["L"] == depth)
-            cosine = samples["first_read_cosine"][mask]
-            valid = np.isfinite(cosine)
-            diagnostics.append(dict(split=str(split), condition=str(condition), L=int(depth),
-                                    z_norm=float(samples["z_norm"][mask].mean()),
-                                    memory_frobenius=float(samples["memory_norm"][mask].mean()),
-                                    first_read_cosine=float(cosine[valid].mean()) if valid.any() else None,
-                                    first_read_count=int(valid.sum())))
-        metrics = dict(table=aggregate_samples(samples), diagnostics=diagnostics, memory_hashes=hashes,
+        metadata = dict(memory_hashes=hashes,
                        gate0_passed=True, query_protocol="one_query_per_hop_from_support_v1",
                        counterfactual_hop="original_query_hop", swap_candidate_set="original_episode",
                        swap_code_space="donor_memory_in_original_query_code_space",
+                       remove_candidate_set="original_source_and_modified_fact_entities_plus_insufficient_when_applicable",
                        codebook_policy=("fixed_source_episode_basis_with_replacement_entity_slots"
                                         if config.get("writer") == "oracle_orth" else "fixed_global_codes_or_backbone"),
-                       evaluation_seed=seed)
+                       counterfactual_codebook_allocation="per_query_fork",
+                       swap_successors_depths=[1, 4, 8], swap_successors_diagnostic_only=True,
+                       swap_successors_seed=seed,
+                       sample_hop_fields={"hop": "original source-query hop",
+                                          "counterfactual_hop_true": "generated part.q_hop_true; swap_memory retains original queries"},
+                       evaluation_seed=seed, aggregation_deferred=samples_only,
+                       **(provenance or {}))
+        metadata.update(config=copy.deepcopy(config), config_hash=stable_hash(config))
+        if "checkpoint_config" in metadata:
+            metadata["checkpoint_config_hash"] = stable_hash(metadata["checkpoint_config"])
         np.savez_compressed(out / "samples.npz", **samples)
-        (out / "metrics.json").write_text(json.dumps(metrics, indent=2, allow_nan=False) + "\n")
+        metadata["samples_hash"] = _file_hash(out / "samples.npz")
+        if samples_only:
+            (out / "evaluation.json").write_text(json.dumps(metadata, indent=2, allow_nan=False) + "\n")
+            config_record = {key: metadata[key] for key in
+                             ("checkpoint", "checkpoint_config", "checkpoint_config_hash", "config", "config_hash", "eval_overrides")
+                             if key in metadata}
+            (out / "config.json").write_text(json.dumps(config_record, indent=2, allow_nan=False) + "\n")
+            result = metadata
+        else:
+            result = {**metadata, "table": aggregate_samples(samples), "diagnostics": _aggregate_diagnostics(samples)}
+            (out / "metrics.json").write_text(json.dumps(result, indent=2, allow_nan=False) + "\n")
         _sync(model)
         timing["evaluation_seconds"] = time.perf_counter() - started
-        return metrics, timing
+        if samples_only:
+            (out / "timing.json").write_text(json.dumps(timing, indent=2, allow_nan=False) + "\n")
+        return result, timing
     finally:
         model.train(previous_mode)
 
@@ -340,6 +431,8 @@ def main(argv: list[str] | None = None) -> None:
     parser.add_argument("--checkpoint", type=Path, required=True)
     parser.add_argument("--out", type=Path, required=True, help="New or empty evaluation output directory")
     parser.add_argument("--device", help="Override the checkpoint device, e.g. cpu or cuda:0")
+    parser.add_argument("--samples-only", action="store_true",
+                        help="Save samples/provenance only; defer all aggregates until the global barrier")
     parser.add_argument("--set", action="append", default=[], metavar="KEY=VALUE",
                         help="Evaluation override (YAML/JSON); repeat keys for last-value-wins. "
                              "Allowed: eval.seed, eval.episodes, eval.splits (e.g. '[test]'), "
@@ -364,7 +457,12 @@ def main(argv: list[str] | None = None) -> None:
         parser.error(f"invalid evaluation configuration: {error}")
     torch.set_num_threads(config["runtime"]["threads"])
     device = torch.device(config["device"])
-    metrics, timing = evaluate(model, config, out)
+    provenance = dict(checkpoint=str(checkpoint), checkpoint_config=checkpoint_config,
+                      config=config, config_hash=stable_hash(config), eval_overrides=overrides)
+    if args.samples_only:
+        metrics, timing = evaluate(model, config, out, samples_only=True, provenance=provenance)
+    else:
+        metrics, timing = evaluate(model, config, out)
     timing["runtime"] = {
         "python": sys.version.split()[0], "torch": torch.__version__,
         "host": socket.gethostname(), "job_id": os.environ.get("PBS_JOBID"),
@@ -377,11 +475,10 @@ def main(argv: list[str] | None = None) -> None:
         "reader_scope": "core read, branch, vocabulary logits, and first-read diagnostic",
         "evaluation_scope": "episode generation, preparation, all readers, validation, hashing, and sample/metric output",
     }
-    provenance = dict(checkpoint=str(checkpoint), checkpoint_config=checkpoint_config,
-                      config=config, config_hash=stable_hash(config), eval_overrides=overrides)
-    metrics.update(provenance)
-    (out / "config.json").write_text(json.dumps(provenance, indent=2, allow_nan=False) + "\n")
-    (out / "metrics.json").write_text(json.dumps(metrics, indent=2, allow_nan=False) + "\n")
+    if not args.samples_only:
+        metrics.update(provenance)
+        (out / "config.json").write_text(json.dumps(provenance, indent=2, allow_nan=False) + "\n")
+        (out / "metrics.json").write_text(json.dumps(metrics, indent=2, allow_nan=False) + "\n")
     (out / "timing.json").write_text(json.dumps(timing, indent=2, allow_nan=False) + "\n")
 
 

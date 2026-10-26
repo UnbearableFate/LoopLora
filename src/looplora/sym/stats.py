@@ -315,6 +315,122 @@ def pooled_compare_runs(
     }
 
 
+def pooled_walk_specificity(
+    samples_by_seed: Mapping[int, SampleSource],
+    depth_a: int = 4,
+    depth_b: int = 1,
+    *,
+    reach_hops: list[int] | tuple[int, ...] = (2, 3),
+    far_hops: list[int] | tuple[int, ...] = (6, 7, 8),
+    split: str = "test",
+    condition: str = "original",
+    resamples: int = 2000,
+    seed: int = 2718,
+    confidence: float = 0.95,
+) -> dict[str, Any]:
+    """Bootstrap the per-episode reachable-minus-far depth-effect contrast.
+
+    Query labels must agree across depths and training seeds. Every episode
+    must cover every requested hop. Within each episode, average query effects
+    separately in the two hop subsets, subtract, then average episodes and
+    seeds equally. Complete episode contrasts are resampled jointly across
+    seeds, preserving covariance between the hop subsets. Confidence changes
+    only percentile cutoffs. No confirmation files are selected by this API.
+    """
+    _check_resamples(resamples)
+    if (isinstance(confidence, bool) or not isinstance(confidence, Real)
+            or not 0 < confidence < 1):
+        raise ValueError("Confidence must be a finite real number strictly between zero and one")
+    confidence = float(confidence)
+    if not math.isfinite(confidence) or not 0 < confidence < 1:
+        raise ValueError("Confidence must be a finite real number strictly between zero and one")
+    if not isinstance(samples_by_seed, Mapping) or not samples_by_seed:
+        raise ValueError("Specificity requires a nonempty mapping keyed by training seed")
+    if any(isinstance(s, bool) or not isinstance(s, (int, np.integer)) or s < 0 for s in samples_by_seed):
+        raise ValueError("Training seed keys must be nonnegative integers")
+    if not isinstance(split, str) or not split or not isinstance(condition, str) or not condition:
+        raise ValueError("Specificity requires nonempty split and condition labels")
+    subsets = []
+    for hops in (reach_hops, far_hops):
+        if (not isinstance(hops, (list, tuple)) or not hops
+                or any(isinstance(h, bool) or not isinstance(h, (int, np.integer)) or h < 1 for h in hops)
+                or len(set(hops)) != len(hops)):
+            raise ValueError("Specificity hop subsets must contain distinct positive integers")
+        subsets.append(sorted(int(h) for h in hops))
+    reach, far = subsets
+    if set(reach) & set(far):
+        raise ValueError("Specificity reachable and far hop subsets must be disjoint")
+    training_seeds = sorted(int(s) for s in samples_by_seed)
+    reference_keys = None
+    reference_hops = reference_answers = None
+    deltas = []
+    for training_seed in training_seeds:
+        arrays = load_samples(samples_by_seed[training_seed])
+        paired = []
+        for depth in (depth_a, depth_b):
+            rows = {key: index for key, index in _depth_rows(arrays, depth).items()
+                    if key[:2] == (split, condition)}
+            if not rows:
+                raise ValueError(f"No specificity samples for seed {training_seed}, L={depth}, {split}/{condition}")
+            keys = sorted(rows)
+            indices = np.asarray([rows[key] for key in keys], dtype=np.int64)
+            if reference_keys is None:
+                reference_keys = keys
+                reference_hops = arrays["hop"][indices]
+                reference_answers = arrays["answer"][indices]
+            elif (keys != reference_keys
+                  or not np.array_equal(arrays["hop"][indices], reference_hops)
+                  or not np.array_equal(arrays["answer"][indices], reference_answers)):
+                raise ValueError("Specificity requires identical episode/query/hop/answer labels across depths and seeds")
+            paired.append(arrays["correct"][indices].astype(np.float64))
+        deltas.append(paired[0] - paired[1])
+    assert reference_keys is not None and reference_hops is not None
+    episode_ids = np.asarray([key[2] for key in reference_keys])
+    _, clusters = np.unique(episode_ids, return_inverse=True)
+    n_episodes = int(clusters.max()) + 1
+    subset_effects = []
+    query_counts = {}
+    for label, hops in (("reach", reach), ("far", far)):
+        for hop in hops:
+            hop_counts = np.bincount(clusters[reference_hops == hop], minlength=n_episodes)
+            if np.any(hop_counts == 0):
+                raise ValueError(f"Every episode must cover specificity hop {hop}")
+        mask = np.isin(reference_hops, hops)
+        counts = np.bincount(clusters[mask], minlength=n_episodes)
+        query_counts[label] = int(mask.sum())
+        subset_effects.append(np.stack([
+            np.bincount(clusters[mask], weights=delta[mask], minlength=n_episodes) / counts
+            for delta in deltas]))
+    reach_effect, far_effect = subset_effects
+    contrasts = reach_effect - far_effect
+    bootstrap_seed = derive_seed(seed, "sym", "pooled_episode_walk_specificity", training_seeds,
+                                 split, condition, reach, far, int(depth_a), int(depth_b))
+    rng = np.random.default_rng(bootstrap_seed)
+    boot = np.empty(resamples, dtype=np.float64)
+    batch_size = max(1, min(256, 1_000_000 // (n_episodes * len(training_seeds))))
+    for start in range(0, resamples, batch_size):
+        stop = min(start + batch_size, resamples)
+        draws = rng.integers(0, n_episodes, size=(stop - start, n_episodes))
+        boot[start:stop] = contrasts[:, draws].mean(axis=-1).mean(axis=0)
+    alpha = (1 - confidence) / 2
+    low, high = np.quantile(boot, [alpha, 1 - alpha])
+    return {
+        "comparison": "reachable depth effect - far depth effect", "split": split, "condition": condition,
+        "depth_a": int(depth_a), "depth_b": int(depth_b), "reach_hops": reach, "far_hops": far,
+        "training_seeds": training_seeds, "n_seeds": len(training_seeds),
+        "n_episodes": n_episodes, "n_queries_per_seed": sum(query_counts.values()),
+        "query_counts_by_subset": query_counts, "episode_weighting": "equal",
+        "reach_difference": float(reach_effect.mean()), "far_difference": float(far_effect.mean()),
+        "difference": float(contrasts.mean()), "ci_low": float(low), "ci_high": float(high),
+        "confidence": confidence, "resamples": int(resamples), "seed": int(seed),
+        "bootstrap_seed": bootstrap_seed, "cluster_unit": "episode", "joint_episode_resampling": True,
+        "statistic": "mean_per_seed_episode_walk_specificity", "method": "paired_multiseed_percentile_bootstrap",
+        "per_seed": [{"seed": training_seed, "reach_difference": float(reach_effect[i].mean()),
+                      "far_difference": float(far_effect[i].mean()), "difference": float(contrasts[i].mean())}
+                     for i, training_seed in enumerate(training_seeds)],
+    }
+
+
 def _load_manifest(path: Path) -> dict[int, Path]:
     def unique_pairs(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
         result: dict[str, Any] = {}
