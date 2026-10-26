@@ -106,11 +106,13 @@ The option applies to the `fact_final` writers (W1-W3, W5, R), not to the paired
 
 # Fact-only oracle writer (WP-C7)
 
-Set `writer: oracle_random`, `stage: reader`, `model.r: 32` and
+Set `writer: oracle_random`, `stage: reader`, `model.r: 32` (or `128`, P1-L B3) and
 `protocol: memory_only`; no `writer_checkpoint` is consumed. `oracle_seed: 17`
 is fixed independently of the reader training seed. Keys are global random
 unit codes for `(entity, relation)` pairs (index `entity * n_rel + relation`);
-values are exactly the symbolic `OracleWriter` entity codes at that seed.
+values are exactly the symbolic `OracleWriter` entity codes at that seed and
+memory dimension. Rank32 is the unchanged default. Checkpoint signatures record
+the actual dimension and reject a writer of another rank.
 Both tables are frozen fp32 buffers saved in the full checkpoint and
 `writer.pt`. Each valid fact writes once, in fact-list order, with λ = β = 1.
 No support text is rendered or forwarded through the LM. The learned writer's

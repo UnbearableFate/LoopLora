@@ -1,0 +1,30 @@
+{
+  "task": {
+    "name": "t2_chain_end",
+    "E": 12,
+    "chain_lengths": [
+      8,
+      4
+    ],
+    "n_distract": 0
+  },
+  "eval": {
+    "episodes": 2000,
+    "splits": [
+      "confirm"
+    ],
+    "hops": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "seed": 4242,
+    "allow_confirmation": true,
+    "counterfactuals": false
+  }
+}

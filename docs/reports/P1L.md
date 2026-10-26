@@ -1,0 +1,67 @@
+# WP-P1L — in progress
+
+Worker handover2026-10-27: Codex role is closing; all armed Codex wake-ups were
+cancelled. Claude Sonnet-5.5 resumes after10/28 22:00. The complete current
+job/artifact inventory and ordered commands are in P1L-state.md. Study incomplete.
+
+B5/master6de902b merged: WP-L4 selected no learned writer. Conditions are the
+two oracle ranks, k2, gate CIs97.5% fixed in confirmation-lock.json before any
+confirmation. After10/28 22:00 and all37 runs complete, evaluation is authorized
+without another permission request; until then confirmation remains held.
+
+Operation-window correction06:50JST: normal operation ends10/27 08:00 per
+/etc/motd. Orchestrator authorized post10/28 22:00 confirmation and retaining
+B1/B2s43 queued. Four unstarted B4+B3 packs were cancelled and replaced by
+eight same-config/seed/S/lr singles3716612–3716619 at measured1.5x walltime
+(57m26s–58m21s), fitting07:58 if assigned promptly. Manifests updated; cancelled
+receipts retained. Details/evidence in P1L-state.md/dedicated-boundary-splits.json.
+Seven replacements started with requested ends by07:56:49; r128 B4-s43 alone
+remains queued among replacements. All seven running configs were verified.
+
+Oracle-random design/all22 run configs were committed before training(ea44bb6).
+The orchestrator's J-lens-inspired name-gradient probe A1 amendment was committed before Pilot-2(b5d923c).
+Merged master Amendments B1/B2: B2 supersedes the total cap, fixes S17000 and
+Pilot-2 5666steps; per-job<=8nodes x2h and maintenance deadline remain binding.
+Single GPU process, sequential backbone reuse, prefetch2. Smoke timing audit
+3715950 passed; S/packing locked1dc8a76. Pilot-2 jobs3715959–3715965 passed,
+5666steps per lr candidate. Selection3716286 onmg0019 fixed M1-L4 lr.003,
+all other trained readers lr.001; lr/S/config lockd644b9b precedes main.
+R32 main jobs3716288–3716306 submitted (19jobs/22runs), one node each,
+maximum request1h55min, B4/B3 pairs sequentially packed.
+Confirmation remains held for all main runs and the post-maintenance window;
+B5 supplies the WP-L4 decision and fixes k2/CI97.5%.
+Amendment B3 adds oracle r128 (15runs, own Pilot-2, B0–B2 reused); confirmation
+is now held for ALL conditions, with confidence1-.05/k fixed beforehand.
+B4 removes cross-rank single-read contrasts and adds descriptive adapter counts/
+inference timing; wrapper3716084 passed onmg0025. R128 smokes completed,
+sizing3716162 locked S17000(e955765), and Pilot-2 jobs3716168–3716172 passed.
+Selection3716392 onmg0021 fixed lr.003 for B8/M1/B4/B5, lr.001 for B3;
+lock1d1bbfd precedes all12 main jobs3716396–3716407 (15runs, one node/job,
+maximum2h; B4/B3 packed sequentially). See P1L-state.md for continuation.
+At06:17JST, B0 and two r32 B5 jobs exited0; two B4 records completed inside
+ongoing packs. Three r128 main jobs started as slots freed; other jobs are
+running/queued under the project16-job limit. Those wake-ups were subsequently
+cancelled for the worker handover; no Codex resumption remains armed.
+No test or confirmation data have been accessed.
+
+Raw root: /work/xg24i002/x10041/LoopLora/runs/p1l/main/.
+Preflight3715826 passed all7 paths onmg0024; peak7.2GB oracle/17.2GB context.
+Smoke3715854/3715855 passed (900steps, timing only; B2 accepts this ratio).
+Readout/oracle tests3715857 passed33checks onmg0022. J-lens-inspired name-gradient probe trial3715862 passed;
+full512-question validation-only gradient cache3715870 completed onmg0865 in932s.
+R128 support/exact reload tests3716000 passed34; short preflight3716009 passed,
+S17000 feasible. Its1700-step smokes3716020/3716021 passed. Gates/
+authorization tests3715889 passed4checks. A validation-only swap-wrapper test
+3715928 caught grouping by rewired hop rather than source hop; fixed and passed
+3715942 with source episode/query/hop retained and raw counterfactual samples.
+Initial
+sizing3715842 failed on sparse preflight timing logs; fixed/rechecked3715847.
+Validation-only full-model evaluation3716191 caught readout batch-bound
+shadowing; regression3716212 passed. Timing acceptance3716213 exposed a2.29e-5
+FP32 difference from separately recomputed residuals; actual deployed residual
+capture replaces recomputation(2823982), with5 exact replay/capture checks
+passed3716225 onmg0023. Full-model recheck3716226 passed onmg0022 with bit-exact
+deployed residual capture. A baseline timing submission
+3716221 used the central HEAD and failed before runtime; explicit-source
+replacement3716223 passed both protocols on validation only.
+Reproduction: reports/p1l/README.md. Final ledger/results/limitations pending.

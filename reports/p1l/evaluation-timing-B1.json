@@ -1,0 +1,20 @@
+{
+  "checkpoint_hash": "7315168ac263736f3480e8c92ca9d4b6",
+  "episodes": 200,
+  "host": "mg0030",
+  "job_id": "3716223.opbs",
+  "phases": {
+    "primary": {
+      "evaluation_seconds": 8.715314503060654,
+      "seconds": 8.717531537869945
+    },
+    "typed": {
+      "evaluation_seconds": 6.650831948034465,
+      "seconds": 6.652766196988523
+    }
+  },
+  "status": "complete",
+  "time": "2026-10-26T20:10:59.309709+00:00",
+  "timing_only": true,
+  "total_seconds": 18.049450563034043
+}

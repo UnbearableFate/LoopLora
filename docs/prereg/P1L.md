@@ -128,3 +128,51 @@ condition, if added, uses the same rule. Information seen: timing only; no score
 - Schedule: normal operation ended 2026-10-27 08:00 (HPC Challenge, then maintenance until 2026-10-28 22:00).
   Runs that could not finish by then (r = 32 B1/B2 seed 43, r = 128 B4 seed 43) and the confirmation evaluation
   run after 2026-10-28 22:00. No design change.
+
+## Amendment B6 — equal-parameter claim rule (2026-10-27 08:18 JST; before any P1-L confirmation score is read)
+Prompted by an external review (`docs/review/rv-astra_2026-10-27.md`). Gates G1-L/G2-L are unchanged.
+- Parameters (`param_count`, adapter only): B4 = M1-L4 = 103,426 at r = 32 and 475,138 at r = 128; B8 = 112,642
+  (+8.9%) and 622,594 (+31.0%). B8 − B4 is a same-rank contrast, not an equal-parameter one.
+- A claim that more reads beat one read **at equal parameters** is made only from the already registered secondary
+  contrast M1-L4@4 − B4@1 (hops {2, 3}, per rank), and only if it meets the G1-L criterion: ≥ 3 pp, 97.5% CI > 0,
+  positive in every seed. Otherwise the paper states the B8 result with its parameter difference and makes no
+  equal-parameter claim for the LLM.
+
+## Amendment B7 — memory-use check and oracle-code interpretation (2026-10-27 09:30 JST; before any P1-L
+## confirmation score is read)
+Prompted by the external reviews (`docs/review/rv-fable_2026-10-27.md` C1, `docs/review/rv-astra_2026-10-27.md`
+§5) and by a check of the main runs' training logs. Runs, gates, confirmation set and the 97.5% level are unchanged.
+The reviews' proposal to change the oracle keys before Pilot-2 is moot: main training is complete.
+
+Information seen (training logs and Pilot-2 validation only; no test or confirmation data):
+- Training logs at step 17,000 (mean of the last five logged batches, hops 1–3 mixed, trained L): at r = 32 every
+  memory reader is at chance (batch accuracy 0.4–1.6%, loss 7.07–7.18; B3-L4, no memory: 0.3–0.4%, 7.15–7.18),
+  while B1/B2 (context-retained) reach 99.4–100%. At r = 128: B4 10.0–10.8%, B5-L4 10.3–13.5%, B8 11.3–12.8%,
+  M1-L4 28.1–41.2%; B3-L4 0.3–0.6%. B4 seed 43 at r = 128 and B1/B2 seed 43 have not run.
+- Pilot-2 validation at r = 32 (S/3, seed 17): full EM ≤ 0.3% and candidate accuracy 7.2–9.1% (chance 7.1%) on
+  hops 1–3 for every reader and lr (`docs/reports/P1L-state.md` on wp/p1l noted it; no design change followed).
+- Capacity check (`scripts/analyze_oracle_capacity.py`, numpy, `reports/p1l-c1/capacity.json`): the oracle's keys
+  (`pair_codes[e, 0]`) and values (`global_codes[e]`) are independent random tables, so every read after the first
+  needs the reader to map the bridge's value code to its unrelated key. Over the 768 seen entities, a one-step map of
+  the reader's form with r hidden units (q = d + Q relu(U m + c)) fitted in-sample reaches mean cosine 0.40 at r = 32
+  and 0.75 at r = 128 (linear least squares 0.20 / 0.41). In replayed T2 episodes (exact hop-1 key, delta rule,
+  nearest-code decoding) that gives hop-2 top-1 addressing among the 12 keys of 48% at r = 32 and 99.8% at r = 128
+  (linear 30% / 99%); rotation keys normalize(Π·global_codes[e]) give 99% / 100%. So the random-key table limits
+  hops ≥ 2 at r = 32 but not at r = 128. It does not explain the r = 32 failure at hop 1, which points to the other
+  two random maps the LM path must learn (question state → random key; random value code → name).
+
+Rules added:
+1. **Memory-use check** (per rank, confirmation set, hop 1, full EM): B4@1, B8@4 and M1-L4@4 must each exceed
+   B3-L4@4 with a 97.5% CI > 0. If any fails, that rank is reported as "the readers did not learn to use the oracle
+   memory", and its G1-L, G2-L and Amendment-B6 outcomes are reported but not interpreted as evidence for or
+   against multiple reads. Prediction from the logs above: r = 32 fails; r = 128 passes.
+2. **r = 32**: no claim about multiple reads in the LM at r = 32, whatever the gate outcomes. The failure is a
+   failure of this oracle design (three random maps learned through a rank-32 adapter), not a reader comparison.
+3. **r = 128**: the value→key transition is a learned lookup over the 768 seen names, not the identity-like map of
+   the symbolic oracle. A G1-L or B6 pass shows that the reader learns that transition and composes reads inside
+   the LM; it does not establish equivalence with the symbolic oracle condition, and no unseen-name claim is made.
+4. Descriptive additions: the memory-use check table, the training-log summary above, and the capacity table.
+5. Follow-ups are registered separately and change nothing here: `docs/prereg/P1L-C.md` (causal and read-position
+   analysis of the r = 128 checkpoints on test [102000, 104000), registered before any confirmation score) and,
+   per `plan/followup_2026-10-27.md`, an oracle-code redesign pilot (WP-L6) and, if it passes, a new r = 32 study
+   (P1L-S) on test [110000, 112000).

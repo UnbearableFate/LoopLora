@@ -1,0 +1,122 @@
+[
+  {
+    "cancelled_at": "2026-10-26T21:51:21.993690+00:00",
+    "cutoff": "2026-10-26T22:58:00+00:00",
+    "packed_job": "3716303.opbs",
+    "rank": 32,
+    "reason": "2026-10-27 orchestrator: same design, split to fit by07:58JST",
+    "seed": 43,
+    "singles": [
+      {
+        "expected_seconds": 2296.7299426643467,
+        "job_id": "3716612.opbs",
+        "label": "B4",
+        "margin_seconds": 3446,
+        "out": "/work/xg24i002/x10041/LoopLora/runs/p1l/main/main/B4-s43",
+        "walltime": "00:57:26"
+      },
+      {
+        "expected_seconds": 2332.904840033906,
+        "job_id": "3716613.opbs",
+        "label": "B3-L4",
+        "margin_seconds": 3500,
+        "out": "/work/xg24i002/x10041/LoopLora/runs/p1l/main/main/B3-L4-s43",
+        "walltime": "00:58:20"
+      }
+    ],
+    "source": {
+      "kind": "commit",
+      "ref": "d644b9ba3b30f7fcc2f13020272f457ee60aae40"
+    }
+  },
+  {
+    "cancelled_at": "2026-10-26T21:51:23.402059+00:00",
+    "cutoff": "2026-10-26T22:58:00+00:00",
+    "packed_job": "3716399.opbs",
+    "rank": 128,
+    "reason": "2026-10-27 orchestrator: same design, split to fit by07:58JST",
+    "seed": 17,
+    "singles": [
+      {
+        "expected_seconds": 2304.8635529743688,
+        "job_id": "3716614.opbs",
+        "label": "B4",
+        "margin_seconds": 3458,
+        "out": "/work/xg24i002/x10041/LoopLora/runs/p1l/main/r128/main/B4-s17",
+        "walltime": "00:57:38"
+      },
+      {
+        "expected_seconds": 2333.5433718619024,
+        "job_id": "3716615.opbs",
+        "label": "B3-L4",
+        "margin_seconds": 3501,
+        "out": "/work/xg24i002/x10041/LoopLora/runs/p1l/main/r128/main/B3-L4-s17",
+        "walltime": "00:58:21"
+      }
+    ],
+    "source": {
+      "kind": "commit",
+      "ref": "1d1bbfd6958bfac2cd35054a24abeebcfdb7da1b"
+    }
+  },
+  {
+    "cancelled_at": "2026-10-26T21:51:25.146325+00:00",
+    "cutoff": "2026-10-26T22:58:00+00:00",
+    "packed_job": "3716403.opbs",
+    "rank": 128,
+    "reason": "2026-10-27 orchestrator: same design, split to fit by07:58JST",
+    "seed": 29,
+    "singles": [
+      {
+        "expected_seconds": 2304.8635529743688,
+        "job_id": "3716616.opbs",
+        "label": "B4",
+        "margin_seconds": 3458,
+        "out": "/work/xg24i002/x10041/LoopLora/runs/p1l/main/r128/main/B4-s29",
+        "walltime": "00:57:38"
+      },
+      {
+        "expected_seconds": 2333.5433718619024,
+        "job_id": "3716617.opbs",
+        "label": "B3-L4",
+        "margin_seconds": 3501,
+        "out": "/work/xg24i002/x10041/LoopLora/runs/p1l/main/r128/main/B3-L4-s29",
+        "walltime": "00:58:21"
+      }
+    ],
+    "source": {
+      "kind": "commit",
+      "ref": "1d1bbfd6958bfac2cd35054a24abeebcfdb7da1b"
+    }
+  },
+  {
+    "cancelled_at": "2026-10-26T21:51:26.879790+00:00",
+    "cutoff": "2026-10-26T22:58:00+00:00",
+    "packed_job": "3716407.opbs",
+    "rank": 128,
+    "reason": "2026-10-27 orchestrator: same design, split to fit by07:58JST",
+    "seed": 43,
+    "singles": [
+      {
+        "expected_seconds": 2304.8635529743688,
+        "job_id": "3716618.opbs",
+        "label": "B4",
+        "margin_seconds": 3458,
+        "out": "/work/xg24i002/x10041/LoopLora/runs/p1l/main/r128/main/B4-s43",
+        "walltime": "00:57:38"
+      },
+      {
+        "expected_seconds": 2333.5433718619024,
+        "job_id": "3716619.opbs",
+        "label": "B3-L4",
+        "margin_seconds": 3501,
+        "out": "/work/xg24i002/x10041/LoopLora/runs/p1l/main/r128/main/B3-L4-s43",
+        "walltime": "00:58:21"
+      }
+    ],
+    "source": {
+      "kind": "commit",
+      "ref": "1d1bbfd6958bfac2cd35054a24abeebcfdb7da1b"
+    }
+  }
+]

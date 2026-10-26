@@ -1,0 +1,70 @@
+{
+  "S": 17000,
+  "budget_rule": "B2: no total cap; record every job's node-hours",
+  "excludes": "smoke, validation, confirmation, name-gradient probe and failed jobs",
+  "job_cap_steps": 23408,
+  "longest_step_seconds": 0.20182948434570183,
+  "main_plus_pilot_node_hours": 14.68024394829125,
+  "overhead_seconds": 717.134237452022,
+  "packing": "one GPU process; runs sequentially reuse backbone, prefetch2 per active run",
+  "pilot_steps": 5666,
+  "rank": 128,
+  "reduced_steps_flag": false,
+  "reserve_seconds": 75.50568028873143,
+  "smoke_steps": 1700,
+  "source": "/work/xg24i002/x10041/LoopLora/runs/p1l/main/r128/preflight",
+  "status": "sized",
+  "time": "2026-10-26T19:40:08.230470+00:00",
+  "timing_rows": [
+    {
+      "checkpoint_hash": "4f51111e5669088e217841232268a7a1",
+      "host": "mg0022",
+      "job_id": "3716009.opbs",
+      "label": "B8",
+      "overhead_seconds": 15.50568028873143,
+      "peak_memory_bytes": 7691751936,
+      "step_seconds": 0.19876219526243707,
+      "steps": 20
+    },
+    {
+      "checkpoint_hash": "65059039624d54aba5f60170f9e76549",
+      "host": "mg0022",
+      "job_id": "3716009.opbs",
+      "label": "M1-L4",
+      "overhead_seconds": 13.217239730021294,
+      "peak_memory_bytes": 7689982464,
+      "step_seconds": 0.20182948434570183,
+      "steps": 20
+    },
+    {
+      "checkpoint_hash": "0e674290309aabd81f97cf3bf4c71ee9",
+      "host": "mg0022",
+      "job_id": "3716009.opbs",
+      "label": "B4",
+      "overhead_seconds": 13.207295841226975,
+      "peak_memory_bytes": 7655772672,
+      "step_seconds": 0.13654853044232976,
+      "steps": 20
+    },
+    {
+      "checkpoint_hash": "7eb390c5967f733a228be7b2ae146354",
+      "host": "mg0022",
+      "job_id": "3716009.opbs",
+      "label": "B5-L4",
+      "overhead_seconds": 13.328330273002697,
+      "peak_memory_bytes": 7678579200,
+      "step_seconds": 0.16047017745052775,
+      "steps": 20
+    },
+    {
+      "checkpoint_hash": "99eb2aa0c84c8df579e3c6908d3a6675",
+      "host": "mg0022",
+      "job_id": "3716009.opbs",
+      "label": "B3-L4",
+      "overhead_seconds": 13.168301357422024,
+      "peak_memory_bytes": 7197150720,
+      "step_seconds": 0.13874564112629742,
+      "steps": 20
+    }
+  ]
+}

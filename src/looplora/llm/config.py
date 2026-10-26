@@ -110,8 +110,8 @@ def resolve_config(mapping: Mapping[str, Any]) -> dict[str, Any]:
     _integer(config["seed"], "seed", 0)
     _integer(config["oracle_seed"], "oracle_seed", 0)
     _integer(config["model"]["r"], "model.r")
-    if oracle and config["model"]["r"] != 32:
-        raise ValueError("oracle_random requires r = r_mem = 32")
+    if oracle and config["model"]["r"] not in {32, 128}:
+        raise ValueError("oracle_random requires r = r_mem in {32,128}")
     _integer(config["model"]["layer"], "model.layer", 0)
     if config["model"]["input_site"] not in {"o_proj", "residual"}:
         raise ValueError("model.input_site must be o_proj or residual")

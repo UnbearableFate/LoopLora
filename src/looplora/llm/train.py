@@ -93,10 +93,10 @@ class LLMExperiment:
         try:
             if self.oracle:
                 if (stage not in {"reader", "joint"} or config["protocol"] != "memory_only"
-                        or self.adapter.cfg.r_mem != 32):
-                    raise ValueError("oracle_random requires a memory-only reader with r_mem=32")
+                        or self.adapter.cfg.r_mem not in {32, 128}):
+                    raise ValueError("oracle_random requires a memory-only reader with r_mem in {32,128}")
                 self.writer = OracleRandomWriter(config["task"]["V"], config["task"]["n_rel"],
-                                                  config.get("oracle_seed", 17)).to(self.device)
+                    config.get("oracle_seed", 17), r_mem=self.adapter.cfg.r_mem).to(self.device)
                 # A encodes the question and remains trainable. Learned writer
                 # projections/gates have no role in this condition.
                 for name in WRITER_NAMES[1:]:
@@ -135,7 +135,7 @@ class LLMExperiment:
         if self.writer is None:
             return {}
         if self.oracle:
-            return dict(writer="oracle_random", version=1, r_mem=32,
+            return dict(writer="oracle_random", version=1, r_mem=self.writer.r_mem,
                         V=self.writer.V, n_rel=self.writer.n_rel, seed=self.writer.seed,
                         keys="global_entity_relation_pairs", values="OracleWriter.global_codes")
         cfg = self.writer.cfg

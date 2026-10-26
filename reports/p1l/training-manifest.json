@@ -1,0 +1,72 @@
+{
+  "S": 17000,
+  "condition": "oracle-r32",
+  "lock_commit": "d644b9ba3b30f7fcc2f13020272f457ee60aae40",
+  "lock_file_hash": "5fb5185fc13c518a583c7cf4b3a83b95",
+  "lrs": {
+    "B1": 0.001,
+    "B2": 0.001,
+    "B3-L4": 0.001,
+    "B4": 0.001,
+    "B5-L4": 0.001,
+    "B8": 0.001,
+    "M1-L4": 0.003
+  },
+  "packing_changes": [
+    {
+      "cancelled_at": "2026-10-26T21:51:21.993690+00:00",
+      "cutoff": "2026-10-26T22:58:00+00:00",
+      "packed_job": "3716303.opbs",
+      "rank": 32,
+      "reason": "2026-10-27 orchestrator: same design, split to fit by07:58JST",
+      "seed": 43,
+      "singles": [
+        {
+          "expected_seconds": 2296.7299426643467,
+          "job_id": "3716612.opbs",
+          "label": "B4",
+          "margin_seconds": 3446,
+          "out": "/work/xg24i002/x10041/LoopLora/runs/p1l/main/main/B4-s43",
+          "walltime": "00:57:26"
+        },
+        {
+          "expected_seconds": 2332.904840033906,
+          "job_id": "3716613.opbs",
+          "label": "B3-L4",
+          "margin_seconds": 3500,
+          "out": "/work/xg24i002/x10041/LoopLora/runs/p1l/main/main/B3-L4-s43",
+          "walltime": "00:58:20"
+        }
+      ],
+      "source": {
+        "kind": "commit",
+        "ref": "d644b9ba3b30f7fcc2f13020272f457ee60aae40"
+      }
+    }
+  ],
+  "rank": 32,
+  "runs": {
+    "B0-s17": "/work/xg24i002/x10041/LoopLora/runs/p1l/main/main/B0-s17/B0-s17",
+    "B1-s17": "/work/xg24i002/x10041/LoopLora/runs/p1l/main/main/B1-s17/B1-s17",
+    "B1-s29": "/work/xg24i002/x10041/LoopLora/runs/p1l/main/main/B1-s29/B1-s29",
+    "B1-s43": "/work/xg24i002/x10041/LoopLora/runs/p1l/main/main/B1-s43/B1-s43",
+    "B2-s17": "/work/xg24i002/x10041/LoopLora/runs/p1l/main/main/B2-s17/B2-s17",
+    "B2-s29": "/work/xg24i002/x10041/LoopLora/runs/p1l/main/main/B2-s29/B2-s29",
+    "B2-s43": "/work/xg24i002/x10041/LoopLora/runs/p1l/main/main/B2-s43/B2-s43",
+    "B3-L4-s17": "/work/xg24i002/x10041/LoopLora/runs/p1l/main/main/B4-B3-s17/B3-L4-s17",
+    "B3-L4-s29": "/work/xg24i002/x10041/LoopLora/runs/p1l/main/main/B4-B3-s29/B3-L4-s29",
+    "B3-L4-s43": "/work/xg24i002/x10041/LoopLora/runs/p1l/main/main/B3-L4-s43/B3-L4-s43",
+    "B4-s17": "/work/xg24i002/x10041/LoopLora/runs/p1l/main/main/B4-B3-s17/B4-s17",
+    "B4-s29": "/work/xg24i002/x10041/LoopLora/runs/p1l/main/main/B4-B3-s29/B4-s29",
+    "B4-s43": "/work/xg24i002/x10041/LoopLora/runs/p1l/main/main/B4-s43/B4-s43",
+    "B5-L4-s17": "/work/xg24i002/x10041/LoopLora/runs/p1l/main/main/B5-s17/B5-L4-s17",
+    "B5-L4-s29": "/work/xg24i002/x10041/LoopLora/runs/p1l/main/main/B5-s29/B5-L4-s29",
+    "B5-L4-s43": "/work/xg24i002/x10041/LoopLora/runs/p1l/main/main/B5-s43/B5-L4-s43",
+    "B8-s17": "/work/xg24i002/x10041/LoopLora/runs/p1l/main/main/B8-s17/B8-s17",
+    "B8-s29": "/work/xg24i002/x10041/LoopLora/runs/p1l/main/main/B8-s29/B8-s29",
+    "B8-s43": "/work/xg24i002/x10041/LoopLora/runs/p1l/main/main/B8-s43/B8-s43",
+    "M1-L4-s17": "/work/xg24i002/x10041/LoopLora/runs/p1l/main/main/M1-s17/M1-L4-s17",
+    "M1-L4-s29": "/work/xg24i002/x10041/LoopLora/runs/p1l/main/main/M1-s29/M1-L4-s29",
+    "M1-L4-s43": "/work/xg24i002/x10041/LoopLora/runs/p1l/main/main/M1-s43/M1-L4-s43"
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "branch_audit": {
+    "captured_bitwise_equal": true,
+    "recomputed_bitwise_equal": false,
+    "recomputed_max_abs_error": 2.288818359375e-05
+  },
+  "checkpoint_hash": "c0f0b3863df3d4aaca17f81f5eb3bf60",
+  "episodes": 200,
+  "host": "mg0022",
+  "job_id": "3716226.opbs",
+  "phases": {
+    "primary": {
+      "evaluation_seconds": 12.122198757948354,
+      "seconds": 12.124943274073303
+    },
+    "readout": {
+      "seconds": 5.210470678983256
+    },
+    "swap": {
+      "seconds": 43.50582004489843
+    },
+    "typed": {
+      "evaluation_seconds": 10.030055125011131,
+      "seconds": 10.032491895952262
+    }
+  },
+  "status": "complete",
+  "time": "2026-10-26T20:11:51.785585+00:00",
+  "timing_only": true,
+  "total_seconds": 72.88858834397979
+}
