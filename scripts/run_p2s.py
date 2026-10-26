@@ -126,25 +126,146 @@ def all_training() -> dict:
     expected={(family_name(f),s) for f in families() for s in SEEDS}
     if len(plan['runs'])!=24 or {(family_name(r),r['seed']) for r in plan['runs']}!=expected:
         raise ValueError('P2-S training matrix differs')
+    with (REPORTS/'selected_lrs.csv').open() as f:
+        locked={family_name(dict(r,r=int(r['r']),r_mem=int(r['r_mem']))):float(r['lr'])
+                for r in csv.DictReader(f)}
+    if set(locked)!={family_name(f) for f in families()}: raise ValueError('locked LR matrix differs')
     for row in plan['runs']:
         folder=Path(row['training_dir'])
         rec=json.loads((folder/'record.json').read_text())
         c=json.loads((folder/'config.json').read_text())['config']
         if (rec['status']!='complete' or c!=row['config'] or rec['config_hash']!=stable_hash(c)
                 or c['train']['steps']!=15000 or c['train']['batch_size']!=64
+                or c['train']['lr']!=locked[family_name(row)]
                 or not (folder/'checkpoint.pt').is_file()):
             raise ValueError(f'P2-S global training barrier: {row["name"]}')
     return plan
 
 
+def confirmation_config(c: dict) -> dict:
+    result=copy.deepcopy(c)
+    result['eval'].update(seed=888001,episodes=2000,batch_size=64,splits=['test'],
+        counterfactuals=False,swap_successors=False,fixed_depth_sweep=True,
+        depths=[4] if c['variant']=='B8' else DEPTHS,hops=list(range(1,9)))
+    return result
+
+
+def evaluation_plan() -> dict:
+    from analyze_p1s_main import file_hash
+    from looplora.infra.seeds import stable_hash
+    trained=all_training()  # Never open or generate P2-S confirmation before this check.
+    entries=[dict(r,source='p2s',steps=15000,descriptive_only=False) for r in trained['runs']]
+    for source,path,variants in (
+        ('wph',ROOT/'reports/p1s/plan.json',('M1','B4','B5','B3')),
+        ('f1',ROOT/'reports/p1s-f1/evaluation_plan.json',('M1','B5','B3'))):
+        released=json.loads(path.read_text())
+        selected=[r for r in released['runs'] if r['writer'] in WRITERS and r['variant'] in variants
+                  and (source=='f1' or (r['group']=='primary' and r['r']==32))]
+        expected={(w,v,r,s) for w in WRITERS for v in variants
+                  for r in ((32,) if source=='wph' else (64,128)) for s in SEEDS}
+        if len(selected)!=len(expected) or {(r['writer'],r['variant'],r['r'],r['seed']) for r in selected}!=expected:
+            raise ValueError('reference matrix differs')
+        for r in selected:
+            folder=Path(r['run_dir'] if source=='wph' else r['training_dir'])
+            c=json.loads((folder/'config.json').read_text())['config']
+            record=json.loads((folder/'record.json').read_text())
+            steps=15000 if source=='wph' else 20000
+            if (record['status']!='complete' or c!=r['config'] or c['train']['steps']!=steps
+                    or c['train']['batch_size']!=64 or c['model']['r']!=r['r']):
+                raise ValueError('reference training identity/budget differs')
+            entries.append(dict(name=source+'-'+r['name'],source=source,steps=steps,
+                descriptive_only=source=='f1',writer=c['writer'],variant=c['variant'],seed=c['seed'],
+                r=c['model']['r'],r_mem=c['model']['r_mem'],config=c,training_dir=str(folder)))
+    for row in entries:
+        row['checkpoint']=str(Path(row['training_dir'])/'checkpoint.pt')
+        row['checkpoint_hash']=file_hash(Path(row['checkpoint']))
+        row['run_dir']=str(RUNS/'evaluation'/row['name'])
+    if len(entries)!=84 or len({r['name'] for r in entries})!=84: raise ValueError('expected 84 evaluations')
+    plan=dict(root=str(RUNS),runs=entries,training_plan_hash=stable_hash(trained))
+    write(RUNS/'evaluation_plan.json',plan)
+    write(RUNS/'training_barrier.json',dict(status='passed',created_at=datetime.now(timezone.utc).isoformat(),
+        training_plan_hash=stable_hash(trained),training_stages=24,evaluation_plan_hash=stable_hash(plan)))
+    csv_table(REPORTS/'checkpoint_manifest.csv',[{k:r[k] for k in
+        ('name','source','writer','variant','r','r_mem','seed','steps','descriptive_only','checkpoint','checkpoint_hash')}
+        for r in entries])
+    return plan
+
+
+def evaluate_one(name: str) -> None:
+    import torch
+    from analyze_p1s_main import file_hash
+    from looplora.sym.evaluate import evaluate
+    from looplora.sym.run import source_metadata
+    from looplora.sym.train import load_checkpoint
+    all_training()
+    plan=json.loads((RUNS/'evaluation_plan.json').read_text())
+    run=next(r for r in plan['runs'] if r['name']==name)
+    path=Path(run['checkpoint']);out=Path(run['run_dir'])
+    if out.exists(): raise FileExistsError(out)
+    if file_hash(path)!=run['checkpoint_hash']: raise ValueError('checkpoint changed before evaluation')
+    torch.set_num_threads(1);torch.cuda.set_device(0)
+    model=load_checkpoint(path)
+    if model.checkpoint_config!=run['config']: raise ValueError('checkpoint configuration differs')
+    out.mkdir(parents=True)
+    rec=dict(name=name,status='running',started_at=datetime.now(timezone.utc).isoformat())
+    write(out/'record.json',rec)
+    try:
+        c=confirmation_config(run['config'])
+        evaluate(model,c,out/'confirmation',samples_only=True,
+                 provenance=dict(checkpoint=str(path),checkpoint_config=run['config'],**source_metadata()))
+        if file_hash(path)!=run['checkpoint_hash']: raise ValueError('evaluation mutated checkpoint')
+        rec.update(status='complete',finished_at=datetime.now(timezone.utc).isoformat(),
+                   checkpoint_unchanged=True,checkpoint_hash=run['checkpoint_hash'])
+    except BaseException as error:
+        rec.update(status='failed',error=f'{type(error).__name__}: {error}')
+        raise
+    finally: write(out/'record.json',rec)
+
+
+def evaluate_all(procs: int) -> None:
+    plan=evaluation_plan()
+    pending=[r['name'] for r in plan['runs']];running=[]
+    while pending or running:
+        for p in list(running):
+            rc=p.poll()
+            if rc is not None:
+                running.remove(p)
+                if rc:
+                    for child in running: child.terminate()
+                    raise RuntimeError(f'P2-S evaluation child failed: {rc}')
+        while pending and len(running)<procs:
+            running.append(subprocess.Popen([sys.executable,str(Path(__file__).resolve()),
+                'evaluate-one','--name',pending.pop(0)],env={**os.environ,'OMP_NUM_THREADS':'1'}))
+        if running: time.sleep(.2)
+    from looplora.infra.seeds import stable_hash
+    paths=[]
+    for r in plan['runs']:
+        folder=Path(r['run_dir'])
+        record=json.loads((folder/'record.json').read_text())
+        meta=json.loads((folder/'confirmation/evaluation.json').read_text())
+        if (record['status']!='complete' or not meta['aggregation_deferred']
+                or meta['config']!=confirmation_config(r['config'])
+                or (folder/'confirmation/metrics.json').exists()):
+            raise ValueError('P2-S blind-set barrier failed')
+        path=folder/'confirmation/samples.npz'
+        if not path.is_file(): raise FileNotFoundError(path)
+        paths.append(str(path))
+    write(RUNS/'barrier.json',dict(status='passed',created_at=datetime.now(timezone.utc).isoformat(),
+          evaluation_plan_hash=stable_hash(plan),runs=[r['name'] for r in plan['runs']],confirmation_samples=paths))
+    print('P2-S release: 24 trained stages,84 blind confirmation sets',flush=True)
+
+
 def main() -> None:
     p=argparse.ArgumentParser(description=__doc__)
-    p.add_argument('stage',choices=('plan','smoke','pilot','select','main'))
+    p.add_argument('stage',choices=('plan','smoke','pilot','select','main','evaluate','evaluate-one'))
     p.add_argument('--shard',type=int,default=0)
     p.add_argument('--procs',type=int,default=8)
+    p.add_argument('--name')
     args=p.parse_args()
     if args.stage=='plan': plan()
     elif args.stage=='select': select()
+    elif args.stage=='evaluate': evaluate_all(args.procs)
+    elif args.stage=='evaluate-one': evaluate_one(args.name)
     else: run(args.stage,args.shard,args.procs)
 
 
