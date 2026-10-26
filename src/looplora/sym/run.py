@@ -118,6 +118,7 @@ def run_one(config: dict[str, Any], out: str | Path) -> dict[str, Any]:
         from looplora.sym.stats import depth_comparisons
         from looplora.sym.train import train
 
+        torch.set_num_threads(config["runtime"]["threads"])
         device = torch.device(config["device"])
         if device.type == "cuda":
             torch.cuda.init()
@@ -203,10 +204,16 @@ def load_suite(path: str | Path, out: str | Path) -> list[dict[str, Any]]:
         raw["name"] = name
         if "writer_from" in entry:
             writer = entry["writer_from"]
-            if not isinstance(writer, str):
-                raise ValueError("writer_from must name another suite run")
-            dependencies.append(writer)
-            raw = recursive_merge(raw, {"pretrain": {"writer_checkpoint": str(out / writer / "writer.pt")}})
+            if isinstance(writer, str):
+                dependencies.append(writer)
+                checkpoint = out / writer / "writer.pt"
+            elif isinstance(writer, dict) and set(writer) == {"checkpoint"} and isinstance(writer["checkpoint"], str):
+                checkpoint = (path.parent / writer["checkpoint"]).resolve()
+                if not checkpoint.is_file():
+                    raise FileNotFoundError(f"external writer checkpoint missing: {checkpoint}")
+            else:
+                raise ValueError("writer_from must name a suite run or contain a checkpoint path")
+            raw = recursive_merge(raw, {"pretrain": {"writer_checkpoint": str(checkpoint)}})
         jobs.append({"name": name, "dependencies": list(dict.fromkeys(dependencies)),
                      "config": resolve_config(raw)})
     pending = {job["name"]: set(job["dependencies"]) for job in jobs}

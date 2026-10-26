@@ -6,24 +6,28 @@ import json
 import math
 from dataclasses import asdict
 from pathlib import Path
-from typing import Any, Mapping
+from typing import TYPE_CHECKING, Any, Mapping
 
-VARIANTS = ("B3", "B4", "B5", "M1", "M1-lin", "B6", "B7", "B8")
+if TYPE_CHECKING:
+    from looplora.data.relations import TaskSpec
+
+VARIANTS = ("B3", "B4", "B5", "B5-lin", "M1", "M1-lin", "B6", "B7", "B8")
 WRITERS = ("oracle_random", "oracle_orth", "t1_frozen", "joint")
 DEFAULTS: dict[str, Any] = {
     "name": "symbolic", "seed": 17, "backbone_seed": 31415, "device": "cuda",
     "writer": "oracle_random", "variant": "M1", "activation": "relu",
-    "model": {"d_e": 64, "r": 64, "r_mem": 64, "rho": .25, "alpha": 1.,
+    "model": {"d_e": 64, "r": 64, "r_mem": 64, "reference_r": None, "rho": .25, "alpha": 1.,
               "lambda_init": .99, "beta_init": .1, "max_hop": 16},
     "task": {"name": "t2_chain_end", "E": 24, "Q": 4, "hops": [1, 2, 3]},
     "train": {"steps": 3000, "batch_size": 32, "lr": .003, "weight_decay": .01,
               "grad_clip": 1., "warmup_steps": 20, "depths": [1, 2, 4], "log_every": 10},
     "pretrain": {"steps": 3000, "batch_size": 32, "lr": .003,
-                 "warmup_steps": 20, "writer_checkpoint": None},
+                 "warmup_steps": 20, "writer_checkpoint": None, "task": {}},
     "eval": {"episodes": 64, "batch_size": 32, "depths": [0, 1, 2, 3, 4, 6, 8, 12, 16],
              "splits": ["val", "test", "test_unseen"], "hops": list(range(1, 9)),
              "seed": 4242, "counterfactuals": True},
     "stats": {"resamples": 2000, "seed": 2718},
+    "runtime": {"threads": 1},
 }
 
 
@@ -67,7 +71,7 @@ def resolve_config(mapping: Mapping[str, Any]) -> dict[str, Any]:
     unknown = set(mapping) - set(DEFAULTS)
     if unknown:
         raise ValueError(f"unknown configuration fields: {sorted(unknown)}")
-    for group in ("model", "task", "train", "pretrain", "eval", "stats"):
+    for group in ("model", "task", "train", "pretrain", "eval", "stats", "runtime"):
         if group in mapping and not isinstance(mapping[group], Mapping):
             raise ValueError(f"{group} must be a mapping")
         if group != "task" and group in mapping:
@@ -82,21 +86,18 @@ def resolve_config(mapping: Mapping[str, Any]) -> dict[str, Any]:
         raise ValueError(f"unknown writer: {config['writer']}")
     if config["activation"] not in ("relu", "identity"):
         raise ValueError("activation must be relu or identity")
-    config["activation"] = "identity" if variant == "M1-lin" else config["activation"]
+    config["activation"] = "identity" if variant in {"M1-lin", "B5-lin"} else config["activation"]
     model = config["model"]
     explicit_model = mapping.get("model", {})
-    if variant == "B6" and "r" not in explicit_model:
-        model["r"] = 96
-        if "r_mem" not in explicit_model:
-            model["r_mem"] = 96
-    if variant == "B7" and "r_mem" not in explicit_model:
-        model["r_mem"] = 96
-    for key in ("d_e", "r", "r_mem", "max_hop"):
+    if "reference_r" not in explicit_model:
+        model["reference_r"] = model["r"]
+    for key in ("d_e", "r", "r_mem", "reference_r", "max_hop"):
         _positive_int(model[key], f"model.{key}")
-    if variant == "B6" and model["r"] <= 64:
-        raise ValueError("B6 requires a larger rank than the default 64")
-    if variant == "B7" and model["r_mem"] <= model["r"]:
-        raise ValueError("B7 requires r_mem > r")
+    if variant == "B6" and ("r" not in explicit_model or model["r"] <= model["reference_r"]):
+        raise ValueError("B6 requires explicit model.r > model.reference_r")
+    if variant == "B7" and ("r_mem" not in explicit_model
+                             or model["r_mem"] <= max(model["r"], model["reference_r"])):
+        raise ValueError("B7 requires explicit model.r_mem > model.r and model.reference_r")
     if config["writer"].startswith("oracle_") and model["r"] != model["r_mem"]:
         raise ValueError("oracle writers require r == r_mem")
     for key in ("rho", "alpha", "lambda_init", "beta_init"):
@@ -136,6 +137,7 @@ def resolve_config(mapping: Mapping[str, Any]) -> dict[str, Any]:
         raise ValueError("eval.splits must contain distinct evaluation splits")
     _positive_int(config["stats"]["resamples"], "stats.resamples", 2000)
     _positive_int(config["stats"]["seed"], "stats.seed", 0)
+    _positive_int(config["runtime"]["threads"], "runtime.threads")
     if variant in ("B4", "B6", "B7"):
         config["train"]["depths"] = config["eval"]["depths"] = [1]
     elif variant == "B8":
@@ -157,7 +159,28 @@ def resolve_config(mapping: Mapping[str, Any]) -> dict[str, Any]:
     checkpoint = config["pretrain"]["writer_checkpoint"]
     if checkpoint is not None and not isinstance(checkpoint, str):
         raise ValueError("pretrain.writer_checkpoint must be a path string or null")
+    pretrain_task_spec(config)
     return json.loads(json.dumps(config, allow_nan=False))
+
+
+def pretrain_task_spec(config: Mapping[str, Any]) -> TaskSpec:
+    """Resolve a T1 writer task compatible with the reader's frozen backbone."""
+    from looplora.data.relations import TaskSpec
+
+    task = config["task"]
+    overrides = config["pretrain"].get("task", {})
+    if not isinstance(overrides, Mapping):
+        raise ValueError("pretrain.task must be a mapping")
+    fields = {"name": "t1", "hops": [1], **{key: task[key] for key in
+              ("E", "Q", "V", "n_rel", "seen", "unseen") if key in task}}
+    fields = recursive_merge(fields, overrides)
+    if fields["name"] != "t1":
+        raise ValueError("pretrain.task.name must remain t1")
+    spec = TaskSpec(**fields)
+    for key in ("V", "n_rel"):
+        if getattr(spec, key) != task[key]:
+            raise ValueError(f"pretrain.task.{key} must match the reader backbone")
+    return spec
 
 
 def load_config(path: str | Path) -> dict[str, Any]:

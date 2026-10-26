@@ -6,7 +6,10 @@ import copy
 from dataclasses import fields, replace
 import hashlib
 import json
+import os
 from pathlib import Path
+import socket
+import sys
 import time
 from typing import Any
 
@@ -104,6 +107,55 @@ def _numpy(tensor: torch.Tensor) -> np.ndarray:
 def _require_finite(tensor: torch.Tensor, name: str, context: str) -> None:
     if not torch.isfinite(tensor).all():
         raise FloatingPointError(f"non-finite {name} during evaluation ({context})")
+
+
+_EVALUATION_OVERRIDE_KEYS = frozenset({"eval.seed", "eval.episodes", "eval.splits",
+                                       "eval.batch_size", "eval.counterfactuals"})
+
+
+def parse_evaluation_overrides(assignments: list[str]) -> dict[str, Any]:
+    """Parse allowlisted YAML/JSON values; repeated keys use their last value."""
+    import yaml
+
+    overrides = {}
+    for assignment in assignments:
+        key, separator, text = assignment.partition("=")
+        key = key.strip()
+        if not separator:
+            raise ValueError(f"invalid evaluation override {assignment!r}; expected key=value")
+        if key not in _EVALUATION_OVERRIDE_KEYS:
+            allowed = ", ".join(sorted(_EVALUATION_OVERRIDE_KEYS))
+            raise ValueError(f"evaluation override {key!r} is not allowed; allowed keys: {allowed}")
+        try:
+            value = yaml.safe_load(text)
+        except yaml.YAMLError as error:
+            raise ValueError(f"invalid YAML/JSON value for {key}: {text!r}") from error
+        if key in {"eval.seed", "eval.episodes", "eval.batch_size"}:
+            minimum = 0 if key == "eval.seed" else 1
+            if isinstance(value, bool) or not isinstance(value, int) or value < minimum:
+                raise ValueError(f"{key} override must be an integer >= {minimum}")
+        elif key == "eval.counterfactuals":
+            if not isinstance(value, bool):
+                raise ValueError(f"{key} override must be a boolean")
+        elif not isinstance(value, list) or not value or any(not isinstance(split, str) for split in value):
+            raise ValueError("eval.splits override must be a nonempty YAML/JSON list of split names")
+        overrides[key] = value
+    return overrides
+
+
+def resolve_evaluation_config(checkpoint_config: dict[str, Any], overrides: dict[str, Any],
+                              device: str | None = None) -> dict[str, Any]:
+    """Apply evaluation-only values to a copy, then validate the whole config."""
+    from looplora.sym.config import resolve_config
+
+    if set(overrides) - _EVALUATION_OVERRIDE_KEYS:
+        raise ValueError("evaluation overrides contain a non-allowlisted key")
+    config = copy.deepcopy(checkpoint_config)
+    for key, value in overrides.items():
+        config.setdefault("eval", {})[key.removeprefix("eval.")] = copy.deepcopy(value)
+    if device is not None:
+        config["device"] = device
+    return resolve_config(config)
 
 
 def aggregate_samples(samples: dict[str, np.ndarray]) -> list[dict[str, Any]]:
@@ -288,7 +340,15 @@ def main(argv: list[str] | None = None) -> None:
     parser.add_argument("--checkpoint", type=Path, required=True)
     parser.add_argument("--out", type=Path, required=True, help="New or empty evaluation output directory")
     parser.add_argument("--device", help="Override the checkpoint device, e.g. cpu or cuda:0")
+    parser.add_argument("--set", action="append", default=[], metavar="KEY=VALUE",
+                        help="Evaluation override (YAML/JSON); repeat keys for last-value-wins. "
+                             "Allowed: eval.seed, eval.episodes, eval.splits (e.g. '[test]'), "
+                             "eval.batch_size, eval.counterfactuals")
     args = parser.parse_args(argv)
+    try:
+        overrides = parse_evaluation_overrides(args.set)
+    except ValueError as error:
+        parser.error(str(error))
     checkpoint, out = args.checkpoint.resolve(), args.out.resolve()
     if not checkpoint.is_file():
         raise FileNotFoundError(f"checkpoint does not exist: {checkpoint}")
@@ -297,9 +357,30 @@ def main(argv: list[str] | None = None) -> None:
     from looplora.sym.train import load_checkpoint
 
     model = load_checkpoint(checkpoint, device=args.device)
-    config = copy.deepcopy(model.config)
+    checkpoint_config = copy.deepcopy(getattr(model, "checkpoint_config", model.config))
+    try:
+        config = resolve_evaluation_config(checkpoint_config, overrides, device=args.device)
+    except ValueError as error:
+        parser.error(f"invalid evaluation configuration: {error}")
+    torch.set_num_threads(config["runtime"]["threads"])
+    device = torch.device(config["device"])
     metrics, timing = evaluate(model, config, out)
-    metrics.update(checkpoint=str(checkpoint), config=config, config_hash=stable_hash(config))
+    timing["runtime"] = {
+        "python": sys.version.split()[0], "torch": torch.__version__,
+        "host": socket.gethostname(), "job_id": os.environ.get("PBS_JOBID"),
+        "device": str(device), "dtype": "float32", "threads": torch.get_num_threads(),
+        "gpu": torch.cuda.get_device_name(device) if device.type == "cuda" else None,
+    }
+    timing["measurement"] = {
+        "synchronization": "CUDA synchronize before and after each timed pass" if device.type == "cuda" else "host clock",
+        "writer_scope": "evaluation preparation, including feature projection and codebooks",
+        "reader_scope": "core read, branch, vocabulary logits, and first-read diagnostic",
+        "evaluation_scope": "episode generation, preparation, all readers, validation, hashing, and sample/metric output",
+    }
+    provenance = dict(checkpoint=str(checkpoint), checkpoint_config=checkpoint_config,
+                      config=config, config_hash=stable_hash(config), eval_overrides=overrides)
+    metrics.update(provenance)
+    (out / "config.json").write_text(json.dumps(provenance, indent=2, allow_nan=False) + "\n")
     (out / "metrics.json").write_text(json.dumps(metrics, indent=2, allow_nan=False) + "\n")
     (out / "timing.json").write_text(json.dumps(timing, indent=2, allow_nan=False) + "\n")
 

@@ -1,0 +1,173 @@
+{
+  "artifacts_root": "/work/xg24i002/x10041/LoopLora/runs/p1s/pilot-20261026/benchmark",
+  "failure_reason": null,
+  "job_id": "3712318.opbs",
+  "process_seconds_total": 11.818022257182747,
+  "runs": [
+    {
+      "artifacts": "/work/xg24i002/x10041/LoopLora/runs/p1s/pilot-20261026/benchmark/oracle_orth",
+      "checkpoint": "/work/xg24i002/x10041/LoopLora/runs/p1s/pilot-20261026/pilot2/shard-02/p2-oracle_orth-M1-lr0.003/checkpoint.pt",
+      "command": [
+        "/work/xg24i002/x10041/LoopLora/.venv/bin/python",
+        "-m",
+        "looplora.sym.evaluate",
+        "--checkpoint",
+        "/work/xg24i002/x10041/LoopLora/runs/p1s/pilot-20261026/pilot2/shard-02/p2-oracle_orth-M1-lr0.003/checkpoint.pt",
+        "--out",
+        "/work/xg24i002/x10041/LoopLora/runs/p1s/pilot-20261026/benchmark/oracle_orth",
+        "--set",
+        "eval.episodes=2000",
+        "--set",
+        "eval.splits=[\"val\"]",
+        "--set",
+        "eval.seed=4242",
+        "--set",
+        "eval.counterfactuals=false"
+      ],
+      "data_fingerprint": "5afd539982af75d2a52cbd48cd015b88",
+      "depths": 9,
+      "effective_config_hash": "87084f0c8c1bdd527398ae9ede7c3e6c",
+      "episodes": 2000,
+      "eval_overrides": {
+        "eval.counterfactuals": false,
+        "eval.episodes": 2000,
+        "eval.seed": 4242,
+        "eval.splits": [
+          "val"
+        ]
+      },
+      "evaluation_seconds": 3.2974662631750107,
+      "integrity": {
+        "approved_overrides_only": true,
+        "checkpoint_config_preserved": true,
+        "complete_2000_by_8_by_9": true,
+        "fixed_x_u_memory_write_count_across_depths": true,
+        "same_query_labels_across_depths": true,
+        "samples_reproduce_metrics": true,
+        "seed17_eval4242": true,
+        "validation_only": true
+      },
+      "log": "/work/xg24i002/x10041/LoopLora/runs/p1s/pilot-20261026/benchmark/oracle_orth.log",
+      "measurement": {
+        "evaluation_scope": "episode generation, preparation, all readers, validation, hashing, and sample/metric output",
+        "reader_scope": "core read, branch, vocabulary logits, and first-read diagnostic",
+        "synchronization": "CUDA synchronize before and after each timed pass",
+        "writer_scope": "evaluation preparation, including feature projection and codebooks"
+      },
+      "metric_cells": 72,
+      "process_seconds": 6.443783557973802,
+      "queries_per_episode": 8,
+      "reader_seconds": {
+        "0": 0.018767709378153086,
+        "1": 0.06923827109858394,
+        "12": 0.11925431294366717,
+        "16": 0.1522539844736457,
+        "2": 0.03478878503665328,
+        "3": 0.04297712352126837,
+        "4": 0.05219819862395525,
+        "6": 0.06900659715756774,
+        "8": 0.08596824202686548
+      },
+      "rows": 144000,
+      "runtime": {
+        "device": "cuda:0",
+        "dtype": "float32",
+        "gpu": "NVIDIA GH200 120GB",
+        "host": "mg0919",
+        "job_id": "3712318.opbs",
+        "python": "3.13.13",
+        "threads": 1,
+        "torch": "2.14.0+cu132"
+      },
+      "selected_name": "p2-oracle_orth-M1-lr0.003",
+      "training_seed": 17,
+      "variant": "M1",
+      "writer": "oracle_orth",
+      "writer_seconds": 1.1915821977891028
+    },
+    {
+      "artifacts": "/work/xg24i002/x10041/LoopLora/runs/p1s/pilot-20261026/benchmark/t1_frozen",
+      "checkpoint": "/work/xg24i002/x10041/LoopLora/runs/p1s/pilot-20261026/pilot2/shard-02/p2-t1_frozen-M1-lr0.003/checkpoint.pt",
+      "command": [
+        "/work/xg24i002/x10041/LoopLora/.venv/bin/python",
+        "-m",
+        "looplora.sym.evaluate",
+        "--checkpoint",
+        "/work/xg24i002/x10041/LoopLora/runs/p1s/pilot-20261026/pilot2/shard-02/p2-t1_frozen-M1-lr0.003/checkpoint.pt",
+        "--out",
+        "/work/xg24i002/x10041/LoopLora/runs/p1s/pilot-20261026/benchmark/t1_frozen",
+        "--set",
+        "eval.episodes=2000",
+        "--set",
+        "eval.splits=[\"val\"]",
+        "--set",
+        "eval.seed=4242",
+        "--set",
+        "eval.counterfactuals=false"
+      ],
+      "data_fingerprint": "5afd539982af75d2a52cbd48cd015b88",
+      "depths": 9,
+      "effective_config_hash": "eae2426f698adb5e3f525a17a7cd6774",
+      "episodes": 2000,
+      "eval_overrides": {
+        "eval.counterfactuals": false,
+        "eval.episodes": 2000,
+        "eval.seed": 4242,
+        "eval.splits": [
+          "val"
+        ]
+      },
+      "evaluation_seconds": 2.287532270886004,
+      "integrity": {
+        "approved_overrides_only": true,
+        "checkpoint_config_preserved": true,
+        "complete_2000_by_8_by_9": true,
+        "fixed_x_u_memory_write_count_across_depths": true,
+        "same_query_labels_across_depths": true,
+        "samples_reproduce_metrics": true,
+        "seed17_eval4242": true,
+        "validation_only": true
+      },
+      "log": "/work/xg24i002/x10041/LoopLora/runs/p1s/pilot-20261026/benchmark/t1_frozen.log",
+      "measurement": {
+        "evaluation_scope": "episode generation, preparation, all readers, validation, hashing, and sample/metric output",
+        "reader_scope": "core read, branch, vocabulary logits, and first-read diagnostic",
+        "synchronization": "CUDA synchronize before and after each timed pass",
+        "writer_scope": "evaluation preparation, including feature projection and codebooks"
+      },
+      "metric_cells": 72,
+      "process_seconds": 5.374238699208945,
+      "queries_per_episode": 8,
+      "reader_seconds": {
+        "0": 0.009383728727698326,
+        "1": 0.0313496682792902,
+        "12": 0.11017026426270604,
+        "16": 0.14003136288374662,
+        "2": 0.03341253474354744,
+        "3": 0.04077195608988404,
+        "4": 0.04854564229026437,
+        "6": 0.06388492975383997,
+        "8": 0.0792946727015078
+      },
+      "rows": 144000,
+      "runtime": {
+        "device": "cuda:0",
+        "dtype": "float32",
+        "gpu": "NVIDIA GH200 120GB",
+        "host": "mg0919",
+        "job_id": "3712318.opbs",
+        "python": "3.13.13",
+        "threads": 1,
+        "torch": "2.14.0+cu132"
+      },
+      "selected_name": "p2-t1_frozen-M1-lr0.003",
+      "training_seed": 17,
+      "variant": "M1",
+      "writer": "t1_frozen",
+      "writer_seconds": 0.381919648963958
+    }
+  ],
+  "scope": "timing only; validation only; no training, LR selection, scientific contrasts, screening/confirmation evaluation, or gate decisions",
+  "selection2": "/work/xg24i002/x10041/LoopLora-wt/sym/reports/p1s-pilot/pilot2/selection.json",
+  "status": "complete"
+}

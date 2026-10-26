@@ -56,7 +56,7 @@ class SymbolicModel(nn.Module):
         else:
             self.writer = LearnedWriter(3 * m["d_e"], self.r, self.r_mem, config["seed"],
                                         m["lambda_init"], m["beta_init"])
-        core_variant = {"B3": "loop", "B5": "fixedq", "B8": "unshared"}.get(self.variant, "iterq")
+        core_variant = {"B3": "loop", "B5": "fixedq", "B5-lin": "fixedq", "B8": "unshared"}.get(self.variant, "iterq")
         cfg = AdapterConfig(d_in=self.r if oracle else 3 * m["d_e"],
                             d_out=self.r_mem if oracle else m["d_e"], r=self.r, r_mem=self.r_mem,
                             variant=core_variant, rho=m["rho"], alpha=m["alpha"],

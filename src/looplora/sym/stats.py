@@ -6,6 +6,16 @@ Run on a compute node with ``PYTHONPATH=src``::
     python -m looplora.sym.stats --samples runs/m1/samples.npz \
         --reference runs/b4/samples.npz --depth-a 4 --depth-b 1 \
         --label-a M1 --label-b B4 --out paired.json
+    python -m looplora.sym.stats --pooled-a m1.json --pooled-b b5.json \
+        --depth-a 4 --depth-b 4 --hops 2 3 --split val \
+        --condition original --confidence 0.975 --label-a M1 --label-b B5 --out pooled.json
+
+Pooled manifests are JSON objects such as ``{"17": "runs/seed17/samples.npz",
+"29": "runs/seed29/samples.npz"}``; relative paths resolve against the manifest
+directory. Pass the same manifest on both sides for a within-checkpoint depth
+contrast. Pooled seeds are fixed experimental replicates: bootstrap uncertainty
+comes from shared evaluation episodes, without independently resampling seeds.
+Pooled confidence defaults to 0.95; preregistered gates use 0.975.
 
 All comparisons retain split and condition labels. Bootstrap draws resample
 whole episodes, retaining every query in each selected episode. The estimand
@@ -15,6 +25,8 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
+from numbers import Real
 from pathlib import Path
 from typing import Any, Mapping
 
@@ -175,19 +187,195 @@ def depth_comparisons(
     return results
 
 
+def pooled_compare_runs(
+    samples_a_by_seed: Mapping[int, SampleSource],
+    samples_b_by_seed: Mapping[int, SampleSource],
+    depth_a: int,
+    depth_b: int,
+    *,
+    hops: list[int] | tuple[int, ...],
+    split: str = "val",
+    condition: str = "original",
+    resamples: int = 2000,
+    seed: int = 2718,
+    confidence: float = 0.95,
+) -> dict[str, Any]:
+    """Mean per-seed A-minus-B accuracy with a joint episode bootstrap.
+
+    Every selected split/condition must have identical episode/query keys and
+    hop/answer labels across both sides and all training seeds. Explicit hop
+    selection is applied after this pairing check. Each bootstrap draw uses
+    the same episodes, including all their selected queries, for every seed;
+    it then averages the per-seed accuracy differences with equal seed weights.
+    This CI conditions on the supplied training seeds; seeds are not clusters.
+    Confidence changes only the percentile cutoffs, retaining identical draws.
+    """
+    _check_resamples(resamples)
+    if (isinstance(confidence, bool) or not isinstance(confidence, Real)
+            or not 0 < confidence < 1):
+        raise ValueError("Confidence must be a finite real number strictly between zero and one")
+    confidence = float(confidence)
+    if not math.isfinite(confidence) or not 0 < confidence < 1:
+        raise ValueError("Confidence must be a finite real number strictly between zero and one")
+    for sources in (samples_a_by_seed, samples_b_by_seed):
+        if not isinstance(sources, Mapping) or not sources:
+            raise ValueError("Pooled comparisons require nonempty mappings keyed by training seed")
+        if any(isinstance(s, bool) or not isinstance(s, (int, np.integer)) or s < 0
+               for s in sources):
+            raise ValueError("Training seed keys must be nonnegative integers")
+    if samples_a_by_seed.keys() != samples_b_by_seed.keys():
+        raise ValueError("Pooled comparisons require identical training seed keys on both sides")
+    if not isinstance(split, str) or not split or not isinstance(condition, str) or not condition:
+        raise ValueError("Pooled comparisons require explicit nonempty split and condition labels")
+    if not isinstance(hops, (list, tuple)) or not hops:
+        raise ValueError("Pooled comparisons require a nonempty explicit hop subset")
+    if any(isinstance(h, bool) or not isinstance(h, (int, np.integer)) or h < 1 for h in hops):
+        raise ValueError("Hop subset must contain positive integers")
+    selected_hops = sorted(int(h) for h in hops)
+    if len(set(selected_hops)) != len(selected_hops):
+        raise ValueError("Hop subset must contain distinct hops")
+    training_seeds = sorted(int(s) for s in samples_a_by_seed)
+    reference_keys: list[tuple[Any, ...]] | None = None
+    reference_hops: np.ndarray | None = None
+    reference_answers: np.ndarray | None = None
+    per_seed: list[dict[str, Any]] = []
+    differences: list[np.ndarray] = []
+    episode_ids: np.ndarray | None = None
+    for training_seed in training_seeds:
+        selected: list[np.ndarray] = []
+        for side, sources, depth in (("A", samples_a_by_seed, depth_a),
+                                     ("B", samples_b_by_seed, depth_b)):
+            arrays = load_samples(sources[training_seed])
+            rows = {key: index for key, index in _depth_rows(arrays, depth).items()
+                    if key[:2] == (split, condition)}
+            if not rows:
+                raise ValueError(f"No samples for seed {training_seed}, side {side}, "
+                                 f"split={split}, condition={condition}, L={depth}")
+            keys = sorted(rows)
+            indices = np.asarray([rows[key] for key in keys], dtype=np.int64)
+            if reference_keys is None:
+                reference_keys = keys
+                reference_hops = arrays["hop"][indices]
+                reference_answers = arrays["answer"][indices]
+            elif keys != reference_keys:
+                raise ValueError("Pooled paired samples require identical split/condition/episode/query "
+                                 f"labels across all seeds and sides (seed {training_seed}, side {side})")
+            elif not np.array_equal(arrays["hop"][indices], reference_hops):
+                raise ValueError(f"Pooled paired samples have different hop labels "
+                                 f"(seed {training_seed}, side {side})")
+            elif not np.array_equal(arrays["answer"][indices], reference_answers):
+                raise ValueError(f"Pooled paired samples have different answer labels "
+                                 f"(seed {training_seed}, side {side})")
+            keep = np.isin(arrays["hop"][indices], selected_hops)
+            present = set(int(h) for h in arrays["hop"][indices][keep])
+            if present != set(selected_hops):
+                raise ValueError(f"Requested hops are absent from seed {training_seed}, side {side}: "
+                                 f"{sorted(set(selected_hops) - present)}")
+            indices = indices[keep]
+            selected.append(arrays["correct"][indices].astype(np.float64))
+            if episode_ids is None:
+                episode_ids = arrays["episode_id"][indices]
+        a, b = selected
+        delta = a - b
+        differences.append(delta)
+        per_seed.append({"seed": training_seed, "accuracy_a": float(a.mean()),
+                         "accuracy_b": float(b.mean()), "difference": float(delta.mean())})
+    # Every side/seed has the same ordered query labels, so cluster sizes are
+    # common. Unequal episode sizes still use query-weighted accuracy ratios.
+    assert episode_ids is not None
+    _, clusters = np.unique(episode_ids, return_inverse=True)
+    counts = np.bincount(clusters).astype(np.float64)
+    totals = np.stack([np.bincount(clusters, weights=delta) for delta in differences])
+    n_episodes = len(counts)
+    bootstrap_seed = derive_seed(seed, "sym", "pooled_paired_episode_bootstrap", training_seeds,
+                                 split, condition, selected_hops, int(depth_a), int(depth_b))
+    rng = np.random.default_rng(bootstrap_seed)
+    boot = np.empty(resamples, dtype=np.float64)
+    batch_size = max(1, min(256, 1_000_000 // (n_episodes * len(training_seeds))))
+    for start in range(0, resamples, batch_size):
+        stop = min(start + batch_size, resamples)
+        draws = rng.integers(0, n_episodes, size=(stop - start, n_episodes))
+        per_seed_boot = totals[:, draws].sum(axis=-1) / counts[draws].sum(axis=-1)
+        boot[start:stop] = per_seed_boot.mean(axis=0)
+    alpha = (1 - confidence) / 2
+    low, high = np.quantile(boot, [alpha, 1 - alpha])
+    return {
+        "comparison": "A - B", "split": split, "condition": condition, "hops": selected_hops,
+        "depth_a": int(depth_a), "depth_b": int(depth_b),
+        "training_seeds": training_seeds, "n_seeds": len(training_seeds), "per_seed": per_seed,
+        "n_episodes": n_episodes, "n_queries_per_seed": len(episode_ids),
+        "accuracy_a": float(np.mean([row["accuracy_a"] for row in per_seed])),
+        "accuracy_b": float(np.mean([row["accuracy_b"] for row in per_seed])),
+        "difference": float(np.mean([row["difference"] for row in per_seed])),
+        "ci_low": float(low), "ci_high": float(high), "confidence": confidence,
+        "resamples": int(resamples), "seed": int(seed), "bootstrap_seed": bootstrap_seed,
+        "cluster_unit": "episode", "joint_episode_resampling": True,
+        "statistic": "mean_per_seed_paired_accuracy_difference",
+        "method": "paired_multiseed_percentile_bootstrap",
+    }
+
+
+def _load_manifest(path: Path) -> dict[int, Path]:
+    def unique_pairs(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
+        result: dict[str, Any] = {}
+        for key, value in pairs:
+            if key in result:
+                raise ValueError(f"Duplicate training seed in pooled manifest: {key}")
+            result[key] = value
+        return result
+
+    manifest = json.loads(path.read_text(), object_pairs_hook=unique_pairs)
+    if not isinstance(manifest, dict) or not manifest:
+        raise ValueError("Pooled manifest must be a nonempty JSON object of seed: sample-path entries")
+    result: dict[int, Path] = {}
+    for key, value in manifest.items():
+        try:
+            training_seed = int(key)
+        except ValueError as exc:
+            raise ValueError(f"Invalid training seed in pooled manifest: {key!r}") from exc
+        if training_seed < 0 or training_seed in result:
+            raise ValueError(f"Negative or duplicate training seed in pooled manifest: {key!r}")
+        if not isinstance(value, str) or not value:
+            raise ValueError(f"Sample path for training seed {key} must be nonempty text")
+        sample_path = Path(value)
+        result[training_seed] = sample_path if sample_path.is_absolute() else path.parent / sample_path
+    return result
+
+
 def main(argv: list[str] | None = None) -> None:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument("--samples", required=True, type=Path)
+    source = parser.add_mutually_exclusive_group(required=True)
+    source.add_argument("--samples", type=Path)
+    source.add_argument("--pooled-a", type=Path)
+    parser.add_argument("--pooled-b", type=Path)
     parser.add_argument("--reference", type=Path)
     parser.add_argument("--depth-a", type=int)
     parser.add_argument("--depth-b", type=int)
     parser.add_argument("--label-a", default="A")
     parser.add_argument("--label-b", default="B")
+    parser.add_argument("--hops", nargs="+", type=int)
+    parser.add_argument("--split", default="val")
+    parser.add_argument("--condition", default="original")
+    parser.add_argument("--confidence", type=float, help="Pooled CI confidence (default: 0.95; gates: 0.975)")
     parser.add_argument("--resamples", type=int, default=2000)
     parser.add_argument("--seed", type=int, default=2718)
     parser.add_argument("--out", required=True, type=Path)
     args = parser.parse_args(argv)
-    if args.reference is not None:
+    if args.pooled_a is not None:
+        if args.pooled_b is None or args.depth_a is None or args.depth_b is None or args.hops is None:
+            parser.error("--pooled-a requires --pooled-b, --depth-a, --depth-b and --hops")
+        if args.reference is not None:
+            parser.error("--reference cannot be combined with pooled manifests")
+        result = pooled_compare_runs(_load_manifest(args.pooled_a), _load_manifest(args.pooled_b),
+                                     args.depth_a, args.depth_b, hops=args.hops,
+                                     split=args.split, condition=args.condition,
+                                     resamples=args.resamples, seed=args.seed,
+                                     confidence=0.95 if args.confidence is None else args.confidence)
+        result["comparison"] = f"{args.label_a} - {args.label_b}"
+    elif (args.pooled_b is not None or args.hops is not None or args.split != "val"
+          or args.condition != "original" or args.confidence is not None):
+        parser.error("--pooled-b, --hops, --split, --condition and --confidence require --pooled-a")
+    elif args.reference is not None:
         if args.depth_a is None or args.depth_b is None:
             parser.error("--reference requires both --depth-a and --depth-b")
         result = compare_runs(args.samples, args.reference, args.depth_a, args.depth_b,

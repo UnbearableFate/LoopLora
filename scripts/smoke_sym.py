@@ -63,7 +63,7 @@ def audit(suite_path: Path, runs: Path, reports: Path) -> dict:
         anchor = prefix + "-M1"
         if anchor not in samples:
             continue
-        members = [prefix + "-" + variant for variant in ("B3", "B4", "B5", "M1-lin")]
+        members = [prefix + "-" + variant for variant in ("B3", "B4", "B5", "B5-lin", "M1-lin")]
         expected_hashes = _snapshot_hashes(metrics[anchor])
         for member in members:
             if member not in metrics or _snapshot_hashes(metrics[member]) != expected_hashes:
@@ -75,6 +75,9 @@ def audit(suite_path: Path, runs: Path, reports: Path) -> dict:
             comparisons.extend({"group": prefix, **row} for row in result)
         comparisons.extend({"group": prefix, **row} for row in compare_runs(
             samples[prefix + "-M1-lin"], samples[anchor], 4, 4, label_a="M1-lin", label_b="M1"))
+        comparisons.extend({"group": prefix, **row} for row in compare_runs(
+            samples[prefix + "-M1-lin"], samples[prefix + "-B5-lin"], 4, 4,
+            label_a="M1-lin", label_b="B5-lin"))
     reports.mkdir(parents=True, exist_ok=True)
     paired_path = reports / "p1s_smoke_paired.json"
     paired_path.write_text(json.dumps(comparisons, indent=2, allow_nan=False) + "\n")

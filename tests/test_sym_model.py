@@ -61,7 +61,25 @@ def test_orthogonal_writer_rejects_overloaded_episode():
         model.prepare(arrays)
 
 
-@pytest.mark.parametrize("variant", ["B3", "B5", "M1", "M1-lin"])
+def test_b5_linear_control_keeps_signed_fixed_query_read_at_every_step():
+    config = small_config(variant="B5-lin")
+    model = SymbolicModel(config)
+    arrays = generate(make_task_spec(config), "val", 0, 2, 19)
+    batch = model.prepare(arrays)
+    with torch.no_grad():
+        model.adapter.R.copy_(.2 * torch.eye(16))
+        model.adapter.Q.copy_(torch.eye(16))
+        model.adapter.U.copy_(torch.eye(16))
+    fixed_read = torch.einsum("bij,bqj->bqi", batch.memory, batch.u)
+    expected = batch.u
+    for _ in range(4):
+        expected = batch.u + .25 * (.2 * expected + fixed_read)
+    actual = model.read(batch, 4)["z"]
+    torch.testing.assert_close(actual, expected)
+    assert (actual < 0).any()
+
+
+@pytest.mark.parametrize("variant", ["B3", "B5", "B5-lin", "M1", "M1-lin"])
 @pytest.mark.parametrize("writer", ["oracle_random", "joint"])
 def test_reading_never_changes_context_or_query_and_zero_depth_is_input(variant, writer):
     config = small_config(variant=variant, writer=writer)
@@ -88,9 +106,9 @@ def test_shared_pretrained_writer_is_identical_across_variants_and_checkpoint_re
     original = {name: value.clone() for name, value in source.writer.state_dict().items()}
     arrays = generate(make_task_spec(config), "val", 0, 2, 19)
     source_batch = source.prepare(arrays)
-    for variant in ("B3", "B5", "M1", "M1-lin"):
+    for variant in ("B3", "B5", "B5-lin", "M1", "M1-lin"):
         reader_config = copy.deepcopy(config)
-        reader_config.update(variant=variant, activation="identity" if variant == "M1-lin" else "relu")
+        reader_config.update(variant=variant, activation="identity" if variant in {"M1-lin", "B5-lin"} else "relu")
         reader_config["pretrain"]["writer_checkpoint"] = str(tmp_path / "source" / "writer.pt")
         reader, result = train(reader_config, tmp_path / variant)
         assert result["pretrain_seconds"] == 0
