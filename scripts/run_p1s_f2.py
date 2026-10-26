@@ -244,7 +244,11 @@ def evaluate_one(name: str) -> None:
 
 
 def evaluation_shard(shard: int, procs: int) -> None:
+    from looplora.infra.seeds import stable_hash
     plan = all_training()
+    write(RUNS/'training_barriers'/f'shard-{shard:02d}.json',dict(status='passed',
+          plan_hash=stable_hash(plan),runs=[r['name'] for r in plan['runs']],
+          created_at=datetime.now(timezone.utc).isoformat()))
     pending = [r['name'] for r in plan['runs'][shard::4]]
     running = []
     while pending or running:

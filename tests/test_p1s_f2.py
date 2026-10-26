@@ -94,6 +94,16 @@ def test_cross_family_refuses_reference_io_until_every_f2_stage_has_trained(tmp_
         f2.cross_family(tmp_path,tmp_path,tmp_path/'wph-plan.json',tmp_path/'wph-barrier.json')
 
 
+def test_evaluation_cannot_start_a_child_before_every_f2_stage_has_trained(tmp_path,monkeypatch):
+    def incomplete(): raise ValueError('F2 global training barrier failed')
+    def forbidden(*args,**kwargs): pytest.fail('evaluation child started before training barrier')
+    monkeypatch.setattr(driver,'all_training',incomplete)
+    monkeypatch.setattr(driver.subprocess,'Popen',forbidden)
+    monkeypatch.setattr(driver,'RUNS',tmp_path)
+    with pytest.raises(ValueError,match='training barrier failed'): driver.evaluation_shard(0,4)
+    assert not (tmp_path/'training_barriers').exists()
+
+
 def test_legacy_audit_roles_do_not_rewrite_factorized_configurations():
     plan={'runs':[{'writer':w,'config':{'writer':w}} for w in f2.WRITERS]}
     before=copy.deepcopy(plan)

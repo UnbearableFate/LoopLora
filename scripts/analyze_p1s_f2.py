@@ -48,6 +48,12 @@ def evaluate_f2_gates(endpoints: dict, *, evaluation_seed: int) -> list[dict]:
 
 def verify_release(root: Path,*,aggregated: bool=False) -> tuple[dict,dict]:
     plan=driver.all_training()
+    for shard in range(4):
+        trained=shared.read_json(root/'training_barriers'/f'shard-{shard:02d}.json')
+        shared.require(trained['status']=='passed' and trained['plan_hash']==stable_hash(plan)
+                       and len(trained['runs'])==39 and
+                       set(trained['runs'])=={r['name'] for r in plan['runs']},
+                       'F2 evaluation lacks a complete training-barrier receipt')
     barrier=shared.read_json(root/'barrier.json')
     expected={(w,v,s) for w in WRITERS for v in driver.VARIANTS for s in driver.SEEDS}
     primary=[r for r in plan['runs'] if r['group']=='primary']
