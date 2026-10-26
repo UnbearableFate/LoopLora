@@ -1,0 +1,83 @@
+{
+  "choice": {
+    "action": "rerun",
+    "amendment": "A1",
+    "arm": null,
+    "arms": [
+      "OA",
+      "W5"
+    ],
+    "final_main_losses": {
+      "OA": 3.344111442565918,
+      "W0": 7.220161437988281,
+      "W1": 7.207719802856445,
+      "W2": 6.725276470184326,
+      "W3": 6.870504856109619,
+      "W4": 6.578404426574707,
+      "W5": 5.241876125335693
+    },
+    "screen_correct": {
+      "OA": 221,
+      "W0": 0,
+      "W1": 0,
+      "W2": 5,
+      "W3": 6,
+      "W4": 3,
+      "W5": 78
+    }
+  },
+  "context_hash": "8060625ae5220f2e720be1ad47c64a0c",
+  "created_at": "2026-10-26T16:33:41.908592+00:00",
+  "screen": [
+    {
+      "arm": "OA",
+      "config_hash": "ae435ff778c982549c303345a3e2d339",
+      "correct": 221,
+      "final_main_loss": 3.344111442565918,
+      "git_commit": "3fbc504b3c2aa2fafd1033ec1a479dc87859a401"
+    },
+    {
+      "arm": "W0",
+      "config_hash": "86a9ccb83e39dadc7185560353054e03",
+      "correct": 0,
+      "final_main_loss": 7.220161437988281,
+      "git_commit": "3fbc504b3c2aa2fafd1033ec1a479dc87859a401"
+    },
+    {
+      "arm": "W1",
+      "config_hash": "5f444836115fb012f7b4338063b0023a",
+      "correct": 0,
+      "final_main_loss": 7.207719802856445,
+      "git_commit": "3fbc504b3c2aa2fafd1033ec1a479dc87859a401"
+    },
+    {
+      "arm": "W2",
+      "config_hash": "f6252225a55eb3c87e1bc0ac6ad3ce57",
+      "correct": 5,
+      "final_main_loss": 6.725276470184326,
+      "git_commit": "3fbc504b3c2aa2fafd1033ec1a479dc87859a401"
+    },
+    {
+      "arm": "W3",
+      "config_hash": "963200455abe5d17633895ffb0d08e21",
+      "correct": 6,
+      "final_main_loss": 6.870504856109619,
+      "git_commit": "3fbc504b3c2aa2fafd1033ec1a479dc87859a401"
+    },
+    {
+      "arm": "W4",
+      "config_hash": "c8b9793a7acbd6b605756ab5c0d527aa",
+      "correct": 3,
+      "final_main_loss": 6.578404426574707,
+      "git_commit": "3fbc504b3c2aa2fafd1033ec1a479dc87859a401"
+    },
+    {
+      "arm": "W5",
+      "config_hash": "c730cf7bc5400ace2173feaf86d4e75b",
+      "correct": 78,
+      "final_main_loss": 5.241876125335693,
+      "git_commit": "3fbc504b3c2aa2fafd1033ec1a479dc87859a401"
+    }
+  ],
+  "source_commit": "3fbc504b3c2aa2fafd1033ec1a479dc87859a401"
+}

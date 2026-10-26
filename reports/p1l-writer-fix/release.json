@@ -1,0 +1,61 @@
+{
+  "science_commit": "3fbc504b3c2aa2fafd1033ec1a479dc87859a401",
+  "core_master_commit": "7f68a3c",
+  "backend": "core.scan_final",
+  "first_scientific_stage": "pre_tail_probes",
+  "screen_arms": [
+    "OA",
+    "W0",
+    "W1",
+    "W2",
+    "W3",
+    "W4",
+    "W5"
+  ],
+  "seed": 17,
+  "E": 16,
+  "rank": 32,
+  "layer": 14,
+  "L": 1,
+  "train_batch": 32,
+  "train_Q": 4,
+  "steps": 4800,
+  "lr": 0.003,
+  "val_episodes": 1000,
+  "eval_seed": 4242,
+  "eval_steps": [
+    1200,
+    2400,
+    4800
+  ],
+  "protocol": "memory_only",
+  "max_total_node_hours": 4,
+  "max_job_nodes": 1,
+  "max_job_seconds": 3600,
+  "selection_order": [
+    "W0",
+    "W1",
+    "W4",
+    "W3",
+    "W2",
+    "W5"
+  ],
+  "threshold_correct": 800,
+  "extension_threshold_correct": 300,
+  "extension": "one highest-EM eligible non-oracle arm; exact ties use simplicity; same seed/stream from scratch;3450s elapsed budget",
+  "tests": {
+    "job_id": "3714689.opbs",
+    "host": "mg0390",
+    "passed": 70,
+    "source": "3fbc504",
+    "argv": [
+      "-m",
+      "pytest",
+      "-q",
+      "tests/test_llm_writer_fix.py",
+      "tests/test_llm_train.py",
+      "tests/test_llm_evaluate.py",
+      "tests/test_llm_render.py"
+    ]
+  }
+}

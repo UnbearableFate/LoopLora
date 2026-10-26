@@ -1,0 +1,120 @@
+{
+  "jobs": [
+    {
+      "job_id": "3714689",
+      "job_name": "t-l3-writer",
+      "status": "FINISH",
+      "project": "xg24i002",
+      "queue": "small-g",
+      "start_date": "10/27 00:43:47",
+      "elapsed_seconds": 32,
+      "token": 0.0,
+      "token_estimate": null,
+      "nodes": 1,
+      "mig": null,
+      "role": "original tests",
+      "node_hours": 0.008888888888888889
+    },
+    {
+      "job_id": "3714703",
+      "job_name": "p-l3-prefix",
+      "status": "FINISH",
+      "project": "xg24i002",
+      "queue": "small-g",
+      "start_date": "10/27 00:47:29",
+      "elapsed_seconds": 33,
+      "token": 0.0,
+      "token_estimate": null,
+      "nodes": 1,
+      "mig": null,
+      "role": "pre-tail probes",
+      "node_hours": 0.009166666666666667
+    },
+    {
+      "job_id": "3714716",
+      "job_name": "s-l3-OA-W0",
+      "status": "FINISH",
+      "project": "xg24i002",
+      "queue": "small-g",
+      "start_date": "10/27 00:57:09",
+      "elapsed_seconds": 1498,
+      "token": 0.4,
+      "token_estimate": null,
+      "nodes": 1,
+      "mig": null,
+      "role": "screen OA/W0",
+      "node_hours": 0.4161111111111111
+    },
+    {
+      "job_id": "3714717",
+      "job_name": "s-l3-W1-W4",
+      "status": "FINISH",
+      "project": "xg24i002",
+      "queue": "small-g",
+      "start_date": "10/27 00:57:09",
+      "elapsed_seconds": 1587,
+      "token": 0.4,
+      "token_estimate": null,
+      "nodes": 1,
+      "mig": null,
+      "role": "screen W1/W4",
+      "node_hours": 0.44083333333333335
+    },
+    {
+      "job_id": "3714718",
+      "job_name": "s-l3-W2-W3",
+      "status": "FINISH",
+      "project": "xg24i002",
+      "queue": "small-g",
+      "start_date": "10/27 00:57:09",
+      "elapsed_seconds": 1644,
+      "token": 0.5,
+      "token_estimate": null,
+      "nodes": 1,
+      "mig": null,
+      "role": "screen W2/W3",
+      "node_hours": 0.45666666666666667
+    },
+    {
+      "job_id": "3714719",
+      "job_name": "s-l3-W5",
+      "status": "FINISH",
+      "project": "xg24i002",
+      "queue": "small-g",
+      "start_date": "10/27 00:57:10",
+      "elapsed_seconds": 1030,
+      "token": 0.3,
+      "token_estimate": null,
+      "nodes": 1,
+      "mig": null,
+      "role": "screen W5",
+      "node_hours": 0.2861111111111111
+    },
+    {
+      "job_id": "3714886",
+      "job_name": "v-l3-A1",
+      "status": "FINISH",
+      "project": "xg24i002",
+      "queue": "small-g",
+      "start_date": "10/27 01:30:19",
+      "elapsed_seconds": 290,
+      "token": 0.1,
+      "token_estimate": null,
+      "nodes": 1,
+      "mig": null,
+      "role": "A1 tests/screen audit/equality/timing",
+      "node_hours": 0.08055555555555556
+    }
+  ],
+  "pending": [
+    {
+      "job_id": "3714914.opbs",
+      "role": "A1 OA/W5 rerun",
+      "nodes": 1,
+      "requested_seconds": 7200,
+      "source": "0713cfb"
+    }
+  ],
+  "completed_node_hours": 1.698333333333333,
+  "max_total_node_hours": 4
+}
