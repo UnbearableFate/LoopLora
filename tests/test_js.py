@@ -113,3 +113,75 @@ def test_confirmation_barrier_precedes_all_reference_and_threshold_access(monkey
     monkeypatch.setattr(driver,'all_training',stop);monkeypatch.setattr(Path,'read_text',no_read)
     with pytest.raises(ValueError,match='training barrier'): driver.evaluation_plan()
     with pytest.raises(ValueError,match='training barrier'): driver.collect_stage('confirmation',12)
+
+
+def test_paired_difference_of_depth_gains_cancels_common_episode_noise(tmp_path):
+    import numpy as np
+    from analyze_js import Cache,delta_overshoot
+    cache=Cache(tmp_path);groups={c:[] for c in ('RS','RS+J')}
+    ids=np.repeat(np.arange(8,dtype=np.int64)+2**55,3);query=np.tile(np.arange(3,dtype=np.int16),8)
+    for condition in groups:
+        for seed in (17,29,43):
+            name=f'{condition}-{seed}';groups[condition].append(dict(name=name,seed=seed))
+            first=(np.arange(24)+seed)%3==0;last=~first
+            arrays=dict(episode_id=np.tile(ids,3),query_id=np.tile(query,3),hop=np.tile(query+1,3),
+                answer=np.ones(72,dtype=np.int32),L=np.repeat(np.array([4,16,17]),24),correct=np.r_[first,last,last])
+            cache.save(name,arrays)
+    stats=delta_overshoot(cache,groups['RS+J'],groups['RS'],'joint_fact')
+    assert stats['difference']==stats['ci_low']==stats['ci_high']==0
+    assert stats['n_episodes']==8 and stats['n_queries_per_seed']==24
+    for condition in groups:
+        for row in groups[condition]:
+            base=condition=='RS'
+            arrays['correct']=np.r_[np.full(24,base),np.full(24,not base),np.full(24,not base)]
+            cache.save(row['name'],arrays)
+    cache.memory.clear()
+    stats=delta_overshoot(cache,groups['RS+J'],groups['RS'],'joint_fact')
+    assert stats['difference']==stats['ci_low']==stats['ci_high']==2
+
+
+def test_overshoot_rule_requires_positive_ci_and_point_floor():
+    from analyze_js import decision
+    rows=[]
+    for w in ('oracle_random','joint_fact'):
+        rows.extend([dict(writer=w,endpoint='JS-E1-DeltaS',statistics=dict(difference=.02,ci_low=.001,ci_high=.03)),
+            dict(writer=w,endpoint='JS-E1-S',condition='RS+J',statistics=dict(difference=-.01-1e-17,n_queries_per_seed=6000,n_seeds=3))])
+    assert all(r['removes_overshoot'] for r in decision(rows))
+    rows[0]['statistics']['ci_low']=0;rows[3]['statistics']['difference']=-181/18000
+    assert not any(r['removes_overshoot'] for r in decision(rows))
+
+
+def test_threshold_integer_ties_follow_c3_rule():
+    from analyze_js import best_threshold
+    cells=[dict(correct=100,steps_total=500,threshold=.001,accuracy=.9),
+           dict(correct=100,steps_total=400,threshold=.1,accuracy=.1),
+           dict(correct=100,steps_total=400,threshold=.03,accuracy=.2),
+           dict(correct=99,steps_total=1,threshold=4,accuracy=1.)]
+    assert best_threshold(cells)['threshold']==.03
+
+
+def test_trace_membership_and_committed_thresholds_before_archive_read(tmp_path,monkeypatch):
+    import numpy as np
+    import analyze_js as analysis
+    import run_js as driver
+    from looplora.infra.seeds import stable_hash
+    monkeypatch.setattr(driver,'RUNS',tmp_path/'runs');monkeypatch.setattr(driver,'REPORTS',tmp_path/'reports')
+    trained=dict(runs=[dict(name=str(i)) for i in range(12)]);monkeypatch.setattr(driver,'all_training',lambda:trained)
+    runs=[];paths=[]
+    for i in range(24):
+        folder=driver.RUNS/'confirmation'/str(i);row=dict(name=str(i),config={'name':str(i)},checkpoint_hash='seal');runs.append(row)
+        driver.write(folder/'evaluation.json',dict(status='complete',aggregation_deferred=True,gate0_passed=True,checkpoint_config=row['config'],
+            checkpoint_hash='seal',episodes=2000,seed=999003,split='test',radius_depths=[4,8,16]))
+        path=folder/'trace.npz';path.touch();paths.append(str(path))
+    plan=dict(runs=runs,training_plan_hash=stable_hash(trained))
+    driver.write(driver.RUNS/'evaluation_plan.json',plan)
+    driver.write(driver.RUNS/'training_barrier.json',dict(status='passed',training_stages=12,evaluation_plan_hash=stable_hash(plan)))
+    barrier=dict(status='passed',evaluation_plan_hash=stable_hash(plan),runs=[r['name'] for r in runs],traces=paths[:-1])
+    driver.write(driver.RUNS/'confirmation_barrier.json',barrier)
+    monkeypatch.setattr(np,'load',lambda *a,**k:pytest.fail('archive opened before full barrier/threshold lock'))
+    with pytest.raises(ValueError,match='trace membership'): analysis.verify_set('confirmation')
+    barrier['traces']=paths;driver.write(driver.RUNS/'confirmation_barrier.json',barrier)
+    archive=tmp_path/'archive';monkeypatch.setenv('LL_SOURCE_ROOT',str(archive))
+    driver.write(driver.REPORTS/'thresholds.json',{'selected':[.03]})
+    driver.write(archive/'reports/js/thresholds.json',{'selected':[.1]})
+    with pytest.raises(ValueError,match='thresholds differ'): analysis.verify_set('confirmation')

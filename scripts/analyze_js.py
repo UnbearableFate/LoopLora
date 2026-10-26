@@ -83,6 +83,10 @@ def stopped(a,threshold):
     return a['predictions'][np.arange(len(steps)),steps],steps
 
 
+def best_threshold(cells):
+    return max(cells,key=lambda r:(r['correct'],-r['steps_total'],-r['threshold']))
+
+
 def select_thresholds():
     plan,barrier=verify_set('validation')
     shared.require(not (driver.REPORTS/'thresholds.json').exists(),'JS stopping thresholds already selected')
@@ -104,7 +108,7 @@ def select_thresholds():
                     per_seed.append(dict(seed=r['seed'],n=len(pred),correct=count,accuracy=count/len(pred),mean_steps=float(steps.mean())))
                 cell=dict(writer=w,condition=condition,threshold=threshold,n=n,correct=correct,steps_total=steps_total,
                     accuracy=correct/n,mean_steps=steps_total/n,per_seed=per_seed);cells.append(cell);grid.append(cell)
-            selected.append(max(cells,key=lambda r:(r['correct'],-r['steps_total'],-r['threshold'])))
+            selected.append(best_threshold(cells))
     selection=dict(status='locked',evaluation_plan_hash=stable_hash(plan),validation_barrier_hash=stable_hash(barrier),
         selected=selected,created_at=datetime.now(timezone.utc).isoformat(),seed=4242,episodes=2000,rule=driver.design()['stopping'])
     driver.write(driver.REPORTS/'thresholds.json',selection)
@@ -132,6 +136,7 @@ def delta_overshoot(cache,a,b,writer):
         for rows,L in ((a,16),(a,4),(b,16),(b,4)):
             run=next(r for r in rows if r['seed']==seed);x=cache.get(run['name'],'confirmation')
             i=np.flatnonzero((x['L']==L)&np.isin(x['hop'],(1,2,3)));i=i[np.lexsort((x['query_id'][i],x['episode_id'][i]))]
+            shared.require(set(x['hop'][i])=={1,2,3},'JS DeltaS hop coverage differs')
             labels=np.stack([x[k][i] for k in ('episode_id','query_id','hop','answer')],axis=1)
             shared.require(reference is None or np.array_equal(reference,labels),'JS DeltaS episode/query/answer pairing differs')
             reference=labels;episode_ids=x['episode_id'][i];values.append(x['correct'][i].astype(float))
@@ -228,10 +233,23 @@ def tables(rows,decisions,out):
     (out/'tables.md').write_text('\n'.join(lines)+'\n')
 
 
+def training_table():
+    plan=driver.all_training();rows=[]
+    for r in plan['runs']:
+        folder=Path(r['training_dir']);rec=shared.read_json(folder/'record.json')
+        logs=[json.loads(line) for line in (folder/'train_log.jsonl').read_text().splitlines()]
+        shared.require(logs[0]['step']==1 and logs[-1]['step']==15000 and all(np.isfinite(x['total_loss']) for x in logs),'JS training step/loss trace differs')
+        rows.append({k:r[k] for k in ('writer','condition','seed')}|
+            {k:rec[k] for k in ('steps','mean_L','train_seconds','peak_memory_bytes','active_batches','active_queries','max_penalty','max_radius')}|
+            dict(initial_CE=logs[0]['ce'],final_CE=logs[-1]['ce'],final_penalty=logs[-1]['penalty']))
+    driver.csv_table(driver.REPORTS/'training.csv',rows)
+
+
 def analyze():
     plan,barrier=verify_set('confirmation');out=driver.REPORTS;raw=driver.RUNS/'analysis'
     shared.require(not (raw/'started.json').exists(),'JS confirmation already aggregated')
     driver.write(raw/'started.json',dict(created_at=datetime.now(timezone.utc).isoformat()))
+    training_table()
     selection=shared.read_json(out/'thresholds.json');cache=Cache(driver.RUNS/'analysis_cache',limit=12)
     reference=None;accuracy=[];rho_seed=[];rho_groups=defaultdict(list);rows_count=0;stopping=[]
     for r in plan['runs']:
