@@ -47,3 +47,8 @@ Final audit omits `--screen-only`, adds `--rerun-release <absolute-rerun-release
 and `--verify-export`, and reproduces all saved sample metrics and paired labels.
 `writer.pt` contains neither optimizer nor auxiliary head; `checkpoint.pt` retains
 training state. Auxiliary address/value labels are supervision beyond the answer.
+
+Completed A1: OA70.3% and W514.4% final EM; no writer selected. Final audit
+3715599 (mg0844) verified all31 checkpoint sample tables and reloaded both
+inference exports with identical1000 predictions. Total12701s=3.52806nodeh.
+See docs/reports/P1L-writer-fix.md; WP-L4 is a separately authorized follow-up.

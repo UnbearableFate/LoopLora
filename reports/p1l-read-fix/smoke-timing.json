@@ -1,0 +1,94 @@
+{
+  "git_commit": "85607afb083652697182be02da9df0fdb26d5c59",
+  "quality_scores_exposed": false,
+  "rows": [
+    {
+      "arm": "R",
+      "artifact_gate_passed": true,
+      "eval100_seconds": [
+        0.9706619991920888,
+        0.9296795949339867,
+        0.91874537197873,
+        0.920337270013988,
+        0.7049490120261908
+      ],
+      "host": "mg0841",
+      "job_id": "3715461.opbs",
+      "steady_step_mean_seconds": 0.19885967794271944,
+      "step_p95_seconds": 0.20500941830687225,
+      "steps": 823,
+      "total_seconds": 184.22112923813984
+    },
+    {
+      "arm": "Rrho",
+      "artifact_gate_passed": true,
+      "eval100_seconds": [
+        1.1362325670197606,
+        0.8727693730033934,
+        0.8731454377993941,
+        0.8853730312548578,
+        0.8751656888052821
+      ],
+      "host": "mg0841",
+      "job_id": "3715461.opbs",
+      "steady_step_mean_seconds": 0.1933228873033741,
+      "step_p95_seconds": 0.20073938323184848,
+      "steps": 823,
+      "total_seconds": 179.82771878503263
+    },
+    {
+      "arm": "RK",
+      "artifact_gate_passed": true,
+      "eval100_seconds": [
+        1.0824271528981626,
+        0.9760918961837888,
+        0.9852181947790086,
+        0.763202185742557,
+        0.7505823560059071
+      ],
+      "host": "mg0880",
+      "job_id": "3715462.opbs",
+      "steady_step_mean_seconds": 0.21318790645923966,
+      "step_p95_seconds": 0.22182054147124292,
+      "steps": 823,
+      "total_seconds": 196.62285139085725
+    },
+    {
+      "arm": "OArho",
+      "artifact_gate_passed": true,
+      "eval100_seconds": [
+        1.210191076155752,
+        0.9768759948201478,
+        0.9313051868230104,
+        0.951628606300801,
+        0.9688786529004574
+      ],
+      "host": "mg0880",
+      "job_id": "3715462.opbs",
+      "steady_step_mean_seconds": 0.172607831249694,
+      "step_p95_seconds": 0.17866484047845005,
+      "steps": 823,
+      "total_seconds": 164.42397781135514
+    }
+  ],
+  "science_commit": "b1c64c17fa34e57489f15e6ca2993ac55883a05d",
+  "scientific_eval_steps": [
+    1645,
+    3290,
+    4935,
+    6580,
+    8225
+  ],
+  "scientific_steps": 8225,
+  "sizing": {
+    "conservative_eval1000_seconds": 12.10191076155752,
+    "expected_seconds_with_margin": 2780.715349748657,
+    "setup_reserve_seconds": 90,
+    "training_margin": 1.5
+  },
+  "smoke_fraction_evaluation": 0.1,
+  "smoke_fraction_steps": 0.10006079027355623,
+  "source_and_sample_artifacts_verified": true,
+  "source_dirty": false,
+  "source_hash": "6bb18ba6a45f8ce3124e41b32721a155"
+}

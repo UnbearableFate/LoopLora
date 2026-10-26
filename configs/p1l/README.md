@@ -90,3 +90,34 @@ training-only value heads and inference exports keep their existing behavior.
 These diagnostic interventions retain WP-L3's truncated memory-only scope.
 The default `configuration(arm)` and all existing variants remain unchanged.
 This implementation support does not authorize a new scientific run.
+
+# Fact-only oracle writer (WP-C7)
+
+Set `writer: oracle_random`, `stage: reader`, `model.r: 32` and
+`protocol: memory_only`; no `writer_checkpoint` is consumed. `oracle_seed: 17`
+is fixed independently of the reader training seed. Keys are global random
+unit codes for `(entity, relation)` pairs (index `entity * n_rel + relation`);
+values are exactly the symbolic `OracleWriter` entity codes at that seed.
+Both tables are frozen fp32 buffers saved in the full checkpoint and
+`writer.pt`. Each valid fact writes once, in fact-list order, with λ = β = 1.
+No support text is rendered or forwarded through the LM. The learned writer's
+`scan_final` path is bypassed because there are no support features to project;
+the oracle uses the unchanged symbolic delta scan on already normalized codes.
+
+M1 (including fixed `train.depths: [4]`), B8, B4, B5, B3 and M1-lin use their
+ordinary LM question encodings and readers. Question-side `A` stays trainable;
+unused learned K/V/gates are frozen. `train.prefetch_workers: 2` prepares only
+question tokens and episode arrays in two CPU workers. Evaluation is restricted
+to memory-only. Cross-reader comparisons assert identical memory/write counts;
+the ordinary per-checkpoint depth check still asserts identical x/u/M/counts.
+
+```yaml
+writer: oracle_random
+oracle_seed: 17
+stage: reader
+variant: B8
+protocol: memory_only
+model: {r: 32, layer: 14, input_site: o_proj}
+task: {name: t2_chain_end, E: 12, Q: 4, n_rel: 4, head_sharing: 0.3, chain_lengths: [8, 4]}
+train: {batch_size: 64, depths: [4], prefetch_workers: 2}
+```

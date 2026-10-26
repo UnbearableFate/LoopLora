@@ -5,7 +5,7 @@ import copy
 import json
 import time
 from contextlib import contextmanager
-from dataclasses import asdict
+from dataclasses import asdict, replace
 from pathlib import Path
 from typing import Any
 
@@ -23,6 +23,7 @@ from .inject import (MODEL_ID, MODEL_REVISION, AdapterBank, attach_adapters,
                      configure_numerics, detach_adapters, load_model, load_tokenizer)
 from .protocols import SupportSnapshot, answer_scores, encode_support
 from .prefetch import BatchStream
+from .oracle import OracleRandomWriter
 
 WRITER_NAMES = ("A", "K", "V", "a_lambda", "a_beta", "w_lambda", "w_beta")
 
@@ -63,6 +64,7 @@ class LLMExperiment:
         self.model.requires_grad_(False)
         self._closed = False
         stage, variant = config["stage"], config["variant"]
+        self.oracle = config.get("writer", "learned") == "oracle_random"
         self.layer = config["model"]["layer"]
         self.input_site = config["model"].get("input_site", "o_proj")
         self.adapter = None
@@ -88,7 +90,18 @@ class LLMExperiment:
         self.adapter = self.bank.modules[self.layer].adapter
         self.writer = self.adapter if self.adapter.has_memory else None
         try:
-            if variant == "B3":
+            if self.oracle:
+                if (stage not in {"reader", "joint"} or config["protocol"] != "memory_only"
+                        or self.adapter.cfg.r_mem != 32):
+                    raise ValueError("oracle_random requires a memory-only reader with r_mem=32")
+                self.writer = OracleRandomWriter(config["task"]["V"], config["task"]["n_rel"],
+                                                  config.get("oracle_seed", 17)).to(self.device)
+                # A encodes the question and remains trainable. Learned writer
+                # projections/gates have no role in this condition.
+                for name in WRITER_NAMES[1:]:
+                    if hasattr(self.adapter, name):
+                        getattr(self.adapter, name).requires_grad_(False)
+            elif variant == "B3":
                 writer_cfg = AdapterConfig(**{**asdict(self.adapter.cfg), "variant": "iterq"})
                 with torch.random.fork_rng(devices=[]):
                     torch.random.default_generator.manual_seed(derive_seed(config["seed"], "llm", "external-writer"))
@@ -97,7 +110,7 @@ class LLMExperiment:
                 # B3 has no loss path through K/V/gates or the external reader.
                 self.writer.requires_grad_(False)
                 self.adapter.A.requires_grad_(stage != "reader")
-            if stage == "reader":
+            if stage == "reader" and not self.oracle:
                 if self.writer is None:
                     raise ValueError("reader stage requires a memory writer")
                 if writer_record is None:
@@ -120,6 +133,10 @@ class LLMExperiment:
     def writer_signature(self) -> dict[str, Any]:
         if self.writer is None:
             return {}
+        if self.oracle:
+            return dict(writer="oracle_random", version=1, r_mem=32,
+                        V=self.writer.V, n_rel=self.writer.n_rel, seed=self.writer.seed,
+                        keys="global_entity_relation_pairs", values="OracleWriter.global_codes")
         cfg = self.writer.cfg
         signature = {"model": MODEL_ID, "revision": MODEL_REVISION, "layer": self.layer,
                 "d_in": cfg.d_in, "d_out": cfg.d_out, "r": cfg.r, "r_mem": cfg.r_mem,
@@ -132,6 +149,8 @@ class LLMExperiment:
     def writer_state(self) -> dict[str, Tensor]:
         if self.writer is None:
             return {}
+        if self.oracle:
+            return {name: value.detach().cpu().clone() for name, value in self.writer.state_dict().items()}
         return {name: getattr(self.writer, name).detach().cpu().clone()
                 for name in WRITER_NAMES if hasattr(self.writer, name)}
 
@@ -145,6 +164,9 @@ class LLMExperiment:
         for name, value in state.items():
             if value.shape != expected[name].shape or value.dtype != torch.float32:
                 raise ValueError(f"writer parameter {name} must have matching shape and fp32 dtype")
+        if self.oracle:
+            self.writer.load_state_dict(state, strict=True)
+            return
         with torch.no_grad():
             for name, value in state.items():
                 getattr(self.writer, name).copy_(value)
@@ -170,10 +192,19 @@ class LLMExperiment:
         protocol = self.config["protocol"] if protocol is None else protocol
         if protocol not in {"memory_only", "context_retained"}:
             raise ValueError(f"unknown protocol: {protocol}")
-        tokens = (tokenize_batch(arrays, self.tokenizer, device=self.device)
+        if self.oracle and protocol != "memory_only":
+            raise ValueError("oracle_random supports memory_only only")
+        tokens = (tokenize_batch(arrays, self.tokenizer, device=self.device, include_support=not self.oracle)
                   if tokens is None else tokens.to(self.device))
         B = tokens.support_ids.shape[0]
-        if protocol == "memory_only" and self.writer is None:
+        if self.oracle:
+            tokens = replace(tokens, support_ids=tokens.support_ids[:, :0],
+                             support_mask=tokens.support_mask[:, :0], fact_final=tokens.fact_final[:, :0])
+            facts = torch.as_tensor(arrays.facts, dtype=torch.long, device=self.device)
+            valid = torch.as_tensor(arrays.fact_valid, dtype=torch.bool, device=self.device)
+            snapshot = SupportSnapshot({self.layer: self.writer(facts, valid)}, None,
+                                       tokens.support_mask.clone(), protocol)
+        elif protocol == "memory_only" and self.writer is None:
             # Support never enters either the backbone attention or a writer.
             snapshot = SupportSnapshot(self.bank.zero_states(B), None, tokens.support_mask.clone(), protocol)
         else:
@@ -185,7 +216,8 @@ class LLMExperiment:
                     truncate=truncate and protocol == "memory_only",
                 )
         permitted = tokens.support_mask if self.config["write_policy"] == "all_tokens" else tokens.fact_final & tokens.support_mask
-        writes = permitted.sum(-1) if self.writer is not None else torch.zeros(B, dtype=torch.long, device=self.device)
+        writes = (valid.sum(-1) if self.oracle else permitted.sum(-1) if self.writer is not None
+                  else torch.zeros(B, dtype=torch.long, device=self.device))
         return PreparedBatch(snapshot, tokens.question_ids, tokens.question_mask,
                              tokens.answer_ids, tokens.candidate_ids, tokens.candidate_mask,
                              arrays, int(tokens.support_mask.sum()), writes,
@@ -248,6 +280,7 @@ def _fit(experiment: LLMExperiment, out: Path) -> dict[str, Any]:
     with (out / "train_log.jsonl").open("w") as log, BatchStream(
         spec, "train", options["batch_size"], data_seed, steps,
         tokenizer=experiment.tokenizer, workers=options.get("prefetch_workers", 0),
+        include_support=not experiment.oracle,
     ) as batches:
         for step in range(steps):
             synchronize(experiment.device)
@@ -292,7 +325,7 @@ def _fit(experiment: LLMExperiment, out: Path) -> dict[str, Any]:
             "mean_L": float(np.mean(chosen)) if chosen else None, "steps": steps,
             "final_loss": final_loss, "data_seed": data_seed, "train_tokens": train_tokens,
             "train_queries": steps * options["batch_size"] * spec.Q,
-            "writer_frozen": config["stage"] == "reader",
+            "writer_frozen": config["stage"] == "reader" or experiment.oracle,
             "trainable_parameters": sum(p.numel() for p in params)}
 
 

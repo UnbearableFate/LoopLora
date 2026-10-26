@@ -46,6 +46,7 @@ def _load_backbone(device: str):
 
 
 def _parameter_counts(experiment) -> dict[str, int]:
+    from torch.nn import Parameter
     from looplora.llm.train import WRITER_NAMES
 
     model = {id(p): p for p in experiment.model.parameters()}
@@ -55,7 +56,7 @@ def _parameter_counts(experiment) -> dict[str, int]:
     if experiment.writer is not None and experiment.writer is not experiment.adapter:
         for name in WRITER_NAMES:
             parameter = getattr(experiment.writer, name, None)
-            if parameter is not None and id(parameter) not in model:
+            if isinstance(parameter, Parameter) and id(parameter) not in model:
                 external[id(parameter)] = parameter
     active = {**model, **external}
     return {"total": sum(p.numel() for p in active.values()),
@@ -90,7 +91,8 @@ def run_one(config: dict[str, Any], out: str | Path, *, model=None, tokenizer=No
         "consumed_writer_checkpoint": consumed,
         "writer_source_record": str(Path(consumed).resolve().parent / "record.json") if consumed else None,
         "writer_checkpoint": None,
-        "writer": "t1_frozen" if config["stage"] == "reader" else config["stage"],
+        "writer": ("oracle_random" if config["writer"] == "oracle_random" else
+                   "t1_frozen" if config["stage"] == "reader" else config["stage"]),
         "stage": config["stage"], "protocol": config["protocol"],
         "eval_protocols": config["eval"]["protocols"], "smoke": config["smoke"],
         "variant": config["variant"], "task": config["task"]["name"],
@@ -138,6 +140,12 @@ def run_one(config: dict[str, Any], out: str | Path, *, model=None, tokenizer=No
             "gpu": torch.cuda.get_device_name(device) if device.type == "cuda" else None,
         }
         experiment, summary = train(config, out, model=model, tokenizer=tokenizer)
+        if config["writer"] == "oracle_random":
+            from looplora.sym.evaluate import tensor_hash
+
+            record["writer_signature"] = experiment.writer_signature()
+            record["writer_hash"] = stable_hash({name: tensor_hash(value)
+                                                  for name, value in experiment.writer_state().items()})
         record["data_seed"] = summary.get("data_seed", record["data_seed"])
         metrics, timing = evaluate(experiment, config, out)
         with np.load(out / "samples.npz", allow_pickle=False) as archive:
@@ -250,6 +258,8 @@ def _comparison_groups(jobs: list[dict[str, Any]]) -> dict[str, dict[str, dict[s
         if config["stage"] not in ("reader", "joint"):
             continue
         key = stable_hash({"stage": config["stage"], "writer": config["writer_checkpoint"],
+                           "writer_kind": config.get("writer", "learned"),
+                           "oracle_seed": config.get("oracle_seed", 17) if config.get("writer") == "oracle_random" else None,
                            "seed": config["seed"], "task": config["task"],
                            "model": config["model"], "write_policy": config["write_policy"],
                            "eval": {k: v for k, v in config["eval"].items() if k not in ("protocols", "depths")}})
@@ -273,7 +283,10 @@ def compare_suite(jobs: list[dict[str, Any]], out: Path) -> dict[str, Any]:
         reference = None
         for job in frozen:
             metrics = json.loads((out / job["name"] / "metrics.json").read_text())
-            hashes = [{k: entry[k] for k in ("split", "protocol", "condition", "episode_start", "x", "u", "M", "write_count")}
+            fields = ("split", "protocol", "condition", "episode_start", "M", "write_count")
+            if job["config"].get("writer", "learned") != "oracle_random":
+                fields += ("x", "u")
+            hashes = [{k: entry[k] for k in fields}
                       for entry in metrics["invariant_hashes"] if entry["protocol"] == "memory_only"]
             hashes.sort(key=lambda e: (e["split"], e["condition"], e["episode_start"]))
             if not hashes:

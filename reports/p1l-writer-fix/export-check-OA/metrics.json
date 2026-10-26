@@ -1,0 +1,27 @@
+{
+  "candidate_accuracy": 0.957,
+  "correct": 703,
+  "em": 0.703,
+  "key_chance": 0.0625,
+  "key_margin": -0.26616692543029785,
+  "key_pairwise_cosine": 0.1291303038597107,
+  "key_top1": 0.058,
+  "loss": 1.0749958753585815,
+  "n": 1000,
+  "seconds": 7.872541417367756,
+  "table": [
+    {
+      "L": 1,
+      "accuracy": 0.703,
+      "candidate_accuracy": 0.957,
+      "chance_accuracy": 0.036468020408012176,
+      "condition": "memory_only/oracle_addressing",
+      "full_accuracy": 0.703,
+      "hop": 1,
+      "n": 1000,
+      "protocol": "memory_only",
+      "split": "val"
+    }
+  ],
+  "tail_prediction_fraction": 0.709
+}

@@ -1,0 +1,27 @@
+{
+  "candidate_accuracy": 0.393,
+  "correct": 144,
+  "em": 0.144,
+  "key_chance": 0.0625,
+  "key_margin": 0.17678652703762054,
+  "key_pairwise_cosine": 0.09942781180143356,
+  "key_top1": 0.824,
+  "loss": 4.8515143394470215,
+  "n": 1000,
+  "seconds": 5.7659697602503,
+  "table": [
+    {
+      "L": 1,
+      "accuracy": 0.144,
+      "candidate_accuracy": 0.393,
+      "chance_accuracy": 0.036468020408012176,
+      "condition": "memory_only/original",
+      "full_accuracy": 0.144,
+      "hop": 1,
+      "n": 1000,
+      "protocol": "memory_only",
+      "split": "val"
+    }
+  ],
+  "tail_prediction_fraction": 0.234
+}

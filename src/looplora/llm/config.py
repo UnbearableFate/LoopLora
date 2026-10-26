@@ -16,7 +16,7 @@ PROTOCOLS = ("memory_only", "context_retained")
 DEFAULTS: dict[str, Any] = {
     "name": "llm", "seed": 17, "device": "cuda", "stage": "joint", "variant": "M1",
     "protocol": "memory_only", "write_policy": "fact_final", "activation": "relu",
-    "smoke": False, "writer_checkpoint": None,
+    "smoke": False, "writer_checkpoint": None, "writer": "learned", "oracle_seed": 17,
     "model": {"r": 32, "layer": 14, "rho": .25, "alpha": 1., "input_site": "o_proj"},
     "task": {"name": "t2_chain_end", "E": 24, "Q": 4, "V": 1024, "n_rel": 4,
              "chain_lengths": [8, 8, 8], "hops": [1, 2, 3]},
@@ -94,6 +94,11 @@ def resolve_config(mapping: Mapping[str, Any]) -> dict[str, Any]:
         raise ValueError("unknown write_policy")
     if config["activation"] not in ("relu", "identity"):
         raise ValueError("activation must be relu or identity")
+    if config["writer"] not in ("learned", "oracle_random"):
+        raise ValueError("writer must be learned or oracle_random")
+    oracle = config["writer"] == "oracle_random"
+    if oracle and (stage not in {"reader", "joint"} or variant in {"B0", "B1", "B2"}):
+        raise ValueError("oracle_random requires a memory-only reader/joint stage")
     if variant == "M1-lin":
         config["activation"] = "identity"
     for key in ("smoke",):
@@ -103,7 +108,10 @@ def resolve_config(mapping: Mapping[str, Any]) -> dict[str, Any]:
         if not isinstance(config[key], str) or not config[key]:
             raise ValueError(f"{key} must be a nonempty string")
     _integer(config["seed"], "seed", 0)
+    _integer(config["oracle_seed"], "oracle_seed", 0)
     _integer(config["model"]["r"], "model.r")
+    if oracle and config["model"]["r"] != 32:
+        raise ValueError("oracle_random requires r = r_mem = 32")
     _integer(config["model"]["layer"], "model.layer", 0)
     if config["model"]["input_site"] not in {"o_proj", "residual"}:
         raise ValueError("model.input_site must be o_proj or residual")
@@ -129,8 +137,10 @@ def resolve_config(mapping: Mapping[str, Any]) -> dict[str, Any]:
     checkpoint = config["writer_checkpoint"]
     if checkpoint is not None and (not isinstance(checkpoint, str) or not checkpoint):
         raise ValueError("writer_checkpoint must be a path string or null")
-    if stage == "reader" and checkpoint is None:
+    if stage == "reader" and checkpoint is None and not oracle:
         raise ValueError("reader requires writer_checkpoint")
+    if oracle and checkpoint is not None:
+        raise ValueError("oracle_random codes are self-contained; no writer_checkpoint")
     if stage != "reader" and checkpoint is not None:
         raise ValueError("only the reader stage consumes writer_checkpoint")
     evaluation = config["eval"]
@@ -159,12 +169,14 @@ def resolve_config(mapping: Mapping[str, Any]) -> dict[str, Any]:
     if config["smoke"] and "seed" not in mapping.get("eval", {}):
         evaluation["seed"] = derive_seed(20261027, "p1l-smoke-eval")
     if "protocols" not in mapping.get("eval", {}):
-        if variant in ("B0", "B1", "B2") or (variant in {"M1", "B8"} and stage in ("reader", "joint")):
+        if not oracle and (variant in ("B0", "B1", "B2") or (variant in {"M1", "B8"} and stage in ("reader", "joint"))):
             evaluation["protocols"] = list(PROTOCOLS)
     protocols = evaluation["protocols"]
     if (not isinstance(protocols, list) or not protocols
             or any(p not in PROTOCOLS for p in protocols) or len(set(protocols)) != len(protocols)):
         raise ValueError("invalid eval.protocols")
+    if oracle and protocols != ["memory_only"]:
+        raise ValueError("oracle_random supports memory_only only")
     if "context_retained" in protocols and variant not in ("M1", "B8", "B0", "B1", "B2"):
         raise ValueError("secondary context-retained evaluation is defined for M1/B8/B0/B1/B2")
     _integer(config["stats"]["resamples"], "stats.resamples", 2000)
