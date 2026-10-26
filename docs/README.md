@@ -6,9 +6,10 @@ authoritative; the orchestrator updates it), `docs/notation.md` (T-01, binding d
 
 ## Roles and communication
 - Orchestrator (Claude Code) writes task files `docs/tasks/WP-*.md`, reviews and merges branches.
-- Workers implement one task file each, on their own branch/worktree, and finish by writing
-  `docs/reports/WP-<id>.md` (≤ 1 page: what was built, test command + result with job id, deviations from
-  the task file and why, open issues). Reply to the orchestrator with one line pointing to that report.
+- Workers are long-lived, with a fixed role (`docs/workers.md`); they receive successive task files in that
+  role on their own branch/worktree. Each task ends with `docs/reports/<task>.md` (≤ 1 page: what was built
+  or run, test command + result with job id, deviations from the task file and why, open issues) and a
+  one-line reply pointing to that report. After the reply, stay idle in the same session for the next task.
 - Ask only when blocked on a decision the task file and notation cannot resolve; otherwise choose, record the
   choice in the report, and proceed.
 
