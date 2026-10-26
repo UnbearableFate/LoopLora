@@ -48,14 +48,23 @@ def size(args) -> None:
     # Two-hour job /1.5 margin, including a bounded load/export reserve.
     longest = max(row["step_seconds"] for row in rows)
     reserve = 60. + max(row["overhead_seconds"] for row in rows)
-    S = math.floor((7200 / 1.5 - reserve) / longest)
+    job_cap = math.floor((7200 / 1.5 - reserve) / longest)
+    # Amendment B1: seven readers x three main seeds plus two pilot rates.
+    # Sequential backbone reuse is the measured packing, with no GPU contention.
+    overhead = 5 * sum(row["overhead_seconds"] for row in rows) + 35 * 15.
+    step_sum = sum(row["step_seconds"] for row in rows)
+    budget_cap = math.floor((13 * 3600 - overhead) / ((3 + 2 / 3) * step_sum))
+    S = min(job_cap, budget_cap) // 500 * 500
     if S < 30:
         raise ValueError("no feasible training budget")
-    predicted = (3 * S + 2 * (S // 3)) * sum(row["step_seconds"] for row in rows) / 3600
+    predicted = ((3 * S + 2 * (S // 3)) * step_sum + overhead) / 3600
     result = dict(status="sized", S=S, pilot_steps=S // 3, smoke_steps=math.ceil(S / 10),
                   longest_step_seconds=longest, reserve_seconds=reserve,
-                  main_plus_pilot_train_node_hours=predicted,
-                  excludes="smoke, process/model startup, evaluation, J-lens and failed jobs",
+                  main_plus_pilot_node_hours=predicted,
+                  job_cap_steps=job_cap, budget_cap_steps=budget_cap,
+                  packing="one GPU process; runs sequentially reuse backbone, prefetch2 per active run",
+                  overhead_seconds=overhead,
+                  excludes="smoke, validation, confirmation, J-lens and failed jobs (3nodeh reserve)",
                   timing_rows=rows, source=str(args.root),
                   time=datetime.now(timezone.utc).isoformat())
     save(args.out, result)
