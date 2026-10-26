@@ -42,7 +42,7 @@ Open or resume (new tab, worktree cwd):
 | WP-L1 P1-L Pilot-1 | wk-llm | 9eb0e10 |
 | WP-L2 P1-L writer diagnosis | wk-llm | 44b27cf |
 | WP-L3 P1-L writer fix screen | wk-llm | done on wp/llm (cd5a45c), merged with WP-L4 |
-| WP-L4 P1-L read fix (last writer screen; Amendment A1) | wk-llm | (running) |
+| WP-L4 P1-L read fix (last writer screen; Amendments A1, A2: parallel r = 128 arms) | wk-llm | (running) |
 | WP-C7 oracle writer in the LLM pipeline | wk-core | d057720 |
 | WP-P4L learned halting on frozen readers (prereg `docs/prereg/P4S-L.md`) | wk-sym | merged after WP-T6 |
 | WP-P2S symbolic budget matching (P2-S) | wk-symf | 0f84084 |
@@ -52,7 +52,7 @@ Open or resume (new tab, worktree cwd):
 | WP-T4 symbolic claims–evidence table (T-10 part 1) | wk-theory | 056a542 |
 | WP-T5 paper draft, symbolic part (T-10 part 2) | wk-theory | merged after WP-T4 (`docs/paper/draft.md`) |
 | WP-IS memory load × read depth (prereg `docs/prereg/IS.md`) | wk-symf | 641911d |
-| WP-P1L P1-L main study (oracle_random condition first) | wk-p1l | (running) |
+| WP-P1L P1-L main study (oracle_random condition first; Amendments B2: S = 17,000, B3: parallel r = 128 oracle condition) | wk-p1l | (running) |
 | WP-JS Jacobian spectral-radius regularization (prereg `docs/prereg/JS.md`) | wk-symf | (running) |
 | WP-T6 IS into evidence/draft; latent-reasoning and Jacobian literature check | wk-theory | merged after WP-IS |
 | WP-B2 swap_successors counterfactual | wk-data | bbe2a24 |
