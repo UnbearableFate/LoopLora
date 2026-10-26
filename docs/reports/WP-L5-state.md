@@ -1,9 +1,11 @@
 # WP-L5 state: DPFP option for the learned writer (step 1 done; nothing executed)
 
 Branch `wp/llm`, base master `6da6330`. Step 1 of `docs/tasks/WP-L5_dpfp_writer.md` is implemented and statically
-checked (`py_compile` and `pyflakes` on every changed Python file, plus a torch-free dry run of the repro test's CSV
-parsing). **No torch code, test or run has been executed**: the login node forbids it and compute is unavailable until
-2026-10-28 22:00 JST. Not merged, not pushed. Binding design: `docs/prereg/DPFP.md`.
+checked (`py_compile` and `pyflakes` on every changed Python file, a torch-free dry run of the repro test's CSV
+parsing, and two independent read-only reviews of the code and of the tests by Sonnet subagents; their one likely test
+defect and two hardening items are fixed in the second commit). **No torch code, test or run has been executed**: the
+login node forbids it and compute is unavailable until 2026-10-28 22:00 JST. Not merged, not pushed.
+Binding design: `docs/prereg/DPFP.md`.
 
 ## What is implemented
 DPFP is `AdapterConfig.dpfp_nu` (default 0 = off). With nu >= 1 the write key and the read query are mapped to
@@ -37,8 +39,8 @@ state-dict names and shapes equal WP-L4 R at the same rank (only M changes shape
   the pre-DPFP `memory.py` (forward cpu+cuda, gradients cpu, fp32/fp64, with and without `feature_map=None`);
   `AdapterConfig` validation; key-width rejection in both scans; `process_sequence` and `process_sequence_fast` vs
   token-by-token feature-space equations; Gram read in phi space; accounting.
-- `tests/test_llm_dpfp.py` (tiny Qwen3 on cuda, inputs standardized as the runner does): config equals WP-L4 R plus only the DPFP fields (3 arms x E16/E8);
-  inconsistent arm/config rejected; W4 guard; per arm (nu 3 and 1): state/key/query shapes, unit nonnegative phi keys,
+- `tests/test_llm_dpfp.py` (tiny Qwen3 on cuda, inputs standardized as the runner does): config equals WP-L4 R plus
+  only the DPFP fields (3 arms x E16/E8); inconsistent arm/config rejected; W4 guard; per arm (nu 3 and 1): state/key/query shapes, unit nonnegative phi keys,
   memory = ordered delta rule over the recorded keys, InfoNCE and alignment in phi space, `M q_hat` read, gradients of
   the raw-read loss, Gram reconstruction, original- and phi-space key overlap; DPFP-off experiment wiring unchanged;
   zero/shuffle controls on the rectangular state; 5-step `fit`, `validate` (16 episodes), export and exact reload
