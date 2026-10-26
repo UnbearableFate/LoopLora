@@ -27,10 +27,9 @@ def oracle_forward(self,facts,valid,codes):
 def factorized_forward(self,x,valid):
     if not bool(valid.all()): return _FACTORIZED(self,x,valid)
     key_u=self.u(x)
-    value_u=F.linear(x[...,2*self.d_e:],self.A_v)
     raw=F.linear(key_u,self.K)
     keys=raw/torch.linalg.vector_norm(raw,dim=-1,keepdim=True).clamp_min(1e-6)
-    values=F.linear(value_u,self.V)
+    values=F.linear(F.linear(x[...,2*self.d_e:],self.A_v),self.V)
     return dense_scan(keys,values,self.a_lambda.sigmoid(),self.a_beta.sigmoid()),values
 
 

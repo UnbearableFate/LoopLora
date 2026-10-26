@@ -68,3 +68,65 @@ def test_no_confirmation_or_reference_read_before_new_training(monkeypatch):
     def no_read(*a,**k): pytest.fail('confirmation/reference opened before training barrier')
     monkeypatch.setattr(driver,'all_training',stop);monkeypatch.setattr(Path,'read_text',no_read)
     with pytest.raises(ValueError,match='training barrier'): driver.evaluation_plan()
+
+
+def test_update_paths_use_chronological_current_and_obsolete_edges():
+    from looplora.sym.evaluate import stratify_queries
+    from analyze_is import update_paths
+    spec=TaskSpec(name='t3_update',base='t2_chain_end',E=14,Q=4,chain_lengths=[8,4],hops=[1,2,3,4])
+    a=stratify_queries(generate(spec,'val',0,20,4242),spec,[1,2,3,4],4242)
+    labels=update_paths(a)
+    assert len(labels)==80 and {v[0] for v in labels.values()}=={False,True}
+    for (episode,q),(changed,old) in labels.items():
+        i=np.flatnonzero(a.episode_seed==episode)[0]
+        assert (old!=a.answer[i,q]) if changed else old==-1
+    # A changed current answer must be rejected before any accuracy is tabulated.
+    a.answer[0,0]=(int(a.answer[0,0])+1)%1024
+    with pytest.raises(ValueError,match='path labels'): update_paths(a)
+
+
+@pytest.mark.parametrize('writer',['oracle_random','joint_fact'])
+def test_dense_full_model_optimizer_trajectory_matches_reference(writer):
+    from looplora.sym.model import SymbolicModel
+    c=driver.new_config(writer,'M1',36,17,.003);a=SymbolicModel(c);b=copy.deepcopy(a)
+    optim_a=torch.optim.AdamW([p for p in a.parameters() if p.requires_grad],lr=.003,weight_decay=.01)
+    optim_b=torch.optim.AdamW([p for p in b.parameters() if p.requires_grad],lr=.003,weight_decay=.01)
+    spec=TaskSpec(**c['task'])
+    for step in range(3):
+        arrays=generate(spec,'val',step*4,4,4242)
+        losses=[]
+        for model,opt,fast in ((a,optim_a,False),(b,optim_b,True)):
+            opt.zero_grad(set_to_none=True)
+            original=model.writer.forward
+            if fast:
+                from types import MethodType
+                model.writer.forward=MethodType(execution.oracle_forward if writer=='oracle_random' else execution.factorized_forward,model.writer)
+            logits,prepared=model(arrays,4)
+            model.writer.forward=original
+            restricted=logits.masked_fill(~prepared.candidate_mask[:,None,:],-torch.inf)
+            loss=torch.nn.functional.cross_entropy(restricted.flatten(0,1),prepared.answer.flatten());loss.backward()
+            torch.nn.utils.clip_grad_norm_(model.parameters(),1.);opt.step();losses.append(loss.detach())
+        torch.testing.assert_close(losses[0],losses[1],rtol=0,atol=0)
+    for p,q in zip(a.parameters(),b.parameters()): torch.testing.assert_close(p,q,rtol=1e-6,atol=1e-7)
+
+
+@pytest.mark.parametrize('reader',['M1-mixed','B8'])
+def test_t3_eval_valid_scope_and_immutable_snapshots(tmp_path,reader):
+    from looplora.sym.model import SymbolicModel
+    from looplora.sym.evaluate import evaluate
+    from audit_p2s import audit_evaluation
+    variant='M1' if reader=='M1-mixed' else 'B8'
+    original=driver.new_config('joint_fact',variant,24,17,.003)
+    row=dict(config=original,reader=reader)
+    c=driver.evaluation_config(row,12,True,episodes=6,seed=4242,split='val')
+    evaluate(SymbolicModel(original),c,tmp_path,samples_only=True)
+    _,audit=audit_evaluation(tmp_path,c)
+    assert audit['sample_rows']==6*4*(1 if reader=='B8' else 8)
+
+
+def test_three_point_capability_threshold_and_strict_ci():
+    from analyze_is import capability_passes
+    s=dict(n_queries_per_seed=4000,n_seeds=3,difference=.03-1e-17,ci_low=.001)
+    assert capability_passes(s)
+    s['ci_low']=0;assert not capability_passes(s)
+    s['ci_low']=.001;s['difference']=359/12000;assert not capability_passes(s)
