@@ -9,6 +9,14 @@ All application runtime goes through scripts/submit.py. Control scripts
 launch_p1l_main.py/p1l_job_ledger.py are stdlib login-safe. Never import torch
 on login. Read docs/README.md, task/prereg, this card before continuing.
 
+Armed wakeups (message mode,300s polling, no Goal):
+- r128 smoke3716021: .job-wakeup/27808c33-f6d6-4f4d-b9d7-ca4e673c498b,
+  worker PID2012956; also verify3716020 on wake.
+- r32 pilot3715965: .job-wakeup/ee3ad75d-7773-4f90-92d8-b0bc5660b157,
+  worker PID2041468; also verify the other six pilot jobs on wake.
+Read the event state and acknowledge with the exact argv from the wakeup
+message. Do not register duplicates or cancel the other pending watcher.
+
 ## Accepted decisions
 
 - Design-lockea44bb6 precedes all training; J-probe A1b5d923c precedes pilots:
@@ -66,6 +74,8 @@ unchanged; signatures record actual rank and reject cross-rank writers.
 Core/exact-checkpoint tests3716000 passed34; B3 gate/config tests3716014
 passed7; r128 exact final-step replay3716027 passed3; global missing-rank/
 wrong-rank/incomplete-other-condition gate3716028 passed1.
+B4 inference timing/count wrapper3716084 passed1 onmg0025 (actual128-question
+GPU batches,20timed calls; no confirmation data).
 R128 preflight3716009(mg0022) exit0, all5paths20steps, peak<=7.70GB;
 sizing3716015 gives
 S17000/Pilot5666, no reduced-steps flag, slowest.20183s/step. Committed

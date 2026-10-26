@@ -10,6 +10,9 @@ from that source,5666steps per lr candidate. Lrs and main remain pending.
 Confirmation remains held for all main runs and the WP-L4 decision.
 Amendment B3 adds oracle r128 (15runs, own Pilot-2, B0–B2 reused); confirmation
 is now held for ALL conditions, with confidence1-.05/k fixed beforehand.
+B4 removes cross-rank single-read contrasts and adds descriptive adapter counts/
+inference timing; wrapper3716084 passed onmg0025. Wakeups for r128 smoke and
+r32 Pilot-2 are armed; see P1L-state.md for continuation.
 No test or confirmation data have been accessed.
 
 Raw root: /work/xg24i002/x10041/LoopLora/runs/p1l/main/.
