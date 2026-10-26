@@ -12,7 +12,7 @@ done report, armed PBS wakeup or live job). Idle after "WP-… done", idle with 
 question are expected states.
 
 Model: sessions opened or resumed from 2026-10-26 19:36 use GPT-6.1-sol xhigh; wk-sym still runs its original
-GPT-6-Astra xhigh session until its next clear.
+GPT-6-Astra xhigh session until its next clear (switched by resume at 03:46 on 2026-10-27; all workers now GPT-6.1-sol).
 
 Open or resume (new tab, worktree cwd):
 `herdr tab create --workspace w1 --cwd <worktree> --label <name> --no-focus`, then
@@ -20,7 +20,7 @@ Open or resume (new tab, worktree cwd):
 
 | worker | role (owns) | worktree, branch | context to inject | session | state |
 | --- | --- | --- | --- | --- | --- |
-| wk-sym | symbolic mechanism experiments: `src/looplora/sym`, `configs/p1s`, runs under `runs/p1s` | LoopLora-wt/sym, wp/sym | `docs/prereg/P1S.md`, `docs/reports/WP-D.md`, `docs/reports/P1S-pilot.md` | 01a177a0-f742-7c63-8800-0983d801fc19 | active: WP-P4L (GPT-6.1-sol from this task) |
+| wk-sym | symbolic mechanism experiments: `src/looplora/sym`, `configs/p1s`, runs under `runs/p1s` | LoopLora-wt/sym, wp/sym | `docs/prereg/P1S.md`, `docs/reports/WP-D.md`, `docs/reports/P1S-pilot.md` | 01a177a0-f742-7c63-8800-0983d801fc19 (resumed 03:46 2026-10-27, GPT-6.1-sol) | active: WP-P4L (GPT-6.1-sol from this task) |
 | wk-llm | LLM module experiments: `src/looplora/llm`, `configs/p1l`, runs under `runs/p1l` | LoopLora-wt/llm, wp/llm | `docs/prereg/P1L.md`, `docs/reports/WP-E.md`, `docs/reports/WP-G.md` | 01a1779d-c123-75a1-9458-ae849ee0fcde (resumed, GPT-6.1-sol) | active: WP-L4 |
 | wk-theory | theory and analytical checks: `docs/theory.md`, `tests/test_theory_examples.py` | LoopLora-wt/theory, wp/theory | `docs/theory.md`, `docs/reports/WP-T.md` | 01a177c4-57fb-7f42-a920-533e74680115 (resumed 21:47, GPT-6.1-sol) | idle (WP-T5 done; tab w1:t14) |
 | wk-core | core adapters, memory, accounting: `src/looplora/core` | LoopLora-wt/core, wp/core | `docs/notation.md`, `docs/reports/WP-A.md` | 01a1779d-747b-7df1-8492-b517a9be8c6a (resumed 22:13, GPT-6.1-sol) | active: WP-C7 (tab w1:t15) |
