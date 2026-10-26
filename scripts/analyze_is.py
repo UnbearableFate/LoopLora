@@ -163,6 +163,7 @@ def plot_accuracy(accuracy,out):
     import matplotlib
     matplotlib.use('Agg')
     import matplotlib.pyplot as plt
+    colors={6:'#1f77b4',12:'#ff7f0e',18:'#2ca02c',24:'#d62728',36:'#9467bd'}
     fig,axes=plt.subplots(2,3,figsize=(10,6),sharey='row')
     for j,w in enumerate(driver.ALL_WRITERS):
         for i,hops in enumerate(((2,3),(6,7,8))):
@@ -175,11 +176,20 @@ def plot_accuracy(accuracy,out):
                 for L in range(1,9):
                     group=[r for r in cells if r['L']==L]
                     points.append(sum(r['correct'] for r in group)/sum(r['n'] for r in group))
-                ax.plot(range(1,9),points,marker='o',markersize=3,label=f'E={E}')
+                ax.plot(range(1,9),points,marker='o',markersize=3,color=colors[E],label=f'E={E}')
             ax.set_title(w+(' (descriptive)' if w=='joint' else ''));ax.set_xticks(range(1,9));ax.set_xlabel('Read depth L');ax.grid(alpha=.2)
             if j==0: ax.set_ylabel('Accuracy, hops '+('/'.join(map(str,hops))))
     axes[0,0].legend(fontsize=8);fig.suptitle('Fixed E12 mixed-depth M1: memory load versus read depth')
     fig.tight_layout();fig.savefig(out/'accuracy_vs_L.png',dpi=150);fig.savefig(out/'accuracy_vs_L.pdf');plt.close(fig)
+
+
+def render_saved():
+    import csv
+    with (driver.REPORTS/'accuracy.csv').open() as f: rows=list(csv.DictReader(f))
+    for r in rows:
+        for k in ('E','base_E','train_E','hop','L','n','correct'): r[k]=int(r[k])
+        r['update']=r['update']=='True'
+    plot_accuracy(rows,driver.REPORTS)
 
 
 def update_table(events,labels,out):
