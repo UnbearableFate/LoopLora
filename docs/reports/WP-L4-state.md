@@ -58,3 +58,13 @@ Reload all exports, predictions identical; head absent at inference. Then collec
 ALL PBS costs (including conditional jobs/final audit), <=8nodeh, and write/commit
 <=1page+tables docs/reports/P1L-read-fix.md with baseline audit, every quality/loss
 curve, matched OAρ comparison, selection and limitations. Do not redo L3work.
+
+SCIENTIFIC SUBMISSIONS (03:53 JST), both source0b03d60 and1node02h via --scale-up:
+3715707.opbs R/Rrho: log /work/xg24i002/x10041/LoopLora/logs/pbs/r-l4-R-Rrho-20261027-035343-1708819.log
+3715708.opbs RK/OArho: log /work/xg24i002/x10041/LoopLora/logs/pbs/r-l4-RK-OArho-20261027-035344-1708832.log
+Specs same stems under logs/pbs/specs/ with.json. Each CLI consumes the frozen
+A1release.json and checks code source equality. Verify ALL4 complete after wake;
+watching3715708 does not prove3715707 finished. Spent0.178333nodeh before science;
+full two jobs4nodeh +conditionalE8job2h still leaves>1.8nodeh below8 for its
+smoke/tests/audits. See pending entries in jobs.json. Do not cancel/change jobs
+or mix numerical sources. No scientific submission existed before A1 steering.

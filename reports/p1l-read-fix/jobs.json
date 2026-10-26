@@ -120,5 +120,21 @@
     "A1 scientific R/Rrho",
     "A1 scientific RK/OArho",
     "conditional E8 and final audits"
+  ],
+  "pending": [
+    {
+      "job_id": "3715707.opbs",
+      "role": "A1 scientific R/Rrho",
+      "source": "0b03d60",
+      "nodes": 1,
+      "requested_seconds": 7200
+    },
+    {
+      "job_id": "3715708.opbs",
+      "role": "A1 scientific RK/OArho",
+      "source": "0b03d60",
+      "nodes": 1,
+      "requested_seconds": 7200
+    }
   ]
 }
