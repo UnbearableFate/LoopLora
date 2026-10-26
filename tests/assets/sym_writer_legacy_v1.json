@@ -1,0 +1,4448 @@
+{
+  "baseline_commit": "01fcfc5",
+  "device": "cpu",
+  "rows": {
+    "joint/B3": {
+      "logits": {
+        "0": {
+          "blake2b": "b24f52a46f393e28c5db40343db2b922",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            3,
+            65
+          ]
+        },
+        "1": {
+          "blake2b": "3487bc89e3307986dc09fabbcaf864f4",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            3,
+            65
+          ]
+        },
+        "2": {
+          "blake2b": "fa15ad343494b36e28e34e8ba54754bd",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            3,
+            65
+          ]
+        },
+        "4": {
+          "blake2b": "9d52b2d4f9f519b8d56000933f24b4ed",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            3,
+            65
+          ]
+        }
+      },
+      "prepared": {
+        "codes": {
+          "blake2b": "d0f2232bd3cfba6ec90ace5c00e26105",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            65,
+            8
+          ]
+        },
+        "memory": {
+          "blake2b": "b96acfed58983098e7bae62bb08f003b",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            16,
+            16
+          ]
+        },
+        "true_value": {
+          "blake2b": "70167e5fc6f51b7b9e2e9488480153b6",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            3,
+            16
+          ]
+        },
+        "u": {
+          "blake2b": "d13a5a8e92125c8c8eb5a77ae711fe29",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            3,
+            16
+          ]
+        }
+      },
+      "seed": 8659182517301876546,
+      "state_dict": {
+        "adapter.A": {
+          "blake2b": "60e2362d1ec4689e5c40fff77a137169",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            24
+          ]
+        },
+        "adapter.B": {
+          "blake2b": "895847261805706b106d6c843188098e",
+          "dtype": "torch.float32",
+          "shape": [
+            8,
+            16
+          ]
+        },
+        "adapter.R": {
+          "blake2b": "095d7aae97b5f2e430363830cb280e94",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            16
+          ]
+        },
+        "backbone.entities": {
+          "blake2b": "44005a41d1242d121457d9c3e3da3b41",
+          "dtype": "torch.float32",
+          "shape": [
+            65,
+            8
+          ]
+        },
+        "backbone.hops": {
+          "blake2b": "14b3c072141c54393a3a1f51f0d24db6",
+          "dtype": "torch.float32",
+          "shape": [
+            5,
+            8
+          ]
+        },
+        "backbone.relations": {
+          "blake2b": "0c0dfb7e4a9ee051d88e981aa8042f61",
+          "dtype": "torch.float32",
+          "shape": [
+            4,
+            8
+          ]
+        },
+        "writer.A": {
+          "blake2b": "60e2362d1ec4689e5c40fff77a137169",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            24
+          ]
+        },
+        "writer.K": {
+          "blake2b": "d6a4a62d53b618a8dd12743299028e80",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            16
+          ]
+        },
+        "writer.V": {
+          "blake2b": "05da1a7f35cc51af9a14c98eb2b7153c",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            16
+          ]
+        },
+        "writer.a_beta": {
+          "blake2b": "4c8518ecbf35d52e816e648b3d80602a",
+          "dtype": "torch.float32",
+          "shape": []
+        },
+        "writer.a_lambda": {
+          "blake2b": "f2fef288b9c10943084451fa44a61d9b",
+          "dtype": "torch.float32",
+          "shape": []
+        }
+      }
+    },
+    "joint/B4": {
+      "logits": {
+        "0": {
+          "blake2b": "8fa4d9d25feb6f3ef9129e68fe9f5f71",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            3,
+            65
+          ]
+        },
+        "1": {
+          "blake2b": "64cf49f5f04bde4f4b8b7c104d0d0561",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            3,
+            65
+          ]
+        },
+        "2": {
+          "blake2b": "d38cd296be2cf3556fe3ab389d92d7e7",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            3,
+            65
+          ]
+        },
+        "4": {
+          "blake2b": "d24d41dad993f9e669f82f18ca62dd9f",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            3,
+            65
+          ]
+        }
+      },
+      "prepared": {
+        "codes": {
+          "blake2b": "d0f2232bd3cfba6ec90ace5c00e26105",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            65,
+            8
+          ]
+        },
+        "memory": {
+          "blake2b": "50ab8798ef259d95c2f5a19c831fd68b",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            16,
+            16
+          ]
+        },
+        "true_value": {
+          "blake2b": "449f54315be5af73b210f15a7f806452",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            3,
+            16
+          ]
+        },
+        "u": {
+          "blake2b": "44e79e90966cea8bac37f31616ce39bc",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            3,
+            16
+          ]
+        }
+      },
+      "seed": 1729731048222626609,
+      "state_dict": {
+        "adapter.A": {
+          "blake2b": "73bd0cba24ba3cbc168de74f27857f56",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            24
+          ]
+        },
+        "adapter.B": {
+          "blake2b": "de21b83a6d03308d0af82ece84813e37",
+          "dtype": "torch.float32",
+          "shape": [
+            8,
+            16
+          ]
+        },
+        "adapter.K": {
+          "blake2b": "8fbf0fb68bcd109c7ca17e9bc74d9f31",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            16
+          ]
+        },
+        "adapter.Q": {
+          "blake2b": "a454910403282fe351e9da984782799b",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            16
+          ]
+        },
+        "adapter.R": {
+          "blake2b": "2652ce9f7883f4655d36a390591155c7",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            16
+          ]
+        },
+        "adapter.U": {
+          "blake2b": "fcd83d7cd4f97ebcd343d6b35c84a6ef",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            16
+          ]
+        },
+        "adapter.V": {
+          "blake2b": "7adf68a80d205f200880ac24bafb95eb",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            16
+          ]
+        },
+        "adapter.a_beta": {
+          "blake2b": "c2e3f94fba0b940a2c6a1419b5a62c91",
+          "dtype": "torch.float32",
+          "shape": []
+        },
+        "adapter.a_lambda": {
+          "blake2b": "817efcea25b6ba9a4fc9cf9911e6b044",
+          "dtype": "torch.float32",
+          "shape": []
+        },
+        "backbone.entities": {
+          "blake2b": "44005a41d1242d121457d9c3e3da3b41",
+          "dtype": "torch.float32",
+          "shape": [
+            65,
+            8
+          ]
+        },
+        "backbone.hops": {
+          "blake2b": "14b3c072141c54393a3a1f51f0d24db6",
+          "dtype": "torch.float32",
+          "shape": [
+            5,
+            8
+          ]
+        },
+        "backbone.relations": {
+          "blake2b": "0c0dfb7e4a9ee051d88e981aa8042f61",
+          "dtype": "torch.float32",
+          "shape": [
+            4,
+            8
+          ]
+        },
+        "writer.A": {
+          "blake2b": "73bd0cba24ba3cbc168de74f27857f56",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            24
+          ]
+        },
+        "writer.K": {
+          "blake2b": "8fbf0fb68bcd109c7ca17e9bc74d9f31",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            16
+          ]
+        },
+        "writer.V": {
+          "blake2b": "7adf68a80d205f200880ac24bafb95eb",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            16
+          ]
+        },
+        "writer.a_beta": {
+          "blake2b": "c2e3f94fba0b940a2c6a1419b5a62c91",
+          "dtype": "torch.float32",
+          "shape": []
+        },
+        "writer.a_lambda": {
+          "blake2b": "817efcea25b6ba9a4fc9cf9911e6b044",
+          "dtype": "torch.float32",
+          "shape": []
+        }
+      }
+    },
+    "joint/B5": {
+      "logits": {
+        "0": {
+          "blake2b": "8c06571d1b711278f49cf8dfbed33266",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            3,
+            65
+          ]
+        },
+        "1": {
+          "blake2b": "df3422488dcab670f2920f6d4de7e382",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            3,
+            65
+          ]
+        },
+        "2": {
+          "blake2b": "83b01c59afe8e35deab806a86394ad4c",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            3,
+            65
+          ]
+        },
+        "4": {
+          "blake2b": "27ad32a0ea51f4b1275279ebfa82e9c9",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            3,
+            65
+          ]
+        }
+      },
+      "prepared": {
+        "codes": {
+          "blake2b": "d0f2232bd3cfba6ec90ace5c00e26105",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            65,
+            8
+          ]
+        },
+        "memory": {
+          "blake2b": "32ca55505e07c25aba5b56a90f62b6f5",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            16,
+            16
+          ]
+        },
+        "true_value": {
+          "blake2b": "70aed3587ce47af58e8a589410dcb714",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            3,
+            16
+          ]
+        },
+        "u": {
+          "blake2b": "0f4545f3e72b44b452c2f7390d0b4da3",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            3,
+            16
+          ]
+        }
+      },
+      "seed": 4247197085230213521,
+      "state_dict": {
+        "adapter.A": {
+          "blake2b": "8314a6b0949b723ffda092f299699135",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            24
+          ]
+        },
+        "adapter.B": {
+          "blake2b": "3f02cb5f710155a76f33496cb7d022b3",
+          "dtype": "torch.float32",
+          "shape": [
+            8,
+            16
+          ]
+        },
+        "adapter.K": {
+          "blake2b": "2f98a229402ed7f3ceb0b50a0b9fe5a3",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            16
+          ]
+        },
+        "adapter.Q": {
+          "blake2b": "3c825e338d22a91e9cd00c7b3ed69fd6",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            16
+          ]
+        },
+        "adapter.R": {
+          "blake2b": "f325cc025e7d5597bcbe81bc57b85c8a",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            16
+          ]
+        },
+        "adapter.U": {
+          "blake2b": "0d3f33f39cfa464152aeecb03f1eec90",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            16
+          ]
+        },
+        "adapter.V": {
+          "blake2b": "bd311949eda27e0aa533029b24d0af1e",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            16
+          ]
+        },
+        "adapter.a_beta": {
+          "blake2b": "e1ca2ba303702d5d4cde2dc29fc2dc65",
+          "dtype": "torch.float32",
+          "shape": []
+        },
+        "adapter.a_lambda": {
+          "blake2b": "c43d6e19392e6de4d52c820fc9f3e996",
+          "dtype": "torch.float32",
+          "shape": []
+        },
+        "backbone.entities": {
+          "blake2b": "44005a41d1242d121457d9c3e3da3b41",
+          "dtype": "torch.float32",
+          "shape": [
+            65,
+            8
+          ]
+        },
+        "backbone.hops": {
+          "blake2b": "14b3c072141c54393a3a1f51f0d24db6",
+          "dtype": "torch.float32",
+          "shape": [
+            5,
+            8
+          ]
+        },
+        "backbone.relations": {
+          "blake2b": "0c0dfb7e4a9ee051d88e981aa8042f61",
+          "dtype": "torch.float32",
+          "shape": [
+            4,
+            8
+          ]
+        },
+        "writer.A": {
+          "blake2b": "8314a6b0949b723ffda092f299699135",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            24
+          ]
+        },
+        "writer.K": {
+          "blake2b": "2f98a229402ed7f3ceb0b50a0b9fe5a3",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            16
+          ]
+        },
+        "writer.V": {
+          "blake2b": "bd311949eda27e0aa533029b24d0af1e",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            16
+          ]
+        },
+        "writer.a_beta": {
+          "blake2b": "e1ca2ba303702d5d4cde2dc29fc2dc65",
+          "dtype": "torch.float32",
+          "shape": []
+        },
+        "writer.a_lambda": {
+          "blake2b": "c43d6e19392e6de4d52c820fc9f3e996",
+          "dtype": "torch.float32",
+          "shape": []
+        }
+      }
+    },
+    "joint/B5-lin": {
+      "logits": {
+        "0": {
+          "blake2b": "ce291ffa0cc003255d37470e69ecde5d",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            3,
+            65
+          ]
+        },
+        "1": {
+          "blake2b": "d7ab201e69e956ca10df00396b4db553",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            3,
+            65
+          ]
+        },
+        "2": {
+          "blake2b": "6ee2d7d507169be050b596902d021c88",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            3,
+            65
+          ]
+        },
+        "4": {
+          "blake2b": "c0c9cad8b50189a67c68acc75d0ec5a6",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            3,
+            65
+          ]
+        }
+      },
+      "prepared": {
+        "codes": {
+          "blake2b": "d0f2232bd3cfba6ec90ace5c00e26105",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            65,
+            8
+          ]
+        },
+        "memory": {
+          "blake2b": "691674748b8819dbb644261c3b4d716a",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            16,
+            16
+          ]
+        },
+        "true_value": {
+          "blake2b": "ec1654784708a5d22b24fe35d85a6258",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            3,
+            16
+          ]
+        },
+        "u": {
+          "blake2b": "f36866bda2e951acca91304de7cbea64",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            3,
+            16
+          ]
+        }
+      },
+      "seed": 949254131755465567,
+      "state_dict": {
+        "adapter.A": {
+          "blake2b": "0950523d2619cfcb2501d0a16d7a8b8e",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            24
+          ]
+        },
+        "adapter.B": {
+          "blake2b": "680d61db733b3695a2d4485d235b479e",
+          "dtype": "torch.float32",
+          "shape": [
+            8,
+            16
+          ]
+        },
+        "adapter.K": {
+          "blake2b": "431c510ba08cbaeff0b03721fede8455",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            16
+          ]
+        },
+        "adapter.Q": {
+          "blake2b": "8a2f9339f9a5c63ef80659a0b8ee9d24",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            16
+          ]
+        },
+        "adapter.R": {
+          "blake2b": "8d5a30f1789c95f7d541b31c56a35609",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            16
+          ]
+        },
+        "adapter.U": {
+          "blake2b": "7e837f9555358fad4ef7a8606af04d25",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            16
+          ]
+        },
+        "adapter.V": {
+          "blake2b": "185eada01c2615392ef9e6da3b4a26ca",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            16
+          ]
+        },
+        "adapter.a_beta": {
+          "blake2b": "9bb2f592b4eec72958bbadfb45383e0d",
+          "dtype": "torch.float32",
+          "shape": []
+        },
+        "adapter.a_lambda": {
+          "blake2b": "65607df43a5005eee45315b70b2b7461",
+          "dtype": "torch.float32",
+          "shape": []
+        },
+        "backbone.entities": {
+          "blake2b": "44005a41d1242d121457d9c3e3da3b41",
+          "dtype": "torch.float32",
+          "shape": [
+            65,
+            8
+          ]
+        },
+        "backbone.hops": {
+          "blake2b": "14b3c072141c54393a3a1f51f0d24db6",
+          "dtype": "torch.float32",
+          "shape": [
+            5,
+            8
+          ]
+        },
+        "backbone.relations": {
+          "blake2b": "0c0dfb7e4a9ee051d88e981aa8042f61",
+          "dtype": "torch.float32",
+          "shape": [
+            4,
+            8
+          ]
+        },
+        "writer.A": {
+          "blake2b": "0950523d2619cfcb2501d0a16d7a8b8e",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            24
+          ]
+        },
+        "writer.K": {
+          "blake2b": "431c510ba08cbaeff0b03721fede8455",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            16
+          ]
+        },
+        "writer.V": {
+          "blake2b": "185eada01c2615392ef9e6da3b4a26ca",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            16
+          ]
+        },
+        "writer.a_beta": {
+          "blake2b": "9bb2f592b4eec72958bbadfb45383e0d",
+          "dtype": "torch.float32",
+          "shape": []
+        },
+        "writer.a_lambda": {
+          "blake2b": "65607df43a5005eee45315b70b2b7461",
+          "dtype": "torch.float32",
+          "shape": []
+        }
+      }
+    },
+    "joint/M1": {
+      "logits": {
+        "0": {
+          "blake2b": "0c2ad887f4aefbc21d8bbda6b03e0537",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            3,
+            65
+          ]
+        },
+        "1": {
+          "blake2b": "3c494d95a79c89ff761ca9f8ad63f2aa",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            3,
+            65
+          ]
+        },
+        "2": {
+          "blake2b": "5fed8052cfb74e99262aafe654385e13",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            3,
+            65
+          ]
+        },
+        "4": {
+          "blake2b": "572f9a34d5d6b79f7699d8219d2f91dd",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            3,
+            65
+          ]
+        }
+      },
+      "prepared": {
+        "codes": {
+          "blake2b": "d0f2232bd3cfba6ec90ace5c00e26105",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            65,
+            8
+          ]
+        },
+        "memory": {
+          "blake2b": "825cd1888c8962a9c0c136984a62fff2",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            16,
+            16
+          ]
+        },
+        "true_value": {
+          "blake2b": "df8472f5de0bcb4ef64a4d4f208f3477",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            3,
+            16
+          ]
+        },
+        "u": {
+          "blake2b": "c3833d64f9f0b55c53e260f0ad31dcb7",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            3,
+            16
+          ]
+        }
+      },
+      "seed": 3430493706734195693,
+      "state_dict": {
+        "adapter.A": {
+          "blake2b": "8df8f36a5cedfa291e6b36b84a0d3b62",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            24
+          ]
+        },
+        "adapter.B": {
+          "blake2b": "13b104998823e723496330fd33c7f7dc",
+          "dtype": "torch.float32",
+          "shape": [
+            8,
+            16
+          ]
+        },
+        "adapter.K": {
+          "blake2b": "96e1d2f1b253a4ea56b974908b969aee",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            16
+          ]
+        },
+        "adapter.Q": {
+          "blake2b": "13bd4d669381ac94f71d7ed0c73a8493",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            16
+          ]
+        },
+        "adapter.R": {
+          "blake2b": "5d2d614f3ba3fa591084f19038a76b95",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            16
+          ]
+        },
+        "adapter.U": {
+          "blake2b": "c87cc0762c347ee4447aa8de3aed266b",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            16
+          ]
+        },
+        "adapter.V": {
+          "blake2b": "926c8cfc1ccd855102cf686c9dac8ffb",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            16
+          ]
+        },
+        "adapter.a_beta": {
+          "blake2b": "3a89c031485ce2459d98115d45d01729",
+          "dtype": "torch.float32",
+          "shape": []
+        },
+        "adapter.a_lambda": {
+          "blake2b": "b985ac13f3781d9e367db4fa45f3e7c7",
+          "dtype": "torch.float32",
+          "shape": []
+        },
+        "backbone.entities": {
+          "blake2b": "44005a41d1242d121457d9c3e3da3b41",
+          "dtype": "torch.float32",
+          "shape": [
+            65,
+            8
+          ]
+        },
+        "backbone.hops": {
+          "blake2b": "14b3c072141c54393a3a1f51f0d24db6",
+          "dtype": "torch.float32",
+          "shape": [
+            5,
+            8
+          ]
+        },
+        "backbone.relations": {
+          "blake2b": "0c0dfb7e4a9ee051d88e981aa8042f61",
+          "dtype": "torch.float32",
+          "shape": [
+            4,
+            8
+          ]
+        },
+        "writer.A": {
+          "blake2b": "8df8f36a5cedfa291e6b36b84a0d3b62",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            24
+          ]
+        },
+        "writer.K": {
+          "blake2b": "96e1d2f1b253a4ea56b974908b969aee",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            16
+          ]
+        },
+        "writer.V": {
+          "blake2b": "926c8cfc1ccd855102cf686c9dac8ffb",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            16
+          ]
+        },
+        "writer.a_beta": {
+          "blake2b": "3a89c031485ce2459d98115d45d01729",
+          "dtype": "torch.float32",
+          "shape": []
+        },
+        "writer.a_lambda": {
+          "blake2b": "b985ac13f3781d9e367db4fa45f3e7c7",
+          "dtype": "torch.float32",
+          "shape": []
+        }
+      }
+    },
+    "joint/M1-lin": {
+      "logits": {
+        "0": {
+          "blake2b": "4f865f6021b5d9bc44ed004d405cc2b2",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            3,
+            65
+          ]
+        },
+        "1": {
+          "blake2b": "8a42e739476bb99396d106c670fddf95",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            3,
+            65
+          ]
+        },
+        "2": {
+          "blake2b": "15772ccb7a2334e36071e265929fbdfe",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            3,
+            65
+          ]
+        },
+        "4": {
+          "blake2b": "ac1ed449c92147688b39fceba36c70c3",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            3,
+            65
+          ]
+        }
+      },
+      "prepared": {
+        "codes": {
+          "blake2b": "d0f2232bd3cfba6ec90ace5c00e26105",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            65,
+            8
+          ]
+        },
+        "memory": {
+          "blake2b": "e3930c86020f0f4d8ff5d4c6b2f5187e",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            16,
+            16
+          ]
+        },
+        "true_value": {
+          "blake2b": "bacee412a2275afb90a85d6d4c980e77",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            3,
+            16
+          ]
+        },
+        "u": {
+          "blake2b": "69b84c32ed374b598fcdce253daac0d8",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            3,
+            16
+          ]
+        }
+      },
+      "seed": 6224958256808634239,
+      "state_dict": {
+        "adapter.A": {
+          "blake2b": "287485608bb3fb02dd22b1962bb4c99b",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            24
+          ]
+        },
+        "adapter.B": {
+          "blake2b": "6e799e418e024329ace81bdfc539e2b0",
+          "dtype": "torch.float32",
+          "shape": [
+            8,
+            16
+          ]
+        },
+        "adapter.K": {
+          "blake2b": "ea1084bf7b436414d021809f66f36bb4",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            16
+          ]
+        },
+        "adapter.Q": {
+          "blake2b": "6382a259336bccce683ec4f749db375b",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            16
+          ]
+        },
+        "adapter.R": {
+          "blake2b": "c49eb922e8a464e383ab2d4a809156a1",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            16
+          ]
+        },
+        "adapter.U": {
+          "blake2b": "81086aa9c96f742b352e7a5c6485b0bf",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            16
+          ]
+        },
+        "adapter.V": {
+          "blake2b": "958a528f0422b4bf670cba5e8cd4f1be",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            16
+          ]
+        },
+        "adapter.a_beta": {
+          "blake2b": "e3050b3628999e71d03870829ec5d6be",
+          "dtype": "torch.float32",
+          "shape": []
+        },
+        "adapter.a_lambda": {
+          "blake2b": "6728db98bc3ef6bf5ccb799e94991e1e",
+          "dtype": "torch.float32",
+          "shape": []
+        },
+        "backbone.entities": {
+          "blake2b": "44005a41d1242d121457d9c3e3da3b41",
+          "dtype": "torch.float32",
+          "shape": [
+            65,
+            8
+          ]
+        },
+        "backbone.hops": {
+          "blake2b": "14b3c072141c54393a3a1f51f0d24db6",
+          "dtype": "torch.float32",
+          "shape": [
+            5,
+            8
+          ]
+        },
+        "backbone.relations": {
+          "blake2b": "0c0dfb7e4a9ee051d88e981aa8042f61",
+          "dtype": "torch.float32",
+          "shape": [
+            4,
+            8
+          ]
+        },
+        "writer.A": {
+          "blake2b": "287485608bb3fb02dd22b1962bb4c99b",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            24
+          ]
+        },
+        "writer.K": {
+          "blake2b": "ea1084bf7b436414d021809f66f36bb4",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            16
+          ]
+        },
+        "writer.V": {
+          "blake2b": "958a528f0422b4bf670cba5e8cd4f1be",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            16
+          ]
+        },
+        "writer.a_beta": {
+          "blake2b": "e3050b3628999e71d03870829ec5d6be",
+          "dtype": "torch.float32",
+          "shape": []
+        },
+        "writer.a_lambda": {
+          "blake2b": "6728db98bc3ef6bf5ccb799e94991e1e",
+          "dtype": "torch.float32",
+          "shape": []
+        }
+      }
+    },
+    "oracle_orth/B3": {
+      "logits": {
+        "0": {
+          "blake2b": "507909ca7e216e891143c3c58aaef8a0",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            3,
+            65
+          ]
+        },
+        "1": {
+          "blake2b": "4a85e09ae67a8948e079fc90fe508a80",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            3,
+            65
+          ]
+        },
+        "2": {
+          "blake2b": "af22c4a90b237461789bfc3bd45834c2",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            3,
+            65
+          ]
+        },
+        "4": {
+          "blake2b": "c6905b97687727e9a17954f226998130",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            3,
+            65
+          ]
+        }
+      },
+      "prepared": {
+        "codes": {
+          "blake2b": "b3f8ba92bfb5d2a86a4e60f0dedbe68d",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            65,
+            16
+          ]
+        },
+        "memory": {
+          "blake2b": "8327c0a959a5c76a2048cccde78daa50",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            16,
+            16
+          ]
+        },
+        "true_value": {
+          "blake2b": "f465269e2f97acd8057d2bcecd1b286d",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            3,
+            16
+          ]
+        },
+        "u": {
+          "blake2b": "078caca7c146cf5d41ba71a4d8b40269",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            3,
+            16
+          ]
+        }
+      },
+      "seed": 4545748618108061098,
+      "state_dict": {
+        "adapter.A": {
+          "blake2b": "eef71f02391f40446d815bbe3b9fc957",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            16
+          ]
+        },
+        "adapter.B": {
+          "blake2b": "d545f10f0badd535058345f53c456ade",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            16
+          ]
+        },
+        "adapter.R": {
+          "blake2b": "d3b9e3b5e979b40b0983e367a6935d79",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            16
+          ]
+        },
+        "backbone.entities": {
+          "blake2b": "44005a41d1242d121457d9c3e3da3b41",
+          "dtype": "torch.float32",
+          "shape": [
+            65,
+            8
+          ]
+        },
+        "backbone.hops": {
+          "blake2b": "14b3c072141c54393a3a1f51f0d24db6",
+          "dtype": "torch.float32",
+          "shape": [
+            5,
+            8
+          ]
+        },
+        "backbone.relations": {
+          "blake2b": "0c0dfb7e4a9ee051d88e981aa8042f61",
+          "dtype": "torch.float32",
+          "shape": [
+            4,
+            8
+          ]
+        },
+        "writer.global_codes": {
+          "blake2b": "a40b5b7c41c81525242437decd4ca44b",
+          "dtype": "torch.float32",
+          "shape": [
+            65,
+            16
+          ]
+        }
+      }
+    },
+    "oracle_orth/B4": {
+      "logits": {
+        "0": {
+          "blake2b": "9cdbeb1aaeb526e126ee6989ebc85c88",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            3,
+            65
+          ]
+        },
+        "1": {
+          "blake2b": "6ac8025ec140d24b7319b7600db8f242",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            3,
+            65
+          ]
+        },
+        "2": {
+          "blake2b": "60c0a232b9dab7e6ccb4d34167db3203",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            3,
+            65
+          ]
+        },
+        "4": {
+          "blake2b": "ec4e7419ae2e9b4a856ce8af18287842",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            3,
+            65
+          ]
+        }
+      },
+      "prepared": {
+        "codes": {
+          "blake2b": "b3f8ba92bfb5d2a86a4e60f0dedbe68d",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            65,
+            16
+          ]
+        },
+        "memory": {
+          "blake2b": "8327c0a959a5c76a2048cccde78daa50",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            16,
+            16
+          ]
+        },
+        "true_value": {
+          "blake2b": "f465269e2f97acd8057d2bcecd1b286d",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            3,
+            16
+          ]
+        },
+        "u": {
+          "blake2b": "078caca7c146cf5d41ba71a4d8b40269",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            3,
+            16
+          ]
+        }
+      },
+      "seed": 6319202343305490123,
+      "state_dict": {
+        "adapter.A": {
+          "blake2b": "8d43706a259d7c7ef6b39464ed5d7a7b",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            16
+          ]
+        },
+        "adapter.B": {
+          "blake2b": "80481898f3dfeb3fb9fd6b89b5783cd0",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            16
+          ]
+        },
+        "adapter.K": {
+          "blake2b": "8c561f1fd42f2ab077738f3bc8505074",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            16
+          ]
+        },
+        "adapter.Q": {
+          "blake2b": "5b56ed9f1bf3229bb11ff1642176b58b",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            16
+          ]
+        },
+        "adapter.R": {
+          "blake2b": "c2f426363a3ec0cc67a1d150affe899c",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            16
+          ]
+        },
+        "adapter.U": {
+          "blake2b": "7a18437390fed6ec1d42218f51f96fb9",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            16
+          ]
+        },
+        "adapter.V": {
+          "blake2b": "f485f53c539bf7a8521713389fcdb96b",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            16
+          ]
+        },
+        "adapter.a_beta": {
+          "blake2b": "4c8518ecbf35d52e816e648b3d80602a",
+          "dtype": "torch.float32",
+          "shape": []
+        },
+        "adapter.a_lambda": {
+          "blake2b": "f2fef288b9c10943084451fa44a61d9b",
+          "dtype": "torch.float32",
+          "shape": []
+        },
+        "backbone.entities": {
+          "blake2b": "44005a41d1242d121457d9c3e3da3b41",
+          "dtype": "torch.float32",
+          "shape": [
+            65,
+            8
+          ]
+        },
+        "backbone.hops": {
+          "blake2b": "14b3c072141c54393a3a1f51f0d24db6",
+          "dtype": "torch.float32",
+          "shape": [
+            5,
+            8
+          ]
+        },
+        "backbone.relations": {
+          "blake2b": "0c0dfb7e4a9ee051d88e981aa8042f61",
+          "dtype": "torch.float32",
+          "shape": [
+            4,
+            8
+          ]
+        },
+        "writer.global_codes": {
+          "blake2b": "a40b5b7c41c81525242437decd4ca44b",
+          "dtype": "torch.float32",
+          "shape": [
+            65,
+            16
+          ]
+        }
+      }
+    },
+    "oracle_orth/B5": {
+      "logits": {
+        "0": {
+          "blake2b": "83dc3efba5b93ffd4245807be9161f6e",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            3,
+            65
+          ]
+        },
+        "1": {
+          "blake2b": "dda9e322d01a7053b9f123691bd9469b",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            3,
+            65
+          ]
+        },
+        "2": {
+          "blake2b": "0160b0c939739128fbce67b53762625a",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            3,
+            65
+          ]
+        },
+        "4": {
+          "blake2b": "d5263e6daeef1b1bfd53757f4d7e0a23",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            3,
+            65
+          ]
+        }
+      },
+      "prepared": {
+        "codes": {
+          "blake2b": "b3f8ba92bfb5d2a86a4e60f0dedbe68d",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            65,
+            16
+          ]
+        },
+        "memory": {
+          "blake2b": "8327c0a959a5c76a2048cccde78daa50",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            16,
+            16
+          ]
+        },
+        "true_value": {
+          "blake2b": "f465269e2f97acd8057d2bcecd1b286d",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            3,
+            16
+          ]
+        },
+        "u": {
+          "blake2b": "078caca7c146cf5d41ba71a4d8b40269",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            3,
+            16
+          ]
+        }
+      },
+      "seed": 6805870676303676988,
+      "state_dict": {
+        "adapter.A": {
+          "blake2b": "cf618bbef528b562e34961104fbad997",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            16
+          ]
+        },
+        "adapter.B": {
+          "blake2b": "e4dfefb9bdd8d691ad36572a97d3c3aa",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            16
+          ]
+        },
+        "adapter.K": {
+          "blake2b": "544a9ccda0a4f75f7ba7c3e3a986936b",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            16
+          ]
+        },
+        "adapter.Q": {
+          "blake2b": "1366846bebe6ce31690ba761cefbae67",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            16
+          ]
+        },
+        "adapter.R": {
+          "blake2b": "e568732b85f834bb513525c89f638c1a",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            16
+          ]
+        },
+        "adapter.U": {
+          "blake2b": "05fcb3383998cb888a747c0baa7d289a",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            16
+          ]
+        },
+        "adapter.V": {
+          "blake2b": "55abfea2b46b06b178a0ceb5b8db3146",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            16
+          ]
+        },
+        "adapter.a_beta": {
+          "blake2b": "4c8518ecbf35d52e816e648b3d80602a",
+          "dtype": "torch.float32",
+          "shape": []
+        },
+        "adapter.a_lambda": {
+          "blake2b": "f2fef288b9c10943084451fa44a61d9b",
+          "dtype": "torch.float32",
+          "shape": []
+        },
+        "backbone.entities": {
+          "blake2b": "44005a41d1242d121457d9c3e3da3b41",
+          "dtype": "torch.float32",
+          "shape": [
+            65,
+            8
+          ]
+        },
+        "backbone.hops": {
+          "blake2b": "14b3c072141c54393a3a1f51f0d24db6",
+          "dtype": "torch.float32",
+          "shape": [
+            5,
+            8
+          ]
+        },
+        "backbone.relations": {
+          "blake2b": "0c0dfb7e4a9ee051d88e981aa8042f61",
+          "dtype": "torch.float32",
+          "shape": [
+            4,
+            8
+          ]
+        },
+        "writer.global_codes": {
+          "blake2b": "a40b5b7c41c81525242437decd4ca44b",
+          "dtype": "torch.float32",
+          "shape": [
+            65,
+            16
+          ]
+        }
+      }
+    },
+    "oracle_orth/B5-lin": {
+      "logits": {
+        "0": {
+          "blake2b": "176eb9220d7ef2e8d48105677c8e4412",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            3,
+            65
+          ]
+        },
+        "1": {
+          "blake2b": "571c8b28c8777a66df33815327efdd71",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            3,
+            65
+          ]
+        },
+        "2": {
+          "blake2b": "2d5049bd87a19b0186b83995c075e0fa",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            3,
+            65
+          ]
+        },
+        "4": {
+          "blake2b": "faaea05a50611b87b20f754964f47a36",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            3,
+            65
+          ]
+        }
+      },
+      "prepared": {
+        "codes": {
+          "blake2b": "b3f8ba92bfb5d2a86a4e60f0dedbe68d",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            65,
+            16
+          ]
+        },
+        "memory": {
+          "blake2b": "8327c0a959a5c76a2048cccde78daa50",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            16,
+            16
+          ]
+        },
+        "true_value": {
+          "blake2b": "f465269e2f97acd8057d2bcecd1b286d",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            3,
+            16
+          ]
+        },
+        "u": {
+          "blake2b": "078caca7c146cf5d41ba71a4d8b40269",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            3,
+            16
+          ]
+        }
+      },
+      "seed": 8789789782312938426,
+      "state_dict": {
+        "adapter.A": {
+          "blake2b": "9870d15625cfa29033a86930f6c4b6ab",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            16
+          ]
+        },
+        "adapter.B": {
+          "blake2b": "b6322bc63ea238b78382bf462fc6ee0d",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            16
+          ]
+        },
+        "adapter.K": {
+          "blake2b": "31945d1b7a01b68e66d42697795b9a51",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            16
+          ]
+        },
+        "adapter.Q": {
+          "blake2b": "3b1d8fd147938f089ad4e3699ddcc1f8",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            16
+          ]
+        },
+        "adapter.R": {
+          "blake2b": "ab3275ed49fae40f23b4151c63467c66",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            16
+          ]
+        },
+        "adapter.U": {
+          "blake2b": "5a1e3641f90b153bfe23276f7191c215",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            16
+          ]
+        },
+        "adapter.V": {
+          "blake2b": "458651ebfe320d64afe44eb2808ca6df",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            16
+          ]
+        },
+        "adapter.a_beta": {
+          "blake2b": "4c8518ecbf35d52e816e648b3d80602a",
+          "dtype": "torch.float32",
+          "shape": []
+        },
+        "adapter.a_lambda": {
+          "blake2b": "f2fef288b9c10943084451fa44a61d9b",
+          "dtype": "torch.float32",
+          "shape": []
+        },
+        "backbone.entities": {
+          "blake2b": "44005a41d1242d121457d9c3e3da3b41",
+          "dtype": "torch.float32",
+          "shape": [
+            65,
+            8
+          ]
+        },
+        "backbone.hops": {
+          "blake2b": "14b3c072141c54393a3a1f51f0d24db6",
+          "dtype": "torch.float32",
+          "shape": [
+            5,
+            8
+          ]
+        },
+        "backbone.relations": {
+          "blake2b": "0c0dfb7e4a9ee051d88e981aa8042f61",
+          "dtype": "torch.float32",
+          "shape": [
+            4,
+            8
+          ]
+        },
+        "writer.global_codes": {
+          "blake2b": "a40b5b7c41c81525242437decd4ca44b",
+          "dtype": "torch.float32",
+          "shape": [
+            65,
+            16
+          ]
+        }
+      }
+    },
+    "oracle_orth/M1": {
+      "logits": {
+        "0": {
+          "blake2b": "1d4d9ab68b5dfd59b93576f49aa37971",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            3,
+            65
+          ]
+        },
+        "1": {
+          "blake2b": "dd047ce394df9b9f44a3c648f01d8da5",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            3,
+            65
+          ]
+        },
+        "2": {
+          "blake2b": "90a15613b98b437d28a7e48046b41ffd",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            3,
+            65
+          ]
+        },
+        "4": {
+          "blake2b": "3ebabff4bc05e2355e44c9fc2379ab5b",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            3,
+            65
+          ]
+        }
+      },
+      "prepared": {
+        "codes": {
+          "blake2b": "b3f8ba92bfb5d2a86a4e60f0dedbe68d",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            65,
+            16
+          ]
+        },
+        "memory": {
+          "blake2b": "8327c0a959a5c76a2048cccde78daa50",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            16,
+            16
+          ]
+        },
+        "true_value": {
+          "blake2b": "f465269e2f97acd8057d2bcecd1b286d",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            3,
+            16
+          ]
+        },
+        "u": {
+          "blake2b": "078caca7c146cf5d41ba71a4d8b40269",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            3,
+            16
+          ]
+        }
+      },
+      "seed": 4062724230417520412,
+      "state_dict": {
+        "adapter.A": {
+          "blake2b": "ff924c32a8e50e735054a451ed9433bd",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            16
+          ]
+        },
+        "adapter.B": {
+          "blake2b": "2b007e75a90c3073012e1bfd7e0206e2",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            16
+          ]
+        },
+        "adapter.K": {
+          "blake2b": "0ec21870258db10835d535852c2920ad",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            16
+          ]
+        },
+        "adapter.Q": {
+          "blake2b": "fa478a9c068d3c06bdc1f14a3b0da018",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            16
+          ]
+        },
+        "adapter.R": {
+          "blake2b": "ea2ddd8dfa51a8504391a9c0f20b2196",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            16
+          ]
+        },
+        "adapter.U": {
+          "blake2b": "af65b48725369d5c5de72b0680cdcb2a",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            16
+          ]
+        },
+        "adapter.V": {
+          "blake2b": "0c9a51cdf21fa3216434c51f0053d066",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            16
+          ]
+        },
+        "adapter.a_beta": {
+          "blake2b": "4c8518ecbf35d52e816e648b3d80602a",
+          "dtype": "torch.float32",
+          "shape": []
+        },
+        "adapter.a_lambda": {
+          "blake2b": "f2fef288b9c10943084451fa44a61d9b",
+          "dtype": "torch.float32",
+          "shape": []
+        },
+        "backbone.entities": {
+          "blake2b": "44005a41d1242d121457d9c3e3da3b41",
+          "dtype": "torch.float32",
+          "shape": [
+            65,
+            8
+          ]
+        },
+        "backbone.hops": {
+          "blake2b": "14b3c072141c54393a3a1f51f0d24db6",
+          "dtype": "torch.float32",
+          "shape": [
+            5,
+            8
+          ]
+        },
+        "backbone.relations": {
+          "blake2b": "0c0dfb7e4a9ee051d88e981aa8042f61",
+          "dtype": "torch.float32",
+          "shape": [
+            4,
+            8
+          ]
+        },
+        "writer.global_codes": {
+          "blake2b": "a40b5b7c41c81525242437decd4ca44b",
+          "dtype": "torch.float32",
+          "shape": [
+            65,
+            16
+          ]
+        }
+      }
+    },
+    "oracle_orth/M1-lin": {
+      "logits": {
+        "0": {
+          "blake2b": "0ff93aa6030316dfe940c231a9e0d0eb",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            3,
+            65
+          ]
+        },
+        "1": {
+          "blake2b": "2128bd50216f657a7f23f5d8464de4e1",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            3,
+            65
+          ]
+        },
+        "2": {
+          "blake2b": "6274f728d9ab0609401d22ff89445d9d",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            3,
+            65
+          ]
+        },
+        "4": {
+          "blake2b": "dfc3c0e830dc6c8023680e1b3a34ec75",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            3,
+            65
+          ]
+        }
+      },
+      "prepared": {
+        "codes": {
+          "blake2b": "b3f8ba92bfb5d2a86a4e60f0dedbe68d",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            65,
+            16
+          ]
+        },
+        "memory": {
+          "blake2b": "8327c0a959a5c76a2048cccde78daa50",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            16,
+            16
+          ]
+        },
+        "true_value": {
+          "blake2b": "f465269e2f97acd8057d2bcecd1b286d",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            3,
+            16
+          ]
+        },
+        "u": {
+          "blake2b": "078caca7c146cf5d41ba71a4d8b40269",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            3,
+            16
+          ]
+        }
+      },
+      "seed": 8165761766093134481,
+      "state_dict": {
+        "adapter.A": {
+          "blake2b": "34fe848d35956248582960ebb04d117f",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            16
+          ]
+        },
+        "adapter.B": {
+          "blake2b": "9b84f6fe61eed61c45b9d097330a4b00",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            16
+          ]
+        },
+        "adapter.K": {
+          "blake2b": "8695f9126030a8142cd85deb9da59cc2",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            16
+          ]
+        },
+        "adapter.Q": {
+          "blake2b": "49dfb7bd8599ba17097c724332289165",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            16
+          ]
+        },
+        "adapter.R": {
+          "blake2b": "1b8f1624b219f7446047a4713195c394",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            16
+          ]
+        },
+        "adapter.U": {
+          "blake2b": "5b5fc23bfb261573146ca93fda3e39a1",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            16
+          ]
+        },
+        "adapter.V": {
+          "blake2b": "0cfd47ad0f883bc16b9cbc93f849a654",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            16
+          ]
+        },
+        "adapter.a_beta": {
+          "blake2b": "4c8518ecbf35d52e816e648b3d80602a",
+          "dtype": "torch.float32",
+          "shape": []
+        },
+        "adapter.a_lambda": {
+          "blake2b": "f2fef288b9c10943084451fa44a61d9b",
+          "dtype": "torch.float32",
+          "shape": []
+        },
+        "backbone.entities": {
+          "blake2b": "44005a41d1242d121457d9c3e3da3b41",
+          "dtype": "torch.float32",
+          "shape": [
+            65,
+            8
+          ]
+        },
+        "backbone.hops": {
+          "blake2b": "14b3c072141c54393a3a1f51f0d24db6",
+          "dtype": "torch.float32",
+          "shape": [
+            5,
+            8
+          ]
+        },
+        "backbone.relations": {
+          "blake2b": "0c0dfb7e4a9ee051d88e981aa8042f61",
+          "dtype": "torch.float32",
+          "shape": [
+            4,
+            8
+          ]
+        },
+        "writer.global_codes": {
+          "blake2b": "a40b5b7c41c81525242437decd4ca44b",
+          "dtype": "torch.float32",
+          "shape": [
+            65,
+            16
+          ]
+        }
+      }
+    },
+    "oracle_random/B3": {
+      "logits": {
+        "0": {
+          "blake2b": "2e4cfedc8be30ebd9f8282633c6dae2b",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            3,
+            65
+          ]
+        },
+        "1": {
+          "blake2b": "b9d30ff30f3025f91fa5438908b754af",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            3,
+            65
+          ]
+        },
+        "2": {
+          "blake2b": "a1074f55fa6f5c9a2919f044eaec237e",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            3,
+            65
+          ]
+        },
+        "4": {
+          "blake2b": "96da1cdd8094822fd6e987cd98b27c58",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            3,
+            65
+          ]
+        }
+      },
+      "prepared": {
+        "codes": {
+          "blake2b": "4b0d859d0b47c4bc2ce978748f0d2337",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            65,
+            16
+          ]
+        },
+        "memory": {
+          "blake2b": "6bbdc8f009241b9451fe33763f2c6f22",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            16,
+            16
+          ]
+        },
+        "true_value": {
+          "blake2b": "3d25c8e0c5e0c14313d6b03d2aa9d908",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            3,
+            16
+          ]
+        },
+        "u": {
+          "blake2b": "264562e7f758285221eeb49e10e722c0",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            3,
+            16
+          ]
+        }
+      },
+      "seed": 4471729295549967057,
+      "state_dict": {
+        "adapter.A": {
+          "blake2b": "0a75fd70723da9e62805d3f43f82b3dd",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            16
+          ]
+        },
+        "adapter.B": {
+          "blake2b": "ca102b9cb4209f0c9a241771434a0c06",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            16
+          ]
+        },
+        "adapter.R": {
+          "blake2b": "6ee31d5ff378141868a56ca98ca12169",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            16
+          ]
+        },
+        "backbone.entities": {
+          "blake2b": "44005a41d1242d121457d9c3e3da3b41",
+          "dtype": "torch.float32",
+          "shape": [
+            65,
+            8
+          ]
+        },
+        "backbone.hops": {
+          "blake2b": "14b3c072141c54393a3a1f51f0d24db6",
+          "dtype": "torch.float32",
+          "shape": [
+            5,
+            8
+          ]
+        },
+        "backbone.relations": {
+          "blake2b": "0c0dfb7e4a9ee051d88e981aa8042f61",
+          "dtype": "torch.float32",
+          "shape": [
+            4,
+            8
+          ]
+        },
+        "writer.global_codes": {
+          "blake2b": "a40b5b7c41c81525242437decd4ca44b",
+          "dtype": "torch.float32",
+          "shape": [
+            65,
+            16
+          ]
+        }
+      }
+    },
+    "oracle_random/B4": {
+      "logits": {
+        "0": {
+          "blake2b": "dfd04768c3c970fa0f2f13249805ab04",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            3,
+            65
+          ]
+        },
+        "1": {
+          "blake2b": "6904c5d96051d1a022ada7920ac759a4",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            3,
+            65
+          ]
+        },
+        "2": {
+          "blake2b": "4f2d9a41c9ff89bf9071c55ea9aff44f",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            3,
+            65
+          ]
+        },
+        "4": {
+          "blake2b": "543a3cfebc3a32d7f8c3c2935656b173",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            3,
+            65
+          ]
+        }
+      },
+      "prepared": {
+        "codes": {
+          "blake2b": "4b0d859d0b47c4bc2ce978748f0d2337",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            65,
+            16
+          ]
+        },
+        "memory": {
+          "blake2b": "6bbdc8f009241b9451fe33763f2c6f22",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            16,
+            16
+          ]
+        },
+        "true_value": {
+          "blake2b": "3d25c8e0c5e0c14313d6b03d2aa9d908",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            3,
+            16
+          ]
+        },
+        "u": {
+          "blake2b": "264562e7f758285221eeb49e10e722c0",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            3,
+            16
+          ]
+        }
+      },
+      "seed": 2112279417993922811,
+      "state_dict": {
+        "adapter.A": {
+          "blake2b": "ee7b98791ae042a3c09e6027a4a13a99",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            16
+          ]
+        },
+        "adapter.B": {
+          "blake2b": "7f7c28aa6687c4b613bbfadaaa306989",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            16
+          ]
+        },
+        "adapter.K": {
+          "blake2b": "2539ca7d108afbb3a9413833ba9f5c60",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            16
+          ]
+        },
+        "adapter.Q": {
+          "blake2b": "1ae317973bd627cbcc8f368e6bffc1d6",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            16
+          ]
+        },
+        "adapter.R": {
+          "blake2b": "6a794a6f0946a3c66c385cc2a875ea86",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            16
+          ]
+        },
+        "adapter.U": {
+          "blake2b": "c75e340985a47bb935d27848409c0138",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            16
+          ]
+        },
+        "adapter.V": {
+          "blake2b": "fdedb76631098e241fb93f9aaa18c4c4",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            16
+          ]
+        },
+        "adapter.a_beta": {
+          "blake2b": "4c8518ecbf35d52e816e648b3d80602a",
+          "dtype": "torch.float32",
+          "shape": []
+        },
+        "adapter.a_lambda": {
+          "blake2b": "f2fef288b9c10943084451fa44a61d9b",
+          "dtype": "torch.float32",
+          "shape": []
+        },
+        "backbone.entities": {
+          "blake2b": "44005a41d1242d121457d9c3e3da3b41",
+          "dtype": "torch.float32",
+          "shape": [
+            65,
+            8
+          ]
+        },
+        "backbone.hops": {
+          "blake2b": "14b3c072141c54393a3a1f51f0d24db6",
+          "dtype": "torch.float32",
+          "shape": [
+            5,
+            8
+          ]
+        },
+        "backbone.relations": {
+          "blake2b": "0c0dfb7e4a9ee051d88e981aa8042f61",
+          "dtype": "torch.float32",
+          "shape": [
+            4,
+            8
+          ]
+        },
+        "writer.global_codes": {
+          "blake2b": "a40b5b7c41c81525242437decd4ca44b",
+          "dtype": "torch.float32",
+          "shape": [
+            65,
+            16
+          ]
+        }
+      }
+    },
+    "oracle_random/B5": {
+      "logits": {
+        "0": {
+          "blake2b": "5e0ed4a25e1c28e1afb2c3b8c32d19a2",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            3,
+            65
+          ]
+        },
+        "1": {
+          "blake2b": "3173185a425acbf3c701761dba7e3dbc",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            3,
+            65
+          ]
+        },
+        "2": {
+          "blake2b": "ef0022b89f8f250b14eeee5a67d4ba57",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            3,
+            65
+          ]
+        },
+        "4": {
+          "blake2b": "baf4be9caaebcef52cbfe37b2d7fb038",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            3,
+            65
+          ]
+        }
+      },
+      "prepared": {
+        "codes": {
+          "blake2b": "4b0d859d0b47c4bc2ce978748f0d2337",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            65,
+            16
+          ]
+        },
+        "memory": {
+          "blake2b": "6bbdc8f009241b9451fe33763f2c6f22",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            16,
+            16
+          ]
+        },
+        "true_value": {
+          "blake2b": "3d25c8e0c5e0c14313d6b03d2aa9d908",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            3,
+            16
+          ]
+        },
+        "u": {
+          "blake2b": "264562e7f758285221eeb49e10e722c0",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            3,
+            16
+          ]
+        }
+      },
+      "seed": 7034755774417748876,
+      "state_dict": {
+        "adapter.A": {
+          "blake2b": "928779f2f8277ecc00b48151d5dab5f7",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            16
+          ]
+        },
+        "adapter.B": {
+          "blake2b": "812770f02562950b638367e1273aa1d9",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            16
+          ]
+        },
+        "adapter.K": {
+          "blake2b": "67fb01b43cbf22d30188e6bdf0d1adb7",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            16
+          ]
+        },
+        "adapter.Q": {
+          "blake2b": "a7de0ba534bb28cab8222111bb898949",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            16
+          ]
+        },
+        "adapter.R": {
+          "blake2b": "fdee7cbb78de727610266d5e543cf0f8",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            16
+          ]
+        },
+        "adapter.U": {
+          "blake2b": "0baa4bb7e4c55c2936469b650e30ad2b",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            16
+          ]
+        },
+        "adapter.V": {
+          "blake2b": "1cffddcba63d769007acf2ba8dbc1b91",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            16
+          ]
+        },
+        "adapter.a_beta": {
+          "blake2b": "4c8518ecbf35d52e816e648b3d80602a",
+          "dtype": "torch.float32",
+          "shape": []
+        },
+        "adapter.a_lambda": {
+          "blake2b": "f2fef288b9c10943084451fa44a61d9b",
+          "dtype": "torch.float32",
+          "shape": []
+        },
+        "backbone.entities": {
+          "blake2b": "44005a41d1242d121457d9c3e3da3b41",
+          "dtype": "torch.float32",
+          "shape": [
+            65,
+            8
+          ]
+        },
+        "backbone.hops": {
+          "blake2b": "14b3c072141c54393a3a1f51f0d24db6",
+          "dtype": "torch.float32",
+          "shape": [
+            5,
+            8
+          ]
+        },
+        "backbone.relations": {
+          "blake2b": "0c0dfb7e4a9ee051d88e981aa8042f61",
+          "dtype": "torch.float32",
+          "shape": [
+            4,
+            8
+          ]
+        },
+        "writer.global_codes": {
+          "blake2b": "a40b5b7c41c81525242437decd4ca44b",
+          "dtype": "torch.float32",
+          "shape": [
+            65,
+            16
+          ]
+        }
+      }
+    },
+    "oracle_random/B5-lin": {
+      "logits": {
+        "0": {
+          "blake2b": "3ae99cae10a32abf895cf22ef09e021c",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            3,
+            65
+          ]
+        },
+        "1": {
+          "blake2b": "d31407f28f1f252c5b556004a66f8a3c",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            3,
+            65
+          ]
+        },
+        "2": {
+          "blake2b": "cdcfe62f2119e3957831f79c572e4349",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            3,
+            65
+          ]
+        },
+        "4": {
+          "blake2b": "ea43707dfb8615ca3381ca36f37ffdde",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            3,
+            65
+          ]
+        }
+      },
+      "prepared": {
+        "codes": {
+          "blake2b": "4b0d859d0b47c4bc2ce978748f0d2337",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            65,
+            16
+          ]
+        },
+        "memory": {
+          "blake2b": "6bbdc8f009241b9451fe33763f2c6f22",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            16,
+            16
+          ]
+        },
+        "true_value": {
+          "blake2b": "3d25c8e0c5e0c14313d6b03d2aa9d908",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            3,
+            16
+          ]
+        },
+        "u": {
+          "blake2b": "264562e7f758285221eeb49e10e722c0",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            3,
+            16
+          ]
+        }
+      },
+      "seed": 5480997887850272953,
+      "state_dict": {
+        "adapter.A": {
+          "blake2b": "9c671e4464a7f0ccaae41333a40935a3",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            16
+          ]
+        },
+        "adapter.B": {
+          "blake2b": "66692d2eacbf42c8ca4ff8e80496a935",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            16
+          ]
+        },
+        "adapter.K": {
+          "blake2b": "17e8f3be75ed06cc7f6bdce800814e0c",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            16
+          ]
+        },
+        "adapter.Q": {
+          "blake2b": "56a834bd01301f124dd74214bb95e9a1",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            16
+          ]
+        },
+        "adapter.R": {
+          "blake2b": "ae26f5ac2927dfe43f18c4ebc89f0beb",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            16
+          ]
+        },
+        "adapter.U": {
+          "blake2b": "e52fcf6161578ab5c7da9514821a0d09",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            16
+          ]
+        },
+        "adapter.V": {
+          "blake2b": "8a2d7314dea06fa009a9ca624aeed104",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            16
+          ]
+        },
+        "adapter.a_beta": {
+          "blake2b": "4c8518ecbf35d52e816e648b3d80602a",
+          "dtype": "torch.float32",
+          "shape": []
+        },
+        "adapter.a_lambda": {
+          "blake2b": "f2fef288b9c10943084451fa44a61d9b",
+          "dtype": "torch.float32",
+          "shape": []
+        },
+        "backbone.entities": {
+          "blake2b": "44005a41d1242d121457d9c3e3da3b41",
+          "dtype": "torch.float32",
+          "shape": [
+            65,
+            8
+          ]
+        },
+        "backbone.hops": {
+          "blake2b": "14b3c072141c54393a3a1f51f0d24db6",
+          "dtype": "torch.float32",
+          "shape": [
+            5,
+            8
+          ]
+        },
+        "backbone.relations": {
+          "blake2b": "0c0dfb7e4a9ee051d88e981aa8042f61",
+          "dtype": "torch.float32",
+          "shape": [
+            4,
+            8
+          ]
+        },
+        "writer.global_codes": {
+          "blake2b": "a40b5b7c41c81525242437decd4ca44b",
+          "dtype": "torch.float32",
+          "shape": [
+            65,
+            16
+          ]
+        }
+      }
+    },
+    "oracle_random/M1": {
+      "logits": {
+        "0": {
+          "blake2b": "3845480bafafde661eac66f1e288a38b",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            3,
+            65
+          ]
+        },
+        "1": {
+          "blake2b": "2a88409c5e21e0703d3fec32e31fc4bf",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            3,
+            65
+          ]
+        },
+        "2": {
+          "blake2b": "b2c7dacb1831f04d3a678a598cac3978",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            3,
+            65
+          ]
+        },
+        "4": {
+          "blake2b": "32e8439877713cc076e9bbd2ee41d5cf",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            3,
+            65
+          ]
+        }
+      },
+      "prepared": {
+        "codes": {
+          "blake2b": "4b0d859d0b47c4bc2ce978748f0d2337",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            65,
+            16
+          ]
+        },
+        "memory": {
+          "blake2b": "6bbdc8f009241b9451fe33763f2c6f22",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            16,
+            16
+          ]
+        },
+        "true_value": {
+          "blake2b": "3d25c8e0c5e0c14313d6b03d2aa9d908",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            3,
+            16
+          ]
+        },
+        "u": {
+          "blake2b": "264562e7f758285221eeb49e10e722c0",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            3,
+            16
+          ]
+        }
+      },
+      "seed": 7349663859560785196,
+      "state_dict": {
+        "adapter.A": {
+          "blake2b": "6630f07eb7985bba0049118d8edebf63",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            16
+          ]
+        },
+        "adapter.B": {
+          "blake2b": "989738bf26674f30c431fb8149278d8d",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            16
+          ]
+        },
+        "adapter.K": {
+          "blake2b": "bdc846ca92e89fb72cce2c7de03ed43f",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            16
+          ]
+        },
+        "adapter.Q": {
+          "blake2b": "88fb94d4ed3f970c5e99813cfd371c6d",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            16
+          ]
+        },
+        "adapter.R": {
+          "blake2b": "7e291704d465152a0922520ba8cbc3d5",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            16
+          ]
+        },
+        "adapter.U": {
+          "blake2b": "8d1fc2a5c7d92d03cfeba1cce8cdb8de",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            16
+          ]
+        },
+        "adapter.V": {
+          "blake2b": "23674ff69ab61a21b14e2fea219624e3",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            16
+          ]
+        },
+        "adapter.a_beta": {
+          "blake2b": "4c8518ecbf35d52e816e648b3d80602a",
+          "dtype": "torch.float32",
+          "shape": []
+        },
+        "adapter.a_lambda": {
+          "blake2b": "f2fef288b9c10943084451fa44a61d9b",
+          "dtype": "torch.float32",
+          "shape": []
+        },
+        "backbone.entities": {
+          "blake2b": "44005a41d1242d121457d9c3e3da3b41",
+          "dtype": "torch.float32",
+          "shape": [
+            65,
+            8
+          ]
+        },
+        "backbone.hops": {
+          "blake2b": "14b3c072141c54393a3a1f51f0d24db6",
+          "dtype": "torch.float32",
+          "shape": [
+            5,
+            8
+          ]
+        },
+        "backbone.relations": {
+          "blake2b": "0c0dfb7e4a9ee051d88e981aa8042f61",
+          "dtype": "torch.float32",
+          "shape": [
+            4,
+            8
+          ]
+        },
+        "writer.global_codes": {
+          "blake2b": "a40b5b7c41c81525242437decd4ca44b",
+          "dtype": "torch.float32",
+          "shape": [
+            65,
+            16
+          ]
+        }
+      }
+    },
+    "oracle_random/M1-lin": {
+      "logits": {
+        "0": {
+          "blake2b": "628ef1b9fcb54306c1afbdcd01fa11d7",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            3,
+            65
+          ]
+        },
+        "1": {
+          "blake2b": "e67d8981e39904cc2b4d8a3c56cc3950",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            3,
+            65
+          ]
+        },
+        "2": {
+          "blake2b": "6490b9b90712c3bd44ebff55d85cc53f",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            3,
+            65
+          ]
+        },
+        "4": {
+          "blake2b": "9ce58755736b97348bd795ed3ee43301",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            3,
+            65
+          ]
+        }
+      },
+      "prepared": {
+        "codes": {
+          "blake2b": "4b0d859d0b47c4bc2ce978748f0d2337",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            65,
+            16
+          ]
+        },
+        "memory": {
+          "blake2b": "6bbdc8f009241b9451fe33763f2c6f22",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            16,
+            16
+          ]
+        },
+        "true_value": {
+          "blake2b": "3d25c8e0c5e0c14313d6b03d2aa9d908",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            3,
+            16
+          ]
+        },
+        "u": {
+          "blake2b": "264562e7f758285221eeb49e10e722c0",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            3,
+            16
+          ]
+        }
+      },
+      "seed": 2813021304478603074,
+      "state_dict": {
+        "adapter.A": {
+          "blake2b": "fa606df00dc5f6909b2928211dff9a9d",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            16
+          ]
+        },
+        "adapter.B": {
+          "blake2b": "bc67fc006c49ba781aba37f4ddcd3aa3",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            16
+          ]
+        },
+        "adapter.K": {
+          "blake2b": "452842e73452cc2e3a65513e8cb68a0c",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            16
+          ]
+        },
+        "adapter.Q": {
+          "blake2b": "240d053d83ca35e8178630108ac57ce8",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            16
+          ]
+        },
+        "adapter.R": {
+          "blake2b": "041d5ddb61475eb4bea8ddb9e1889eec",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            16
+          ]
+        },
+        "adapter.U": {
+          "blake2b": "eb5007865560d87e38e0c17823b7edf6",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            16
+          ]
+        },
+        "adapter.V": {
+          "blake2b": "86e2a260be770696982d64aaa9b47697",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            16
+          ]
+        },
+        "adapter.a_beta": {
+          "blake2b": "4c8518ecbf35d52e816e648b3d80602a",
+          "dtype": "torch.float32",
+          "shape": []
+        },
+        "adapter.a_lambda": {
+          "blake2b": "f2fef288b9c10943084451fa44a61d9b",
+          "dtype": "torch.float32",
+          "shape": []
+        },
+        "backbone.entities": {
+          "blake2b": "44005a41d1242d121457d9c3e3da3b41",
+          "dtype": "torch.float32",
+          "shape": [
+            65,
+            8
+          ]
+        },
+        "backbone.hops": {
+          "blake2b": "14b3c072141c54393a3a1f51f0d24db6",
+          "dtype": "torch.float32",
+          "shape": [
+            5,
+            8
+          ]
+        },
+        "backbone.relations": {
+          "blake2b": "0c0dfb7e4a9ee051d88e981aa8042f61",
+          "dtype": "torch.float32",
+          "shape": [
+            4,
+            8
+          ]
+        },
+        "writer.global_codes": {
+          "blake2b": "a40b5b7c41c81525242437decd4ca44b",
+          "dtype": "torch.float32",
+          "shape": [
+            65,
+            16
+          ]
+        }
+      }
+    },
+    "t1_frozen/B3": {
+      "logits": {
+        "0": {
+          "blake2b": "15dc5d43162ef639e78cd86fc4347fa1",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            3,
+            65
+          ]
+        },
+        "1": {
+          "blake2b": "64c4b86158902a12ba1a08ffa22c510d",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            3,
+            65
+          ]
+        },
+        "2": {
+          "blake2b": "61ea82bf66b7bdfa2ae777e9784ceb64",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            3,
+            65
+          ]
+        },
+        "4": {
+          "blake2b": "d413cb1fabb95f9912f64847e37c5b7c",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            3,
+            65
+          ]
+        }
+      },
+      "prepared": {
+        "codes": {
+          "blake2b": "d0f2232bd3cfba6ec90ace5c00e26105",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            65,
+            8
+          ]
+        },
+        "memory": {
+          "blake2b": "cb77ae3d3c8ffd58a3663c81326061eb",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            16,
+            16
+          ]
+        },
+        "true_value": {
+          "blake2b": "4ba682ea96a4ac97c32352580afc141c",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            3,
+            16
+          ]
+        },
+        "u": {
+          "blake2b": "c73718e34032e98b9fd84bffcc26fcc1",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            3,
+            16
+          ]
+        }
+      },
+      "seed": 5339102809926190747,
+      "state_dict": {
+        "adapter.A": {
+          "blake2b": "78bdff825db46615efbde27910eac59b",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            24
+          ]
+        },
+        "adapter.B": {
+          "blake2b": "d90bdf1be5022689e5fa9e40b69e58dc",
+          "dtype": "torch.float32",
+          "shape": [
+            8,
+            16
+          ]
+        },
+        "adapter.R": {
+          "blake2b": "b89d93d59b6f97e3ddc8804a861d418e",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            16
+          ]
+        },
+        "backbone.entities": {
+          "blake2b": "44005a41d1242d121457d9c3e3da3b41",
+          "dtype": "torch.float32",
+          "shape": [
+            65,
+            8
+          ]
+        },
+        "backbone.hops": {
+          "blake2b": "14b3c072141c54393a3a1f51f0d24db6",
+          "dtype": "torch.float32",
+          "shape": [
+            5,
+            8
+          ]
+        },
+        "backbone.relations": {
+          "blake2b": "0c0dfb7e4a9ee051d88e981aa8042f61",
+          "dtype": "torch.float32",
+          "shape": [
+            4,
+            8
+          ]
+        },
+        "writer.A": {
+          "blake2b": "78bdff825db46615efbde27910eac59b",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            24
+          ]
+        },
+        "writer.K": {
+          "blake2b": "e3385e1a3b23b41bf99b9a2e2a765257",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            16
+          ]
+        },
+        "writer.V": {
+          "blake2b": "011642a1e0a948921e1fb1c362a2d439",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            16
+          ]
+        },
+        "writer.a_beta": {
+          "blake2b": "d78ca2d3b95294904566305b14c4cee1",
+          "dtype": "torch.float32",
+          "shape": []
+        },
+        "writer.a_lambda": {
+          "blake2b": "080202d9a8dc73f7dc1b5038b7da5bc6",
+          "dtype": "torch.float32",
+          "shape": []
+        }
+      }
+    },
+    "t1_frozen/B4": {
+      "logits": {
+        "0": {
+          "blake2b": "57ec35d292a7675246f8a408e656dbdf",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            3,
+            65
+          ]
+        },
+        "1": {
+          "blake2b": "2f0bca8399366c72f7d9ad00235e5db8",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            3,
+            65
+          ]
+        },
+        "2": {
+          "blake2b": "d904e03d17dde0882e8a3af5a3be41a4",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            3,
+            65
+          ]
+        },
+        "4": {
+          "blake2b": "28bf9ff77c6dd6012e770a865739852b",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            3,
+            65
+          ]
+        }
+      },
+      "prepared": {
+        "codes": {
+          "blake2b": "d0f2232bd3cfba6ec90ace5c00e26105",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            65,
+            8
+          ]
+        },
+        "memory": {
+          "blake2b": "3bd5ff6c83bc359e0b2d27d11c613fb9",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            16,
+            16
+          ]
+        },
+        "true_value": {
+          "blake2b": "c6201dc759d326437cb2f90b71911d5f",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            3,
+            16
+          ]
+        },
+        "u": {
+          "blake2b": "84db798b13c4eb26da904113cb6a5d6a",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            3,
+            16
+          ]
+        }
+      },
+      "seed": 2205618346979194054,
+      "state_dict": {
+        "adapter.A": {
+          "blake2b": "5ad961da6d0b2900f85c6b202d9a85c6",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            24
+          ]
+        },
+        "adapter.B": {
+          "blake2b": "5b1e8021270fadc4befe9b63093b91d7",
+          "dtype": "torch.float32",
+          "shape": [
+            8,
+            16
+          ]
+        },
+        "adapter.K": {
+          "blake2b": "f5339b9203e4e90090a2c3d43779f6e7",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            16
+          ]
+        },
+        "adapter.Q": {
+          "blake2b": "e69c9cfb38671b6d384610de6c369f1b",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            16
+          ]
+        },
+        "adapter.R": {
+          "blake2b": "275522b45b7bd38467f5f481fdbc0942",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            16
+          ]
+        },
+        "adapter.U": {
+          "blake2b": "9c2ee1924730bfd0a3cbbe618b74008e",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            16
+          ]
+        },
+        "adapter.V": {
+          "blake2b": "0c5adc1382b3cb1443861fcad9860174",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            16
+          ]
+        },
+        "adapter.a_beta": {
+          "blake2b": "abde41425ac480ba8346add46ccec92d",
+          "dtype": "torch.float32",
+          "shape": []
+        },
+        "adapter.a_lambda": {
+          "blake2b": "2cd8d08b332625a3cf641f626e92f33f",
+          "dtype": "torch.float32",
+          "shape": []
+        },
+        "backbone.entities": {
+          "blake2b": "44005a41d1242d121457d9c3e3da3b41",
+          "dtype": "torch.float32",
+          "shape": [
+            65,
+            8
+          ]
+        },
+        "backbone.hops": {
+          "blake2b": "14b3c072141c54393a3a1f51f0d24db6",
+          "dtype": "torch.float32",
+          "shape": [
+            5,
+            8
+          ]
+        },
+        "backbone.relations": {
+          "blake2b": "0c0dfb7e4a9ee051d88e981aa8042f61",
+          "dtype": "torch.float32",
+          "shape": [
+            4,
+            8
+          ]
+        },
+        "writer.A": {
+          "blake2b": "5ad961da6d0b2900f85c6b202d9a85c6",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            24
+          ]
+        },
+        "writer.K": {
+          "blake2b": "f5339b9203e4e90090a2c3d43779f6e7",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            16
+          ]
+        },
+        "writer.V": {
+          "blake2b": "0c5adc1382b3cb1443861fcad9860174",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            16
+          ]
+        },
+        "writer.a_beta": {
+          "blake2b": "abde41425ac480ba8346add46ccec92d",
+          "dtype": "torch.float32",
+          "shape": []
+        },
+        "writer.a_lambda": {
+          "blake2b": "2cd8d08b332625a3cf641f626e92f33f",
+          "dtype": "torch.float32",
+          "shape": []
+        }
+      }
+    },
+    "t1_frozen/B5": {
+      "logits": {
+        "0": {
+          "blake2b": "107f8b9f0eb94a5f624ba43fa0a01021",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            3,
+            65
+          ]
+        },
+        "1": {
+          "blake2b": "1717a7bbca1cc59522002e2077c0978f",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            3,
+            65
+          ]
+        },
+        "2": {
+          "blake2b": "bb9cc1ecf712c3593efc22700124799f",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            3,
+            65
+          ]
+        },
+        "4": {
+          "blake2b": "0e12f5bdb2ce8ff44175d83bcc149f5d",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            3,
+            65
+          ]
+        }
+      },
+      "prepared": {
+        "codes": {
+          "blake2b": "d0f2232bd3cfba6ec90ace5c00e26105",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            65,
+            8
+          ]
+        },
+        "memory": {
+          "blake2b": "96b214031c8be6749fbf2194235014f2",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            16,
+            16
+          ]
+        },
+        "true_value": {
+          "blake2b": "0d0831dccdcb854e7a476c5c74e04e00",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            3,
+            16
+          ]
+        },
+        "u": {
+          "blake2b": "da81f8bed27e15113fd0fc9b39e0696d",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            3,
+            16
+          ]
+        }
+      },
+      "seed": 5912745645536587533,
+      "state_dict": {
+        "adapter.A": {
+          "blake2b": "f18e59c8ab9b260fdcda970110a764eb",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            24
+          ]
+        },
+        "adapter.B": {
+          "blake2b": "036e507aa2adf772bfbe5fbe4603d3e4",
+          "dtype": "torch.float32",
+          "shape": [
+            8,
+            16
+          ]
+        },
+        "adapter.K": {
+          "blake2b": "c187596e4ef6bf6765714742ed35d50a",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            16
+          ]
+        },
+        "adapter.Q": {
+          "blake2b": "aad2544103ee285a55ed92c0c2d5436b",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            16
+          ]
+        },
+        "adapter.R": {
+          "blake2b": "66b5a83db7fa359a70ad1320c88e6d06",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            16
+          ]
+        },
+        "adapter.U": {
+          "blake2b": "176ecb697ffafbbbd06fcdd77d20a76b",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            16
+          ]
+        },
+        "adapter.V": {
+          "blake2b": "6cedc544b17bba82bc510f515a49ec95",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            16
+          ]
+        },
+        "adapter.a_beta": {
+          "blake2b": "fcc1f3fddd131bc62f5610561a83dee7",
+          "dtype": "torch.float32",
+          "shape": []
+        },
+        "adapter.a_lambda": {
+          "blake2b": "cff8ab13e20a192a283581392305c599",
+          "dtype": "torch.float32",
+          "shape": []
+        },
+        "backbone.entities": {
+          "blake2b": "44005a41d1242d121457d9c3e3da3b41",
+          "dtype": "torch.float32",
+          "shape": [
+            65,
+            8
+          ]
+        },
+        "backbone.hops": {
+          "blake2b": "14b3c072141c54393a3a1f51f0d24db6",
+          "dtype": "torch.float32",
+          "shape": [
+            5,
+            8
+          ]
+        },
+        "backbone.relations": {
+          "blake2b": "0c0dfb7e4a9ee051d88e981aa8042f61",
+          "dtype": "torch.float32",
+          "shape": [
+            4,
+            8
+          ]
+        },
+        "writer.A": {
+          "blake2b": "f18e59c8ab9b260fdcda970110a764eb",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            24
+          ]
+        },
+        "writer.K": {
+          "blake2b": "c187596e4ef6bf6765714742ed35d50a",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            16
+          ]
+        },
+        "writer.V": {
+          "blake2b": "6cedc544b17bba82bc510f515a49ec95",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            16
+          ]
+        },
+        "writer.a_beta": {
+          "blake2b": "fcc1f3fddd131bc62f5610561a83dee7",
+          "dtype": "torch.float32",
+          "shape": []
+        },
+        "writer.a_lambda": {
+          "blake2b": "cff8ab13e20a192a283581392305c599",
+          "dtype": "torch.float32",
+          "shape": []
+        }
+      }
+    },
+    "t1_frozen/B5-lin": {
+      "logits": {
+        "0": {
+          "blake2b": "904d7fdcb01929b15321f241f38a985e",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            3,
+            65
+          ]
+        },
+        "1": {
+          "blake2b": "8bbff41de17f3a5ce240ec4284a0e62d",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            3,
+            65
+          ]
+        },
+        "2": {
+          "blake2b": "8cff42a6088aac4856c4b580f03317ee",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            3,
+            65
+          ]
+        },
+        "4": {
+          "blake2b": "c6ca21652dbab9cab1810365c1856d82",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            3,
+            65
+          ]
+        }
+      },
+      "prepared": {
+        "codes": {
+          "blake2b": "d0f2232bd3cfba6ec90ace5c00e26105",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            65,
+            8
+          ]
+        },
+        "memory": {
+          "blake2b": "2b2af15ad3c651971f6842f3bb6a3308",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            16,
+            16
+          ]
+        },
+        "true_value": {
+          "blake2b": "94ab52debf7dbe5f846e48a4d847006a",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            3,
+            16
+          ]
+        },
+        "u": {
+          "blake2b": "84b376521c288dfbb4a3ed60b914c489",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            3,
+            16
+          ]
+        }
+      },
+      "seed": 2848635157364884610,
+      "state_dict": {
+        "adapter.A": {
+          "blake2b": "55077ed18bbbb2ea20f601c5d0cd6155",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            24
+          ]
+        },
+        "adapter.B": {
+          "blake2b": "7baeb87d2c2b89ccd1fc11a1fb945042",
+          "dtype": "torch.float32",
+          "shape": [
+            8,
+            16
+          ]
+        },
+        "adapter.K": {
+          "blake2b": "5e01ec370f613d0135af58fbd1b47e28",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            16
+          ]
+        },
+        "adapter.Q": {
+          "blake2b": "11b7af24aef8f0e8446f069e214d51d1",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            16
+          ]
+        },
+        "adapter.R": {
+          "blake2b": "0f1322f7731226b9259d7e1776208543",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            16
+          ]
+        },
+        "adapter.U": {
+          "blake2b": "22a5534ccfb588a6087d37aabce4c0f8",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            16
+          ]
+        },
+        "adapter.V": {
+          "blake2b": "79f2c46942819dffb36bb7f587e87d38",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            16
+          ]
+        },
+        "adapter.a_beta": {
+          "blake2b": "ba89822ac2ccf34014a9d602444f5a65",
+          "dtype": "torch.float32",
+          "shape": []
+        },
+        "adapter.a_lambda": {
+          "blake2b": "225f2d19721141048455c4351da2248e",
+          "dtype": "torch.float32",
+          "shape": []
+        },
+        "backbone.entities": {
+          "blake2b": "44005a41d1242d121457d9c3e3da3b41",
+          "dtype": "torch.float32",
+          "shape": [
+            65,
+            8
+          ]
+        },
+        "backbone.hops": {
+          "blake2b": "14b3c072141c54393a3a1f51f0d24db6",
+          "dtype": "torch.float32",
+          "shape": [
+            5,
+            8
+          ]
+        },
+        "backbone.relations": {
+          "blake2b": "0c0dfb7e4a9ee051d88e981aa8042f61",
+          "dtype": "torch.float32",
+          "shape": [
+            4,
+            8
+          ]
+        },
+        "writer.A": {
+          "blake2b": "55077ed18bbbb2ea20f601c5d0cd6155",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            24
+          ]
+        },
+        "writer.K": {
+          "blake2b": "5e01ec370f613d0135af58fbd1b47e28",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            16
+          ]
+        },
+        "writer.V": {
+          "blake2b": "79f2c46942819dffb36bb7f587e87d38",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            16
+          ]
+        },
+        "writer.a_beta": {
+          "blake2b": "ba89822ac2ccf34014a9d602444f5a65",
+          "dtype": "torch.float32",
+          "shape": []
+        },
+        "writer.a_lambda": {
+          "blake2b": "225f2d19721141048455c4351da2248e",
+          "dtype": "torch.float32",
+          "shape": []
+        }
+      }
+    },
+    "t1_frozen/M1": {
+      "logits": {
+        "0": {
+          "blake2b": "018070005f3533a45e0ac346c0bc7a0e",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            3,
+            65
+          ]
+        },
+        "1": {
+          "blake2b": "f54f9758cea43d3702b5f02e96f50ee2",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            3,
+            65
+          ]
+        },
+        "2": {
+          "blake2b": "bc4deba5fcd4ef29e2bbff4a8a1ea246",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            3,
+            65
+          ]
+        },
+        "4": {
+          "blake2b": "60c4c9f5e500249033544da04c7fec07",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            3,
+            65
+          ]
+        }
+      },
+      "prepared": {
+        "codes": {
+          "blake2b": "d0f2232bd3cfba6ec90ace5c00e26105",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            65,
+            8
+          ]
+        },
+        "memory": {
+          "blake2b": "657fd09e99832f90ef2dbedcbd0a2744",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            16,
+            16
+          ]
+        },
+        "true_value": {
+          "blake2b": "dd8ce34ff670611bd3250aaa9cf15a11",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            3,
+            16
+          ]
+        },
+        "u": {
+          "blake2b": "c204467a3752344cdecccd7f6edf82cd",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            3,
+            16
+          ]
+        }
+      },
+      "seed": 8117336616155678817,
+      "state_dict": {
+        "adapter.A": {
+          "blake2b": "0d680174ff2f1ee9eedf5eccaa190962",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            24
+          ]
+        },
+        "adapter.B": {
+          "blake2b": "3c7051ec1910e73e364030e30cba3d0d",
+          "dtype": "torch.float32",
+          "shape": [
+            8,
+            16
+          ]
+        },
+        "adapter.K": {
+          "blake2b": "51b28f1a705a2fc79383e31844d61e92",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            16
+          ]
+        },
+        "adapter.Q": {
+          "blake2b": "f47ac878b8652cf56cb5acd9a4b6ec9c",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            16
+          ]
+        },
+        "adapter.R": {
+          "blake2b": "6d1ee89283da7d50848e2e7a17f09c86",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            16
+          ]
+        },
+        "adapter.U": {
+          "blake2b": "ed4a7fbd1cf1b29c4e1f1eafdd818e9d",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            16
+          ]
+        },
+        "adapter.V": {
+          "blake2b": "4511dcf37fd7db26a7e5fdd1b1c27639",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            16
+          ]
+        },
+        "adapter.a_beta": {
+          "blake2b": "d9c278e85c97713199ab1e653f6f9c52",
+          "dtype": "torch.float32",
+          "shape": []
+        },
+        "adapter.a_lambda": {
+          "blake2b": "a51d20a00d71b68b264120df4196ee31",
+          "dtype": "torch.float32",
+          "shape": []
+        },
+        "backbone.entities": {
+          "blake2b": "44005a41d1242d121457d9c3e3da3b41",
+          "dtype": "torch.float32",
+          "shape": [
+            65,
+            8
+          ]
+        },
+        "backbone.hops": {
+          "blake2b": "14b3c072141c54393a3a1f51f0d24db6",
+          "dtype": "torch.float32",
+          "shape": [
+            5,
+            8
+          ]
+        },
+        "backbone.relations": {
+          "blake2b": "0c0dfb7e4a9ee051d88e981aa8042f61",
+          "dtype": "torch.float32",
+          "shape": [
+            4,
+            8
+          ]
+        },
+        "writer.A": {
+          "blake2b": "0d680174ff2f1ee9eedf5eccaa190962",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            24
+          ]
+        },
+        "writer.K": {
+          "blake2b": "51b28f1a705a2fc79383e31844d61e92",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            16
+          ]
+        },
+        "writer.V": {
+          "blake2b": "4511dcf37fd7db26a7e5fdd1b1c27639",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            16
+          ]
+        },
+        "writer.a_beta": {
+          "blake2b": "d9c278e85c97713199ab1e653f6f9c52",
+          "dtype": "torch.float32",
+          "shape": []
+        },
+        "writer.a_lambda": {
+          "blake2b": "a51d20a00d71b68b264120df4196ee31",
+          "dtype": "torch.float32",
+          "shape": []
+        }
+      }
+    },
+    "t1_frozen/M1-lin": {
+      "logits": {
+        "0": {
+          "blake2b": "508ee4f71b589a5e0d0fea42ee2653eb",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            3,
+            65
+          ]
+        },
+        "1": {
+          "blake2b": "7bfafd545cc30169518dfd32f1820d4e",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            3,
+            65
+          ]
+        },
+        "2": {
+          "blake2b": "31de61714f87f5b505d6cb8be43586a3",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            3,
+            65
+          ]
+        },
+        "4": {
+          "blake2b": "a7f6eb16ad3f546e35fa85ff0d5f4570",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            3,
+            65
+          ]
+        }
+      },
+      "prepared": {
+        "codes": {
+          "blake2b": "d0f2232bd3cfba6ec90ace5c00e26105",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            65,
+            8
+          ]
+        },
+        "memory": {
+          "blake2b": "ab6ef8ecf7b6e0ea167527c0e6a5e408",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            16,
+            16
+          ]
+        },
+        "true_value": {
+          "blake2b": "34240147e60152e40aa7e357afc56ec0",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            3,
+            16
+          ]
+        },
+        "u": {
+          "blake2b": "bd52a89e23390497b40432b499c4d8c2",
+          "dtype": "torch.float32",
+          "shape": [
+            2,
+            3,
+            16
+          ]
+        }
+      },
+      "seed": 1288246446946833989,
+      "state_dict": {
+        "adapter.A": {
+          "blake2b": "1592cd3f6438e180c5cc803b0dbbf038",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            24
+          ]
+        },
+        "adapter.B": {
+          "blake2b": "100288ed4ecc52c3f8e6a8ff570523db",
+          "dtype": "torch.float32",
+          "shape": [
+            8,
+            16
+          ]
+        },
+        "adapter.K": {
+          "blake2b": "fcb5ce19c673ef2e82dfc8c05ac836e8",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            16
+          ]
+        },
+        "adapter.Q": {
+          "blake2b": "a4cd015a3ee3bd3fe2ac210c41f1d5ba",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            16
+          ]
+        },
+        "adapter.R": {
+          "blake2b": "524202ffeba44767ad35e80dd23f7bb0",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            16
+          ]
+        },
+        "adapter.U": {
+          "blake2b": "005cb99520f64966036d0f7e1de86818",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            16
+          ]
+        },
+        "adapter.V": {
+          "blake2b": "c04fc325a8ed80905a1170105d1ec7ae",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            16
+          ]
+        },
+        "adapter.a_beta": {
+          "blake2b": "0e002353781a8301651a6cc1691d9e21",
+          "dtype": "torch.float32",
+          "shape": []
+        },
+        "adapter.a_lambda": {
+          "blake2b": "b3cb2ed121af0fe0907580c3cb154f1b",
+          "dtype": "torch.float32",
+          "shape": []
+        },
+        "backbone.entities": {
+          "blake2b": "44005a41d1242d121457d9c3e3da3b41",
+          "dtype": "torch.float32",
+          "shape": [
+            65,
+            8
+          ]
+        },
+        "backbone.hops": {
+          "blake2b": "14b3c072141c54393a3a1f51f0d24db6",
+          "dtype": "torch.float32",
+          "shape": [
+            5,
+            8
+          ]
+        },
+        "backbone.relations": {
+          "blake2b": "0c0dfb7e4a9ee051d88e981aa8042f61",
+          "dtype": "torch.float32",
+          "shape": [
+            4,
+            8
+          ]
+        },
+        "writer.A": {
+          "blake2b": "1592cd3f6438e180c5cc803b0dbbf038",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            24
+          ]
+        },
+        "writer.K": {
+          "blake2b": "fcb5ce19c673ef2e82dfc8c05ac836e8",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            16
+          ]
+        },
+        "writer.V": {
+          "blake2b": "c04fc325a8ed80905a1170105d1ec7ae",
+          "dtype": "torch.float32",
+          "shape": [
+            16,
+            16
+          ]
+        },
+        "writer.a_beta": {
+          "blake2b": "0e002353781a8301651a6cc1691d9e21",
+          "dtype": "torch.float32",
+          "shape": []
+        },
+        "writer.a_lambda": {
+          "blake2b": "b3cb2ed121af0fe0907580c3cb154f1b",
+          "dtype": "torch.float32",
+          "shape": []
+        }
+      }
+    }
+  },
+  "threads": 1,
+  "torch_version": "2.14.0+cu132"
+}
