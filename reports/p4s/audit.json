@@ -1,0 +1,105 @@
+{
+  "status": "passed",
+  "task": "WP-C3",
+  "audited_at": "2026-10-26T14:28:09.438534+00:00",
+  "root": "/work/xg24i002/x10041/LoopLora/runs/p4s/main-v1",
+  "runtime": {
+    "host": "mg0888",
+    "job_id": "3714004.opbs"
+  },
+  "runs": 24,
+  "families": 8,
+  "confirmation_inputs_opened": false,
+  "checkpoints": {
+    "verified": 24,
+    "seal": "blake2b-128",
+    "bytes_streamed": 18390264,
+    "all_unchanged": true
+  },
+  "threshold_lock": {
+    "locked_at": "2026-10-26T14:06:54.608525+00:00",
+    "seconds_after_last_val": 1.608525037765503,
+    "seconds_before_first_test": 10.391474962234497,
+    "metadata_frozen": true
+  },
+  "traces": {
+    "files": 48,
+    "episodes": 96000,
+    "queries": 768000,
+    "shape": [
+      2000,
+      8,
+      17
+    ],
+    "all_noninitial_metrics_finite": true,
+    "all_certificates_finite": true
+  },
+  "latency": {
+    "rows": 1728,
+    "runs": 24,
+    "methods": 8,
+    "batch64_rows": 192,
+    "batch1_rows": 1536,
+    "batch1_hops": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "max_state_relative_l2_drift": 1.543004259474401e-06,
+    "max_state_absolute_component_drift": 0.0234375,
+    "per_criterion": {
+      "read_norm": {
+        "cells": 216,
+        "max_relative_l2": 2.553941840233165e-07,
+        "max_absolute_component": 8.344650268554688e-07
+      },
+      "relative_change": {
+        "cells": 216,
+        "max_relative_l2": 7.578372560601565e-07,
+        "max_absolute_component": 0.0234375
+      },
+      "output_stability": {
+        "cells": 216,
+        "max_relative_l2": 1.543004259474401e-06,
+        "max_absolute_component": 0.005859375
+      }
+    }
+  },
+  "f1_fixed_reference": {
+    "expected_cells": 960,
+    "matched_cells": 960,
+    "exact_cells": 960,
+    "differing_cells": 0,
+    "max_absolute_accuracy_delta": 0.0,
+    "mean_absolute_accuracy_delta": 0.0,
+    "largest_differences": [],
+    "explanation": "Every fixed-depth screening accuracy is an exact match.",
+    "reference_scope": "CSV rows with dataset=screening, split=test, condition=original only"
+  },
+  "threshold_integer_ties": {
+    "queries_per_family": 48000,
+    "family_criteria": 24,
+    "groups_with_equal_maximum_correct_counts": 6,
+    "mismatch_count": 0,
+    "mismatches": [],
+    "interpretation": "Integer-equivalent accuracy and step totals expose true ties that can differ by one floating-point ulp after averaging. Mismatches are reported for review; frozen selections are not changed by this audit."
+  },
+  "exported": [
+    "accuracy.csv",
+    "contraction.csv",
+    "latency.csv",
+    "thresholds.csv",
+    "threshold_grid.csv",
+    "summary.json",
+    "manifest.json",
+    "selection.json",
+    "headline.csv",
+    "tables.md",
+    "audit.json"
+  ]
+}

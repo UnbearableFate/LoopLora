@@ -1,0 +1,374 @@
+{
+  "design": {
+    "budget_node_hours": 2,
+    "certificate": "FP64 exact spectral norms in abs(rho)*(norm(R)+norm(U)*norm(M)*norm(Q)); one c per episode; c>=1 is inconclusive, not proof of divergence",
+    "episode_batch_size": 64,
+    "episodes_per_split": 2000,
+    "evaluation_seed": 4242,
+    "families": {
+      "r": [
+        64,
+        128
+      ],
+      "variant": [
+        "M1",
+        "M1-lin"
+      ],
+      "writer": [
+        "oracle_random",
+        "joint"
+      ]
+    },
+    "fixed_references": [
+      1,
+      2,
+      4,
+      8,
+      16
+    ],
+    "halting_convention": "after update L>=1, predict from z^L; read norm uses UMQz^L relative to UMQz^0; change uses norm(z^L-z^(L-1))/norm(z^(L-1)); stability threshold is consecutive unchanged argmax pairs ending at L; first hit or cap 16",
+    "hops": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "job_max_hours": 1,
+    "job_max_nodes": 1,
+    "latency": {
+      "clock": "CUDA events plus synchronized wall time",
+      "input_selection": "batch64: one query per episode cycling hops 1..8; batch1: eight separate queries, one per hop; same inputs for all methods",
+      "query_batch_sizes": [
+        64,
+        1
+      ],
+      "repeats": 20,
+      "scope": "prepared-memory reader plus candidate-restricted prediction and required stopping bookkeeping; no writer/backbone preparation",
+      "warmup": 5
+    },
+    "max_steps": 16,
+    "minimum_steps": 1,
+    "normalization_epsilon": 1e-12,
+    "oracle_reference": "stop at true hop; label-informed reference, not a guarantee of maximal accuracy for a learned reader",
+    "output_stability_thresholds": [
+      1,
+      2,
+      3,
+      4,
+      8,
+      16
+    ],
+    "read_norm_cost": "cached next-step read; L+1 Mq operations for a query halting at update L, including the terminal diagnostic read",
+    "read_norm_thresholds": [
+      0,
+      0.001,
+      0.003,
+      0.01,
+      0.03,
+      0.1,
+      0.2,
+      0.3,
+      0.5,
+      0.7,
+      1,
+      1.5,
+      2,
+      4
+    ],
+    "relative_change_thresholds": [
+      0,
+      0.001,
+      0.003,
+      0.01,
+      0.03,
+      0.1,
+      0.2,
+      0.3,
+      0.5,
+      0.7,
+      1,
+      1.5,
+      2,
+      4
+    ],
+    "scope": "evaluation only; F1 checkpoints; no r32 or confirmation episodes",
+    "selection": "maximum validation mean accuracy, equally weighting eight hops and three seeds; ties: fewer mean steps, then smaller threshold",
+    "selection_barrier": "thresholds saved after every validation trace and before any screening test evaluation",
+    "source_master": "992aa38",
+    "splits": [
+      "val",
+      "test"
+    ],
+    "task": "WP-C3",
+    "threshold_scope": "one per writer/rank/variant family and criterion, shared across all three training seeds",
+    "training_seeds": [
+      17,
+      29,
+      43
+    ]
+  },
+  "design_hash": "af47a9cda6f2417de5ddff043d798c2e",
+  "finished_at": "2026-10-26T14:12:30.733685+00:00",
+  "git_commit": "fc32c7a986c30e7fd4394120900ba9258a0e8a7e",
+  "peak_memory_bytes": 128553472,
+  "runs": [
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p1s/f1/training/shard-04/f1-joint-r128-M1-lin-s17/checkpoint.pt",
+      "checkpoint_blake2b": "5b2963b79fa86d6bc1a823be96657fb8",
+      "family": "joint/r128/M1-lin",
+      "name": "f1-joint-r128-M1-lin-s17",
+      "r": 128,
+      "seed": 17,
+      "variant": "M1-lin",
+      "writer": "joint"
+    },
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p1s/f1/training/shard-03/f1-joint-r128-M1-lin-s29/checkpoint.pt",
+      "checkpoint_blake2b": "59f35649170005233760544744d56592",
+      "family": "joint/r128/M1-lin",
+      "name": "f1-joint-r128-M1-lin-s29",
+      "r": 128,
+      "seed": 29,
+      "variant": "M1-lin",
+      "writer": "joint"
+    },
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p1s/f1/training/shard-02/f1-joint-r128-M1-lin-s43/checkpoint.pt",
+      "checkpoint_blake2b": "8ff215c4d7a40688eadb822f5f504ecf",
+      "family": "joint/r128/M1-lin",
+      "name": "f1-joint-r128-M1-lin-s43",
+      "r": 128,
+      "seed": 43,
+      "variant": "M1-lin",
+      "writer": "joint"
+    },
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p1s/f1/training/shard-03/f1-joint-r128-M1-s17/checkpoint.pt",
+      "checkpoint_blake2b": "79739f57035b270d11b20d2d4c517658",
+      "family": "joint/r128/M1",
+      "name": "f1-joint-r128-M1-s17",
+      "r": 128,
+      "seed": 17,
+      "variant": "M1",
+      "writer": "joint"
+    },
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p1s/f1/training/shard-02/f1-joint-r128-M1-s29/checkpoint.pt",
+      "checkpoint_blake2b": "8b258152c4ca8b8c54906a64330ea030",
+      "family": "joint/r128/M1",
+      "name": "f1-joint-r128-M1-s29",
+      "r": 128,
+      "seed": 29,
+      "variant": "M1",
+      "writer": "joint"
+    },
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p1s/f1/training/shard-01/f1-joint-r128-M1-s43/checkpoint.pt",
+      "checkpoint_blake2b": "63846cd96778d539e613341dec02a5c4",
+      "family": "joint/r128/M1",
+      "name": "f1-joint-r128-M1-s43",
+      "r": 128,
+      "seed": 43,
+      "variant": "M1",
+      "writer": "joint"
+    },
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p1s/f1/training/shard-01/f1-joint-r64-M1-lin-s17/checkpoint.pt",
+      "checkpoint_blake2b": "49a2ae4445949cdaec06c88a55d2f1f9",
+      "family": "joint/r64/M1-lin",
+      "name": "f1-joint-r64-M1-lin-s17",
+      "r": 64,
+      "seed": 17,
+      "variant": "M1-lin",
+      "writer": "joint"
+    },
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p1s/f1/training/shard-00/f1-joint-r64-M1-lin-s29/checkpoint.pt",
+      "checkpoint_blake2b": "d65c46187dcb46e90fbb24ae70e91dc1",
+      "family": "joint/r64/M1-lin",
+      "name": "f1-joint-r64-M1-lin-s29",
+      "r": 64,
+      "seed": 29,
+      "variant": "M1-lin",
+      "writer": "joint"
+    },
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p1s/f1/training/shard-05/f1-joint-r64-M1-lin-s43/checkpoint.pt",
+      "checkpoint_blake2b": "194fce5898f2f5b6c8f2fd26fb7433fb",
+      "family": "joint/r64/M1-lin",
+      "name": "f1-joint-r64-M1-lin-s43",
+      "r": 64,
+      "seed": 43,
+      "variant": "M1-lin",
+      "writer": "joint"
+    },
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p1s/f1/training/shard-00/f1-joint-r64-M1-s17/checkpoint.pt",
+      "checkpoint_blake2b": "2355614e06b6100d6adc4b276e5cfc53",
+      "family": "joint/r64/M1",
+      "name": "f1-joint-r64-M1-s17",
+      "r": 64,
+      "seed": 17,
+      "variant": "M1",
+      "writer": "joint"
+    },
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p1s/f1/training/shard-05/f1-joint-r64-M1-s29/checkpoint.pt",
+      "checkpoint_blake2b": "5eef18d3a833ef2e18a5295968c1faf7",
+      "family": "joint/r64/M1",
+      "name": "f1-joint-r64-M1-s29",
+      "r": 64,
+      "seed": 29,
+      "variant": "M1",
+      "writer": "joint"
+    },
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p1s/f1/training/shard-04/f1-joint-r64-M1-s43/checkpoint.pt",
+      "checkpoint_blake2b": "01b3d1c285e464688bbdc5f3f38ab055",
+      "family": "joint/r64/M1",
+      "name": "f1-joint-r64-M1-s43",
+      "r": 64,
+      "seed": 43,
+      "variant": "M1",
+      "writer": "joint"
+    },
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p1s/f1/training/shard-04/f1-oracle_random-r128-M1-lin-s17/checkpoint.pt",
+      "checkpoint_blake2b": "fa807bfb149e1da717dd0aee119cd4cc",
+      "family": "oracle_random/r128/M1-lin",
+      "name": "f1-oracle_random-r128-M1-lin-s17",
+      "r": 128,
+      "seed": 17,
+      "variant": "M1-lin",
+      "writer": "oracle_random"
+    },
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p1s/f1/training/shard-03/f1-oracle_random-r128-M1-lin-s29/checkpoint.pt",
+      "checkpoint_blake2b": "db048185b8b7cfebf458aa339576323f",
+      "family": "oracle_random/r128/M1-lin",
+      "name": "f1-oracle_random-r128-M1-lin-s29",
+      "r": 128,
+      "seed": 29,
+      "variant": "M1-lin",
+      "writer": "oracle_random"
+    },
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p1s/f1/training/shard-02/f1-oracle_random-r128-M1-lin-s43/checkpoint.pt",
+      "checkpoint_blake2b": "0f70be7439507f803e24b11a0020059b",
+      "family": "oracle_random/r128/M1-lin",
+      "name": "f1-oracle_random-r128-M1-lin-s43",
+      "r": 128,
+      "seed": 43,
+      "variant": "M1-lin",
+      "writer": "oracle_random"
+    },
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p1s/f1/training/shard-03/f1-oracle_random-r128-M1-s17/checkpoint.pt",
+      "checkpoint_blake2b": "03e4714a051634591ecd6ca89ce32d23",
+      "family": "oracle_random/r128/M1",
+      "name": "f1-oracle_random-r128-M1-s17",
+      "r": 128,
+      "seed": 17,
+      "variant": "M1",
+      "writer": "oracle_random"
+    },
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p1s/f1/training/shard-02/f1-oracle_random-r128-M1-s29/checkpoint.pt",
+      "checkpoint_blake2b": "b421ad5e15026b5c1a719fa516ba2077",
+      "family": "oracle_random/r128/M1",
+      "name": "f1-oracle_random-r128-M1-s29",
+      "r": 128,
+      "seed": 29,
+      "variant": "M1",
+      "writer": "oracle_random"
+    },
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p1s/f1/training/shard-01/f1-oracle_random-r128-M1-s43/checkpoint.pt",
+      "checkpoint_blake2b": "d3f573eb5454746ec26a3df11d102a84",
+      "family": "oracle_random/r128/M1",
+      "name": "f1-oracle_random-r128-M1-s43",
+      "r": 128,
+      "seed": 43,
+      "variant": "M1",
+      "writer": "oracle_random"
+    },
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p1s/f1/training/shard-01/f1-oracle_random-r64-M1-lin-s17/checkpoint.pt",
+      "checkpoint_blake2b": "c488efcb2b2d5a10afabbe7d823fecb8",
+      "family": "oracle_random/r64/M1-lin",
+      "name": "f1-oracle_random-r64-M1-lin-s17",
+      "r": 64,
+      "seed": 17,
+      "variant": "M1-lin",
+      "writer": "oracle_random"
+    },
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p1s/f1/training/shard-00/f1-oracle_random-r64-M1-lin-s29/checkpoint.pt",
+      "checkpoint_blake2b": "27f294cb3cb1c7f780f8229d289cdd69",
+      "family": "oracle_random/r64/M1-lin",
+      "name": "f1-oracle_random-r64-M1-lin-s29",
+      "r": 64,
+      "seed": 29,
+      "variant": "M1-lin",
+      "writer": "oracle_random"
+    },
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p1s/f1/training/shard-05/f1-oracle_random-r64-M1-lin-s43/checkpoint.pt",
+      "checkpoint_blake2b": "1631ca036996af3569a206211a11c6f8",
+      "family": "oracle_random/r64/M1-lin",
+      "name": "f1-oracle_random-r64-M1-lin-s43",
+      "r": 64,
+      "seed": 43,
+      "variant": "M1-lin",
+      "writer": "oracle_random"
+    },
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p1s/f1/training/shard-00/f1-oracle_random-r64-M1-s17/checkpoint.pt",
+      "checkpoint_blake2b": "1b89cda598f49a1e45d2ae81f48b6675",
+      "family": "oracle_random/r64/M1",
+      "name": "f1-oracle_random-r64-M1-s17",
+      "r": 64,
+      "seed": 17,
+      "variant": "M1",
+      "writer": "oracle_random"
+    },
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p1s/f1/training/shard-05/f1-oracle_random-r64-M1-s29/checkpoint.pt",
+      "checkpoint_blake2b": "cba1581f1758fbd61bcc900b7415e276",
+      "family": "oracle_random/r64/M1",
+      "name": "f1-oracle_random-r64-M1-s29",
+      "r": 64,
+      "seed": 29,
+      "variant": "M1",
+      "writer": "oracle_random"
+    },
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p1s/f1/training/shard-04/f1-oracle_random-r64-M1-s43/checkpoint.pt",
+      "checkpoint_blake2b": "0dd26a2ae2d72f56bf734e612b3594d1",
+      "family": "oracle_random/r64/M1",
+      "name": "f1-oracle_random-r64-M1-s43",
+      "r": 64,
+      "seed": 43,
+      "variant": "M1",
+      "writer": "oracle_random"
+    }
+  ],
+  "runtime": {
+    "dtype": "float32; certificate float64",
+    "gpu": "NVIDIA GH200 120GB",
+    "host": "mg0835",
+    "job_id": "3713666.opbs",
+    "threads": 1,
+    "torch": "2.14.0+cu132"
+  },
+  "smoke": false,
+  "source_dirty": false,
+  "source_hash": "fe57ea4434de3207c9a2e09b210307c6",
+  "started_at": "2026-10-26T14:03:42.117538+00:00",
+  "status": "complete",
+  "total_seconds": 528.6236430639401
+}
