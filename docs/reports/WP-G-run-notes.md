@@ -48,9 +48,6 @@ No commits, submissions, training, evaluation, pilot or screening execution in t
   model/write policy and eval sets; joint variants do not claim a common writer. B4 pairs
   at L1 against M1 L4; B3/B5/M1-lin pair at L4. All conditions retain protocol labels.
 
-Validation: `/usr/bin/python3` AST syntax parsing passed for the three owned Python files;
-`git diff --check` passed for tracked changes. Runtime tests are deliberately unexecuted:
-the current shell is login/control (`miyabi-g2`, no PBS allocation), and the parent requested
-implementation only with no submissions yet. After WP-D merge, run on compute through
-`scripts/submit.py --name t-wpg-run --walltime 00:10:00 --worktree . --wait -- -m pytest -q tests/test_llm_run.py`.
-No measured scheduling preference or smoke timing is claimed before that execution.
+Subagent validation used stdlib AST parsing and `git diff --check` only on the
+login/control node. The primary coordinates compute validation after merging
+WP-D; final test, scheduling and smoke evidence is in [WP-G.md](WP-G.md).

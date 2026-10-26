@@ -1,0 +1,316 @@
+{
+  "runs": 14,
+  "run_root": "/work/xg24i002/x10041/LoopLora/runs/p1l/wp-g-smoke-final-20261026/runs",
+  "suite_seconds": 1216.8477846002206,
+  "total_node_hours": 0.34544306690817594,
+  "procs": 2,
+  "all_sample_tables_reproduced": true,
+  "frozen_writers_bitwise_unchanged": true,
+  "gate0_passed": true,
+  "shared_writer_groups": [
+    [
+      "frozen-M1",
+      "frozen-M1-lin",
+      "frozen-B5",
+      "frozen-B3",
+      "frozen-B4"
+    ]
+  ],
+  "records": [
+    {
+      "run": "writer",
+      "stage": "writer",
+      "variant": "M1",
+      "samples": 600,
+      "git_commit": "3cb908c2794460566422799953226783c959c4a4",
+      "runtime": {
+        "cublas_workspace_config": ":4096:8",
+        "cudnn_deterministic": true,
+        "deterministic_algorithms": true,
+        "device": "cuda:0",
+        "dtype": "bfloat16 backbone / float32 adapter",
+        "gpu": "NVIDIA GH200 120GB",
+        "host": "mg0753",
+        "job_id": "3712085.opbs",
+        "python": "3.13.13",
+        "threads": 72,
+        "torch": "2.14.0+cu132",
+        "transformers": "4.57.6"
+      }
+    },
+    {
+      "run": "frozen-M1",
+      "stage": "reader",
+      "variant": "M1",
+      "samples": 67200,
+      "git_commit": "3cb908c2794460566422799953226783c959c4a4",
+      "runtime": {
+        "cublas_workspace_config": ":4096:8",
+        "cudnn_deterministic": true,
+        "deterministic_algorithms": true,
+        "device": "cuda:0",
+        "dtype": "bfloat16 backbone / float32 adapter",
+        "gpu": "NVIDIA GH200 120GB",
+        "host": "mg0753",
+        "job_id": "3712085.opbs",
+        "python": "3.13.13",
+        "threads": 72,
+        "torch": "2.14.0+cu132",
+        "transformers": "4.57.6"
+      }
+    },
+    {
+      "run": "frozen-M1-lin",
+      "stage": "reader",
+      "variant": "M1-lin",
+      "samples": 33600,
+      "git_commit": "3cb908c2794460566422799953226783c959c4a4",
+      "runtime": {
+        "cublas_workspace_config": ":4096:8",
+        "cudnn_deterministic": true,
+        "deterministic_algorithms": true,
+        "device": "cuda:0",
+        "dtype": "bfloat16 backbone / float32 adapter",
+        "gpu": "NVIDIA GH200 120GB",
+        "host": "mg0753",
+        "job_id": "3712085.opbs",
+        "python": "3.13.13",
+        "threads": 72,
+        "torch": "2.14.0+cu132",
+        "transformers": "4.57.6"
+      }
+    },
+    {
+      "run": "frozen-B5",
+      "stage": "reader",
+      "variant": "B5",
+      "samples": 33600,
+      "git_commit": "3cb908c2794460566422799953226783c959c4a4",
+      "runtime": {
+        "cublas_workspace_config": ":4096:8",
+        "cudnn_deterministic": true,
+        "deterministic_algorithms": true,
+        "device": "cuda:0",
+        "dtype": "bfloat16 backbone / float32 adapter",
+        "gpu": "NVIDIA GH200 120GB",
+        "host": "mg0753",
+        "job_id": "3712085.opbs",
+        "python": "3.13.13",
+        "threads": 72,
+        "torch": "2.14.0+cu132",
+        "transformers": "4.57.6"
+      }
+    },
+    {
+      "run": "frozen-B3",
+      "stage": "reader",
+      "variant": "B3",
+      "samples": 33600,
+      "git_commit": "3cb908c2794460566422799953226783c959c4a4",
+      "runtime": {
+        "cublas_workspace_config": ":4096:8",
+        "cudnn_deterministic": true,
+        "deterministic_algorithms": true,
+        "device": "cuda:0",
+        "dtype": "bfloat16 backbone / float32 adapter",
+        "gpu": "NVIDIA GH200 120GB",
+        "host": "mg0753",
+        "job_id": "3712085.opbs",
+        "python": "3.13.13",
+        "threads": 72,
+        "torch": "2.14.0+cu132",
+        "transformers": "4.57.6"
+      }
+    },
+    {
+      "run": "frozen-B4",
+      "stage": "reader",
+      "variant": "B4",
+      "samples": 4800,
+      "git_commit": "3cb908c2794460566422799953226783c959c4a4",
+      "runtime": {
+        "cublas_workspace_config": ":4096:8",
+        "cudnn_deterministic": true,
+        "deterministic_algorithms": true,
+        "device": "cuda:0",
+        "dtype": "bfloat16 backbone / float32 adapter",
+        "gpu": "NVIDIA GH200 120GB",
+        "host": "mg0753",
+        "job_id": "3712085.opbs",
+        "python": "3.13.13",
+        "threads": 72,
+        "torch": "2.14.0+cu132",
+        "transformers": "4.57.6"
+      }
+    },
+    {
+      "run": "joint-M1",
+      "stage": "joint",
+      "variant": "M1",
+      "samples": 67200,
+      "git_commit": "3cb908c2794460566422799953226783c959c4a4",
+      "runtime": {
+        "cublas_workspace_config": ":4096:8",
+        "cudnn_deterministic": true,
+        "deterministic_algorithms": true,
+        "device": "cuda:0",
+        "dtype": "bfloat16 backbone / float32 adapter",
+        "gpu": "NVIDIA GH200 120GB",
+        "host": "mg0753",
+        "job_id": "3712085.opbs",
+        "python": "3.13.13",
+        "threads": 72,
+        "torch": "2.14.0+cu132",
+        "transformers": "4.57.6"
+      }
+    },
+    {
+      "run": "joint-M1-lin",
+      "stage": "joint",
+      "variant": "M1-lin",
+      "samples": 33600,
+      "git_commit": "3cb908c2794460566422799953226783c959c4a4",
+      "runtime": {
+        "cublas_workspace_config": ":4096:8",
+        "cudnn_deterministic": true,
+        "deterministic_algorithms": true,
+        "device": "cuda:0",
+        "dtype": "bfloat16 backbone / float32 adapter",
+        "gpu": "NVIDIA GH200 120GB",
+        "host": "mg0753",
+        "job_id": "3712085.opbs",
+        "python": "3.13.13",
+        "threads": 72,
+        "torch": "2.14.0+cu132",
+        "transformers": "4.57.6"
+      }
+    },
+    {
+      "run": "joint-B5",
+      "stage": "joint",
+      "variant": "B5",
+      "samples": 33600,
+      "git_commit": "3cb908c2794460566422799953226783c959c4a4",
+      "runtime": {
+        "cublas_workspace_config": ":4096:8",
+        "cudnn_deterministic": true,
+        "deterministic_algorithms": true,
+        "device": "cuda:0",
+        "dtype": "bfloat16 backbone / float32 adapter",
+        "gpu": "NVIDIA GH200 120GB",
+        "host": "mg0753",
+        "job_id": "3712085.opbs",
+        "python": "3.13.13",
+        "threads": 72,
+        "torch": "2.14.0+cu132",
+        "transformers": "4.57.6"
+      }
+    },
+    {
+      "run": "joint-B3",
+      "stage": "joint",
+      "variant": "B3",
+      "samples": 33600,
+      "git_commit": "3cb908c2794460566422799953226783c959c4a4",
+      "runtime": {
+        "cublas_workspace_config": ":4096:8",
+        "cudnn_deterministic": true,
+        "deterministic_algorithms": true,
+        "device": "cuda:0",
+        "dtype": "bfloat16 backbone / float32 adapter",
+        "gpu": "NVIDIA GH200 120GB",
+        "host": "mg0753",
+        "job_id": "3712085.opbs",
+        "python": "3.13.13",
+        "threads": 72,
+        "torch": "2.14.0+cu132",
+        "transformers": "4.57.6"
+      }
+    },
+    {
+      "run": "joint-B4",
+      "stage": "joint",
+      "variant": "B4",
+      "samples": 4800,
+      "git_commit": "3cb908c2794460566422799953226783c959c4a4",
+      "runtime": {
+        "cublas_workspace_config": ":4096:8",
+        "cudnn_deterministic": true,
+        "deterministic_algorithms": true,
+        "device": "cuda:0",
+        "dtype": "bfloat16 backbone / float32 adapter",
+        "gpu": "NVIDIA GH200 120GB",
+        "host": "mg0753",
+        "job_id": "3712085.opbs",
+        "python": "3.13.13",
+        "threads": 72,
+        "torch": "2.14.0+cu132",
+        "transformers": "4.57.6"
+      }
+    },
+    {
+      "run": "lora-context",
+      "stage": "lora_ctx",
+      "variant": "B1",
+      "samples": 9600,
+      "git_commit": "3cb908c2794460566422799953226783c959c4a4",
+      "runtime": {
+        "cublas_workspace_config": ":4096:8",
+        "cudnn_deterministic": true,
+        "deterministic_algorithms": true,
+        "device": "cuda:0",
+        "dtype": "bfloat16 backbone / float32 adapter",
+        "gpu": "NVIDIA GH200 120GB",
+        "host": "mg0753",
+        "job_id": "3712085.opbs",
+        "python": "3.13.13",
+        "threads": 72,
+        "torch": "2.14.0+cu132",
+        "transformers": "4.57.6"
+      }
+    },
+    {
+      "run": "parallel-context",
+      "stage": "lora_ctx",
+      "variant": "B2",
+      "samples": 9600,
+      "git_commit": "3cb908c2794460566422799953226783c959c4a4",
+      "runtime": {
+        "cublas_workspace_config": ":4096:8",
+        "cudnn_deterministic": true,
+        "deterministic_algorithms": true,
+        "device": "cuda:0",
+        "dtype": "bfloat16 backbone / float32 adapter",
+        "gpu": "NVIDIA GH200 120GB",
+        "host": "mg0753",
+        "job_id": "3712085.opbs",
+        "python": "3.13.13",
+        "threads": 72,
+        "torch": "2.14.0+cu132",
+        "transformers": "4.57.6"
+      }
+    },
+    {
+      "run": "baseline-both-protocols",
+      "stage": "baseline",
+      "variant": "B0",
+      "samples": 9600,
+      "git_commit": "3cb908c2794460566422799953226783c959c4a4",
+      "runtime": {
+        "cublas_workspace_config": ":4096:8",
+        "cudnn_deterministic": true,
+        "deterministic_algorithms": true,
+        "device": "cuda:0",
+        "dtype": "bfloat16 backbone / float32 adapter",
+        "gpu": "NVIDIA GH200 120GB",
+        "host": "mg0753",
+        "job_id": "3712085.opbs",
+        "python": "3.13.13",
+        "threads": 72,
+        "torch": "2.14.0+cu132",
+        "transformers": "4.57.6"
+      }
+    }
+  ],
+  "scope": "smoke only; no pilot, screening, confirmation or method selection"
+}

@@ -20,12 +20,12 @@ from subagents. Shared conventions: `derive_seed`, blake2b, fp32 adapters.
   chain_lengths=[8,8,8], hops=[1,2,3]. writer forces t1 n_rel4 head_sharing.3.
 - train: steps=1000 default /100 smoke, batch_size=8, lr=.0003,
   weight_decay=.01, grad_clip=1, warmup_steps=20 default/2 smoke,
-  depths=[1,2,4] (writer/B4/B1 [1]), log_every=10.
+  depths=[1,2,4] (writer/B4/B1/B2 [1]), log_every=10.
 - writer_checkpoint: null or path to writer.pt; reader requires path.
 - eval: episodes=2000 default /200 smoke, batch_size=16, depths=[0,1,2,3,4,6,8],
   splits=['val'] smoke (can val/test/confirm/test_unseen for later stages),
   hops=[1,2,3,4,5,6,7,8] (writer [1]), seed=4242,
-  counterfactuals=true, protocols=['memory_only'] (+context_retained M1/B0/B1),
+  counterfactuals=true, protocols=['memory_only'] (+context_retained M1/B0/B1/B2),
   allow_confirmation=false. val/test start0; confirm maps split test start100000.
 - stats: resamples=2000, seed=2718. smoke=true for smoke configs.
 
