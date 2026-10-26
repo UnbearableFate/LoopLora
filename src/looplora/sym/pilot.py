@@ -274,6 +274,11 @@ def main(argv: list[str] | None = None) -> None:
     else:
         rows = collect(args.runs, json.loads(args.manifest.read_text()))
         selection = select_pilot1(rows) if args.action == "summarize1" else select_pilot2(rows)
+        if args.action == "summarize-replication":
+            if len(rows) != len(selection["selected"]):
+                raise ValueError("replication must contain exactly one LR per writer/variant")
+            selection.update(rule="reuse Pilot-2 selected LR per writer/variant; no further selection",
+                             status="validation replication at the selected Pilot-2 learning rates")
         write_report_data(rows, selection, args.out, stage="pilot1" if args.action == "summarize1" else "pilot2")
         print(json.dumps({"runs": len(rows), "report": str(args.out), "E_star": selection.get("E_star")}))
 
