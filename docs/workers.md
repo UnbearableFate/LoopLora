@@ -22,7 +22,7 @@ Open or resume (new tab, worktree cwd):
 | --- | --- | --- | --- | --- | --- |
 | wk-sym | symbolic mechanism experiments: `src/looplora/sym`, `configs/p1s`, runs under `runs/p1s` | LoopLora-wt/sym, wp/sym | `docs/prereg/P1S.md`, `docs/reports/WP-D.md`, `docs/reports/P1S-pilot.md` | 01a177a0-f742-7c63-8800-0983d801fc19 | idle (WP-H done) |
 | wk-llm | LLM module experiments: `src/looplora/llm`, `configs/p1l`, runs under `runs/p1l` | LoopLora-wt/llm, wp/llm | `docs/prereg/P1L.md`, `docs/reports/WP-E.md`, `docs/reports/WP-G.md` | 01a1779d-c123-75a1-9458-ae849ee0fcde (resumed, GPT-6.1-sol) | active: WP-L3 |
-| wk-theory | theory and analytical checks: `docs/theory.md`, `tests/test_theory_examples.py` | LoopLora-wt/theory, wp/theory | `docs/theory.md`, `docs/reports/WP-T.md` | 01a177c4-57fb-7f42-a920-533e74680115 (resumed 21:47, GPT-6.1-sol) | active: WP-T3 (tab w1:t14) |
+| wk-theory | theory and analytical checks: `docs/theory.md`, `tests/test_theory_examples.py` | LoopLora-wt/theory, wp/theory | `docs/theory.md`, `docs/reports/WP-T.md` | 01a177c4-57fb-7f42-a920-533e74680115 (resumed 21:47, GPT-6.1-sol) | idle (WP-T3 done; tab w1:t14) |
 | wk-core | core adapters, memory, accounting: `src/looplora/core` | LoopLora-wt/core, wp/core | `docs/notation.md`, `docs/reports/WP-A.md` | 01a1779d-747b-7df1-8492-b517a9be8c6a (resumed 22:13, GPT-6.1-sol) | active: WP-C6 (tab w1:t15) |
 | wk-data | data generators, rendering, real-task preprocessing: `src/looplora/data` | LoopLora-wt/data, wp/data | `docs/reports/WP-B.md`, `docs/tasks/WP-B_contract.md` | 01a1779d-96b3-7431-8fb7-0458e768764e (resumed 21:19, GPT-6.1-sol) | idle (WP-B4 done) |
 | wk-symf | symbolic follow-up studies (capacity/rank, later P2-S budget matching): runs under `runs/p1s/f1`, `reports/p1s-f1` | LoopLora-wt/symf, wp/symf | `docs/prereg/P1S.md`, `docs/prereg/P1S-F1.md`, `docs/reports/P1S-pilot.md` | 01a17828-31b5-75f0-89b3-6bfbcb4d89a5 (GPT-6.1-sol, opened 21:24) | idle (WP-P2S-F1 done; tab w1:t13) |
@@ -43,7 +43,7 @@ Open or resume (new tab, worktree cwd):
 | WP-L3 P1-L writer fix screen | wk-llm | (running) |
 | WP-P2S symbolic budget matching (P2-S) | wk-symf | 0f84084 |
 | WP-P2S-F1 sharing at matched depth; shortcut-free budget contrasts | wk-symf | f7d2aed |
-| WP-T3 retrieval interference with learned keys (theory) | wk-theory | (running) |
+| WP-T3 retrieval interference with learned keys (theory) | wk-theory | merged after WP-P2S-F1 |
 | WP-C6 LLM support for B8 and fixed-depth training | wk-core | (running) |
 | WP-B2 swap_successors counterfactual | wk-data | bbe2a24 |
 | WP-B3 MuSiQue data and retention suite (T-08) | wk-data | ba2b2e8 |
