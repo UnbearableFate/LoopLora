@@ -8,7 +8,7 @@ from torch import Tensor, nn
 from torch.nn import functional as F
 
 from looplora.core import memory
-from looplora.core.adapters import IterativeQueryAdapter
+from looplora.core.adapters import IterativeQueryAdapter, UnsharedAdapter
 from looplora.data.relations import generate
 from looplora.data.render import load_name_pool, render_episodes
 from looplora.infra.seeds import derive_seed
@@ -74,7 +74,7 @@ def true_fact_indices(arrays,device) -> Tensor:
     return matches.long().argmax(-1)
 
 
-class FixAdapter(IterativeQueryAdapter):
+class _WriterFix:
     """Same reader/writer numerics except the explicitly named intervention."""
     def __init__(self,initial,arm: str):
         if arm not in ARMS:
@@ -140,10 +140,20 @@ class FixAdapter(IterativeQueryAdapter):
         selected = flat.index_select(0,indices)
         value = oracle.reshape(-1,self.cfg.r_mem).index_select(0,indices)
         z = selected
-        for _ in range(loop_steps):
-            z = selected+self.cfg.rho*self._phi(F.linear(z,self.R)+F.linear(value,self.U))
+        for step in range(loop_steps):
+            R = self.R[step] if self.cfg.variant=='unshared' else self.R
+            U = self.U[step] if self.cfg.variant=='unshared' else self.U
+            z = selected+self.cfg.rho*self._phi(F.linear(z,R)+F.linear(value,U))
         output = u.new_zeros((len(flat),self.cfg.d_out)).index_copy(0,indices,self.branch(z))
         return output.reshape(*u.shape[:-1],self.cfg.d_out)
+
+
+class FixAdapter(_WriterFix,IterativeQueryAdapter):
+    """WP-L3 interventions on the original shared reader."""
+
+
+class UnsharedFixAdapter(_WriterFix,UnsharedAdapter):
+    """The same writer interventions with B8's four step-specific reads."""
 
 
 @dataclass(frozen=True)
@@ -158,7 +168,8 @@ class WriterFixExperiment(LLMExperiment):
     def __init__(self,config,arm: str,*,model=None,tokenizer=None):
         super().__init__(config,model=model,tokenizer=tokenizer)
         self.arm = arm
-        adapter = FixAdapter(self.adapter,arm).to(device=self.device,dtype=torch.float32)
+        container = UnsharedFixAdapter if self.adapter.cfg.variant=='unshared' else FixAdapter
+        adapter = container(self.adapter,arm).to(device=self.device,dtype=torch.float32)
         self.adapter = self.writer = self.bank.modules[self.layer].adapter = adapter
         self.value_head = None
         if arm in {'W3','W5'}:
@@ -184,7 +195,8 @@ class WriterFixExperiment(LLMExperiment):
         self.adapter.positions,self.adapter.phase = positions,'support'
         try:
             snapshot = encode_support(self.model,tokens.support_ids,tokens.support_mask,
-                'fact_final',fact_final=write_mask,protocol='memory_only',loop_steps=1,truncate=True)
+                'fact_final',fact_final=write_mask,protocol='memory_only',
+                loop_steps=4 if self.config['variant']=='B8' else 1,truncate=True)
         finally:
             self.adapter.phase='idle'
         return FixBatch(snapshot,tokens.question_ids,tokens.question_mask,tokens.answer_ids,
@@ -192,7 +204,9 @@ class WriterFixExperiment(LLMExperiment):
             write_mask.sum(-1),tokens.support_ids,tokens.support_mask,write_mask,
             self.adapter.keys,self.adapter.values,positions,self.adapter.support_x)
 
-    def score(self,prepared,L=1,*,capture_inputs=False):
+    def score(self,prepared,L=None,*,capture_inputs=False):
+        if L is None:
+            L = 4 if self.config['variant']=='B8' else 1
         self.adapter.phase='read'
         if self.arm=='OA':
             target = true_fact_indices(prepared.arrays,self.device)
@@ -219,7 +233,7 @@ class WriterFixExperiment(LLMExperiment):
         for begin in range(0,256,32):
             arrays = generate(spec,'train',begin,32,seed)
             batch = self.prepare(arrays)
-            _,read = self.score(batch,1,capture_inputs=True)
+            _,read = self.score(batch,4 if self.config['variant']=='B8' else 1,capture_inputs=True)
             write_x = gather_positions(batch.raw_support,batch.positions[:,:,0]).flatten(0,1)
             read_x = read[batch.question_mask]
             features = torch.cat((write_x,read_x),0).double()
@@ -248,7 +262,9 @@ def query_codes(experiment,batch,question_x):
     B,Q = last.shape
     x = question_x[torch.arange(B,device=last.device)[:,None],
                    torch.arange(Q,device=last.device)[None,:],last]
-    raw = F.linear(experiment.adapter.u(x.float()),experiment.adapter.Q)
+    # The addressing target supervises the first read, whose state is z^0 = u.
+    Q = experiment.adapter.Q[0] if experiment.adapter.cfg.variant=='unshared' else experiment.adapter.Q
+    raw = F.linear(experiment.adapter.u(x.float()),Q)
     return F.normalize(raw,dim=-1,eps=experiment.adapter.cfg.eps)
 
 

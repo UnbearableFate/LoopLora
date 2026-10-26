@@ -56,7 +56,8 @@ def validate(experiment,out: Path):
     for begin in range(0,1000,16):
         part = _slice(arrays,slice(begin,min(begin+16,1000)))
         batch = experiment.prepare(part)
-        logits,x = experiment.score(batch,1,capture_inputs=True)
+        depth = 4 if experiment.config['variant']=='B8' else 1
+        logits,x = experiment.score(batch,depth,capture_inputs=True)
         answer = batch.answer_ids
         prediction = logits.argmax(-1)
         restricted = logits.gather(-1,batch.candidate_ids[:,None,:])
@@ -69,7 +70,7 @@ def validate(experiment,out: Path):
                 'memory_only/oracle_addressing' if experiment.arm=='OA' else 'memory_only/original'),
             protocol=np.full(shape,'memory_only'),arm=np.full(shape,experiment.arm),
             episode_id=part.episode_seed[:,None],query_id=np.zeros(shape,dtype=np.int64),
-            hop=np.ones(shape,dtype=np.int64),L=np.ones(shape,dtype=np.int64),
+            hop=np.ones(shape,dtype=np.int64),L=np.full(shape,depth,dtype=np.int64),
             answer=answer,prediction=prediction,correct=prediction==answer,full_correct=prediction==answer,
             full_prediction=prediction,candidate_prediction=candidate,candidate_correct=candidate==answer,
             candidate_size=batch.candidate_mask.sum(-1)[:,None],tail_prediction=tail_prediction,
@@ -142,7 +143,8 @@ def fit(experiment,out: Path,*,steps=4800,extension=False,max_seconds=3450,eval_
                 group['lr']=.003*min(1.,step/20)
             optimizer.zero_grad(set_to_none=True)
             batch = experiment.prepare(arrays,tokens=tokens)
-            logits,x = experiment.score(batch,1,capture_inputs=experiment.arm in {'W2','W5'})
+            depth = 4 if experiment.config['variant']=='B8' else 1
+            logits,x = experiment.score(batch,depth,capture_inputs=experiment.arm in {'W2','W5'})
             main = F.cross_entropy(logits.float().flatten(0,1),batch.answer_ids.flatten())
             address,value = auxiliary_losses(experiment,batch,x)
             loss = main+address+value

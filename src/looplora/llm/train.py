@@ -73,12 +73,14 @@ class LLMExperiment:
             self.bank = AdapterBank({})
             self.model.looplora_adapters = self.bank
             return
-        core_variant = {"B1": "lora", "B2": "parallel", "B3": "loop", "B5": "fixedq"}.get(variant, "iterq")
+        core_variant = {"B1": "lora", "B2": "parallel", "B3": "loop", "B5": "fixedq",
+                        "B8": "unshared"}.get(variant, "iterq")
         m = config["model"]
         cfg = AdapterConfig(d_in=1, d_out=1, r=m["r"], variant=core_variant,
                             rho=m["rho"], alpha=m["alpha"],
                             activation=config.get("activation", "identity" if variant == "M1-lin" else "relu"),
                             gate=m.get("gate", "scalar"),
+                            unshared_steps=4 if variant == "B8" else 1,
                             lambda_init=m.get("lambda_init", .99), beta_init=m.get("beta_init", .1))
         init_seed = derive_seed(config["seed"], "llm", stage, "reader", variant)
         self.bank = attach_adapters(self.model, cfg, layers=(self.layer,), seed=init_seed,
@@ -179,7 +181,7 @@ class LLMExperiment:
                 snapshot = encode_support(
                     self.model, tokens.support_ids, tokens.support_mask,
                     self.config["write_policy"], fact_final=tokens.fact_final,
-                    protocol=protocol, loop_steps=1,
+                    protocol=protocol, loop_steps=4 if self.config["variant"] == "B8" else 1,
                     truncate=truncate and protocol == "memory_only",
                 )
         permitted = tokens.support_mask if self.config["write_policy"] == "all_tokens" else tokens.fact_final & tokens.support_mask
@@ -231,6 +233,8 @@ def _fit(experiment: LLMExperiment, out: Path) -> dict[str, Any]:
     config, options = experiment.config, experiment.config["train"]
     spec = make_task_spec(config)
     depths = [1] if config["stage"] in {"writer", "lora_ctx"} or config["variant"] == "B4" else options["depths"]
+    if config["variant"] == "B8":
+        depths = [4]
     depth_rng = np.random.default_rng(derive_seed(config["seed"], "llm", config["stage"], "depths"))
     data_seed = derive_seed(config["seed"], "llm", "writer-data" if config["stage"] == "writer" else "train-data")
     params = experiment.trainable_parameters()
@@ -300,7 +304,8 @@ def train(config: dict[str, Any], out: Path, *, model=None, tokenizer=None):
     resolved = copy.deepcopy(config)
     resolved["task"] = asdict(make_task_spec(resolved))
     if resolved["stage"] == "writer":
-        resolved["variant"], resolved["protocol"] = "M1", "memory_only"
+        resolved["variant"] = "B8" if resolved["variant"] == "B8" else "M1"
+        resolved["protocol"] = "memory_only"
     if resolved["stage"] == "lora_ctx":
         resolved["variant"] = "B2" if resolved["variant"] == "B2" else "B1"
         resolved["protocol"] = "context_retained"

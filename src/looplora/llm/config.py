@@ -10,7 +10,7 @@ from typing import Any, Mapping
 
 from looplora.infra.seeds import derive_seed
 
-VARIANTS = ("M1", "M1-lin", "B5", "B3", "B4", "B1", "B2", "B0")
+VARIANTS = ("M1", "M1-lin", "B5", "B3", "B4", "B8", "B1", "B2", "B0")
 STAGES = ("writer", "reader", "joint", "lora_ctx", "baseline")
 PROTOCOLS = ("memory_only", "context_retained")
 DEFAULTS: dict[str, Any] = {
@@ -81,10 +81,10 @@ def resolve_config(mapping: Mapping[str, Any]) -> dict[str, Any]:
     stage, variant = config["stage"], config["variant"]
     if stage not in STAGES or variant not in VARIANTS:
         raise ValueError("unknown stage or variant")
-    if ((stage == "writer" and variant != "M1")
+    if ((stage == "writer" and variant not in {"M1", "B8"})
             or ((stage == "lora_ctx") != (variant in ("B1", "B2")))
             or ((stage == "baseline") != (variant == "B0"))):
-        raise ValueError("writer requires M1, lora_ctx requires B1/B2, baseline requires B0")
+        raise ValueError("writer requires M1/B8, lora_ctx requires B1/B2, baseline requires B0")
     if config["protocol"] not in PROTOCOLS:
         raise ValueError("unknown protocol")
     expected = "context_retained" if stage == "lora_ctx" else "memory_only"
@@ -124,6 +124,8 @@ def resolve_config(mapping: Mapping[str, Any]) -> dict[str, Any]:
         config["train"]["depths"] = [1]
     if stage in ("writer", "lora_ctx", "baseline") or variant == "B4":
         config["eval"]["depths"] = [1]
+    if variant == "B8":
+        config["train"]["depths"] = config["eval"]["depths"] = [4]
     checkpoint = config["writer_checkpoint"]
     if checkpoint is not None and (not isinstance(checkpoint, str) or not checkpoint):
         raise ValueError("writer_checkpoint must be a path string or null")
@@ -157,14 +159,14 @@ def resolve_config(mapping: Mapping[str, Any]) -> dict[str, Any]:
     if config["smoke"] and "seed" not in mapping.get("eval", {}):
         evaluation["seed"] = derive_seed(20261027, "p1l-smoke-eval")
     if "protocols" not in mapping.get("eval", {}):
-        if variant in ("B0", "B1", "B2") or (variant == "M1" and stage in ("reader", "joint")):
+        if variant in ("B0", "B1", "B2") or (variant in {"M1", "B8"} and stage in ("reader", "joint")):
             evaluation["protocols"] = list(PROTOCOLS)
     protocols = evaluation["protocols"]
     if (not isinstance(protocols, list) or not protocols
             or any(p not in PROTOCOLS for p in protocols) or len(set(protocols)) != len(protocols)):
         raise ValueError("invalid eval.protocols")
-    if "context_retained" in protocols and variant not in ("M1", "B0", "B1", "B2"):
-        raise ValueError("secondary context-retained evaluation is defined for M1/B0/B1/B2")
+    if "context_retained" in protocols and variant not in ("M1", "B8", "B0", "B1", "B2"):
+        raise ValueError("secondary context-retained evaluation is defined for M1/B8/B0/B1/B2")
     _integer(config["stats"]["resamples"], "stats.resamples", 2000)
     _integer(config["stats"]["seed"], "stats.seed", 0)
     from looplora.data.relations import TaskSpec
