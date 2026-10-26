@@ -84,6 +84,37 @@ def test_oracle_config_rejects_incompatible_contracts(updates):
         resolve_config(raw)
 
 
+@pytest.mark.parametrize("variant", ["M1", "B8", "B4", "B5", "B3"])
+def test_rank128_training_roundtrip_and_writer_dimension_validation(model, tokenizer, tmp_path, variant):
+    cfg = config(variant)
+    cfg["model"]["r"] = 128
+    cfg["train"]["steps"] = 1
+    cfg = resolve_config(cfg)
+    depth = 1 if variant == "B4" else 4
+    experiment, summary = train(cfg, tmp_path / variant, model=model, tokenizer=tokenizer)
+    try:
+        assert experiment.writer_signature()["r_mem"] == 128
+        assert experiment.writer.pair_codes.shape == (1024, 4, 128)
+        assert summary["writer_frozen"]
+        arrays = data(cfg)
+        with torch.no_grad():
+            expected, _ = experiment.score(experiment.prepare(arrays), depth)
+        writer = dict(writer=experiment.writer_state(), signature=experiment.writer_signature())
+        writer["signature"]["r_mem"] = 32
+        with pytest.raises(ValueError, match="signature"):
+            experiment._load_writer(writer)
+    finally:
+        experiment.close()
+    restored = load_checkpoint(tmp_path / variant / "checkpoint.pt", model=model, tokenizer=tokenizer)
+    try:
+        with torch.no_grad():
+            observed, _ = restored.score(restored.prepare(arrays), depth)
+        assert torch.equal(observed, expected)
+        assert restored.writer_signature()["r_mem"] == 128
+    finally:
+        restored.close()
+
+
 def test_question_only_rendering_preserves_exact_queries_and_tokens(tokenizer):
     arrays = data(config())
     full = render_episodes(arrays,tokenizer=tokenizer)
