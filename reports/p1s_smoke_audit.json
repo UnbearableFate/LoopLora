@@ -1,0 +1,311 @@
+{
+  "runs": 24,
+  "suite_seconds": 159.75374742783606,
+  "all_sample_tables_reproduced": true,
+  "gate0_passed": true,
+  "identical_writer_groups": [
+    [
+      "t1-M1",
+      "t1-B3",
+      "t1-B4",
+      "t1-B5",
+      "t1-M1-lin"
+    ],
+    [
+      "t2-M1",
+      "t2-B3",
+      "t2-B4",
+      "t2-B5",
+      "t2-M1-lin"
+    ],
+    [
+      "t2-frozen-M1",
+      "t2-frozen-B3",
+      "t2-frozen-B4",
+      "t2-frozen-B5",
+      "t2-frozen-M1-lin"
+    ]
+  ],
+  "paired_contrasts": 400,
+  "figures": [
+    "/work/xg24i002/x10041/LoopLora-wt/sym/reports/figures/p1s/M1-v-B3/accuracy_L_00_test_original.png",
+    "/work/xg24i002/x10041/LoopLora-wt/sym/reports/figures/p1s/M1-v-B3/hop_L_00_test_original.png",
+    "/work/xg24i002/x10041/LoopLora-wt/sym/reports/figures/p1s/M1-v-B3/paired_differences.png",
+    "/work/xg24i002/x10041/LoopLora-wt/sym/reports/figures/p1s/M1-v-B3/paired_differences.json",
+    "/work/xg24i002/x10041/LoopLora-wt/sym/reports/figures/p1s/M1-v-B4/accuracy_L_00_test_original.png",
+    "/work/xg24i002/x10041/LoopLora-wt/sym/reports/figures/p1s/M1-v-B4/hop_L_00_test_original.png",
+    "/work/xg24i002/x10041/LoopLora-wt/sym/reports/figures/p1s/M1-v-B4/paired_differences.png",
+    "/work/xg24i002/x10041/LoopLora-wt/sym/reports/figures/p1s/M1-v-B4/paired_differences.json",
+    "/work/xg24i002/x10041/LoopLora-wt/sym/reports/figures/p1s/M1-v-B5/accuracy_L_00_test_original.png",
+    "/work/xg24i002/x10041/LoopLora-wt/sym/reports/figures/p1s/M1-v-B5/hop_L_00_test_original.png",
+    "/work/xg24i002/x10041/LoopLora-wt/sym/reports/figures/p1s/M1-v-B5/paired_differences.png",
+    "/work/xg24i002/x10041/LoopLora-wt/sym/reports/figures/p1s/M1-v-B5/paired_differences.json"
+  ],
+  "timing": [
+    {
+      "run": "t1-B3",
+      "train_seconds": 15.974052845966071,
+      "pretrain_seconds": 0.0,
+      "train_step_seconds": 0.05314318416174501,
+      "writer_seconds": 0.24829463753849268,
+      "reader_seconds": 0.03957366291433573,
+      "total_seconds": 22.243497484829277,
+      "mean_L": 2.3866666666666667,
+      "peak_memory_bytes": 72086016
+    },
+    {
+      "run": "t1-B4",
+      "train_seconds": 16.122431756928563,
+      "pretrain_seconds": 0.0,
+      "train_step_seconds": 0.05363334073374669,
+      "writer_seconds": 0.26366364071145654,
+      "reader_seconds": 0.0060277096927165985,
+      "total_seconds": 22.204993615392596,
+      "mean_L": 1.0,
+      "peak_memory_bytes": 73464320
+    },
+    {
+      "run": "t1-B5",
+      "train_seconds": 16.11479984782636,
+      "pretrain_seconds": 0.0,
+      "train_step_seconds": 0.053610144555568694,
+      "writer_seconds": 0.22206570953130722,
+      "reader_seconds": 0.05535656027495861,
+      "total_seconds": 22.348010290879756,
+      "mean_L": 2.3866666666666667,
+      "peak_memory_bytes": 73660928
+    },
+    {
+      "run": "t1-M1",
+      "train_seconds": 16.3418760439381,
+      "pretrain_seconds": 0.0,
+      "train_step_seconds": 0.05436604825314134,
+      "writer_seconds": 0.1303822472691536,
+      "reader_seconds": 0.09297796012833714,
+      "total_seconds": 22.460358527954668,
+      "mean_L": 2.3866666666666667,
+      "peak_memory_bytes": 80050688
+    },
+    {
+      "run": "t1-M1-lin",
+      "train_seconds": 17.558121104724705,
+      "pretrain_seconds": 0.0,
+      "train_step_seconds": 0.058414635664472976,
+      "writer_seconds": 0.3278792221099138,
+      "reader_seconds": 0.09359768498688936,
+      "total_seconds": 23.992094109766185,
+      "mean_L": 2.3866666666666667,
+      "peak_memory_bytes": 79919616
+    },
+    {
+      "run": "t1-B6",
+      "train_seconds": 21.60927972290665,
+      "pretrain_seconds": 0.0,
+      "train_step_seconds": 0.07192430369711171,
+      "writer_seconds": 0.14599480386823416,
+      "reader_seconds": 0.004235540516674519,
+      "total_seconds": 27.554259778931737,
+      "mean_L": 1.0,
+      "peak_memory_bytes": 201053184
+    },
+    {
+      "run": "t1-B7",
+      "train_seconds": 21.778362798970193,
+      "pretrain_seconds": 0.0,
+      "train_step_seconds": 0.07248152812321981,
+      "writer_seconds": 0.10543425101786852,
+      "reader_seconds": 0.004683318082243204,
+      "total_seconds": 27.562390378676355,
+      "mean_L": 1.0,
+      "peak_memory_bytes": 200684544
+    },
+    {
+      "run": "t1-B8",
+      "train_seconds": 17.84378373483196,
+      "pretrain_seconds": 0.0,
+      "train_step_seconds": 0.05936595321788142,
+      "writer_seconds": 0.34123708168044686,
+      "reader_seconds": 0.009494703263044357,
+      "total_seconds": 23.787682316266,
+      "mean_L": 4.0,
+      "peak_memory_bytes": 80493056
+    },
+    {
+      "run": "t2-B3",
+      "train_seconds": 13.175351758021861,
+      "pretrain_seconds": 0.0,
+      "train_step_seconds": 0.04382525433165332,
+      "writer_seconds": 0.5786678874865174,
+      "reader_seconds": 0.09444229584187269,
+      "total_seconds": 20.106084694620222,
+      "mean_L": 2.3866666666666667,
+      "peak_memory_bytes": 72749568
+    },
+    {
+      "run": "t2-B4",
+      "train_seconds": 13.326528571080416,
+      "pretrain_seconds": 0.0,
+      "train_step_seconds": 0.04432713186678787,
+      "writer_seconds": 0.6192024843767285,
+      "reader_seconds": 0.014943238347768784,
+      "total_seconds": 19.710473649203777,
+      "mean_L": 1.0,
+      "peak_memory_bytes": 75104768
+    },
+    {
+      "run": "t2-B5",
+      "train_seconds": 13.811278295237571,
+      "pretrain_seconds": 0.0,
+      "train_step_seconds": 0.04593978370850285,
+      "writer_seconds": 0.2752611362375319,
+      "reader_seconds": 0.12787612713873386,
+      "total_seconds": 20.091290631797165,
+      "mean_L": 2.3866666666666667,
+      "peak_memory_bytes": 75039232
+    },
+    {
+      "run": "t2-M1",
+      "train_seconds": 13.805900570936501,
+      "pretrain_seconds": 0.0,
+      "train_step_seconds": 0.045919194590921204,
+      "writer_seconds": 0.26351256761699915,
+      "reader_seconds": 0.21076696924865246,
+      "total_seconds": 20.09245431702584,
+      "mean_L": 2.3866666666666667,
+      "peak_memory_bytes": 80050688
+    },
+    {
+      "run": "t2-M1-lin",
+      "train_seconds": 13.696737002115697,
+      "pretrain_seconds": 0.0,
+      "train_step_seconds": 0.045560105559416114,
+      "writer_seconds": 0.7397451312281191,
+      "reader_seconds": 0.23122723260894418,
+      "total_seconds": 20.861599755939096,
+      "mean_L": 2.3866666666666667,
+      "peak_memory_bytes": 79919616
+    },
+    {
+      "run": "t2-B6",
+      "train_seconds": 19.811771073844284,
+      "pretrain_seconds": 0.0,
+      "train_step_seconds": 0.06593620590555171,
+      "writer_seconds": 0.3808947177603841,
+      "reader_seconds": 0.012707295827567577,
+      "total_seconds": 25.776368654798716,
+      "mean_L": 1.0,
+      "peak_memory_bytes": 201053184
+    },
+    {
+      "run": "t2-B7",
+      "train_seconds": 20.58339482685551,
+      "pretrain_seconds": 0.0,
+      "train_step_seconds": 0.0685087177188446,
+      "writer_seconds": 0.31232650578022003,
+      "reader_seconds": 0.011785559821873903,
+      "total_seconds": 26.46127473283559,
+      "mean_L": 1.0,
+      "peak_memory_bytes": 200684544
+    },
+    {
+      "run": "t2-B8",
+      "train_seconds": 17.230045625008643,
+      "pretrain_seconds": 0.0,
+      "train_step_seconds": 0.05732575579546392,
+      "writer_seconds": 0.329958688467741,
+      "reader_seconds": 0.020994249265640974,
+      "total_seconds": 23.078690504655242,
+      "mean_L": 4.0,
+      "peak_memory_bytes": 80493056
+    },
+    {
+      "run": "t1-M1-L4",
+      "train_seconds": 8.584704564884305,
+      "pretrain_seconds": 0.0,
+      "train_step_seconds": 0.028539278499471646,
+      "writer_seconds": 0.23189698765054345,
+      "reader_seconds": 0.0950961196795106,
+      "total_seconds": 14.59775019576773,
+      "mean_L": 4.0,
+      "peak_memory_bytes": 80050688
+    },
+    {
+      "run": "t2-M1-L4",
+      "train_seconds": 10.462186465971172,
+      "pretrain_seconds": 0.0,
+      "train_step_seconds": 0.034791751597076655,
+      "writer_seconds": 0.3237044820562005,
+      "reader_seconds": 0.21341830817982554,
+      "total_seconds": 16.993230370804667,
+      "mean_L": 4.0,
+      "peak_memory_bytes": 80050688
+    },
+    {
+      "run": "t1-shared-writer",
+      "train_seconds": 6.023682611063123,
+      "pretrain_seconds": 16.823230009991676,
+      "train_step_seconds": 0.02004137020247678,
+      "writer_seconds": 0.09410401666536927,
+      "reader_seconds": 0.004113459959626198,
+      "total_seconds": 28.413857195992023,
+      "mean_L": 1.0,
+      "peak_memory_bytes": 126581248
+    },
+    {
+      "run": "t2-frozen-B3",
+      "train_seconds": 12.94636349612847,
+      "pretrain_seconds": 0.0,
+      "train_step_seconds": 0.04304439895631124,
+      "writer_seconds": 0.41050759982317686,
+      "reader_seconds": 0.09108211472630501,
+      "total_seconds": 19.937952305190265,
+      "mean_L": 2.3866666666666667,
+      "peak_memory_bytes": 73882112
+    },
+    {
+      "run": "t2-frozen-B4",
+      "train_seconds": 13.104634071700275,
+      "pretrain_seconds": 0.0,
+      "train_step_seconds": 0.04357213757621745,
+      "writer_seconds": 0.42372424248605967,
+      "reader_seconds": 0.013081280514597893,
+      "total_seconds": 19.53701422503218,
+      "mean_L": 1.0,
+      "peak_memory_bytes": 74874880
+    },
+    {
+      "run": "t2-frozen-B5",
+      "train_seconds": 13.154741455800831,
+      "pretrain_seconds": 0.0,
+      "train_step_seconds": 0.04373763646620015,
+      "writer_seconds": 0.3768662456423044,
+      "reader_seconds": 0.1431538537144661,
+      "total_seconds": 20.12412333767861,
+      "mean_L": 2.3866666666666667,
+      "peak_memory_bytes": 74809344
+    },
+    {
+      "run": "t2-frozen-M1",
+      "train_seconds": 13.320486978627741,
+      "pretrain_seconds": 0.0,
+      "train_step_seconds": 0.04429083594897141,
+      "writer_seconds": 0.32703921711072326,
+      "reader_seconds": 0.21959283482283354,
+      "total_seconds": 20.261609555222094,
+      "mean_L": 2.3866666666666667,
+      "peak_memory_bytes": 79820800
+    },
+    {
+      "run": "t2-frozen-M1-lin",
+      "train_seconds": 6.587710906751454,
+      "pretrain_seconds": 0.0,
+      "train_step_seconds": 0.021896761155997712,
+      "writer_seconds": 0.20353428460657597,
+      "reader_seconds": 0.20350061682984233,
+      "total_seconds": 12.934227660298347,
+      "mean_L": 2.3866666666666667,
+      "peak_memory_bytes": 79689728
+    }
+  ],
+  "scope": "smoke validation only; no method-selection or scientific claim"
+}

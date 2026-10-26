@@ -79,7 +79,7 @@ def audit(suite_path: Path, runs: Path, reports: Path) -> dict:
     paired_path = reports / "p1s_smoke_paired.json"
     paired_path.write_text(json.dumps(comparisons, indent=2, allow_nan=False) + "\n")
     with (reports / "p1s_smoke_timing.csv").open("w", newline="") as stream:
-        writer = csv.DictWriter(stream, fieldnames=list(timing_rows[0]))
+        writer = csv.DictWriter(stream, fieldnames=list(timing_rows[0]), lineterminator="\n")
         writer.writeheader()
         writer.writerows(timing_rows)
     artifacts = []
