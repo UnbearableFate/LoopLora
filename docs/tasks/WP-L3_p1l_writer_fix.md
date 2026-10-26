@@ -46,6 +46,17 @@ the same threshold. If none reaches 0.30, P1-L stops: report the negative result
 failing link. Auxiliary losses (W2, W3, W5) become part of the P1-L training objective for every memory variant
 if chosen, and are reported as supervision beyond the answer.
 
+## Amendment A1 (2026-10-27 01:16 JST, before any WP-L3 validation EM was read)
+Information seen at this time: training-loss logs only (main loss at steps 1500–2000: OA ≈ 4.8 and W5 ≈ 5.9,
+falling; W0, W1, W4 flat at ≈ 7.3; W2, W3 ≈ 7.2–7.4). Reason: WP-C5 and WP-B4 raised throughput ≈ 7× after the
+screen was sized, so 4800 steps × 32 episodes is a small fraction of what one job can now train. Replacement for
+the branches below 0.80: if no arm reaches val EM ≥ 0.80 at 4800 steps, rerun the two arms with the highest val EM
+(ties: lower final main loss), plus OA as the reference if it is not among them, on the fast path
+(`scan_final`, `train.prefetch_workers: 2`), same batch 32 and lr, for the longest schedule that fits one ≤ 2 h job
+(`scripts/submit.py --scale-up docs/tasks/WP-L3_p1l_writer_fix.md`; justified by the falling OA/W5 losses), with
+val EM at five evenly spaced checkpoints. The simplest rerun arm with val EM ≥ 0.80 becomes the P1-L writer; if
+none reaches 0.80, P1-L stops and the report gives the curves (EM ≥ 0.30 reported as partial learning).
+
 ## Limits
 Val only; seed 17; no T2, reader comparison or joint runs. Two runs per node as in D3. Each PBS job ≤ 1 node × 1 h;
 WP-L3 total ≤ 4 node·h; record node·h per job. If WP-C5's exact fast write path lands on `master` before you
