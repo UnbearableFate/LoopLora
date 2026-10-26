@@ -1,4 +1,4 @@
-# wk-p1l continuation card — both ranks' Pilot-2 running
+# wk-p1l continuation card — r32 Pilot-2 locked; main launching
 
 Worktree /work/xg24i002/x10041/LoopLora-wt/p1l, branchwp/p1l. User assigned
 WP-P1L; finish docs/reports/P1L.md and only then reply exactly
@@ -13,7 +13,7 @@ Armed wakeups (message mode,300s polling, no Goal):
 - r128 smoke3716021: .job-wakeup/27808c33-f6d6-4f4d-b9d7-ca4e673c498b,
   acknowledged; both smoke jobs verified complete, exit0.
 - r32 pilot3715965: .job-wakeup/ee3ad75d-7773-4f90-92d8-b0bc5660b157,
-  worker PID2041468; also verify the other six pilot jobs on wake.
+  acknowledged; all seven jobs exit0 and all14 candidate records complete.
 - r128 pilot3716169: .job-wakeup/d921e843-f2a6-44ff-82e7-83cb3267c07f,
   worker PID2200345; also verify the other four pilot jobs on wake.
 Read the event state and acknowledge with the exact argv from the wakeup
@@ -64,6 +64,12 @@ Pilot jobs are all source1dc8a7606f3c2fa5a5358301fc4a383030d01af6:
 ties lower lr (B1/B2 selected in their trained context-retained protocol).
 R/pilot-jobs.json retains exact job IDs/log/spec/source. R/pilot/<LABEL>/
 <LABEL>-lr0.001 or -lr0.003 contain records/checkpoints/validation samples.
+All seven pilots completed, boundary verified. Compute selection3716286 onmg0019
+passed, source716110a. reports/p1l/lr-S-lock.json fixes S17000, M1-L4 lr.003;
+B8/B4/B5-L4/B3-L4/B1/B2 lr.001 (ties lower). All22 configs updated before
+main submission. Pilot full-vocabulary pooled val EM is0.033–0.133% for oracle/
+no-memory readers across candidates; context-retained B1/B2 is99.33–99.83%.
+These are validation results only; no change to design, gates or main schedule.
 
 Probe full cache3715870, source d276308, R/jlens/directions.pt,512 fixed val
 questions only, frozen model, completed onmg0865 in932.28s. Small metadata
@@ -85,7 +91,7 @@ reports/p1l/r128/preflight-sizing.json and design. Full10% smokes1700steps:
 3716020(B8,M1-L4),3716021(B4,B5-L4,B3-L4), source16bef08. BOTH exit0.
 Full-smoke sizing3716162 (mg0024), reports/p1l/r128/smoke-sizing.json,
 committed e955765: S17000/Pilot5666, slowest .199397s, no reduced-steps flag,
-projected Pilot-2+main14.408nodeh. No pilot quality score of either rank read.
+projected Pilot-2+main14.408nodeh. No r128 pilot quality score has been read.
 R128 Pilot-2 launched source e95576527c46cc1798d97c5af83384fc62bd0e06:
 3716168B8,3716169M1-L4,3716170B4,3716171B5-L4,3716172B3-L4.
 Receipts R/r128/pilot-jobs.json, two sequential lrs per label under
@@ -117,7 +123,8 @@ episodes, total18.05s. Wrong-source submission3716221 endedexit2 in8s (central
 HEAD lacked script); replacement uses explicit3801bb2. Never use --commit HEAD
 in submit.py: it resolves refs in the CENTRAL checkout. Use explicit worker
 hash or wp/p1l. Main launcher already resolves its own ROOT hash explicitly.
-Timings and regression outputs only have been read; no quality score read.
+Timing acceptance quality artifacts have not been read. R32 pilot scores were
+first consumed by registered compute selection3716286 after all seven finished.
 
 Passed: readout/oracle33checks3715857; gates/authorization4checks3715889;
 swap-wrapper1check3715942. Failed development jobs, included in ledger:
@@ -128,8 +135,8 @@ separately; unchanged regression passed3715942). No further blanket retests.
 ## Immediate next actions
 
 1. Validation-only evaluation acceptance is complete; never read its raw scores.
-2. Retain the armed r32 watcher3715965; do not duplicate or cancel it.
-   R128 pilot3716169 has its own independent armed watcher above.
+2. R32 pilot wakeup acknowledged; commit the lock/configs and launch main.
+   R128 pilot3716169 has its own independent armed watcher above; retain it.
 
 ## Next actions after each rank's pilot wakeup
 
