@@ -1,0 +1,4 @@
+name,writer,variant,seed,lr,steps,depth,val_accuracy,train_seconds,run_dir,config_hash,git_commit
+p-writer-lr0.001,joint_fact,B4,17,0.001,5000,1,0.782,138.72532623191364,/work/xg24i002/x10041/LoopLora-wt/symf/runs/p1s/f2/pilot-writers/shard-00/p-writer-lr0.001,d4209ac827c0656fce8ddbb566758265,ad6086ee6962830f4dfc63bc28211a8f57fd5a6c
+p-writer-lr0.0003,joint_fact,B4,17,0.0003,5000,1,0.537,138.70380201213993,/work/xg24i002/x10041/LoopLora-wt/symf/runs/p1s/f2/pilot-writers/shard-00/p-writer-lr0.0003,37527604c19583a6151a12a8e822ff92,ad6086ee6962830f4dfc63bc28211a8f57fd5a6c
+p-writer-lr0.003,joint_fact,B4,17,0.003,5000,1,0.865,138.71726951817982,/work/xg24i002/x10041/LoopLora-wt/symf/runs/p1s/f2/pilot-writers/shard-00/p-writer-lr0.003,c0b80cc590127ad9761071171740cf70,ad6086ee6962830f4dfc63bc28211a8f57fd5a6c

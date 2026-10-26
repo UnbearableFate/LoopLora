@@ -1,0 +1,13 @@
+{
+  "status": "passed",
+  "runs": 39,
+  "reader_runs": 36,
+  "frozen_writers_checked": 18,
+  "sample_rows": 32835000,
+  "global_barrier_created_at": "2026-10-26T14:40:16.354738+00:00",
+  "all_sample_tables_reproduced": true,
+  "all_depth_snapshots_identical": true,
+  "all_controlled_groups_identical": true,
+  "all_frozen_writers_match_source": true,
+  "full_audit": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p1s/f2/analysis/artifact_audit.json"
+}

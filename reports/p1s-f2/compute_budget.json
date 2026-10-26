@@ -1,0 +1,17 @@
+{
+  "status": "passed",
+  "job_count": 18,
+  "all_jobs_exit_zero": true,
+  "pilot_seconds": 1382,
+  "main_seconds": 4853,
+  "total_seconds": 6235,
+  "pilot_node_hours": 0.3838888888888889,
+  "main_node_hours": 1.3480555555555556,
+  "total_node_hours": 1.7319444444444445,
+  "pilot_cap_node_hours": 2,
+  "main_cap_node_hours": 6,
+  "total_cap_node_hours": 8,
+  "maximum_nodes_per_job": 1,
+  "maximum_requested_walltime": "00:30:00",
+  "elapsed_source": "PBS qstat -ll -H; queue time excluded"
+}

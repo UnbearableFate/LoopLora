@@ -1,0 +1,14 @@
+{
+  "config_hash": "c0b80cc590127ad9761071171740cf70",
+  "depth": 1,
+  "git_commit": "ad6086ee6962830f4dfc63bc28211a8f57fd5a6c",
+  "lr": 0.003,
+  "name": "p-writer-lr0.003",
+  "run_dir": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p1s/f2/pilot-writers/shard-00/p-writer-lr0.003",
+  "seed": 17,
+  "steps": 5000,
+  "train_seconds": 138.71726951817982,
+  "val_accuracy": 0.865,
+  "variant": "B4",
+  "writer": "joint_fact"
+}

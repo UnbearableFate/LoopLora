@@ -1,0 +1,208 @@
+{
+  "E": 12,
+  "config_hash": "c0b80cc590127ad9761071171740cf70",
+  "convergence": {
+    "final_step": 5000,
+    "loss_tail_early": 0.45019968450069425,
+    "loss_tail_late": 0.43820984959602355,
+    "plateau_2pct": false,
+    "relative_loss_improvement": 0.026632259678210004
+  },
+  "head_multiplicity": {
+    "multiple_relation_specific_facts": {
+      "accuracy": 0.8017817371937639,
+      "chance_accuracy": 0.04972393427992101,
+      "max_write_age": 11,
+      "mean_first_read_cosine": 0.7143769860267639,
+      "mean_memory_norm": 4.177189826965332,
+      "mean_write_age": 5.184855233853007,
+      "min_write_age": 0,
+      "n_correct": 360,
+      "n_finite_first_read_cosine": 449,
+      "n_queries": 449
+    },
+    "one_fact": {
+      "accuracy": 0.9165154264972777,
+      "chance_accuracy": 0.04725350262662774,
+      "max_write_age": 11,
+      "mean_first_read_cosine": 0.7839339971542358,
+      "mean_memory_norm": 4.19516658782959,
+      "mean_write_age": 5.279491833030853,
+      "min_write_age": 0,
+      "n_correct": 505,
+      "n_finite_first_read_cosine": 551,
+      "n_queries": 551
+    }
+  },
+  "head_multiplicity_and_last_write": {
+    "multiple_relation_specific_facts/last": {
+      "accuracy": 0.8918918918918919,
+      "chance_accuracy": 0.049446777230631046,
+      "max_write_age": 10,
+      "mean_first_read_cosine": 0.7506598234176636,
+      "mean_memory_norm": 4.1847758293151855,
+      "mean_write_age": 2.626126126126126,
+      "min_write_age": 0,
+      "n_correct": 198,
+      "n_finite_first_read_cosine": 222,
+      "n_queries": 222
+    },
+    "multiple_relation_specific_facts/not_last": {
+      "accuracy": 0.7136563876651982,
+      "chance_accuracy": 0.0499949865483896,
+      "max_write_age": 11,
+      "mean_first_read_cosine": 0.6788934469223022,
+      "mean_memory_norm": 4.16977071762085,
+      "mean_write_age": 7.687224669603524,
+      "min_write_age": 1,
+      "n_correct": 162,
+      "n_finite_first_read_cosine": 227,
+      "n_queries": 227
+    },
+    "one_fact/last": {
+      "accuracy": 0.9165154264972777,
+      "chance_accuracy": 0.04725350262662774,
+      "max_write_age": 11,
+      "mean_first_read_cosine": 0.7839339971542358,
+      "mean_memory_norm": 4.19516658782959,
+      "mean_write_age": 5.279491833030853,
+      "min_write_age": 0,
+      "n_correct": 505,
+      "n_finite_first_read_cosine": 551,
+      "n_queries": 551
+    },
+    "one_fact/not_last": {
+      "accuracy": null,
+      "chance_accuracy": null,
+      "max_write_age": null,
+      "mean_first_read_cosine": null,
+      "mean_memory_norm": null,
+      "mean_write_age": null,
+      "min_write_age": null,
+      "n_correct": 0,
+      "n_finite_first_read_cosine": 0,
+      "n_queries": 0
+    }
+  },
+  "joined_answers_equivalent": true,
+  "lr": 0.003,
+  "name": "p-writer-lr0.003",
+  "overall": {
+    "accuracy": 0.865,
+    "chance_accuracy": 0.048362726438956415,
+    "max_write_age": 11,
+    "mean_first_read_cosine": 0.7527028918266296,
+    "mean_memory_norm": 4.1870951652526855,
+    "mean_write_age": 5.237,
+    "min_write_age": 0,
+    "n_correct": 865,
+    "n_finite_first_read_cosine": 1000,
+    "n_queries": 1000
+  },
+  "queried_fact_is_last_write_for_head": {
+    "no": {
+      "accuracy": 0.7136563876651982,
+      "chance_accuracy": 0.0499949865483896,
+      "max_write_age": 11,
+      "mean_first_read_cosine": 0.6788934469223022,
+      "mean_memory_norm": 4.16977071762085,
+      "mean_write_age": 7.687224669603524,
+      "min_write_age": 1,
+      "n_correct": 162,
+      "n_finite_first_read_cosine": 227,
+      "n_queries": 227
+    },
+    "yes": {
+      "accuracy": 0.9094437257438551,
+      "chance_accuracy": 0.04788339520371536,
+      "max_write_age": 11,
+      "mean_first_read_cosine": 0.7743778824806213,
+      "mean_memory_norm": 4.192182540893555,
+      "mean_write_age": 4.517464424320828,
+      "min_write_age": 0,
+      "n_correct": 703,
+      "n_finite_first_read_cosine": 773,
+      "n_queries": 773
+    }
+  },
+  "r": 32,
+  "reconstructed_episode_count": 1000,
+  "run_dir": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p1s/f2/pilot-writers/shard-00/p-writer-lr0.003",
+  "runtime": {
+    "device": "cuda:0",
+    "dtype": "float32",
+    "gpu": "NVIDIA GH200 120GB",
+    "host": "mg0014",
+    "job_id": "3713453.opbs",
+    "python": "3.13.13",
+    "threads": 1,
+    "torch": "2.14.0+cu132"
+  },
+  "samples": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p1s/f2/pilot-writers/shard-00/p-writer-lr0.003/samples.npz",
+  "selection_accuracy": 0.865,
+  "write_age_quartiles": {
+    "boundary_rule": "Q1 <= p25; Q2 > p25 and <= p50; Q3 > p50 and <= p75; Q4 > p75; ties stay together",
+    "cutpoints": [
+      2.0,
+      5.0,
+      8.0
+    ],
+    "definition": "number of valid fact writes after the queried fact; lower age is more recent",
+    "groups": {
+      "Q1": {
+        "accuracy": 0.9411764705882353,
+        "chance_accuracy": 0.04833488287990214,
+        "max_write_age": 2,
+        "mean_first_read_cosine": 0.7861106991767883,
+        "mean_memory_norm": 4.194120407104492,
+        "mean_write_age": 0.9826989619377162,
+        "min_write_age": 0,
+        "n_correct": 272,
+        "n_finite_first_read_cosine": 289,
+        "n_queries": 289
+      },
+      "Q2": {
+        "accuracy": 0.8910505836575876,
+        "chance_accuracy": 0.04808705822285479,
+        "max_write_age": 5,
+        "mean_first_read_cosine": 0.772593080997467,
+        "mean_memory_norm": 4.198006629943848,
+        "mean_write_age": 4.0778210116731515,
+        "min_write_age": 3,
+        "n_correct": 229,
+        "n_finite_first_read_cosine": 257,
+        "n_queries": 257
+      },
+      "Q3": {
+        "accuracy": 0.8461538461538461,
+        "chance_accuracy": 0.048545808699380154,
+        "max_write_age": 8,
+        "mean_first_read_cosine": 0.7429860830307007,
+        "mean_memory_norm": 4.169023513793945,
+        "mean_write_age": 7.0542986425339365,
+        "min_write_age": 6,
+        "n_correct": 187,
+        "n_finite_first_read_cosine": 221,
+        "n_queries": 221
+      },
+      "Q4": {
+        "accuracy": 0.759656652360515,
+        "chance_accuracy": 0.04852767210655796,
+        "max_write_age": 11,
+        "mean_first_read_cosine": 0.698543131351471,
+        "mean_memory_norm": 4.183486461639404,
+        "mean_write_age": 10.068669527896995,
+        "min_write_age": 9,
+        "n_correct": 177,
+        "n_finite_first_read_cosine": 233,
+        "n_queries": 233
+      }
+    }
+  },
+  "writer": "joint_fact",
+  "writer_gates": {
+    "beta": 0.1629791259765625,
+    "lambda": 0.9999630451202393,
+    "source": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p1s/f2/pilot-writers/shard-00/p-writer-lr0.003/checkpoint.pt"
+  }
+}

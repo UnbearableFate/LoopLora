@@ -1,0 +1,4 @@
+name,writer,seed,n,accuracy,full_accuracy,chance_accuracy
+f2-writer-s17,joint_fact,17,1000,0.918,0.669,0.048362726438956415
+f2-writer-s29,joint_fact,29,1000,0.912,0.618,0.048362726438956415
+f2-writer-s43,joint_fact,43,1000,0.924,0.688,0.048362726438956415

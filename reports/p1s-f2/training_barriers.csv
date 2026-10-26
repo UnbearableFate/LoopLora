@@ -1,0 +1,5 @@
+shard,status,training_stages,plan_hash,created_at,receipt
+0,passed,39,258c6caff388e6fab06b237b1dbdf7b1,2026-10-26T14:19:14.692222+00:00,runs/p1s/f2/training_barriers/shard-00.json
+1,passed,39,258c6caff388e6fab06b237b1dbdf7b1,2026-10-26T14:32:58.973917+00:00,runs/p1s/f2/training_barriers/shard-01.json
+2,passed,39,258c6caff388e6fab06b237b1dbdf7b1,2026-10-26T14:33:05.019016+00:00,runs/p1s/f2/training_barriers/shard-02.json
+3,passed,39,258c6caff388e6fab06b237b1dbdf7b1,2026-10-26T14:33:08.611799+00:00,runs/p1s/f2/training_barriers/shard-03.json

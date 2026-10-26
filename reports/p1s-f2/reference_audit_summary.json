@@ -1,0 +1,16 @@
+{
+  "status": "passed",
+  "reference_commit": "758c06a",
+  "reference_plan": "/work/xg24i002/x10041/LoopLora-wt/symf/reports/p1s/plan.json",
+  "reference_barrier": "/work/xg24i002/x10041/LoopLora-wt/symf/reports/p1s/barrier.json",
+  "reference_plan_hash": "badd390003095b54e8cc3df07d75f035",
+  "reference_run_count": 12,
+  "reference_sample_rows": 1728000,
+  "f2_plan_hash": "258c6caff388e6fab06b237b1dbdf7b1",
+  "f2_sample_barrier_created_at": "2026-10-26T14:40:16.354738+00:00",
+  "f2_training_barrier_checked_before_reference_at": "2026-10-26T14:42:15.045490+00:00",
+  "all_episode_query_hop_answer_labels_paired": true,
+  "depth_effects_jointly_resampled": true,
+  "gating": false,
+  "full_audit": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p1s/f2/analysis/reference_audit.json"
+}

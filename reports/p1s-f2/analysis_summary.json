@@ -1,0 +1,12 @@
+{
+  "status": "complete",
+  "runs": 39,
+  "reader_runs": 36,
+  "gate_rows": 4,
+  "confirmation_look_count": 1,
+  "replication_required": false,
+  "passing_rows": [],
+  "completed_at": "2026-10-26T14:42:14.361891+00:00",
+  "cross_family": "complete",
+  "cross_family_completed_at": "2026-10-26T14:42:22.405189+00:00"
+}

@@ -1,0 +1,13 @@
+writer,variant,lr,val_accuracy
+t1_frozen_fact,M1,0.003,0.2783333333333333
+t1_frozen_fact,M1-lin,0.003,0.2806666666666667
+t1_frozen_fact,B5,0.001,0.291
+t1_frozen_fact,B5-lin,0.001,0.29133333333333333
+t1_frozen_fact,B3,0.001,0.08
+t1_frozen_fact,B4,0.001,0.29333333333333333
+joint_fact,M1,0.003,0.268
+joint_fact,M1-lin,0.003,0.31266666666666665
+joint_fact,B5,0.003,0.29033333333333333
+joint_fact,B5-lin,0.003,0.30133333333333334
+joint_fact,B3,0.001,0.08266666666666667
+joint_fact,B4,0.003,0.303
