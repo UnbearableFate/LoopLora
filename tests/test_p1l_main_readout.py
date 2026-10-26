@@ -12,6 +12,7 @@ from transformers import Qwen3Config, Qwen3ForCausalLM
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
 from readout_p1l import (name_gradients, normalize_directions, path_entities,
                          read_batch, reader_states)
+import evaluate_p1l_main as evaluator
 from run_p1l_main import LABELS, config
 from looplora.core.adapters import make_adapter
 from looplora.core.config import AdapterConfig
@@ -109,3 +110,32 @@ def test_final_logit_lens_replays_actual_model_with_nonzero_branch(variant):
         assert any(not np.array_equal(outputs[0][kind], outputs[-1][kind]) for kind in outputs[0])
     finally:
         experiment.close()
+
+
+def test_swap_wrapper_preserves_source_queries_and_writes_reproducible_counts(monkeypatch, tmp_path):
+    model, tokenizer = tiny(151936).cuda().to(torch.bfloat16), load_tokenizer()
+    cfg = resolve_config(config("M1-L4"))
+    cfg["model"]["layer"] = 0
+    cfg["eval"]["batch_size"] = 4
+    # The scientific helper's requested test range is intercepted: this test
+    # only consumes a two-episode validation fixture, never confirmation data.
+    spec = make_task_spec(cfg, evaluation=True)
+    fixture = evaluator.stratify_queries(generate(spec, "val", 0, 2, 4242),
+                                        spec, cfg["eval"]["hops"], 4242)
+    monkeypatch.setattr(evaluator, "generate", lambda *args, **kwargs: fixture)
+    experiment = LLMExperiment(cfg, model=model, tokenizer=tokenizer)
+    try:
+        result = evaluator.swap_successors(experiment, cfg, tmp_path)
+    finally:
+        experiment.close()
+    assert result["episodes"] == 2
+    with np.load(tmp_path / "swap-successors-samples.npz", allow_pickle=False) as source:
+        arrays = {key: source[key] for key in source.files}
+    assert set(arrays["episode_id"]) == set(fixture.episode_seed)
+    assert set(arrays["L"]) == {1, 4, 8}
+    assert set(arrays["query_id"]) == set(range(8))
+    assert len(arrays["L"]) == 2 * 8 * 3
+    for row in result["table"]:
+        keep = (arrays["L"] == row["L"]) & (arrays["hop"] == row["hop"])
+        assert row["n"] == 2
+        assert row["follows_new"] == (arrays["prediction"][keep] == arrays["answer"][keep]).mean()
