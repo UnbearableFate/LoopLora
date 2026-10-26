@@ -1,8 +1,11 @@
 # P1-L oracle-random main study
 
 The authoritative science is `docs/prereg/P1L.md`, including B2. Design and
-per-step/J-lens-inspired name-gradient probe definitions are in `design-lock.md`, including A1. No confirmation
-evaluation is authorized yet. S17000; Pilot-2 5666steps, seed17, lr.001/.003.
+per-step/J-lens-inspired name-gradient probe definitions are in `design-lock.md`, including A1.
+B5 fixes only the two oracle ranks, k2/CI97.5%; no learned writer was selected.
+Confirmation is authorized after10/28 22:00JST and all37 main runs complete,
+without another permission request; until then it is held. See confirmation-lock.json.
+S17000; Pilot-2 5666steps, seed17, lr.001/.003.
 The900-step timing-only smokes remain valid by the orchestrator's B2 instruction.
 
 Raw root: `/work/xg24i002/x10041/LoopLora/runs/p1l/main` (called R below).
@@ -28,9 +31,9 @@ must run on Miyabi-G via scripts/submit.py, from a committed source snapshot.
 6. On login: `scripts/launch_p1l_main.py main --root R --sizing reports/p1l/smoke-sizing.json`.
    B4/B3 share a job sequentially; other variants have one run/job. Three seeds
    each, plus the untrained B0. R/training-manifest.json maps every artifact.
-7. Hold confirmation until all runs in ALL conditions finish AND the orchestrator
-   supplies WP-L4's decision. B3 adds r128; fix confidence=1-.05/k before any
-   confirmation. Commit authorization with statusallowed, gated_conditions=k,
+7. B5 supplies WP-L4's decision: no learned writer, k2/CI97.5% fixed now.
+   Hold confirmation until all37 runs finish AND10/28 22:00JST. Then proceed
+   without asking again. Commit authorization with statusallowed, gated_conditions=2,
    condition_manifests={oracle-r32:ABS_MANIFEST,oracle-r128:ABS_MANIFEST,...},
    and orchestrator_decision text. Each manifest has its matching condition/rank.
    `evaluate_p1l_main.py` checks every main checkpoint against the locked matrix
@@ -71,5 +74,7 @@ resolved instead of explicit worker source) remain in the job ledger.
 Refresh node-hours on login with
 `/usr/bin/python3 scripts/p1l_job_ledger.py --out reports/p1l/jobs.json`.
 Every job goes through submit.py; each request includes measured1.5margin,
-never exceeds2hours, and must finish before2026-10-28 09:00JST. Long waits use
+never exceeds2hours. The original finish-before10/28 09:00 rule is superseded
+by B5 and the operation schedule: normal operation ends10/27 08:00; remaining
+training and confirmation run after10/28 22:00JST. Long waits use
 the Miyabi wakeup skill in Codex message mode (no Goal exists in this session).

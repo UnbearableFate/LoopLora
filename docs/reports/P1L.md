@@ -1,5 +1,10 @@
 # WP-P1L — in progress
 
+B5/master6de902b merged: WP-L4 selected no learned writer. Conditions are the
+two oracle ranks, k2, gate CIs97.5% fixed in confirmation-lock.json before any
+confirmation. After10/28 22:00 and all37 runs complete, evaluation is authorized
+without another permission request; until then confirmation remains held.
+
 Operation-window correction06:50JST: normal operation ends10/27 08:00 per
 /etc/motd. Orchestrator authorized post10/28 22:00 confirmation and retaining
 B1/B2s43 queued. Four unstarted B4+B3 packs were cancelled and replaced by
@@ -19,7 +24,8 @@ Single GPU process, sequential backbone reuse, prefetch2. Smoke timing audit
 all other trained readers lr.001; lr/S/config lockd644b9b precedes main.
 R32 main jobs3716288–3716306 submitted (19jobs/22runs), one node each,
 maximum request1h55min, B4/B3 pairs sequentially packed.
-Confirmation remains held for all main runs and the WP-L4 decision.
+Confirmation remains held for all main runs and the post-maintenance window;
+B5 supplies the WP-L4 decision and fixes k2/CI97.5%.
 Amendment B3 adds oracle r128 (15runs, own Pilot-2, B0–B2 reused); confirmation
 is now held for ALL conditions, with confidence1-.05/k fixed beforehand.
 B4 removes cross-rank single-read contrasts and adds descriptive adapter counts/

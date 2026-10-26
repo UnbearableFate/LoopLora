@@ -18,9 +18,9 @@ The main runner refuses to run without `reports/p1l/lr-S-lock.json`.
   Candidates are .001/.003, seed17, floor(S/3) steps. Smoke reads timing and
   memory only. No test/screening evaluation is planned before confirmation.
 - Confirmation: test [100000,102000), seed4242; held until every primary and
-  B0/B1/B2 training run in EVERY condition is complete and Claude Code confirms
-  the WP-L4 decision. B3 fixes confidence=1-.05/k, where k counts the two oracle
-  ranks plus any learned condition, before the first confirmation evaluation.
+  B0/B1/B2 training run in EVERY condition is complete. B5 supplies Claude Code's
+  WP-L4 decision: only the two oracle ranks, k2 and97.5% CIs, and confirms the
+  post10/28 22:00JST evaluation schedule without another permission request.
   Joint episode resampling across fixed seeds,2000draws. G1/G2 follow the preregistration.
 - Typed replication uses the same checkpoints: E12 total facts, 3 same-head
   distractors, chains (8,1), relations1/2/3 as distractors; this matches the
@@ -74,8 +74,8 @@ fraction whose top1 name equals the actual model's top1 name among all1024 names
 Full-vocabulary EM remains the scientific endpoint; the faithfulness reference
 is the model's name-restricted argmax. The orchestrator accepted the residual
 space and512-question frozen-backbone definition. Confirmation remains held
-until its explicit WP-L4 decision and all conditions finish training. B3
-supersedes the original one/two-writer CI rule with confidence=1-.05/k above.
+until all conditions finish training and the B5 post-maintenance window opens.
+B5 supplies the explicit WP-L4 decision, with B3's formula fixed at k2/97.5%.
 
 ## Cost and artifacts
 
@@ -91,6 +91,11 @@ capture or hashing is timed. The production score path includes its CE
 calculation; tokenization and support writing are excluded. Report mean/median
 amortized seconds per question, batch size, protocols and raw batch durations.
 These timings are descriptive and do not change the scientific gates.
+
+Amendment B5 (master6de902b, received before confirmation) fixes the gated set:
+oracle-r32 and oracle-r128 only, no learned writer selected, k2 and97.5% CIs.
+Confirmation-lock.json records this now. Confirmation is authorized after
+2026-10-28 22:00JST AND all37 main runs finish, without another permission request.
 
 Amendment B2 supersedes the original total cap and B1's13/16node-hour limits.
 S=17000, Pilot-2=floor(S/3)=5666, fixed before any Pilot-2 score. The900-step

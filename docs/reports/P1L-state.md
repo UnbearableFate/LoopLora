@@ -2,11 +2,20 @@
 
 ## URGENT operation-window correction — orchestrator 2026-10-27 06:50JST
 
+Amendment B5 received and master6de902b MERGED (merge1940030).
+WP-L4 selected NO learned writer: do not run a learned
+condition. k=2 (oracle-r32/oracle-r128), every gate CI97.5%, fixed now in
+reports/p1l/confirmation-lock.json, before any confirmation. After10/28 22:00
+AND every run of BOTH conditions is complete, create the allowed authorization
+from this lock and PROCEED WITHOUT ASKING AGAIN. The orchestrator explicitly
+authorized that continuation. Until then all confirmation remains held.
+
 `/etc/motd` confirms NORMAL OPERATION ENDS TODAY10/27 08:00JST (HPC Challenge
 until10/28 09:00, then maintenance until10/28 22:00). The prior assumption that
 jobs could start up to10/28 09:00 was wrong. Orchestrator explicitly authorizes
 confirmation after10/28 22:00, and leaving B1/B2-s43 queued until then.
-Confirmation remains HELD for all main runs and the explicit WP-L4 decision.
+Confirmation remains HELD for all main runs and the post-maintenance window;
+B5 provides the explicit WP-L4 decision and fixes k2/CI97.5% now.
 
 At06:51JST replaced exactly four QUEUED, unstarted B4+B3 packs with eight
 single-run jobs. Original source/configs/seeds/S17000/lrs preserved:
@@ -43,8 +52,8 @@ The old r128 watcher404cd2e5 watches CANCELLED3716407: acknowledge its wakeup,
 but this means no training succeeded; inspect replacement singles and arm an
 appropriate remaining replacement job only after reconciling the existing event.
 This cancellation wakeup was delivered and acknowledged06:55JST (no start/no
-elapsed time, no successful workload). Arrange new pre-boundary completion
-watcher on3716619; retain the existing post-maintenance3716305 watcher.
+elapsed time, no successful workload). The new pre-boundary completion
+watcher is3716619; retain the existing post-maintenance3716305 watcher.
 Replacement completion watcher is ARMED: .job-wakeup/187e742c-1c41-4da5-8700-cc998c31ce5e,
 worker PID2813469, exact job3716619. It checks all pre-boundary completions.
 Rank32 watcher3716305 remains pending for the post-maintenance B2 completion.
@@ -70,6 +79,8 @@ Armed wakeups (message mode,300s polling, no Goal):
   worker PID2276624; verify all19 jobs/22 run artifacts on wake.
 - cancelled r128 pack3716407: .job-wakeup/404cd2e5-fa6f-482e-beb3-11f09a424a15,
   acknowledged06:55JST; pack never ran. Its replacements are3716618/3716619.
+- replacement completion3716619: .job-wakeup/187e742c-1c41-4da5-8700-cc998c31ce5e,
+  worker PID2813469; inspect all pre-boundary main completions, retain post-maintenance watcher.
 - early queue-progress3716290: .job-wakeup/e098924a-8adc-43d9-b03c-063317e048ab,
   acknowledged; queue movement verified06:17JST. No replacement needed.
 Read the event state and acknowledge with the exact argv from the wakeup
@@ -87,11 +98,10 @@ message. Do not register duplicates or cancel the other pending watcher.
   confirmation after10/28 22:00. B2 accepts the900-step timing smokes.
 - Single GPU process, sequential backbone reuse, prefetch2. Oracle seed17 fixed.
   Main will pack B4/B3 sequentially; other trained variants separate jobs.
-- Confirmation is HELD. Orchestrator has NOT decided WP-L4; it promises to
-  message the decision. B3 supersedes the old writer-count CI rule: k counts
-  oracle-r32,oracle-r128,plus any learned condition; confidence=1-.05/k fixed
-  before the first confirmation. ALL conditions must finish training first.
-  Proceed with oracle pilots/main while holding all test/confirmation data.
+- Confirmation is HELD for remaining training and the post-maintenance window.
+  B5/master6de902b: WP-L4 selected no learned writer; only oracle-r32/oracle-r128,
+  k=2, confidence97.5% fixed before confirmation. After10/28 22:00 AND ALL37
+  main runs complete, proceed without asking again. No learned condition.
 - B3 merged masterdf21654 at04:33JST: parallel r128,5readers x3seeds, its own
   Pilot-2; B0/B1/B2 shared fromr32. Configs configs/p1l/main-r128, outputs
   R/r128 and reports/p1l/r128. Design locked7503f54 before any r128 training.
@@ -237,12 +247,14 @@ separately; unchanged regression passed3715942). No further blanket retests.
 1. Validation-only evaluation acceptance is complete; never read its raw scores.
 2. Both pilot wakeups acknowledged; r32 lock/configs committed and main running.
    R128 lock/configs committed; main submitted. Both condition manifests exist.
-3. R32 main3716305 wakeup armed. At either wake preserve
-   the other pending event; independently advance whichever rank is ready.
-4. Rank128 end3716407 is armed; early progress3716290 acknowledged and queue
-   movement verified06:17. Keep both end watchers and return idle while training.
+3. Replacement3716619 and post-maintenance3716305 wakeups are armed. Preserve
+   both. The old3716407 cancellation wakeup is acknowledged; it was not a run.
+4. At the replacement wake, verify all pre-boundary jobs/checkpoints complete,
+   record the remaining three queued jobs and retain3716305 for10/28 22:00.
+   At the post-maintenance wake, verify ALL37 runs, then release confirmation
+   with k2/CI97.5% under B5 without requesting permission again.
 
-## Next actions after each rank's pilot wakeup
+## Completed pilot procedure (historical; do not rerun)
 
 1. Read/ack wakeup state per skill; inspect ALL7 pilot jobs and records.
    A FINISH alone is insufficient. Require exit0 and record.statuscomplete
@@ -264,7 +276,9 @@ separately; unchanged regression passed3715942). No further blanket retests.
 4. Use wakeup message mode for main wait. No implicit Goal creation.
    Endpoint from existing daemon: unix:///home/x10041/.codex/app-server-control/app-server-control.sock.
    Watcher: /work/xg24i002/x10041/.codex/skills/miyabi-pbs-goal-wakeup/scripts/job_wakeup.py.
-5. After ALL conditions' main jobs complete AND explicit WP-L4 decision arrives,
+5. B5 decision is received: NO learned writer, k2/CI97.5%. After ALL main jobs
+   complete AND10/28 22:00JST has passed, proceed without asking again. Use the
+   fixed reports/p1l/confirmation-lock.json to
    commit authorization JSON {status:allowed,gated_conditions:k,
    condition_manifests:{oracle-r32:ABS_MANIFEST,oracle-r128:ABS_MANIFEST,...},
    orchestrator_decision:text}. Global gate checks matching condition/rank
@@ -290,6 +304,4 @@ separately; unchanged regression passed3715942). No further blanket retests.
    Also write reports/decisions/P1L.md per prereg. Commit own paths only.
    Do not merge/push other branches. Reply final exact done line only at end.
 
-If WP-L4 selects a writer and orchestrator adds the learned condition, run that
-condition under its addendum with the same staged procedure. Await concrete
-writer/checkpoint/interface instructions; do not invent a learned condition.
+B5 closes the learned-writer branch: no writer was selected, no learned condition.
