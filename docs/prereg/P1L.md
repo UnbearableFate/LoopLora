@@ -1,6 +1,6 @@
 # P1-L pre-registration — single module in Qwen3-0.6B-Base (draft v2, 2026-10-27)
 
-Status: **draft v2** (2026-10-27 03:19 JST; writer conditions revised 03:55 JST). Written after P2-S-F1
+Status: **draft v2** (2026-10-27 03:19 JST; writer conditions revised 03:43 JST). Written after P2-S-F1
 (`reports/decisions/P2S.md` §6) and WP-L3 (`docs/reports/P1L-writer-fix.md`), before any P1-L T2 run; no T2 result
 exists. Finalised before Pilot-2, when WP-L4 has decided and WP-C7 (oracle writer in the LLM pipeline) has passed
 its tests.
