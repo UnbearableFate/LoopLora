@@ -1,0 +1,17 @@
+{
+  "capability_scope": "oracle and joint_fact at tested budgets",
+  "failing_capability_rows": [],
+  "reader_for_P1L": "B8",
+  "sharing_CI_positive": {
+    "joint": true,
+    "joint_fact": true,
+    "oracle_random": true
+  },
+  "shortcut_free_capability_passed": true,
+  "training_depth_by_writer": {
+    "joint": "fixed L=4",
+    "joint_fact": "fixed L=4",
+    "oracle_random": "fixed L=4"
+  },
+  "training_depth_rule": "Use the listed F-E2 outcome for the writer carried into P1-L; writer choice is not selected by this follow-up"
+}
