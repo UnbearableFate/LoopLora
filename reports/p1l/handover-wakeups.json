@@ -1,0 +1,54 @@
+{
+  "no_armed_events": true,
+  "events": [
+    {
+      "event": "ee3ad75d-7773-4f90-92d8-b0bc5660b157",
+      "path": "/work/xg24i002/x10041/LoopLora-wt/p1l/.job-wakeup/ee3ad75d-7773-4f90-92d8-b0bc5660b157",
+      "status": "acknowledged",
+      "job_id": "3715965.opbs",
+      "worker_pid": 2041468
+    },
+    {
+      "event": "187e742c-1c41-4da5-8700-cc998c31ce5e",
+      "path": "/work/xg24i002/x10041/LoopLora-wt/p1l/.job-wakeup/187e742c-1c41-4da5-8700-cc998c31ce5e",
+      "status": "cancelled",
+      "job_id": "3716619.opbs",
+      "worker_pid": 2813469
+    },
+    {
+      "event": "404cd2e5-fa6f-482e-beb3-11f09a424a15",
+      "path": "/work/xg24i002/x10041/LoopLora-wt/p1l/.job-wakeup/404cd2e5-fa6f-482e-beb3-11f09a424a15",
+      "status": "acknowledged",
+      "job_id": "3716407.opbs",
+      "worker_pid": 2354422
+    },
+    {
+      "event": "e098924a-8adc-43d9-b03c-063317e048ab",
+      "path": "/work/xg24i002/x10041/LoopLora-wt/p1l/.job-wakeup/e098924a-8adc-43d9-b03c-063317e048ab",
+      "status": "acknowledged",
+      "job_id": "3716290.opbs",
+      "worker_pid": 2354519
+    },
+    {
+      "event": "27808c33-f6d6-4f4d-b9d7-ca4e673c498b",
+      "path": "/work/xg24i002/x10041/LoopLora-wt/p1l/.job-wakeup/27808c33-f6d6-4f4d-b9d7-ca4e673c498b",
+      "status": "acknowledged",
+      "job_id": "3716021.opbs",
+      "worker_pid": 2012956
+    },
+    {
+      "event": "a101bbc0-d502-4bf4-8978-4e613b043510",
+      "path": "/work/xg24i002/x10041/LoopLora-wt/p1l/.job-wakeup/a101bbc0-d502-4bf4-8978-4e613b043510",
+      "status": "cancelled",
+      "job_id": "3716305.opbs",
+      "worker_pid": 2276624
+    },
+    {
+      "event": "d921e843-f2a6-44ff-82e7-83cb3267c07f",
+      "path": "/work/xg24i002/x10041/LoopLora-wt/p1l/.job-wakeup/d921e843-f2a6-44ff-82e7-83cb3267c07f",
+      "status": "acknowledged",
+      "job_id": "3716169.opbs",
+      "worker_pid": 2200345
+    }
+  ]
+}

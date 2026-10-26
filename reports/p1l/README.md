@@ -76,5 +76,6 @@ Refresh node-hours on login with
 Every job goes through submit.py; each request includes measured1.5margin,
 never exceeds2hours. The original finish-before10/28 09:00 rule is superseded
 by B5 and the operation schedule: normal operation ends10/27 08:00; remaining
-training and confirmation run after10/28 22:00JST. Long waits use
-the Miyabi wakeup skill in Codex message mode (no Goal exists in this session).
+training and confirmation run after10/28 22:00JST. The closing Codex worker's
+wake-ups are all disabled; docs/reports/P1L-state.md is the successor handover.
+Future waits belong to the successor's own Claude session, never the old Codex thread.

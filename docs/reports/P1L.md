@@ -1,5 +1,9 @@
 # WP-P1L — in progress
 
+Worker handover2026-10-27: Codex role is closing; all armed Codex wake-ups were
+cancelled. Claude Sonnet-5.5 resumes after10/28 22:00. The complete current
+job/artifact inventory and ordered commands are in P1L-state.md. Study incomplete.
+
 B5/master6de902b merged: WP-L4 selected no learned writer. Conditions are the
 two oracle ranks, k2, gate CIs97.5% fixed in confirmation-lock.json before any
 confirmation. After10/28 22:00 and all37 runs complete, evaluation is authorized
@@ -36,7 +40,8 @@ lock1d1bbfd precedes all12 main jobs3716396–3716407 (15runs, one node/job,
 maximum2h; B4/B3 packed sequentially). See P1L-state.md for continuation.
 At06:17JST, B0 and two r32 B5 jobs exited0; two B4 records completed inside
 ongoing packs. Three r128 main jobs started as slots freed; other jobs are
-running/queued under the project16-job limit. Both end wakeups remain armed.
+running/queued under the project16-job limit. Those wake-ups were subsequently
+cancelled for the worker handover; no Codex resumption remains armed.
 No test or confirmation data have been accessed.
 
 Raw root: /work/xg24i002/x10041/LoopLora/runs/p1l/main/.

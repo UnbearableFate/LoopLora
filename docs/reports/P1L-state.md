@@ -1,307 +1,509 @@
-# wk-p1l continuation card — both ranks' main training submitted
+# WP-P1L handover — Codex worker closed
 
-## URGENT operation-window correction — orchestrator 2026-10-27 06:50JST
+Successor: Claude Sonnet-5.5 subagent under the orchestrator, resume after
+2026-10-28 22:00 JST. This is a handover, NOT study completion. No compute was
+started during handover. All Codex wake-ups were cancelled or already acknowledged;
+do not resume/re-arm Codex thread01a17999-7c19-7ac2-a6d2-cf6aee2583c0.
+Fresh status/artifact snapshots below are observations, not promises of completion.
 
-Amendment B5 received and master6de902b MERGED (merge1940030).
-WP-L4 selected NO learned writer: do not run a learned
-condition. k=2 (oracle-r32/oracle-r128), every gate CI97.5%, fixed now in
-reports/p1l/confirmation-lock.json, before any confirmation. After10/28 22:00
-AND every run of BOTH conditions is complete, create the allowed authorization
-from this lock and PROCEED WITHOUT ASKING AGAIN. The orchestrator explicitly
-authorized that continuation. Until then all confirmation remains held.
+## Binding decisions and locations
 
-`/etc/motd` confirms NORMAL OPERATION ENDS TODAY10/27 08:00JST (HPC Challenge
-until10/28 09:00, then maintenance until10/28 22:00). The prior assumption that
-jobs could start up to10/28 09:00 was wrong. Orchestrator explicitly authorizes
-confirmation after10/28 22:00, and leaving B1/B2-s43 queued until then.
-Confirmation remains HELD for all main runs and the post-maintenance window;
-B5 provides the explicit WP-L4 decision and fixes k2/CI97.5% now.
+Read docs/README.md, docs/tasks/WP-P1L_main.md, docs/prereg/P1L.md through B5,
+reports/p1l/design-lock.md, reports/p1l/README.md and this handover.
+Worktree/branch: /work/xg24i002/x10041/LoopLora-wt/p1l, wp/p1l.
+Set these shell variables in the successor's own session:
 
-At06:51JST replaced exactly four QUEUED, unstarted B4+B3 packs with eight
-single-run jobs. Original source/configs/seeds/S17000/lrs preserved:
-- r32s43: cancelled3716303 -> B4 3716612, B3-L4 3716613, sourced644b9b.
-- r128s17: cancelled3716399 -> B4 3716614, B3-L4 3716615, source1d1bbfd.
-- r128s29: cancelled3716403 -> B4 3716616, B3-L4 3716617, source1d1bbfd.
-- r128s43: cancelled3716407 -> B4 3716618, B3-L4 3716619, source1d1bbfd.
-Requested walltimes include ceil1.5*(S*measured_step+measured_overhead+30s
-load reserve): r32 B4 57m26s/B3 58m20s; r128 B4 57m38s/B3 58m21s.
-Each fit a07:58JST finish when submitted. Project11/16 running at submission;
-eight new jobs await assignment, so check which start before about06:59JST.
-At06:52:12–13, six replacements3716612–3716617 actually started (r32s43 both;
-r128s17/s29 both). Their requested ends are07:49:38–07:50:34JST. R128s43
-3716618/3716619 remain queued at the16-job limit; a further slot is expected
-when r128 B5-s17 finishes around06:58. Check whether either can start by the
-07:58 margin cutoff; keep any that cannot fit queued for post-maintenance.
-At06:58:28, seventh replacement r128 B3-L4-s43/3716619 STARTED; requested
-end07:56:49JST fits07:58. Its locked config was verified from the running record.
-R128 B4-s43/3716618 alone remains queued among replacements (project16-job
-limit); its latest07:58-compatible start is07:00:22. No further slot expected
-before that cutoff; leave it queued for10/28 22:00 if it cannot fit.
-Checked again after07:00:22:3716618 still QUEUED, forecast10/28 22:00; retain
-it for that window. Seven split runs were recovered before the boundary;
-remaining training after maintenance is B1-s43/B2-s43(r32) and B4-s43(r128).
-All seven actual starts and requested ends verified in
-reports/p1l/dedicated-boundary-starts.json. Do not count cancelled packs as runs.
-Do not cancel/alter B1/B2s43 jobs3716304/3716305: retain for10/28 22:00.
-Exact evidence reports/p1l/dedicated-boundary-splits.json; one-time stdlib
-control script scripts/split_p1l_packed_jobs.py. It must NOT be rerun blindly.
-Both main-jobs.json files preserve cancelled receipts under superseded_jobs;
-training manifests now map replacement paths and retain22/15 run identities.
-Rank32 now20 active receipts; rank12815 (cancelled packs retained separately).
-The old r128 watcher404cd2e5 watches CANCELLED3716407: acknowledge its wakeup,
-but this means no training succeeded; inspect replacement singles and arm an
-appropriate remaining replacement job only after reconciling the existing event.
-This cancellation wakeup was delivered and acknowledged06:55JST (no start/no
-elapsed time, no successful workload). The new pre-boundary completion
-watcher is3716619; retain the existing post-maintenance3716305 watcher.
-Replacement completion watcher is ARMED: .job-wakeup/187e742c-1c41-4da5-8700-cc998c31ce5e,
-worker PID2813469, exact job3716619. It checks all pre-boundary completions.
-Rank32 watcher3716305 remains pending for the post-maintenance B2 completion.
+```bash
+P1L_W=/work/xg24i002/x10041/LoopLora-wt/p1l
+P1L_R=/work/xg24i002/x10041/LoopLora/runs/p1l/main
+cd "$P1L_W"
+```
+
+R below means P1L_R. Authoritative mutable raw manifests are
+R/training-manifest.json (22 runs, oracle-r32) and
+R/r128/training-manifest.json (15 runs, oracle-r128). Committed copies and
+main-jobs.json receipts are in reports/p1l/ and reports/p1l/r128/ for handover.
+Use the RAW paths recorded in confirmation-lock.json for evaluation authorization.
+Every run directory contains config.json, record.json, train_log.jsonl,
+checkpoint.pt and, for oracle readers, writer.pt. The exact37 run/checkpoint paths
+and observed states/hashes are in reports/p1l/handover-artifacts.json and the table below.
+
+- B5/master6de902b merged by1940030. NO learned writer was selected; no learned
+  condition and no P3. Exactly two oracle rank conditions; k=2, gate CIs97.5%,
+  locked BEFORE confirmation in reports/p1l/confirmation-lock.json.
+- Confirmation is already authorized, without another permission request, AFTER
+  2026-10-28 22:00 JST AND every run of BOTH conditions has completed training.
+  No test/confirmation data have yet been evaluated. Do not release early.
+- /etc/motd: normal operation ends10/27 08:00; HPC Challenge until10/28 09:00,
+  then maintenance until10/28 22:00. The old09:00 finish deadline is superseded
+  by the orchestrator/B5 post-maintenance schedule. Each job remains<=8nodes x2h;
+  actual implementation uses1node/job. B2 removed all study-total caps.
+- Both ranks S17000, Pilot-2 floor(S/3)=5666, seeds17/29/43, oracle seed17.
+  R32 selected M1-L4 lr.003, all other trained readers lr.001 (lockd644b9b).
+  R128 selected B8/M1-L4/B4/B5-L4 lr.003, B3-L4 lr.001 (lock1d1bbfd).
+  Configs configs/p1l/main/ and main-r128/ are locked; do not change them.
+- E12 chains(8,4), train hops1/2/3, batch64, prefetch2, layer14/o_proj,
+  Qwen3-0.6B-Base pinned da87bfb608c14b7cf20ba1ce41287e8de496c0cd, bf16 frozen
+  backbone/fp32 adapters. B8 primary; M1-L4 shared secondary; B4 single read;
+  B5-L4 fixed query; B3-L4 no memory. B0/B1/B2 shared from r32, not repeated.
+- Only SAME-RANK B8-versus-B4 comparisons gate. B4 removed the cross-rank
+  single-read contrasts. B8(r128)-B8(r32) remains descriptive only.
+
+## Wake-ups: all disabled for this closing session
+
+Both pending events were cancelled with job_wakeup.py cancel during handover:
+187e742c-1c41-4da5-8700-cc998c31ce5e (job3716619) and
+a101bbc0-d502-4bf4-8978-4e613b043510 (job3716305).
+The other five events are acknowledged, not armed. Verified no waiting/ready/
+sending/delivered/uncertain events remain; snapshot reports/p1l/handover-wakeups.json.
+PBS jobs themselves were NOT cancelled during handover. A successor may use its
+own Claude background wake-up workflow if necessary; never target this Codex session.
+
+## What happened at the operation boundary
+
+At06:51JST, with explicit orchestrator authorization, cancelled four QUEUED,
+unstarted packs and submitted eight single runs using the ORIGINAL source hashes,
+configs, seeds, S and lrs. Raw main-jobs.json files retain cancelled receipts under
+superseded_jobs; training manifests point to replacement paths.
+
+| Rank/seed | Cancelled pack (never ran) | B4 replacement | B3-L4 replacement |
+| --- | --- | --- | --- |
+| 32/43 | 3716303 | 3716612 | 3716613 |
+| 128/17 | 3716399 | 3716614 | 3716615 |
+| 128/29 | 3716403 | 3716616 | 3716617 |
+| 128/43 | 3716407 | 3716618 | 3716619 |
+
+3716612–3716617 started06:52;3716619 started06:58:28. All seven requested ends
+are<=07:56:49, within07:58 at1.5x measured time including load reserve. Verified
+their running records have unchanged configs. 3716618 did not get a slot before
+its07:00:22 cutoff and remains queued. Evidence dedicated-boundary-splits.json /
+dedicated-boundary-starts.json. Do NOT rerun split_p1l_packed_jobs.py.
+
+The three intentionally deferred runs, already submitted, are:
+
+| Run | PBS ID | Intended window | Raw run directory |
+| --- | --- | --- | --- |
+| r32 B1-s43 | 3716304 | after10/28 22:00 | R/main/B1-s43/B1-s43 |
+| r32 B2-s43 | 3716305 | after10/28 22:00 | R/main/B2-s43/B2-s43 |
+| r128 B4-s43 | 3716618 | after10/28 22:00 | R/r128/main/B4-s43/B4-s43 |
+
+These should start automatically when normal operation resumes. Do not duplicate
+them. At the07:21 snapshot25/37 records were complete; nine additional runs were
+still running and the three above were unstarted. The fresher snapshot/table
+below is authoritative for handover; requery after resumption.
+
+## What is verified already
+
+- Designea44bb6 and probe amendment A1b5d923c precede training/pilot scores.
+- R32 timing smokes3715854/3715855 passed900steps; B2 explicitly accepts this
+  ratio. Sizing3715950 passed, S17000 locked1dc8a76. All seven r32 Pilot-2 jobs
+  3715959–3715965 exited0, both candidates complete. Selection3716286 onmg0019.
+- R128 preflight3716009, full1700step smokes3716020/3716021, sizing3716162 passed;
+  S17000 feasible. All five pilots3716168–3716172 exited0, ten candidates complete.
+  Selection3716392 onmg0021. No smoke loss/quality was consumed.
+- Full frozen-backbone512-question validation gradient cache3715870 onmg0865:
+  R/jlens/directions.pt, blake2b16=9a76963e9587ae51db52b29188c004d8,
+  metadata R/jlens/record.json and reports/p1l/name-gradient-probe.json. Shared
+  across ranks because residual space, frozen model and questions are identical.
+- Runtime checks:3715857 passed33;3715889 gate/auth4;3715942 swap fixture1;
+  3716000 oracle/rank/reload34;3716014 B3 gates/config7;3716027 r128 readout3;
+  3716028 global-condition gate1;3716084 inference wrapper1;3716212 batching1;
+  3716225 exact residual/replay/batching5. No blanket rerun needed absent a new issue.
+- Full pinned-model validation-only eval acceptance3716226 onmg0022 passed exact
+  deployed-residual capture. M1 all-depth primary+typed+swap+readout200episodes
+  took72.89s; B1 both-protocol acceptance3716223 onmg0030 took18.05s. Timing-only
+  copies evaluation-timing-M1.json / evaluation-timing-B1.json; do not consume
+  the acceptance directories' quality artifacts for scientific selection.
+- B0 checkpoint3716306 onmg0019 has zero trainable parameters and recorded hash
+  6af601799a569397330e74196c99ebe8. All pilot/checkpoint sources are retained.
+- Handover checked only bounded scheduler/file metadata, statuses, expected config
+  fields and recorded hashes. Actual checkpoint digests for all37 must be
+  recomputed on compute before confirmation. No main failure.json was present.
+
+## Remaining steps, in order
+
+### 1. Resume after10/28 22:00 and let remaining training finish
+
+All runtime/tests/evaluation/statistics MUST use scripts/submit.py on Miyabi-G.
+Login is control only: no torch/numpy/project runtime imports, pytest or model work.
+Shared venv /work/xg24i002/x10041/LoopLora/.venv and offline HF cache are unchanged.
+Use the Miyabi PBS skills in the successor session.
+
+```bash
+/usr/bin/python3 -I /work/xg24i002/x10041/.codex/skills/miyabi-pbs-cmd/scripts/context.py --target-system Miyabi-G
+date -Is
+cat /etc/motd
+/usr/bin/python3 -I /work/xg24i002/x10041/.codex/skills/miyabi-pbs-cmd/scripts/qstat_json.py --fields job_id,job_name,status,start_date,elapsed_seconds
+/usr/bin/python3 scripts/p1l_job_ledger.py --out reports/p1l/jobs.json
+```
+
+Require each CURRENT job in R/main-jobs.json and R/r128/main-jobs.json to exit0
+(receipt log+'.exit'), every37 record.status complete, checkpoint present, no
+failure.json, correct seed/rank/S/lr and val-only training boundary. Ignore the
+four superseded cancelled packs for success checks; PBS FINISH without a start
+is cancellation, NOT successful training. Check every run, not just one late job.
+If any running/queued job remains, wait in the successor's own session. If a job
+failed, diagnose it and preserve artifacts; do not silently shorten/reseed/retune.
+
+Do NOT rerun launch_p1l_main.py: its original packing would recreate cancelled
+groups/unmap replacements, and its old absolute deadline rejects post-maintenance
+launches. The three remaining jobs already exist; use their exact receipts.
+
+### 2. Freeze authorization, then verify actual artifacts on compute
+
+Only once the date and ALL37 metadata checks pass, create the allowed file from
+the already committed B5 lock. Do not change the CI or condition count. The following
+is a FUTURE command; no allowed authorization has been created during handover.
+
+```bash
+/usr/bin/python3 -I - <<'PY'
+import json
+from datetime import datetime
+from pathlib import Path
+w=Path('/work/xg24i002/x10041/LoopLora-wt/p1l')
+a=json.loads((w/'reports/p1l/confirmation-lock.json').read_text())
+assert datetime.now().astimezone() >= datetime.fromisoformat(a['not_before'])
+assert a['gated_conditions']==2 and a['confidence']==.975
+n=0
+for path in a['condition_manifests'].values():
+    m=json.loads(Path(path).read_text())
+    jobs=json.loads((Path(path).parent/'main-jobs.json').read_text())
+    for job in jobs['jobs'].values():
+        assert int(Path(job['log']+'.exit').read_text())==0,job['job_id']
+    for name,directory in m['runs'].items():
+        d=Path(directory)
+        r=json.loads((d/'record.json').read_text())
+        assert r['status']=='complete' and (d/'checkpoint.pt').is_file(),name
+        assert not (d/'failure.json').exists(),name
+        n+=1
+assert n==37
+a['status']='allowed'
+out=w/'reports/p1l/confirmation-authorization.json'
+assert not out.exists(),'Inspect existing authorization; never rewrite after evaluation'
+out.write_text(json.dumps(a,indent=2)+'\n')
+PY
+git add reports/p1l/confirmation-authorization.json
+git commit -m 'WP-P1L: release B5 confirmation after all37 training completions'
+P1L_SOURCE="$(git rev-parse HEAD)"
+P1L_AUTH="$P1L_W/reports/p1l/confirmation-authorization.json"
+/usr/bin/python3 scripts/submit.py --name t-p1l-preconfirm --walltime 00:05:00 --commit "$P1L_SOURCE" --wait -- -c '
+import json,sys
+from pathlib import Path
+sys.path.insert(0,"scripts")
+from evaluate_p1l_main import check_training
+a=json.loads(Path("/work/xg24i002/x10041/LoopLora-wt/p1l/reports/p1l/confirmation-authorization.json").read_text())
+for path in a["condition_manifests"].values():
+    check_training(json.loads(Path(path).read_text()),a)
+print("All37 immutable checkpoints and global training boundary verified")
+'
+```
+
+Require that check's exit0 before evaluating. check_training hashes all actual
+checkpoints, checks the complete two-rank matrix and fixed S/lrs and training
+data boundary before any test episode generation. Commit authorization once;
+do not mutate it or the training manifests after evaluation starts (hashes bind
+the artifacts). Use full source hashes: submit.py resolves --commit HEAD in the
+CENTRAL checkout, not this worktree. Passing P1L_SOURCE above avoids that pitfall.
+
+### 3. Confirmation, typed replication, per-step readout and inference timing
+
+No evaluation jobs/artifacts/manifests exist yet. Evaluate each main checkpoint
+once, after the global check. This parameterized control-shell function submits
+13 groups (8 at r32 including B0;5 at r128), each one node through submit.py.
+The1h M1 request covers three runs at roughly10x the200-episode acceptance plus
+load/reserve and1.5 margin; B8 has fewer depths/swaps. Baselines measured18s per
+200episodes;20min covers three seeds. Keep every request<=2h; above1h requires
+--scale-up docs/prereg/P1L.md. Do not change science to fit a job.
+
+```bash
+set -euo pipefail
+submit_p1l_eval() {
+  local rank="$1" label="$2" root="$P1L_R" wall=00:15:00 queue=debug-g
+  local -a names=("$label-s17" "$label-s29" "$label-s43")
+  if [ "$rank" = 128 ]; then root="$P1L_R/r128"; fi
+  case "$label" in
+    M1-L4|B8) wall=01:00:00; queue=regular-g ;;
+    B1|B2) wall=00:20:00 ;;
+    B0) wall=00:10:00; names=(B0-s17) ;;
+  esac
+  test ! -e "$root/confirmation/$label"
+  /usr/bin/python3 scripts/submit.py --name "ev-p1l-r$rank-$label" \
+    --queue "$queue" --walltime "$wall" --commit "$P1L_SOURCE" -- \
+    scripts/evaluate_p1l_main.py --manifest "$root/training-manifest.json" \
+    --authorization "$P1L_AUTH" --out "$root/confirmation/$label" \
+    --runs "${names[@]}" --directions "$P1L_R/jlens/directions.pt" \
+    | tee -a "$P1L_R/confirmation-submissions.jsonl"
+}
+for label in B8 M1-L4 B4 B5-L4 B3-L4 B1 B2 B0; do submit_p1l_eval 32 "$label"; done
+for label in B8 M1-L4 B4 B5-L4 B3-L4; do submit_p1l_eval 128 "$label"; done
+```
+
+This block is a submission recipe, NOT an idempotent controller. If interrupted,
+inspect submission receipts and existing output directories before submitting
+only missing groups. Never blindly rerun it. Keep source and authorization fixed.
+Wait in the successor's own session, verify every evaluation record complete.
+
+evaluate_p1l_main.py performs primary + t2_typed on the SAME checkpoints,
+confirm=test[100000,102000), seed4242,2000episodes, all hops1–8. M1 scans L1–8;
+B8 stays L4. B0/B1/B2 report both protocols. For M1/B8 it also writes swap controls,
+per-step readout and final-step faithfulness, using the cached fixed directions.
+All readers get adapter stored/trainable counts and fixed-validation inference
+timing. Do NOT separately recache directions or retrain/retune based on these scores.
+
+Per-run evaluation files: record.json, primary/{samples.npz,metrics.json,config.json,
+timing.json}, typed/same, inference.json; M1/B8 additionally readout.json,
+swap-successors.json and swap-successors-samples.npz. readout.json contains ranks,
+top1/tied-top1 for entity steps1–4 at each reader step and s4 faithfulness.
+
+### 4. Build evaluation maps, audit and analyze on compute
+
+After ALL37 evaluation records complete, construct the two maps on login from
+metadata only. The exact path convention comes from the submission function.
+
+```bash
+/usr/bin/python3 -I - <<'PY'
+import json
+from pathlib import Path
+r=Path('/work/xg24i002/x10041/LoopLora/runs/p1l/main')
+for root in [r,r/'r128']:
+    m=json.loads((root/'training-manifest.json').read_text())
+    runs={name:str(root/'confirmation'/name.rsplit('-s',1)[0]/name) for name in m['runs']}
+    for name,path in runs.items():
+        assert json.loads((Path(path)/'record.json').read_text())['status']=='complete',name
+    (root/'evaluation-manifest.json').write_text(json.dumps({'runs':runs},indent=2)+'\n')
+PY
+/usr/bin/python3 scripts/submit.py --name fin-p1l-r32 --walltime 00:10:00 --commit "$P1L_SOURCE" --wait -- \
+  scripts/finalize_p1l_main.py --manifest "$P1L_R/training-manifest.json" \
+  --evaluations "$P1L_R/evaluation-manifest.json" --authorization "$P1L_AUTH" --out "$P1L_W/reports/p1l"
+/usr/bin/python3 scripts/submit.py --name fin-p1l-r128 --walltime 00:10:00 --commit "$P1L_SOURCE" --wait -- \
+  scripts/finalize_p1l_main.py --manifest "$P1L_R/r128/training-manifest.json" \
+  --evaluations "$P1L_R/r128/evaluation-manifest.json" --authorization "$P1L_AUTH" --out "$P1L_W/reports/p1l/r128"
+/usr/bin/python3 scripts/submit.py --name fin-p1l-ranks --walltime 00:05:00 --commit "$P1L_SOURCE" --wait -- \
+  scripts/compare_p1l_ranks.py --r32-manifest "$P1L_R/training-manifest.json" \
+  --r128-manifest "$P1L_R/r128/training-manifest.json" \
+  --r32-evaluations "$P1L_R/evaluation-manifest.json" \
+  --r128-evaluations "$P1L_R/r128/evaluation-manifest.json" \
+  --authorization "$P1L_AUTH" --out "$P1L_W/reports/p1l/rank-comparison.json"
+```
+
+Require all exit0. Finalizer verifies actual hashes, complete matrices, full-vocab
+labels, reproduction of metrics from samples,2000paired queries/hop/depth/protocol,
+confirmation range, Gate0, common oracle codes/M/write counts within rank, source
+pairing and swap tables. It computes G1/G2 per rank, per-seed values and97.5% paired
+joint-episode bootstrap CIs (2000draws); secondary M1 comparators/depth/far/walk
+specificity and descriptive B8 rank contrast remain non-gating.
+
+Outputs per rank: endpoints.json, accuracy.csv (counts), run-manifest.json (audited
+hashes), per-step-readout.csv, readout-faithfulness.csv, swap-successors.csv,
+inference.csv, results.md, accuracy.png/pdf and M1-depth.png/pdf.
+Inspect audit results before drawing claims; diagnose genuine failures without
+changing the pre-registered gates. Finalizer has gate/component regression coverage,
+but a full real37-run finalization has NOT been executed yet.
+
+### 5. Final report and commit
+
+Refresh final accounting (login-safe):
+
+```bash
+/usr/bin/python3 scripts/p1l_job_ledger.py --out reports/p1l/jobs.json --require-final
+```
+
+It includes failed jobs and cancelled unstarted packs (zero actual allocation).
+Its prefix filter captures t-p1l/ev-p1l/fin-p1l jobs, including the commands above.
+Preserve checkpoints, samples and cached directions; no full-backbone copies.
+Write reports/decisions/P1L.md using prereg decision rules, and replace the current
+in-progress docs/reports/P1L.md with the final<=1page report: what ran/built, primary
+and typed results per rank with CIs/per-seed effects, readout/faithfulness and
+descriptive timing/parameters, actual node-hours/job evidence, deviations, limits.
+Link detailed tables/figures rather than inflating that report. No learned/P3 claim.
+Commit own task paths on wp/p1l; orchestrator merges. Task completion line, only
+when every required step is actually finished: WP-P1L done: docs/reports/P1L.md.
+
+## Known pitfalls and required wording
+
+1. FINISH alone is not success. Four packed jobs were deliberately deleted before
+   starting; their source IDs remain in the ledger, not the current run mapping.
+2. Old Codex watchers are CANCELLED. Do not revive them or this session. PBS jobs
+   remain submitted; do not qdel/resubmit the three deferred runs as routine work.
+3. Never --commit HEAD directly in submit.py: it resolves in the central checkout.
+   Pass an explicit full worktree commit. Job3716221 failed before runtime for this;
+   replacement3716223 passed. No dependencies/pyproject/uv.lock edits are needed.
+4. No scientific runtime on login. Even check_training/statistics/checkpoint hashing
+   belong on compute through submit.py. Small JSON/status/file-metadata control is fine.
+5. No smoke quality consumption; validation timing acceptance scores are not selection
+   data. Pilot selection is already locked. No S/lr/seed/CI changes after seeing tests.
+6. Call the diagnostic a J-lens-inspired name-gradient probe, NOT the published
+   J-lens or sparse J-space (docs/reports/lit_check.md). Primary directions subtract
+   each question's uniform1024-name gradient mean, average512questions, then unit
+   normalize; raw-logit directions secondary; random unit directions fixed baseline.
+7. Probe alpha*B*z_s is CAPTURED from actual per-prefix forwards, not separately
+   recomputed from last-token batches.3716213 found2.29e-5 FP32 differences from
+   changed matrix shapes;2823982 fixed capture;3716226 verified bitwise equality.
+   B8 prefix replay retains its public L4 contract; never change unshared_steps.
+8. s4 faithfulness compares probe/logit-lens top1 with the actual model top1 AMONG
+   NAMES. Primary EM remains full-vocabulary. Keep strict argmax and tied-top1 separate.
+9. Swap tables retain ORIGINAL source hop/episode/query; rewired hop is a separate
+   counterfactual_hop.3715928 caught the earlier grouping bug;3715942 passed the fix.
+   Readout batch slicing also had a counter-name shadowing bug, fixed b88a742 and
+   regression3716212; current code has fixed episode_count bounds.
+10. B4/B3 still prepare the same oracle support for hash comparisons, but B3 ignores
+    memory. B0 config's unused writer marker does not define a learned condition.
+11. Inference timing is amortized128-question batched score+full-vocab argmax,
+   5warmups/20CUDA-sync repeats, prepared supports excluded, score-path CE included.
+    Do not call it serial latency or include probe/audit capture time.
+12. No published confirmation/analysis yet. Pilot oracle r32 scores were near chance;
+    r128 selected val EM was B8 5.667%,M1 8.133%,B4 5.900%,B5 5.633%,B3 .0667%.
+    These are validation only and do not establish final gates or motivate retuning.
+
+## Handover snapshots (generated below; requery after resumption)
 
 
-Worktree /work/xg24i002/x10041/LoopLora-wt/p1l, branchwp/p1l. User assigned
-WP-P1L; finish docs/reports/P1L.md and only then reply exactly
-`WP-P1L done: docs/reports/P1L.md`. Do not call this task complete prematurely.
-No Goal exists; Codex thread01a17999-7c19-7ac2-a6d2-cf6aee2583c0, wakeup message
-mode authorized by the user. No tests/training/evaluation/analysis on login.
-All application runtime goes through scripts/submit.py. Control scripts
-launch_p1l_main.py/p1l_job_ledger.py are stdlib login-safe. Never import torch
-on login. Read docs/README.md, task/prereg, this card before continuing.
+### Current37 run/checkpoint inventory
 
-Armed wakeups (message mode,300s polling, no Goal):
-- r128 smoke3716021: .job-wakeup/27808c33-f6d6-4f4d-b9d7-ca4e673c498b,
-  acknowledged; both smoke jobs verified complete, exit0.
-- r32 pilot3715965: .job-wakeup/ee3ad75d-7773-4f90-92d8-b0bc5660b157,
-  acknowledged; all seven jobs exit0 and all14 candidate records complete.
-- r128 pilot3716169: .job-wakeup/d921e843-f2a6-44ff-82e7-83cb3267c07f,
-  acknowledged; all five jobs exit0 and all ten candidates complete.
-- r32 main3716305: .job-wakeup/a101bbc0-d502-4bf4-8978-4e613b043510,
-  worker PID2276624; verify all19 jobs/22 run artifacts on wake.
-- cancelled r128 pack3716407: .job-wakeup/404cd2e5-fa6f-482e-beb3-11f09a424a15,
-  acknowledged06:55JST; pack never ran. Its replacements are3716618/3716619.
-- replacement completion3716619: .job-wakeup/187e742c-1c41-4da5-8700-cc998c31ce5e,
-  worker PID2813469; inspect all pre-boundary main completions, retain post-maintenance watcher.
-- early queue-progress3716290: .job-wakeup/e098924a-8adc-43d9-b03c-063317e048ab,
-  acknowledged; queue movement verified06:17JST. No replacement needed.
-Read the event state and acknowledge with the exact argv from the wakeup
-message. Do not register duplicates or cancel the other pending watcher.
+Captured 2026-10-27T07:25:34.909192+09:00; complete records 27/37. Actual digests still require compute verification.
 
-## Accepted decisions
+R = /work/xg24i002/x10041/LoopLora/runs/p1l/main. Every directory below has its checkpoint at DIR/checkpoint.pt and record at DIR/record.json. Fully expanded paths, file sizes, hosts and recorded blake2b hashes are committed in handover-artifacts.json.
 
-- Design-lockea44bb6 precedes all training; J-probe A1b5d923c precedes pilots:
-  name-contrastive gradients primary, raw secondary, unit-normalize after mean
-  over512 fixed val questions. Final-step faithfulness vs actual name argmax.
-- Master Amendment B2 (merged7bfaf16) supersedes B1 and the original total cap.
-  S17000, Pilot5666, no study-total cap. Every job<=8nodes x2h. Its original
-  finish-before10/28 09:00 rule is superseded by the urgent operation-window
-  correction above: eligible work before10/27 08:00, remaining training and
-  confirmation after10/28 22:00. B2 accepts the900-step timing smokes.
-- Single GPU process, sequential backbone reuse, prefetch2. Oracle seed17 fixed.
-  Main will pack B4/B3 sequentially; other trained variants separate jobs.
-- Confirmation is HELD for remaining training and the post-maintenance window.
-  B5/master6de902b: WP-L4 selected no learned writer; only oracle-r32/oracle-r128,
-  k=2, confidence97.5% fixed before confirmation. After10/28 22:00 AND ALL37
-  main runs complete, proceed without asking again. No learned condition.
-- B3 merged masterdf21654 at04:33JST: parallel r128,5readers x3seeds, its own
-  Pilot-2; B0/B1/B2 shared fromr32. Configs configs/p1l/main-r128, outputs
-  R/r128 and reports/p1l/r128. Design locked7503f54 before any r128 training.
-- B4 merged master379115d: remove B3's B8r32-B4r128 and M1r32-B4r128 contrasts.
-  B8r128-B8r32 stays descriptive; no gate/run/CI change. Add stored/trainable
-  adapter counts and measured inference time per question for every reader/rank.
-  Protocol locked in reports/p1l/design-lock.md; evaluate_p1l_main.py writes
-  inference.json for each run and finalizer writes inference.csv. Fixed16val
-  episodes/128questions,5warmups+20CUDA-synchronized score+argmax calls, trained
-  depth, supports prepared outside timing; no audit capture/hashing. Includes
-  score-path CE and reports amortized batched time, never serial latency.
-- Orchestrator wording: call the diagnostic a **J-lens-inspired name-gradient
-  probe**, per master docs/reports/lit_check.md WP-T6; it is not the published
-  averaged-transport lens or sparse J-space. Numerics unchanged.
+| Rank | Run | PBS ID | PBS state | Record state | Run directory |
+| --- | --- | --- | --- | --- | --- |
+| 32 | B0-s17 | 3716306 | FINISH | complete | R/main/B0-s17/B0-s17 |
+| 32 | B1-s17 | 3716292 | FINISH | complete | R/main/B1-s17/B1-s17 |
+| 32 | B1-s29 | 3716298 | FINISH | complete | R/main/B1-s29/B1-s29 |
+| 32 | B1-s43 | 3716304 | QUEUED | not_started | R/main/B1-s43/B1-s43 |
+| 32 | B2-s17 | 3716293 | FINISH | complete | R/main/B2-s17/B2-s17 |
+| 32 | B2-s29 | 3716299 | FINISH | complete | R/main/B2-s29/B2-s29 |
+| 32 | B2-s43 | 3716305 | QUEUED | not_started | R/main/B2-s43/B2-s43 |
+| 32 | B3-L4-s17 | 3716291 | FINISH | complete | R/main/B4-B3-s17/B3-L4-s17 |
+| 32 | B3-L4-s29 | 3716297 | FINISH | complete | R/main/B4-B3-s29/B3-L4-s29 |
+| 32 | B3-L4-s43 | 3716613 | RUNNING | running | R/main/B3-L4-s43/B3-L4-s43 |
+| 32 | B4-s17 | 3716291 | FINISH | complete | R/main/B4-B3-s17/B4-s17 |
+| 32 | B4-s29 | 3716297 | FINISH | complete | R/main/B4-B3-s29/B4-s29 |
+| 32 | B4-s43 | 3716612 | RUNNING | running | R/main/B4-s43/B4-s43 |
+| 32 | B5-L4-s17 | 3716290 | FINISH | complete | R/main/B5-s17/B5-L4-s17 |
+| 32 | B5-L4-s29 | 3716296 | FINISH | complete | R/main/B5-s29/B5-L4-s29 |
+| 32 | B5-L4-s43 | 3716302 | FINISH | complete | R/main/B5-s43/B5-L4-s43 |
+| 32 | B8-s17 | 3716288 | FINISH | complete | R/main/B8-s17/B8-s17 |
+| 32 | B8-s29 | 3716294 | FINISH | complete | R/main/B8-s29/B8-s29 |
+| 32 | B8-s43 | 3716300 | FINISH | complete | R/main/B8-s43/B8-s43 |
+| 32 | M1-L4-s17 | 3716289 | FINISH | complete | R/main/M1-s17/M1-L4-s17 |
+| 32 | M1-L4-s29 | 3716295 | FINISH | complete | R/main/M1-s29/M1-L4-s29 |
+| 32 | M1-L4-s43 | 3716301 | FINISH | complete | R/main/M1-s43/M1-L4-s43 |
+| 128 | B3-L4-s17 | 3716615 | RUNNING | running | R/r128/main/B3-L4-s17/B3-L4-s17 |
+| 128 | B3-L4-s29 | 3716617 | RUNNING | running | R/r128/main/B3-L4-s29/B3-L4-s29 |
+| 128 | B3-L4-s43 | 3716619 | RUNNING | running | R/r128/main/B3-L4-s43/B3-L4-s43 |
+| 128 | B4-s17 | 3716614 | RUNNING | running | R/r128/main/B4-s17/B4-s17 |
+| 128 | B4-s29 | 3716616 | RUNNING | running | R/r128/main/B4-s29/B4-s29 |
+| 128 | B4-s43 | 3716618 | QUEUED | not_started | R/r128/main/B4-s43/B4-s43 |
+| 128 | B5-L4-s17 | 3716398 | FINISH | complete | R/r128/main/B5-s17/B5-L4-s17 |
+| 128 | B5-L4-s29 | 3716402 | FINISH | complete | R/r128/main/B5-s29/B5-L4-s29 |
+| 128 | B5-L4-s43 | 3716406 | FINISH | complete | R/r128/main/B5-s43/B5-L4-s43 |
+| 128 | B8-s17 | 3716396 | FINISH | complete | R/r128/main/B8-s17/B8-s17 |
+| 128 | B8-s29 | 3716400 | FINISH | complete | R/r128/main/B8-s29/B8-s29 |
+| 128 | B8-s43 | 3716404 | FINISH | complete | R/r128/main/B8-s43/B8-s43 |
+| 128 | M1-L4-s17 | 3716397 | FINISH | complete | R/r128/main/M1-s17/M1-L4-s17 |
+| 128 | M1-L4-s29 | 3716401 | FINISH | complete | R/r128/main/M1-s29/M1-L4-s29 |
+| 128 | M1-L4-s43 | 3716405 | FINISH | complete | R/r128/main/M1-s43/M1-L4-s43 |
 
-## Observed state
+### Every WP-P1L PBS job (historical + current)
 
-Raw R=/work/xg24i002/x10041/LoopLora/runs/p1l/main.
-Smokes3715854(mg0037)/3715855(mg0045) exit0, all7 paths900steps; scores never
-read. Sizing3715950(mg0014) exit0, committed reports/p1l/smoke-sizing.json in
-1dc8a76: longest.26584s/step; S17000 fits1.5margin; pilot+main~23.48nodeh.
-Old preflight/S sizing artifacts are historical; B1 cap is superseded.
+Complete inventory from reports/p1l/jobs.json;83 jobs, including failures and the four cancelled packs. FINISH/0 is observed application exit0; FINISH/— for the labelled cancelled packs means never started. Main artifact completeness is a separate check above. Node-hours below are provisional for running jobs.
 
-Pilot jobs are all source1dc8a7606f3c2fa5a5358301fc4a383030d01af6:
-3715959B8,3715960M1-L4,3715961B4,3715962B5-L4,3715963B3-L4,
-3715964B1,3715965B2. Each runs lr.001/.003 sequentially, seed17,5666steps,
-1000val episodes, hops1/2/3 at trained depth; selection by full-vocab EM,
-ties lower lr (B1/B2 selected in their trained context-retained protocol).
-R/pilot-jobs.json retains exact job IDs/log/spec/source. R/pilot/<LABEL>/
-<LABEL>-lr0.001 or -lr0.003 contain records/checkpoints/validation samples.
-All seven pilots completed, boundary verified. Compute selection3716286 onmg0019
-passed, source716110a. reports/p1l/lr-S-lock.json fixes S17000, M1-L4 lr.003;
-B8/B4/B5-L4/B3-L4/B1/B2 lr.001 (ties lower). All22 configs updated before
-main submission, committed d644b9b. Pilot full-vocabulary pooled val EM is0.033–0.133% for oracle/
-no-memory readers across candidates; context-retained B1/B2 is99.33–99.83%.
-These are validation results only; no change to design, gates or main schedule.
+| PBS ID | Job name | Observed state | Exit marker | Node-hours |
+| --- | --- | --- | --- | ---: |
+| 3715826 | pf-p1l | FINISH | 0 | 0.03917 |
+| 3715842 | size-p1l-pf | FINISH | 1 | 0.00222 |
+| 3715847 | size-p1l-pf2 | FINISH | 0 | 0.00222 |
+| 3715850 | size-p1l-b1 | FINISH | 0 | 0.00222 |
+| 3715854 | sm-p1l-oracle | FINISH | 0 | 0.22806 |
+| 3715855 | sm-p1l-context | FINISH | 0 | 0.14639 |
+| 3715857 | t-p1l-readout | FINISH | 0 | 0.01389 |
+| 3715862 | pf-p1l-J | FINISH | 0 | 0.00639 |
+| 3715870 | p1l-J-cache | FINISH | 0 | 0.26528 |
+| 3715889 | t-p1l-gates | FINISH | 0 | 0.00528 |
+| 3715928 | t-p1l-swap | FINISH | 1 | 0.00639 |
+| 3715942 | t-p1l-swap2 | FINISH | 0 | 0.00583 |
+| 3715950 | size-p1l-smoke | FINISH | 0 | 0.00194 |
+| 3715959 | p1l-p-B8 | FINISH | 0 | 0.63222 |
+| 3715960 | p1l-p-M1-L4 | FINISH | 0 | 0.60944 |
+| 3715961 | p1l-p-B4 | FINISH | 0 | 0.43250 |
+| 3715962 | p1l-p-B5-L4 | FINISH | 0 | 0.49111 |
+| 3715963 | p1l-p-B3-L4 | FINISH | 0 | 0.43694 |
+| 3715964 | p1l-p-B1 | FINISH | 0 | 0.85889 |
+| 3715965 | p1l-p-B2 | FINISH | 0 | 0.88750 |
+| 3716000 | t-p1l-r128 | FINISH | 0 | 0.01361 |
+| 3716009 | pf-p1l-r128 | FINISH | 0 | 0.02972 |
+| 3716014 | t-p1l-b3 | FINISH | 0 | 0.00528 |
+| 3716015 | size-p1l-r128 | FINISH | 0 | 0.00222 |
+| 3716020 | sm-p1l-r128-a | FINISH | 0 | 0.20222 |
+| 3716021 | sm-p1l-r128-b | FINISH | 0 | 0.21750 |
+| 3716027 | t-p1l-r128-read | FINISH | 0 | 0.00611 |
+| 3716028 | t-p1l-global | FINISH | 0 | 0.00528 |
+| 3716084 | t-p1l-inference | FINISH | 0 | 0.00639 |
+| 3716162 | size-p1l-r128-sm | FINISH | 0 | 0.00222 |
+| 3716168 | p1l-r128-p-B8 | FINISH | 0 | 0.60917 |
+| 3716169 | p1l-r128-p-M1-L4 | FINISH | 0 | 0.62444 |
+| 3716170 | p1l-r128-p-B4 | FINISH | 0 | 0.43500 |
+| 3716171 | p1l-r128-p-B5-L4 | FINISH | 0 | 0.52000 |
+| 3716172 | p1l-r128-p-B3-L4 | FINISH | 0 | 0.44778 |
+| 3716191 | pf-p1l-eval | FINISH | 1 | 0.02583 |
+| 3716212 | t-p1l-read-batch | FINISH | 0 | 0.00583 |
+| 3716213 | sm-p1l-eval-v2 | FINISH | 0 | 0.02556 |
+| 3716221 | sm-p1l-eval-B1 | FINISH | 2 | 0.00222 |
+| 3716223 | sm-p1l-eval-B1v2 | FINISH | 0 | 0.01028 |
+| 3716225 | t-p1l-exact-probe | FINISH | 0 | 0.00667 |
+| 3716226 | sm-p1l-eval-v3 | FINISH | 0 | 0.02611 |
+| 3716286 | p1l-select-r32 | FINISH | 0 | 0.00222 |
+| 3716288 | p1l-m-B8-s17 | FINISH | 0 | 0.93556 |
+| 3716289 | p1l-m-M1-s17 | FINISH | 0 | 0.94972 |
+| 3716290 | p1l-m-B5-s17 | FINISH | 0 | 0.73000 |
+| 3716291 | p1l-m-B4-B3-s17 | FINISH | 0 | 1.28056 |
+| 3716292 | p1l-m-B1-s17 | FINISH | 0 | 1.27111 |
+| 3716293 | p1l-m-B2-s17 | FINISH | 0 | 1.32167 |
+| 3716294 | p1l-m-B8-s29 | FINISH | 0 | 0.92972 |
+| 3716295 | p1l-m-M1-s29 | FINISH | 0 | 0.92306 |
+| 3716296 | p1l-m-B5-s29 | FINISH | 0 | 0.72722 |
+| 3716297 | p1l-m-B4-B3-s29 | FINISH | 0 | 1.29778 |
+| 3716298 | p1l-m-B1-s29 | FINISH | 0 | 1.26500 |
+| 3716299 | p1l-m-B2-s29 | FINISH | 0 | 1.27639 |
+| 3716300 | p1l-m-B8-s43 | FINISH | 0 | 0.88806 |
+| 3716301 | p1l-m-M1-s43 | FINISH | 0 | 0.89972 |
+| 3716302 | p1l-m-B5-s43 | FINISH | 0 | 0.73750 |
+| 3716303 | p1l-m-B4-B3-s43 | CANCELLED before start (PBS FINISH) | — | 0.00000 |
+| 3716304 | p1l-m-B1-s43 | QUEUED | — | 0.00000 |
+| 3716305 | p1l-m-B2-s43 | QUEUED | — | 0.00000 |
+| 3716306 | p1l-m-B0-s17 | FINISH | 0 | 0.00556 |
+| 3716392 | p1l-select-r128 | FINISH | 0 | 0.00222 |
+| 3716396 | p1l-r128-m-B8-s17 | FINISH | 0 | 0.93833 |
+| 3716397 | p1l-r128-m-M1-s17 | FINISH | 0 | 0.92889 |
+| 3716398 | p1l-r128-m-B5-s17 | FINISH | 0 | 0.73750 |
+| 3716399 | p1l-r128-m-B4-B3-s17 | CANCELLED before start (PBS FINISH) | — | 0.00000 |
+| 3716400 | p1l-r128-m-B8-s29 | FINISH | 0 | 0.97167 |
+| 3716401 | p1l-r128-m-M1-s29 | FINISH | 0 | 0.91806 |
+| 3716402 | p1l-r128-m-B5-s29 | FINISH | 0 | 0.72917 |
+| 3716403 | p1l-r128-m-B4-B3-s29 | CANCELLED before start (PBS FINISH) | — | 0.00000 |
+| 3716404 | p1l-r128-m-B8-s43 | FINISH | 0 | 0.92528 |
+| 3716405 | p1l-r128-m-M1-s43 | FINISH | 0 | 0.94944 |
+| 3716406 | p1l-r128-m-B5-s43 | FINISH | 0 | 0.73278 |
+| 3716407 | p1l-r128-m-B4-B3-s43 | CANCELLED before start (PBS FINISH) | — | 0.00000 |
+| 3716612 | p1l-r32-one-B4-s43 | RUNNING | — | 0.54111 |
+| 3716613 | p1l-r32-one-B3-L4-s43 | RUNNING | — | 0.54000 |
+| 3716614 | p1l-r128-one-B4-s17 | RUNNING | — | 0.53972 |
+| 3716615 | p1l-r128-one-B3-L4-s17 | RUNNING | — | 0.53972 |
+| 3716616 | p1l-r128-one-B4-s29 | RUNNING | — | 0.54083 |
+| 3716617 | p1l-r128-one-B3-L4-s29 | RUNNING | — | 0.54000 |
+| 3716618 | p1l-r128-one-B4-s43 | QUEUED | — | 0.00000 |
+| 3716619 | p1l-r128-one-B3-L4-s43 | RUNNING | — | 0.43972 |
 
-R32 main launched source d644b9ba3b30f7fcc2f13020272f457ee60aae40,
-19jobs/22runs, all1node, requests5min–1h55min. R/main-jobs.json retains
-receipts; R/training-manifest.json maps all22 runs. Raw R/main/<GROUP>/<RUN>.
-Seed17:3716288B8,3716289M1,3716290B5,3716291B4+B3,3716292B1,3716293B2.
-Seed29:3716294B8,3716295M1,3716296B5,3716297B4+B3,3716298B1,3716299B2.
-Seed43:3716300B8,3716301M1,3716302B5,3716303B4+B3,3716304B1,3716305B2.
-B0 untrained checkpoint:3716306, passed onmg0019, zero trainable parameters,
-hash6af601799a569397330e74196c99ebe8. Never rerun the launcher blindly or duplicate
-submitted groups. All main run records must complete before confirmation;
-main training performs no quality evaluation. Wakeup on3716305 (late long job)
-is armed above; inspect all19 receipts/22 artifacts on wake, not only that job.
+Provisional allocation total: 35.25861 node-hours. All job sources, argv, log/spec paths and per-job walltime requests are retained in jobs.json and the central logs/pbs/submissions.jsonl.
 
-Probe full cache3715870, source d276308, R/jlens/directions.pt,512 fixed val
-questions only, frozen model, completed onmg0865 in932.28s. Small metadata
-copied to reports/p1l/name-gradient-probe.json; file hash9a76963e9587ae51db52b29188c004d8.
-Shared across ranks: residual space/model/questions are identical. Retain raw
-direction tensor. No confirmation used.
+### Wake-up terminal-state inventory
 
-R128 support: OracleRandomWriter/config/train now accept32/128, default32
-unchanged; signatures record actual rank and reject cross-rank writers.
-Core/exact-checkpoint tests3716000 passed34; B3 gate/config tests3716014
-passed7; r128 exact final-step replay3716027 passed3; global missing-rank/
-wrong-rank/incomplete-other-condition gate3716028 passed1.
-B4 inference timing/count wrapper3716084 passed1 onmg0025 (actual128-question
-GPU batches,20timed calls; no confirmation data).
-R128 preflight3716009(mg0022) exit0, all5paths20steps, peak<=7.70GB;
-sizing3716015 gives
-S17000/Pilot5666, no reduced-steps flag, slowest.20183s/step. Committed
-reports/p1l/r128/preflight-sizing.json and design. Full10% smokes1700steps:
-3716020(B8,M1-L4),3716021(B4,B5-L4,B3-L4), source16bef08. BOTH exit0.
-Full-smoke sizing3716162 (mg0024), reports/p1l/r128/smoke-sizing.json,
-committed e955765: S17000/Pilot5666, slowest .199397s, no reduced-steps flag,
-projected Pilot-2+main14.408nodeh.
-R128 Pilot-2 launched source e95576527c46cc1798d97c5af83384fc62bd0e06:
-3716168B8,3716169M1-L4,3716170B4,3716171B5-L4,3716172B3-L4.
-Receipts R/r128/pilot-jobs.json, two sequential lrs per label under
-R/r128/pilot/<LABEL>/<LABEL>-lr0.001 or -lr0.003. Requested45–65min,
-started04:59JST. All five completed, exit0; ten candidate records and stage
-records complete, validation boundary verified. Compute selection3716392 on
-mg0021 passed, source4bdb475. R128 lr-S lock fixes S17000, B3-L4 lr.001
-(tie), B8/M1-L4/B4/B5-L4 lr.003. All15 configs updated before main submission.
-Selected pooled val hops1/2/3 full-vocabulary EM: B8 5.667%, M1 8.133%,
-B4 5.900%, B5 5.633%, B3 0.0667% (3000 queries each). Selection follows the
-registered rule; no design or endpoint changes. No confirmation accessed.
-R128 lock/configs committed1d1bbfd before main; source
-1d1bbfd6958bfac2cd35054a24abeebcfdb7da1b. All12 main jobs/15 runs submitted:
-seed17:3716396B8,3716397M1,3716398B5,3716399B4+B3;
-seed29:3716400B8,3716401M1,3716402B5,3716403B4+B3;
-seed43:3716404B8,3716405M1,3716406B5,3716407B4+B3.
-R/r128/main-jobs.json and R/r128/training-manifest.json retain receipts/map.
-Each1node,1h10–2h requested. B4/B3 sequential packing measured; no repeat B0–B2.
-Rank128 end watcher3716407 and early progress watcher3716290 (r32 B5) are
-listed above; early progress is acknowledged and both end watchers remain armed.
-
-Scheduler05:39JST: regular project limit16 active jobs; queued r32 seeds43
-have placeholder/predicted starts after maintenance. Detail3716304 states
-the group njobs-g limit as the blocker. Fourteen r32 main runs and two WP-L4
-jobs already run, with expected slot releases around06:10–07:00JST. Recheck
-queued jobs at the main wakeup and do not assume those estimates prove a run
-will start. All work must still finish before2026-10-28 09:00JST.
-Progress06:17JST: queue movement is verified. R32 B5-s17/B5-s29 jobs3716290/
-3716296 exited0 with complete records, as did B0. B4-s17/s29 records are complete
-inside still-running B4+B3 packs. Total5/22 r32 run records complete; twelve
-r32 jobs running and four queued. R128 jobs3716398(B5-s17),3716400(B8-s29),
-3716396(B8-s17) actually started06:13–06:15JST, replacing finished jobs;
-three running/nine queued,0/15 records complete. No main failure records.
-One WP-L4 job still running; no orchestrator decision received. Preserve both
-end watchers; no new watcher is necessary solely for this progress event.
-
-Validation-only full-evaluation timing acceptance: script
-scripts/benchmark_p1l_evaluation.py loads the immutable completed M1-L4
-lr.001 r32 pilot checkpoint and fixed probe cache. Uses val[0,200),
-allow_confirmationFalse, smokeTrue; primary+typed,swap,readout,timing only.
-Never read its quality artifacts. Job3716191(mg0026) failed before readout
-completion: faithfulness counter shadowed episode count and truncated later
-batch slices. Fixed b88a742 with a multibatch/partial-tail regression.
-Regression job3716212 passed onmg0030, exit0. Rerun3716213 passed onmg0031,
-revealed max2.29e-5 FP32 error from recomputing only last-token states in another
-matrix shape. Fixed2823982: capture actual alpha B z_s during prefix replay.
-No direction, endpoint or selection rule changes. Exact capture+replay tests
-3716225 passed5 onmg0023; full-model validation-only rerun3716226 passed onmg0022.
-R/evaluation-preflight-v3/timing.json reports captured_bitwise_equalTrue;
-its recomputed_bitwise_equalFalse documents why manual recomputation was removed.
-Compact timing-only copies reports/p1l/evaluation-timing-M1.json and
-evaluation-timing-B1.json retain source checkpoint hashes and compute evidence.
-M1 total72.89s for200episodes: primary12.12s,typed10.03s,swap43.51s,
-readout5.21s. For later confirmation sizing multiply episode-dependent phases
-by10 for2000episodes, add load/reserve and1.5margin. Three M1 seeds fit one1h
-evaluation job under this measurement. Baseline both-protocol total18.05s.
-Baseline timing3716223 passed onmg0030, primary+typed, both protocols,200val
-episodes, total18.05s. Wrong-source submission3716221 endedexit2 in8s (central
-HEAD lacked script); replacement uses explicit3801bb2. Never use --commit HEAD
-in submit.py: it resolves refs in the CENTRAL checkout. Use explicit worker
-hash or wp/p1l. Main launcher already resolves its own ROOT hash explicitly.
-Timing acceptance quality artifacts have not been read. R32 pilot scores were
-first consumed by registered compute selection3716286 after all seven finished.
-
-Passed: readout/oracle33checks3715857; gates/authorization4checks3715889;
-swap-wrapper1check3715942. Failed development jobs, included in ledger:
-3715842 sparse timing-log check (fixed3715847),3715928 counterfactual grouping
-by rewired hop (fixed; source episode/query/hop now retained and new hop kept
-separately; unchanged regression passed3715942). No further blanket retests.
-
-## Immediate next actions
-
-1. Validation-only evaluation acceptance is complete; never read its raw scores.
-2. Both pilot wakeups acknowledged; r32 lock/configs committed and main running.
-   R128 lock/configs committed; main submitted. Both condition manifests exist.
-3. Replacement3716619 and post-maintenance3716305 wakeups are armed. Preserve
-   both. The old3716407 cancellation wakeup is acknowledged; it was not a run.
-4. At the replacement wake, verify all pre-boundary jobs/checkpoints complete,
-   record the remaining three queued jobs and retain3716305 for10/28 22:00.
-   At the post-maintenance wake, verify ALL37 runs, then release confirmation
-   with k2/CI97.5% under B5 without requesting permission again.
-
-## Completed pilot procedure (historical; do not rerun)
-
-1. Read/ack wakeup state per skill; inspect ALL7 pilot jobs and records.
-   A FINISH alone is insufficient. Require exit0 and record.statuscomplete
-   for both rates per label. If one remains running, avoid duplicate jobs;
-   arrange wakeup for that exact remaining job. Keep confirmation held.
-2. On compute through submit.py, run:
-   `scripts/analyze_p1l_main.py select --root R/pilot --sizing ABS/reports/p1l/smoke-sizing.json --out ABS/reports/p1l/lr-S-lock.json`.
-   Commit generated lr-S lock; update all22 configs/p1l/main/*-s*.json with
-   S17000 and each label's selected lr (B0 lr unchanged; no training), then
-   commit BEFORE any main training. All routines use the same S.
-   For r128 use --rank 128, R/r128/pilot, its smoke-sizing and
-   reports/p1l/r128/lr-S-lock.json; update its15configs in main-r128. Main
-   launcher also needs --rank 128 and R/r128 root. No B0/B1/B2 repetition.
-3. On LOGIN, launch `scripts/launch_p1l_main.py main --root R --sizing reports/p1l/smoke-sizing.json`.
-   This submits19 jobs (18 groups for21 trained runs plusB0), all through
-   submit.py with1.5margin. Some queue because project limit16 running.
-   R/training-manifest.json maps all22 runs. Do not rerun launcher blindly;
-   its receipts guard submitted groups. Record actual node-hours per job.
-4. Use wakeup message mode for main wait. No implicit Goal creation.
-   Endpoint from existing daemon: unix:///home/x10041/.codex/app-server-control/app-server-control.sock.
-   Watcher: /work/xg24i002/x10041/.codex/skills/miyabi-pbs-goal-wakeup/scripts/job_wakeup.py.
-5. B5 decision is received: NO learned writer, k2/CI97.5%. After ALL main jobs
-   complete AND10/28 22:00JST has passed, proceed without asking again. Use the
-   fixed reports/p1l/confirmation-lock.json to
-   commit authorization JSON {status:allowed,gated_conditions:k,
-   condition_manifests:{oracle-r32:ABS_MANIFEST,oracle-r128:ABS_MANIFEST,...},
-   orchestrator_decision:text}. Global gate checks matching condition/rank
-   labels, complete checkpoints and fixed S/lrs for every listed condition.
-   Evaluate each checkpoint once with scripts/evaluate_p1l_main.py; it requires
-   --manifest R/training-manifest.json --authorization AUTH --out NEW_GROUP
-   --runs RUN_NAMES --directions R/jlens/directions.pt. Batch short jobs,
-   measure timing before large eval packs; M1 depth1..8 + swaps1/4/8 is slower.
-   Creates primary/typed samples plus readout/faithfulness/swap artifacts.
-   Fill evaluation manifest {runs:{RUN_NAME:EVAL_DIR}} (all22).
-6. Finalize on compute: scripts/finalize_p1l_main.py --manifest R/training-manifest.json
-   --evaluations EVAL_MANIFEST --authorization AUTH --out ABS/reports/p1l.
-   Audits all sample metrics, source pairing, oracle codes and memories;
-   computes registered G1/G2, secondary M1 contrasts and specificity, per-seed
-   values, accuracy/counts/readout/faithfulness/swap tables and figures.
-   Inspect end-to-end audit output; fix concrete issues without changing gates.
-   Repeat per rank with separate report directory; then run compare_p1l_ranks.py
-   for B4's retained descriptive B8 rank contrast. The two cross-rank single-read
-   comparisons are removed. Report adapter counts/inference.csv; cite any unequal S.
-7. Refresh costs on login: `/usr/bin/python3 scripts/p1l_job_ledger.py --out reports/p1l/jobs.json --require-final`.
-   Finish <=1page docs/reports/P1L.md with actual results, validation jobs,
-   deviations(A1/B1/B2, valid900-step smoke, probe wording), cost, limitations.
-   Also write reports/decisions/P1L.md per prereg. Commit own paths only.
-   Do not merge/push other branches. Reply final exact done line only at end.
-
-B5 closes the learned-writer branch: no writer was selected, no learned condition.
+| Event | PBS job | State after handover |
+| --- | --- | --- |
+| ee3ad75d-7773-4f90-92d8-b0bc5660b157 | 3715965.opbs | acknowledged |
+| 187e742c-1c41-4da5-8700-cc998c31ce5e | 3716619.opbs | cancelled |
+| 404cd2e5-fa6f-482e-beb3-11f09a424a15 | 3716407.opbs | acknowledged |
+| e098924a-8adc-43d9-b03c-063317e048ab | 3716290.opbs | acknowledged |
+| 27808c33-f6d6-4f4d-b9d7-ca4e673c498b | 3716021.opbs | acknowledged |
+| a101bbc0-d502-4bf4-8978-4e613b043510 | 3716305.opbs | cancelled |
+| d921e843-f2a6-44ff-82e7-83cb3267c07f | 3716169.opbs | acknowledged |
