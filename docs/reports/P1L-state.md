@@ -45,6 +45,8 @@ appropriate remaining replacement job only after reconciling the existing event.
 This cancellation wakeup was delivered and acknowledged06:55JST (no start/no
 elapsed time, no successful workload). Arrange new pre-boundary completion
 watcher on3716619; retain the existing post-maintenance3716305 watcher.
+Replacement completion watcher is ARMED: .job-wakeup/187e742c-1c41-4da5-8700-cc998c31ce5e,
+worker PID2813469, exact job3716619. It checks all pre-boundary completions.
 Rank32 watcher3716305 remains pending for the post-maintenance B2 completion.
 
 
