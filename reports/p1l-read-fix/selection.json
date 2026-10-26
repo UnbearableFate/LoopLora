@@ -1,0 +1,75 @@
+{
+  "choice": {
+    "E": null,
+    "action": "stop",
+    "arm": null,
+    "correct": {
+      "r128/R": 335,
+      "r128/W5": 299,
+      "r32/R": 120,
+      "r32/RK": 120,
+      "r32/Rrho": 122
+    },
+    "rank": null
+  },
+  "context": [
+    {
+      "arm": "R",
+      "config_hash": "3728a5b34f1d062fa67dc2946c548bec",
+      "correct": 120,
+      "git_commit": "0b03d606f3c752cddfcfd716946dbbc3e36bf025",
+      "rank": 32,
+      "steps": 23590
+    },
+    {
+      "arm": "Rrho",
+      "config_hash": "46ff21ef41ec316026add2b18b467612",
+      "correct": 122,
+      "git_commit": "0b03d606f3c752cddfcfd716946dbbc3e36bf025",
+      "rank": 32,
+      "steps": 24220
+    },
+    {
+      "arm": "RK",
+      "config_hash": "817a255b6c99c76330f6904a75853bb5",
+      "correct": 120,
+      "git_commit": "0b03d606f3c752cddfcfd716946dbbc3e36bf025",
+      "rank": 32,
+      "steps": 21980
+    },
+    {
+      "arm": "W5",
+      "config_hash": "166b976c5b95763724cf8f18cce26ae0",
+      "correct": 299,
+      "git_commit": "be07f7fb34c1cdd14b64f65b7f687364fcd6e36f",
+      "rank": 128,
+      "steps": 24635
+    },
+    {
+      "arm": "R",
+      "config_hash": "65eaf986a31495bbdeb56c641911aae7",
+      "correct": 335,
+      "git_commit": "be07f7fb34c1cdd14b64f65b7f687364fcd6e36f",
+      "rank": 128,
+      "steps": 24645
+    },
+    {
+      "arm": "OArho",
+      "config_hash": "28beae520e8232546a7ddbe96faa55e6",
+      "correct": 747,
+      "git_commit": "0b03d606f3c752cddfcfd716946dbbc3e36bf025",
+      "rank": 32,
+      "steps": 27040
+    },
+    {
+      "arm": "OA",
+      "config_hash": "6a7b32e9176cfbf5c01717117ab72955",
+      "correct": 840,
+      "git_commit": "be07f7fb34c1cdd14b64f65b7f687364fcd6e36f",
+      "rank": 128,
+      "steps": 31175
+    }
+  ],
+  "context_hash": "4689ee7d2210cfee24ab7ac86281b504",
+  "created_at": "2026-10-26T21:46:55.119179+00:00"
+}

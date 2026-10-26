@@ -243,24 +243,30 @@
       "exit_status": 0,
       "host": "mg0852",
       "node_hours": 1.3666666666666667
+    },
+    {
+      "job_id": "3716541",
+      "job_name": "a-l4-selection",
+      "status": "FINISH",
+      "project": "xg24i002",
+      "queue": "small-g",
+      "start_date": "10/27 06:46:34",
+      "elapsed_seconds": 79,
+      "token": 0.0,
+      "token_estimate": null,
+      "nodes": 1,
+      "mig": null,
+      "role": "all-seven E16 sample/config/selection audit and seven inference export reloads",
+      "exit_status": 0,
+      "host": "mg0859",
+      "node_hours": 0.021944444444444444
     }
   ],
-  "completed_node_hours": 5.711944444444445,
+  "completed_node_hours": 5.733888888888889,
   "max_total_node_hours": null,
   "separate_from": "WP-L3 costs",
-  "pending_roles": [
-    "four scientific jobs: all seven E16 arms",
-    "conditional best-arm E8 across both ranks and final audits"
-  ],
-  "pending": [
-    {
-      "job_id": "3716541.opbs",
-      "role": "all-seven E16 audit/selection, final export audit unless E8 required",
-      "source": "b5ff4ee",
-      "nodes": 1,
-      "requested_seconds": 300
-    }
-  ],
+  "pending_roles": [],
+  "pending": [],
   "budget_amendment": "A2: user removed total cap; every job <=1node2h",
   "validation_blind_boundary": {
     "all_rank128_scientific_arms_submitted": "2026-10-27T04:56:45+09:00",
@@ -270,5 +276,8 @@
     ],
     "no_WP_L4_quality_read_before_submission": true,
     "quality_used_to_set_budgets": false
-  }
+  },
+  "total_elapsed_seconds": 20642,
+  "status": "complete",
+  "decision": "stop P1-L; best learned EM0.335 below0.50 E8 trigger; no E8 jobs"
 }
