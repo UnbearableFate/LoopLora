@@ -1,0 +1,17 @@
+{
+  "status": "passed",
+  "budget_node_hours": 1.5,
+  "slowest_smoke_train_seconds": 98.34792730305344,
+  "projected_main_node_hours": 0.8195660608587787,
+  "other_stages_reserve_node_hours": 0.25,
+  "projected_total_node_hours": 1.0695660608587787,
+  "jobs": 3,
+  "runs_per_job": 4,
+  "procs": 4,
+  "main_walltime": "00:25:00",
+  "walltime_basis": "1.5 times slowest 1500-step smoke scaled to15000 plus startup, rounded up",
+  "design_lock_commit": "852d293d50fa70810e8b43e7e24efb474d812666",
+  "smoke_job": "3715904",
+  "tests_passed": 10,
+  "all_regularized_smokes_finite_and_active": true
+}

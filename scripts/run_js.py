@@ -130,15 +130,20 @@ def train_one(stage,name):
                         radius_mean=float(radius.detach().mean()) if radius is not None else None))+ '\n');log.flush()
         summary=dict(steps=options['steps'],train_seconds=time.perf_counter()-started,mean_L=depth_sum/options['steps'],
             peak_memory_bytes=torch.cuda.max_memory_allocated(),penalty_finite=True,active_batches=active_batches,
-            active_queries=active_queries,max_radius=max_radius,max_penalty=max_penalty,design_penalty=d['penalty'])
+            active_queries=active_queries,max_radius=max_radius if row['condition']=='RS+J' else None,max_penalty=max_penalty,
+            radius_measured_during_training=row['condition']=='RS+J',design_penalty=d['penalty'])
         torch.save(dict(config=c,model=model.state_dict(),summary=summary),out/'checkpoint.pt')
         rec.update(status='complete',**summary);write(out/'record.json',rec)
     except BaseException as error:
         rec.update(status='failed',error=f'{type(error).__name__}: {error}');write(out/'record.json',rec);raise
 
 
-def train_stage(stage,procs):
-    design();plan=json.loads((RUNS/f'{stage}_plan.json').read_text());pending=[r['name'] for r in plan['runs']];running=[];started=time.perf_counter()
+def train_stage(stage,procs,shard=None):
+    design();plan=json.loads((RUNS/f'{stage}_plan.json').read_text())
+    if shard is not None:
+        if stage!='main' or shard not in (0,1,2): raise ValueError('JS main shard must be 0,1,2')
+        plan=dict(runs=plan['runs'][shard::3])
+    pending=[r['name'] for r in plan['runs']];running=[];started=time.perf_counter()
     while pending or running:
         for child in list(running):
             code=child.poll()
@@ -272,15 +277,16 @@ def collect_stage(stage,procs):
     paths=[str(RUNS/stage/r['name']/'trace.npz') for r in plan['runs']]
     if not all(Path(p).is_file() for p in paths): raise ValueError('JS incomplete trace set')
     write(RUNS/f'{stage}_barrier.json',dict(status='passed',created_at=datetime.now(timezone.utc).isoformat(),
-        evaluation_plan_hash=stable_hash(plan),runs=[r['name'] for r in plan['runs']],traces=paths))
+        evaluation_plan_hash=stable_hash(plan),runs=[r['name'] for r in plan['runs']],traces=paths,
+        **(dict(threshold_hash=stable_hash(selection)) if stage=='confirmation' else {})))
     print(f'JS {stage}: all 24 blind traces complete',flush=True)
 
 
 def main():
     p=argparse.ArgumentParser(description=__doc__);p.add_argument('action',choices=('lock','train','train-one','collect','collect-one'))
-    p.add_argument('--stage',default='main');p.add_argument('--procs',type=int,default=12);p.add_argument('--name');a=p.parse_args()
+    p.add_argument('--stage',default='main');p.add_argument('--procs',type=int,default=12);p.add_argument('--name');p.add_argument('--shard',type=int);a=p.parse_args()
     if a.action=='lock': lock()
-    elif a.action=='train': train_stage(a.stage,a.procs)
+    elif a.action=='train': train_stage(a.stage,a.procs,a.shard)
     elif a.action=='train-one': train_one(a.stage,a.name)
     elif a.action=='collect': collect_stage(a.stage,a.procs)
     else:
