@@ -5,4 +5,5 @@ Research code for *Iterative Low-Rank Adaptation under a Fixed Context-Memory Bu
 binding definitions: `docs/notation.md`.
 
 Environment: `uv sync` on a Miyabi-G login node (torch 2.14.0+cu132, aarch64). All tests and experiments run
-on compute nodes via `scripts/submit.py` (per-experiment cap: ≤ 8 nodes × 1 h).
+on compute nodes via `scripts/submit.py` (per-experiment cap: ≤ 8 nodes × 1 h; ≤ 8 nodes × 2 h with
+`--scale-up <decision doc>` when results already obtained justify scaling up).

@@ -2,8 +2,9 @@
 """Submit a LoopLora compute job (login node, stdlib only).
 
 Enforces the current-stage cap from the user (2026-10-26): one experiment may
-use at most 8 nodes x 1 h. The cap is a check, not the request; size walltime
-from measured runs.
+use at most 8 nodes x 1 h, or 8 nodes x 2 h when results already obtained
+support scaling up (pass --scale-up with the decision/prereg that justifies it).
+The cap is a check, not the request; size walltime from measured runs.
 
 Examples:
   scripts/submit.py --name pytest --walltime 00:15:00 --worktree . --wait -- -m pytest -q tests
@@ -27,6 +28,7 @@ JOB_SCRIPT = REPO / "scripts" / "pbs" / "job.pbs"
 GROUP = "xg24i002"
 MAX_NODES = 8          # user cap: <= 8 nodes per experiment
 MAX_WALLTIME_S = 3600  # user cap: <= 1 h per experiment
+SCALE_UP_WALLTIME_S = 7200  # user cap with --scale-up: <= 2 h when earlier results justify it
 QUEUES = {"debug-g": 1800, "regular-g": None}
 
 
@@ -55,12 +57,14 @@ def main() -> int:
     ap.add_argument("--queue", default="debug-g", choices=sorted(QUEUES))
     ap.add_argument("--nodes", type=int, default=1)
     ap.add_argument("--walltime", required=True, help="HH:MM:SS")
+    ap.add_argument("--scale-up", metavar="DOC",
+                    help="repo path of the decision/prereg whose results justify a job above 1 h (<= 2 h)")
     src = ap.add_mutually_exclusive_group(required=True)
     src.add_argument("--commit", help="git ref to snapshot (experiments)")
     src.add_argument("--worktree", help="run a working tree in place (tests/development only)")
     ap.add_argument("--log", help="log path (default logs/pbs/<name>-<stamp>.log)")
     ap.add_argument("--wait", action="store_true", help="block until the job ends and print the log tail")
-    ap.add_argument("--wait-timeout", type=int, default=5400, help="seconds")
+    ap.add_argument("--wait-timeout", type=int, help="seconds (default: walltime + 30 min)")
     ap.add_argument("--tail", type=int, default=60)
     ap.add_argument("argv", nargs=argparse.REMAINDER, help="-- then python argv")
     a = ap.parse_args()
@@ -71,8 +75,11 @@ def main() -> int:
     wall = parse_walltime(a.walltime)
     if not 1 <= a.nodes <= MAX_NODES:
         raise SystemExit(f"nodes={a.nodes} violates the cap (1..{MAX_NODES})")
-    if wall > MAX_WALLTIME_S:
-        raise SystemExit(f"walltime {a.walltime} exceeds the 1 h per-experiment cap")
+    if a.scale_up and not (REPO / a.scale_up).is_file():
+        raise SystemExit(f"--scale-up document {a.scale_up!r} does not exist in {REPO}")
+    if wall > (SCALE_UP_WALLTIME_S if a.scale_up else MAX_WALLTIME_S):
+        raise SystemExit(f"walltime {a.walltime} exceeds the per-experiment cap "
+                         f"({'2 h with --scale-up' if a.scale_up else '1 h; 2 h needs --scale-up'})")
     qmax = QUEUES[a.queue]
     if qmax is not None and wall > qmax:
         raise SystemExit(f"walltime {a.walltime} exceeds {a.queue} limit")
@@ -86,7 +93,7 @@ def main() -> int:
     else:
         source = {"kind": "worktree", "ref": str(Path(a.worktree).absolute())}
     spec = {"name": a.name, "queue": a.queue, "nodes": a.nodes, "walltime": a.walltime,
-            "source": source, "argv": argv, "log": str(log), "submitted": dt.datetime.now().isoformat()}
+            "scale_up": a.scale_up, "source": source, "argv": argv, "log": str(log), "submitted": dt.datetime.now().isoformat()}
     spec_path = LOG_ROOT / "specs" / f"{a.name}-{stamp}.json"
     spec_path.parent.mkdir(parents=True, exist_ok=True)
     log.parent.mkdir(parents=True, exist_ok=True)
@@ -108,7 +115,7 @@ def main() -> int:
         return 0
 
     exit_file = Path(str(log) + ".exit")
-    deadline = time.time() + a.wait_timeout
+    deadline = time.time() + (a.wait_timeout or wall + 1800)
     missing_since = None
     while time.time() < deadline:
         if exit_file.exists():
