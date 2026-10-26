@@ -16,7 +16,7 @@ from looplora.data.relations import TaskSpec, generate
 from looplora.infra.seeds import derive_seed
 from .config import pretrain_task_spec
 from .model import SymbolicModel, make_task_spec
-from .writers import LearnedWriter
+from .writers import FactorizedWriter, LearnedWriter
 
 
 def synchronize(device: torch.device) -> None:
@@ -90,6 +90,8 @@ def _pretrain_config(config: dict[str, Any]) -> dict[str, Any]:
     # Task overrides preserve the reader's feature vocabulary and relation table.
     result["task"] = asdict(pretrain_task_spec(config))
     result["variant"], result["activation"], result["writer"] = "B4", "relu", "joint"
+    if config["writer"] == "t1_frozen_fact":
+        result["writer"] = "joint_fact"
     result["train"].update({key: value for key, value in config["pretrain"].items()
                             if key in result["train"]})
     result["train"]["depths"] = [1]
@@ -104,7 +106,7 @@ def train(config: dict[str, Any], out: Path) -> tuple[SymbolicModel, dict[str, A
     pretrain_seconds = 0.0
     pretrain_summary: dict[str, Any] | None = None
     model = SymbolicModel(config)
-    if config["writer"] == "t1_frozen":
+    if config["writer"] in {"t1_frozen", "t1_frozen_fact"}:
         checkpoint = config["pretrain"].get("writer_checkpoint")
         if checkpoint:
             writer_record = torch.load(checkpoint, map_location="cpu", weights_only=True)
@@ -125,12 +127,12 @@ def train(config: dict[str, Any], out: Path) -> tuple[SymbolicModel, dict[str, A
     summary = _fit(model, config, out, "train")
     summary["pretrain_seconds"] = pretrain_seconds
     summary["pretrain"] = pretrain_summary
-    summary["writer_frozen"] = config["writer"] != "joint"
-    exports_writer = config["writer"] in {"t1_frozen", "joint"} and isinstance(model.writer, LearnedWriter)
+    summary["writer_frozen"] = config["writer"] not in {"joint", "joint_fact"}
+    exports_writer = isinstance(model.writer, (LearnedWriter, FactorizedWriter))
     summary["writer_checkpoint"] = str(out / "writer.pt") if exports_writer else None
     summary["trainable_parameters"] = sum(p.numel() for p in model.parameters() if p.requires_grad)
     summary["registered_parameters"] = sum(p.numel() for p in model.parameters())
-    if config["writer"] == "joint" and exports_writer:
+    if config["writer"] in {"joint", "joint_fact"} and exports_writer:
         torch.save({"writer": {key: value.detach().cpu().clone()
                                for key, value in model.writer.state_dict().items()},
                     "signature": model.writer_signature(),
@@ -149,6 +151,6 @@ def load_checkpoint(path: str | Path, device: str | None = None) -> SymbolicMode
     model = SymbolicModel(config)
     model.checkpoint_config = checkpoint_config
     model.load_state_dict(record["model"], strict=True)
-    if config["writer"] == "t1_frozen":
+    if config["writer"] in {"t1_frozen", "t1_frozen_fact"}:
         model.freeze_writer()
     return model.eval()

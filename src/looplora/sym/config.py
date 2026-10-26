@@ -12,7 +12,7 @@ if TYPE_CHECKING:
     from looplora.data.relations import TaskSpec
 
 VARIANTS = ("B3", "B4", "B5", "B5-lin", "M1", "M1-lin", "B6", "B7", "B8")
-WRITERS = ("oracle_random", "oracle_orth", "t1_frozen", "joint")
+WRITERS = ("oracle_random", "oracle_orth", "t1_frozen", "joint", "t1_frozen_fact", "joint_fact")
 DEFAULTS: dict[str, Any] = {
     "name": "symbolic", "seed": 17, "backbone_seed": 31415, "device": "cuda",
     "writer": "oracle_random", "variant": "M1", "activation": "relu",

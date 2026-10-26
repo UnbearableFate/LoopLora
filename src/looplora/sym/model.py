@@ -12,7 +12,7 @@ from looplora.core import AdapterConfig, make_adapter
 from looplora.data.relations import EpisodeArrays, TaskSpec
 from looplora.infra.seeds import derive_seed
 from .backbone import SymbolicBackbone
-from .writers import LearnedWriter, OracleWriter
+from .writers import FactorizedWriter, LearnedWriter, OracleWriter
 
 
 @dataclass
@@ -48,16 +48,18 @@ class SymbolicModel(nn.Module):
         self.backbone = SymbolicBackbone(spec.V, spec.n_rel, m["d_e"], m["max_hop"],
                                          config["backbone_seed"])
         oracle = self.writer_condition.startswith("oracle_")
+        factorized = self.writer_condition in {"t1_frozen_fact", "joint_fact"}
         if oracle and self.r != self.r_mem:
             raise ValueError("oracle query codes require r == r_mem")
         if oracle:
             self.writer = OracleWriter(spec.V, self.r_mem, config["backbone_seed"],
                                        orthogonal=self.writer_condition == "oracle_orth")
         else:
-            self.writer = LearnedWriter(3 * m["d_e"], self.r, self.r_mem, config["seed"],
-                                        m["lambda_init"], m["beta_init"])
+            writer_type = FactorizedWriter if factorized else LearnedWriter
+            self.writer = writer_type(3 * m["d_e"], self.r, self.r_mem, config["seed"],
+                                      m["lambda_init"], m["beta_init"])
         core_variant = {"B3": "loop", "B5": "fixedq", "B5-lin": "fixedq", "B8": "unshared"}.get(self.variant, "iterq")
-        cfg = AdapterConfig(d_in=self.r if oracle else 3 * m["d_e"],
+        cfg = AdapterConfig(d_in=self.r if oracle else (2 if factorized else 3) * m["d_e"],
                             d_out=self.r_mem if oracle else m["d_e"], r=self.r, r_mem=self.r_mem,
                             variant=core_variant, rho=m["rho"], alpha=m["alpha"],
                             activation=config["activation"], unshared_steps=4,
@@ -72,7 +74,8 @@ class SymbolicModel(nn.Module):
             if oracle:
                 getattr(self.adapter, name).requires_grad_(False)
             else:
-                setattr(self.adapter, name, getattr(self.writer, name))
+                writer_name = "A_k" if factorized and name == "A" else name
+                setattr(self.adapter, name, getattr(self.writer, writer_name))
         self.to(config["device"])
 
     @property
@@ -83,9 +86,12 @@ class SymbolicModel(nn.Module):
         self.writer.requires_grad_(False)
 
     def writer_signature(self) -> dict[str, Any]:
-        return {"r": self.r, "r_mem": self.r_mem, "d_e": self.backbone.d_e,
-                "V": self.backbone.V, "n_rel": len(self.backbone.relations),
-                "backbone_seed": self.config["backbone_seed"]}
+        signature = {"r": self.r, "r_mem": self.r_mem, "d_e": self.backbone.d_e,
+                     "V": self.backbone.V, "n_rel": len(self.backbone.relations),
+                     "backbone_seed": self.config["backbone_seed"]}
+        if isinstance(self.writer, FactorizedWriter):
+            signature["writer_type"] = "factorized"
+        return signature
 
     def orthogonal_codebooks(self, arrays: EpisodeArrays,
                              replacement: EpisodeArrays | None = None, *,
