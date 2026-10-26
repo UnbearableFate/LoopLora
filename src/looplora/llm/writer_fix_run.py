@@ -28,10 +28,15 @@ from .train import make_task_spec,synchronize
 from .writer_fix import (ARMS,SIMPLICITY,WriterFixExperiment,alignment,auxiliary_losses)
 
 
-def configuration(arm: str,steps=4800,*,prefetch_workers=0):
+def configuration(arm: str,steps=4800,*,prefetch_workers=0,variant='M1'):
     if arm not in ARMS:
         raise ValueError('unknown WP-L3 arm')
+    if variant not in {'M1','B8'}:
+        raise ValueError('writer-fix configuration requires M1 or B8')
     cfg = writer_config(f'writer-fix-{arm}',16,'fact_final',.003,32,steps)
+    if variant=='B8':
+        cfg['variant']='B8'
+        cfg['train']['depths']=cfg['eval']['depths']=[4]
     cfg['train']['log_every']=50
     if prefetch_workers:
         cfg['train']['prefetch_workers']=prefetch_workers

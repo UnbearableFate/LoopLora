@@ -1,5 +1,4 @@
 """B8 LLM depth, protocol, writer compatibility and WP-L3 controls."""
-import copy
 import json
 from types import MethodType
 
@@ -160,10 +159,10 @@ def test_explicit_fixed_depth_training_is_not_resampled(model,tokenizer,tmp_path
 @pytest.mark.parametrize('site', ['o_proj','residual'])
 @pytest.mark.parametrize('arm', ['OA','W0','W1','W2','W3','W4','W5'])
 def test_all_wp_l3_arms_support_b8(model,tokenizer,site,arm):
-    cfg = configuration(arm)
-    cfg.update(variant='B8',activation='identity')
+    cfg = configuration(arm,variant='B8')
+    cfg.update(activation='identity')
     cfg['model'].update(r=8,layer=1,input_site=site)
-    cfg['train']['depths']=cfg['eval']['depths']=[4]
+    assert cfg['train']['depths']==cfg['eval']['depths']==[4]
     experiment = WriterFixExperiment(cfg,arm,model=model,tokenizer=tokenizer)
     try:
         with torch.no_grad():
@@ -197,10 +196,8 @@ def test_all_wp_l3_arms_support_b8(model,tokenizer,site,arm):
 
 
 def test_b8_wp_l3_normalization_and_inference_reload(model,tokenizer,tmp_path):
-    cfg=configuration('W5')
-    cfg.update(variant='B8')
+    cfg=configuration('W5',variant='B8')
     cfg['model'].update(r=8,layer=1,input_site='residual')
-    cfg['train']['depths']=cfg['eval']['depths']=[4]
     experiment=WriterFixExperiment(cfg,'W5',model=model,tokenizer=tokenizer)
     try:
         assert experiment.standardize()['episodes']==256
