@@ -23,6 +23,13 @@ r128s17/s29 both). Their requested ends are07:49:38–07:50:34JST. R128s43
 3716618/3716619 remain queued at the16-job limit; a further slot is expected
 when r128 B5-s17 finishes around06:58. Check whether either can start by the
 07:58 margin cutoff; keep any that cannot fit queued for post-maintenance.
+At06:58:28, seventh replacement r128 B3-L4-s43/3716619 STARTED; requested
+end07:56:49JST fits07:58. Its locked config was verified from the running record.
+R128 B4-s43/3716618 alone remains queued among replacements (project16-job
+limit); its latest07:58-compatible start is07:00:22. No further slot expected
+before that cutoff; leave it queued for10/28 22:00 if it cannot fit.
+All seven actual starts and requested ends verified in
+reports/p1l/dedicated-boundary-starts.json. Do not count cancelled packs as runs.
 Do not cancel/alter B1/B2s43 jobs3716304/3716305: retain for10/28 22:00.
 Exact evidence reports/p1l/dedicated-boundary-splits.json; one-time stdlib
 control script scripts/split_p1l_packed_jobs.py. It must NOT be rerun blindly.
@@ -32,6 +39,9 @@ Rank32 now20 active receipts; rank12815 (cancelled packs retained separately).
 The old r128 watcher404cd2e5 watches CANCELLED3716407: acknowledge its wakeup,
 but this means no training succeeded; inspect replacement singles and arm an
 appropriate remaining replacement job only after reconciling the existing event.
+This cancellation wakeup was delivered and acknowledged06:55JST (no start/no
+elapsed time, no successful workload). Arrange new pre-boundary completion
+watcher on3716619; retain the existing post-maintenance3716305 watcher.
 Rank32 watcher3716305 remains pending for the post-maintenance B2 completion.
 
 
@@ -53,8 +63,8 @@ Armed wakeups (message mode,300s polling, no Goal):
   acknowledged; all five jobs exit0 and all ten candidates complete.
 - r32 main3716305: .job-wakeup/a101bbc0-d502-4bf4-8978-4e613b043510,
   worker PID2276624; verify all19 jobs/22 run artifacts on wake.
-- r128 main3716407: .job-wakeup/404cd2e5-fa6f-482e-beb3-11f09a424a15,
-  worker PID2354422; verify all12 jobs/15 run artifacts on wake.
+- cancelled r128 pack3716407: .job-wakeup/404cd2e5-fa6f-482e-beb3-11f09a424a15,
+  acknowledged06:55JST; pack never ran. Its replacements are3716618/3716619.
 - early queue-progress3716290: .job-wakeup/e098924a-8adc-43d9-b03c-063317e048ab,
   acknowledged; queue movement verified06:17JST. No replacement needed.
 Read the event state and acknowledge with the exact argv from the wakeup
