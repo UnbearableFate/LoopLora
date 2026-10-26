@@ -82,7 +82,7 @@ def prepare(root,out,*,rank=128,arms=('W5','R','OA'),steps=2400,e8_decision=None
         status='released_after_smoke_artifact_and_timing_gate',seed=17,eval_seed=4242,
         prior_report_commit='cd5a45c',max_total_node_hours=None,max_job_seconds=7200,walltime='02:00:00',
         scale_up='docs/tasks/WP-L4_p1l_read_fix.md',lr=.003,lr_search=False,
-        lr_note='rank128 retains lr3e-3 by user request; no new search',
+        lr_note=f'rank{rank} retains lr3e-3 by user request; no new search',
         steps_by_arm={},primary_eval_steps_by_arm={},matched_eval_steps_by_arm={},sizing_by_arm={},
         selection_order=['r32/R','r32/Rrho','r32/RK','r128/W5','r128/R'],
         e8_rule='one best learned arm across both ranks; fresh same seed/lr/objective; own smoke-sized schedule')

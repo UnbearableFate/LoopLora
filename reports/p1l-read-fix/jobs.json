@@ -159,15 +159,30 @@
       "role": "A2 rank128 smoke OA,2400steps",
       "exit_status": 0,
       "node_hours": 0.11444444444444445
+    },
+    {
+      "job_id": "3716145",
+      "job_name": "a-l4-128-releas",
+      "status": "FINISH",
+      "project": "xg24i002",
+      "queue": "small-g",
+      "start_date": "10/27 04:55:25",
+      "elapsed_seconds": 34,
+      "token": 0.0,
+      "token_estimate": null,
+      "nodes": 1,
+      "mig": null,
+      "role": "A2 smoke artifact/export audit and frozen per-arm timing release on mg0842",
+      "exit_status": 0,
+      "node_hours": 0.009444444444444445
     }
   ],
-  "completed_node_hours": 0.48750000000000004,
+  "completed_node_hours": 0.49694444444444447,
   "max_total_node_hours": null,
   "separate_from": "WP-L3 costs",
   "pending_roles": [
-    "A1 rank32 scientific jobs unchanged",
-    "A2 rank128 smokes/release and scientific jobs",
-    "conditional E8 across both ranks and final audits"
+    "four scientific jobs: all seven E16 arms",
+    "conditional best-arm E8 across both ranks and final audits"
   ],
   "pending": [
     {
@@ -185,12 +200,28 @@
       "requested_seconds": 7200
     },
     {
-      "job_id": "3716145.opbs",
-      "role": "A2 smoke artifact/export audit and immutable timing release",
-      "source": "7e776bd",
+      "job_id": "3716159.opbs",
+      "role": "A2 rank128 scientific W5/R",
+      "source": "be07f7f",
       "nodes": 1,
-      "requested_seconds": 300
+      "requested_seconds": 7200
+    },
+    {
+      "job_id": "3716160.opbs",
+      "role": "A2 rank128 scientific OA",
+      "source": "be07f7f",
+      "nodes": 1,
+      "requested_seconds": 7200
     }
   ],
-  "budget_amendment": "A2: user removed total cap; every job <=1node2h"
+  "budget_amendment": "A2: user removed total cap; every job <=1node2h",
+  "validation_blind_boundary": {
+    "all_rank128_scientific_arms_submitted": "2026-10-27T04:56:45+09:00",
+    "job_ids": [
+      "3716159.opbs",
+      "3716160.opbs"
+    ],
+    "no_WP_L4_quality_read_before_submission": true,
+    "quality_used_to_set_budgets": false
+  }
 }

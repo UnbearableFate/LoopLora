@@ -1,4 +1,62 @@
-# WP-L4 active state — Amendment A1
+# WP-L4 CURRENT — Amendment A2, all science submitted
+
+All three r128scientific arms SUBMITTED04:56:45JST, before ANY WP-L4 quality
+score was read; none read yet even after that boundary. Both newjobs started
+04:57:31JST, in parallel with unchangedrank32jobs. NoPBSjob was canceled.
+WP-L3 already COMPLETE/reportcd5a45c/done-line emitted; do not redo it.
+
+Current scientific jobs (all1node02h via--scale-up task):
+- 3715707.opbs r32 R/Rrho, source0b03d606f3c752cddfcfd716946dbbc3e36bf025.
+- 3715708.opbs r32 RK/OArho, same0b03d60, unchangedrelease.json.
+- 3716159.opbs r128 W5/R, sourcebe07f7fb34c1cdd14b64f65b7f687364fcd6e36f.
+- 3716160.opbs r128 OA, samebe07f7f, separate release-r128.json.
+Newlogs /work/xg24i002/x10041/LoopLora/logs/pbs/r-l4-128-W5-R-20261027-045645-2066285.log
+and r-l4-128-OA-20261027-045645-2066310.log. Check ALL4 terminal and ALL7 records
+complete after wake. Do not change runningjobs or their frozen sources.
+
+R128tests69passed3716019mg0851; smokes3716039mg0855/3716040mg0897 exit0,
+2400steps/100evalepisodes. Compute gate3716145mg0842 passed: allsamples/configs,
+finite diagnostics/objectives/gradients, sharednormalization, 128x128 memory,
+head-free reload identical100predictions. NO quality exposed. Gatecode7e776bd;
+release committed2fd95f9. Allsmoke and scientificr128MLsourcebe07f7f.
+Maximal5-step-resolution budgets,1.5*(S*ownmeanstep+5*ownmaxeval100x10)+90<=7200:
+W5 S24635 checkpoints4927/9854/14781/19708/24635;
+R S24645 checkpoints4929/9858/14787/19716/24645;
+OA S31175 checkpoints6235/12470/18705/24940/31175.
+Smoke was10% of provisional24000; actualfractions9.74%W5/R,7.70%OA after
+maximal sizing; recorded explicitly, no quality-guided settings. Fixedlr.003
+at r128 withoutsearch is flagged. OA is learned-value oracleaddressing,
+not WP-C7 externaloracle_random. TOTALWP-L4capremoved; recordALLactualjobcosts.
+Completedcostpre-current4sciencejobs0.496944nodeh; jobs.json updated/pending.
+
+After ALL7E16 complete: onCOMPUTE via submit.py --commit CURRENTexplicitwp/llm
+hash (HEAD resolves master), scripts/analyze_p1l_read_fix.py --root ROOT
+--out REPORTS --release REPORTS/release.json --rank128-release
+REPORTS/release-r128.json --e16-only. Auditsallconfig/source/samples/metrics,
+fixedbudgets, exportheadcounts and allcurves; locksimmutable selection.json.
+Candidate order r32R<Rrho<RK then r128W5<R. SimplestfinalEM>=.80 selected.
+Bothoracles ineligible. Ifnone>=.80 and bestlearned>=.50, exactlyONE E8retrain
+at bestarm'srank (tiescandidateorder), same seed17/lr/objective, ownsmoke-sized
+2hrelease. Usebe07f7f scientificimplementation for E8 at EITHERrank. E8CLI:
+--rank RANK --arms ARM --smoke --steps2400 --e8-decision REPORTS/selection.json
+--out ROOT/smoke-e8 pluspriorL3arguments. Thencompute
+scripts/prepare_p1l_read_fix_a2.py --root ROOT/smoke-e8 --out REPORTS --rank RANK
+--arms ARM --steps2400 --e8-decision REPORTS/selection.json writes e8-release.json,
+ONLYtiming/artifacts exposed. ScientificE8 uses --schedule REPORTS/e8-release.json
+--e8-decision REPORTS/selection.json --rank RANK --arms ARM --out ROOT/e8,
+samepriorL3arguments,be07source,--scale-up task,<=2h. No further writertraining.
+Finalanalyzer omit--e16-only add--verify-export (+--e8-release ifused); all7(+E8)
+exports must reproduce1000predictions head-free. UpdateALLPBSactualcosts. Write
+<=1page+tables docs/reports/P1L-read-fix.md, commitonwp/llm, exactdone-line.
+
+ROOT=/work/xg24i002/x10041/LoopLora/runs/p1l/read-fix-20261027
+REPORTS=/work/xg24i002/x10041/LoopLora-wt/llm/reports/p1l-read-fix
+PriorL3decisionREPORTS/../p1l-writer-fix/summary.json; priorreport
+/work/xg24i002/x10041/LoopLora-wt/llm/docs/reports/P1L-writer-fix.md.
+Never importtorch/runpytest/validators onlogin. NoGoal. Olderhistory below
+is superseded where A2 differs; no totalnodeh cap,7arms/bothranks forselection.
+
+# Historical A1 and A2 preparation
 
 Branch wp/llm only. No Goal. Never import torch/runpytest or validators on login;
 all runtime via scripts/submit.py on Miyabi-G compute. Final exact line:

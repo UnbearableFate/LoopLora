@@ -23,6 +23,32 @@ The seven-run analyzer now additionally requires `--rank128-release` and
 preserves rank in all tables, selection locks and export checks. E8release
 also records rank. This paragraph supersedes older rank32-only commands below.
 
+A2 tests3716019 passed69 onmg0851. Smokes3716039mg0855 and3716040mg0897,
+2400steps each, passed quality-blind gate3716145mg0842: all samples/configs,
+finite losses/gradients/diagnostics, sharednormalization, r=r_mem128 exports,
+and identical100predictions after head-free reload. Gate froze these schedules
+and committed them as2fd95f9 BEFORE science; release science sourcebe07f7f.
+All three arms were submitted04:56:45JST before any WP-L4 score was read:
+3716159 W5/R and3716160 OA, both started04:57:31 alongside originalrank32jobs.
+Rank128 retains lr.003 withoutsearch. Totalcapnone; perjob2h/1node remains.
+
+| r128 arm | Steps | Primary checkpoints |
+| --- | ---: | --- |
+| W5 | 24635 | 4927 / 9854 / 14781 / 19708 / 24635 |
+| R | 24645 | 4929 / 9858 / 14787 / 19716 / 24645 |
+| OA | 31175 | 6235 / 12470 / 18705 / 24940 / 31175 |
+
+Each schedule is the largest multiple5 satisfying
+1.5*(steps*ownsmokemeanstep+5*ownmaxeval100seconds*10)+90<=7200.
+The2400step systems smoke was10% of provisional24000steps; after maximal sizing
+it is9.74% forW5/R and7.70% forOA, recorded in release sizing metadata. No
+accuracy determined these budgets. Newruns persist in `arms-r128/`.
+Rank128 CLI adds `--rank 128`, `--schedule <release-r128.json>`, and
+`--out <root>/arms-r128`; uses frozenbe07f7f, samepriorL3arguments andscale-up.
+The final analyzer command must include BOTH `--release <release.json>` and
+`--rank128-release <release-r128.json>`; E8(iftriggered) also usesbe07f7f and
+the selected rank. These instructions supersede historicalrank32-onlyexamples.
+
 Task `docs/tasks/WP-L4_p1l_read_fix.md`; choices `docs/reports/WP-L4-plan.md`;
 continuation `docs/reports/WP-L4-state.md`. Persistent root:
 `/work/xg24i002/x10041/LoopLora/runs/p1l/read-fix-20261027/`.
