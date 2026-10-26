@@ -69,3 +69,7 @@ on synthetic data; a 300-step T1 smoke on GPU gets clearly above chance.
 Build and validate the pipeline, then run only: (1) the test suite; (2) one smoke suite (T1 + T2 at 10% of the
 default steps, all variants, one seed) with timing. Do not run pilots or the screening suite — the orchestrator
 pre-registers those. Report measured times per run to size jobs (≤ 8 nodes × 1 h per experiment).
+
+## Addenda (sent to the worker by prompt, 2026-10-26)
+1. Reader variants include **M1-lin** = `iterq` with `activation=identity` (plan §6.2 linear-reader control);
+   B5/B3 may run with either activation. M1-lin is part of the smoke suite.

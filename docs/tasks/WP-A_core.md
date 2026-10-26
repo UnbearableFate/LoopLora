@@ -54,3 +54,9 @@ Run: `scripts/submit.py --name t-core --walltime 00:15:00 --worktree . --wait --
 - FP32/FP64 reference first; no custom kernels, no torch.compile in this WP.
 - No in-place updates on tensors autograd may have saved (state updates return new tensors).
 - Keep the public interface above stable; WP-E (LLM) and the symbolic stage build on it.
+
+## Addenda (sent to the worker by prompt, 2026-10-26)
+1. Expose `core.memory.delta_update(M, k, v, write_mask, lam, beta) -> M_new` (k already normalised; same
+   decay-first rule and mask semantics); `write()` is built on it. Used by the symbolic oracle writer.
+2. `AdapterConfig.activation ∈ {relu, identity}` (default relu); identity is the linear-reader mechanism control
+   of plan §6.2. Covered by the reference-equivalence tests.
