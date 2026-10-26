@@ -45,7 +45,7 @@ class ResidualInputLinear(nn.Module):
             u,state,valid,write,reset = self.adapter._prepare(
                 sequence,context.state,context.loop_steps,context.valid,write,context.reset)
             if self.adapter.has_memory:
-                _,state = self.adapter.scan_prewrite(state,u,valid,write,reset)
+                state = self.adapter.scan_final(state,u,valid,write,reset)
             elif state is not None:
                 state = torch.where(reset.any(1)[:,None,None],torch.zeros_like(state),state)
             stats = self.adapter._stats(valid,write,context.loop_steps)

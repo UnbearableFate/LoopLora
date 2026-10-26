@@ -191,6 +191,14 @@ class MemoryAdapter(AdapterBase):
         return memory.scan_prewrite(M0, u, valid, write, reset, K=self.K, V=self.V,
                                     lam=lam, beta=beta, eps=self.cfg.eps)
 
+    def scan_final(
+        self, M0: Tensor, u: Tensor, valid: Tensor | None = None,
+        write: Tensor | None = None, reset: Tensor | None = None,
+    ) -> Tensor:
+        lam, beta = self.gates(u)
+        return memory.scan_final(M0, u, valid, write, reset, K=self.K, V=self.V,
+                                 lam=lam, beta=beta, eps=self.cfg.eps)
+
     @staticmethod
     def _query(u: Tensor, M: Tensor, Q: Tensor, U: Tensor) -> Tensor:
         q = F.linear(u, Q)

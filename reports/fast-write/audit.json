@@ -1,0 +1,40 @@
+{
+  "status": "passed",
+  "cells": 24,
+  "workers": 3,
+  "measured_worker_steps": 720,
+  "fixed_loss_checks": [
+    {
+      "input_site": "o_proj",
+      "policy": "fact_final",
+      "reference_loss": 11.856364250183105,
+      "fast_loss": 11.856364250183105,
+      "state_max_absolute_error": 1.4901161193847656e-08
+    },
+    {
+      "input_site": "o_proj",
+      "policy": "all_tokens",
+      "reference_loss": 11.840630531311035,
+      "fast_loss": 11.840630531311035,
+      "state_max_absolute_error": 1.4901161193847656e-08
+    },
+    {
+      "input_site": "residual",
+      "policy": "fact_final",
+      "reference_loss": 12.167141914367676,
+      "fast_loss": 12.167141914367676,
+      "state_max_absolute_error": 8.940696716308594e-08
+    },
+    {
+      "input_site": "residual",
+      "policy": "all_tokens",
+      "reference_loss": 12.249484062194824,
+      "fast_loss": 12.249484062194824,
+      "state_max_absolute_error": 2.384185791015625e-07
+    }
+  ],
+  "phase_partition_checks": "passed",
+  "all_cells_fit": true,
+  "raw_root": "/work/xg24i002/x10041/LoopLora/runs/fast-write/main-v1",
+  "seconds": 387.6155378241092
+}

@@ -1,0 +1,142 @@
+[
+  {
+    "input_site": "o_proj",
+    "policy": "fact_final",
+    "losses": [
+      11.856364250183105,
+      11.856364250183105,
+      11.856364250183105,
+      11.856364250183105
+    ],
+    "state_abs_errors": [
+      0.0,
+      0.0,
+      2.2351741790771484e-08,
+      2.2351741790771484e-08
+    ],
+    "state_relative_errors": [
+      0.0,
+      0.0,
+      1.0741292300053829e-07,
+      1.0741292300053829e-07
+    ],
+    "bulk_step_projection_abs_error": 2.384185791015625e-07,
+    "u_shape": [
+      2,
+      79,
+      32
+    ],
+    "packed_shape": [
+      2,
+      16,
+      32
+    ],
+    "float32_precision": "highest",
+    "tf32": false
+  },
+  {
+    "input_site": "o_proj",
+    "policy": "all_tokens",
+    "losses": [
+      11.840630531311035,
+      11.840630531311035,
+      11.840630531311035,
+      11.840630531311035
+    ],
+    "state_abs_errors": [
+      0.0,
+      0.0,
+      2.9802322387695312e-08,
+      2.9802322387695312e-08
+    ],
+    "state_relative_errors": [
+      0.0,
+      0.0,
+      1.508369393832254e-07,
+      1.508369393832254e-07
+    ],
+    "bulk_step_projection_abs_error": 2.384185791015625e-07,
+    "u_shape": [
+      2,
+      79,
+      32
+    ],
+    "packed_shape": [
+      2,
+      79,
+      32
+    ],
+    "float32_precision": "highest",
+    "tf32": false
+  },
+  {
+    "input_site": "residual",
+    "policy": "fact_final",
+    "losses": [
+      12.167141914367676,
+      12.167141914367676,
+      12.167141914367676,
+      12.167141914367676
+    ],
+    "state_abs_errors": [
+      0.0,
+      0.0,
+      5.960464477539063e-08,
+      5.960464477539063e-08
+    ],
+    "state_relative_errors": [
+      0.0,
+      0.0,
+      9.620791274755902e-08,
+      9.620791274755902e-08
+    ],
+    "bulk_step_projection_abs_error": 5.960464477539062e-07,
+    "u_shape": [
+      2,
+      79,
+      32
+    ],
+    "packed_shape": [
+      2,
+      16,
+      32
+    ],
+    "float32_precision": "highest",
+    "tf32": false
+  },
+  {
+    "input_site": "residual",
+    "policy": "all_tokens",
+    "losses": [
+      12.249484062194824,
+      12.249484062194824,
+      12.247495651245117,
+      12.247495651245117
+    ],
+    "state_abs_errors": [
+      0.0,
+      0.0,
+      2.384185791015625e-06,
+      2.384185791015625e-06
+    ],
+    "state_relative_errors": [
+      0.0,
+      0.0,
+      3.4417757888149936e-07,
+      3.4417757888149936e-07
+    ],
+    "bulk_step_projection_abs_error": 4.9591064453125e-05,
+    "u_shape": [
+      2,
+      79,
+      32
+    ],
+    "packed_shape": [
+      2,
+      79,
+      32
+    ],
+    "float32_precision": "highest",
+    "tf32": false
+  }
+]
