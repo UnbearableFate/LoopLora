@@ -52,12 +52,14 @@ def size(args) -> None:
     longest = max(row["step_seconds"] for row in rows)
     reserve = 60. + max(row["overhead_seconds"] for row in rows)
     job_cap = math.floor((7200 / 1.5 - reserve) / longest)
-    # Amendment B1: seven readers x three main seeds plus two pilot rates.
+    # Amendment B2 restores per-job sizing; the former total cap is descriptive.
     # Sequential backbone reuse is the measured packing, with no GPU contention.
     overhead = 5 * sum(row["overhead_seconds"] for row in rows) + 35 * 15.
     step_sum = sum(row["step_seconds"] for row in rows)
     budget_cap = math.floor((13 * 3600 - overhead) / ((3 + 2 / 3) * step_sum))
-    S = min(job_cap, budget_cap) // 500 * 500
+    S = 17000  # B2 explicitly fixes S from the timing-only preflight.
+    if S > job_cap:
+        raise ValueError("smoke timing no longer supports preregistered S17000 under2h/1.5")
     if S < 30:
         raise ValueError("no feasible training budget")
     predicted = ((3 * S + 2 * (S // 3)) * step_sum + overhead) / 3600
@@ -67,7 +69,8 @@ def size(args) -> None:
                   job_cap_steps=job_cap, budget_cap_steps=budget_cap,
                   packing="one GPU process; runs sequentially reuse backbone, prefetch2 per active run",
                   overhead_seconds=overhead,
-                  excludes="smoke, validation, confirmation, J-lens and failed jobs (3nodeh reserve)",
+                  budget_rule="B2: no total cap; record every job's node-hours",
+                  excludes="smoke, validation, confirmation, J-lens and failed jobs",
                   timing_rows=rows, source=str(args.root),
                   time=datetime.now(timezone.utc).isoformat())
     save(args.out, result)

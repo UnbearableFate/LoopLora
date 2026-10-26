@@ -69,11 +69,16 @@ until its explicit WP-L4 decision (one condition:95% CI; two:97.5%).
 
 ## Cost and artifacts
 
-Total cap16 node-hours, including failed jobs; every job<=8nodes x2hours and
+Amendment B2 supersedes the original total cap and B1's13/16node-hour limits.
+S=17000, Pilot-2=floor(S/3)=5666, fixed before any Pilot-2 score. The900-step
+timing smokes remain valid by explicit orchestrator instruction. There is no
+study-total cap; record node-hours for every job, including failures.
+Every job<=8nodes x2hours and
 must finish before2026-10-28 09:00JST. All submissions use scripts/submit.py.
-Measure all7 trained variants before selecting S from the slowest run and
-price the full matrix before pilot/main. Raise any cap conflict to Claude Code
-before spending beyond the authorized cap. Raw artifacts live under
+Measure all7 trained variants and verify that the slowest run x1.5 fits2hours.
+Packing is sequential backbone reuse, with only active-run prefetch2 and no
+GPU process contention. Pack multiple trainings only when their summed
+measured time x1.5 fits the job request. Raw artifacts live under
 `/work/xg24i002/x10041/LoopLora/runs/p1l/main/`; compact locks, manifests,
 counts, paired endpoints, readout tables and figures live in reports/p1l.
 Keep adapters/checkpoints and sample arrays; no full-backbone copies or new
