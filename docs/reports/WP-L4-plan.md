@@ -23,10 +23,12 @@ is discarded at inference, retained only in training checkpoint and audit.
 All scope same T1E16/n_rel4/headsharing.3/seed17/r32/layer14/L1/o_proj/B32/Q4,
 lr.003, AdamW(.01 weight decay),20-step warmup, gradclip1, val1000seed4242.
 Use scan_final and two prefetch workers per process. No test/T2/reader/joint.
-Before smoke scores, provisional target13160 steps, with a10% smoke1316 steps
+Before smoke scores, revised provisional target8225 steps, with a10% smoke823 steps
 for ALL4 arms in two paired jobs, eval100episodes at five roughly equal steps.
-The target13160 is an existing A1 OA checkpoint, giving OAρ an exact matched-
-step reference. Smoke ONLY timings/finite-output/artifact gates are read until
+The fourth evaluation is6580, an existing A1 OA checkpoint, giving OAρ an exact
+matched-step reference. The initial13160 proposal would exceed1h with the
+theory's1.5x margin at A1's measured.209s paired step, so it was reduced BEFORE
+smoke submission or scores. Smoke ONLY timings/finite-output/artifact gates are read until
 final schedule is fixed. Retain target if measured1.5x training time plus setup/
 5 full evaluations fits1h; otherwise reduce paired packing or target by a declared
 common schedule before any scientific score. Never choose from smoke accuracy.

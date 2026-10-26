@@ -126,14 +126,26 @@ def test_controls_change_deployed_memory_keep_question_inputs_and_reproduce_gram
             donor=replace(batch,values=batch.values.flip(0),snapshot=replace(batch.snapshot,
                 states={1:batch.snapshot.states[1].flip(0)}))
             before=batch.snapshot.states[1].clone()
-            original,x=controlled_score(experiment,batch)
-            repeat,rx=controlled_score(experiment,batch)
-            zero,zx=controlled_score(experiment,batch,'zero')
-            shuffled,sx=controlled_score(experiment,batch,'shuffle',donor)
+            observed=[]
+            def capture(module,inputs):
+                value=(experiment.adapter.oracle_values if arm=='OArho' else module.context.state)
+                observed.append(value.clone())
+            hook=experiment.bank.modules[1].register_forward_pre_hook(capture)
+            try:
+                original,x=controlled_score(experiment,batch)
+                repeat,rx=controlled_score(experiment,batch)
+                zero,zx=controlled_score(experiment,batch,'zero')
+                shuffled,sx=controlled_score(experiment,batch,'shuffle',donor)
+            finally: hook.remove()
             assert torch.equal(original,repeat)
             assert all(torch.equal(x,y) for y in (rx,zx,sx))
             assert not torch.equal(original,zero)
-            assert not torch.equal(original,shuffled)
+            assert torch.equal(observed[0],observed[1])
+            assert observed[2].count_nonzero()==0
+            expected=(donor.snapshot.states[1].repeat_interleave(4,0) if arm=='R' else
+                      question_terms(experiment,donor,x)['clean'].flatten(0,1))
+            assert torch.equal(observed[3],expected)
+            assert not torch.equal(observed[0],observed[3])
             assert torch.equal(before,batch.snapshot.states[1])
             assert experiment.adapter.oracle_values is None and experiment.adapter.phase=='idle'
             diag,exact=diagnostics(experiment,batch,x)

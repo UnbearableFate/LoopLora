@@ -102,8 +102,8 @@ def audit_one(folder,out,count=1000,*,model=None,tokenizer=None):
                 prediction=logits.argmax(-1),correct=logits.argmax(-1)==batch.answer_ids,**diag)
             for name,scores in conditions.items():
                 nll=F.cross_entropy(scores.float().flatten(0,1),batch.answer_ids.flatten(),reduction='none')
-                answer_logit=scores.gather(-1,batch.answer_ids[...,None]).squeeze(-1)
-                other=scores.clone().scatter(-1,batch.answer_ids[...,None],-torch.inf).amax(-1)
+                answer_logit=scores.float().gather(-1,batch.answer_ids[...,None]).squeeze(-1)
+                other=scores.float().clone().scatter(-1,batch.answer_ids[...,None],-torch.inf).amax(-1)
                 values.update({name+'_nll':nll,name+'_correct':scores.argmax(-1)==batch.answer_ids,
                     name+'_answer_logit':answer_logit,name+'_answer_margin':answer_logit-other})
             for key,value in values.items():
