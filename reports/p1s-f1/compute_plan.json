@@ -14,6 +14,6 @@
   "requested_walltime_per_shard": "00:50:00",
   "walltime_rule": "1.5 times measured pack, scaled by steps and run count, rounded to 50 minutes",
   "total_node_hour_cap": 6,
-  "confirmation_not_started": true,
-  "evaluation_pipeline": "Await tested WP-H pipeline merge; re-evaluate all checkpoints there."
+  "evaluation_pipeline": "Await tested WP-H pipeline merge; re-evaluate all checkpoints there.",
+  "confirmation_not_started_at_decision": true
 }
