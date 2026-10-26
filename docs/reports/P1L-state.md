@@ -14,6 +14,8 @@ Armed wakeups (message mode,300s polling, no Goal):
   acknowledged; both smoke jobs verified complete, exit0.
 - r32 pilot3715965: .job-wakeup/ee3ad75d-7773-4f90-92d8-b0bc5660b157,
   worker PID2041468; also verify the other six pilot jobs on wake.
+- r128 pilot3716169: .job-wakeup/d921e843-f2a6-44ff-82e7-83cb3267c07f,
+  worker PID2200345; also verify the other four pilot jobs on wake.
 Read the event state and acknowledge with the exact argv from the wakeup
 message. Do not register duplicates or cancel the other pending watcher.
 
@@ -88,7 +90,7 @@ R128 Pilot-2 launched source e95576527c46cc1798d97c5af83384fc62bd0e06:
 3716168B8,3716169M1-L4,3716170B4,3716171B5-L4,3716172B3-L4.
 Receipts R/r128/pilot-jobs.json, two sequential lrs per label under
 R/r128/pilot/<LABEL>/<LABEL>-lr0.001 or -lr0.003. Requested45–65min,
-started04:59JST. Arrange an independent watcher for3716169 before going idle.
+started04:59JST. Independent watcher for3716169 is armed above.
 
 Validation-only full-evaluation timing acceptance: script
 scripts/benchmark_p1l_evaluation.py loads the immutable completed M1-L4
@@ -127,7 +129,7 @@ separately; unchanged regression passed3715942). No further blanket retests.
 
 1. Validation-only evaluation acceptance is complete; never read its raw scores.
 2. Retain the armed r32 watcher3715965; do not duplicate or cancel it.
-   Arrange an independent watcher on r128 pilot3716169 before going idle.
+   R128 pilot3716169 has its own independent armed watcher above.
 
 ## Next actions after each rank's pilot wakeup
 
