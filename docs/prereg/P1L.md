@@ -17,7 +17,8 @@ the backbone's attention (context-retained)?
 - Writer policy ⟨pilot: `fact_final` vs `all_tokens`, chosen by T1 val accuracy⟩.
 - Writer conditions carried from P1-S ⟨P1-S result⟩: `t1_frozen` (writer trained on rendered `t1`, n_rel = 4) and/or
   `joint`.
-- Variants: M1, B4, B5, B3 (+ M1-lin if P1-S showed it differs from M1). Baselines: B0 frozen base (both
+- Variants: the co-primary reader(s) that pass P1-S (M1 and/or M1-lin, P1S.md amendment A1) with their fixed-query
+  comparator (B5 / B5-lin), plus B4 and B3. If both pass in P1-S, both are carried as co-primary (97.5% CIs). Baselines: B0 frozen base (both
   protocols), B1 LoRA and B2 single-step nonlinear adapter at the same position (both protocols), trained in the
   context-retained protocol with the same data and steps.
 - Tasks and episode sets mirror P1-S (`t2_chain_end` primary, `t2_typed` replication, hops 1–3 train / 1–8 eval,
