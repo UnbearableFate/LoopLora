@@ -138,7 +138,7 @@ Prompted by an external review (`docs/review/rv-astra_2026-10-27.md`). Gates G1-
   positive in every seed. Otherwise the paper states the B8 result with its parameter difference and makes no
   equal-parameter claim for the LLM.
 
-## Amendment B7 — memory-use check and oracle-code interpretation (2026-10-27 09:30 JST; before any P1-L
+## Amendment B7 — memory-use check and oracle-code interpretation (2026-10-27 08:51 JST; before any P1-L
 ## confirmation score is read)
 Prompted by the external reviews (`docs/review/rv-fable_2026-10-27.md` C1, `docs/review/rv-astra_2026-10-27.md`
 §5) and by a check of the main runs' training logs. Runs, gates, confirmation set and the 97.5% level are unchanged.

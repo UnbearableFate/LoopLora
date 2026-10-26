@@ -1,6 +1,6 @@
 # Study P1L-C — causal and read-position analysis of the P1-L r = 128 readers, pre-registered
 
-Registered 2026-10-27 09:40 JST, before any P1-L confirmation score is read (P1-L Amendment B7). Proposed by the
+Registered 2026-10-27 08:51 JST, before any P1-L confirmation score is read (P1-L Amendment B7). Proposed by the
 external review `docs/review/rv-astra_2026-10-27.md` §5. Evaluation only: no training, no change to P1-L.
 
 ## Question
