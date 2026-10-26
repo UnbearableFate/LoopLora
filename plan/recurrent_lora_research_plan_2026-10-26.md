@@ -32,7 +32,7 @@
 - 资源上限（用户指定，当前阶段）：单个实验的训练资源 ≤ 8 节点 × 1 小时；由 `scripts/submit.py` 在提交时检查，实际 walltime 按实测 ×1.5 申请。2026-10-26 用户补充：当已获得的实验结论支持扩大实验时，单次实验预算可扩至 8 节点 × 2 小时。2026-10-27 用户澄清：“单个实验”指单个作业，总预算可以放宽（各研究的总量为自设预算，按作业记录 node·h）（`submit.py --scale-up <决策记录或预注册>`，理由写入该文档）。
 - 平台：Miyabi-G（GH200，aarch64），组 xg24i002；torch 2.14.0+cu132、transformers 4.57.6，uv 管理（`pyproject.toml`/`uv.lock`）。所有测试与实验经 PBS 在计算节点运行。
 - 系统日程（2026-10-27 06:49 从 `/etc/motd` 与 PBS 注释“Job would cross dedicated time boundary”核实；此前误记为 10-28 09:00 才停止）：正常运行到 **2026-10-27 08:00**；10-27 08:00 至 10-28 09:00 为 HPC Challenge 专用时段，普通作业不能运行；10-28 09:00–22:00 系统维护；10-28 22:00 起恢复。不能在 08:00 前结束的作业要到 10-28 22:00 之后才会开始。
-- 执行组织：Claude Code 作为 Orchestrator；codex worker（2026-10-26 19:36 前启动的为 GPT-6-Astra xhigh，此后新开 session 为 GPT-6.1-sol xhigh）经 herdr 在独立 tab 与 git worktree（`wp/*` 分支）中实现子任务；worker 为固定角色、长生命周期（`docs/workers.md`），按需清理并重新注入上下文；交流以 `docs/tasks/`（任务书）与 `docs/reports/`（报告）为准。
+- 执行组织：Claude Code 作为 Orchestrator；codex worker（2026-10-26 19:36 前启动的为 GPT-6-Astra xhigh，此后新开 session 为 GPT-6.1-sol xhigh）经 herdr 在独立 tab 与 git worktree（`wp/*` 分支）中实现子任务；worker 为固定角色、长生命周期（`docs/workers.md`），按需清理并重新注入上下文；交流以 `docs/tasks/`（任务书）与 `docs/reports/`（报告）为准。2026-10-27 07:20 用户要求提前交接：所有 codex worker 关闭，各角色改由主 session 的 Sonnet-5.5 subagent 按需承担；交接记录见 `docs/workers.md` 与各 WP 的 state 文件（如 `docs/reports/P1L-state.md`）。
 - 代码约定：不使用 SHA-256，内容哈希统一用 blake2b；随机种子由 `derive_seed(base, label…)` 派生。
 
 ### E.2 相对原计划的调整及理由
@@ -48,6 +48,7 @@
 | 与潜空间推理 / Jacobian 研究的联系（2026-10-27 用户提问后加入） | 无 | (1) 研究 JS：终点处读取 Jacobian 谱半径正则（STARS 思路），只约束终点的局部稳定而非全局收缩（结果：减轻但未消除走过头，见 T-09）；(2) P1-L 增加逐步 J-lens / logit-lens 读出（Anthropic J-space：多步推理的中间实体按顺序出现在“可说出”的方向上）；(3) 候选：把模块输出对齐到名字 token 的 J-lens 方向，视 WP-L4 中 OAρ 的结果决定（结果：不做，见 T-04/T-05 LLM 行） | 走过头与无标签停止失败对应读取动力学不收敛（0/96000 收缩证书）；全局收缩与在等距实体编码间移动矛盾，故只约束终点；LLM 中“候选内选对 96%、全词表仅 70%”指向输出方向/强度问题；我们的读取器属于“纵向循环”的潜空间推理，状态仅 32 维，Jacobian 可精确计算 |
 | LLM 阶段的 rank（2026-10-27 用户要求加入） | 按 P1-S 决策在 {32, 64} 中由验证 pilot 选定，之后实际固定为 r=32 | 在 r=32 之外并行运行 r=r_mem=128：WP-L4 的 W5/R/OA 三臂（修订 A2）与 P1-L 的 oracle_random 条件（修订 B3）；不替代 r=32，结果按 rank 分别报告 | 符号阶段 joint writer 在 r=64/128 下更稳健（F1），而 LLM writer 的瓶颈可能来自 rank 32 的读取噪声；并行运行不增加排队轮次，同时给出 LLM 中“多次读取 vs 更大 rank 的单次读取”对照 |
 | 多次读取的比较基准（2026-10-27 用户决定） | Gate 3（§11.6）：与更大 rank 的单次读取在匹配延迟下比较（系统效率） | 只要求超过同 rank 的单次读取：M1-L4 与 B4 参数完全相同，B8 因每步独立的 R/U/Q 多 8.9% 参数（r=r_mem=32）；多出的推理延迟视为可接受的代价，报告参数量与实测延迟。LLM 阶段不做“更大 rank 的单次读取”对照（P1-L 修订 B4 删去 B3 中的两项跨 rank 对照），论文不主张相对加大 rank 的效率优势 | 多次读取与单次读取训练参数相同，只多一点推理时间；Gate 3 原文本就允许以“严格状态限制下的能力优势”通过；符号阶段 P2-S/F1 的更大 rank 对照已完成，按原结果报告 |
+| learned writer 的后续（2026-10-27 用户决定） | WP-L4 为最后一次 writer 筛选 | 增加一轮 DPFP writer 研究（`docs/prereg/DPFP.md`，WP-L5，维护后运行）：在 WP-L4 的 R 上把 key/query 经 DPFP 特征映射（Schlag 等 2021）到更高维的非负空间后再写入/读取；三臂 D32-3、D128-1、D128-3，门槛与 E=8 分支同 WP-L4；选出 writer 时另行登记 P1-L learned 条件（P1L-D） | WP-L4 诊断显示瓶颈是 learned key 高度重叠造成的读取失真（干净 value 93% 对实际读取 20%）；DPFP 是 fast-weight 文献中提高 delta 规则记忆容量、减少 key 重叠干扰的无参数方法 |
 | P1-L 的启动时机 | P1-S 通过 Gate 1 后才开始 P1-L | P1-L Pilot-1（LLM writer 可行性，仅验证集）与 P1-S 并行；Pilot-2 与正式运行仍以 P1-S 结论为条件 | Pilot-1 不依赖 P1-S 结果；系统停机（10-28 09:00）前的时间有限，并行可节省一个排队周期 |
 
 ### E.3 任务状态
