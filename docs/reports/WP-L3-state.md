@@ -48,3 +48,11 @@ Collect all job costs including final audit; write <=1page+tables report with
 all screen/rerun EM, diagnostics, probes, supervision, OA link limitations,
 selection, curves and costs. Commit on wp/llm only. Final exact line:
 WP-L3 done: docs/reports/P1L-writer-fix.md
+
+A1 rerun submitted3714914.opbs, source0713cfb, request1node/02:00:00,
+regular-g, --scale-up docs/tasks/WP-L3_p1l_writer_fix.md.
+Log /work/xg24i002/x10041/LoopLora/logs/pbs/r-l3-A1-20261027-013648-4128197.log;
+spec same stem under logs/pbs/specs/ with.json. Await terminal event and verify
+application status for BOTH rerun arms; FINISH/exit0 alone is insufficient.
+All cost IDs:3714689,3714703,3714716,3714717,3714718,3714719,3714886,3714914,
+plus final audit. jobs.json records the6114s completed before rerun.
