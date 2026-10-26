@@ -46,7 +46,7 @@ def evaluate_f2_gates(endpoints: dict, *, evaluation_seed: int) -> list[dict]:
     return rows
 
 
-def verify_release(root: Path) -> tuple[dict,dict]:
+def verify_release(root: Path,*,aggregated: bool=False) -> tuple[dict,dict]:
     plan=driver.all_training()
     barrier=shared.read_json(root/'barrier.json')
     expected={(w,v,s) for w in WRITERS for v in driver.VARIANTS for s in driver.SEEDS}
@@ -69,8 +69,14 @@ def verify_release(root: Path) -> tuple[dict,dict]:
                        and e['episodes']==2000 and e['splits']==['test'] and not e['counterfactuals']
                        and e['depths']==driver.DEPTHS and e['hops']==list(shared.HOPS), 'F2 confirmation scope differs')
         path=folder/'confirmation/samples.npz'
-        shared.require(path.is_file() and not (folder/'confirmation/metrics.json').exists(),
-                       'F2 confirmation missing or prematurely aggregated')
+        metrics=folder/'confirmation/metrics.json'
+        shared.require(path.is_file() and metrics.exists()==aggregated,
+                       'F2 confirmation missing or aggregation state differs')
+        if aggregated:
+            final=shared.read_json(metrics)
+            shared.require(final['finalized_after_global_barrier'] and
+                           final['barrier_created_at']==barrier['created_at'],
+                           'F2 aggregation does not follow its global sample barrier')
         samples.append(str(path))
     shared.require(len(barrier['confirmation_samples'])==36 and set(samples)==set(barrier['confirmation_samples']),
                    'F2 release does not cover every sample set')
@@ -208,7 +214,9 @@ def compact_exports(out: Path,raw: Path,tables: list[dict],gates: list[dict],rep
                   per_seed=json.dumps(s['per_seed'])) for r in reported for s in r['statistics'].values()])
     a5=json.loads((raw/'swap_successors.json').read_text())
     driver.csv_table(out/'swap_successors.csv',a5)
-    driver.csv_table(out/'writer_t1_scores.csv',[r for r in summary if r['group']=='writer'])
+    driver.csv_table(out/'writer_t1_scores.csv',[{k:r[k] for k in
+        ('name','writer','seed','n','accuracy','full_accuracy','chance_accuracy')}
+        for r in tables if r['group']=='writer'])
 
 
 def analyze(root: Path,out: Path) -> None:
@@ -226,9 +234,15 @@ def analyze(root: Path,out: Path) -> None:
         for row in rows: row['writer']=reverse[row['writer']]
         shared.write_json(raw/f'{name}.json',rows)
     shared.require(audit['frozen_writers_checked']==18,'F2 must audit all18 frozen readers')
+    audit['role_adapter_plan_hash']=audit['plan_hash']
+    audit['plan_hash']=stable_hash(plan)
+    audit['audit_role_aliases']=LEGACY
+    for group in audit['controlled_writer_groups']: group['writer']=reverse[group['writer']]
+    shared.write_json(raw/'artifact_audit.json',audit)
     gates,reported=statistics(plan,cache)
     f1.tables(raw,tables,gates,reported)
     compact_exports(out,raw,tables,gates,reported)
+    plot_training(out,plan,logs)
     driver.csv_table(out/'swap_successors_new_path_length.csv',exact_successor_lengths(plan))
     shared.write_json(out/'artifact_audit_summary.json',dict(status=audit['status'],runs=39,
           reader_runs=36,frozen_writers_checked=18,sample_rows=audit['sample_rows'],
@@ -242,9 +256,166 @@ def analyze(root: Path,out: Path) -> None:
     print('F2 analysis completed: 39 stages,36 readers,4 gate rows',flush=True)
 
 
+def plot_training(out: Path,plan: dict,logs: dict) -> None:
+    import matplotlib
+    matplotlib.use('Agg')
+    import matplotlib.pyplot as plt
+    fig=plt.figure(figsize=(15,7))
+    grid=fig.add_gridspec(3,6,height_ratios=(1,1,.9))
+    colors={17:'#1765ad',29:'#c05e13',43:'#29843e'}
+    for i,writer in enumerate(WRITERS):
+        for j,variant in enumerate(driver.VARIANTS):
+            ax=fig.add_subplot(grid[i,j])
+            for run in plan['runs']:
+                if run['group']!='primary' or (run['writer'],run['variant'])!=(writer,variant): continue
+                points=logs[run['name']]
+                ax.plot([r['step'] for r in points],[r['loss'] for r in points],
+                        color=colors[run['seed']],linewidth=.8,label=str(run['seed']))
+            ax.set_title(f'{writer}\n{variant}',fontsize=8)
+            ax.set_yscale('log')
+            ax.tick_params(labelsize=7)
+            ax.grid(alpha=.2)
+            if j==0: ax.set_ylabel('Training loss')
+    ax=fig.add_subplot(grid[2,:])
+    for run in plan['runs']:
+        if run['group']!='writer': continue
+        points=logs[run['name']]
+        ax.plot([r['step'] for r in points],[r['loss'] for r in points],
+                color=colors[run['seed']],label=str(run['seed']))
+    ax.set_yscale('log')
+    ax.set_title('Fresh T1 factorized writers',fontsize=9)
+    ax.set_xlabel('Training step')
+    ax.set_ylabel('Training loss')
+    ax.legend(title='Seed',ncol=3,fontsize=8)
+    ax.grid(alpha=.2)
+    fig.tight_layout()
+    fig.savefig(out/'training_losses.pdf')
+    fig.savefig(out/'training_losses.png',dpi=140)
+    plt.close(fig)
+
+
+def cross_family(root: Path,out: Path,reference_plan: Path,reference_barrier: Path) -> None:
+    # No reference file is opened before F2's complete training/sample barriers.
+    plan,barrier=verify_release(root,aggregated=True)
+    checked_at=datetime.now(timezone.utc).isoformat()
+    summary=shared.read_json(out/'analysis_summary.json')
+    shared.require(summary['status']=='complete','finish F2 analysis before paired reference contrasts')
+    released=shared.read_json(reference_plan)
+    released_barrier=shared.read_json(reference_barrier)
+    actual_plan,actual_barrier=shared.verify_release(Path(released['root'])/'plan.json')
+    shared.require(actual_plan==released and actual_barrier==released_barrier,
+                   'released reference copies differ from raw run records')
+    shared.require(released['steps']==15000,'reference training budget must match F2')
+    expected={(LEGACY[w],v,s) for w in WRITERS for v in READERS for s in driver.SEEDS}
+    references=[r for r in released['runs'] if r['group']=='primary'
+                and (r['writer'],r['variant'],r['seed']) in expected and r['r']==32]
+    shared.require(len(references)==12 and
+                   {(r['writer'],r['variant'],r['seed']) for r in references}==expected,
+                   'reference must cover twelve matched unfactorized readers')
+    cache=shared.CompactCache(root/'analysis_cache',limit=12)
+    audits=[]
+    accuracy=defaultdict(lambda:np.zeros(2))
+    for run in references:
+        folder=Path(run['run_dir'])/'confirmation'
+        metadata=shared.read_json(folder/'evaluation.json')
+        snapshot=shared.audit_snapshots(metadata,metadata['config'])
+        sample_hash=shared.file_hash(folder/'samples.npz')
+        shared.require(sample_hash==metadata['samples_hash'],'released reference sample seal differs')
+        with np.load(folder/'samples.npz',allow_pickle=False) as z:
+            arrays={k:z[k] for k in z.files}
+        table,audit=shared.audit_samples(arrays,metadata['config'])
+        for row in table:
+            accuracy[run['writer'],run['variant'],row['hop'],row['L']]+=np.array(
+                [row['n'],row['n']*row['accuracy']])
+        cache.save('wph-'+run['name'],'confirmation',arrays,'test')
+        audits.append(dict(name=run['name'],samples=str(folder/'samples.npz'),
+                           file_hash=sample_hash,
+                           sample_rows=audit['rows'],depth_snapshot_count=len(snapshot)))
+        del arrays
+    reported=[]
+    for writer in WRITERS:
+        for reader in READERS:
+            fact=[r for r in plan['runs'] if r['group']=='primary'
+                  and r['writer']==writer and r['variant']==reader]
+            unfact=[dict(r,name='wph-'+r['name']) for r in references
+                    if r['writer']==LEGACY[writer] and r['variant']==reader]
+            at4=shared.paired(cache,fact,unfact,'confirmation',4,4,(2,3))
+            effects=depth_effect_difference(
+                {r['seed']:cache.get(r['name'],'confirmation') for r in fact},
+                {r['seed']:cache.get(r['name'],'confirmation') for r in unfact})
+            for name,pair in (('factorized_minus_unfactorized_L4_reach',at4),
+                              ('factorized_minus_unfactorized_depth_effect_reach',effects)):
+                reported.append(dict(writer=writer,reader=reader,endpoint=name,
+                                     statistics=pair,gating=False))
+    shared.write_json(root/'analysis/cross_family_contrasts.json',reported)
+    driver.csv_table(out/'cross_family_contrasts.csv',[
+        {k:r[k] for k in ('writer','reader','endpoint','gating')}|
+        dict(confidence=s['confidence'],difference=s['difference'],ci_low=s['ci_low'],ci_high=s['ci_high'],
+             per_seed=json.dumps(s['per_seed'])) for r in reported for s in r['statistics'].values()])
+    shared.write_json(root/'analysis/reference_audit.json',dict(runs=audits))
+    reference_accuracy=[dict(writer=w,reader=p,hop=h,L=d,n=int(a[0]),accuracy=float(a[1]/a[0]))
+                        for (w,p,h,d),a in sorted(accuracy.items())]
+    driver.csv_table(out/'reference_accuracy.csv',reference_accuracy)
+    plot_depth_profiles(out,reference_accuracy)
+    shared.write_json(out/'reference_audit_summary.json',dict(status='passed',reference_commit='758c06a',
+        reference_plan=str(reference_plan),reference_barrier=str(reference_barrier),
+        reference_plan_hash=stable_hash(released),reference_run_count=12,
+        reference_sample_rows=sum(r['sample_rows'] for r in audits),
+        f2_plan_hash=stable_hash(plan),f2_sample_barrier_created_at=barrier['created_at'],
+        f2_training_barrier_checked_before_reference_at=checked_at,
+        all_episode_query_hop_answer_labels_paired=True,depth_effects_jointly_resampled=True,
+        gating=False,full_audit=str(root/'analysis/reference_audit.json')))
+    summary.update(cross_family='complete',cross_family_completed_at=datetime.now(timezone.utc).isoformat())
+    shared.write_json(out/'analysis_summary.json',summary)
+    print('F2 paired reference contrasts completed: twelve matched WP-H readers',flush=True)
+
+
+def plot_depth_profiles(out: Path,reference_accuracy: list[dict]) -> None:
+    import csv
+    import matplotlib
+    matplotlib.use('Agg')
+    import matplotlib.pyplot as plt
+    with (out/'accuracy_summary.csv').open() as f:
+        fact=[r for r in csv.DictReader(f) if r['group']=='primary' and r['dataset']=='confirmation'
+              and r['condition']=='original']
+    fig,axes=plt.subplots(2,2,figsize=(9,6),sharex=True,sharey=True)
+    for i,writer in enumerate(WRITERS):
+        for j,reader in enumerate(READERS):
+            ax=axes[i,j]
+            for family,source,w,pkey,color in (
+                ('F2 factorized',fact,writer,'variant','#1765ad'),
+                ('WP-H unfactorized',reference_accuracy,LEGACY[writer],'reader','#555555')):
+                for hops,label,style in (((2,3),'hops 2–3','-'),((6,7,8),'hops 6–8','--')):
+                    values=[np.mean([float(r['accuracy']) for r in source if r['writer']==w
+                                    and r[pkey]==reader and int(r['L'])==d and int(r['hop']) in hops])
+                            for d in driver.DEPTHS]
+                    ax.plot(driver.DEPTHS,values,style,color=color,marker='.',
+                            label=f'{family}, {label}')
+            ax.set_title(f'{writer}, {reader}',fontsize=10)
+            ax.grid(alpha=.2)
+            ax.set_ylim(bottom=0)
+            ax.set_xticks([0,1,4,8,12,16])
+            if i==1: ax.set_xlabel('Reader depth L')
+            if j==0: ax.set_ylabel('Confirmation accuracy')
+    handles,labels=axes[0,0].get_legend_handles_labels()
+    fig.legend(handles,labels,loc='lower center',ncol=2,fontsize=8)
+    fig.suptitle('Three-seed means; F2 has no replication setting',fontsize=11)
+    fig.tight_layout(rect=(0,.10,1,.95))
+    fig.savefig(out/'depth_profiles.pdf')
+    fig.savefig(out/'depth_profiles.png',dpi=160)
+    plt.close(fig)
+
+
 if __name__=='__main__':
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--root',type=Path,default=driver.RUNS)
     parser.add_argument('--out',type=Path,default=driver.REPORTS)
+    parser.add_argument('--reference-plan',type=Path)
+    parser.add_argument('--reference-barrier',type=Path)
     args=parser.parse_args()
-    analyze(args.root,args.out)
+    if args.reference_plan is not None:
+        if args.reference_barrier is None: parser.error('--reference-barrier is required with --reference-plan')
+        cross_family(args.root,args.out,args.reference_plan,args.reference_barrier)
+    else:
+        if args.reference_barrier is not None: parser.error('--reference-plan is required with --reference-barrier')
+        analyze(args.root,args.out)

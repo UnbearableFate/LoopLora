@@ -1,0 +1,11 @@
+{
+  "study": "WP-H",
+  "released_by": "orchestrator, explicit reply during WP-F2",
+  "released_commit": "758c06a",
+  "plan": "reports/p1s/plan.json",
+  "barrier": "reports/p1s/barrier.json",
+  "raw_root": "/work/xg24i002/x10041/LoopLora/runs/p1s/main/20261026",
+  "f2_embargo": "Read WP-H confirmation inputs only after every F2 main stage has passed the F2 training barrier.",
+  "contrasts": ["factorized_minus_unfactorized_L4_reach", "factorized_minus_unfactorized_depth_effect_reach"],
+  "gating": false
+}
