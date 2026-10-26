@@ -54,6 +54,19 @@ models/seeds. The baseline is1024 independent unit Gaussian residual-space
 directions, using derive_seed(2718,"p1l","readout-random-directions"). Report
 J-lens and random-direction ranks/top1 by hop, reader step and entity step.
 
+### Amendment A1 — orchestrator instruction, before Pilot-2 scores
+
+The primary J-lens is name-contrastive: for each question subtract the uniform
+mean across all1024 name-logit gradients, then average the centered gradients
+across512 questions and unit-normalize each name direction. Retain the raw-logit
+gradient directions above as a secondary readout. Cache and hash both versions.
+For s=4 report, separately for both J-lens versions and the logit lens, the
+fraction whose top1 name equals the actual model's top1 name among all1024 names.
+Full-vocabulary EM remains the scientific endpoint; the faithfulness reference
+is the model's name-restricted argmax. The orchestrator accepted the residual
+space and512-question frozen-backbone definition. Confirmation remains held
+until its explicit WP-L4 decision (one condition:95% CI; two:97.5%).
+
 ## Cost and artifacts
 
 Total cap16 node-hours, including failed jobs; every job<=8nodes x2hours and
