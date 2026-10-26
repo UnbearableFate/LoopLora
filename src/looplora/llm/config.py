@@ -17,7 +17,7 @@ DEFAULTS: dict[str, Any] = {
     "name": "llm", "seed": 17, "device": "cuda", "stage": "joint", "variant": "M1",
     "protocol": "memory_only", "write_policy": "fact_final", "activation": "relu",
     "smoke": False, "writer_checkpoint": None,
-    "model": {"r": 32, "layer": 14, "rho": .25, "alpha": 1.},
+    "model": {"r": 32, "layer": 14, "rho": .25, "alpha": 1., "input_site": "o_proj"},
     "task": {"name": "t2_chain_end", "E": 24, "Q": 4, "V": 1024, "n_rel": 4,
              "chain_lengths": [8, 8, 8], "hops": [1, 2, 3]},
     "train": {"steps": 1000, "batch_size": 8, "lr": .0003, "weight_decay": .01,
@@ -104,6 +104,8 @@ def resolve_config(mapping: Mapping[str, Any]) -> dict[str, Any]:
     _integer(config["seed"], "seed", 0)
     _integer(config["model"]["r"], "model.r")
     _integer(config["model"]["layer"], "model.layer", 0)
+    if config["model"]["input_site"] not in {"o_proj", "residual"}:
+        raise ValueError("model.input_site must be o_proj or residual")
     for group, keys in (("model", ("rho", "alpha")),
                         ("train", ("lr", "weight_decay", "grad_clip"))):
         for key in keys:

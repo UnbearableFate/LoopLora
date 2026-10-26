@@ -31,3 +31,9 @@ the actual final budget and explicitly report deviation rather than claim6400.
 D4 is conditional on D1 or D2/D3 as the task states. Only then add/test the
 residual-input option and run the same two D3 configurations. Output remains
 at o_proj14. No additional scientific factors are authorized.
+
+2026-10-26 23:08 JST: D4 triggered. D2 lr.003 valEM=.987 (B0=.0), while
+both D3 runs completed6400 steps with finalEM=.0/.001. Implement only the
+authorized pre-layer14 residual input option and repeat the same2 configs.
+D1 does not establish absence of identity at o_proj; per-target probes are
+strong at question-final and imperfect at fact-final. No feature/probe tuning.

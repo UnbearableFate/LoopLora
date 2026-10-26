@@ -15,6 +15,7 @@ from looplora.infra.seeds import derive_seed
 if TYPE_CHECKING:
     from looplora.core.config import AdapterConfig
     from looplora.core.wrapper import AdaptedLinear
+    from .residual import ResidualInputLinear
 
 MODEL_ID = "Qwen/Qwen3-0.6B-Base"
 MODEL_REVISION = "da87bfb608c14b7cf20ba1ce41287e8de496c0cd"
@@ -57,9 +58,10 @@ class AdapterBank:
     register all adapter parameters exactly once in the model's module tree.
     """
 
-    def __init__(self, modules: dict[int, AdaptedLinear]):
+    def __init__(self, modules: dict[int, AdaptedLinear | ResidualInputLinear]):
         self.modules = modules
         self._last_states: dict[int, Tensor] = {}
+        self.input_hooks = []
 
     def zero_states(self, batch: int) -> dict[int, Tensor]:
         return {
@@ -109,14 +111,18 @@ class AdapterBank:
 
 def attach_adapters(
     model: nn.Module, config: AdapterConfig, *, layers: tuple[int, ...] = (14,), seed: int = 0,
+    input_site: str = "o_proj",
 ) -> AdapterBank:
     from looplora.core.adapters import make_adapter
     from looplora.core.wrapper import AdaptedLinear
+    from .residual import ResidualInputLinear
 
     if hasattr(model, "looplora_adapters"):
         raise ValueError("adapters are already installed")
     if not layers or len(set(layers)) != len(layers):
         raise ValueError("layers must be nonempty and unique")
+    if input_site not in {"o_proj", "residual"}:
+        raise ValueError("input_site must be o_proj or residual")
     projections = {}
     for layer in layers:
         if not 0 <= layer < len(model.model.layers):
@@ -128,21 +134,30 @@ def attach_adapters(
     model.requires_grad_(False)
     modules = {}
     for layer, projection in projections.items():
-        cfg = replace(config, d_in=projection.in_features, d_out=projection.out_features)
+        dimensions = model.config.hidden_size if input_site == "residual" else projection.in_features
+        cfg = replace(config, d_in=dimensions, d_out=projection.out_features)
         # Initialize on CPU with a local seed, preserving the caller's RNG stream.
         with torch.random.fork_rng(devices=[]):
             torch.random.default_generator.manual_seed(derive_seed(seed, "llm-adapter", layer))
             adapter = make_adapter(cfg).to(device=projection.weight.device, dtype=torch.float32)
-        wrapper = AdaptedLinear(projection, adapter)
+        wrapper = (ResidualInputLinear(projection, adapter) if input_site == "residual"
+                   else AdaptedLinear(projection, adapter))
         model.model.layers[layer].self_attn.o_proj = wrapper
         modules[layer] = wrapper
     bank = AdapterBank(modules)
+    if input_site == "residual":
+        for layer, module in modules.items():
+            bank.input_hooks.append(model.model.layers[layer].register_forward_pre_hook(
+                lambda _, args, wrapper=module: wrapper.capture(args[0])))
     model.looplora_adapters = bank
     return bank
 
 
 def detach_adapters(model: nn.Module) -> AdapterBank:
     bank = model.looplora_adapters
+    for handle in bank.input_hooks:
+        handle.remove()
+    bank.input_hooks.clear()
     for layer, module in bank.modules.items():
         model.model.layers[layer].self_attn.o_proj = module.base
     del model.looplora_adapters
