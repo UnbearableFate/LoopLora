@@ -37,3 +37,8 @@ context helper. Parent worker runs the suite through
 `scripts/submit.py --name t-b3 --walltime 00:15:00 --worktree . --wait -- -m pytest -q tests/test_musique.py`
 and record the compute job/result in `docs/reports/WP-B3.md`. No runtime imports,
 dependency changes, downloads, or commits were performed by this test author.
+
+Final MuSiQue-only validation: **57 passed in 10.87s**, job `3712970.opbs`,
+host `mg0851`, exit 0, at implementation commit `8bc909a`. The normalized-alias
+regression is included. Full-corpus preparation also passed at the same commit
+(job `3712971.opbs`, `mg0919`, exit 0). Retention validation remains pending.
