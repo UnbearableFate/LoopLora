@@ -24,9 +24,16 @@ ASCII punctuation is removed; curly apostrophes are retained; two empty
 normalized token lists have F1=1. Alias maxima and repeated-token overlap have
 explicit hand-computed expected scores.
 
-Validation: not executed by this author. The shell is login/control
+Validation: parent reports the initial suite passed **56 tests** on compute
+host `mg0846`, PBS job `3712871.opbs`. A subsequent focused regression rejects
+substitute gold `USA` for original gold `United States`/alias `U.S.A.` and
+filters donor aliases `USA`/`the USA`: the official metric treats those strings
+as the original alias despite their distinct literal spelling. This new case
+is pending a compute rerun with the parent's production fix.
+
+No runtime checks were executed by this author. The shell is login/control
 (`miyabi-g2`, aarch64; no PBS allocation), checked with the `miyabi-pbs-cmd`
-context helper. Parent worker will run the suite through
+context helper. Parent worker runs the suite through
 `scripts/submit.py --name t-b3 --walltime 00:15:00 --worktree . --wait -- -m pytest -q tests/test_musique.py`
 and record the compute job/result in `docs/reports/WP-B3.md`. No runtime imports,
 dependency changes, downloads, or commits were performed by this test author.

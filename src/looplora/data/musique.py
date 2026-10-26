@@ -302,6 +302,7 @@ def answer_substitution(
     if final is None or not _answer_pattern((gold,), ignore_case=False).search(f"{final.title}\n{final.text}"):
         return None
     pattern = _answer_pattern((gold, *episode.answer_aliases))
+    original_labels = {normalize_answer(text) for text in (gold, *episode.answer_aliases)}
     if any(pattern.search(f"{paragraph.title}\n{paragraph.text}")
            for paragraph in episode.paragraphs if not paragraph.is_supporting):
         return None
@@ -315,7 +316,7 @@ def answer_substitution(
     begin = random.Random(seed).randrange(len(candidates))
     for offset in range(len(candidates)):
         donor = candidates[(begin + offset) % len(candidates)]
-        if donor.id == episode.id or normalize_answer(donor.answer) == normalize_answer(gold):
+        if donor.id == episode.id or normalize_answer(donor.answer) in original_labels:
             continue
         if pattern.search(donor.answer):
             continue
@@ -325,7 +326,8 @@ def answer_substitution(
                            if paragraph.is_supporting else paragraph for paragraph in episode.paragraphs)
         if any(pattern.search(f"{paragraph.title}\n{paragraph.text}") for paragraph in paragraphs):
             continue
-        aliases = tuple(alias for alias in donor.answer_aliases if alias.strip() and not pattern.search(alias))
+        aliases = tuple(alias for alias in donor.answer_aliases if alias.strip() and not pattern.search(alias)
+                        and normalize_answer(alias) not in original_labels)
         return _render(episode.id, episode.hop_type, paragraphs, episode.final_support_idx,
                        episode.question_text, donor.answer, aliases, tokenizer, "answer_substitution", False,
                        {**episode.meta, "counterfactual_seed": seed, "donor_id": donor.id,

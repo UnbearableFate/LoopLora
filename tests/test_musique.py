@@ -339,6 +339,28 @@ def test_substitution_final_title_is_part_of_support_and_overlapping_aliases_are
     check_encoding(changed, tokenizer)
 
 
+def test_substitution_rejects_metric_equivalent_donor_gold_and_filters_equivalent_aliases(tokenizer):
+    source = example(answer="United States", aliases=("U.S.A.",))
+    source = replace(source, paragraphs=(
+        Paragraph(0, "Final support", "United States is the answer.", True),
+        *source.paragraphs[1:],
+    ))
+    rendered = render_example(source, tokenizer=tokenizer)
+    equivalent = example(serial=904, answer="USA", aliases=())
+    assert answer_scores(equivalent.answer, source.answer, source.answer_aliases)["em"] == 1
+    assert answer_substitution(rendered, [equivalent], tokenizer=tokenizer) is None
+
+    donor = example(serial=905, answer="Canada", aliases=("Dominion of Canada", "USA", "the USA"))
+    changed = answer_substitution(rendered, [donor], tokenizer=tokenizer)
+    assert changed is not None
+    assert changed.answer_text == " Canada"
+    assert changed.answer_aliases == ("Dominion of Canada",)
+    assert answer_scores(changed.answer_text, source.answer, source.answer_aliases)["em"] == 0
+    for alias in changed.answer_aliases:
+        assert answer_scores(alias, source.answer, source.answer_aliases)["em"] == 0
+    check_encoding(changed, tokenizer)
+
+
 @pytest.mark.parametrize("final_text", ["york is lower-case.", "Yorkshire is a county.", "NYC is only an alias.", "No answer."])
 def test_substitution_requires_exact_gold_word_in_final_support(tokenizer, final_text):
     source = example()
