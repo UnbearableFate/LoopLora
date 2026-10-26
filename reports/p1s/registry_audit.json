@@ -1,0 +1,12 @@
+{
+  "appended_rows": 145,
+  "previous_rows": 24,
+  "previous_rows_preserved": true,
+  "registry": "/work/xg24i002/x10041/LoopLora-wt/sym/reports/experiment_registry.csv",
+  "roots": [
+    "/work/xg24i002/x10041/LoopLora/runs/p1s/main/20261026/runs",
+    "/work/xg24i002/x10041/LoopLora/runs/p1s/main/throughput-20261026",
+    "/work/xg24i002/x10041/LoopLora/runs/p1s/main/throughput-batched-20261026"
+  ],
+  "total_rows": 169
+}

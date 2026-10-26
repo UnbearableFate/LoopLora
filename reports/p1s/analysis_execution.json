@@ -1,0 +1,23 @@
+{
+  "analysis_seconds": 394.3951509860344,
+  "git_commit": "7e1c96fe27a24651f5a34556ea4bd6883cc1c7bf",
+  "host": "mg0841",
+  "job_id": "3713367.opbs",
+  "max_rss_kib": 1259456,
+  "registry": {
+    "appended_rows": 145,
+    "previous_rows": 24,
+    "previous_rows_preserved": true,
+    "registry": "/work/xg24i002/x10041/LoopLora-wt/sym/reports/experiment_registry.csv",
+    "roots": [
+      "/work/xg24i002/x10041/LoopLora/runs/p1s/main/20261026/runs",
+      "/work/xg24i002/x10041/LoopLora/runs/p1s/main/throughput-20261026",
+      "/work/xg24i002/x10041/LoopLora/runs/p1s/main/throughput-batched-20261026"
+    ],
+    "total_rows": 169
+  },
+  "source_dirty": false,
+  "source_hash": "ded46e3f04cb370cc9d1c6ccb19820e1",
+  "status": "complete",
+  "total_seconds": 395.195582464803
+}

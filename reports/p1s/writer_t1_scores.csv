@@ -1,0 +1,4 @@
+name,group,writer,variant,seed,r,E,dataset,split,condition,hop,L,n,accuracy,full_accuracy,chance_accuracy
+writer-joint-B4-r32-s17,writer,joint,B4,17,32,12,writer_validation,val,original,1,1,1000,0.874,0.473,0.048362726438956415
+writer-joint-B4-r32-s29,writer,joint,B4,29,32,12,writer_validation,val,original,1,1,1000,0.882,0.451,0.048362726438956415
+writer-joint-B4-r32-s43,writer,joint,B4,43,32,12,writer_validation,val,original,1,1,1000,0.879,0.48,0.048362726438956415
