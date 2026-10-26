@@ -83,7 +83,8 @@ class LLMExperiment:
                             activation=config.get("activation", "identity" if variant == "M1-lin" else "relu"),
                             gate=m.get("gate", "scalar"),
                             unshared_steps=4 if variant == "B8" else 1,
-                            lambda_init=m.get("lambda_init", .99), beta_init=m.get("beta_init", .1))
+                            lambda_init=m.get("lambda_init", .99), beta_init=m.get("beta_init", .1),
+                            dpfp_nu=m.get("dpfp_nu", 0))
         init_seed = derive_seed(config["seed"], "llm", stage, "reader", variant)
         self.bank = attach_adapters(self.model, cfg, layers=(self.layer,), seed=init_seed,
                                     input_site=self.input_site)
@@ -144,6 +145,8 @@ class LLMExperiment:
                 "V": self.config["task"]["V"]}
         if self.input_site != "o_proj":
             signature["input_site"] = self.input_site
+        if cfg.dpfp_nu:
+            signature["dpfp_nu"] = cfg.dpfp_nu
         return signature
 
     def writer_state(self) -> dict[str, Tensor]:

@@ -4,7 +4,8 @@ Source: plan §4–§6, §10 and Appendix A. Where this file is more specific th
 
 ## 1. Shapes and conventions
 Math uses column vectors. Code uses row-major batches: `x: [B, T, d_in]`; parameter matrices are stored with
-their math shape and applied as `x @ A.T`. Memory `M: [B, r_m, r_m]` maps key → value:
+their math shape and applied as `x @ A.T`. Memory `M: [B, r_m, r_m]` (`[B, r_m, 2 r_m ν]` with the optional DPFP
+features of §9) maps key → value:
 `m = M q` ⇔ `einsum("bij,bj->bi", M, q)`; a write `err kᵀ` ⇔ `einsum("bi,bj->bij", err, k)`.
 
 | Symbol | Shape (math) | Meaning | Trainable |
@@ -85,3 +86,16 @@ or the non-skip form with nonzero A, B and an outer scalar gate `g` initialised 
 `F(z) = u + ρ φ(H z)`, `H = R + U M Q`; `c = |ρ| L_φ ‖H‖₂ < 1` ⇒ unique fixed point and
 `‖z_s − z*‖ ≤ e_s / (1 − c)`, `e_s = ‖F(z_s) − z_s‖`. Use the bound `c ≤ |ρ| (‖R‖₂ + ‖U‖₂‖M‖₂‖Q‖₂)`
 when H is not formed. The bound says nothing about task correctness.
+
+## 9. Optional DPFP address features (WP-L5; off by default, `dpfp_nu = 0`)
+With `dpfp_nu = ν ≥ 1`, writer keys and reader queries pass through the parameter-free feature map of Schlag, Irie &
+Schmidhuber (2021, §5.4) before the unit normalization; values and everything else are unchanged:
+```
+r = ReLU([k; −k]) ;  φ_ν(k) = [ r ⊙ roll(r, j) ]_{j=1..ν} ∈ R^{2 d ν}      (roll shifts the last axis by j)
+k̂ = φ_ν(K u) / max(‖φ_ν(K u)‖₂, ε) ;  q̂ = φ_ν(Q z) / max(‖φ_ν(Q z)‖₂, ε)
+M ∈ R^{r_m × 2 r_m ν} ;  write: §3 with k̂ in place of k ;  read: m = M_prev q̂
+```
+φ_ν is nonnegative and homogeneous of degree two. Because ‖k̂‖ = 1, the §3 write overwrites exactly at β = 1
+(`M_new k̂ = v`), which is why L2 replaces Schlag et al.'s sum normalization. Address similarities (InfoNCE, key Gram,
+the exact Gram read) use `q̂·k̂_j` and `k̂_i·k̂_j` in φ space. Accounting (§7) uses `key_dim = 2 r_m ν` in place of
+`r_m` for `M q̂`, `M̄ k̂` and the outer product, and for the state bytes; φ_ν adds no parameters. With `ν = 0`, §2–§7 hold exactly.

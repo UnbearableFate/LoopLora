@@ -1,20 +1,41 @@
-"""Functional decay-first memory writes and pre-write snapshots."""
+"""Functional decay-first memory writes and pre-write snapshots.
+
+The state is [B, r_mem, key_dim]: key_dim = r_mem, or 2 * r_mem * nu when keys and
+queries are mapped through DPFP features (``feature_map``, off by default).
+"""
 from __future__ import annotations
 
 import math
+from typing import Callable
+
 import torch
 from torch import Tensor
 from torch.nn import functional as F
 
+FeatureMap = Callable[[Tensor], Tensor]
 
-def zeros_state(batch: int, r_mem: int, dtype: torch.dtype, device: torch.device | str) -> Tensor:
-    if batch < 0 or r_mem <= 0:
-        raise ValueError("batch must be nonnegative and r_mem positive")
-    return torch.zeros(batch, r_mem, r_mem, dtype=dtype, device=device)
+
+def dpfp_features(k: Tensor, nu: int) -> Tensor:
+    """DPFP of Schlag, Irie & Schmidhuber (2021, sec. 5.4): [r * roll(r, j)]_{j=1..nu}, r = relu([k; -k]).
+
+    Maps [..., d] to [..., 2 * d * nu]; nonnegative, and homogeneous of degree two for scalars c >= 0.
+    """
+    if isinstance(nu, bool) or not isinstance(nu, int) or nu < 1:
+        raise ValueError("nu must be a positive integer")
+    r = torch.relu(torch.cat((k, -k), dim=-1))
+    return torch.cat([r * torch.roll(r, shifts=j, dims=-1) for j in range(1, nu + 1)], dim=-1)
+
+
+def zeros_state(
+    batch: int, r_mem: int, dtype: torch.dtype, device: torch.device | str, key_dim: int | None = None,
+) -> Tensor:
+    if batch < 0 or r_mem <= 0 or (key_dim is not None and key_dim <= 0):
+        raise ValueError("batch must be nonnegative and r_mem and key_dim positive")
+    return torch.zeros(batch, r_mem, r_mem if key_dim is None else key_dim, dtype=dtype, device=device)
 
 
 def fork(M: Tensor, n: int) -> Tensor:
-    """Return [B*n, r_mem, r_mem], grouping n independent copies per sample."""
+    """Return [B*n, r_mem, key_dim], grouping n independent copies per sample."""
     if isinstance(n, bool) or not isinstance(n, int) or n < 1:
         raise ValueError("n must be a positive integer")
     _check_state(M)
@@ -22,8 +43,8 @@ def fork(M: Tensor, n: int) -> Tensor:
 
 
 def _check_state(M: Tensor) -> None:
-    if M.ndim != 3 or M.shape[-1] != M.shape[-2] or not M.is_floating_point():
-        raise ValueError("state must be a floating tensor [B, r_mem, r_mem]")
+    if M.ndim != 3 or not M.is_floating_point():
+        raise ValueError("state must be a floating tensor [B, r_mem, key_dim]")
 
 
 def _mask(value: Tensor | None, shape: tuple[int, ...], device: torch.device, default: bool) -> Tensor:
@@ -53,8 +74,9 @@ def delta_update(
     the returned state use M.dtype; casts preserve gradients.
     """
     _check_state(M)
-    if k.shape != M.shape[:2] or v.shape != k.shape or k.device != M.device or v.device != M.device:
-        raise ValueError("k and v must have shape [B, r_mem] on the state device")
+    if (k.shape != (M.shape[0], M.shape[2]) or v.shape != M.shape[:2]
+            or k.device != M.device or v.device != M.device):
+        raise ValueError("k must have shape [B, key_dim] and v [B, r_mem] on the state device")
     mask = _mask(write_mask, (M.shape[0],), M.device, True)
     indices = mask.nonzero(as_tuple=True)[0]
     if indices.numel() == 0:
@@ -70,8 +92,12 @@ def delta_update(
 def write(
     M: Tensor, u: Tensor, write_mask: Tensor | None, *, K: Tensor, V: Tensor,
     lam: Tensor | float, beta: Tensor | float, eps: float = 1e-6,
+    feature_map: FeatureMap | None = None,
 ) -> Tensor:
-    """Project and normalize one token's writer codes, then apply delta_update."""
+    """Project and normalize one token's writer codes, then apply delta_update.
+
+    A feature_map is applied to the projected key before its unit normalization.
+    """
     _check_state(M)
     if u.ndim != 2 or u.shape[0] != M.shape[0] or u.device != M.device:
         raise ValueError("u must have shape [B, r] on the state device")
@@ -86,6 +112,8 @@ def write(
         return M
     active_u = u.index_select(0, indices)
     raw = F.linear(active_u, K)
+    if feature_map is not None:
+        raw = feature_map(raw)
     key = raw / torch.linalg.vector_norm(raw, dim=-1, keepdim=True).clamp_min(eps)
     value = F.linear(active_u, V)
     active_lam = _gate(lam, M, indices).flatten()
@@ -99,7 +127,7 @@ def write(
 def scan_prewrite(
     M0: Tensor, u: Tensor, valid: Tensor | None = None, write: Tensor | None = None,
     reset: Tensor | None = None, *, K: Tensor, V: Tensor, lam: Tensor | float,
-    beta: Tensor | float, eps: float = 1e-6,
+    beta: Tensor | float, eps: float = 1e-6, feature_map: FeatureMap | None = None,
 ) -> tuple[Tensor, Tensor]:
     """Sequential functional scan; output t is after reset, before token t writes.
 
@@ -125,7 +153,7 @@ def scan_prewrite(
         beta_t = beta[:, t] if isinstance(beta, Tensor) and beta.numel() != 1 else beta
         state = _write_token(
             state, u[:, t], valid_mask[:, t] & write_mask[:, t],
-            K=K, V=V, lam=lam_t, beta=beta_t, eps=eps,
+            K=K, V=V, lam=lam_t, beta=beta_t, eps=eps, feature_map=feature_map,
         )
     if not snapshots:
         return M0.new_empty((M0.shape[0], 0, *M0.shape[1:])), state
@@ -135,7 +163,7 @@ def scan_prewrite(
 def scan_final(
     M0: Tensor, u: Tensor, valid: Tensor | None = None, write: Tensor | None = None,
     reset: Tensor | None = None, *, K: Tensor, V: Tensor, lam: Tensor | float,
-    beta: Tensor | float, eps: float = 1e-6,
+    beta: Tensor | float, eps: float = 1e-6, feature_map: FeatureMap | None = None,
 ) -> Tensor:
     """Final-only scan over packed writes, preserving each row's token order.
 
@@ -161,7 +189,7 @@ def scan_final(
         raise ValueError("eps must be finite and positive")
     if reset is not None and bool(reset_mask[:, 1:].any()):
         return scan_prewrite(M0, u, valid, write, reset, K=K, V=V,
-                             lam=lam, beta=beta, eps=eps)[1]
+                             lam=lam, beta=beta, eps=eps, feature_map=feature_map)[1]
     state = torch.where(reset_mask[:, 0, None, None], torch.zeros_like(M0), M0)
     if u.shape[0] == 0:
         return state
@@ -191,6 +219,8 @@ def scan_final(
         # changes FP32 rounding enough to affect a subsequent BF16 backbone.
         token = packed[:, step].contiguous()
         raw = F.linear(token, K)
+        if feature_map is not None:
+            raw = feature_map(raw)
         key = (raw / torch.linalg.vector_norm(raw, dim=-1, keepdim=True).clamp_min(eps)).to(M0.dtype)
         value = F.linear(token, V).to(M0.dtype)
         active_state = torch.where(mask, state, torch.zeros_like(state))

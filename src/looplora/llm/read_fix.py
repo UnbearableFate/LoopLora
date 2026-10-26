@@ -53,7 +53,7 @@ def question_terms(experiment,batch,x):
     B,Q=last.shape
     final=x[torch.arange(B,device=x.device)[:,None],torch.arange(Q,device=x.device)[None,:],last]
     u=experiment.adapter.u(final.float())
-    q=F.linear(u,experiment.adapter.Q)
+    q=experiment.adapter.query_code(F.linear(u,experiment.adapter.Q))
     matrix=batch.snapshot.states[experiment.layer]
     stored=torch.einsum('bij,bqj->bqi',matrix,q)
     target=true_fact_indices(batch.arrays,x.device)
@@ -130,6 +130,12 @@ def diagnostics(experiment,batch,x):
         parallel_interference=(signal*interference).sum(-1)/signal.square().sum(-1).clamp_min(1e-12),
         key_gram_rms=pair.square().mean(-1).sqrt()[:,None].expand_as(target),
         key_gram_max_abs=pair.abs().amax(-1)[:,None].expand_as(target))
+    if batch.base_keys is not None:
+        # DPFP: the metrics above are in the feature space; also report the projected key space.
+        base=F.normalize(batch.base_keys,dim=-1)
+        base_pair=(base@base.transpose(-1,-2))[:,~eye]
+        result.update(key_gram_rms_base=base_pair.square().mean(-1).sqrt()[:,None].expand_as(target),
+                      key_gram_max_abs_base=base_pair.abs().amax(-1)[:,None].expand_as(target))
     if experiment.value_head is not None:
         answers=torch.as_tensor(batch.arrays.answer,device=x.device)
         result.update(clean_value_correct=experiment.value_head(terms['clean']).argmax(-1)==answers,

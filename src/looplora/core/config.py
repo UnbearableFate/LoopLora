@@ -31,6 +31,7 @@ class AdapterConfig:
     unshared_steps: int = 1
     double_ba_form: Literal["skip", "gated"] = "skip"
     activation: Literal["relu", "identity"] = "relu"
+    dpfp_nu: int = 0
 
     def __post_init__(self) -> None:
         if self.r_mem is None:
@@ -50,6 +51,10 @@ class AdapterConfig:
         if self.variant == "double_ba" and self.d_in != self.d_out:
             raise ValueError("double_ba requires d_in == d_out")
         validate_steps(self.unshared_steps)
+        if isinstance(self.dpfp_nu, bool) or not isinstance(self.dpfp_nu, int) or self.dpfp_nu < 0:
+            raise ValueError("dpfp_nu must be a nonnegative integer")
+        if self.dpfp_nu and self.variant not in MEMORY_VARIANTS:
+            raise ValueError("dpfp_nu requires a memory variant")
         for name in ("lambda_init", "beta_init"):
             if not 0 < getattr(self, name) < 1:
                 raise ValueError(f"{name} must lie strictly between 0 and 1")
@@ -60,6 +65,11 @@ class AdapterConfig:
             raise ValueError("eps must be positive")
         if any(getattr(self, name) < 0 for name in ("sigma_r", "sigma_u", "sigma_q", "sigma_k", "sigma_v")):
             raise ValueError("initialization scales must be nonnegative")
+
+    @property
+    def key_dim(self) -> int:
+        """Columns of the memory M: r_mem, or 2 * r_mem * dpfp_nu with DPFP address features."""
+        return 2 * self.r_mem * self.dpfp_nu if self.dpfp_nu else self.r_mem
 
 
 def validate_steps(loop_steps: int) -> None:

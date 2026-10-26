@@ -2,6 +2,8 @@
 from __future__ import annotations
 
 import math
+from functools import partial
+
 import torch
 from torch import Tensor, nn
 from torch.nn import functional as F
@@ -41,7 +43,7 @@ class AdapterBase(nn.Module):
         if u.ndim not in {2, 3} or u.shape[-1] != self.cfg.r:
             raise ValueError("reader u must have shape [B,r] or [B,T,r]")
         if self.has_memory and loop_steps:
-            shape = (*u.shape[:-1], self.cfg.r_mem, self.cfg.r_mem)
+            shape = (*u.shape[:-1], self.cfg.r_mem, self.cfg.key_dim)
             if M_prev is None or M_prev.shape != shape or M_prev.device != u.device:
                 raise ValueError(f"reader state must have shape {shape} on the input device")
         return self._read(u, M_prev, loop_steps)
@@ -67,10 +69,10 @@ class AdapterBase(nn.Module):
         write_mask = memory._mask(write, shape, x.device, True)
         reset_mask = memory._mask(reset, shape, x.device, False)
         if M0 is None and self.has_memory:
-            M0 = memory.zeros_state(x.shape[0], self.cfg.r_mem, x.dtype, x.device)
+            M0 = memory.zeros_state(x.shape[0], self.cfg.r_mem, x.dtype, x.device, self.cfg.key_dim)
         if M0 is not None:
             memory._check_state(M0)
-            if M0.shape != (x.shape[0], self.cfg.r_mem, self.cfg.r_mem) or M0.device != x.device:
+            if M0.shape != (x.shape[0], self.cfg.r_mem, self.cfg.key_dim) or M0.device != x.device:
                 raise ValueError("M0 shape/device does not match this sequence and adapter")
         # Undefined padding values must not enter parameter-gradient products.
         projected = self.u(torch.where(valid_mask[..., None], x, torch.zeros_like(x)))
@@ -85,7 +87,7 @@ class AdapterBase(nn.Module):
         if indices.numel():
             selected_state = None
             if state is not None:
-                selected_state = state.reshape(-1, self.cfg.r_mem, self.cfg.r_mem).index_select(0, indices)
+                selected_state = state.reshape(-1, self.cfg.r_mem, self.cfg.key_dim).index_select(0, indices)
             z = self.read(flat_u.index_select(0, indices), selected_state, loop_steps)
             values = self.branch(z)
             output = output.to(values.dtype).index_copy(0, indices, values)
@@ -179,9 +181,20 @@ class MemoryAdapter(AdapterBase):
                     torch.sigmoid(u @ self.w_beta + self.a_beta))
         return self.lam, self.beta
 
+    def _key_features(self) -> dict:
+        """Write-side DPFP map; no argument at all (the original call) when DPFP is off."""
+        nu = self.cfg.dpfp_nu
+        return {"feature_map": partial(memory.dpfp_features, nu=nu)} if nu else {}
+
+    def query_code(self, raw: Tensor) -> Tensor:
+        """Read-side address of a raw query projection: itself, or its unit-norm DPFP features."""
+        nu = self.cfg.dpfp_nu
+        return F.normalize(memory.dpfp_features(raw, nu), dim=-1, eps=self.cfg.eps) if nu else raw
+
     def write(self, M_prev: Tensor, u: Tensor, write_mask: Tensor | None) -> Tensor:
         lam, beta = self.gates(u)
-        return memory.write(M_prev, u, write_mask, K=self.K, V=self.V, lam=lam, beta=beta, eps=self.cfg.eps)
+        return memory.write(M_prev, u, write_mask, K=self.K, V=self.V, lam=lam, beta=beta,
+                            eps=self.cfg.eps, **self._key_features())
 
     def scan_prewrite(
         self, M0: Tensor, u: Tensor, valid: Tensor | None = None,
@@ -189,7 +202,7 @@ class MemoryAdapter(AdapterBase):
     ) -> tuple[Tensor, Tensor]:
         lam, beta = self.gates(u)
         return memory.scan_prewrite(M0, u, valid, write, reset, K=self.K, V=self.V,
-                                    lam=lam, beta=beta, eps=self.cfg.eps)
+                                    lam=lam, beta=beta, eps=self.cfg.eps, **self._key_features())
 
     def scan_final(
         self, M0: Tensor, u: Tensor, valid: Tensor | None = None,
@@ -197,11 +210,10 @@ class MemoryAdapter(AdapterBase):
     ) -> Tensor:
         lam, beta = self.gates(u)
         return memory.scan_final(M0, u, valid, write, reset, K=self.K, V=self.V,
-                                 lam=lam, beta=beta, eps=self.cfg.eps)
+                                 lam=lam, beta=beta, eps=self.cfg.eps, **self._key_features())
 
-    @staticmethod
-    def _query(u: Tensor, M: Tensor, Q: Tensor, U: Tensor) -> Tensor:
-        q = F.linear(u, Q)
+    def _query(self, u: Tensor, M: Tensor, Q: Tensor, U: Tensor) -> Tensor:
+        q = self.query_code(F.linear(u, Q))
         m = torch.matmul(M, q.to(M.dtype).unsqueeze(-1)).squeeze(-1)
         return F.linear(m.to(u.dtype), U)
 

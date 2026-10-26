@@ -91,6 +91,19 @@ These diagnostic interventions retain WP-L3's truncated memory-only scope.
 The default `configuration(arm)` and all existing variants remain unchanged.
 This implementation support does not authorize a new scientific run.
 
+# DPFP address features (WP-L5)
+
+`looplora.llm.dpfp.configuration(arm, steps, E=16, smoke=False)` builds the three registered arms D32-3, D128-1 and
+D128-3 of `docs/prereg/DPFP.md`: WP-L4's `read_fix.configuration('R', ...)` at rank r = r_mem = 32, 128 and 128, plus
+`model.dpfp_nu` (3, 1, 3) and a descriptive `dpfp` block; nothing else differs. `AdapterConfig.dpfp_nu` (default 0 =
+off) maps write keys and read queries through `core.memory.dpfp_features` and an L2 normalization, and the memory
+becomes `[B, r_mem, key_dim]` with `key_dim = 2 * r_mem * dpfp_nu` (`docs/notation.md` section 9). Like the WP-L3 and
+WP-L4 blocks, the new keys are added after `resolve_config`: they are not YAML or default fields, so existing
+configs, config hashes and checkpoints are unchanged, and writer signatures gain `dpfp_nu` only when it is nonzero.
+The option applies to the `fact_final` writers (W1-W3, W5, R), not to the paired W4 write. One arm per job:
+`python -m looplora.llm.dpfp_run --arm D32-3 --out ROOT (--steps N --smoke | --schedule release.json)`.
+`docs/reports/WP-L5-state.md` has the tests and smoke commands. This support alone authorizes no scientific run.
+
 # Fact-only oracle writer (WP-C7)
 
 Set `writer: oracle_random`, `stage: reader`, `model.r: 32` and
