@@ -244,10 +244,27 @@ def tables(rows,decision,out):
     (out/'tables.md').write_text('\n'.join(lines)+'\n')
 
 
+def training_table(out):
+    plan=driver.all_training();rows=[]
+    for r in plan['runs']:
+        folder=Path(r['training_dir']);rec=shared.read_json(folder/'record.json');metrics=shared.read_json(folder/'metrics.json')
+        logs=[json.loads(line) for line in (folder/'train_log.jsonl').read_text().splitlines()]
+        shared.require(logs[0]['step']==1 and logs[-1]['step']==15000 and all(np.isfinite(x['loss']) for x in logs),'training loss/step trace differs')
+        L=1 if r['reader']=='B4' else 4
+        cells=[x for x in metrics['table'] if x['split']=='val' and x['condition']=='original' and x['L']==L and x['hop'] in (1,2,3)]
+        shared.require(sum(x['n'] for x in cells)==3000,'training validation coverage differs')
+        correct=sum(round(x['n']*x['accuracy']) for x in cells)
+        rows.append({k:r[k] for k in ('writer','reader','train_E','seed')}|dict(steps=15000,initial_loss=logs[0]['loss'],
+            final_loss=logs[-1]['loss'],mean_L=rec['mean_L'],val_n=3000,val_correct=correct,val_accuracy=correct/3000,
+            train_seconds=rec['train_seconds'],peak_memory_bytes=rec['peak_memory_bytes'],validation_used_for_selection=False))
+    driver.csv_table(out/'training.csv',rows)
+
+
 def analyze():
     plan,barrier=verify_release();raw=driver.RUNS/'analysis';out=driver.REPORTS
     shared.require(not (raw/'started.json').exists(),'IS analysis already started')
     driver.write(raw/'started.json',dict(created_at=datetime.now(timezone.utc).isoformat()))
+    training_table(out)
     cache=Cache(driver.RUNS/'analysis_cache',limit=12);references={};accuracy=[];events=[];labels=None;sample_rows=0
     for r in plan['runs']:
         shared.require(shared.file_hash(Path(r['checkpoint']))==r['checkpoint_hash'],'IS checkpoint changed')
@@ -272,7 +289,9 @@ def analyze():
     driver.csv_table(out/'accuracy.csv',accuracy)
     driver.csv_table(out/'endpoints.csv',[{k:v for k,v in r.items() if k!='statistics'}|dict(
         difference=r['statistics']['difference'],ci_low=r['statistics']['ci_low'],ci_high=r['statistics']['ci_high'],
-        confidence=.975,per_seed=json.dumps(r['statistics']['per_seed'])) for r in rows])
+        confidence=.975,n_seeds=3,n_episodes_per_load=2000,
+        n_queries_per_seed=r['statistics'].get('n_queries_per_seed',4000),
+        per_seed=json.dumps(r['statistics']['per_seed'])) for r in rows])
     best=[]
     for w in driver.ALL_WRITERS:
         for E in driver.LAYOUTS:

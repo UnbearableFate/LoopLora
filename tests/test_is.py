@@ -24,13 +24,13 @@ def test_layouts_and_update_scope_are_valid():
 
 
 @pytest.mark.parametrize('E',[12,24,36])
-@pytest.mark.parametrize('device',['cpu','cuda'])
-def test_factorized_dense_write_forward_and_every_gradient(E,device):
+@pytest.mark.parametrize('device,batch',[('cpu',4),('cuda',4),('cuda',64)])
+def test_factorized_dense_write_forward_and_every_gradient(E,device,batch):
     if device=='cuda' and not torch.cuda.is_available(): pytest.skip('CUDA needed')
     torch.manual_seed(123)
     ref=FactorizedWriter(192,32,32,17).to(device);fast=copy.deepcopy(ref)
-    x=torch.randn(4,E,192,device=device,requires_grad=True);y=x.detach().clone().requires_grad_()
-    valid=torch.ones(4,E,dtype=torch.bool,device=device)
+    x=torch.randn(batch,E,192,device=device,requires_grad=True);y=x.detach().clone().requires_grad_()
+    valid=torch.ones(batch,E,dtype=torch.bool,device=device)
     a,av=execution._FACTORIZED(ref,x,valid);b,bv=execution.factorized_forward(fast,y,valid)
     torch.testing.assert_close(a,b,atol=0,rtol=0);torch.testing.assert_close(av,bv,atol=0,rtol=0)
     (a.square().sum()+av.square().sum()).backward();(b.square().sum()+bv.square().sum()).backward()
@@ -40,7 +40,7 @@ def test_factorized_dense_write_forward_and_every_gradient(E,device):
 
 @pytest.mark.parametrize('E',[12,24,36])
 def test_oracle_dense_exact_and_padding_fallback(E):
-    spec=TaskSpec(name='t2_chain_end',E=E,chain_lengths=driver.LAYOUTS[E]);a=generate(spec,'val',0,4,4242)
+    spec=TaskSpec(name='t2_chain_end',E=E,chain_lengths=driver.LAYOUTS[E]);a=generate(spec,'val',0,64,4242)
     writer=OracleWriter(1024,32,31415).cuda();facts=torch.as_tensor(a.facts,device='cuda');valid=torch.as_tensor(a.fact_valid,device='cuda')
     codes=writer.codes(facts,valid,a.episode_seed)
     original=execution._ORACLE(writer,facts,valid,codes)
@@ -93,7 +93,7 @@ def test_dense_full_model_optimizer_trajectory_matches_reference(writer):
     optim_b=torch.optim.AdamW([p for p in b.parameters() if p.requires_grad],lr=.003,weight_decay=.01)
     spec=TaskSpec(**c['task'])
     for step in range(3):
-        arrays=generate(spec,'val',step*4,4,4242)
+        arrays=generate(spec,'val',step*64,64,4242)
         losses=[]
         for model,opt,fast in ((a,optim_a,False),(b,optim_b,True)):
             opt.zero_grad(set_to_none=True)
