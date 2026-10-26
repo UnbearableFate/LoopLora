@@ -28,9 +28,11 @@ must run on Miyabi-G via scripts/submit.py, from a committed source snapshot.
 6. On login: `scripts/launch_p1l_main.py main --root R --sizing reports/p1l/smoke-sizing.json`.
    B4/B3 share a job sequentially; other variants have one run/job. Three seeds
    each, plus the untrained B0. R/training-manifest.json maps every artifact.
-7. Hold confirmation until all runs finish AND the orchestrator supplies WP-L4's
-   decision and writer-condition count. Record this in a committed authorization
-   file with statusallowed, writer_conditions1/2, and orchestrator_decision text.
+7. Hold confirmation until all runs in ALL conditions finish AND the orchestrator
+   supplies WP-L4's decision. B3 adds r128; fix confidence=1-.05/k before any
+   confirmation. Commit authorization with statusallowed, gated_conditions=k,
+   condition_manifests={oracle-r32:ABS_MANIFEST,oracle-r128:ABS_MANIFEST,...},
+   and orchestrator_decision text. Each manifest has its matching condition/rank.
    `evaluate_p1l_main.py` checks every main checkpoint against the locked matrix
    before generating any test episode. Evaluate confirmation/typed once, with
    the cached registered J-lens-inspired name-gradient probe for M1/B8; preserve all original samples.
@@ -38,6 +40,8 @@ must run on Miyabi-G via scripts/submit.py, from a committed source snapshot.
    --evaluations EVAL-MANIFEST --authorization AUTH --out ABS/reports/p1l`.
    This rechecks exact full-vocabulary labels, sample-to-table reproduction,
    oracle code hashes and support snapshots, then computes all registered CIs.
+   Run compare_p1l_ranks.py on the two ranks' final manifests for B3's secondary
+   cross-rank contrasts. R128 configs/locks are separate (main-r128, r128/).
 
 Readout/oracle regression tests3715857:33passed onmg0022. J-lens-inspired name-gradient probe timing
 trial3715862 passed onmg0032; full cache3715870 uses only the fixed512 validation

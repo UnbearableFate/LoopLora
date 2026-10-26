@@ -18,9 +18,10 @@ The main runner refuses to run without `reports/p1l/lr-S-lock.json`.
   Candidates are .001/.003, seed17, floor(S/3) steps. Smoke reads timing and
   memory only. No test/screening evaluation is planned before confirmation.
 - Confirmation: test [100000,102000), seed4242; held until every primary and
-  B0/B1/B2 training run is complete and Claude Code confirms the WP-L4 decision.
-  Joint episode resampling across fixed seeds, 2000 draws, .95 confidence for
-  one writer condition or .975 for two. G1/G2 follow the preregistration verbatim.
+  B0/B1/B2 training run in EVERY condition is complete and Claude Code confirms
+  the WP-L4 decision. B3 fixes confidence=1-.05/k, where k counts the two oracle
+  ranks plus any learned condition, before the first confirmation evaluation.
+  Joint episode resampling across fixed seeds,2000draws. G1/G2 follow the preregistration.
 - Typed replication uses the same checkpoints: E12 total facts, 3 same-head
   distractors, chains (8,1), relations1/2/3 as distractors; this matches the
   preregistered P1-S typed layout. No replication training or lr selection.
@@ -66,7 +67,8 @@ fraction whose top1 name equals the actual model's top1 name among all1024 names
 Full-vocabulary EM remains the scientific endpoint; the faithfulness reference
 is the model's name-restricted argmax. The orchestrator accepted the residual
 space and512-question frozen-backbone definition. Confirmation remains held
-until its explicit WP-L4 decision (one condition:95% CI; two:97.5%).
+until its explicit WP-L4 decision and all conditions finish training. B3
+supersedes the original one/two-writer CI rule with confidence=1-.05/k above.
 
 ## Cost and artifacts
 

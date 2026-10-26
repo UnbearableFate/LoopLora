@@ -44,7 +44,7 @@ def test_global_training_gate_requires_orchestrator_decision_before_opening_runs
 
 
 def test_global_gate_rejects_missing_rank_or_an_incomplete_other_condition(tmp_path):
-    manifest = {"rank": 128, "runs": {f"{label}-s{seed}": "/does-not-exist"
+    manifest = {"condition": "oracle-r128", "rank": 128, "runs": {f"{label}-s{seed}": "/does-not-exist"
                 for label in LABELS[:5] for seed in SEEDS}}
     with pytest.raises(ValueError, match="B3"):
         check_training(manifest, dict(status="allowed", orchestrator_decision="none selected", gated_conditions=1,
@@ -53,10 +53,13 @@ def test_global_gate_rejects_missing_rank_or_an_incomplete_other_condition(tmp_p
     current = tmp_path / "r128.json"
     current.write_text(json.dumps(manifest))
     other = tmp_path / "r32.json"
-    other.write_text(json.dumps(dict(rank=32, runs={})))
+    other.write_text(json.dumps(dict(condition="oracle-r32", rank=32, runs={})))
     authorization = dict(status="allowed", orchestrator_decision="none selected", gated_conditions=2,
                          condition_manifests={"oracle-r32": str(other), "oracle-r128": str(current)})
     with pytest.raises(ValueError, match="all21"):
+        check_training(manifest, authorization)
+    other.write_text(json.dumps(dict(condition="oracle-r32", rank=128, runs={})))
+    with pytest.raises(ValueError, match="rank labels"):
         check_training(manifest, authorization)
 
 

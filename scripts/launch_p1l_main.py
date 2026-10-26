@@ -96,7 +96,8 @@ def launch(args):
         state["source"] = source
         save(receipt_path, state)
     if args.stage == "main":
-        save(args.root / "training-manifest.json", dict(rank=args.rank, S=lock["S"], lrs=lock["lrs"], runs=runs,
+        save(args.root / "training-manifest.json", dict(condition=f"oracle-r{args.rank}", rank=args.rank,
+            S=lock["S"], lrs=lock["lrs"], runs=runs,
             lock_commit=source, lock_file_hash=__import__("hashlib").blake2b(lock_path.read_bytes(), digest_size=16).hexdigest()))
 
 

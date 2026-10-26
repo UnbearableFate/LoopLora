@@ -40,10 +40,15 @@ def check_training(manifest: dict, authorization: dict, *, check_all: bool = Tru
             or not {"oracle-r32", "oracle-r128"} <= conditions.keys()):
         raise ValueError("B3 requires the fixed count and manifests of every gated condition")
     if check_all:
-        all_manifests = [json.loads(Path(path).read_text()) for path in conditions.values()]
-        if manifest not in all_manifests:
+        all_manifests = {label: json.loads(Path(path).read_text()) for label, path in conditions.items()}
+        if any(other.get("condition") != label for label, other in all_manifests.items()):
+            raise ValueError("global confirmation condition labels do not match their manifests")
+        if (all_manifests["oracle-r32"].get("rank") != 32
+                or all_manifests["oracle-r128"].get("rank") != 128):
+            raise ValueError("global confirmation rank labels do not match their manifests")
+        if manifest not in all_manifests.values():
             raise ValueError("current condition is absent from the global confirmation lock")
-        for other in all_manifests:
+        for other in all_manifests.values():
             check_training(other, authorization, check_all=False)
     for name, path in manifest["runs"].items():
         directory = Path(path)
