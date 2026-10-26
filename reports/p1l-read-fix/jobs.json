@@ -111,9 +111,25 @@
       "role": "A1 tests and independent audit/schedule release",
       "exit_status": 0,
       "node_hours": 0.011944444444444445
+    },
+    {
+      "job_id": "3716019",
+      "job_name": "t-l4-r128",
+      "status": "FINISH",
+      "project": "xg24i002",
+      "queue": "small-g",
+      "start_date": "10/27 04:41:22",
+      "elapsed_seconds": 191,
+      "token": 0.1,
+      "token_estimate": null,
+      "nodes": 1,
+      "mig": null,
+      "role": "A2 tests:69passed,182.079s pytest on mg0851",
+      "exit_status": 0,
+      "node_hours": 0.05305555555555556
     }
   ],
-  "completed_node_hours": 0.17833333333333334,
+  "completed_node_hours": 0.2313888888888889,
   "max_total_node_hours": null,
   "separate_from": "WP-L3 costs",
   "pending_roles": [
@@ -135,13 +151,6 @@
       "source": "0b03d60",
       "nodes": 1,
       "requested_seconds": 7200
-    },
-    {
-      "job_id": "3716019.opbs",
-      "role": "A2 rank128 tests",
-      "source": "be07f7f",
-      "nodes": 1,
-      "requested_seconds": 300
     },
     {
       "job_id": "3716039.opbs",

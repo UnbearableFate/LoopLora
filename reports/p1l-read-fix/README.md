@@ -14,6 +14,10 @@ WP-L4 validation quality score. Rank128 smoke is2400steps/100evalepisodes,
 five equal checkpoints, pairedW5/R and soloOA; it exposes only timing/artifact
 checks and freezes each largest2h schedule before science. Scientific source
 is the exact tested/smoked commit, recorded by that release.
+These OA arms supply the true learned fact value to the reader (WP-L3 OA);
+they use `writer: learned`, and are distinct from WP-C7's external random oracle.
+Rank128 W5/R have132096 training-only head parameters (128-to1024 plus bias),
+discarded in their inference exports; OA has no auxiliary head.
 
 The seven-run analyzer now additionally requires `--rank128-release` and
 preserves rank in all tables, selection locks and export checks. E8release

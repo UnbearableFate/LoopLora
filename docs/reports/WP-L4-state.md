@@ -80,7 +80,8 @@ Prepare separate rank128 release/root directories and re-arm the wake-up after
 submission. Older4-only decisions/8nodeh instructions above are superseded.
 
 A2 IMPLEMENTATION SOURCE be07f7fb34c1cdd14b64f65b7f687364fcd6e36f (mergedmaster
-df21654/2844d5e). Tests3716019 onmg0851; wait for terminal/result, not dots.
+df21654/2844d5e). Tests3716019 onmg0851 PASSED69, zero failures/skips,182.079s
+pytest; PBS191s. XMLreports/p1l-read-fix/tests-r128.xml. No runtime on login.
 Smokes2400steps (10% of provisional24000), eval100 five480step intervals:
 3716039.opbs W5/R, log /work/xg24i002/x10041/LoopLora/logs/pbs/s-l4-128-W5-R-20261027-044344-1999311.log
 3716040.opbs OA, log /work/xg24i002/x10041/LoopLora/logs/pbs/s-l4-128-OA-20261027-044344-1999323.log
