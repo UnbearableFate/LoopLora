@@ -45,7 +45,7 @@ questions and the frozen model. Gates/authorization tests have a separate job.
 The logit-lens final-step replay must reproduce the deployed logits exactly.
 
 Refresh node-hours on login with
-`/usr/bin/python3 -I scripts/p1l_job_ledger.py --out reports/p1l/jobs.json`.
+`/usr/bin/python3 scripts/p1l_job_ledger.py --out reports/p1l/jobs.json`.
 Every job goes through submit.py; each request includes measured1.5margin,
 never exceeds2hours, and must finish before2026-10-28 09:00JST. Long waits use
 the Miyabi wakeup skill in Codex message mode (no Goal exists in this session).
