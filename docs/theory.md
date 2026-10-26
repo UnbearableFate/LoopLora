@@ -1126,6 +1126,435 @@ named protocol because backbone attention can solve the relation task itself.
 Choose any follow-up using validation data and explicit cost accounting; this
 note provides designs and falsifiable predictions, not new P1-L results.
 
+## Proposition 11 — Retrieval interference and the value-to-answer path (WP-T3)
+
+**Scope and evidence.** These are local derivations for the V2 definition at
+`b4f1ad4`, not a fitted explanation of a particular checkpoint. The
+[WP-T3 observations](tasks/WP-T3_retrieval_interference.md) report slow oracle-
+addressing learning and small addressing/value auxiliary losses without good
+answer EM. [WP-L2](reports/P1L-diagnosis.md) establishes direct output-code
+feasibility but failed learned addressing. The WP-L3 source inspected read-only
+on `wp/llm` at `c5879d3`, `llm/writer_fix.py`, confirms that InfoNCE normalizes
+the query, the V2 read uses raw \(Qz\), and written values have a separate
+training-only linear name decoder. Those files are not imported into this
+branch. Reported losses/EM are observations supplied by those sources;
+the constructed checks below do not measure the ongoing runs.
+
+### 11.1 Exact delta-read coefficients and the small-beta approximation
+
+**Assumptions.** There are \(E\) actual writes, with no resets between them,
+zero initial memory, constant scalar gates \(0\le\lambda,\beta\le1\), unit
+keys \(k_i\), arbitrary values \(v_i\), and an arbitrary raw query \(q\).
+Skipped tokens cause no decay and do not enter \(E\). Let
+\(c_{ij}=k_i^Tk_j\), \(b_i=k_i^Tq=\|q\|\cos(q,k_i)\) for \(q\ne0\), and
+\(H_i=I-\beta k_i k_i^T\). Zero or clamped short keys are not unit: the
+matrix identity still uses their actual vectors, but unit-key cosine formulas
+must not be applied to them unchanged. For \(q=0\), all coefficients and the
+read are zero without defining a query cosine.
+
+**Proved, for every beta.** The decay-first writer and its read are
+
+\[
+M_i=\lambda M_{i-1}H_i+\beta v_i k_i^T,\qquad
+M_Eq=\sum_{i=1}^E d_i v_i,\quad
+d_i=\beta\lambda^{E-i}a_i,\quad
+a_i=k_i^TH_{i+1}\cdots H_Eq.\tag{11.1}
+\]
+
+Expanding one update and induction prove this; products are in increasing
+write order and do not commute in general. A nonzero initial state contributes
+\(\lambda^E M_0H_1\cdots H_Eq\). The coefficients are signed and are not
+softmax probabilities. The original cosine \(b_i\) alone omits subsequent
+erasure by other keys.
+
+An exact computation using just the Gram matrix is
+
+\[
+a_E=b_E,\qquad a_i=b_i-\beta\sum_{j>i}c_{ij}a_j;\qquad
+a=(I+\beta C_+)^{-1}b,\tag{11.2}
+\]
+
+where \(C_+\) is the strictly upper triangular part of the key Gram.
+To prove it, start with \(w_E=q\) and work backward:
+\(a_j=k_j^Tw_j\), \(w_{j-1}=w_j-\beta k_j a_j\). Then
+\(w_i=q-\beta\sum_{j>i}k_j a_j\), giving (11.2). Since
+\(C_+^E=0\), its inverse is exactly the finite sum
+\(\sum_{n=0}^{E-1}(-\beta C_+)^n\), with no convergence assumption.
+
+**Small beta: approximation with an exact remainder, not an exact additive rule.**
+Substituting (11.2) twice gives
+
+\[
+M_Eq=
+\underbrace{\beta\sum_i\lambda^{E-i}b_i v_i}_{m_{add}}
+-\beta^2\sum_{i<j}\lambda^{E-i}c_{ij}b_jv_i+\mathcal R_3,
+\]
+\[
+\|\mathcal R_3\|
+\le\beta^3\|q\|\sum_i\lambda^{E-i}\|v_i\|
+       \sum_{i<j<l}|c_{ij}c_{jl}|.\tag{11.3}
+\]
+
+Indeed the remaining term in \(a_i\) is exactly
+\(\beta^2\sum_{i<j<l}c_{ij}c_{jl}a_l\). Each \(H_j\) has norm at most
+1 on the stated gate interval, so \(|a_l|\le\|q\|\); multiplying by
+\(\beta\lambda^{E-i}v_i\) and taking norms proves the bound. Likewise,
+
+\[
+\|M_Eq-m_{add}\|
+\le\beta^2\|q\|\sum_i\lambda^{E-i}\|v_i\|\sum_{j>i}|c_{ij}|
+\le\beta^2\|q\|V_{max}\mu\binom E2,\tag{11.4}
+\]
+
+where \(V_{max}=\max_i\|v_i\|\), \(\mu=\max_{i\ne j}|c_{ij}|\).
+Similarly (11.3) is at most
+\(\beta^3\|q\|V_{max}\mu^2\binom E3\). Ignoring decay as well adds at
+most \(\beta(1-\lambda)\|q\|V_{max}\binom E2\), by
+\(1-\lambda^n\le n(1-\lambda)\). These inequalities hold at all allowed
+betas, but a truncation is useful only when its bound is small relative to
+the required signal or decoder margin. With \(E=16,\beta=0.1\),
+\(\beta(E-1)=1.5\); calling beta “small” does not certify accuracy when keys
+are strongly correlated. Orthogonal keys make \(C_+=0\), so \(m_{add}\)
+is exact for every beta. Even then, \(q=k_t\) returns
+\(\beta\lambda^{E-t}v_t\), not \(v_t\).
+
+### 11.2 Signal, interference, and actual decoding
+
+For queried write \(t\), define \(s=d_t v_t\),
+\(\eta=\sum_{i\ne t}d_i v_i\), and the value Gram
+\(G^v_{ij}=v_i^Tv_j\). The exact signal/interference power ratio is
+
+\[
+\mathrm{SIR}=\frac{d_t^2G^v_{tt}}
+ {d_{-t}^TG^v_{-t,-t}d_{-t}},\qquad
+s^T\eta=d_tG^v_{t,-t}d_{-t}.\tag{11.5}
+\]
+
+Expanding the squared norms proves the expression. A zero denominator with
+nonzero signal means infinite SIR; zero signal needs separate treatment.
+Independent-noise approximations discard the cross terms in the denominator.
+For \(E-1\) equal coherent contributions their power is \((E-1)^2\) times
+one contribution, not \(E-1\). Conversely cancellation or a downstream
+projection can make large individual terms harmless. Neither the usual
+\(\sqrt{E/r}\) heuristic nor key cosines alone settles a learned-value read.
+
+A sufficient norm-dominance condition for nonzero \(v_t\) is
+\(d_t>0\) and \(\|\eta\|\le\epsilon d_t\|v_t\|\), \(\epsilon<1\).
+Triangle inequalities then give
+
+\[
+\cos(M_Eq,v_t)\ge\frac{1-\epsilon}{1+\epsilon}.
+\]
+
+The stronger but more conservative scalar check
+\(\sum_{i\ne t}|d_i|\|v_i\|<d_t\|v_t\|\) suffices. These are sufficient,
+not necessary: parallel positive interference can reinforce the right value.
+With \(e=v_t/\|v_t\|\), \(h=e^T\eta\), and
+\(\eta_\perp=\eta-he\), the exact cosine, when both \(M_Eq\) and \(v_t\)
+are nonzero, is
+\((d_t\|v_t\|+h)/\sqrt{(d_t\|v_t\|+h)^2+\|\eta_\perp\|^2}\).
+
+For a linear decoder with rows \(w_y\), correct target-over-competitor
+ranking requires \((w_t-w_j)^T(d_t v_t+\eta)>0\) for every competitor \(j\).
+If the isolated signal has margin
+\(\gamma=\min_j(w_t-w_j)^Td_t v_t>0\), then
+\(\|\eta\|\max_j\|w_t-w_j\|<\gamma\) is sufficient, by Cauchy–Schwarz.
+An auxiliary decoder on \(v_t\), the V2 reader, and the frozen LM above the
+insertion point are different maps; a guarantee for the first is not a
+guarantee for the last.
+
+### 11.3 What InfoNCE at temperature 0.1 guarantees
+
+For a unit query \(\hat q\), write \(s_i=\hat q^Tk_i\). A per-query
+addressing loss is
+
+\[
+\ell_a=\log\left(1+\sum_{j\ne t}
+e^{(s_j-s_t)/\tau}\right).\tag{11.6}
+\]
+
+It implies softmax target probability \(e^{-\ell_a}\) and individual gaps
+\(s_t-s_j\ge-\tau\log(e^{\ell_a}-1)\), since each exponential is bounded
+by their sum. At \(\ell_a=0.65,\tau=0.1\), this minimum-gap guarantee is
+only about 0.0088. That individual query is correctly ranked because
+\(0.65<\log2\); a **mean** loss of 0.65 does not rank every query correctly.
+Misranked queries have loss at least \(\log2\), so even the distribution-free
+bound on their fraction is only \(\bar\ell_a/\log2\), nearly 0.94 here.
+If all 15 negatives tie, their common gap is instead
+\(0.1\log[15/(e^{0.65}-1)]\), about 0.2796. These are statements about an
+exponentiated competition, not a bound on signed linear interference.
+
+**Constructed failure with excellent isolated-value decoding.** In 32 dimensions
+take \(q=k_1=e_0\), and for \(j=1,\ldots,15\),
+\(k_{j+1}=0.72e_0+\sqrt{1-0.72^2}e_j\). Write \(v_i=e_{i-1}\), in
+order, with \(\lambda=0.99,\beta=0.1\), target \(t=1\). Every key is unit;
+the target is the strict cosine winner and its InfoNCE loss is
+\(\log(1+15e^{-2.8})\), about 0.65. A 1024-name linear head with the first
+16 code coordinates scaled by 12 decodes each isolated written value with
+CE \(\log(1+1023e^{-12})<0.01\). But (11.2) gives
+
+\[
+d_1=0.1[0.99(1-0.1\cdot0.72^2)]^{15},\qquad d_{16}=0.072>d_1.
+\tag{11.7}
+\]
+
+To derive it, non-target keys have mutual cosine \(g=0.72^2\);
+\(a_i=0.72(1-\beta g)^{16-i}\) for \(i>1\), and
+\(a_1=(1-\beta g)^{15}\). Thus the actual read's largest code component is
+the newest distractor; the same auxiliary name head decodes that distractor.
+The two auxiliary objectives can therefore be good while the mixed read is
+wrong, without invoking unknown properties of the LLM.
+
+**Even the target coefficient can change sign.** Set target key
+\(0.8e_0+0.6e_1\), query \(e_0\), and negative keys
+\(be_0+0.2e_1+\sqrt{1-b^2-0.04}e_{j+1}\), where
+\(b=0.8-0.1\log[15/(e^{0.65}-1)]\). They have the same per-query loss
+0.65. Put \(g=b^2+0.04\), \(D=0.8b+0.12\). With
+\(\beta=\lambda=0.99\), the first key's backward coefficient is
+\(a_1=0.8-(Db/g)[1-(1-\beta g)^{15}]<0\), by the same geometric-series
+substitution. For example \(0.52<b<0.521\) gives \(Db/g-0.8>0.095\)
+and \(1-0.99g<0.7\), proving the strict negative sign. Raising beta is not
+an unconditional repair for nonorthogonal keys.
+
+Finally, the contrastive loss sees \(\hat q\), whereas V2 reads raw
+\(q=Qz\). At fixed \(z\), in particular the first read with \(z=u\), scaling
+\(Q\) by a positive scalar leaves (11.6) invariant away from the normalization
+clamp, but scales \(Mq\) by that scalar. It can make
+the memory signal arbitrarily weak without changing addressing loss. The
+loss also does not constrain value norms, their Gram matrix, write-age
+attenuation, subsequent delta erasure, \(U\)/ReLU masks, or answer decoding.
+Small value CE similarly need not fix code norm: its separate decoder can
+absorb rescaling. None of these counterexamples establishes which failure
+dominates the observed WP-L3 checkpoints; exact read/scale measurements are
+required to distinguish them.
+
+### 11.4 Residual scale, gradients, and slow oracle-addressing learning
+
+At \(L=1\), let \(m=MQ u\). The total loop residual is
+\(r_M=\rho\phi(Ru+Um)\), but this includes a no-memory \(R\) route. The
+**memory-specific** effect for the same question is exactly
+
+\[
+g_M=z(M)-z(0)=\rho[\phi(Ru+Um)-\phi(Ru)],\quad
+\|g_M\|\le|\rho|\|Um\|,\quad
+\|\alpha B g_M\|\le|\alpha\rho|\|B\|\|U\|\|m\|.\tag{11.8}
+\]
+
+The inequalities use ReLU's 1-Lipschitz property. Useful diagnostic ratios are
+\(\|g_M\|/(\|u\|+\epsilon)\), \(\|Um\|/(\|Ru\|+\epsilon)\), and the
+answer-logit change under the same-question zero/shuffled-memory intervention.
+A large \(\|r_M\|\) can be mostly the question-only route. Even perfect
+\(m=v_t\) can have \(g_M=0\) if \(Ru+Uv_t\) and \(Ru\) remain on the
+negative side of all relevant ReLU coordinates. Conversely a small latent
+contrast can still matter if \(B\) and the upper LM amplify its useful
+direction. Norm ratios alone cannot identify the cause of an EM curve.
+
+**An initialization benchmark, with explicit assumptions.** Here \(r_m=r\).
+Conditional on fixed \(m\) independent of initialized \(U\), its entry variance
+\(\sigma_U^2/r\) gives \(\mathbb E\|Um\|^2=\sigma_U^2\|m\|^2\).
+For \(R=0\), symmetry of each Gaussian preactivation gives
+
+\[
+\mathbb E\|\rho\operatorname{ReLU}(Um)\|^2
+=\rho^2\sigma_U^2\|m\|^2/2.\tag{11.9}
+\]
+
+This follows because positive and negative squared halves of a centered
+Gaussian have equal expectation. At \(\sigma_U=0.5,\rho=0.25\), the isolated
+RMS memory gain is about 0.0884. If \(\|v_t\|=\|u\|\), exact orthogonal
+unit-query addressing at the initial \(\beta=0.1,\lambda=0.99\) further
+reduces the isolated residual-to-input RMS ratio to about 0.0076–0.0088
+across the 16 write ages.
+Oracle addressing supplies raw \(v_t\), so the latter beta/decay factors
+are **absent** there. With nonzero \(R\), (11.9) is not a formula for
+\(g_M\): its ReLU masks depend on \(Ru\). Learned norms, query magnitudes,
+and contextual feature anisotropy require measurement. Initial gate settings
+also cannot substitute for the gates after 9000 optimizer steps.
+
+Kaiming initialization here gives \(\operatorname{Var}A_{ij}=1/(3d_{in})\),
+hence \(\mathbb E\|Ax\|^2=r\|x\|^2/(3d_{in})\), not unit-norm latent
+inputs by default. Marginal per-feature standardization does not whiten
+correlations or make write-position and read-position distributions equal.
+The symbolic embedding problem has different geometry, conditioning and
+downstream loss from contextual LLM features. Its reported roughly 200-step
+retrieval does not supply an expected iteration count for the LM task.
+
+**Proved first-step gradient routing.** Let \(h_t\) be the main loss gradient
+at the wrapped output, including effects through frozen upper layers and later
+positions. For a single module,
+
+\[
+\nabla_B\ell_{main}=\alpha\sum_t h_t z_t^T,\qquad
+\nabla_z\ell_{main}=\alpha B^Th_t.\tag{11.10}
+\]
+
+At \(B=0\), the main loss can update \(B\) but gives no gradient through
+this adapter to \(A,R,U,Q,K,V\) or the gates. This is a one-step routing
+delay, not a dead start: a nonzero \(B\) unblocks those paths. Addressing and
+value auxiliaries can meanwhile update \(A,K,Q\) and \(A,V,C_v\),
+respectively, without directly training \(R,U,B\). The common latent geometry
+may therefore move while the deployed decoder learns it. The address loss's
+query Jacobian \((I-\hat q\hat q^T)/\|q\|\) also has no direct radial
+gradient; optimizer preconditioning, other losses and weight decay can still
+change query norms. Scalar auxiliary/main loss magnitudes do not measure their
+gradient competition, especially with global clipping and AdamW.
+
+In the first \(B\) update, \(h_t z_t^T\) contains both question-derived
+\(h_tu_t^T\) and value-bearing residual terms. Their individual Frobenius
+norm ratio is the corresponding latent norm ratio when \(h_t\ne0\);
+batch cancellation and useful correlations can alter the net update. In a
+randomly reassigned memory-QA episode, question-only features need not predict
+the tail, while the small transformed value has to establish a consistent
+answer code. This is a plausible conditioning problem, not a proof of a
+particular optimizer rate or of which route dominates observed learning.
+
+**Why the two oracles are different.** D2 in `llm/diagnosis.py` supplies a
+free trainable answer-identity code directly as post-reader \(z\), training
+only its table and \(B\), and injects at the final question position. WP-L3
+oracle addressing supplies the actual encoder's written \(v_t\) as \(m\)
+and still uses \(u+\rho\phi(Rz+Uv_t)\); it operates at every valid question
+read position. It must learn the contextual value encoder, shared latent
+geometry, \(U\), activation masks and the answer path in the presence of
+varying question \(u\). Its slow EM is therefore compatible with D2's high
+EM. Interference, beta, decay and query norm have been bypassed by this
+oracle and **cannot explain its own slowness**. Its remaining bottleneck needs
+value/reader/output measurements. In non-oracle W5, the separate name head is
+discarded at inference, and final-question InfoNCE also does not certify the
+earlier question positions that can influence the LM's answer.
+
+### 11.5 Ranked V2-preserving recommendations and falsifiable validation screens
+
+These are **proposed diagnostics/experiments**, not amendments to the running
+[WP-L3 selection rule](tasks/WP-L3_p1l_writer_fix.md) or new trained results.
+Preserve the V2 recurrence, raw linear memory read, one fact write, input site,
+memory-only T1 protocol, rank 32, batch 32 and existing data splits. Do not
+replace \(Mq\) by softmax attention, add runtime normalization to it, or
+remove \(u\) as an undocumented fix. Added objectives and initialization
+choices are declared training changes and must be checkpointed.
+
+For each selected comparison, use paired training examples/initial parameters
+and seed 17, a fixed development schedule, and the same 1000 validation
+episodes (no test/T2). First evaluate the same checkpoint twice to establish
+the numerical noise floor. Use a uniform 10% fast-path smoke (480 steps for a
+4800-step plan, with at least 32 representative validation queries), reserving
+setup, validation and a 1.5× time margin; fix the final step count
+before reading new validation scores. Each suggested arm must fit **one
+node and ≤1 hour**, including its evaluations. A default ceiling of 4800
+steps is a starting design, not a throughput guarantee. Stop at the declared
+budget and report partial learning; do not extend a run based only on a
+falling auxiliary loss. Log a few fixed checkpoints, with evaluation in the
+same allocation. These screens are an ordered decision tree, not a request
+to run a factorial grid. WP-T3 itself runs only the small checks below within
+its separate 0.2 node-hour cap.
+
+0. **Audit the actual failing link before further training.** On a fixed
+   validation slice, log \(b_i,a_i,d_i\) from (11.2), exact Gram reconstruction
+   versus the actual read, value-Gram SIR/parallel interference, target write
+   age, raw \(\|q\|\), \(\|v_t\|\), \(\|m\|\), \(\|u\|\), \(\|Ru\|\),
+   \(\|Um\|\), \(g_M\), \(Bg_M\), and answer NLL/EM/logit contrasts with
+   zeroed and shuffled memory. Compare the same value head on clean \(v_t\)
+   and actual \(Mq\); record key Gram RMS/max absolute cosine, not only
+   its signed mean. On training minibatches measure per-loss parameter
+   gradients, their alignment, and clipping frequency. Do not backpropagate
+   on validation labels. For OA substitute \(v_t\) for \(m\), and zero/shuffle
+   the supplied `oracle_values`; the stored matrix is bypassed in that arm.
+   **Falsifier:** accurate, calibrated, decodable actual reads with negligible
+   downstream memory effect weaken interference as the immediate explanation;
+   substantial OA memory-to-answer contrasts weaken a simple weak-injection
+   explanation. A mismatched Gram reconstruction instead calls for tracing
+   the logged keys/values/write masks before drawing a scientific conclusion.
+
+1. **Supervise the raw deployed read.** If the audit finds bad \(Mq\), add
+   \(\|Mq-\operatorname{sg}(v_t)\|^2/
+   (\operatorname{sg}(\|v_t\|^2)+\epsilon)\) at the final question token,
+   where \(\operatorname{sg}\) stops target gradients. Retain clean-value
+   supervision and monitor code norms; stop-gradient alone does not exclude
+   a moving-target collapse. A fixed noncollapsed teacher is an alternative.
+   The loss supplies a query-gain and actual-mixture signal absent from
+   normalized InfoNCE. An additional CE on the actual read with the same
+   value head is useful, but letting that head freely rescale still does
+   not calibrate raw magnitude. **Prediction:** lower validation read error,
+   a smaller clean-value/read decoding gap, then better answer NLL/EM.
+   **Falsifier:** if error halves and half the decoding gap closes but answer
+   NLL improves by <0.2 nats and EM by <5 percentage points versus matched
+   continuation, read quality is insufficient as a rescue; investigate the
+   deployed output path. Failure to improve the read itself instead rejects
+   this objective's short-budget effectiveness, not V2 expressibility.
+
+2. **Test injection scale in matched OA runs.** Compare the plan's
+   \(\rho=0.25\) with \(0.5\), optionally \(0.1\) as a lower-gain control
+   only if cost permits, retaining the same matrices at initialization.
+   OA removes interference from this test. Larger rho also scales the
+   \(R\) nuisance, so inspect \(g_M\), \(Bg_M\) and answer-logit influence,
+   rather than the total residual alone. **Prediction:** if weak injection
+   limits conditioning, stronger useful contrast improves early NLL/EM.
+   **Falsifier:** useful contrast/gradient rises but matched improvement
+   remains below 0.2 nats/5 points. If only the nuisance grows, this rho
+   comparison did not isolate memory gain; a separately declared
+   initialization-only calibration of \(U\) is a sharper next test. No
+   successful single-step gain choice implies stability at larger depths.
+
+3. **Reduce destructive key overlap when the coefficient audit supports it.**
+   Add mean squared off-diagonal key cosine over distinct intended addresses,
+   not a penalty on signed mean cosine and not repulsion of repeated writes
+   to the same address. At E=16≤r=32, episode-wise orthogonality is
+   dimensionally possible; one shared contextual encoder need not achieve
+   it across all episodes. (11.3)–(11.4) predict less erasure as coherence
+   falls; they do not make query distractor projections zero.
+   **Falsifier:** halving Gram RMS does not improve target coefficients,
+   age-stratified SIR/read error, or improves those without answer benefit.
+   Only after that audit, try one larger beta initialization (e.g. 0.3)
+   against 0.1 with lambda fixed. Orthogonal target amplitude grows with
+   beta; correlated keys can erase or reverse old targets as above. Reject
+   a beta-only scale explanation if read norm rises but old-fact retrieval
+   worsens. Merely lowering beta has the opposite tradeoff: less erasure,
+   but weaker absolute read gain. At initial lambda=.99, decay alone gives
+   only a factor \(.99^{15}\approx0.86\), so lambda-only tuning ranks below
+   diagnosing overwrite and output scale.
+
+4. **Bridge to a demonstrated useful output direction if read decoding is
+   already good.** A more supervised option regresses the actual final-token
+   branch \(\alpha Bz\) toward a frozen training-only D2 teacher's
+   \(B_{D2}c_{answer}\), with declared training-set scale calibration. Keep
+   the deployed V2 equation and discard the teacher at inference. This is
+   extra supervision and cost, not an equivalent clean-value classifier.
+   **Prediction:** deployed branch alignment and answer NLL/EM improve
+   together even with unchanged key top1. **Falsifier:** teacher direction
+   and scale match on validation yet answer NLL does not improve, pointing
+   to context/position-dependent downstream mismatch; or good reads never
+   produce branch alignment, pointing to the intervening reader/code map.
+   Try this only after the cheaper read/scale diagnostics justify it.
+
+The practical thresholds above are proposed **development falsification
+criteria**, not existing preregistered success gates or statistical guarantees.
+A pilot identifies a candidate explanation; any selected training change needs
+its own declared validation and later independent confirmation. None of the
+reported observations proves that scaling, interference, or optimizer routing
+is the unique bottleneck.
+
+### 11.6 Constructed numerical checks and limits
+
+Compute job `3715090.opbs` on `mg0005` passed 42 FP64 theory tests in 5.72 s,
+including six new WP-T3 cases and the 36 previous cases. The new cases compare
+ordered products, the triangular Gram recursion, and actual `delta_update`;
+check both small-beta remainder bounds and full correlated-value SIR; and
+verify initialization gradients and the two InfoNCE counterexamples. They
+load no LLM checkpoint and perform no training experiment.
+
+In the default-gate construction (11.7), the measured addressing CE is
+0.648229, clean-value name-head CE 0.006266, and actual-read name-head CE
+6.479258. The target component is 0.038704 while the interference norm is
+0.192546; the actual read selects the newest distractor (write 16). These are constructed
+values, not estimates of a live checkpoint's coefficients or losses.
+
+With \(R=0,U=I,\rho=0.25\) and positive read coordinates, the measured
+\(\|g_M\|\) is 0.0490993 at raw query norm 1 and 0.0000490993 at norm
+0.001; \(\|u\|=1\) and addressing CE is unchanged. The test also verifies
+a negative first-target coefficient at finite \(\beta=\lambda=0.99\) with
+per-query InfoNCE 0.65. The log and command are linked from
+[WP-T3's report](reports/WP-T3.md). A one-node three-minute request bounds
+this task's submitted compute by 0.05 node-hours, below its 0.2 cap.
+
 ## Validation and interpretation
 
 [tests/test_theory_examples.py](../tests/test_theory_examples.py) checks small,
@@ -1135,5 +1564,8 @@ original checks are recorded in [the WP-T report](reports/WP-T.md); Proposition
 10's checks and descriptive measurements are recorded in
 [the WP-T2 report](reports/WP-T2.md), job `3712948.opbs` on `mg0851`
 (36 tests passed, including the 16 original cases).
+Proposition 11 and the rerun of all preceding examples are recorded in
+[the WP-T3 report](reports/WP-T3.md), job `3715090.opbs` on `mg0005`
+(42 tests passed).
 These checks support the derivations and implementation correspondence. They
 are not P1-S training experiments or evidence that G1/G2 pass.

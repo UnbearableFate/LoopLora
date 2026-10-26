@@ -438,3 +438,175 @@ def test_wpt2_tail_sum_alone_does_not_determine_terminal_set():
     first = set(torch.where((S @ ones > 0) & (S.T @ ones == 0))[0].tolist())
     second = set(torch.where((T @ ones > 0) & (T.T @ ones == 0))[0].tolist())
     assert first == {2, 5} and second == {1, 5}
+
+
+# WP-T3: exact delta coefficients and constructed retrieval failure witnesses.
+def _wpt3_memory(keys, values, lam, beta):
+    state = torch.zeros(1, keys.shape[1], keys.shape[1], dtype=DTYPE)
+    for key, value in zip(keys, values):
+        state = delta_update(state, key[None], value[None], None, lam=lam, beta=beta)
+    return state
+
+
+def _wpt3_coefficients(keys, query, lam, beta):
+    gram, b = keys @ keys.T, keys @ query
+    a = torch.zeros_like(b)
+    for i in range(len(keys) - 1, -1, -1):
+        a[i] = b[i] - beta * (gram[i, i + 1:] @ a[i + 1:])
+    decay = lam ** torch.arange(len(keys) - 1, -1, -1, dtype=DTYPE)
+    return beta * decay * a
+
+
+@pytest.mark.parametrize("beta", [.1, .7])
+@torch.no_grad()
+def test_wpt3_exact_nonorthogonal_products_gram_and_correlated_value_sir(beta):
+    generator = torch.Generator().manual_seed(derive_seed(17, "WP-T3", "general-coefficients"))
+    keys = torch.nn.functional.normalize(torch.randn(16, 32, generator=generator, dtype=DTYPE), dim=-1)
+    common = torch.randn(32, generator=generator, dtype=DTYPE)
+    values = common + .3 * torch.randn(16, 32, generator=generator, dtype=DTYPE)
+    query = torch.nn.functional.normalize(torch.randn(32, generator=generator, dtype=DTYPE), dim=0)
+    lam, eye = .99, torch.eye(32, dtype=DTYPE)
+    memory = _wpt3_memory(keys, values, lam, beta)[0]
+    coeff = _wpt3_coefficients(keys, query, lam, beta)
+    product_coeff = []
+    for i in range(len(keys)):
+        product = eye.clone()
+        for j in range(i + 1, len(keys)):
+            product = product @ (eye - beta * torch.outer(keys[j], keys[j]))
+        product_coeff.append(beta * lam ** (15 - i) * (keys[i] @ product @ query))
+    torch.testing.assert_close(coeff, torch.stack(product_coeff), atol=1e-14, rtol=1e-12)
+    torch.testing.assert_close(memory @ query, coeff @ values, atol=1e-14, rtol=1e-12)
+    signal, noise = coeff[0] * values[0], coeff[1:] @ values[1:]
+    value_gram = values @ values.T
+    gram_noise_sq = coeff[1:] @ value_gram[1:, 1:] @ coeff[1:]
+    torch.testing.assert_close(noise.square().sum(), gram_noise_sq, atol=1e-14, rtol=1e-12)
+    torch.testing.assert_close(signal @ noise, coeff[0] * (value_gram[0, 1:] @ coeff[1:]),
+                               atol=1e-14, rtol=1e-12)
+    torch.testing.assert_close(signal.square().sum() / noise.square().sum(),
+                               coeff[0].square() * value_gram[0, 0] / gram_noise_sq,
+                               atol=1e-14, rtol=1e-12)
+
+
+@torch.no_grad()
+def test_wpt3_small_beta_leading_and_second_order_rigorous_bounds():
+    generator = torch.Generator().manual_seed(derive_seed(17, "WP-T3", "small-beta"))
+    keys = torch.nn.functional.normalize(torch.randn(16, 32, generator=generator, dtype=DTYPE), dim=-1)
+    values = torch.randn(16, 32, generator=generator, dtype=DTYPE)
+    query = torch.randn(32, generator=generator, dtype=DTYPE)
+    lam, beta = .99, 1e-4
+    gram, b, norms = keys @ keys.T, keys @ query, values.norm(dim=-1)
+    decay = lam ** torch.arange(15, -1, -1, dtype=DTYPE)
+    actual = _wpt3_memory(keys, values, lam, beta)[0] @ query
+    leading = (beta * decay * b) @ values
+    first_correction = torch.zeros_like(actual)
+    bound2 = torch.zeros((), dtype=DTYPE)
+    bound3 = torch.zeros((), dtype=DTYPE)
+    for i in range(16):
+        bound2 += beta**2 * query.norm() * decay[i] * norms[i] * gram[i, i + 1:].abs().sum()
+        for j in range(i + 1, 16):
+            first_correction -= beta**2 * decay[i] * gram[i, j] * b[j] * values[i]
+            bound3 += (beta**3 * query.norm() * decay[i] * norms[i]
+                       * gram[i, j].abs() * gram[j, j + 1:].abs().sum())
+    assert (actual - leading).norm() <= bound2 + 1e-16
+    assert (actual - leading - first_correction).norm() <= bound3 + 1e-16
+
+
+def _wpt3_ranked_but_interfering():
+    keys = torch.eye(32, dtype=DTYPE)[:16].clone()
+    keys[1:, 0] = .72
+    keys[1:, 1:] *= (1 - .72**2)**.5
+    values = torch.eye(32, dtype=DTYPE)[:16]
+    return keys, values, _wpt3_memory(keys, values, .99, .1)
+
+
+@torch.no_grad()
+def test_wpt3_low_auxiliary_losses_do_not_certify_read_and_q_scale(capsys):
+    import json
+
+    keys, values, memory = _wpt3_ranked_but_interfering()
+    query = torch.eye(32, dtype=DTYPE)[0]
+    cosine = keys @ query
+    addressing_ce = torch.nn.functional.cross_entropy((cosine / .1)[None], torch.tensor([0]))
+    torch.testing.assert_close(addressing_ce, torch.log1p(15 * torch.exp(torch.tensor(-2.8, dtype=DTYPE))))
+    assert addressing_ce.item() == pytest.approx(.648, abs=.002)
+    assert cosine.argmax().item() == 0
+    head = torch.zeros(1024, 32, dtype=DTYPE)
+    head[:16, :16] = 12 * torch.eye(16, dtype=DTYPE)
+    value_ce = torch.nn.functional.cross_entropy(values @ head.T, torch.arange(16))
+    assert value_ce < .01
+    read = memory[0] @ query
+    h = .99 * (1 - .1 * .72**2)
+    assert read[0].item() == pytest.approx(.1 * h**15, rel=1e-12, abs=1e-14)
+    assert read.argmax().item() == 15  # newest distractor, despite top-ranked target key.
+    assert (head @ read).argmax().item() == 15
+    reader = _reader(32, activation="relu")
+    reader.U.copy_(torch.eye(32, dtype=DTYPE))
+    records, differences = [], []
+    for scale in (1., 1e-3):
+        reader.Q.copy_(scale * torch.eye(32, dtype=DTYPE))
+        q = reader.Q @ query
+        qhat = torch.nn.functional.normalize(q, dim=0)
+        loss = torch.nn.functional.cross_entropy(((keys @ qhat) / .1)[None], torch.tensor([0]))
+        torch.testing.assert_close(loss, addressing_ce, atol=1e-14, rtol=1e-12)
+        scaled_read = memory[0] @ q
+        torch.testing.assert_close(scaled_read, scale * read, atol=1e-15, rtol=1e-12)
+        with_memory = reader.read(query[None], memory, 1)
+        without_memory = reader.read(query[None], torch.zeros_like(memory), 1)
+        difference = (with_memory - without_memory)[0]
+        differences.append(difference)
+        torch.testing.assert_close(difference, .25 * scale * read, atol=1e-15, rtol=1e-12)
+        records.append({"query_scale": scale, "normalized_addressing_ce": loss.item(),
+            "query_norm": q.norm().item(), "read_norm": scaled_read.norm().item(),
+            "target_component": scaled_read[0].item(), "interference_norm": scaled_read[1:].norm().item(),
+            "memory_specific_z_norm": difference.norm().item(), "u_norm": query.norm().item()})
+    torch.testing.assert_close(differences[1], 1e-3 * differences[0], atol=1e-15, rtol=1e-12)
+    # Disabled capture makes the constructed numbers available in the compute log.
+    with capsys.disabled():
+        print("WP-T3 constructed measurements " + json.dumps({
+            "label": "constructed E16/r32; no real checkpoint", "value_head_ce": value_ce.item(),
+            "read_head_ce": torch.nn.functional.cross_entropy((head @ read)[None], torch.tensor([0])).item(),
+            "target_key_top1": True, "actual_read_top1": read.argmax().item(), "query_scales": records},
+            sort_keys=True))
+
+
+def test_wpt3_zero_B_blocks_first_main_gradient_then_nonzero_B_enables_U():
+    reader = _reader(2)
+    x = torch.tensor([[1., 2.]], dtype=DTYPE)
+    memory = torch.tensor([[[0., 1.], [1., 0.]]], dtype=DTYPE)
+    target = torch.tensor([[1., -1.]], dtype=DTYPE)
+    with torch.no_grad():
+        reader.B.zero_()
+        reader.U.copy_(torch.eye(2, dtype=DTYPE))
+    output = reader.branch(reader.read(reader.u(x), memory, 1))
+    (.5 * (output - target).square().sum()).backward()
+    assert reader.B.grad.norm() > 0
+    for name in ("A", "U", "Q", "R"):
+        gradient = getattr(reader, name).grad
+        assert gradient is not None and gradient.abs().max() == 0
+    reader.zero_grad(set_to_none=True)
+    with torch.no_grad():
+        reader.B.copy_(.1 * torch.eye(2, dtype=DTYPE))
+    output = reader.branch(reader.read(reader.u(x), memory, 1))
+    (.5 * (output - target).square().sum()).backward()
+    assert reader.U.grad.norm() > 0
+
+
+@torch.no_grad()
+def test_wpt3_finite_large_beta_can_reverse_target_coefficient_at_same_infonce():
+    a, c = .8, .2
+    delta = .1 * torch.log(15 / torch.expm1(torch.tensor(.65, dtype=DTYPE)))
+    b = a - delta
+    keys = torch.zeros(16, 32, dtype=DTYPE)
+    keys[0, :2] = torch.tensor([.8, .6], dtype=DTYPE)
+    for j in range(1, 16):
+        keys[j, 0], keys[j, 1], keys[j, j + 1] = b, c, (1 - b**2 - c**2).sqrt()
+    values = torch.eye(32, dtype=DTYPE)[:16]
+    query = torch.eye(32, dtype=DTYPE)[0]
+    loss = torch.nn.functional.cross_entropy(((keys @ query) / .1)[None], torch.tensor([0]))
+    assert loss.item() == pytest.approx(.65, rel=1e-12)
+    assert (keys @ query).argmax().item() == 0
+    memory = _wpt3_memory(keys, values, .99, .99)[0]
+    g, D = b**2 + c**2, a * b + .6 * c
+    expected = .99 * .99**15 * (a - D * b / g * (1 - (1 - .99 * g)**15))
+    torch.testing.assert_close(memory[0] @ query, expected, atol=1e-14, rtol=1e-12)
+    assert expected < 0 and (memory @ query)[0] < 0
