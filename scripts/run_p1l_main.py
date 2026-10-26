@@ -56,7 +56,8 @@ def fit(cfg: dict, out: Path, model, tokenizer, *, expose_scores: bool) -> dict:
     out.mkdir(parents=True)
     cfg = resolve_config(cfg)
     save(out / "config.json", cfg)
-    save(out / "record.json", dict(status="running", config=cfg, **runtime(), **source_metadata()))
+    save(out / "record.json", dict(status="running", config=cfg, config_hash=stable_hash(cfg),
+                                   **runtime(), **source_metadata()))
     torch.cuda.reset_peak_memory_stats()
     started = time.perf_counter()
     experiment = None
@@ -66,7 +67,8 @@ def fit(cfg: dict, out: Path, model, tokenizer, *, expose_scores: bool) -> dict:
         with (out / "train_log.jsonl").open() as stream:
             durations = [row["step_seconds"] for line in stream
                          if (row := json.loads(line))["step"] > 5]
-        record = dict(status="complete", config=cfg, **runtime(), **source_metadata(),
+        record = dict(status="complete", config=cfg, config_hash=stable_hash(cfg),
+                      **runtime(), **source_metadata(),
                       train_seconds=summary["train_seconds"],
                       mean_step_seconds=summary["train_step_seconds"],
                       steady_step_seconds=statistics.mean(durations) if durations else None,
