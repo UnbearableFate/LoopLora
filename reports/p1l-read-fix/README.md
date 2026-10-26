@@ -49,6 +49,12 @@ The final analyzer command must include BOTH `--release <release.json>` and
 `--rank128-release <release-r128.json>`; E8(iftriggered) also usesbe07f7f and
 the selected rank. These instructions supersede historicalrank32-onlyexamples.
 
+All seven scientific runs completed at their frozen schedules; all four jobs
+exit0. Jobs3715707/3715708/3716159/3716160 used4759/4483/4920/4612s on
+mg0856/mg0859/mg0852/mg0853 respectively. Selection/finalexport audit3716541
+first locks all7 E16records; if no E8retrain is required it immediately verifies
+all head-free exports and writes the finalsummary in the samecomputejob.
+
 Task `docs/tasks/WP-L4_p1l_read_fix.md`; choices `docs/reports/WP-L4-plan.md`;
 continuation `docs/reports/WP-L4-state.md`. Persistent root:
 `/work/xg24i002/x10041/LoopLora/runs/p1l/read-fix-20261027/`.

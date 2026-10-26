@@ -1,5 +1,24 @@
 # WP-L4 CURRENT — Amendment A2, all science submitted
 
+LATEST 06:22JST: ALL4 scientific jobs FINISH/exit0, ALL7 records complete.
+3715707mg0856=4759s,3715708mg0859=4483s,3716159mg0852=4920s,
+3716160mg0853=4612s. Frozen schedules/sources matched in records. Still no
+scientificquality read by worker; seven-run COMPUTE audit is next.
+Newaudit3716541.opbs (sourceb5ff4ee8bf30c976f64b9b3668908a067de6b81b),
+log /work/xg24i002/x10041/LoopLora/logs/pbs/a-l4-selection-20261027-061953-2563190.log,
+1node5min,regular-g. It FIRST calls analyzer --e16-only tolockall7; THEN
+automatically calls fullanalyzer --verify-export IFF action!='retry_e8'. Thus
+ifselect/stop and exit0, finalsummary/7exports alreadyverified in SAMEjob;
+do not rerun audit unnecessarily. Ifretry_e8, onlye16-summary/selection exist,
+proceed singleconditional E8 below. Everycallincludesbothreleaseflags.
+At06:21PBS said wouldexceedgroupxg24i002njobsglimit, estimatedstart06:59:49;
+leavequeued, do not cancelothers/touchscientificruns. Currentcost20563s=
+5.711944nodeh before audit, jobs.json updated withonlyauditpending.
+Untracked docs/reports/P1L-read-fix.md is a DRAFT withbaselinetables/protocol,
+notcomplete; filldecision/results/validation/costs and removeDraft beforefinal
+commit. Currentrawsamples/exports/records retainedunderROOT, nofinalselection
+untilcompute audit. Previous3716160wakeab5a16c0 inspected/acknowledged.
+
 CURRENT ARMED WAKE-UP: job3716160.opbs, event
 .job-wakeup/ab5a16c0-aff3-4f80-b5b2-603b100b891a, worker2095488, message-mode,
 5minpoll; thread01a1779d-c123-75a1-9458-ae849ee0fcde. NoGoal. Previous smoke
