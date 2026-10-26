@@ -35,6 +35,17 @@
       "exit_code": 0,
       "host": "mg0897",
       "log": "/work/xg24i002/x10041/LoopLora/logs/pbs/p4l-smoke2-20261027-040139-1764891.log"
+    },
+    {
+      "job_id": "3715784.opbs",
+      "stage": "Formal24head training and validation-only theta selection",
+      "source": "ccb4ec55ba85ab051d394181fd619a240d1c4094",
+      "nodes": 1,
+      "requested_seconds": 600,
+      "elapsed_seconds": 351,
+      "exit_code": 0,
+      "host": "mg0855",
+      "log": "/work/xg24i002/x10041/LoopLora/logs/pbs/p4l-train-20261027-040610-1788777.log"
     }
   ]
 }

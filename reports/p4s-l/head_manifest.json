@@ -1,0 +1,3101 @@
+{
+  "status": "passed",
+  "runs": [
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p1s/f2/main-readers/shard-03/f2-main-joint_fact-M1-lin-s17/checkpoint.pt",
+      "checkpoint_blake2b": "bd49fc38af1ab0c88e9c0999d41804ee",
+      "design_hash": "93655f15c777e581e4c23d80f9712f6b",
+      "family": "joint_fact/r32/M1-lin",
+      "finished_at": "2026-10-26T19:07:50.744783+00:00",
+      "head_blake2b": "49334fd1751df9a39d0250bb971d5216",
+      "head_checkpoint": "/work/xg24i002/x10041/LoopLora/runs/p4s-l/20261027/main-v1/heads/f2-main-joint_fact-M1-lin-s17.pt",
+      "name": "f2-main-joint_fact-M1-lin-s17",
+      "peak_memory_bytes": 1159237120,
+      "r": 32,
+      "reader_state_hash": "3c3f755cbfa446df3c950187b18f5907",
+      "reader_unchanged": true,
+      "reference_metrics": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p1s/f2/evaluation/f2-main-joint_fact-M1-lin-s17/screening/metrics.json",
+      "seed": 17,
+      "training": {
+        "init_seed": 4464227915400433259,
+        "logs": [
+          {
+            "loss": 0.8794597387313843,
+            "step": 1
+          },
+          {
+            "loss": 0.5300849676132202,
+            "step": 100
+          },
+          {
+            "loss": 0.47779595851898193,
+            "step": 200
+          },
+          {
+            "loss": 0.45642608404159546,
+            "step": 300
+          },
+          {
+            "loss": 0.47315043210983276,
+            "step": 400
+          },
+          {
+            "loss": 0.4316897988319397,
+            "step": 500
+          },
+          {
+            "loss": 0.429381787776947,
+            "step": 600
+          },
+          {
+            "loss": 0.4578710198402405,
+            "step": 700
+          },
+          {
+            "loss": 0.43899112939834595,
+            "step": 800
+          },
+          {
+            "loss": 0.4548373222351074,
+            "step": 900
+          },
+          {
+            "loss": 0.4415454566478729,
+            "step": 1000
+          },
+          {
+            "loss": 0.43773984909057617,
+            "step": 1100
+          },
+          {
+            "loss": 0.4497562050819397,
+            "step": 1200
+          },
+          {
+            "loss": 0.4531801640987396,
+            "step": 1300
+          },
+          {
+            "loss": 0.4668150544166565,
+            "step": 1400
+          },
+          {
+            "loss": 0.4507140517234802,
+            "step": 1500
+          },
+          {
+            "loss": 0.42914438247680664,
+            "step": 1600
+          },
+          {
+            "loss": 0.43140745162963867,
+            "step": 1700
+          },
+          {
+            "loss": 0.43081727623939514,
+            "step": 1800
+          },
+          {
+            "loss": 0.4377651512622833,
+            "step": 1900
+          },
+          {
+            "loss": 0.44953984022140503,
+            "step": 2000
+          }
+        ],
+        "parameters": 3393,
+        "sampler_seed": 4445457182232863783,
+        "seconds": 2.483224858995527,
+        "steps": 2000
+      },
+      "training_trace": {
+        "episodes": 20000,
+        "generator_seed": 31337,
+        "prepare_seconds": 1.994978350121528,
+        "queries": 160000,
+        "split": "train",
+        "total_seconds": 10.282811937388033,
+        "trace_seconds": 4.467263414524496
+      },
+      "validation": {
+        "episodes": 2000,
+        "generator_seed": 4242,
+        "prepare_seconds": 0.18361451104283333,
+        "queries": 16000,
+        "split": "val",
+        "total_seconds": 1.10829844372347,
+        "trace_seconds": 0.5463268053717911
+      },
+      "variant": "M1-lin",
+      "writer": "joint_fact"
+    },
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p1s/f2/main-readers/shard-01/f2-main-joint_fact-M1-lin-s29/checkpoint.pt",
+      "checkpoint_blake2b": "20e1231170f42c5d2f162313918435b9",
+      "design_hash": "93655f15c777e581e4c23d80f9712f6b",
+      "family": "joint_fact/r32/M1-lin",
+      "finished_at": "2026-10-26T19:08:04.273657+00:00",
+      "head_blake2b": "44c0d5cfed71cca01616c701aaa279dd",
+      "head_checkpoint": "/work/xg24i002/x10041/LoopLora/runs/p4s-l/20261027/main-v1/heads/f2-main-joint_fact-M1-lin-s29.pt",
+      "name": "f2-main-joint_fact-M1-lin-s29",
+      "peak_memory_bytes": 1193298432,
+      "r": 32,
+      "reader_state_hash": "af93747dfd68db1c34a511475279ba09",
+      "reader_unchanged": true,
+      "reference_metrics": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p1s/f2/evaluation/f2-main-joint_fact-M1-lin-s29/screening/metrics.json",
+      "seed": 29,
+      "training": {
+        "init_seed": 4602465601110085311,
+        "logs": [
+          {
+            "loss": 0.8923974633216858,
+            "step": 1
+          },
+          {
+            "loss": 0.5049704313278198,
+            "step": 100
+          },
+          {
+            "loss": 0.47431474924087524,
+            "step": 200
+          },
+          {
+            "loss": 0.4674161374568939,
+            "step": 300
+          },
+          {
+            "loss": 0.42061394453048706,
+            "step": 400
+          },
+          {
+            "loss": 0.4403758645057678,
+            "step": 500
+          },
+          {
+            "loss": 0.42690983414649963,
+            "step": 600
+          },
+          {
+            "loss": 0.44132986664772034,
+            "step": 700
+          },
+          {
+            "loss": 0.4292833209037781,
+            "step": 800
+          },
+          {
+            "loss": 0.4401199519634247,
+            "step": 900
+          },
+          {
+            "loss": 0.42598769068717957,
+            "step": 1000
+          },
+          {
+            "loss": 0.4333982765674591,
+            "step": 1100
+          },
+          {
+            "loss": 0.4242401719093323,
+            "step": 1200
+          },
+          {
+            "loss": 0.4330143630504608,
+            "step": 1300
+          },
+          {
+            "loss": 0.4249266982078552,
+            "step": 1400
+          },
+          {
+            "loss": 0.4512532949447632,
+            "step": 1500
+          },
+          {
+            "loss": 0.4259940981864929,
+            "step": 1600
+          },
+          {
+            "loss": 0.4389279782772064,
+            "step": 1700
+          },
+          {
+            "loss": 0.42042309045791626,
+            "step": 1800
+          },
+          {
+            "loss": 0.42996424436569214,
+            "step": 1900
+          },
+          {
+            "loss": 0.4361444413661957,
+            "step": 2000
+          }
+        ],
+        "parameters": 3393,
+        "sampler_seed": 5732797436764203188,
+        "seconds": 2.3919178768992424,
+        "steps": 2000
+      },
+      "training_trace": {
+        "episodes": 20000,
+        "generator_seed": 31337,
+        "prepare_seconds": 1.672008914873004,
+        "queries": 160000,
+        "split": "train",
+        "total_seconds": 9.946786755230278,
+        "trace_seconds": 4.556206910870969
+      },
+      "validation": {
+        "episodes": 2000,
+        "generator_seed": 4242,
+        "prepare_seconds": 0.17427317518740892,
+        "queries": 16000,
+        "split": "val",
+        "total_seconds": 1.0467136376537383,
+        "trace_seconds": 0.500642959959805
+      },
+      "variant": "M1-lin",
+      "writer": "joint_fact"
+    },
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p1s/f2/main-readers/shard-03/f2-main-joint_fact-M1-lin-s43/checkpoint.pt",
+      "checkpoint_blake2b": "cd0e05a9ab30809d1d9b58507ccd92ee",
+      "design_hash": "93655f15c777e581e4c23d80f9712f6b",
+      "family": "joint_fact/r32/M1-lin",
+      "finished_at": "2026-10-26T19:08:17.851972+00:00",
+      "head_blake2b": "77b3b71352376e8187564c4b8f61c019",
+      "head_checkpoint": "/work/xg24i002/x10041/LoopLora/runs/p4s-l/20261027/main-v1/heads/f2-main-joint_fact-M1-lin-s43.pt",
+      "name": "f2-main-joint_fact-M1-lin-s43",
+      "peak_memory_bytes": 1193298432,
+      "r": 32,
+      "reader_state_hash": "f221fe673a7139f09a7622ae08a61d4a",
+      "reader_unchanged": true,
+      "reference_metrics": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p1s/f2/evaluation/f2-main-joint_fact-M1-lin-s43/screening/metrics.json",
+      "seed": 43,
+      "training": {
+        "init_seed": 5813977970409832345,
+        "logs": [
+          {
+            "loss": 0.8055480718612671,
+            "step": 1
+          },
+          {
+            "loss": 0.6244780421257019,
+            "step": 100
+          },
+          {
+            "loss": 0.5159672498703003,
+            "step": 200
+          },
+          {
+            "loss": 0.4868798553943634,
+            "step": 300
+          },
+          {
+            "loss": 0.47085750102996826,
+            "step": 400
+          },
+          {
+            "loss": 0.4623357057571411,
+            "step": 500
+          },
+          {
+            "loss": 0.4372294247150421,
+            "step": 600
+          },
+          {
+            "loss": 0.46409136056900024,
+            "step": 700
+          },
+          {
+            "loss": 0.46490323543548584,
+            "step": 800
+          },
+          {
+            "loss": 0.42761528491973877,
+            "step": 900
+          },
+          {
+            "loss": 0.48127907514572144,
+            "step": 1000
+          },
+          {
+            "loss": 0.43612781167030334,
+            "step": 1100
+          },
+          {
+            "loss": 0.45749685168266296,
+            "step": 1200
+          },
+          {
+            "loss": 0.4253740906715393,
+            "step": 1300
+          },
+          {
+            "loss": 0.45395854115486145,
+            "step": 1400
+          },
+          {
+            "loss": 0.44951915740966797,
+            "step": 1500
+          },
+          {
+            "loss": 0.4250970482826233,
+            "step": 1600
+          },
+          {
+            "loss": 0.46409377455711365,
+            "step": 1700
+          },
+          {
+            "loss": 0.4424315094947815,
+            "step": 1800
+          },
+          {
+            "loss": 0.44442155957221985,
+            "step": 1900
+          },
+          {
+            "loss": 0.44283169507980347,
+            "step": 2000
+          }
+        ],
+        "parameters": 3393,
+        "sampler_seed": 6885701716963731343,
+        "seconds": 2.385352491866797,
+        "steps": 2000
+      },
+      "training_trace": {
+        "episodes": 20000,
+        "generator_seed": 31337,
+        "prepare_seconds": 1.6696388153359294,
+        "queries": 160000,
+        "split": "train",
+        "total_seconds": 9.991070940159261,
+        "trace_seconds": 4.559023763984442
+      },
+      "validation": {
+        "episodes": 2000,
+        "generator_seed": 4242,
+        "prepare_seconds": 0.1755456947721541,
+        "queries": 16000,
+        "split": "val",
+        "total_seconds": 1.0589038897305727,
+        "trace_seconds": 0.5069705490022898
+      },
+      "variant": "M1-lin",
+      "writer": "joint_fact"
+    },
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p1s/f2/main-readers/shard-02/f2-main-joint_fact-M1-s17/checkpoint.pt",
+      "checkpoint_blake2b": "1ca5fabe8741942ee947d643d24581f1",
+      "design_hash": "93655f15c777e581e4c23d80f9712f6b",
+      "family": "joint_fact/r32/M1",
+      "finished_at": "2026-10-26T19:08:31.411065+00:00",
+      "head_blake2b": "51626416a5df36d827fcbba668f41d8c",
+      "head_checkpoint": "/work/xg24i002/x10041/LoopLora/runs/p4s-l/20261027/main-v1/heads/f2-main-joint_fact-M1-s17.pt",
+      "name": "f2-main-joint_fact-M1-s17",
+      "peak_memory_bytes": 1193298432,
+      "r": 32,
+      "reader_state_hash": "e3b2e66e6ac0346086b0c411d2024dcd",
+      "reader_unchanged": true,
+      "reference_metrics": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p1s/f2/evaluation/f2-main-joint_fact-M1-s17/screening/metrics.json",
+      "seed": 17,
+      "training": {
+        "init_seed": 6759816403337572194,
+        "logs": [
+          {
+            "loss": 0.7072585225105286,
+            "step": 1
+          },
+          {
+            "loss": 0.45512813329696655,
+            "step": 100
+          },
+          {
+            "loss": 0.43116670846939087,
+            "step": 200
+          },
+          {
+            "loss": 0.44258177280426025,
+            "step": 300
+          },
+          {
+            "loss": 0.42603227496147156,
+            "step": 400
+          },
+          {
+            "loss": 0.39410561323165894,
+            "step": 500
+          },
+          {
+            "loss": 0.4151924252510071,
+            "step": 600
+          },
+          {
+            "loss": 0.41427838802337646,
+            "step": 700
+          },
+          {
+            "loss": 0.41446587443351746,
+            "step": 800
+          },
+          {
+            "loss": 0.412748247385025,
+            "step": 900
+          },
+          {
+            "loss": 0.42605721950531006,
+            "step": 1000
+          },
+          {
+            "loss": 0.42631423473358154,
+            "step": 1100
+          },
+          {
+            "loss": 0.4341999888420105,
+            "step": 1200
+          },
+          {
+            "loss": 0.4290996789932251,
+            "step": 1300
+          },
+          {
+            "loss": 0.42188310623168945,
+            "step": 1400
+          },
+          {
+            "loss": 0.4287511706352234,
+            "step": 1500
+          },
+          {
+            "loss": 0.4011397361755371,
+            "step": 1600
+          },
+          {
+            "loss": 0.4118921160697937,
+            "step": 1700
+          },
+          {
+            "loss": 0.4176161289215088,
+            "step": 1800
+          },
+          {
+            "loss": 0.3914482891559601,
+            "step": 1900
+          },
+          {
+            "loss": 0.4026237726211548,
+            "step": 2000
+          }
+        ],
+        "parameters": 3393,
+        "sampler_seed": 4575212739788687768,
+        "seconds": 2.381695539690554,
+        "steps": 2000
+      },
+      "training_trace": {
+        "episodes": 20000,
+        "generator_seed": 31337,
+        "prepare_seconds": 1.6557091013528407,
+        "queries": 160000,
+        "split": "train",
+        "total_seconds": 9.97920427378267,
+        "trace_seconds": 4.593601833563298
+      },
+      "validation": {
+        "episodes": 2000,
+        "generator_seed": 4242,
+        "prepare_seconds": 0.17468079924583435,
+        "queries": 16000,
+        "split": "val",
+        "total_seconds": 1.0575187620706856,
+        "trace_seconds": 0.5098971631377935
+      },
+      "variant": "M1",
+      "writer": "joint_fact"
+    },
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p1s/f2/main-readers/shard-00/f2-main-joint_fact-M1-s29/checkpoint.pt",
+      "checkpoint_blake2b": "020f263d1a74cb51aebf85b666984312",
+      "design_hash": "93655f15c777e581e4c23d80f9712f6b",
+      "family": "joint_fact/r32/M1",
+      "finished_at": "2026-10-26T19:08:44.951503+00:00",
+      "head_blake2b": "0b3fe4a81588095cdaf5fa6496d32711",
+      "head_checkpoint": "/work/xg24i002/x10041/LoopLora/runs/p4s-l/20261027/main-v1/heads/f2-main-joint_fact-M1-s29.pt",
+      "name": "f2-main-joint_fact-M1-s29",
+      "peak_memory_bytes": 1193298432,
+      "r": 32,
+      "reader_state_hash": "4aa25e69050c2773fc2e523a2c7be11b",
+      "reader_unchanged": true,
+      "reference_metrics": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p1s/f2/evaluation/f2-main-joint_fact-M1-s29/screening/metrics.json",
+      "seed": 29,
+      "training": {
+        "init_seed": 2013701447523849985,
+        "logs": [
+          {
+            "loss": 0.5309327840805054,
+            "step": 1
+          },
+          {
+            "loss": 0.4114149808883667,
+            "step": 100
+          },
+          {
+            "loss": 0.4074459969997406,
+            "step": 200
+          },
+          {
+            "loss": 0.4224413335323334,
+            "step": 300
+          },
+          {
+            "loss": 0.42966485023498535,
+            "step": 400
+          },
+          {
+            "loss": 0.4068300724029541,
+            "step": 500
+          },
+          {
+            "loss": 0.413401335477829,
+            "step": 600
+          },
+          {
+            "loss": 0.41805756092071533,
+            "step": 700
+          },
+          {
+            "loss": 0.42697328329086304,
+            "step": 800
+          },
+          {
+            "loss": 0.40858930349349976,
+            "step": 900
+          },
+          {
+            "loss": 0.41671907901763916,
+            "step": 1000
+          },
+          {
+            "loss": 0.4208279252052307,
+            "step": 1100
+          },
+          {
+            "loss": 0.418229341506958,
+            "step": 1200
+          },
+          {
+            "loss": 0.3954411745071411,
+            "step": 1300
+          },
+          {
+            "loss": 0.40554600954055786,
+            "step": 1400
+          },
+          {
+            "loss": 0.42734283208847046,
+            "step": 1500
+          },
+          {
+            "loss": 0.4056336283683777,
+            "step": 1600
+          },
+          {
+            "loss": 0.4128207564353943,
+            "step": 1700
+          },
+          {
+            "loss": 0.40549781918525696,
+            "step": 1800
+          },
+          {
+            "loss": 0.4254396855831146,
+            "step": 1900
+          },
+          {
+            "loss": 0.4346529245376587,
+            "step": 2000
+          }
+        ],
+        "parameters": 3393,
+        "sampler_seed": 3243941377515810600,
+        "seconds": 2.383558654692024,
+        "steps": 2000
+      },
+      "training_trace": {
+        "episodes": 20000,
+        "generator_seed": 31337,
+        "prepare_seconds": 1.6500144614838064,
+        "queries": 160000,
+        "split": "train",
+        "total_seconds": 9.94765696907416,
+        "trace_seconds": 4.571924769785255
+      },
+      "validation": {
+        "episodes": 2000,
+        "generator_seed": 4242,
+        "prepare_seconds": 0.17588377790525556,
+        "queries": 16000,
+        "split": "val",
+        "total_seconds": 1.0680283969268203,
+        "trace_seconds": 0.5175226842984557
+      },
+      "variant": "M1",
+      "writer": "joint_fact"
+    },
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p1s/f2/main-readers/shard-02/f2-main-joint_fact-M1-s43/checkpoint.pt",
+      "checkpoint_blake2b": "645cbdf31dd2853499361c3cd0f1923a",
+      "design_hash": "93655f15c777e581e4c23d80f9712f6b",
+      "family": "joint_fact/r32/M1",
+      "finished_at": "2026-10-26T19:08:58.550032+00:00",
+      "head_blake2b": "b9b26c0b18207d53e80e2ffd4abba0be",
+      "head_checkpoint": "/work/xg24i002/x10041/LoopLora/runs/p4s-l/20261027/main-v1/heads/f2-main-joint_fact-M1-s43.pt",
+      "name": "f2-main-joint_fact-M1-s43",
+      "peak_memory_bytes": 1193298432,
+      "r": 32,
+      "reader_state_hash": "3a23a124a02b0176cffbd807622fd444",
+      "reader_unchanged": true,
+      "reference_metrics": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p1s/f2/evaluation/f2-main-joint_fact-M1-s43/screening/metrics.json",
+      "seed": 43,
+      "training": {
+        "init_seed": 2945794485070762990,
+        "logs": [
+          {
+            "loss": 0.8309609889984131,
+            "step": 1
+          },
+          {
+            "loss": 0.4388757646083832,
+            "step": 100
+          },
+          {
+            "loss": 0.4053822457790375,
+            "step": 200
+          },
+          {
+            "loss": 0.4360835552215576,
+            "step": 300
+          },
+          {
+            "loss": 0.41054007411003113,
+            "step": 400
+          },
+          {
+            "loss": 0.39651158452033997,
+            "step": 500
+          },
+          {
+            "loss": 0.43402397632598877,
+            "step": 600
+          },
+          {
+            "loss": 0.40555211901664734,
+            "step": 700
+          },
+          {
+            "loss": 0.4072284698486328,
+            "step": 800
+          },
+          {
+            "loss": 0.42309096455574036,
+            "step": 900
+          },
+          {
+            "loss": 0.45340970158576965,
+            "step": 1000
+          },
+          {
+            "loss": 0.4383091926574707,
+            "step": 1100
+          },
+          {
+            "loss": 0.4082811176776886,
+            "step": 1200
+          },
+          {
+            "loss": 0.41925284266471863,
+            "step": 1300
+          },
+          {
+            "loss": 0.427751362323761,
+            "step": 1400
+          },
+          {
+            "loss": 0.40670961141586304,
+            "step": 1500
+          },
+          {
+            "loss": 0.411888062953949,
+            "step": 1600
+          },
+          {
+            "loss": 0.41786789894104004,
+            "step": 1700
+          },
+          {
+            "loss": 0.4051910936832428,
+            "step": 1800
+          },
+          {
+            "loss": 0.41584205627441406,
+            "step": 1900
+          },
+          {
+            "loss": 0.42306700348854065,
+            "step": 2000
+          }
+        ],
+        "parameters": 3393,
+        "sampler_seed": 2781801807326277059,
+        "seconds": 2.363775222096592,
+        "steps": 2000
+      },
+      "training_trace": {
+        "episodes": 20000,
+        "generator_seed": 31337,
+        "prepare_seconds": 1.6814046069048345,
+        "queries": 160000,
+        "split": "train",
+        "total_seconds": 10.039071683771908,
+        "trace_seconds": 4.663481157738715
+      },
+      "validation": {
+        "episodes": 2000,
+        "generator_seed": 4242,
+        "prepare_seconds": 0.17360325809568167,
+        "queries": 16000,
+        "split": "val",
+        "total_seconds": 1.0555762280710042,
+        "trace_seconds": 0.5070199808105826
+      },
+      "variant": "M1",
+      "writer": "joint_fact"
+    },
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p1s/f2/main-readers/shard-01/f2-main-t1_frozen_fact-M1-lin-s17/checkpoint.pt",
+      "checkpoint_blake2b": "64576c9bd27b8ec4fdd77e2b56a5401e",
+      "design_hash": "93655f15c777e581e4c23d80f9712f6b",
+      "family": "t1_frozen_fact/r32/M1-lin",
+      "finished_at": "2026-10-26T19:09:12.000871+00:00",
+      "head_blake2b": "1381405b84a6a0b2c1d44239c5bd2263",
+      "head_checkpoint": "/work/xg24i002/x10041/LoopLora/runs/p4s-l/20261027/main-v1/heads/f2-main-t1_frozen_fact-M1-lin-s17.pt",
+      "name": "f2-main-t1_frozen_fact-M1-lin-s17",
+      "peak_memory_bytes": 1193298432,
+      "r": 32,
+      "reader_state_hash": "f265d4d7b11ee19f1b788e57f99113e1",
+      "reader_unchanged": true,
+      "reference_metrics": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p1s/f2/evaluation/f2-main-t1_frozen_fact-M1-lin-s17/screening/metrics.json",
+      "seed": 17,
+      "training": {
+        "init_seed": 1136203856759274087,
+        "logs": [
+          {
+            "loss": 0.7414162158966064,
+            "step": 1
+          },
+          {
+            "loss": 0.3749895691871643,
+            "step": 100
+          },
+          {
+            "loss": 0.3942859470844269,
+            "step": 200
+          },
+          {
+            "loss": 0.39309465885162354,
+            "step": 300
+          },
+          {
+            "loss": 0.3915010094642639,
+            "step": 400
+          },
+          {
+            "loss": 0.38748839497566223,
+            "step": 500
+          },
+          {
+            "loss": 0.38770103454589844,
+            "step": 600
+          },
+          {
+            "loss": 0.39593106508255005,
+            "step": 700
+          },
+          {
+            "loss": 0.4028316140174866,
+            "step": 800
+          },
+          {
+            "loss": 0.4054501950740814,
+            "step": 900
+          },
+          {
+            "loss": 0.4252842366695404,
+            "step": 1000
+          },
+          {
+            "loss": 0.40477874875068665,
+            "step": 1100
+          },
+          {
+            "loss": 0.40414565801620483,
+            "step": 1200
+          },
+          {
+            "loss": 0.39160725474357605,
+            "step": 1300
+          },
+          {
+            "loss": 0.3770040273666382,
+            "step": 1400
+          },
+          {
+            "loss": 0.38531193137168884,
+            "step": 1500
+          },
+          {
+            "loss": 0.39415013790130615,
+            "step": 1600
+          },
+          {
+            "loss": 0.3725290298461914,
+            "step": 1700
+          },
+          {
+            "loss": 0.37993672490119934,
+            "step": 1800
+          },
+          {
+            "loss": 0.4165739119052887,
+            "step": 1900
+          },
+          {
+            "loss": 0.38213086128234863,
+            "step": 2000
+          }
+        ],
+        "parameters": 3393,
+        "sampler_seed": 5469034903826569055,
+        "seconds": 2.3618352748453617,
+        "steps": 2000
+      },
+      "training_trace": {
+        "episodes": 20000,
+        "generator_seed": 31337,
+        "prepare_seconds": 1.6629129499197006,
+        "queries": 160000,
+        "split": "train",
+        "total_seconds": 9.905001393985003,
+        "trace_seconds": 4.5164323640055954
+      },
+      "validation": {
+        "episodes": 2000,
+        "generator_seed": 4242,
+        "prepare_seconds": 0.17527431715279818,
+        "queries": 16000,
+        "split": "val",
+        "total_seconds": 1.0483182007446885,
+        "trace_seconds": 0.5025762976147234
+      },
+      "variant": "M1-lin",
+      "writer": "t1_frozen_fact"
+    },
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p1s/f2/main-readers/shard-03/f2-main-t1_frozen_fact-M1-lin-s29/checkpoint.pt",
+      "checkpoint_blake2b": "dc549ca93b3004e8172ae72b647b30cd",
+      "design_hash": "93655f15c777e581e4c23d80f9712f6b",
+      "family": "t1_frozen_fact/r32/M1-lin",
+      "finished_at": "2026-10-26T19:09:25.521180+00:00",
+      "head_blake2b": "3dccf8dd4e5bd15a7eafbffb925a2c6a",
+      "head_checkpoint": "/work/xg24i002/x10041/LoopLora/runs/p4s-l/20261027/main-v1/heads/f2-main-t1_frozen_fact-M1-lin-s29.pt",
+      "name": "f2-main-t1_frozen_fact-M1-lin-s29",
+      "peak_memory_bytes": 1193298432,
+      "r": 32,
+      "reader_state_hash": "e3e82ff671160e0c8c18d04215d04232",
+      "reader_unchanged": true,
+      "reference_metrics": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p1s/f2/evaluation/f2-main-t1_frozen_fact-M1-lin-s29/screening/metrics.json",
+      "seed": 29,
+      "training": {
+        "init_seed": 5998786595939846591,
+        "logs": [
+          {
+            "loss": 0.695244312286377,
+            "step": 1
+          },
+          {
+            "loss": 0.4119959771633148,
+            "step": 100
+          },
+          {
+            "loss": 0.3882671892642975,
+            "step": 200
+          },
+          {
+            "loss": 0.38356709480285645,
+            "step": 300
+          },
+          {
+            "loss": 0.3699655532836914,
+            "step": 400
+          },
+          {
+            "loss": 0.36123305559158325,
+            "step": 500
+          },
+          {
+            "loss": 0.39458829164505005,
+            "step": 600
+          },
+          {
+            "loss": 0.37529921531677246,
+            "step": 700
+          },
+          {
+            "loss": 0.38793855905532837,
+            "step": 800
+          },
+          {
+            "loss": 0.37473630905151367,
+            "step": 900
+          },
+          {
+            "loss": 0.37731820344924927,
+            "step": 1000
+          },
+          {
+            "loss": 0.382689893245697,
+            "step": 1100
+          },
+          {
+            "loss": 0.37842538952827454,
+            "step": 1200
+          },
+          {
+            "loss": 0.373595654964447,
+            "step": 1300
+          },
+          {
+            "loss": 0.3924782872200012,
+            "step": 1400
+          },
+          {
+            "loss": 0.37874823808670044,
+            "step": 1500
+          },
+          {
+            "loss": 0.3688364028930664,
+            "step": 1600
+          },
+          {
+            "loss": 0.3873883783817291,
+            "step": 1700
+          },
+          {
+            "loss": 0.37591513991355896,
+            "step": 1800
+          },
+          {
+            "loss": 0.3784981966018677,
+            "step": 1900
+          },
+          {
+            "loss": 0.37606555223464966,
+            "step": 2000
+          }
+        ],
+        "parameters": 3393,
+        "sampler_seed": 7404532747836330769,
+        "seconds": 2.365434496663511,
+        "steps": 2000
+      },
+      "training_trace": {
+        "episodes": 20000,
+        "generator_seed": 31337,
+        "prepare_seconds": 1.676611221395433,
+        "queries": 160000,
+        "split": "train",
+        "total_seconds": 9.970010737422854,
+        "trace_seconds": 4.562047161627561
+      },
+      "validation": {
+        "episodes": 2000,
+        "generator_seed": 4242,
+        "prepare_seconds": 0.17522582970559597,
+        "queries": 16000,
+        "split": "val",
+        "total_seconds": 1.0502880681306124,
+        "trace_seconds": 0.5037256847135723
+      },
+      "variant": "M1-lin",
+      "writer": "t1_frozen_fact"
+    },
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p1s/f2/main-readers/shard-01/f2-main-t1_frozen_fact-M1-lin-s43/checkpoint.pt",
+      "checkpoint_blake2b": "090156e155ab77dad0c1cb6c6b019df3",
+      "design_hash": "93655f15c777e581e4c23d80f9712f6b",
+      "family": "t1_frozen_fact/r32/M1-lin",
+      "finished_at": "2026-10-26T19:09:38.889520+00:00",
+      "head_blake2b": "df4f7e02f43ff586a130c3b69c02db80",
+      "head_checkpoint": "/work/xg24i002/x10041/LoopLora/runs/p4s-l/20261027/main-v1/heads/f2-main-t1_frozen_fact-M1-lin-s43.pt",
+      "name": "f2-main-t1_frozen_fact-M1-lin-s43",
+      "peak_memory_bytes": 1193298432,
+      "r": 32,
+      "reader_state_hash": "a5afacbcabd7bf18bd731ea778c5f70f",
+      "reader_unchanged": true,
+      "reference_metrics": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p1s/f2/evaluation/f2-main-t1_frozen_fact-M1-lin-s43/screening/metrics.json",
+      "seed": 43,
+      "training": {
+        "init_seed": 3010587382665611855,
+        "logs": [
+          {
+            "loss": 0.9467495679855347,
+            "step": 1
+          },
+          {
+            "loss": 0.46696680784225464,
+            "step": 100
+          },
+          {
+            "loss": 0.39551010727882385,
+            "step": 200
+          },
+          {
+            "loss": 0.38370612263679504,
+            "step": 300
+          },
+          {
+            "loss": 0.40413904190063477,
+            "step": 400
+          },
+          {
+            "loss": 0.41414177417755127,
+            "step": 500
+          },
+          {
+            "loss": 0.39783012866973877,
+            "step": 600
+          },
+          {
+            "loss": 0.40753042697906494,
+            "step": 700
+          },
+          {
+            "loss": 0.38965141773223877,
+            "step": 800
+          },
+          {
+            "loss": 0.3909055292606354,
+            "step": 900
+          },
+          {
+            "loss": 0.3907485008239746,
+            "step": 1000
+          },
+          {
+            "loss": 0.3947902321815491,
+            "step": 1100
+          },
+          {
+            "loss": 0.3877299129962921,
+            "step": 1200
+          },
+          {
+            "loss": 0.3936287760734558,
+            "step": 1300
+          },
+          {
+            "loss": 0.37535980343818665,
+            "step": 1400
+          },
+          {
+            "loss": 0.3858970105648041,
+            "step": 1500
+          },
+          {
+            "loss": 0.39402204751968384,
+            "step": 1600
+          },
+          {
+            "loss": 0.39772486686706543,
+            "step": 1700
+          },
+          {
+            "loss": 0.4508552551269531,
+            "step": 1800
+          },
+          {
+            "loss": 0.3950303792953491,
+            "step": 1900
+          },
+          {
+            "loss": 0.3950819969177246,
+            "step": 2000
+          }
+        ],
+        "parameters": 3393,
+        "sampler_seed": 62237169994789642,
+        "seconds": 2.358091956935823,
+        "steps": 2000
+      },
+      "training_trace": {
+        "episodes": 20000,
+        "generator_seed": 31337,
+        "prepare_seconds": 1.643390942364931,
+        "queries": 160000,
+        "split": "train",
+        "total_seconds": 9.824324793182313,
+        "trace_seconds": 4.474914369639009
+      },
+      "validation": {
+        "episodes": 2000,
+        "generator_seed": 4242,
+        "prepare_seconds": 0.1747477171011269,
+        "queries": 16000,
+        "split": "val",
+        "total_seconds": 1.0503678140230477,
+        "trace_seconds": 0.5023938366211951
+      },
+      "variant": "M1-lin",
+      "writer": "t1_frozen_fact"
+    },
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p1s/f2/main-readers/shard-00/f2-main-t1_frozen_fact-M1-s17/checkpoint.pt",
+      "checkpoint_blake2b": "ee3a2f31ae93b974609d2f70bdf9cde6",
+      "design_hash": "93655f15c777e581e4c23d80f9712f6b",
+      "family": "t1_frozen_fact/r32/M1",
+      "finished_at": "2026-10-26T19:09:52.402380+00:00",
+      "head_blake2b": "205dbfc923b2aa170d2fd7bd692ac237",
+      "head_checkpoint": "/work/xg24i002/x10041/LoopLora/runs/p4s-l/20261027/main-v1/heads/f2-main-t1_frozen_fact-M1-s17.pt",
+      "name": "f2-main-t1_frozen_fact-M1-s17",
+      "peak_memory_bytes": 1193298432,
+      "r": 32,
+      "reader_state_hash": "2a82568b22ab394f30d8f085be6654c1",
+      "reader_unchanged": true,
+      "reference_metrics": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p1s/f2/evaluation/f2-main-t1_frozen_fact-M1-s17/screening/metrics.json",
+      "seed": 17,
+      "training": {
+        "init_seed": 4890362889625002118,
+        "logs": [
+          {
+            "loss": 0.6646462678909302,
+            "step": 1
+          },
+          {
+            "loss": 0.4096679985523224,
+            "step": 100
+          },
+          {
+            "loss": 0.39774903655052185,
+            "step": 200
+          },
+          {
+            "loss": 0.3624398112297058,
+            "step": 300
+          },
+          {
+            "loss": 0.39037221670150757,
+            "step": 400
+          },
+          {
+            "loss": 0.3924064040184021,
+            "step": 500
+          },
+          {
+            "loss": 0.3917238116264343,
+            "step": 600
+          },
+          {
+            "loss": 0.37929093837738037,
+            "step": 700
+          },
+          {
+            "loss": 0.39311033487319946,
+            "step": 800
+          },
+          {
+            "loss": 0.38374748826026917,
+            "step": 900
+          },
+          {
+            "loss": 0.37377893924713135,
+            "step": 1000
+          },
+          {
+            "loss": 0.38899490237236023,
+            "step": 1100
+          },
+          {
+            "loss": 0.4051262140274048,
+            "step": 1200
+          },
+          {
+            "loss": 0.3862149119377136,
+            "step": 1300
+          },
+          {
+            "loss": 0.37535926699638367,
+            "step": 1400
+          },
+          {
+            "loss": 0.3832229971885681,
+            "step": 1500
+          },
+          {
+            "loss": 0.39882802963256836,
+            "step": 1600
+          },
+          {
+            "loss": 0.3907870352268219,
+            "step": 1700
+          },
+          {
+            "loss": 0.4073007106781006,
+            "step": 1800
+          },
+          {
+            "loss": 0.37794315814971924,
+            "step": 1900
+          },
+          {
+            "loss": 0.37714701890945435,
+            "step": 2000
+          }
+        ],
+        "parameters": 3393,
+        "sampler_seed": 5409341879441953082,
+        "seconds": 2.4061002396047115,
+        "steps": 2000
+      },
+      "training_trace": {
+        "episodes": 20000,
+        "generator_seed": 31337,
+        "prepare_seconds": 1.6566998269408941,
+        "queries": 160000,
+        "split": "train",
+        "total_seconds": 9.905741591006517,
+        "trace_seconds": 4.580359506886452
+      },
+      "validation": {
+        "episodes": 2000,
+        "generator_seed": 4242,
+        "prepare_seconds": 0.17802565917372704,
+        "queries": 16000,
+        "split": "val",
+        "total_seconds": 1.0656614718027413,
+        "trace_seconds": 0.5163452392444015
+      },
+      "variant": "M1",
+      "writer": "t1_frozen_fact"
+    },
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p1s/f2/main-readers/shard-02/f2-main-t1_frozen_fact-M1-s29/checkpoint.pt",
+      "checkpoint_blake2b": "ce44f0d0d1e50abf704c30ef6c7a305c",
+      "design_hash": "93655f15c777e581e4c23d80f9712f6b",
+      "family": "t1_frozen_fact/r32/M1",
+      "finished_at": "2026-10-26T19:10:05.981229+00:00",
+      "head_blake2b": "2e416743f30d38a0dce86bd6d6ede3d4",
+      "head_checkpoint": "/work/xg24i002/x10041/LoopLora/runs/p4s-l/20261027/main-v1/heads/f2-main-t1_frozen_fact-M1-s29.pt",
+      "name": "f2-main-t1_frozen_fact-M1-s29",
+      "peak_memory_bytes": 1193298432,
+      "r": 32,
+      "reader_state_hash": "c980922388d6de6ac828261e54005f1e",
+      "reader_unchanged": true,
+      "reference_metrics": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p1s/f2/evaluation/f2-main-t1_frozen_fact-M1-s29/screening/metrics.json",
+      "seed": 29,
+      "training": {
+        "init_seed": 3784589150816019432,
+        "logs": [
+          {
+            "loss": 0.8155139088630676,
+            "step": 1
+          },
+          {
+            "loss": 0.38845691084861755,
+            "step": 100
+          },
+          {
+            "loss": 0.3656080961227417,
+            "step": 200
+          },
+          {
+            "loss": 0.3660199046134949,
+            "step": 300
+          },
+          {
+            "loss": 0.3734612464904785,
+            "step": 400
+          },
+          {
+            "loss": 0.3832232356071472,
+            "step": 500
+          },
+          {
+            "loss": 0.3731273412704468,
+            "step": 600
+          },
+          {
+            "loss": 0.3857583999633789,
+            "step": 700
+          },
+          {
+            "loss": 0.37295636534690857,
+            "step": 800
+          },
+          {
+            "loss": 0.37480083107948303,
+            "step": 900
+          },
+          {
+            "loss": 0.3923478424549103,
+            "step": 1000
+          },
+          {
+            "loss": 0.39181405305862427,
+            "step": 1100
+          },
+          {
+            "loss": 0.3685385584831238,
+            "step": 1200
+          },
+          {
+            "loss": 0.38571256399154663,
+            "step": 1300
+          },
+          {
+            "loss": 0.39790529012680054,
+            "step": 1400
+          },
+          {
+            "loss": 0.37451621890068054,
+            "step": 1500
+          },
+          {
+            "loss": 0.3810071051120758,
+            "step": 1600
+          },
+          {
+            "loss": 0.36711591482162476,
+            "step": 1700
+          },
+          {
+            "loss": 0.38265207409858704,
+            "step": 1800
+          },
+          {
+            "loss": 0.3690580129623413,
+            "step": 1900
+          },
+          {
+            "loss": 0.3678354024887085,
+            "step": 2000
+          }
+        ],
+        "parameters": 3393,
+        "sampler_seed": 1714648933083018865,
+        "seconds": 2.4462754549458623,
+        "steps": 2000
+      },
+      "training_trace": {
+        "episodes": 20000,
+        "generator_seed": 31337,
+        "prepare_seconds": 1.6416766932234168,
+        "queries": 160000,
+        "split": "train",
+        "total_seconds": 9.919290860183537,
+        "trace_seconds": 4.566123676486313
+      },
+      "validation": {
+        "episodes": 2000,
+        "generator_seed": 4242,
+        "prepare_seconds": 0.18079754896461964,
+        "queries": 16000,
+        "split": "val",
+        "total_seconds": 1.0778118437156081,
+        "trace_seconds": 0.5301365051418543
+      },
+      "variant": "M1",
+      "writer": "t1_frozen_fact"
+    },
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p1s/f2/main-readers/shard-00/f2-main-t1_frozen_fact-M1-s43/checkpoint.pt",
+      "checkpoint_blake2b": "55d47d87777814bc0ac31dc9cb50bf1f",
+      "design_hash": "93655f15c777e581e4c23d80f9712f6b",
+      "family": "t1_frozen_fact/r32/M1",
+      "finished_at": "2026-10-26T19:10:19.662857+00:00",
+      "head_blake2b": "1c17e45831c0f1187e97a65f48c01d93",
+      "head_checkpoint": "/work/xg24i002/x10041/LoopLora/runs/p4s-l/20261027/main-v1/heads/f2-main-t1_frozen_fact-M1-s43.pt",
+      "name": "f2-main-t1_frozen_fact-M1-s43",
+      "peak_memory_bytes": 1193298432,
+      "r": 32,
+      "reader_state_hash": "d3e693941b03e6c9b954859081409084",
+      "reader_unchanged": true,
+      "reference_metrics": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p1s/f2/evaluation/f2-main-t1_frozen_fact-M1-s43/screening/metrics.json",
+      "seed": 43,
+      "training": {
+        "init_seed": 5069548671767466557,
+        "logs": [
+          {
+            "loss": 0.5989211797714233,
+            "step": 1
+          },
+          {
+            "loss": 0.39004117250442505,
+            "step": 100
+          },
+          {
+            "loss": 0.38317760825157166,
+            "step": 200
+          },
+          {
+            "loss": 0.3701111078262329,
+            "step": 300
+          },
+          {
+            "loss": 0.38842296600341797,
+            "step": 400
+          },
+          {
+            "loss": 0.3656669557094574,
+            "step": 500
+          },
+          {
+            "loss": 0.3899139165878296,
+            "step": 600
+          },
+          {
+            "loss": 0.36386004090309143,
+            "step": 700
+          },
+          {
+            "loss": 0.37713027000427246,
+            "step": 800
+          },
+          {
+            "loss": 0.40107280015945435,
+            "step": 900
+          },
+          {
+            "loss": 0.3610078692436218,
+            "step": 1000
+          },
+          {
+            "loss": 0.3881509006023407,
+            "step": 1100
+          },
+          {
+            "loss": 0.3764188289642334,
+            "step": 1200
+          },
+          {
+            "loss": 0.3726545572280884,
+            "step": 1300
+          },
+          {
+            "loss": 0.36705875396728516,
+            "step": 1400
+          },
+          {
+            "loss": 0.3683842122554779,
+            "step": 1500
+          },
+          {
+            "loss": 0.37338578701019287,
+            "step": 1600
+          },
+          {
+            "loss": 0.3986988663673401,
+            "step": 1700
+          },
+          {
+            "loss": 0.3844103217124939,
+            "step": 1800
+          },
+          {
+            "loss": 0.3641693890094757,
+            "step": 1900
+          },
+          {
+            "loss": 0.35227763652801514,
+            "step": 2000
+          }
+        ],
+        "parameters": 3393,
+        "sampler_seed": 6915863572798814121,
+        "seconds": 2.410230261273682,
+        "steps": 2000
+      },
+      "training_trace": {
+        "episodes": 20000,
+        "generator_seed": 31337,
+        "prepare_seconds": 1.6830190480686724,
+        "queries": 160000,
+        "split": "train",
+        "total_seconds": 10.066969762090594,
+        "trace_seconds": 4.668195954523981
+      },
+      "validation": {
+        "episodes": 2000,
+        "generator_seed": 4242,
+        "prepare_seconds": 0.17676070053130388,
+        "queries": 16000,
+        "split": "val",
+        "total_seconds": 1.0686890818178654,
+        "trace_seconds": 0.5169943305663764
+      },
+      "variant": "M1",
+      "writer": "t1_frozen_fact"
+    },
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora/runs/p1s/main/20261026/runs/primary-joint-M1-lin-r32-s17/checkpoint.pt",
+      "checkpoint_blake2b": "fc4a58c026f0ab2f4b45e0b93201ffbb",
+      "design_hash": "93655f15c777e581e4c23d80f9712f6b",
+      "family": "joint/r32/M1-lin",
+      "finished_at": "2026-10-26T19:10:34.295021+00:00",
+      "head_blake2b": "38bfba7ff26f26aad44d230a703313f7",
+      "head_checkpoint": "/work/xg24i002/x10041/LoopLora/runs/p4s-l/20261027/main-v1/heads/primary-joint-M1-lin-r32-s17.pt",
+      "name": "primary-joint-M1-lin-r32-s17",
+      "peak_memory_bytes": 1193298432,
+      "r": 32,
+      "reader_state_hash": "c8dcbe4c75f732fc950e6cce37ebcd8f",
+      "reader_unchanged": true,
+      "reference_metrics": "/work/xg24i002/x10041/LoopLora/runs/p1s/main/20261026/runs/primary-joint-M1-lin-r32-s17/screening/metrics.json",
+      "seed": 17,
+      "training": {
+        "init_seed": 3651790657330176207,
+        "logs": [
+          {
+            "loss": 0.7072490453720093,
+            "step": 1
+          },
+          {
+            "loss": 0.694831132888794,
+            "step": 100
+          },
+          {
+            "loss": 0.6951354742050171,
+            "step": 200
+          },
+          {
+            "loss": 0.6906282901763916,
+            "step": 300
+          },
+          {
+            "loss": 0.6889708042144775,
+            "step": 400
+          },
+          {
+            "loss": 0.688652515411377,
+            "step": 500
+          },
+          {
+            "loss": 0.6849039793014526,
+            "step": 600
+          },
+          {
+            "loss": 0.6905001401901245,
+            "step": 700
+          },
+          {
+            "loss": 0.6916002035140991,
+            "step": 800
+          },
+          {
+            "loss": 0.6892261505126953,
+            "step": 900
+          },
+          {
+            "loss": 0.690061092376709,
+            "step": 1000
+          },
+          {
+            "loss": 0.6863127946853638,
+            "step": 1100
+          },
+          {
+            "loss": 0.6871914863586426,
+            "step": 1200
+          },
+          {
+            "loss": 0.6848185062408447,
+            "step": 1300
+          },
+          {
+            "loss": 0.6898679733276367,
+            "step": 1400
+          },
+          {
+            "loss": 0.6889500617980957,
+            "step": 1500
+          },
+          {
+            "loss": 0.6840111613273621,
+            "step": 1600
+          },
+          {
+            "loss": 0.6801326274871826,
+            "step": 1700
+          },
+          {
+            "loss": 0.6876929998397827,
+            "step": 1800
+          },
+          {
+            "loss": 0.6928996443748474,
+            "step": 1900
+          },
+          {
+            "loss": 0.6872815489768982,
+            "step": 2000
+          }
+        ],
+        "parameters": 3393,
+        "sampler_seed": 4819793310131412722,
+        "seconds": 2.4005952700972557,
+        "steps": 2000
+      },
+      "training_trace": {
+        "episodes": 20000,
+        "generator_seed": 31337,
+        "prepare_seconds": 2.693962682504207,
+        "queries": 160000,
+        "split": "train",
+        "total_seconds": 10.95066882390529,
+        "trace_seconds": 4.591358403209597
+      },
+      "validation": {
+        "episodes": 2000,
+        "generator_seed": 4242,
+        "prepare_seconds": 0.2825492317788303,
+        "queries": 16000,
+        "split": "val",
+        "total_seconds": 1.155001422856003,
+        "trace_seconds": 0.5008171014487743
+      },
+      "variant": "M1-lin",
+      "writer": "joint"
+    },
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora/runs/p1s/main/20261026/runs/primary-joint-M1-lin-r32-s29/checkpoint.pt",
+      "checkpoint_blake2b": "ad8eef507a068deca4d4eef84536ed81",
+      "design_hash": "93655f15c777e581e4c23d80f9712f6b",
+      "family": "joint/r32/M1-lin",
+      "finished_at": "2026-10-26T19:10:48.834937+00:00",
+      "head_blake2b": "5a2380c5dc7b45bdb79b13b1cfd70959",
+      "head_checkpoint": "/work/xg24i002/x10041/LoopLora/runs/p4s-l/20261027/main-v1/heads/primary-joint-M1-lin-r32-s29.pt",
+      "name": "primary-joint-M1-lin-r32-s29",
+      "peak_memory_bytes": 1193298432,
+      "r": 32,
+      "reader_state_hash": "8d9f84d9638f2a7935b2cf5089136653",
+      "reader_unchanged": true,
+      "reference_metrics": "/work/xg24i002/x10041/LoopLora/runs/p1s/main/20261026/runs/primary-joint-M1-lin-r32-s29/screening/metrics.json",
+      "seed": 29,
+      "training": {
+        "init_seed": 5928509928735958225,
+        "logs": [
+          {
+            "loss": 0.7237621545791626,
+            "step": 1
+          },
+          {
+            "loss": 0.6931798458099365,
+            "step": 100
+          },
+          {
+            "loss": 0.6952829360961914,
+            "step": 200
+          },
+          {
+            "loss": 0.68744295835495,
+            "step": 300
+          },
+          {
+            "loss": 0.6909379363059998,
+            "step": 400
+          },
+          {
+            "loss": 0.6908742189407349,
+            "step": 500
+          },
+          {
+            "loss": 0.6887221336364746,
+            "step": 600
+          },
+          {
+            "loss": 0.6878786087036133,
+            "step": 700
+          },
+          {
+            "loss": 0.6866275072097778,
+            "step": 800
+          },
+          {
+            "loss": 0.6868301630020142,
+            "step": 900
+          },
+          {
+            "loss": 0.6877081394195557,
+            "step": 1000
+          },
+          {
+            "loss": 0.6883784532546997,
+            "step": 1100
+          },
+          {
+            "loss": 0.6912014484405518,
+            "step": 1200
+          },
+          {
+            "loss": 0.6844559907913208,
+            "step": 1300
+          },
+          {
+            "loss": 0.6929503083229065,
+            "step": 1400
+          },
+          {
+            "loss": 0.6883779764175415,
+            "step": 1500
+          },
+          {
+            "loss": 0.6876178979873657,
+            "step": 1600
+          },
+          {
+            "loss": 0.6871938109397888,
+            "step": 1700
+          },
+          {
+            "loss": 0.6925156116485596,
+            "step": 1800
+          },
+          {
+            "loss": 0.6775169372558594,
+            "step": 1900
+          },
+          {
+            "loss": 0.6829649209976196,
+            "step": 2000
+          }
+        ],
+        "parameters": 3393,
+        "sampler_seed": 1155987711103648249,
+        "seconds": 2.402192321140319,
+        "steps": 2000
+      },
+      "training_trace": {
+        "episodes": 20000,
+        "generator_seed": 31337,
+        "prepare_seconds": 2.6459262799471617,
+        "queries": 160000,
+        "split": "train",
+        "total_seconds": 10.8519818931818,
+        "trace_seconds": 4.499735495541245
+      },
+      "validation": {
+        "episodes": 2000,
+        "generator_seed": 4242,
+        "prepare_seconds": 0.2822187910787761,
+        "queries": 16000,
+        "split": "val",
+        "total_seconds": 1.1596822580322623,
+        "trace_seconds": 0.5060766390524805
+      },
+      "variant": "M1-lin",
+      "writer": "joint"
+    },
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora/runs/p1s/main/20261026/runs/primary-joint-M1-lin-r32-s43/checkpoint.pt",
+      "checkpoint_blake2b": "7b55c7818d5928d012999bd6952027f4",
+      "design_hash": "93655f15c777e581e4c23d80f9712f6b",
+      "family": "joint/r32/M1-lin",
+      "finished_at": "2026-10-26T19:11:03.457528+00:00",
+      "head_blake2b": "6314c103ddef5794ce7ad85853d861c6",
+      "head_checkpoint": "/work/xg24i002/x10041/LoopLora/runs/p4s-l/20261027/main-v1/heads/primary-joint-M1-lin-r32-s43.pt",
+      "name": "primary-joint-M1-lin-r32-s43",
+      "peak_memory_bytes": 1193298432,
+      "r": 32,
+      "reader_state_hash": "82d51d94bb128bc5be648cbd844e4420",
+      "reader_unchanged": true,
+      "reference_metrics": "/work/xg24i002/x10041/LoopLora/runs/p1s/main/20261026/runs/primary-joint-M1-lin-r32-s43/screening/metrics.json",
+      "seed": 43,
+      "training": {
+        "init_seed": 8797871747493670090,
+        "logs": [
+          {
+            "loss": 0.7027392387390137,
+            "step": 1
+          },
+          {
+            "loss": 0.6922901272773743,
+            "step": 100
+          },
+          {
+            "loss": 0.6911835670471191,
+            "step": 200
+          },
+          {
+            "loss": 0.6928932070732117,
+            "step": 300
+          },
+          {
+            "loss": 0.6870459318161011,
+            "step": 400
+          },
+          {
+            "loss": 0.6897850036621094,
+            "step": 500
+          },
+          {
+            "loss": 0.6900542974472046,
+            "step": 600
+          },
+          {
+            "loss": 0.6863001585006714,
+            "step": 700
+          },
+          {
+            "loss": 0.6886664032936096,
+            "step": 800
+          },
+          {
+            "loss": 0.6875044107437134,
+            "step": 900
+          },
+          {
+            "loss": 0.6859264373779297,
+            "step": 1000
+          },
+          {
+            "loss": 0.6869661808013916,
+            "step": 1100
+          },
+          {
+            "loss": 0.6866815090179443,
+            "step": 1200
+          },
+          {
+            "loss": 0.686919093132019,
+            "step": 1300
+          },
+          {
+            "loss": 0.6826226115226746,
+            "step": 1400
+          },
+          {
+            "loss": 0.6891216039657593,
+            "step": 1500
+          },
+          {
+            "loss": 0.6813985109329224,
+            "step": 1600
+          },
+          {
+            "loss": 0.6898112297058105,
+            "step": 1700
+          },
+          {
+            "loss": 0.6881849765777588,
+            "step": 1800
+          },
+          {
+            "loss": 0.6859889626502991,
+            "step": 1900
+          },
+          {
+            "loss": 0.6917015314102173,
+            "step": 2000
+          }
+        ],
+        "parameters": 3393,
+        "sampler_seed": 1128468396158030367,
+        "seconds": 2.3973978087306023,
+        "steps": 2000
+      },
+      "training_trace": {
+        "episodes": 20000,
+        "generator_seed": 31337,
+        "prepare_seconds": 2.6892395769245923,
+        "queries": 160000,
+        "split": "train",
+        "total_seconds": 10.938158083707094,
+        "trace_seconds": 4.580093851312995
+      },
+      "validation": {
+        "episodes": 2000,
+        "generator_seed": 4242,
+        "prepare_seconds": 0.28251519333571196,
+        "queries": 16000,
+        "split": "val",
+        "total_seconds": 1.1583167919889092,
+        "trace_seconds": 0.5053390483371913
+      },
+      "variant": "M1-lin",
+      "writer": "joint"
+    },
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora/runs/p1s/main/20261026/runs/primary-joint-M1-r32-s17/checkpoint.pt",
+      "checkpoint_blake2b": "6e18bec6997ce261a00f2697fc441c73",
+      "design_hash": "93655f15c777e581e4c23d80f9712f6b",
+      "family": "joint/r32/M1",
+      "finished_at": "2026-10-26T19:11:18.025074+00:00",
+      "head_blake2b": "c244b7800c904b4e22f0a663d16ed2cf",
+      "head_checkpoint": "/work/xg24i002/x10041/LoopLora/runs/p4s-l/20261027/main-v1/heads/primary-joint-M1-r32-s17.pt",
+      "name": "primary-joint-M1-r32-s17",
+      "peak_memory_bytes": 1193298432,
+      "r": 32,
+      "reader_state_hash": "dc803ca143ea5414788c56aaab8fd0ab",
+      "reader_unchanged": true,
+      "reference_metrics": "/work/xg24i002/x10041/LoopLora/runs/p1s/main/20261026/runs/primary-joint-M1-r32-s17/screening/metrics.json",
+      "seed": 17,
+      "training": {
+        "init_seed": 426641980986658947,
+        "logs": [
+          {
+            "loss": 0.707069993019104,
+            "step": 1
+          },
+          {
+            "loss": 0.6867547035217285,
+            "step": 100
+          },
+          {
+            "loss": 0.6857789754867554,
+            "step": 200
+          },
+          {
+            "loss": 0.6916285753250122,
+            "step": 300
+          },
+          {
+            "loss": 0.6776936054229736,
+            "step": 400
+          },
+          {
+            "loss": 0.6816513538360596,
+            "step": 500
+          },
+          {
+            "loss": 0.6795752048492432,
+            "step": 600
+          },
+          {
+            "loss": 0.6806743741035461,
+            "step": 700
+          },
+          {
+            "loss": 0.6797842979431152,
+            "step": 800
+          },
+          {
+            "loss": 0.6789429187774658,
+            "step": 900
+          },
+          {
+            "loss": 0.6775431632995605,
+            "step": 1000
+          },
+          {
+            "loss": 0.6786913275718689,
+            "step": 1100
+          },
+          {
+            "loss": 0.6743001341819763,
+            "step": 1200
+          },
+          {
+            "loss": 0.6834733486175537,
+            "step": 1300
+          },
+          {
+            "loss": 0.6778873205184937,
+            "step": 1400
+          },
+          {
+            "loss": 0.6789758205413818,
+            "step": 1500
+          },
+          {
+            "loss": 0.6795899868011475,
+            "step": 1600
+          },
+          {
+            "loss": 0.6734573841094971,
+            "step": 1700
+          },
+          {
+            "loss": 0.6773849725723267,
+            "step": 1800
+          },
+          {
+            "loss": 0.6787694692611694,
+            "step": 1900
+          },
+          {
+            "loss": 0.6787686347961426,
+            "step": 2000
+          }
+        ],
+        "parameters": 3393,
+        "sampler_seed": 6826225557445558902,
+        "seconds": 2.3908607899211347,
+        "steps": 2000
+      },
+      "training_trace": {
+        "episodes": 20000,
+        "generator_seed": 31337,
+        "prepare_seconds": 2.6331955757923424,
+        "queries": 160000,
+        "split": "train",
+        "total_seconds": 10.891902966890484,
+        "trace_seconds": 4.562604591716081
+      },
+      "validation": {
+        "episodes": 2000,
+        "generator_seed": 4242,
+        "prepare_seconds": 0.2785241976380348,
+        "queries": 16000,
+        "split": "val",
+        "total_seconds": 1.153236257378012,
+        "trace_seconds": 0.5069110225886106
+      },
+      "variant": "M1",
+      "writer": "joint"
+    },
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora/runs/p1s/main/20261026/runs/primary-joint-M1-r32-s29/checkpoint.pt",
+      "checkpoint_blake2b": "7153919166a10705afe093414f2b1339",
+      "design_hash": "93655f15c777e581e4c23d80f9712f6b",
+      "family": "joint/r32/M1",
+      "finished_at": "2026-10-26T19:11:32.691742+00:00",
+      "head_blake2b": "401f2ba218899f10d4864465a0dc949f",
+      "head_checkpoint": "/work/xg24i002/x10041/LoopLora/runs/p4s-l/20261027/main-v1/heads/primary-joint-M1-r32-s29.pt",
+      "name": "primary-joint-M1-r32-s29",
+      "peak_memory_bytes": 1193298432,
+      "r": 32,
+      "reader_state_hash": "474677e2be3339d4687b4c1d3bf69019",
+      "reader_unchanged": true,
+      "reference_metrics": "/work/xg24i002/x10041/LoopLora/runs/p1s/main/20261026/runs/primary-joint-M1-r32-s29/screening/metrics.json",
+      "seed": 29,
+      "training": {
+        "init_seed": 3631227582498345517,
+        "logs": [
+          {
+            "loss": 0.6169804334640503,
+            "step": 1
+          },
+          {
+            "loss": 0.5753285884857178,
+            "step": 100
+          },
+          {
+            "loss": 0.5512615442276001,
+            "step": 200
+          },
+          {
+            "loss": 0.569826602935791,
+            "step": 300
+          },
+          {
+            "loss": 0.5636032819747925,
+            "step": 400
+          },
+          {
+            "loss": 0.544439971446991,
+            "step": 500
+          },
+          {
+            "loss": 0.5632839202880859,
+            "step": 600
+          },
+          {
+            "loss": 0.5123900175094604,
+            "step": 700
+          },
+          {
+            "loss": 0.5537475347518921,
+            "step": 800
+          },
+          {
+            "loss": 0.5392899513244629,
+            "step": 900
+          },
+          {
+            "loss": 0.5478864908218384,
+            "step": 1000
+          },
+          {
+            "loss": 0.5813197493553162,
+            "step": 1100
+          },
+          {
+            "loss": 0.5264272093772888,
+            "step": 1200
+          },
+          {
+            "loss": 0.5688523650169373,
+            "step": 1300
+          },
+          {
+            "loss": 0.5382658243179321,
+            "step": 1400
+          },
+          {
+            "loss": 0.5403186082839966,
+            "step": 1500
+          },
+          {
+            "loss": 0.5353648662567139,
+            "step": 1600
+          },
+          {
+            "loss": 0.549199640750885,
+            "step": 1700
+          },
+          {
+            "loss": 0.5393280982971191,
+            "step": 1800
+          },
+          {
+            "loss": 0.553451657295227,
+            "step": 1900
+          },
+          {
+            "loss": 0.5590076446533203,
+            "step": 2000
+          }
+        ],
+        "parameters": 3393,
+        "sampler_seed": 9125946888319346061,
+        "seconds": 2.3864381462335587,
+        "steps": 2000
+      },
+      "training_trace": {
+        "episodes": 20000,
+        "generator_seed": 31337,
+        "prepare_seconds": 2.6829731361940503,
+        "queries": 160000,
+        "split": "train",
+        "total_seconds": 10.986691381782293,
+        "trace_seconds": 4.644406622741371
+      },
+      "validation": {
+        "episodes": 2000,
+        "generator_seed": 4242,
+        "prepare_seconds": 0.2831116118468344,
+        "queries": 16000,
+        "split": "val",
+        "total_seconds": 1.1657017515972257,
+        "trace_seconds": 0.5132890627719462
+      },
+      "variant": "M1",
+      "writer": "joint"
+    },
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora/runs/p1s/main/20261026/runs/primary-joint-M1-r32-s43/checkpoint.pt",
+      "checkpoint_blake2b": "74052cf2cd30f1327dda605aeca37a89",
+      "design_hash": "93655f15c777e581e4c23d80f9712f6b",
+      "family": "joint/r32/M1",
+      "finished_at": "2026-10-26T19:11:47.269308+00:00",
+      "head_blake2b": "09e18aa662720f114211efb0fbb3acde",
+      "head_checkpoint": "/work/xg24i002/x10041/LoopLora/runs/p4s-l/20261027/main-v1/heads/primary-joint-M1-r32-s43.pt",
+      "name": "primary-joint-M1-r32-s43",
+      "peak_memory_bytes": 1193298432,
+      "r": 32,
+      "reader_state_hash": "08915a770c16fe8632c01bf9a3fd7274",
+      "reader_unchanged": true,
+      "reference_metrics": "/work/xg24i002/x10041/LoopLora/runs/p1s/main/20261026/runs/primary-joint-M1-r32-s43/screening/metrics.json",
+      "seed": 43,
+      "training": {
+        "init_seed": 5680552419387550024,
+        "logs": [
+          {
+            "loss": 0.7063027620315552,
+            "step": 1
+          },
+          {
+            "loss": 0.6904237270355225,
+            "step": 100
+          },
+          {
+            "loss": 0.6864469647407532,
+            "step": 200
+          },
+          {
+            "loss": 0.6893525719642639,
+            "step": 300
+          },
+          {
+            "loss": 0.6902148723602295,
+            "step": 400
+          },
+          {
+            "loss": 0.6899865865707397,
+            "step": 500
+          },
+          {
+            "loss": 0.6854866743087769,
+            "step": 600
+          },
+          {
+            "loss": 0.680192768573761,
+            "step": 700
+          },
+          {
+            "loss": 0.6862201690673828,
+            "step": 800
+          },
+          {
+            "loss": 0.6835725903511047,
+            "step": 900
+          },
+          {
+            "loss": 0.688864529132843,
+            "step": 1000
+          },
+          {
+            "loss": 0.688158392906189,
+            "step": 1100
+          },
+          {
+            "loss": 0.6882483959197998,
+            "step": 1200
+          },
+          {
+            "loss": 0.6836758852005005,
+            "step": 1300
+          },
+          {
+            "loss": 0.6879691481590271,
+            "step": 1400
+          },
+          {
+            "loss": 0.6804512739181519,
+            "step": 1500
+          },
+          {
+            "loss": 0.6829240322113037,
+            "step": 1600
+          },
+          {
+            "loss": 0.6850498914718628,
+            "step": 1700
+          },
+          {
+            "loss": 0.6827050447463989,
+            "step": 1800
+          },
+          {
+            "loss": 0.6891300082206726,
+            "step": 1900
+          },
+          {
+            "loss": 0.6855150461196899,
+            "step": 2000
+          }
+        ],
+        "parameters": 3393,
+        "sampler_seed": 5315451337813862734,
+        "seconds": 2.3922681198455393,
+        "steps": 2000
+      },
+      "training_trace": {
+        "episodes": 20000,
+        "generator_seed": 31337,
+        "prepare_seconds": 2.637713266070932,
+        "queries": 160000,
+        "split": "train",
+        "total_seconds": 10.888071039225906,
+        "trace_seconds": 4.56920152110979
+      },
+      "validation": {
+        "episodes": 2000,
+        "generator_seed": 4242,
+        "prepare_seconds": 0.2812277157790959,
+        "queries": 16000,
+        "split": "val",
+        "total_seconds": 1.1684532114304602,
+        "trace_seconds": 0.5124274338595569
+      },
+      "variant": "M1",
+      "writer": "joint"
+    },
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora/runs/p1s/main/20261026/runs/primary-oracle_random-M1-lin-r32-s17/checkpoint.pt",
+      "checkpoint_blake2b": "b584d51998018871b258488df490292e",
+      "design_hash": "93655f15c777e581e4c23d80f9712f6b",
+      "family": "oracle_random/r32/M1-lin",
+      "finished_at": "2026-10-26T19:12:00.859618+00:00",
+      "head_blake2b": "40315aa7ab2fabd28801bbc1798cb224",
+      "head_checkpoint": "/work/xg24i002/x10041/LoopLora/runs/p4s-l/20261027/main-v1/heads/primary-oracle_random-M1-lin-r32-s17.pt",
+      "name": "primary-oracle_random-M1-lin-r32-s17",
+      "peak_memory_bytes": 1251441664,
+      "r": 32,
+      "reader_state_hash": "7b8051f049665ceca7e9a04a70f4d63a",
+      "reader_unchanged": true,
+      "seed": 17,
+      "training": {
+        "init_seed": 8322101454661876812,
+        "logs": [
+          {
+            "loss": 12.356678009033203,
+            "step": 1
+          },
+          {
+            "loss": 1.3647466897964478,
+            "step": 100
+          },
+          {
+            "loss": 0.9306193590164185,
+            "step": 200
+          },
+          {
+            "loss": 0.94256991147995,
+            "step": 300
+          },
+          {
+            "loss": 0.6051888465881348,
+            "step": 400
+          },
+          {
+            "loss": 0.6217139959335327,
+            "step": 500
+          },
+          {
+            "loss": 0.6051559448242188,
+            "step": 600
+          },
+          {
+            "loss": 0.7184359431266785,
+            "step": 700
+          },
+          {
+            "loss": 0.5286544561386108,
+            "step": 800
+          },
+          {
+            "loss": 0.5526147484779358,
+            "step": 900
+          },
+          {
+            "loss": 0.524128258228302,
+            "step": 1000
+          },
+          {
+            "loss": 0.503380537033081,
+            "step": 1100
+          },
+          {
+            "loss": 0.5092825889587402,
+            "step": 1200
+          },
+          {
+            "loss": 0.5997692346572876,
+            "step": 1300
+          },
+          {
+            "loss": 0.5431289076805115,
+            "step": 1400
+          },
+          {
+            "loss": 0.778380811214447,
+            "step": 1500
+          },
+          {
+            "loss": 0.5043454170227051,
+            "step": 1600
+          },
+          {
+            "loss": 0.5911593437194824,
+            "step": 1700
+          },
+          {
+            "loss": 0.5330246686935425,
+            "step": 1800
+          },
+          {
+            "loss": 0.5085420608520508,
+            "step": 1900
+          },
+          {
+            "loss": 0.5667774677276611,
+            "step": 2000
+          }
+        ],
+        "parameters": 3393,
+        "sampler_seed": 110416135183257995,
+        "seconds": 2.385225357953459,
+        "steps": 2000
+      },
+      "training_trace": {
+        "episodes": 20000,
+        "generator_seed": 31337,
+        "prepare_seconds": 1.936384663451463,
+        "queries": 160000,
+        "split": "train",
+        "total_seconds": 9.975579584017396,
+        "trace_seconds": 4.382733639329672
+      },
+      "validation": {
+        "episodes": 2000,
+        "generator_seed": 4242,
+        "prepare_seconds": 0.20883801765739918,
+        "queries": 16000,
+        "split": "val",
+        "total_seconds": 1.083349963184446,
+        "trace_seconds": 0.5006302115507424
+      },
+      "variant": "M1-lin",
+      "writer": "oracle_random"
+    },
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora/runs/p1s/main/20261026/runs/primary-oracle_random-M1-lin-r32-s29/checkpoint.pt",
+      "checkpoint_blake2b": "76394efd949d2614f3e5a4cfe8b53c58",
+      "design_hash": "93655f15c777e581e4c23d80f9712f6b",
+      "family": "oracle_random/r32/M1-lin",
+      "finished_at": "2026-10-26T19:12:14.598780+00:00",
+      "head_blake2b": "a15fafae2b19f0ebec04b277cb203321",
+      "head_checkpoint": "/work/xg24i002/x10041/LoopLora/runs/p4s-l/20261027/main-v1/heads/primary-oracle_random-M1-lin-r32-s29.pt",
+      "name": "primary-oracle_random-M1-lin-r32-s29",
+      "peak_memory_bytes": 1251326976,
+      "r": 32,
+      "reader_state_hash": "9ce37a126810e671106a34d4d9f1febf",
+      "reader_unchanged": true,
+      "seed": 29,
+      "training": {
+        "init_seed": 2331301193002682813,
+        "logs": [
+          {
+            "loss": 7.994826316833496,
+            "step": 1
+          },
+          {
+            "loss": 1.082235336303711,
+            "step": 100
+          },
+          {
+            "loss": 0.96949702501297,
+            "step": 200
+          },
+          {
+            "loss": 0.745482325553894,
+            "step": 300
+          },
+          {
+            "loss": 0.6332482099533081,
+            "step": 400
+          },
+          {
+            "loss": 0.6379586458206177,
+            "step": 500
+          },
+          {
+            "loss": 0.5591068863868713,
+            "step": 600
+          },
+          {
+            "loss": 0.6550973653793335,
+            "step": 700
+          },
+          {
+            "loss": 0.8681943416595459,
+            "step": 800
+          },
+          {
+            "loss": 0.5027738213539124,
+            "step": 900
+          },
+          {
+            "loss": 0.5387905836105347,
+            "step": 1000
+          },
+          {
+            "loss": 0.511897623538971,
+            "step": 1100
+          },
+          {
+            "loss": 0.514075756072998,
+            "step": 1200
+          },
+          {
+            "loss": 0.5517918467521667,
+            "step": 1300
+          },
+          {
+            "loss": 0.5316066145896912,
+            "step": 1400
+          },
+          {
+            "loss": 0.5526474714279175,
+            "step": 1500
+          },
+          {
+            "loss": 0.594791829586029,
+            "step": 1600
+          },
+          {
+            "loss": 0.5157143473625183,
+            "step": 1700
+          },
+          {
+            "loss": 0.5343084335327148,
+            "step": 1800
+          },
+          {
+            "loss": 0.5132160186767578,
+            "step": 1900
+          },
+          {
+            "loss": 0.5122995376586914,
+            "step": 2000
+          }
+        ],
+        "parameters": 3393,
+        "sampler_seed": 1588050765301485766,
+        "seconds": 2.3878664588555694,
+        "steps": 2000
+      },
+      "training_trace": {
+        "episodes": 20000,
+        "generator_seed": 31337,
+        "prepare_seconds": 1.9686583392322063,
+        "queries": 160000,
+        "split": "train",
+        "total_seconds": 10.134665268007666,
+        "trace_seconds": 4.474932003766298
+      },
+      "validation": {
+        "episodes": 2000,
+        "generator_seed": 4242,
+        "prepare_seconds": 0.20762687409296632,
+        "queries": 16000,
+        "split": "val",
+        "total_seconds": 1.0738705261610448,
+        "trace_seconds": 0.49721032846719027
+      },
+      "variant": "M1-lin",
+      "writer": "oracle_random"
+    },
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora/runs/p1s/main/20261026/runs/primary-oracle_random-M1-lin-r32-s43/checkpoint.pt",
+      "checkpoint_blake2b": "dd93370b54b6cc90909905fcad428e76",
+      "design_hash": "93655f15c777e581e4c23d80f9712f6b",
+      "family": "oracle_random/r32/M1-lin",
+      "finished_at": "2026-10-26T19:12:28.321106+00:00",
+      "head_blake2b": "a2f184a8935391f0d237bc65e07cc9d4",
+      "head_checkpoint": "/work/xg24i002/x10041/LoopLora/runs/p4s-l/20261027/main-v1/heads/primary-oracle_random-M1-lin-r32-s43.pt",
+      "name": "primary-oracle_random-M1-lin-r32-s43",
+      "peak_memory_bytes": 1251326976,
+      "r": 32,
+      "reader_state_hash": "06bc2538dcb51ae7ed0730fe454cc594",
+      "reader_unchanged": true,
+      "seed": 43,
+      "training": {
+        "init_seed": 3606843903511392536,
+        "logs": [
+          {
+            "loss": 12.940601348876953,
+            "step": 1
+          },
+          {
+            "loss": 1.1893267631530762,
+            "step": 100
+          },
+          {
+            "loss": 0.8569235801696777,
+            "step": 200
+          },
+          {
+            "loss": 0.7052436470985413,
+            "step": 300
+          },
+          {
+            "loss": 0.7474256157875061,
+            "step": 400
+          },
+          {
+            "loss": 0.5706382989883423,
+            "step": 500
+          },
+          {
+            "loss": 0.5529891848564148,
+            "step": 600
+          },
+          {
+            "loss": 0.6151612997055054,
+            "step": 700
+          },
+          {
+            "loss": 0.6152656674385071,
+            "step": 800
+          },
+          {
+            "loss": 0.5793039798736572,
+            "step": 900
+          },
+          {
+            "loss": 0.5462186932563782,
+            "step": 1000
+          },
+          {
+            "loss": 0.5244088172912598,
+            "step": 1100
+          },
+          {
+            "loss": 0.5146701335906982,
+            "step": 1200
+          },
+          {
+            "loss": 0.49933895468711853,
+            "step": 1300
+          },
+          {
+            "loss": 0.5323399305343628,
+            "step": 1400
+          },
+          {
+            "loss": 0.5164397954940796,
+            "step": 1500
+          },
+          {
+            "loss": 0.5320720076560974,
+            "step": 1600
+          },
+          {
+            "loss": 0.5526342988014221,
+            "step": 1700
+          },
+          {
+            "loss": 0.48539474606513977,
+            "step": 1800
+          },
+          {
+            "loss": 0.5500859618186951,
+            "step": 1900
+          },
+          {
+            "loss": 0.5162697434425354,
+            "step": 2000
+          }
+        ],
+        "parameters": 3393,
+        "sampler_seed": 3042823204035027453,
+        "seconds": 2.3908171891234815,
+        "steps": 2000
+      },
+      "training_trace": {
+        "episodes": 20000,
+        "generator_seed": 31337,
+        "prepare_seconds": 1.959901265334338,
+        "queries": 160000,
+        "split": "train",
+        "total_seconds": 10.113452166784555,
+        "trace_seconds": 4.446584492456168
+      },
+      "validation": {
+        "episodes": 2000,
+        "generator_seed": 4242,
+        "prepare_seconds": 0.20818025013431907,
+        "queries": 16000,
+        "split": "val",
+        "total_seconds": 1.0763161648064852,
+        "trace_seconds": 0.498145439196378
+      },
+      "variant": "M1-lin",
+      "writer": "oracle_random"
+    },
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora/runs/p1s/main/20261026/runs/primary-oracle_random-M1-r32-s17/checkpoint.pt",
+      "checkpoint_blake2b": "5cfcfa0a8530ec2da3d01c84ba76754b",
+      "design_hash": "93655f15c777e581e4c23d80f9712f6b",
+      "family": "oracle_random/r32/M1",
+      "finished_at": "2026-10-26T19:12:42.102900+00:00",
+      "head_blake2b": "43cbe24b8af1d987b25e007fcd5601e1",
+      "head_checkpoint": "/work/xg24i002/x10041/LoopLora/runs/p4s-l/20261027/main-v1/heads/primary-oracle_random-M1-r32-s17.pt",
+      "name": "primary-oracle_random-M1-r32-s17",
+      "peak_memory_bytes": 1251326976,
+      "r": 32,
+      "reader_state_hash": "00a4582ae1cb94a8877a3c6b987d4618",
+      "reader_unchanged": true,
+      "seed": 17,
+      "training": {
+        "init_seed": 5506661960033722427,
+        "logs": [
+          {
+            "loss": 5.502207279205322,
+            "step": 1
+          },
+          {
+            "loss": 0.7943423986434937,
+            "step": 100
+          },
+          {
+            "loss": 0.7346181869506836,
+            "step": 200
+          },
+          {
+            "loss": 0.9012883901596069,
+            "step": 300
+          },
+          {
+            "loss": 1.0690951347351074,
+            "step": 400
+          },
+          {
+            "loss": 0.6479030847549438,
+            "step": 500
+          },
+          {
+            "loss": 0.5744181275367737,
+            "step": 600
+          },
+          {
+            "loss": 0.7754617929458618,
+            "step": 700
+          },
+          {
+            "loss": 0.47676196694374084,
+            "step": 800
+          },
+          {
+            "loss": 0.8248645067214966,
+            "step": 900
+          },
+          {
+            "loss": 1.1915675401687622,
+            "step": 1000
+          },
+          {
+            "loss": 0.7108455896377563,
+            "step": 1100
+          },
+          {
+            "loss": 0.48898419737815857,
+            "step": 1200
+          },
+          {
+            "loss": 0.5126389265060425,
+            "step": 1300
+          },
+          {
+            "loss": 0.7080126404762268,
+            "step": 1400
+          },
+          {
+            "loss": 0.5609652996063232,
+            "step": 1500
+          },
+          {
+            "loss": 0.5641382932662964,
+            "step": 1600
+          },
+          {
+            "loss": 0.6743162870407104,
+            "step": 1700
+          },
+          {
+            "loss": 0.6469927430152893,
+            "step": 1800
+          },
+          {
+            "loss": 0.49018487334251404,
+            "step": 1900
+          },
+          {
+            "loss": 1.1291570663452148,
+            "step": 2000
+          }
+        ],
+        "parameters": 3393,
+        "sampler_seed": 2172706260642225193,
+        "seconds": 2.383052579127252,
+        "steps": 2000
+      },
+      "training_trace": {
+        "episodes": 20000,
+        "generator_seed": 31337,
+        "prepare_seconds": 1.9499119413085282,
+        "queries": 160000,
+        "split": "train",
+        "total_seconds": 10.174145655706525,
+        "trace_seconds": 4.5147894895635545
+      },
+      "validation": {
+        "episodes": 2000,
+        "generator_seed": 4242,
+        "prepare_seconds": 0.20736429980024695,
+        "queries": 16000,
+        "split": "val",
+        "total_seconds": 1.0835162443108857,
+        "trace_seconds": 0.5011447193101048
+      },
+      "variant": "M1",
+      "writer": "oracle_random"
+    },
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora/runs/p1s/main/20261026/runs/primary-oracle_random-M1-r32-s29/checkpoint.pt",
+      "checkpoint_blake2b": "f6b35c6f243797d3fd77548de37e374a",
+      "design_hash": "93655f15c777e581e4c23d80f9712f6b",
+      "family": "oracle_random/r32/M1",
+      "finished_at": "2026-10-26T19:12:55.918970+00:00",
+      "head_blake2b": "03a62eab8b0e55e6c10161536b058402",
+      "head_checkpoint": "/work/xg24i002/x10041/LoopLora/runs/p4s-l/20261027/main-v1/heads/primary-oracle_random-M1-r32-s29.pt",
+      "name": "primary-oracle_random-M1-r32-s29",
+      "peak_memory_bytes": 1251326976,
+      "r": 32,
+      "reader_state_hash": "ac565161827da0f38e928080a89f7d6f",
+      "reader_unchanged": true,
+      "seed": 29,
+      "training": {
+        "init_seed": 6563419367105643212,
+        "logs": [
+          {
+            "loss": 2.7551136016845703,
+            "step": 1
+          },
+          {
+            "loss": 0.7950729727745056,
+            "step": 100
+          },
+          {
+            "loss": 0.6369612812995911,
+            "step": 200
+          },
+          {
+            "loss": 0.5238132476806641,
+            "step": 300
+          },
+          {
+            "loss": 0.5380458235740662,
+            "step": 400
+          },
+          {
+            "loss": 0.4815877079963684,
+            "step": 500
+          },
+          {
+            "loss": 0.4650324881076813,
+            "step": 600
+          },
+          {
+            "loss": 0.4331710636615753,
+            "step": 700
+          },
+          {
+            "loss": 0.4409688711166382,
+            "step": 800
+          },
+          {
+            "loss": 0.4470272362232208,
+            "step": 900
+          },
+          {
+            "loss": 0.4429076015949249,
+            "step": 1000
+          },
+          {
+            "loss": 0.5431597828865051,
+            "step": 1100
+          },
+          {
+            "loss": 0.49108612537384033,
+            "step": 1200
+          },
+          {
+            "loss": 0.5793739557266235,
+            "step": 1300
+          },
+          {
+            "loss": 0.4757162928581238,
+            "step": 1400
+          },
+          {
+            "loss": 0.44554460048675537,
+            "step": 1500
+          },
+          {
+            "loss": 0.4498023986816406,
+            "step": 1600
+          },
+          {
+            "loss": 0.4357120990753174,
+            "step": 1700
+          },
+          {
+            "loss": 0.4507305920124054,
+            "step": 1800
+          },
+          {
+            "loss": 0.5308699607849121,
+            "step": 1900
+          },
+          {
+            "loss": 0.6309496760368347,
+            "step": 2000
+          }
+        ],
+        "parameters": 3393,
+        "sampler_seed": 792827240059595454,
+        "seconds": 2.386427318211645,
+        "steps": 2000
+      },
+      "training_trace": {
+        "episodes": 20000,
+        "generator_seed": 31337,
+        "prepare_seconds": 1.9721969901584089,
+        "queries": 160000,
+        "split": "train",
+        "total_seconds": 10.207119372673333,
+        "trace_seconds": 4.566947026643902
+      },
+      "validation": {
+        "episodes": 2000,
+        "generator_seed": 4242,
+        "prepare_seconds": 0.2070554313249886,
+        "queries": 16000,
+        "split": "val",
+        "total_seconds": 1.0787350982427597,
+        "trace_seconds": 0.5022581950761378
+      },
+      "variant": "M1",
+      "writer": "oracle_random"
+    },
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora/runs/p1s/main/20261026/runs/primary-oracle_random-M1-r32-s43/checkpoint.pt",
+      "checkpoint_blake2b": "3f9b21f8658f2c86f3ae8c074589b7b2",
+      "design_hash": "93655f15c777e581e4c23d80f9712f6b",
+      "family": "oracle_random/r32/M1",
+      "finished_at": "2026-10-26T19:13:09.725956+00:00",
+      "head_blake2b": "d92b34672ee10ab9d153dc27ee04d547",
+      "head_checkpoint": "/work/xg24i002/x10041/LoopLora/runs/p4s-l/20261027/main-v1/heads/primary-oracle_random-M1-r32-s43.pt",
+      "name": "primary-oracle_random-M1-r32-s43",
+      "peak_memory_bytes": 1251326976,
+      "r": 32,
+      "reader_state_hash": "b6126ed1e2baa911a1fed9f9d305e3de",
+      "reader_unchanged": true,
+      "seed": 43,
+      "training": {
+        "init_seed": 1084425783999344013,
+        "logs": [
+          {
+            "loss": 7.173696994781494,
+            "step": 1
+          },
+          {
+            "loss": 0.7836838364601135,
+            "step": 100
+          },
+          {
+            "loss": 0.5628842115402222,
+            "step": 200
+          },
+          {
+            "loss": 0.48233476281166077,
+            "step": 300
+          },
+          {
+            "loss": 0.4885775148868561,
+            "step": 400
+          },
+          {
+            "loss": 0.578574538230896,
+            "step": 500
+          },
+          {
+            "loss": 0.4642261564731598,
+            "step": 600
+          },
+          {
+            "loss": 0.4953150451183319,
+            "step": 700
+          },
+          {
+            "loss": 0.43850117921829224,
+            "step": 800
+          },
+          {
+            "loss": 0.47272875905036926,
+            "step": 900
+          },
+          {
+            "loss": 0.45039641857147217,
+            "step": 1000
+          },
+          {
+            "loss": 0.46721965074539185,
+            "step": 1100
+          },
+          {
+            "loss": 0.4278104603290558,
+            "step": 1200
+          },
+          {
+            "loss": 0.44700536131858826,
+            "step": 1300
+          },
+          {
+            "loss": 0.5341304540634155,
+            "step": 1400
+          },
+          {
+            "loss": 0.4502965807914734,
+            "step": 1500
+          },
+          {
+            "loss": 0.4517011046409607,
+            "step": 1600
+          },
+          {
+            "loss": 0.5050520896911621,
+            "step": 1700
+          },
+          {
+            "loss": 0.48850831389427185,
+            "step": 1800
+          },
+          {
+            "loss": 0.45811861753463745,
+            "step": 1900
+          },
+          {
+            "loss": 0.43601080775260925,
+            "step": 2000
+          }
+        ],
+        "parameters": 3393,
+        "sampler_seed": 4732826471608148291,
+        "seconds": 2.384141760878265,
+        "steps": 2000
+      },
+      "training_trace": {
+        "episodes": 20000,
+        "generator_seed": 31337,
+        "prepare_seconds": 1.9563723364844918,
+        "queries": 160000,
+        "split": "train",
+        "total_seconds": 10.192852511070669,
+        "trace_seconds": 4.5328378030098975
+      },
+      "validation": {
+        "episodes": 2000,
+        "generator_seed": 4242,
+        "prepare_seconds": 0.20841729873791337,
+        "queries": 16000,
+        "split": "val",
+        "total_seconds": 1.0870390511117876,
+        "trace_seconds": 0.5067290193401277
+      },
+      "variant": "M1",
+      "writer": "oracle_random"
+    }
+  ],
+  "source": "ccb4ec55ba85ab051d394181fd619a240d1c4094",
+  "design_hash": "93655f15c777e581e4c23d80f9712f6b",
+  "design_lock_commit": "9366da4035aa15bfe97be14acec92574c6d3e894",
+  "all_readers_unchanged": true,
+  "training_episodes_per_head": 20000,
+  "head_steps": 2000
+}
