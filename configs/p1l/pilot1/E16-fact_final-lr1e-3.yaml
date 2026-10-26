@@ -1,0 +1,57 @@
+{
+  "seed": 17,
+  "stage": "writer",
+  "variant": "M1",
+  "protocol": "memory_only",
+  "smoke": false,
+  "model": {
+    "r": 32,
+    "layer": 14,
+    "rho": 0.25,
+    "alpha": 1.0
+  },
+  "task": {
+    "name": "t1",
+    "E": 16,
+    "Q": 4,
+    "n_rel": 4,
+    "head_sharing": 0.3,
+    "hops": [
+      1
+    ],
+    "chain_lengths": null
+  },
+  "train": {
+    "steps": 1500,
+    "batch_size": 32,
+    "warmup_steps": 20,
+    "weight_decay": 0.01,
+    "grad_clip": 1.0,
+    "depths": [
+      1
+    ],
+    "log_every": 10,
+    "lr": 0.001
+  },
+  "eval": {
+    "episodes": 1000,
+    "batch_size": 16,
+    "splits": [
+      "val"
+    ],
+    "seed": 4242,
+    "protocols": [
+      "memory_only"
+    ],
+    "depths": [
+      1
+    ],
+    "hops": [
+      1
+    ],
+    "counterfactuals": false,
+    "allow_confirmation": false
+  },
+  "name": "E16-fact_final-lr1e-3",
+  "write_policy": "fact_final"
+}

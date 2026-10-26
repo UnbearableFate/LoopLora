@@ -1,0 +1,36 @@
+{
+  "stage": "writer",
+  "seed": 17,
+  "rank": 32,
+  "layer": 14,
+  "L": 1,
+  "batch_size": 32,
+  "procs": 2,
+  "steps": 1500,
+  "training_episodes": 48000,
+  "training_queries": 192000,
+  "validation_episodes": 1000,
+  "eval_seed": 4242,
+  "policy_grid": [
+    "fact_final",
+    "all_tokens"
+  ],
+  "learning_rates": [
+    0.0003,
+    0.001,
+    0.003
+  ],
+  "policy_E": 16,
+  "capacity_E": [
+    8,
+    12,
+    24
+  ],
+  "step_budget_rule": "floor100((1800 - 90) / (1.5 * worst_worker_p95_step_seconds))",
+  "worst_worker_p95_step_seconds": 0.71709189908579,
+  "throughput_episodes_per_second": 93.52962528347315,
+  "throughput": "/work/xg24i002/x10041/LoopLora/runs/p1l/pilot1-20261026/throughput/throughput.json",
+  "throughput_commit": "8bac2fa7d2088c74fdfa91f16a97f962789d7c5f",
+  "locked_at": "2026-10-26T12:06:20.847257+00:00",
+  "scope": "writer-only validation-only seed17; policy/lr selected before capacity; no further tuning"
+}
