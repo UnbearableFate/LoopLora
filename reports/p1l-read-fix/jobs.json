@@ -1,0 +1,91 @@
+{
+  "jobs": [
+    {
+      "job_id": "3715417",
+      "job_name": "t-l4-read",
+      "status": "FINISH",
+      "project": "xg24i002",
+      "queue": "small-g",
+      "start_date": "10/27 03:00:01",
+      "elapsed_seconds": 33,
+      "token": 0.0,
+      "token_estimate": null,
+      "nodes": 1,
+      "mig": null,
+      "role": "initial tests:2failed/55",
+      "exit_status": 1,
+      "node_hours": 0.009166666666666667
+    },
+    {
+      "job_id": "3715437",
+      "job_name": "t-l4-read2",
+      "status": "FINISH",
+      "project": "xg24i002",
+      "queue": "small-g",
+      "start_date": "10/27 03:03:30",
+      "elapsed_seconds": 34,
+      "token": 0.0,
+      "token_estimate": null,
+      "nodes": 1,
+      "mig": null,
+      "role": "corrected tests:55passed",
+      "exit_status": 0,
+      "node_hours": 0.009444444444444445
+    },
+    {
+      "job_id": "3715461",
+      "job_name": "s-l4-R-Rrho",
+      "status": "FINISH",
+      "project": "xg24i002",
+      "queue": "small-g",
+      "start_date": "10/27 03:06:26",
+      "elapsed_seconds": 218,
+      "token": 0.1,
+      "token_estimate": null,
+      "nodes": 1,
+      "mig": null,
+      "role": "10% smoke R/Rrho",
+      "exit_status": 0,
+      "node_hours": 0.06055555555555556
+    },
+    {
+      "job_id": "3715462",
+      "job_name": "s-l4-RK-OArho",
+      "status": "FINISH",
+      "project": "xg24i002",
+      "queue": "small-g",
+      "start_date": "10/27 03:06:26",
+      "elapsed_seconds": 230,
+      "token": 0.1,
+      "token_estimate": null,
+      "nodes": 1,
+      "mig": null,
+      "role": "10% smoke RK/OArho",
+      "exit_status": 0,
+      "node_hours": 0.06388888888888888
+    },
+    {
+      "job_id": "3715504",
+      "job_name": "a-l4-smoke",
+      "status": "FINISH",
+      "project": "xg24i002",
+      "queue": "small-g",
+      "start_date": "10/27 03:12:09",
+      "elapsed_seconds": 20,
+      "token": 0.0,
+      "token_estimate": null,
+      "nodes": 1,
+      "mig": null,
+      "role": "smoke artifact/timing audit",
+      "exit_status": 0,
+      "node_hours": 0.005555555555555556
+    }
+  ],
+  "completed_node_hours": 0.1486111111111111,
+  "max_total_node_hours": 4,
+  "separate_from": "WP-L3 costs",
+  "pending_roles": [
+    "conditional no-training A1 audit",
+    "conditional scientific arms/E8/final audit"
+  ]
+}

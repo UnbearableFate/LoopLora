@@ -49,3 +49,14 @@ Max4nodeh for ALL WP-L4 jobs, each1node<=1h. Track failed tests too. Never impor
 torch/runpytest or validators on login. Commit on wp/llm only. Final report
 <=1page+tables docs/reports/P1L-read-fix.md and exact final line
 WP-L4 done: docs/reports/P1L-read-fix.md
+
+PREPARATION COMPLETE (03:14 JST): smoke3715461 mg0841 and3715462 mg0880 exit0.
+Smoke artifact/timing audit3715504 mg0880 exit0: all four arm samples/exports
+verified, shared normalization buffers exactly equal. No smoke EM was exposed
+or used for selection. Slow RK mean.213188s; full eval conservative12.102s;
+1.5x train+5eval+90s=2780.715s. Freeze8225steps, five1645-step intervals, source
+b1c64c17fa34e57489f15e6ca2993ac55883a05d, two paired50min jobs WHEN L3gate passes.
+Release reports/p1l-read-fix/release.json; timing/source proof and ledger committed.
+No WP-L4 scientific arms or final A1 diagnostic audit have been submitted.
+Do not rerun tests/smoke without a new failure or code concern. Await original
+A1 wake-up, finish WP-L3 first, then perform audit/science/final WP-L4 report.

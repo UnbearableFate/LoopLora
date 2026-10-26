@@ -50,3 +50,12 @@ Decision order R<Rrho<RK, final EM>=.80. Else best final EM>=.50 gets exactly
 one E8 retrain at same fixed schedule; exact score ties use simplicity. No other
 screen/extension. At most4 allocated nodeh across ALL WP-L4 jobs, each<=1node1h.
 Scientific execution waits for WP-L3 report/decision even if smoke finishes first.
+
+## Smoke timing gate, before any WP-L4 scientific score
+
+All4 smoke arms/sourceb1c64c1 passed; artifact audit3715504 verifies all labels,
+finite diagnostics, exports and exact shared normalization. Only timing metadata
+was exposed. Slow RK mean.213188s; conservative full eval12.102s;1.5x training
+plus5eval+90s=2780.715s. Freeze8225steps/five1645step intervals, two paired50min
+jobs, with OAρ6580 exactly matched to A1 OA. Scientific release remains gated
+on final negative WP-L3 decision/report; original A1 wake-up stays armed.
