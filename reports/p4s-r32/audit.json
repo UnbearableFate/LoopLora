@@ -1,0 +1,85 @@
+{
+  "status": "passed",
+  "task": "WP-C4",
+  "audited_at": "2026-10-26T15:01:33.799945+00:00",
+  "runtime": {
+    "host": "mg0005",
+    "job_id": "3714230.opbs"
+  },
+  "root": "/work/xg24i002/x10041/LoopLora/runs/p4s-r32/main-v1",
+  "runs": 18,
+  "families": 6,
+  "checkpoints_unchanged": true,
+  "confirmation_inputs_opened": false,
+  "latency_evaluated": false,
+  "certificates_evaluated": false,
+  "traces": {
+    "files": 36,
+    "episodes": 72000,
+    "queries": 576000,
+    "all_metrics_finite": true
+  },
+  "threshold_lock": {
+    "locked_at": "2026-10-26T15:01:14.658899+00:00",
+    "seconds_after_last_val": 1.6588990688323975,
+    "seconds_before_first_test": 0.34110093116760254
+  },
+  "threshold_integer_ties": {
+    "queries_per_family": 48000,
+    "family_criteria": 18,
+    "groups_with_equal_maximum_correct_counts": 4,
+    "mismatch_count": 0,
+    "mismatches": [],
+    "interpretation": "Integer-equivalent accuracy and step totals expose true ties that can differ by one floating-point ulp after averaging. Mismatches are reported for review; frozen selections are not changed by this audit."
+  },
+  "reference_check": {
+    "cells": 576,
+    "exact_cells": 576,
+    "differing_cells": 0,
+    "max_absolute_delta": 0.0
+  },
+  "adaptive_screening_candidates": [
+    {
+      "writer": "joint",
+      "r": 32,
+      "variant": "M1",
+      "family": "joint/r32/M1",
+      "method": "output_stability",
+      "hop1_delta": 0.0515,
+      "reach_delta": 0.08666666666666667,
+      "far_delta": 0.060277777777777784,
+      "walk_specificity": 0.026388888888888896,
+      "screening_candidate": true,
+      "min_seed_reach_delta": 0.01575,
+      "min_seed_walk_specificity": -0.0012499999999999976
+    },
+    {
+      "writer": "joint",
+      "r": 32,
+      "variant": "M1",
+      "family": "joint/r32/M1",
+      "method": "read_norm",
+      "hop1_delta": 0.0515,
+      "reach_delta": 0.08666666666666667,
+      "far_delta": 0.060277777777777784,
+      "walk_specificity": 0.026388888888888896,
+      "screening_candidate": true,
+      "min_seed_reach_delta": 0.01575,
+      "min_seed_walk_specificity": -0.0012499999999999976
+    },
+    {
+      "writer": "joint",
+      "r": 32,
+      "variant": "M1",
+      "family": "joint/r32/M1",
+      "method": "relative_change",
+      "hop1_delta": 0.0515,
+      "reach_delta": 0.08666666666666667,
+      "far_delta": 0.060277777777777784,
+      "walk_specificity": 0.026388888888888896,
+      "screening_candidate": true,
+      "min_seed_reach_delta": 0.01575,
+      "min_seed_walk_specificity": -0.0012499999999999976
+    }
+  ]
+}

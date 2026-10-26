@@ -77,7 +77,10 @@ def collect(model, split: str, design: dict, out: Path) -> tuple[dict, ReaderBat
     seed, count = design["evaluation_seed"], design["episodes_per_split"]
     started = time.perf_counter()
     arrays = stratify_queries(generate(spec, split, 0, count, seed), spec, design["hops"], seed)
-    chunks = {key: [] for key in ("predictions", "read_norm", "relative_change", "certified_c")}
+    certificates = design.get("collect_certificates", True)
+    chunks = {key: [] for key in ("predictions", "read_norm", "relative_change")}
+    if certificates:
+        chunks["certified_c"] = []
     first = None
     prepare_seconds = trace_seconds = certificate_seconds = 0.0
     for begin in range(0, count, design["episode_batch_size"]):
@@ -107,14 +110,15 @@ def collect(model, split: str, design: dict, out: Path) -> tuple[dict, ReaderBat
                 actual = trace.predictions[:, depth].reshape(b, q)
                 if not torch.equal(actual, expected):
                     raise AssertionError(f"fixed-reader/candidate-decoder mismatch at L={depth}")
-        tick = time.perf_counter()
-        certificate = contraction_upper_bound(
-            model.adapter.R.double(), model.adapter.U.double(), model.adapter.Q.double(),
-            prepared.memory.double(), model.adapter.cfg.rho,
-        )
-        torch.cuda.synchronize()
-        certificate_seconds += time.perf_counter() - tick
-        chunks["certified_c"].append(certificate.cpu().numpy())
+        if certificates:
+            tick = time.perf_counter()
+            certificate = contraction_upper_bound(
+                model.adapter.R.double(), model.adapter.U.double(), model.adapter.Q.double(),
+                prepared.memory.double(), model.adapter.cfg.rho,
+            )
+            torch.cuda.synchronize()
+            certificate_seconds += time.perf_counter() - tick
+            chunks["certified_c"].append(certificate.cpu().numpy())
     values = {key: np.concatenate(value) for key, value in chunks.items()}
     values.update(answer=arrays.answer, hop=arrays.q_hop_true,
                   episode_id=np.broadcast_to(arrays.episode_seed[:, None], arrays.answer.shape))

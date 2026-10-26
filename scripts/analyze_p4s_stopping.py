@@ -82,10 +82,13 @@ def _grid(design, criterion):
 def _load_trace(root, run, split, design):
     _require(split in ('val', 'test'), 'Confirmation data are outside WP-C3 scope')
     path = Path(root) / 'traces' / run['name'] / f'{split}.npz'
+    certificates = design.get('collect_certificates', True)
     with np.load(path, allow_pickle=False) as archive:
         data = {key: archive[key] for key in
                 ('predictions', 'read_norm', 'relative_change', 'answer', 'hop',
-                 'episode_id', 'certified_c')}
+                 'episode_id')}
+        if certificates:
+            data['certified_c'] = archive['certified_c']
     shape = data['answer'].shape
     _require(len(shape) == 2 and shape[0] > 0 and shape[1] == len(design['hops']),
              f'Invalid answer shape in {path}')
@@ -102,9 +105,10 @@ def _load_trace(root, run, split, design):
     _require(np.all(data['episode_id'] == data['episode_id'][:, :1])
              and len(np.unique(data['episode_id'][:, 0])) == shape[0],
              f'Episode identities must be unique and shared across hops in {path}')
-    _require(data['certified_c'].shape == (shape[0],)
-             and np.all(np.isfinite(data['certified_c'])) and np.all(data['certified_c'] >= 0),
-             f'Invalid contraction certificates in {path}')
+    if certificates:
+        _require(data['certified_c'].shape == (shape[0],)
+                 and np.all(np.isfinite(data['certified_c'])) and np.all(data['certified_c'] >= 0),
+                 f'Invalid contraction certificates in {path}')
     for key in ('read_norm', 'relative_change'):
         values = data[key][..., 1:]
         _require(np.all(np.isfinite(values)) and np.all(values >= 0), f'Invalid {key} in {path}')

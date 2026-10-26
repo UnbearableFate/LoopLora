@@ -1,0 +1,47 @@
+{
+  "task": "WP-C4",
+  "budget_node_hours": 1,
+  "allocated_seconds": 74,
+  "allocated_node_hours": 0.020555555555555556,
+  "cost_source": "qstat_json.py -H 3714216 3714219 3714230 elapsed_seconds; every job used one node; application exits verified from logs",
+  "jobs": [
+    {
+      "job_id": "3714216.opbs",
+      "purpose": "initial test submission with incorrectly resolved HEAD",
+      "host": "mg0015",
+      "queue": "debug-g",
+      "requested_seconds": 300,
+      "allocated_seconds": 9,
+      "source_commit": "0e7cbf3333beccb9e336c8041aadbe9dac9cdd8b",
+      "exit_code": 1,
+      "result": "New test file absent in main checkout snapshot; stopped before tests or evaluation; resubmitted with explicit worker commit",
+      "log": "/work/xg24i002/x10041/LoopLora/logs/pbs/t-c4-smoke-20261026-235912-3407564.log"
+    },
+    {
+      "job_id": "3714219.opbs",
+      "purpose": "tests and six-family seed17 smoke",
+      "host": "mg0013",
+      "queue": "debug-g",
+      "requested_seconds": 300,
+      "allocated_seconds": 19,
+      "source_commit": "613376b266f063a62b25979baccd7137009f42d1",
+      "exit_code": 0,
+      "result": "77 tests passed in 5.75s; smoke: 200 validation episodes per checkpoint, all six families passed, 1.101 application seconds; no screening or selection",
+      "log": "/work/xg24i002/x10041/LoopLora/logs/pbs/t-c4-smoke-20261026-235942-3410266.log"
+    },
+    {
+      "job_id": "3714230.opbs",
+      "purpose": "full validation, threshold lock, screening, audit and compact export",
+      "host": "mg0005",
+      "queue": "debug-g",
+      "requested_seconds": 180,
+      "allocated_seconds": 46,
+      "source_commit": "613376b266f063a62b25979baccd7137009f42d1",
+      "exit_code": 0,
+      "result": "18 checkpoints; 33.514 evaluation application seconds; 36 traces, 72000 episodes, 576000 queries; all 576 released fixed screening cells exact; audit passed",
+      "log": "/work/xg24i002/x10041/LoopLora/logs/pbs/eval-c4-20261027-000042-3433695.log"
+    }
+  ],
+  "all_jobs_within_one_node_one_hour": true,
+  "raw_root": "/work/xg24i002/x10041/LoopLora/runs/p4s-r32/main-v1"
+}
