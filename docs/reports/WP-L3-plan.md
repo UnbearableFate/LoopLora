@@ -65,3 +65,18 @@ include all tests/probes/screen/audits when sizing this job. The original <=1h
 single-arm extension and stop-below.30 rules are superseded. Select the simplest
 rerun writer reaching.80; otherwise stop and report>=.30 as partial learning.
 No validation scores were read by this worker when recording this amendment.
+
+## A1 release, after the completed screen
+
+Screen audited on compute3714886, immutable selection committeda4afc80. Ranked
+all seven arms (OA may be among the two under A1's explicit wording): OA221/1000,
+W578/1000. Thus rerun OA/W5 together; no third arm is added. OA is diagnostic.
+Merged master3548d6e after screen completion. Frozen new numerical source0713cfb
+passed68 tests plus exact100-step real-model workers0/2 parameter/loss equality.
+W5 prefetched steady mean/p95=.199155/.209157s, OA mean=.166809s. Common32900
+steps is the largest multiple100 fitting (7000-100)/slow-p95, reserving100s inside
+a7000s fit guard for prefetch/evaluation/close, plus200s PBS setup/export reserve.
+One7200s job, two training processes, prefetch_workers2 each; five evaluations
+6580/13160/19740/26320/32900. Gate at the final fixed checkpoint as in the original
+screen. Fresh same seed/initialization/episode stream; no checkpoint continuation.
+Budget spent6114s; full rerun leaves1086s below4nodeh for final audits.
