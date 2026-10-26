@@ -1,4 +1,4 @@
-# P1-L pre-registration — single module in Qwen3-0.6B-Base (draft v0, 2026-10-26)
+# P1-L pre-registration — single module in Qwen3-0.6B-Base (draft v1, 2026-10-26)
 
 Status: **draft v1** (2026-10-26, after the P1-S decision). P1-S passed G1/G2 for M1 with `oracle_orth` and
 `joint`, so P1-L may run; it is finalised after the writer diagnosis (WP-L2; Pilot-1 found no admissible E*_L)
