@@ -28,17 +28,18 @@ Validation: parent reports the initial suite passed **56 tests** on compute
 host `mg0846`, PBS job `3712871.opbs`. A subsequent focused regression rejects
 substitute gold `USA` for original gold `United States`/alias `U.S.A.` and
 filters donor aliases `USA`/`the USA`: the official metric treats those strings
-as the original alias despite their distinct literal spelling. This new case
-is pending a compute rerun with the parent's production fix.
+as the original alias despite their distinct literal spelling. This case passed
+in the final 57-test suite with the parent's production fix.
 
 No runtime checks were executed by this author. The shell is login/control
 (`miyabi-g2`, aarch64; no PBS allocation), checked with the `miyabi-pbs-cmd`
-context helper. Parent worker runs the suite through
-`scripts/submit.py --name t-b3 --walltime 00:15:00 --worktree . --wait -- -m pytest -q tests/test_musique.py`
-and record the compute job/result in `docs/reports/WP-B3.md`. No runtime imports,
+context helper. Parent worker ran the suite through `scripts/submit.py` and
+recorded the exact command, commit and compute job/result in `docs/reports/WP-B3.md`. No runtime imports,
 dependency changes, downloads, or commits were performed by this test author.
 
 Final MuSiQue-only validation: **57 passed in 10.87s**, job `3712970.opbs`,
 host `mg0851`, exit 0, at implementation commit `8bc909a`. The normalized-alias
 regression is included. Full-corpus preparation also passed at the same commit
-(job `3712971.opbs`, `mg0919`, exit 0). Retention validation remains pending.
+(job `3712971.opbs`, `mg0919`, exit 0). The final retention suite also passed:
+26 cases in job `3713131.opbs` on `mg0841`, exit 0. Real retention preparation
+passed in job `3713132.opbs` on `mg0856`, exit 0.

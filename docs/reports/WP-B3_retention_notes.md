@@ -56,15 +56,15 @@ validation items, with no test items. The contracted API required no extension.
 
 Login/control plane: `miyabi-g2`, no allocation. Static checks passed:
 `python -m py_compile src/looplora/data/retention.py tests/test_retention.py`
-and `git diff --check`. No runtime imports, pytest, or real-data preparation
-ran here. Parent must run `tests/test_retention.py` through `scripts/submit.py`
-after approved PyArrow installation. Tests cover deterministic order-independent subsets, all six
+and `git diff --check`. The subworker performed no runtime imports, pytest, or
+real-data preparation. Parent-run compute evidence follows. Tests cover
+deterministic order-independent subsets, all six
 formats, label mapping, exact continuations, semantic IDs, manifest/raw hashes,
 split policies, MMLU completeness, missing shards, duplicates, and corruption.
 
 Parent validation: PyArrow 21.0.0 was installed by the orchestrator and brought
-into this branch through master; no worker-side `uv sync` ran. The 25 retention
-tests passed in 2.11s on Miyabi-G `mg0981`, job `3713065.opbs`, exit 0, using
+into this branch through master; no worker-side `uv sync` ran. The initial 25
+retention tests passed in 2.11s on Miyabi-G `mg0981`, job `3713065.opbs`, exit 0, using
 `scripts/submit.py --queue regular-g --walltime 00:03:00 --commit c12f7db --wait -- -m pytest -q -o addopts= tests/test_retention.py`.
 Real-cache preparation exposed repeated HellaSwag `ind` values: compute probe
 `3713105.opbs` on `mg0841` found 10,042 rows but 9,609 unique indices, including
@@ -72,3 +72,10 @@ distinct contexts for index 180. The content-qualified identity fixes this witho
 including labels in IDs or suppressing conflicting annotations. A focused
 regression and repeated-index integration fixtures cover this boundary.
 The final real-cache result is recorded in `WP-B3.md` and both cache manifests.
+
+Final validation after the identity fix: **26 passed in 2.02s**, job
+`3713131.opbs`, host `mg0841`, source commit `bf95246`, exit 0. Real preparation
+then succeeded in `3713132.opbs` on `mg0856`, exit 0, with
+`--section retention --allow-smaller-retention arc_challenge`. All six suites
+use validation; ARC-Challenge has 299 examples and the others 500 each.
+MMLU's 1,531-row aggregate covers all 57 subjects. No remaining retention work.
