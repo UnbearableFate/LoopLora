@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import argparse
 import csv
+from datetime import datetime, timezone
 import json
 import math
 from pathlib import Path
@@ -74,7 +75,7 @@ def _run_paths(root: Path, expected_count: int, procs: int) -> list[Path]:
         children = sorted(path for path in root.iterdir() if path.is_dir())
         shards = [path for path in children if (path / "suite.json").is_file()]
         if shards:
-            maximum_shards = 6 if expected_count == 6 else 2 if expected_count == 3 else expected_count
+            maximum_shards = expected_count
             _require(len(shards) == len(children) and len(shards) <= maximum_shards,
                      f"expected only one level of at most {maximum_shards} suite shards under {root}")
             paths = [path for shard in shards for path in suite_paths(shard, allow_redirect=False)]
@@ -197,6 +198,7 @@ def _audit_run(path: Path, *, batch: int, steps: int, procs: int) -> tuple[dict[
                cudnn_deterministic=runtime["cudnn_deterministic"],
                cublas_workspace_config=runtime["cublas_workspace_config"],
                peak_memory_bytes=record["peak_memory_bytes"], git_commit=record["git_commit"],
+               config_hash=config_hash, created_at=record["created_at"],
                **trend)
     return row, loss_rows
 
@@ -229,8 +231,9 @@ def _plot(path: Path, summaries: list[dict[str, Any]], losses: list[dict[str, An
     plt.close(figure)
 
 
-def analyze(policy_root: Path, capacity_root: Path, throughput_path: Path, reports: Path,
-            jobs_path: Path | None = None) -> dict[str, Any]:
+def _audit_policy(policy_root: Path, throughput_path: Path) -> tuple[
+    list[dict[str, Any]], list[dict[str, Any]], dict[str, Any], int,
+]:
     throughput = _json(throughput_path)
     selected_throughput = throughput["selected"]
     _require(selected_throughput["E"] == 24 and selected_throughput["write_policy"] == "all_tokens",
@@ -246,11 +249,70 @@ def analyze(policy_root: Path, capacity_root: Path, throughput_path: Path, repor
         row, points = _audit_run(path, batch=batch, steps=steps, procs=procs)
         policy_rows.append(row)
         losses.extend(points)
+    return policy_rows, losses, selected_throughput, steps
+
+
+def _policy_context(rows: list[dict[str, Any]], throughput: dict[str, Any], steps: int) -> str:
+    fields = ("run_path", "git_commit", "config_hash", "correct", "candidate_correct", "n")
+    provenance = [{key: row[key] for key in fields} for row in sorted(rows, key=lambda row: row["run_path"])]
+    return stable_hash(dict(throughput=throughput, steps=steps, runs=provenance))
+
+
+def _timestamp(value: str) -> datetime:
+    result = datetime.fromisoformat(value)
+    _require(result.tzinfo is not None, "selection and run timestamps must include a timezone")
+    return result
+
+
+def _policy_lock(path: Path, selected: dict[str, Any], context_hash: str) -> dict[str, Any] | None:
+    if not path.is_file():
+        return None
+    locked = _json(path)
+    _require(locked.get("context_hash") == context_hash,
+             f"policy lock budget or run provenance differs from the audited context: {path}")
+    _require(all(locked["selected"][field] == selected[field]
+                 for field in ("write_policy", "lr", "correct", "n")),
+             f"policy selection differs from the persisted pre-capacity choice: {path}")
+    return locked
+
+
+def analyze_policy(policy_root: Path, throughput_path: Path, reports: Path) -> dict[str, Any]:
+    """Audit all six policy cells and persist the choice without reading capacity."""
+    rows, _, selected_throughput, steps = _audit_policy(policy_root, throughput_path)
+    selected = select_policy(rows)
+    context_hash = _policy_context(rows, selected_throughput, steps)
+    lock_path = reports / "p1l_pilot1_policy_selection.json"
+    locked = _policy_lock(lock_path, selected, context_hash)
+    if locked is not None:
+        return locked
+    summary = dict(created_at=datetime.now(timezone.utc).isoformat(), context_hash=context_hash, policy_runs=6,
+                   policy_root=str(policy_root.resolve()), throughput_path=str(throughput_path.resolve()),
+                   batch_size=selected_throughput["batch_size"], procs=selected_throughput["procs"],
+                   steps=steps, training_episodes_per_run=steps * selected_throughput["batch_size"],
+                   rows=sorted(rows, key=lambda row: (row["write_policy"], row["lr"])), selected=selected,
+                   all_runs_complete=True, all_sample_tables_reproduced=True,
+                   selection_rule="best full-vocabulary EM; within 5/1000 of best prefer fact_final, then smaller lr",
+                   scope="all six E16 policy runs; capacity results have not been opened by this analysis")
+    reports.mkdir(parents=True, exist_ok=True)
+    lock_path.write_text(json.dumps(summary, indent=2, allow_nan=False) + "\n")
+    return summary
+
+
+def analyze(policy_root: Path, capacity_root: Path, throughput_path: Path, reports: Path,
+            jobs_path: Path | None = None) -> dict[str, Any]:
+    policy_rows, losses, selected_throughput, steps = _audit_policy(policy_root, throughput_path)
+    batch, procs = selected_throughput["batch_size"], selected_throughput["procs"]
     selected_policy = select_policy(policy_rows)
+    lock_path = reports / "p1l_pilot1_policy_selection.json"
+    locked = _policy_lock(lock_path, selected_policy, _policy_context(policy_rows, selected_throughput, steps))
+    _require(locked is not None, "capacity analysis requires a persisted pre-capacity policy selection")
+    locked_at = _timestamp(locked["created_at"])
     capacity_rows = [selected_policy]
     extra_rows = []
     for path in _run_paths(capacity_root, 3, procs):
         row, points = _audit_run(path, batch=batch, steps=steps, procs=procs)
+        _require(_timestamp(row["created_at"]) >= locked_at,
+                 f"capacity run predates the persisted policy selection: {path}")
         _require(row["write_policy"] == selected_policy["write_policy"] and row["lr"] == selected_policy["lr"],
                  f"capacity configuration differs from selected policy/lr: {path}")
         extra_rows.append(row)
@@ -276,6 +338,8 @@ def analyze(policy_root: Path, capacity_root: Path, throughput_path: Path, repor
                    validation_episodes_per_run=1000, steps_per_run=steps, batch_size=batch, procs=procs,
                    throughput_path=str(throughput_path.resolve()), throughput_selected=selected_throughput,
                    policy_selection=selected_policy, capacity=capacity,
+                   policy_selection_lock=dict(path=str(lock_path.resolve()), verified=True,
+                                              created_at=locked["created_at"]),
                    capacity_runs=sorted(capacity_rows, key=lambda row: row["E"]), runs=rows,
                    all_capacities_below_095=capacities_below_095,
                    writer_statement=("Validation EM is below 0.95 at every tested E for the selected policy/lr."
@@ -308,11 +372,19 @@ def analyze(policy_root: Path, capacity_root: Path, throughput_path: Path, repor
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--policy-root", type=Path, required=True)
-    parser.add_argument("--capacity-root", type=Path, required=True)
+    parser.add_argument("--capacity-root", type=Path)
     parser.add_argument("--throughput", type=Path, required=True)
     parser.add_argument("--reports", type=Path, required=True)
     parser.add_argument("--jobs", type=Path, help="Optional JSON mapping PBS job IDs to nodes and elapsed_seconds")
+    parser.add_argument("--policy-only", action="store_true", help="Lock the six-run policy selection without opening capacity results")
     args = parser.parse_args()
+    if args.policy_only:
+        summary = analyze_policy(args.policy_root, args.throughput, args.reports)
+        print(json.dumps(dict(selected={key: summary["selected"][key] for key in ("write_policy", "lr", "correct", "n")},
+                              batch_size=summary["batch_size"], procs=summary["procs"], steps=summary["steps"])))
+        return 0
+    if args.capacity_root is None:
+        parser.error("--capacity-root is required unless --policy-only is supplied")
     summary = analyze(args.policy_root, args.capacity_root, args.throughput, args.reports, args.jobs)
     print(json.dumps({key: summary[key] for key in ("policy_runs", "additional_capacity_runs", "capacity", "writer_statement")}))
     return 0
