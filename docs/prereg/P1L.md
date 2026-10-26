@@ -87,3 +87,12 @@ s/step, oracle readers ≈ 0.13–0.20 s/step); no score. The fixed-S rule ("lar
   job, and (b) projected Pilot-2 + main node·h ≤ 13, keeping 3 node·h for smoke, startup, confirmation, J-lens
   directions and failures. If that S is below 6000, the orchestrator decides before Pilot-2.
 - Pilot-2 still uses S/3; S stays identical for every reader.
+
+## Amendment B2 — total budget relaxed (2026-10-27 04:18 JST, before any Pilot-2 run or score)
+The user clarified (2026-10-27) that the resource rule applies to a single job (≤ 8 nodes × 2 h with
+`--scale-up`) and that the total budget may be relaxed. Amendment B1's 16 / 13 node·h totals are therefore
+dropped and the v2 S rule is restored: S = the largest common S, rounded down to a multiple of 500, whose slowest
+run under the packing actually used × 1.5 fits one 2 h job (preflight 3715826 and sizing
+`reports/p1l/preflight-B1-sizing.json` on wp/p1l: job cap 17,413 steps → **S = 17,000**, Pilot-2 at ⌊S/3⌋).
+Projected Pilot-2 + main ≈ 24 node·h plus smoke, confirmation and readout; node·h recorded per job. The learned
+condition, if added, uses the same rule. Information seen: timing only; no score.
