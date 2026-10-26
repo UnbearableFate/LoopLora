@@ -1,10 +1,10 @@
 # Iterative Queries in a Low-Rank Memory Adapter: Composition, Writer Dependence, and Budget Limits
 
-*Symbolic manuscript draft. Code cutoff: `5d2efd3`; numerical and claim authority:
-[symbolic evidence ledger](evidence_symbolic.md), introduced in `e8f90d2` and extended
-with IS and the subsequent stopping/stability studies.
-Main-text experimental claims carry ledger IDs in HTML comments. P4-S-L and JS are
-included; end-to-end language-model results and per-step readouts remain incomplete.*
+*Manuscript draft. Code cutoff: `f1dd6e2`; numerical and claim authority:
+[symbolic evidence ledger](evidence_symbolic.md) and
+[LLM evidence ledger](evidence_llm.md). Main-text experimental claims carry ledger
+IDs in HTML comments. Symbolic results and the completed LLM writer screens are
+included; P1-L multihop confirmation and per-step readout results remain pending.*
 
 ## Abstract
 
@@ -16,7 +16,7 @@ additional reads improve reachable-hop accuracy and exceed fixed-query and memor
 controls. <!-- S1 --><!-- S2 --> Learned writing changes the result: the original joint
 writer gives a smaller, seed-dependent benefit, while factorized writing gives stronger
 walk-specific depth effects but fails to preserve single-hop accuracy. <!-- S3 --><!-- S9 -->
-The primary comparison is now against a single read at the same rank, with added
+The primary comparison is against a single read at the same rank, with added
 latency reported as a cost; no efficiency advantage over a larger-rank single read
 is claimed. <!-- FR1 --> At rank32, the reachable-hop L4−L1 benefit
 shrinks from E12 to E36 under the registered load/layout changes, while the multi-read
@@ -26,7 +26,10 @@ families. <!-- HL1 --> Training-time terminal-Jacobian regularization reduces
 overshoot without meeting the registered removal criterion, and decreases longer-walk accuracy.
 <!-- JS1 --><!-- JS3 --> Conditional theory separates composition inside a fixed
 output subspace, limitations of one-read observations, writer shortcuts, and fixed-point
-certificates. The resulting contribution is a bounded account of when repeated memory
+certificates. In a single frozen language-model module, the completed validation
+screens select no learned writer, despite informative input probes and a usable
+supplied-answer-code output path; oracle-reader confirmation remains pending.
+<!-- LL2 --><!-- LL3 --><!-- LL9 --><!-- LP4 --> The resulting contribution is a bounded account of when repeated memory
 access helps, together with negative results that prevent capability gains from being
 mistaken for general efficiency or end-to-end reasoning gains. <!-- B7 --><!-- B8 --><!-- B9 -->
 
@@ -63,8 +66,9 @@ We distinguish three questions. First, does changing evaluation depth improve on
 trained reader while preserving its input and memory? Second, do separately trained
 evolving-query systems outperform single-read, fixed-query, or memory-free controls
 at the same rank? Third, what parameter and measured-latency costs accompany those
-comparisons? The user's comparison decision makes same-rank capability primary and
-accepts extra inference latency as a reported cost. <!-- FR1 --> Earlier P2-S and
+comparisons? We hold rank fixed to separate additional reader computation from
+increased representation width, and report extra inference latency as a cost.
+<!-- FR1 --> Earlier P2-S and
 P2-S-F1 comparisons with larger single reads remain historical evidence, including
 the original practical-gate failure; they supply no efficiency claim for this paper.
 <!-- B1 --><!-- B5 --><!-- B7 --><!-- FR1 -->
@@ -73,9 +77,10 @@ The paper presents both the useful mechanism and its restrictions. The rank foll
 changes training duration as well as rank, the sharing follow-up compares separately
 trained systems. <!-- S8 --><!-- B3 --> Early stopping pilots are screening-only;
 P4-S-L and JS subsequently use separate confirmation sets and report adjusted or
-registered intervals. <!-- H1 --><!-- H4 --><!-- HL1 --><!-- JS1 --> End-to-end language-model performance
-is a separate unresolved question, not a consequence of selecting a symbolic reader.
-<!-- B9 --> Keeping these distinctions explicit makes the negative outcomes informative:
+registered intervals. <!-- H1 --><!-- H4 --><!-- HL1 --><!-- JS1 --> The completed
+LLM writer screens and pending multihop reader confirmation answer separate
+questions; symbolic reader selection supplies no missing LLM effect.
+<!-- B9 --><!-- LL9 --><!-- LP4 --> Keeping these distinctions explicit makes the negative outcomes informative:
 they specify which interpretation of additional reader computation survives each control.
 
 ## 2. Related work and boundaries
@@ -459,15 +464,15 @@ continuation decision are different records.
 
 ## 6. Same-rank comparisons, reported costs, and historical budget controls
 
-The current baseline is the single read at the same rank, following the user's
-2026-10-27 decision and [P1-L Amendment B4](../prereg/P1L.md). <!-- FR1 --> With an
+The primary baseline is the single read at the same rank, so the shared-reader
+comparison changes computation depth without increasing parameter count. <!-- FR1 --> With an
 otherwise identical architecture, shared M1-L4 and B4 have exactly the same parameter
 count. <!-- FR1 --> At the registered P1-L projection, B8 adds 9,216 registered adapter
 parameters at rank32: 103,426 becomes 112,642, approximately +8.9%, from step-specific
 R/U/Q. <!-- FR1 --> That percentage is specific to the LLM projection and the registered
 adapter count; it is not the symbolic model's overhead or necessarily the proportion
-of trainable oracle parameters. <!-- FR1 --> Extra reader latency is accepted and
-reported, not a superiority criterion against a larger-rank single read. <!-- FR1 -->
+of trainable oracle parameters. <!-- FR1 --> Extra reader latency is reported as
+a cost of the additional computation. <!-- FR1 -->
 
 ### Historical rank, state, and sharing controls
 
@@ -517,7 +522,7 @@ different parameter and state budgets, so the negative practical result does not
 erase the fixed-budget composition contrast; it rejects a broader efficiency claim.
 <!-- S3 --><!-- B7 --> P2-S-F1 supplies no factorized accuracy–latency benchmark.
 <!-- B8 --> This historical measurement gap is not converted into an efficiency
-claim, and the subsequent same-rank decision does not relabel the earlier gate.
+claim, and the same-rank design does not relabel the earlier gate.
 <!-- B7 --><!-- FR1 -->
 
 The parameter and storage differences make the intended tradeoff concrete: the
@@ -768,44 +773,195 @@ finite state does not certify global contraction, convergence, terminal
 annihilation, or a correct decoded answer. Lower radii coexist here with the
 longer-walk and stopped-accuracy losses. <!-- JS3 --><!-- JS4 --><!-- JS6 -->
 
-## 8. End-to-end language models — TODO
+## 8. A single language-model module: writer screens and pending reader confirmation
 
-The symbolic follow-up selects fixed-L4 B8 with a shared fixed-L4 comparator for
-the next stage; this protocol choice supplies no end-to-end language-model effect.
-<!-- B9 --> At the code cutoff, merged design/development records include the
-[updated P1-L preregistration](../prereg/P1L.md),
-[writer-fix screen report](../reports/P1L-writer-fix.md),
-[read-fix state](../reports/WP-L4-state.md), and
-[oracle-writer implementation report](../reports/WP-C7.md). <!-- B9 -->
-They are the boundary of this draft's available implementation history, rather
-than a completed comparative LLM result. <!-- B9 -->
+### 8.1 Access protocol and scoring
 
-**TODO:** incorporate only a subsequent audited, merged evidence ledger for the
-end-to-end stage. Report the memory-only versus context-retained protocol,
-single-hop writing/retrieval feasibility, fixed-L4 trained-system controls,
-answer scoring, and ordinary-capability retention before interpreting any gain.
-No provisional screen metric is inserted here. Proposition 11 motivates checking
-raw read scale, interference, and the actual value-to-answer path; it does not
-predict which writer correction will succeed. The current symbolic reader
-selection cannot substitute for this evidence. <!-- B9 -->
+The LLM experiments use frozen `Qwen/Qwen3-0.6B-Base`, revision
+`da87bfb608c14b7cf20ba1ce41287e8de496c0cd`, with one adapter at the zero-based
+layer-14 attention `o_proj` (2048→1024). <!-- LP1 --> The backbone uses bf16 and
+SDPA; the adapter and memory state use fp32. <!-- LP1 --> The primary protocol
+is memory-only: support facts populate the adapter memory, then their backbone
+KV is discarded before questions are answered. <!-- LP1 --> Templated relations
+use single-token names, and the primary metric is unrestricted full-vocabulary
+greedy exact match at the one-token answer position. <!-- LP1 --> Secondary
+candidate-restricted accuracy and auxiliary name-probe accuracy measure different
+objects; neither substitutes for full-vocabulary EM. <!-- LP1 --><!-- LL2 -->
 
-The updated P1-L protocol plans to decode intermediate reader states through the
-trained output path and frozen upper layers, and to compare name-logit-gradient
-directions with a random-direction baseline. These are proposed diagnostics, not
-readout results in this manuscript. A name gradient at the injection residual,
-g_j, induces local reader sensitivity alpha B^T g_j. Averaging these gradients is
-a J-lens-inspired probe; it should be distinguished from the published averaged
-residual-transport lens and from the transition Jacobian that JS regularizes.
+The completed writer studies use T1 single-hop facts, seed17, and validation
+seed4242 with 1,000 episodes and one scored question per episode. <!-- LL1 --><!-- LL4 --><!-- LL6 --><!-- LL9 -->
+Diagnosis and repair use E16, four relations, and head sharing 0.3; ordinary
+writer fits use M1 at L1, with ranks identified below. <!-- LL4 --><!-- LL6 --><!-- LL9 -->
+Their training batches contain four questions per episode, but that does not
+make the validation sample 4,000 independent answers. <!-- LL4 --><!-- LL6 -->
+These are sequential validation screens with reused questions and no confirmation
+intervals or new-training-seed replication. <!-- LL1 --><!-- LL4 --><!-- LL6 --><!-- LL9 -->
+The backbone is frozen during T1 fitting, while eligible adapter parameters,
+including recurrence matrices, can train; the term writer stage does not imply
+a frozen reader recurrence. <!-- LL4 --><!-- LL5 -->
+
+### 8.2 Information and output controls, then writer repair
+
+Pilot-1 found no admissible writer capacity under its registered 1,500-step
+budget: the best full-vocabulary validation EM was 0.3%, and the selected
+fact-final policy at learning rate 0.0003 failed the capacity criteria at
+E8/12/16/24. <!-- LL1 --> This is a budgeted negative result, rather than an
+estimate of the architecture's maximum capacity. <!-- LL1 --> Separate rank32
+frozen-feature probes recover tail identity at the tail-token input with 97.619%
+accuracy, and question-start identity/relation at the final question position
+with 99.4%/100.0%. <!-- LL2 --> These are independently fitted classifiers over
+seen name identities, not proof that one shared A jointly preserves all required
+information. <!-- LL2 -->
+
+A supplied-answer-code control trains only a 1024×32 code table and B and reaches
+98.7% full-vocabulary EM after 1,500 steps at learning rate 0.003. <!-- LL3 --> It
+bypasses the reader and its rho scale, establishing that this output path can
+express the answer when its identity is supplied; it does not establish learned
+retrieval or accessible writer codes. <!-- LL3 --> Extending unassisted writer
+training to 6,400 steps and moving A's input from `o_proj` to the pre-layer-14
+residual did not rescue EM. <!-- LL4 --> At the final checkpoints, source-fact
+key/query cosine top1 is 6.0–7.5%, compared with the 1/16=6.25% ranking baseline,
+with negative mean true-key margins. <!-- LL4 --> This supports a failed-matching
+diagnosis for those fits, without identifying a unique cause or showing that
+additional training can never help. <!-- LL4 -->
+
+The next screen adds input standardization (W1), normalized address supervision
+(W2), clean-value auxiliary CE (W3), a pre-tail-key/tail-token-value architecture
+(W4), and their W1+W2+W3 combination W5. <!-- LL5 --> W5 does not include W4;
+W4 also has more deployed parameters than the other arms. <!-- LL5 --> Auxiliary
+address and value labels exceed answer-only supervision, and the value head is
+discarded for inference. <!-- LL5 --> At 4,800 steps, W2 has 78.9% key top1 but
+only 0.5% EM; W5 reaches 7.8% EM. <!-- LL5 --> Thus improved normalized matching
+need not imply useful deployed retrieval. <!-- LL5 -->
+
+Fresh 32,900-step reruns give W5 14.4% EM, despite 82.4% key top1 and 39.3%
+candidate accuracy. <!-- LL6 --> The diagnostic OA arm reaches 70.3% EM and 95.7%
+candidate accuracy. <!-- LL6 --> OA substitutes the true learned fact value at
+every valid question token, bypassing the entire memory read, including
+attenuation and interference; its advantage does not isolate addressing. <!-- LL6 -->
+It is also different from the supplied answer-state control and from P1-L's
+fact-written random oracle. <!-- LL3 --><!-- LL6 --><!-- LP2 --> Neither W5 nor any
+other eligible learned writer meets the selection threshold at this stage.
+<!-- LL6 -->
+
+### 8.3 Actual-read distortion and the final negative screen
+
+WP-L4 audits the preceding W5 checkpoint without further training. Its mean query,
+true-value, and deployed-read norms are 19.012, 30.750, and 159.350; mean normalized
+squared read error is 26.635. <!-- LL7 --> The training-only value head decodes
+clean values at 85.4% but actual reads at 10.5%. <!-- LL7 --> These measurements
+make Proposition 11's distinction concrete: normalized key rankings omit raw
+query scale, later-write erasure, and value-mixture geometry. They do not identify
+which component uniquely causes the final answer failures. <!-- LL7 --> Zeroing
+or shuffling the deployed memory reduces W5 EM from 14.4% to 0.1%/0.2% while
+question inputs stay fixed; this establishes sensitivity to the tested memory
+interventions, not successful path following. <!-- LL10 -->
+
+The final screen tests R, which supervises the raw read with normalized squared
+error and a stopped target/denominator; Rρ raises rho to 0.5, and RK adds a
+distinct-address key-cosine penalty. <!-- LL8 --> OAρ is a diagnostic gain variant
+of OA. <!-- LL8 --> The final checkpoints are:
+
+| Rank | Arm | Training steps | Full-vocabulary validation EM, % |
+| --- | --- | --- | --- |
+| 32 | R | 23,590 <!-- LL8 --> | 12.0 <!-- LL8 --> |
+| 32 | Rρ | 24,220 <!-- LL8 --> | 12.2 <!-- LL8 --> |
+| 32 | RK | 21,980 <!-- LL8 --> | 12.0 <!-- LL8 --> |
+| 32 | OAρ, diagnostic | 27,040 <!-- LL8 --> | 74.7 <!-- LL8 --> |
+| 128 | W5 | 24,635 <!-- LL9 --> | 29.9 <!-- LL9 --> |
+| 128 | R | 24,645 <!-- LL9 --> | 33.5 <!-- LL9 --> |
+| 128 | OA, diagnostic | 31,175 <!-- LL9 --> | 84.0 <!-- LL9 --> |
+
+For the three read-supervised r32 arms, normalized read error remains
+0.663–0.669 alongside 12.0–12.2% EM. <!-- LL8 -->
+All are single-seed validation points without CIs; per-arm budgets were fixed by
+timing, so final comparisons are not matched-step causal effects of rank or gain.
+<!-- LL8 --><!-- LL9 --> The predeclared matched-step OAρ diagnostic at 6,580 steps
+has higher observed EM than the earlier OA: 43.2% versus 33.7%. <!-- LL8 --> This does not
+make either diagnostic eligible as a learned writer. <!-- LL8 --> R at rank128
+has clean/read head accuracy 93.3%/19.7%, consistent with remaining read distortion,
+while a decoder trained on clean values does not measure all information present
+in a read. <!-- LL9 -->
+
+The best eligible final arm is R/r128 at 33.5%, below both the 80% writer gate and
+the 50% E8-retraining trigger; no E8 retraining occurred. <!-- LL9 --> The completed
+selection therefore yields no learned P1-L condition and no P3; the separately
+registered oracle-reader study remains in the design. <!-- LL9 --><!-- LP3 --><!-- LP4 -->
+The negative result concerns these single-module tasks, supervision choices,
+learning rates, and unequal fixed budgets. It establishes neither impossibility
+of learned writing in LLMs nor a universal output-path bottleneck. <!-- LL3 --><!-- LL9 -->
+
+### 8.4 Registered P1-L oracle-reader comparison
+
+The symbolic reader selection motivates primary B8 trained at fixed L4, with
+shared M1-L4 as a secondary comparator. <!-- B9 --><!-- LP3 --> P1-L registers two
+`oracle_random` conditions, r=r_mem=32 and r=r_mem=128, with seeds17/29/43. <!-- LP3 -->
+The writer constructs memory directly from the fact list using frozen random
+unit key codes for (entity,relation) and fixed entity value codes, oracle seed17,
+and lambda=beta=1. <!-- LP2 --> Support text is not rendered or forwarded through
+the LM in this oracle protocol; question encoding and the reader/output path
+still train. <!-- LP2 --> Random codes do not imply orthogonality, lossless memory,
+or the exact Proposition 3 construction. <!-- LP2 -->
+
+The task is T2 E12, chains(8,4), four relations, head sharing 0.3, trained on
+hops1–3 and evaluated on hops1–8. <!-- LP1 --><!-- LP3 --> Per rank, B8@4 is compared
+with B4@1, fixed-query B5-L4@4, and memory-free B3-L4@4; M1-L4 supplies the shared
+variant. <!-- LP3 --> B8's primary comparison holds rank fixed but has additional
+step matrices; only the matched shared M1-L4/B4 architecture has equal parameter
+counts. <!-- FR1 --><!-- LP3 --> Adapter parameters and inference time per question
+are descriptive costs. <!-- LP3 --> B0–B2 provide descriptive baselines in both
+access protocols; B1/B2 train with retained context and are not repeated at r128.
+<!-- LP3 -->
+
+The registered target is 17,000 training steps at r32; r128 uses that target if
+the timing rule permits, otherwise a flagged smaller budget. <!-- LP3 --> Pilot-2
+selects learning rate 0.001 or 0.003 at ⌊S/3⌋ steps, using
+training seed17 and validation generator seed4242, before locking
+main training; the available ledger reports the design,
+not an unseen final run lock. <!-- LP3 --> Confirmation uses split `test`, episode
+indices [100000,102000), after all required training; this range is not an
+evaluation RNG seed. <!-- LP3 --> With two gated rank conditions, k=2, each gate
+uses 97.5% pooled paired episode-bootstrap intervals from 2,000 draws and reports
+seed-specific effects. <!-- LP3 -->
+
+On hops2–3, G1-L requires B8@4−B4@1≥3 pp as a point estimate, CI lower>0, and
+positive effects in every seed. <!-- LP3 --> Its hop1 point contrast must be
+at least −1 pp, and the same checkpoints must have a positive interval on a typed
+replication with three same-head distractors. <!-- LP3 --> G2-L requires positive
+intervals against both fixed-query B5-L4 and memory-free B3-L4. <!-- LP3 -->
+M1-L4 comparisons and its same-checkpoint L1–8 scan are secondary; B8 has no
+shared-weight depth scan. <!-- LP3 --> No primary gate compares a lower-rank
+multi-read system with a larger-rank single read. <!-- LP3 -->
+
+### 8.5 Confirmation and intermediate-state results — pending
+
+**P1-L r32 results — TODO:** confirmation effects and intervals for G1-L/G2-L,
+per-seed and hop1 effects, typed replication, baseline tables, and descriptive
+parameters/inference costs. No gate outcome is asserted. <!-- LP4 -->
+
+**P1-L r128 results — TODO:** the same registered endpoints, with the actual
+locked training budget identified. No effect or CI is imputed from the r128
+writer screens or the symbolic studies. <!-- LP4 -->
+
+**Secondary/readout results — TODO:** same-checkpoint scans, swaps, and per-step
+entity ranks/top1 for M1-L4 and B8. <!-- LP4 --><!-- LP5 --> The protocol plans to
+decode z_s, s=1…4, through the trained output path/frozen upper layers and to
+compare projections onto name-logit-gradient directions with a random-direction
+baseline, by hop; directions average 512 validation questions for 1024 names.
+<!-- LP5 --> These are descriptive diagnostics, not gate criteria or observed
+ordered entity traces. <!-- LP5 --> A gradient g_j at the actual injection
+residual induces local reader sensitivity alpha B^T g_j; a gradient at another
+site requires the intervening transport Jacobian. This J-lens-inspired proxy differs from published
+averaged residual-transport lenses and from JS's recurrent transition Jacobian.
 Hypothetical per-step upper-layer forwards incur diagnostic cost separate from
-the deployed reader loop. Ordered entity readability would not alone establish
-causal path following, so the existing counterfactual controls remain necessary.
-The [primary-source audit](../reports/lit_check.md#two-jacobians-and-the-projects-proposed-readouts)
-states the mapping and its limitations. No name-direction alignment intervention
-or local terminal-stability remedy is reported as successful here.
+the deployed reader loop. <!-- LP5 --> Ordered readability would not alone
+establish causal path following. The [primary-source audit](../reports/lit_check.md#two-jacobians-and-the-projects-proposed-readouts)
+states those limits; the separate output-alignment intervention is not pursued
+after the writer-screen decision. <!-- LP5 -->
 
-**TODO — plan §9.3 item 6:** corresponding single-module and end-to-end results,
-using separately identified protocols and uncertainty once the end-to-end evidence
-is available. No result is imputed from the symbolic panels.
+**TODO — plan §9.3 item6:** the symbolic/LLM correspondence figure awaits P1-L
+confirmation. The completed writer-screen negatives above supply no multihop
+oracle-reader outcome or general language-reasoning claim. <!-- LL9 --><!-- LP4 -->
 
 ## 9. Limitations, reproducibility, and conclusion
 
@@ -838,7 +994,7 @@ Reproduction separates data access from rendering. The figures are produced by
 [paper_figures.py](../../scripts/paper_figures.py) from committed CSV/JSON exports;
 the [figure manifest](figures/provenance.json) identifies revisions, selectors,
 aggregation, and claim IDs. No checkpoints are reevaluated and no bootstrap or
-timing measurement is rerun for this manuscript. The evidence ledger retains exact
+timing measurement is rerun for this manuscript. The evidence ledgers retain exact
 stored values and artifact commits; Appendix B records sets, seeds, and comparisons.
 Preparation cost and training cost per model remain outside the prepared-query
 timings. <!-- B7 --><!-- B8 --> The paper's primary same-rank comparison reports
@@ -855,8 +1011,11 @@ failure remain in the record; neither is rewritten as a system-efficiency succes
 families, and training-time regularization reduces overshoot at a longer-walk cost.
 <!-- HL1 --><!-- JS1 --><!-- JS3 -->
 The appropriate conclusion is therefore a bounded mechanism result and a set of
-reproducible failures, with no efficiency claim over increasing rank and with
-end-to-end language-model performance still unresolved. <!-- FR1 --><!-- B9 -->
+reproducible failures, with no efficiency claim over increasing rank. <!-- FR1 -->
+The single-module LLM screens select no learned writer; input probes and oracle
+controls do not overcome the deployed-read/answer gap. <!-- LL2 --><!-- LL3 --><!-- LL7 --><!-- LL9 -->
+P1-L's multihop oracle-reader confirmation and intermediate-state results remain
+unreported. <!-- LP4 --><!-- LP5 -->
 
 The additional load study narrows this result further: depth benefits decrease
 under the registered load/layout changes, while multi-read capability remains
@@ -942,8 +1101,9 @@ nor isolated value decoding guarantees the actual downstream answer
 ## Appendix B. Experimental protocol and evidence map
 
 All empirical numbers in this draft are rounded from the authoritative
-[evidence ledger](evidence_symbolic.md); figures use its linked committed exports.
-The ledger's status and conditions take priority over shortened manuscript wording.
+[symbolic](evidence_symbolic.md) and [LLM](evidence_llm.md) evidence ledgers;
+figures use the symbolic ledger's committed exports. The ledgers' status and
+conditions take priority over shortened manuscript wording.
 
 | Stage | Evaluation set | Training and comparison conditions | Ledger IDs |
 | --- | --- | --- | --- |
@@ -957,9 +1117,13 @@ The ledger's status and conditions take priority over shortened manuscript wordi
 | Stopping pilots | V4242 validation and S4242 screening, 2,000 episodes per checkpoint/split | Thresholds selected on validation, fixed before screening. Reuse mixed-depth checkpoints; no retraining or confirmation, no stopping CIs. | H1–H6 <!-- H1 --><!-- H2 --><!-- H3 --><!-- H4 --><!-- H5 --><!-- H6 --> |
 | P4-S-L | C999002: new confirmation seed999002, 2,000 episodes | Six primary frozen-reader families, r32; 3,393-parameter supervised heads, thresholds locked on V4242. Descriptive joint families stay outside primary qualification. | HL1–HL5 <!-- HL1 --><!-- HL2 --><!-- HL3 --><!-- HL4 --><!-- HL5 --> |
 | JS | C999003: new confirmation seed999003, 2,000 episodes | r32 M1; RS/RS+J train 15,000 steps with one uniform depth4–8 draw per batch; unchanged fixed-L4/mixed-depth references freshly evaluated. Stopped policies use locked V4242 thresholds and cap16. | JS1–JS6 <!-- JS1 --><!-- JS2 --><!-- JS3 --><!-- JS4 --><!-- JS5 --><!-- JS6 --> |
-| Current comparison policy | User decision 2026-10-27, P1-L Amendment B4 | Multi-read versus single-read at the same rank; registered adapter parameters and extra latency reported. LLM B8 overhead is dimension-specific architectural accounting, not a measured accuracy result. | FR1 <!-- FR1 --> |
+| Same-rank design | Architectural accounting; no accuracy sample or CI | Multi-read versus single-read at the same rank; registered adapter parameters and extra latency reported. LLM B8 overhead is dimension-specific architectural accounting, not a measured accuracy result. | FR1 <!-- FR1 --> |
+| LLM Pilot-1 and diagnosis | Validation seed4242; training seed17 | T1; initial 1,500-step capacity screen, separate input probes, supplied-answer-code output control, 6,400-step unassisted writer/input-site fits; no confirmation CIs. | LL1–LL4 <!-- LL1 --><!-- LL2 --><!-- LL3 --><!-- LL4 --> |
+| LLM writer fixes | Same validation set; training seed17 | Seven 4,800-step arms; fresh 32,900-step OA/W5 reruns; stronger auxiliary supervision, no multihop confirmation. | LL5/LL6 <!-- LL5 --><!-- LL6 --> |
+| LLM read fixes and audit | Same validation set; training seed17 | Audited historical W5/OA; seven r32/r128 final arms with unequal timing-sized step budgets; final-checkpoint selection, no learned writer/no E8 retry. | LL7–LL10 <!-- LL7 --><!-- LL8 --><!-- LL9 --><!-- LL10 --> |
+| P1-L registered oracle readers | Confirmation pending: test episode indices[100000,102000) | oracle_random at r32/r128; planned seeds17/29/43, primary fixed-L4 B8, same-rank gates, k2 and 97.5% intervals; readouts secondary/descriptive. No reported result or CI. | LP1–LP5 <!-- LP1 --><!-- LP2 --><!-- LP3 --><!-- LP4 --><!-- LP5 --> |
 
-The training seeds are 17/29/43. <!-- S1 --><!-- B3 --> P1-S/P2-S and their follow-ups use 2,000 paired
+The symbolic studies use training seeds 17/29/43. <!-- S1 --><!-- B3 --> P1-S/P2-S and their follow-ups use 2,000 paired
 episode-bootstrap draws with seed2718 and confidence 97.5%, conditional on those
 seeds; episodes are the pairing units, and the same episode is not independent
 merely because several queries or model seeds are scored on it. <!-- S1 --><!-- S3 --><!-- B3 -->
@@ -975,6 +1139,11 @@ with 2,000 paired episode draws conditional on the same three fixed seeds.
 <!-- HL1 --> JS uses 97.5% paired episode intervals; DeltaS jointly resamples all
 four accuracy terms. <!-- JS1 --> Neither study's uncertainty includes retraining,
 head fitting, or threshold reselection on new training seeds. <!-- HL1 --><!-- JS1 -->
+The LLM writer screens have no such intervals: their reused validation episodes,
+single seed, diagnostic supervision, and sequential selections limit all
+cross-arm and cross-budget interpretations. <!-- LL1 --><!-- LL6 --><!-- LL9 -->
+P1-L's 97.5% intervals are registered for future confirmation; they must not be
+attached to these writer-screen values. <!-- LP3 --><!-- LP4 -->
 
 The learned-writer P1-S replication uses typed chains(8,1), E=12, with distractors. <!-- S5 -->
 Both primary oracle rows use a random-code replication at E=18 with chains(8,8,2);
@@ -1038,5 +1207,5 @@ than populated from unmerged or provisional results.
 - Bae et al., [*Mixture-of-Recursions: Learning Dynamic Recursive Depths for Adaptive Token-Level Computation*](https://arxiv.org/html/2507.10524v3).
 - Hao et al., [*Training Large Language Models to Reason in a Continuous Latent Space*](https://arxiv.org/html/2412.06769v4).
 - Project source records: [dated literature audit](../reports/lit_check.md),
-  [symbolic evidence ledger](evidence_symbolic.md), [binding notation](../notation.md),
+  [symbolic evidence ledger](evidence_symbolic.md), [LLM evidence ledger](evidence_llm.md), [binding notation](../notation.md),
   and [full theory](../theory.md). The unresolved RecLoRA comparison remains a TODO.
