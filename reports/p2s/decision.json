@@ -1,0 +1,53 @@
+{
+  "F1_only_descriptive": true,
+  "capability_passed": false,
+  "failing_capability_rows": [
+    {
+      "comparator": "B6",
+      "endpoint": "E1",
+      "r": 128,
+      "r_mem": 128,
+      "writer": "joint"
+    },
+    {
+      "comparator": "B7",
+      "endpoint": "E2",
+      "r": 32,
+      "r_mem": 64,
+      "writer": "joint"
+    },
+    {
+      "comparator": "B7",
+      "endpoint": "E2",
+      "r": 32,
+      "r_mem": 128,
+      "writer": "joint"
+    }
+  ],
+  "practical_latency_statistic": "three-seed mean CUDA-event milliseconds per prepared batch",
+  "practical_passed": false,
+  "practical_settings": [
+    {
+      "any_primary_M1_point_unmatched": false,
+      "batch_size": 64,
+      "writer": "joint"
+    },
+    {
+      "any_primary_M1_point_unmatched": false,
+      "batch_size": 1,
+      "writer": "joint"
+    },
+    {
+      "any_primary_M1_point_unmatched": true,
+      "batch_size": 64,
+      "writer": "oracle_random"
+    },
+    {
+      "any_primary_M1_point_unmatched": true,
+      "batch_size": 1,
+      "writer": "oracle_random"
+    }
+  ],
+  "primary_cost_training_steps": 15000,
+  "single_step_definition": "L=1 within writer; includes all 15000-step variants and budgets"
+}

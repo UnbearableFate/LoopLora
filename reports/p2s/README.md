@@ -27,6 +27,8 @@ directories and checkpoints remain read only. All outputs go to `runs/p2s/`.
   are fractions. Paired bootstrap draws resample 2000 complete episodes jointly
   across the three training seeds (seed 2718); uncertainty conditions on these
   seeds. All 84 sample files must be released before any confirmation aggregation.
+- `tables.md`: readable E1–E3 intervals and per-seed differences, selected E4
+  points and practical eligibility, formatted from the summary CSVs.
 - `accuracy.csv`: three-seed pooled candidate/full-vocabulary/chance accuracy
   by family, hop and evaluated L, including L0/16 where defined.
 - `cost.csv`, `cost_per_seed.csv`: E4 at L1/2/4/8 where defined, with accuracy

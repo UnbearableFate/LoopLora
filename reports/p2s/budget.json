@@ -1,0 +1,15 @@
+{
+  "status": "passed",
+  "jobs": 11,
+  "successful_jobs": 10,
+  "failed_before_training_jobs": 1,
+  "pilot_node_hours": 0.3522222222222222,
+  "main_node_hours": 0.9930555555555556,
+  "total_node_hours": 1.3452777777777778,
+  "pilot_cap_node_hours": 1,
+  "total_cap_node_hours": 3,
+  "requested_node_hours": 2.716666666666667,
+  "maximum_nodes_per_job": 1,
+  "maximum_requested_walltime": "00:30:00",
+  "elapsed_source": "PBS qstat -ll -H; queue time excluded; all failures counted"
+}
