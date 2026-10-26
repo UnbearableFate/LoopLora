@@ -1,5 +1,8 @@
 # P1-L budget reconciliation needed before Pilot-2
 
+RESOLVED by master Amendments B1 then B2. B2 drops the total cap and fixes
+S17000/Pilot5666. This file preserves the pre-score question and evidence.
+
 Design commit ea44bb6; preflight3715826 completed successfully on mg0024.
 All7 actual train paths fit memory (oracle readers~7.2GB; B1/B2~17.2GB).
 The longest path is B1 context-retained, approximately.28s per step; other
