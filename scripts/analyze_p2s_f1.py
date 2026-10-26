@@ -94,7 +94,7 @@ def decisions(rows: list[dict]) -> dict:
 
 def write_tables(rows: list[dict],decision: dict,out: Path) -> None:
     lines=['# P2-S-F1 paired contrasts','',
-        'Effects and intervals are percentage points; 97.5% pooled paired episode-bootstrap CIs. ',
+        'Effects and intervals are percentage points; 97.5% pooled paired episode-bootstrap CIs.',
         'Per-seed effects are ordered 17 / 29 / 43. The confirmation episodes are reused from P2-S.',
         'Intervals condition on these three trained seeds. F-E3 hop-1/long rows accompany the registered reach endpoint.',
         '', '| Endpoint | Writer | Contrast | Hops | Estimate [97.5% CI], pp | Per seed, pp |',

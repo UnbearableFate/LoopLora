@@ -1,0 +1,16 @@
+{
+  "status": "passed",
+  "jobs": 10,
+  "all_exit_zero": true,
+  "total_node_hours": 1.0991666666666666,
+  "total_budget_node_hours": 2.5,
+  "pilot_node_hours": 0.29333333333333333,
+  "pilot_budget_node_hours": 0.5,
+  "main_and_final_node_hours": 0.8058333333333333,
+  "requested_node_hours": 1.9666666666666666,
+  "max_nodes_per_job": 1,
+  "max_requested_seconds": 1500,
+  "pilot_includes": "all smoke, tests, pilot training and LR selection",
+  "source": "PBS qstat -H elapsed_seconds, one node per job",
+  "main_training_lock_commit": "44c1fd51208f09e71de98a1e66fa51445218673b"
+}

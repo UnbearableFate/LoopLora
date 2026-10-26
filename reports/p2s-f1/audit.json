@@ -1,0 +1,24 @@
+{
+  "all_depth_snapshots_identical": true,
+  "all_query_labels_paired": true,
+  "all_samples_sealed": true,
+  "all_tables_reproduced": true,
+  "checkpoints_unchanged": true,
+  "completed_at": "2026-10-26T17:11:45.904590+00:00",
+  "confirmation_look_count_this_followup": 1,
+  "confirmation_set_reused_from_P2S": true,
+  "confirmation_sets": 42,
+  "reference_checkpoints": 18,
+  "sample_barrier_created_at": "2026-10-26T17:11:27.049094+00:00",
+  "sample_rows": 3312000,
+  "status": "passed",
+  "training_barrier": {
+    "created_at": "2026-10-26T17:10:50.963769+00:00",
+    "evaluation_plan_hash": "b81328e4159ee8cfaed73fe5ca979b34",
+    "status": "passed",
+    "training_plan_hash": "90bdff93ef5b9617069fffc2d33045d0",
+    "training_stages": 24
+  },
+  "training_stages": 24,
+  "uncertainty": "Episode bootstrap conditions on the three fixed training seeds; confirmation set was already used in P2-S"
+}

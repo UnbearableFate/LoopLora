@@ -19,5 +19,6 @@ provenance and the complete statistics stay under
 
 Confirmation uses P2-S's test seed 888001, 2000 episodes, one query at each hop 1–8; this set was already
 used by P2-S. All 24 new runs must finish before evaluation and all 42 blind sets must exist before aggregation.
+Results: B8, fixed L4 for every writer; all four shortcut-free capability contrasts pass.
 Bootstrap: shared `sym.stats`, 2000 pooled paired episode draws, seed 2718, conditional on the three seeds.
 No latency benchmark is part of this follow-up. Compact committed outputs must remain below 1 MB.
