@@ -1,0 +1,241 @@
+[
+  {
+    "name": "t-l2-probes",
+    "queue": "regular-g",
+    "nodes": 1,
+    "walltime": "00:05:00",
+    "source": {
+      "kind": "commit",
+      "ref": "bcab7144302f3ab3539cb6cc7f7ec46b6996e6ea"
+    },
+    "argv": [
+      "-m",
+      "pytest",
+      "-q",
+      "tests/test_llm_diagnosis_probes.py"
+    ],
+    "log": "/work/xg24i002/x10041/LoopLora/logs/pbs/t-l2-probes-20261026-220250-2447944.log",
+    "submitted": "2026-10-26T22:02:50.909058",
+    "job_id": "3713089.opbs",
+    "spec_path": "/work/xg24i002/x10041/LoopLora/logs/pbs/specs/t-l2-probes-20261026-220250-2447944.json"
+  },
+  {
+    "name": "d-l2-probes",
+    "queue": "regular-g",
+    "nodes": 1,
+    "walltime": "00:35:00",
+    "source": {
+      "kind": "commit",
+      "ref": "bcab7144302f3ab3539cb6cc7f7ec46b6996e6ea"
+    },
+    "argv": [
+      "-m",
+      "looplora.llm.diagnosis_probes",
+      "--out",
+      "/work/xg24i002/x10041/LoopLora/runs/p1l/diagnosis-20261026/D1"
+    ],
+    "log": "/work/xg24i002/x10041/LoopLora/logs/pbs/d-l2-probes-20261026-220519-2460710.log",
+    "submitted": "2026-10-26T22:05:19.225747",
+    "job_id": "3713110.opbs",
+    "spec_path": "/work/xg24i002/x10041/LoopLora/logs/pbs/specs/d-l2-probes-20261026-220519-2460710.json"
+  },
+  {
+    "name": "t-l2-oracle",
+    "queue": "regular-g",
+    "nodes": 1,
+    "walltime": "00:05:00",
+    "source": {
+      "kind": "commit",
+      "ref": "9ffabc49f92929b96640ab831d0c8bf44949bd1b"
+    },
+    "argv": [
+      "-m",
+      "pytest",
+      "-q",
+      "tests/test_llm_diagnosis.py",
+      "tests/test_llm_train.py"
+    ],
+    "log": "/work/xg24i002/x10041/LoopLora/logs/pbs/t-l2-oracle-20261026-220520-2460832.log",
+    "submitted": "2026-10-26T22:05:20.480806",
+    "job_id": "3713111.opbs",
+    "spec_path": "/work/xg24i002/x10041/LoopLora/logs/pbs/specs/t-l2-oracle-20261026-220520-2460832.json"
+  },
+  {
+    "name": "t-l2-budget",
+    "queue": "regular-g",
+    "nodes": 1,
+    "walltime": "00:05:00",
+    "source": {
+      "kind": "commit",
+      "ref": "99daecb05599c9e0fc88df83238919096772348e"
+    },
+    "argv": [
+      "-m",
+      "pytest",
+      "-q",
+      "tests/test_llm_diagnosis.py"
+    ],
+    "log": "/work/xg24i002/x10041/LoopLora/logs/pbs/t-l2-budget-20261026-220726-2470921.log",
+    "submitted": "2026-10-26T22:07:26.259880",
+    "job_id": "3713137.opbs",
+    "spec_path": "/work/xg24i002/x10041/LoopLora/logs/pbs/specs/t-l2-budget-20261026-220726-2470921.json"
+  },
+  {
+    "name": "d-l2-oracle",
+    "queue": "regular-g",
+    "nodes": 1,
+    "walltime": "00:30:00",
+    "source": {
+      "kind": "commit",
+      "ref": "99daecb05599c9e0fc88df83238919096772348e"
+    },
+    "argv": [
+      "-m",
+      "looplora.llm.diagnosis",
+      "--diagnostic",
+      "D2",
+      "--out",
+      "/work/xg24i002/x10041/LoopLora/runs/p1l/diagnosis-20261026/D2"
+    ],
+    "log": "/work/xg24i002/x10041/LoopLora/logs/pbs/d-l2-oracle-20261026-220735-2471618.log",
+    "submitted": "2026-10-26T22:07:35.101668",
+    "job_id": "3713139.opbs",
+    "spec_path": "/work/xg24i002/x10041/LoopLora/logs/pbs/specs/d-l2-oracle-20261026-220735-2471618.json"
+  },
+  {
+    "name": "d-l2-budget",
+    "queue": "regular-g",
+    "nodes": 1,
+    "walltime": "01:00:00",
+    "source": {
+      "kind": "commit",
+      "ref": "99daecb05599c9e0fc88df83238919096772348e"
+    },
+    "argv": [
+      "-m",
+      "looplora.llm.diagnosis",
+      "--diagnostic",
+      "D3",
+      "--out",
+      "/work/xg24i002/x10041/LoopLora/runs/p1l/diagnosis-20261026/D3"
+    ],
+    "log": "/work/xg24i002/x10041/LoopLora/logs/pbs/d-l2-budget-20261026-220953-2482449.log",
+    "submitted": "2026-10-26T22:09:53.461383",
+    "job_id": "3713165.opbs",
+    "spec_path": "/work/xg24i002/x10041/LoopLora/logs/pbs/specs/d-l2-budget-20261026-220953-2482449.json"
+  },
+  {
+    "name": "t-l2-residual",
+    "queue": "regular-g",
+    "nodes": 1,
+    "walltime": "00:05:00",
+    "source": {
+      "kind": "commit",
+      "ref": "fdf0d8016cf4f3e2604d2f3b879ca3f5053fa3e4"
+    },
+    "argv": [
+      "-m",
+      "pytest",
+      "-q",
+      "tests/test_llm_residual.py",
+      "tests/test_llm_train.py",
+      "tests/test_llm_evaluate.py",
+      "tests/test_llm_config.py"
+    ],
+    "log": "/work/xg24i002/x10041/LoopLora/logs/pbs/t-l2-residual-20261026-231041-2798759.log",
+    "submitted": "2026-10-26T23:10:41.298503",
+    "job_id": "3713783.opbs",
+    "spec_path": "/work/xg24i002/x10041/LoopLora/logs/pbs/specs/t-l2-residual-20261026-231041-2798759.json"
+  },
+  {
+    "name": "t-l2-resid2",
+    "queue": "regular-g",
+    "nodes": 1,
+    "walltime": "00:05:00",
+    "source": {
+      "kind": "commit",
+      "ref": "3c1cffbd065cc10091fd8d76b3ffe5931485d0fb"
+    },
+    "argv": [
+      "-m",
+      "pytest",
+      "-q",
+      "tests/test_llm_residual.py",
+      "tests/test_llm_train.py",
+      "tests/test_llm_evaluate.py",
+      "tests/test_llm_run.py"
+    ],
+    "log": "/work/xg24i002/x10041/LoopLora/logs/pbs/t-l2-resid2-20261026-231147-2803700.log",
+    "submitted": "2026-10-26T23:11:47.731862",
+    "job_id": "3713800.opbs",
+    "spec_path": "/work/xg24i002/x10041/LoopLora/logs/pbs/specs/t-l2-resid2-20261026-231147-2803700.json"
+  },
+  {
+    "name": "d-l2-residual",
+    "queue": "regular-g",
+    "nodes": 1,
+    "walltime": "01:00:00",
+    "source": {
+      "kind": "commit",
+      "ref": "3c1cffbd065cc10091fd8d76b3ffe5931485d0fb"
+    },
+    "argv": [
+      "-m",
+      "looplora.llm.diagnosis",
+      "--diagnostic",
+      "D4",
+      "--out",
+      "/work/xg24i002/x10041/LoopLora/runs/p1l/diagnosis-20261026/D4"
+    ],
+    "log": "/work/xg24i002/x10041/LoopLora/logs/pbs/d-l2-residual-20261026-231329-2811503.log",
+    "submitted": "2026-10-26T23:13:29.808384",
+    "job_id": "3713853.opbs",
+    "spec_path": "/work/xg24i002/x10041/LoopLora/logs/pbs/specs/d-l2-residual-20261026-231329-2811503.json"
+  },
+  {
+    "name": "a-l2-diagnosis",
+    "queue": "regular-g",
+    "nodes": 1,
+    "walltime": "00:03:00",
+    "source": {
+      "kind": "commit",
+      "ref": "18b0cd99fc05f9f09a5642c86810f853ef244221"
+    },
+    "argv": [
+      "scripts/analyze_p1l_diagnosis.py",
+      "--root",
+      "/work/xg24i002/x10041/LoopLora/runs/p1l/diagnosis-20261026",
+      "--out",
+      "/work/xg24i002/x10041/LoopLora-wt/llm/reports/p1l-diagnosis",
+      "--jobs",
+      "/work/xg24i002/x10041/LoopLora-wt/llm/reports/p1l-diagnosis/jobs.json"
+    ],
+    "log": "/work/xg24i002/x10041/LoopLora/logs/pbs/a-l2-diagnosis-20261027-001242-3500622.log",
+    "submitted": "2026-10-27T00:12:42.458796",
+    "job_id": "3714411.opbs",
+    "spec_path": "/work/xg24i002/x10041/LoopLora/logs/pbs/specs/a-l2-diagnosis-20261027-001242-3500622.json"
+  },
+  {
+    "name": "a-l2-paired",
+    "queue": "regular-g",
+    "nodes": 1,
+    "walltime": "00:03:00",
+    "source": {
+      "kind": "commit",
+      "ref": "d04a1f8b7c2efa13187eb0cfce02c3e259dd8ab9"
+    },
+    "argv": [
+      "scripts/analyze_p1l_diagnosis.py",
+      "--root",
+      "/work/xg24i002/x10041/LoopLora/runs/p1l/diagnosis-20261026",
+      "--out",
+      "/work/xg24i002/x10041/LoopLora-wt/llm/reports/p1l-diagnosis",
+      "--jobs",
+      "/work/xg24i002/x10041/LoopLora-wt/llm/reports/p1l-diagnosis/jobs.json"
+    ],
+    "log": "/work/xg24i002/x10041/LoopLora/logs/pbs/a-l2-paired-20261027-001839-3537496.log",
+    "submitted": "2026-10-27T00:18:40.005171",
+    "job_id": "3714453.opbs",
+    "spec_path": "/work/xg24i002/x10041/LoopLora/logs/pbs/specs/a-l2-paired-20261027-001839-3537496.json"
+  }
+]

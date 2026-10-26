@@ -182,7 +182,7 @@ def run(out: Path, train_episodes=4096, probe_steps=1200):
     rows = []
     with (out/'probes.csv').open('w') as file:
         fields = ['site','position','target','rank','dimensions','classes','train_n','train_accuracy','n','correct','accuracy']
-        writer = csv.DictWriter(file,fieldnames=fields)
+        writer = csv.DictWriter(file,fieldnames=fields,lineterminator='\n')
         writer.writeheader()
         for site in SITES:
             for position in POSITIONS:

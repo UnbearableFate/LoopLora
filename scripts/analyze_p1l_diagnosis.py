@@ -38,7 +38,7 @@ def audit(root: Path,out: Path,jobs: Path | None):
             assert len(y)==row['n'] and int((p==y).sum())==row['correct']
             assert row['accuracy']==row['correct']/row['n']
             assert np.all((y>=0)&(y<row['classes']))
-    (out/'probes.csv').write_bytes((root/'D1/probes.csv').read_bytes())
+    (out/'probes.csv').write_text((root/'D1/probes.csv').read_text())
     write_json(out/'D1.json',d1)
     rows,loss_rows,run_records = [],[],[]
     reference_labels = None
@@ -107,7 +107,7 @@ def audit(root: Path,out: Path,jobs: Path | None):
                                       step=logged['step'],loss=logged['loss']))
     for name,data in (('runs.csv',rows),('loss_curves.csv',loss_rows)):
         with (out/name).open('w') as file:
-            writer = csv.DictWriter(file,fieldnames=list(data[0]))
+            writer = csv.DictWriter(file,fieldnames=list(data[0]),lineterminator='\n')
             writer.writeheader()
             writer.writerows(data)
     fig,axes = plt.subplots(1,3,figsize=(13,3.7),sharey=True)
@@ -141,7 +141,7 @@ def audit(root: Path,out: Path,jobs: Path | None):
         assert total<=4
         result.update(total_node_hours=total,jobs=job_rows)
         with (out/'job_costs.csv').open('w') as file:
-            writer=csv.DictWriter(file,fieldnames=list(job_rows[0]))
+            writer=csv.DictWriter(file,fieldnames=list(job_rows[0]),lineterminator='\n')
             writer.writeheader()
             writer.writerows(job_rows)
     write_json(out/'summary.json',result)
