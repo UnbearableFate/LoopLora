@@ -15,8 +15,10 @@ Amendment B3 adds oracle r128 (15runs, own Pilot-2, B0–B2 reused); confirmatio
 is now held for ALL conditions, with confidence1-.05/k fixed beforehand.
 B4 removes cross-rank single-read contrasts and adds descriptive adapter counts/
 inference timing; wrapper3716084 passed onmg0025. R128 smokes completed,
-sizing3716162 locked S17000(e955765), and Pilot-2 jobs3716168–3716172 are
-running. R128 pilot watcher remains armed; see P1L-state.md for continuation.
+sizing3716162 locked S17000(e955765), and Pilot-2 jobs3716168–3716172 passed.
+Selection3716392 onmg0021 fixed lr.003 for B8/M1/B4/B5, lr.001 for B3;
+lock1d1bbfd precedes all12 main jobs3716396–3716407 (15runs, one node/job,
+maximum2h; B4/B3 packed sequentially). See P1L-state.md for continuation.
 No test or confirmation data have been accessed.
 
 Raw root: /work/xg24i002/x10041/LoopLora/runs/p1l/main/.

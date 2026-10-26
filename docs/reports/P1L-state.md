@@ -1,4 +1,4 @@
-# wk-p1l continuation card — r32 main running; r128 Pilot-2 locked
+# wk-p1l continuation card — both ranks' main training submitted
 
 Worktree /work/xg24i002/x10041/LoopLora-wt/p1l, branchwp/p1l. User assigned
 WP-P1L; finish docs/reports/P1L.md and only then reply exactly
@@ -117,6 +117,15 @@ mg0021 passed, source4bdb475. R128 lr-S lock fixes S17000, B3-L4 lr.001
 Selected pooled val hops1/2/3 full-vocabulary EM: B8 5.667%, M1 8.133%,
 B4 5.900%, B5 5.633%, B3 0.0667% (3000 queries each). Selection follows the
 registered rule; no design or endpoint changes. No confirmation accessed.
+R128 lock/configs committed1d1bbfd before main; source
+1d1bbfd6958bfac2cd35054a24abeebcfdb7da1b. All12 main jobs/15 runs submitted:
+seed17:3716396B8,3716397M1,3716398B5,3716399B4+B3;
+seed29:3716400B8,3716401M1,3716402B5,3716403B4+B3;
+seed43:3716404B8,3716405M1,3716406B5,3716407B4+B3.
+R/r128/main-jobs.json and R/r128/training-manifest.json retain receipts/map.
+Each1node,1h10–2h requested. B4/B3 sequential packing measured; no repeat B0–B2.
+Arrange rank128 end watcher3716407 and early progress watcher3716290 (r32 B5)
+to recheck queued jobs as project slots release, retaining r32 end watcher.
 
 Scheduler05:39JST: regular project limit16 active jobs; queued r32 seeds43
 have placeholder/predicted starts after maintenance. Detail3716304 states
@@ -163,9 +172,12 @@ separately; unchanged regression passed3715942). No further blanket retests.
 
 1. Validation-only evaluation acceptance is complete; never read its raw scores.
 2. Both pilot wakeups acknowledged; r32 lock/configs committed and main running.
-   Commit r128 lock/configs before launching its main training.
+   R128 lock/configs committed; main submitted. Both condition manifests exist.
 3. R32 main3716305 wakeup armed. At either wake preserve
    the other pending event; independently advance whichever rank is ready.
+4. Before idle arm rank128 end3716407 and early running r32 progress3716290.
+   Early progress is needed because PBS currently predicts queued starts after
+   maintenance while reporting the group16-job limit as the blocker.
 
 ## Next actions after each rank's pilot wakeup
 
