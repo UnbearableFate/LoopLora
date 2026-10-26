@@ -35,3 +35,13 @@ or tuning is allowed. Final audit omits `--screen-only` and adds `--verify-expor
 it reloads the chosen inference export (OA if no writer passes) and checks all
 1000 predictions. `writer.pt` has no training head or optimizer; `checkpoint.pt`
 retains training state. Every auxiliary term is supervision beyond the answer.
+# Amendment A1
+
+The original extension instructions below are superseded by Amendment A1 in
+`docs/tasks/WP-L3_p1l_writer_fix.md` on master3548d6e. The original screen remains
+on3fbc504. After it finishes, merge master and use a common rerun source with
+scan_final and actual prefetch_workers:2; lock two highest-EM arms (ties lower
+final main loss) plus OA if absent, if no writer reaches.80. One<=2h packed job,
+five evenly spaced evaluations, total task<=4nodeh. See the updated state card
+and plan before using the original analyzer's selection or extension commands.
+

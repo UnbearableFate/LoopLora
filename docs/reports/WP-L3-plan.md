@@ -46,3 +46,22 @@ each, last single-arm job30min. Tests/probes/audit <=15min requested; conditiona
 extension <=60min: total requested<=225min and actual expected<3nodeh (cap4).
 Extension starts from scratch with the same seed/stream and runs until3450s
 elapsed training/evaluation time, preserving final evaluation/export reserve.
+
+## Amendment A1 received during the running screen
+
+Master3548d6e replaces the decision branches below.80 above. The original screen
+and its source3fbc504 remain unchanged. Keep the existing wake-up armed. After
+the screen finishes, merge master and implement the amended rerun on a common
+source with WP-C5 scan_final and WP-B4 train.prefetch_workers:2. The custom
+writer_fix_run.fit must actually consume prefetched batches; merely setting the
+configuration field is insufficient. Validate exact behavior on compute.
+
+If no writer reaches.80 at4800, rerun the two highest-final-EM arms (ties: lower
+final main loss), plus OA if absent. Freeze selection before submission. Use the
+same initialization/data/seed/batch32/lr.003 and the longest measured schedule
+that fits one<=2h job, with five evenly spaced validation checkpoints. Submit
+with --scale-up docs/tasks/WP-L3_p1l_writer_fix.md. The total4nodeh cap remains;
+include all tests/probes/screen/audits when sizing this job. The original <=1h
+single-arm extension and stop-below.30 rules are superseded. Select the simplest
+rerun writer reaching.80; otherwise stop and report>=.30 as partial learning.
+No validation scores were read by this worker when recording this amendment.

@@ -2,8 +2,9 @@
 
 Task docs/tasks/WP-L3_p1l_writer_fix.md; final docs/reports/P1L-writer-fix.md.
 Branch wp/llm only. Merged master8001347 then WP-C5 at7f68a3c BEFORE science.
-Frozen numeric source ALL scientific runs/extension:3fbc504 (core.scan_final).
-No future numerical/backend merge into these comparisons.
+Frozen numeric source for probes and the original seven-arm screen:3fbc504
+(core.scan_final). Keep running jobs and the current wake-up unchanged.
+Amendment A1 below authorizes a new common source for the conditional rerun.
 Root: /work/xg24i002/x10041/LoopLora/runs/p1l/writer-fix-20261027/.
 
 Scope: T1 E16/n_rel4/headsharing.3, seed17/r32/layer14/L1, batch32/Q4,
@@ -24,9 +25,22 @@ seven complete, run it ON COMPUTE with --screen-only and --release
 reports/p1l-writer-fix/release.json; root above, out absolute reports directory.
 It audits every sample/probe and writes immutable selection.json.
 
-Rule W0<W1<W4<W3<W2<W5: simplest>=800 correct wins. Else if any>=300,
-exactly ONE highest-final-EM arm extends (exact ties use simplicity), fresh same
-seed/stream, source3fbc504, --extension ARM --out root/extension/ARM,1h job.
-Do not extend before lock. Otherwise stop P1-L. OA never eligible.
+## Amendment A1 takes precedence over the old wake-up message
+
+Orchestrator steering/master3548d6e, received while the screen was running:
+do not follow the original stop-below.30 / one-arm-one-hour extension rule.
+After all seven arms finish, merge master3548d6e or later into wp/llm and read
+the amended task, including WP-B4 prefetch. Do not merge while jobs are running.
+If no eligible writer reaches.80, lock the two highest-final-EM arms (ties:
+lower final main loss), plus OA if absent, for a fresh common-source fast rerun.
+Use scan_final and actual train.prefetch_workers:2 in the custom writer-fix
+training loop, same seed/data/batch32/lr.003. Fit the longest measured schedule
+into one <=2h PBS job using --scale-up docs/tasks/WP-L3_p1l_writer_fix.md;
+evaluate at five evenly spaced checkpoints. Total task remains<=4nodeh.
+Adapt the existing analyzer/selection and old --extension runner BEFORE locking
+or rerunning: their original thresholds and single-arm extension are obsolete.
+Test prefetch equality on compute. Preserve original screen provenance3fbc504.
+Simplest rerun writer>=.80 wins (W0<W1<W4<W3<W2<W5); otherwise stop P1-L,
+reporting>=.30 as partial learning. OA remains diagnostic, never a writer.
 Then final compute audit --verify-export, all job costs, <=1page+tables report,
 commit on wp/llm and exact final WP-L3 done: docs/reports/P1L-writer-fix.md.
