@@ -1,0 +1,42 @@
+[
+  {
+    "config": "configs/f1-oracle_random-r64-M1-lin-s17.json",
+    "name": "f1-oracle_random-r64-M1-lin-s17"
+  },
+  {
+    "config": "configs/f1-oracle_random-r64-B5-s29.json",
+    "name": "f1-oracle_random-r64-B5-s29"
+  },
+  {
+    "config": "configs/f1-oracle_random-r64-B5-lin-s43.json",
+    "name": "f1-oracle_random-r64-B5-lin-s43"
+  },
+  {
+    "config": "configs/f1-oracle_random-r128-B3-s17.json",
+    "name": "f1-oracle_random-r128-B3-s17"
+  },
+  {
+    "config": "configs/f1-oracle_random-r128-M1-s43.json",
+    "name": "f1-oracle_random-r128-M1-s43"
+  },
+  {
+    "config": "configs/f1-joint-r64-M1-lin-s17.json",
+    "name": "f1-joint-r64-M1-lin-s17"
+  },
+  {
+    "config": "configs/f1-joint-r64-B5-s29.json",
+    "name": "f1-joint-r64-B5-s29"
+  },
+  {
+    "config": "configs/f1-joint-r64-B5-lin-s43.json",
+    "name": "f1-joint-r64-B5-lin-s43"
+  },
+  {
+    "config": "configs/f1-joint-r128-B3-s17.json",
+    "name": "f1-joint-r128-B3-s17"
+  },
+  {
+    "config": "configs/f1-joint-r128-M1-s43.json",
+    "name": "f1-joint-r128-M1-s43"
+  }
+]

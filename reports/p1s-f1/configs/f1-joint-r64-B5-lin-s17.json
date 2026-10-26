@@ -1,0 +1,110 @@
+{
+  "activation": "identity",
+  "backbone_seed": 31415,
+  "device": "cuda:0",
+  "eval": {
+    "batch_size": 64,
+    "counterfactuals": true,
+    "depths": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      6,
+      8,
+      12,
+      16
+    ],
+    "episodes": 2000,
+    "hops": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "seed": 4242,
+    "splits": [
+      "test",
+      "test_unseen"
+    ]
+  },
+  "model": {
+    "alpha": 1.0,
+    "beta_init": 0.1,
+    "d_e": 64,
+    "lambda_init": 0.99,
+    "max_hop": 16,
+    "r": 64,
+    "r_mem": 64,
+    "reference_r": 64,
+    "rho": 0.25
+  },
+  "name": "f1-joint-r64-B5-lin-s17",
+  "pretrain": {
+    "batch_size": 32,
+    "lr": 0.003,
+    "steps": 3000,
+    "task": {},
+    "warmup_steps": 20,
+    "writer_checkpoint": null
+  },
+  "runtime": {
+    "threads": 1
+  },
+  "seed": 17,
+  "stats": {
+    "resamples": 2000,
+    "seed": 2718
+  },
+  "task": {
+    "E": 12,
+    "Q": 4,
+    "V": 1024,
+    "base": null,
+    "chain_lengths": [
+      8,
+      4
+    ],
+    "head_sharing": 0.0,
+    "hops": [
+      1,
+      2,
+      3
+    ],
+    "missing_rate": 0.5,
+    "n_distract": 0,
+    "n_rel": 4,
+    "n_updates": 2,
+    "name": "t2_chain_end",
+    "seen": [
+      0,
+      768
+    ],
+    "unseen": [
+      768,
+      1024
+    ],
+    "update_query_rate": 0.5
+  },
+  "train": {
+    "batch_size": 64,
+    "depths": [
+      1,
+      2,
+      4
+    ],
+    "grad_clip": 1.0,
+    "log_every": 10,
+    "lr": 0.003,
+    "steps": 20000,
+    "warmup_steps": 20,
+    "weight_decay": 0.01
+  },
+  "variant": "B5-lin",
+  "writer": "joint"
+}
