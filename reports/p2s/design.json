@@ -1,0 +1,82 @@
+{
+  "batch_size": 64,
+  "benchmark": {
+    "batch_one_queries": 8,
+    "batch_sizes": [
+      64,
+      1
+    ],
+    "repeats": 20,
+    "warmup": 5
+  },
+  "confirmation_depths": [
+    0,
+    1,
+    2,
+    4,
+    8,
+    16
+  ],
+  "confirmation_episodes": 2000,
+  "confirmation_seed": 888001,
+  "families": [
+    {
+      "r": 64,
+      "r_mem": 64,
+      "variant": "B6",
+      "writer": "joint"
+    },
+    {
+      "r": 128,
+      "r_mem": 128,
+      "variant": "B6",
+      "writer": "joint"
+    },
+    {
+      "r": 64,
+      "r_mem": 64,
+      "variant": "B6",
+      "writer": "oracle_random"
+    },
+    {
+      "r": 128,
+      "r_mem": 128,
+      "variant": "B6",
+      "writer": "oracle_random"
+    },
+    {
+      "r": 32,
+      "r_mem": 64,
+      "variant": "B7",
+      "writer": "joint"
+    },
+    {
+      "r": 32,
+      "r_mem": 128,
+      "variant": "B7",
+      "writer": "joint"
+    },
+    {
+      "r": 32,
+      "r_mem": 32,
+      "variant": "B8",
+      "writer": "joint"
+    },
+    {
+      "r": 32,
+      "r_mem": 32,
+      "variant": "B8",
+      "writer": "oracle_random"
+    }
+  ],
+  "main_steps": 15000,
+  "pilot_budget_node_hours": 1,
+  "pilot_steps": 5000,
+  "prereg": "docs/prereg/P2S.md",
+  "seeds": [
+    17,
+    29,
+    43
+  ],
+  "total_budget_node_hours": 3
+}
