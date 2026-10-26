@@ -1,0 +1,24 @@
+# Exactly 10% of the 3000-step default. All smoke entries use seed 17.
+seed: 17
+backbone_seed: 31415
+device: cuda
+writer: oracle_random
+variant: M1
+task:
+  name: t2_chain_end
+  E: 24
+  Q: 4
+  chain_lengths: [8, 8, 8]
+  hops: [1, 2, 3]
+train:
+  steps: 300
+  batch_size: 32
+  log_every: 10
+pretrain:
+  steps: 300
+  batch_size: 32
+eval:
+  episodes: 32
+  batch_size: 32
+  splits: [val, test, test_unseen]
+  counterfactuals: true

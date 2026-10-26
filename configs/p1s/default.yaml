@@ -1,0 +1,51 @@
+# Main mechanism defaults: mixed-depth reader, fixed oracle memory, 3000 steps.
+name: p1s-default
+seed: 17
+backbone_seed: 31415
+device: cuda
+writer: oracle_random
+variant: M1
+activation: relu
+model:
+  d_e: 64
+  r: 64
+  r_mem: 64
+  rho: 0.25
+  alpha: 1.0
+  lambda_init: 0.99
+  beta_init: 0.1
+  max_hop: 16
+task:
+  name: t2_chain_end
+  E: 24
+  Q: 4
+  V: 1024
+  n_rel: 4
+  chain_lengths: [8, 8, 8]
+  hops: [1, 2, 3]
+train:
+  steps: 3000
+  batch_size: 32
+  lr: 0.003
+  weight_decay: 0.01
+  grad_clip: 1.0
+  warmup_steps: 20
+  depths: [1, 2, 4]
+  log_every: 10
+pretrain:
+  steps: 3000
+  batch_size: 32
+  lr: 0.003
+  warmup_steps: 20
+  writer_checkpoint: null
+eval:
+  episodes: 64
+  batch_size: 32
+  depths: [0, 1, 2, 3, 4, 6, 8, 12, 16]
+  splits: [val, test, test_unseen]
+  hops: [1, 2, 3, 4, 5, 6, 7, 8]
+  seed: 4242
+  counterfactuals: true
+stats:
+  resamples: 2000
+  seed: 2718
