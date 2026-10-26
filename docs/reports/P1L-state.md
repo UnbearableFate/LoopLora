@@ -1,4 +1,4 @@
-# wk-p1l continuation card — r32 main submitted; r128 Pilot-2 running
+# wk-p1l continuation card — r32 main running; r128 Pilot-2 locked
 
 Worktree /work/xg24i002/x10041/LoopLora-wt/p1l, branchwp/p1l. User assigned
 WP-P1L; finish docs/reports/P1L.md and only then reply exactly
@@ -15,7 +15,7 @@ Armed wakeups (message mode,300s polling, no Goal):
 - r32 pilot3715965: .job-wakeup/ee3ad75d-7773-4f90-92d8-b0bc5660b157,
   acknowledged; all seven jobs exit0 and all14 candidate records complete.
 - r128 pilot3716169: .job-wakeup/d921e843-f2a6-44ff-82e7-83cb3267c07f,
-  worker PID2200345; also verify the other four pilot jobs on wake.
+  acknowledged; all five jobs exit0 and all ten candidates complete.
 - r32 main3716305: .job-wakeup/a101bbc0-d502-4bf4-8978-4e613b043510,
   worker PID2276624; verify all19 jobs/22 run artifacts on wake.
 Read the event state and acknowledge with the exact argv from the wakeup
@@ -105,12 +105,25 @@ reports/p1l/r128/preflight-sizing.json and design. Full10% smokes1700steps:
 3716020(B8,M1-L4),3716021(B4,B5-L4,B3-L4), source16bef08. BOTH exit0.
 Full-smoke sizing3716162 (mg0024), reports/p1l/r128/smoke-sizing.json,
 committed e955765: S17000/Pilot5666, slowest .199397s, no reduced-steps flag,
-projected Pilot-2+main14.408nodeh. No r128 pilot quality score has been read.
+projected Pilot-2+main14.408nodeh.
 R128 Pilot-2 launched source e95576527c46cc1798d97c5af83384fc62bd0e06:
 3716168B8,3716169M1-L4,3716170B4,3716171B5-L4,3716172B3-L4.
 Receipts R/r128/pilot-jobs.json, two sequential lrs per label under
 R/r128/pilot/<LABEL>/<LABEL>-lr0.001 or -lr0.003. Requested45–65min,
-started04:59JST. Independent watcher for3716169 is armed above.
+started04:59JST. All five completed, exit0; ten candidate records and stage
+records complete, validation boundary verified. Compute selection3716392 on
+mg0021 passed, source4bdb475. R128 lr-S lock fixes S17000, B3-L4 lr.001
+(tie), B8/M1-L4/B4/B5-L4 lr.003. All15 configs updated before main submission.
+Selected pooled val hops1/2/3 full-vocabulary EM: B8 5.667%, M1 8.133%,
+B4 5.900%, B5 5.633%, B3 0.0667% (3000 queries each). Selection follows the
+registered rule; no design or endpoint changes. No confirmation accessed.
+
+Scheduler05:39JST: regular project limit16 active jobs; queued r32 seeds43
+have placeholder/predicted starts after maintenance. Detail3716304 states
+the group njobs-g limit as the blocker. Fourteen r32 main runs and two WP-L4
+jobs already run, with expected slot releases around06:10–07:00JST. Recheck
+queued jobs at the main wakeup and do not assume those estimates prove a run
+will start. All work must still finish before2026-10-28 09:00JST.
 
 Validation-only full-evaluation timing acceptance: script
 scripts/benchmark_p1l_evaluation.py loads the immutable completed M1-L4
@@ -149,8 +162,8 @@ separately; unchanged regression passed3715942). No further blanket retests.
 ## Immediate next actions
 
 1. Validation-only evaluation acceptance is complete; never read its raw scores.
-2. R32 pilot wakeup acknowledged; lock/configs committed and main submitted.
-   R128 pilot3716169 has its own independent armed watcher above; retain it.
+2. Both pilot wakeups acknowledged; r32 lock/configs committed and main running.
+   Commit r128 lock/configs before launching its main training.
 3. R32 main3716305 wakeup armed. At either wake preserve
    the other pending event; independently advance whichever rank is ready.
 
