@@ -28,8 +28,9 @@ multi-read (M1) beat the single read (B4), the fixed-query loop (B5) and the no-
 
 ## Pilots (validation only, seed 17)
 - Pilot-1: `t1` writer+L=1 reader, r ∈ {16,32}, E ∈ {8,12,16,24}, lr ∈ {3e-4,1e-3,3e-3}. Output: capacity table.
-  Rule: lr per r = best val; E* = largest E ∈ {16, 24} with val single-hop accuracy ≥ 0.95 at r = 32, else 12
-  (then chains (8,4) and a flag in the report).
+  Rule: for each (r, E) take the best-val lr; E* = largest E ∈ {16, 24} whose best-lr val single-hop accuracy is
+  ≥ 0.95 at r = 32, else 12 (then chains (8,4) and a flag in the report); the writer-pretraining lr for r is the
+  best-val lr at (r, E*) (clarification 2026-10-26, before any pilot result was read).
 - Pilot-2: every (writer condition × variant) at r = 32, lr ∈ {3e-4,1e-3,3e-3}; select lr per pair by val
   accuracy on hops 1–3 at the variant's training-max L (L=4; B4 at L=1). Steps ⟨pilot⟩ from smoke timing.
 
