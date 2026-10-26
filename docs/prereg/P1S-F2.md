@@ -43,3 +43,8 @@ the symbolic precondition for the P1-L writer design (Prop. 10.6), since P1-L ca
 
 ## Budget
 ≤ 8 node·h (pilot ≤ 2, main ≤ 6); every job ≤ 1 node × 1 h.
+
+## Post-result note (2026-10-26 23:59 JST)
+Result: both conditions fail G1 on hop-1 preservation only. The second decision-use bullet is not applied; the
+reason and the resulting decision are recorded in `reports/decisions/P1S.md` §7. The registered rule text above
+is unchanged.

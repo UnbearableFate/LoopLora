@@ -73,3 +73,37 @@ pretraining or r = 32 can be rescued.
 ## 6. Next stage's single most important question
 Can a writer trained on a real LM's features produce memory codes that the evolving-query reader composes in the
 memory-only protocol (beginning with: can it store and retrieve single-hop facts at all)?
+
+## 7. Addendum — F2 result and its decision use (2026-10-26 23:59 JST, after merge 4bafd71)
+Source: `docs/reports/P1S-F2.md`, `reports/p1s-f2/` (confirmation set, seeds 17/29/43, r = 32, 15,000 steps,
+1.73 node·h). Neither factorized condition passes: all four rows pass G2, reach and walk specificity, and fail G1
+only on hop-1 preservation.
+
+| Writer | Reader | Δ_reach pp [97.5% CI] | Walk specificity pp | Hop-1 L4−L1 pp | Per-seed reach pp |
+| --- | --- | --- | --- | --- | --- |
+| joint_fact | M1 | +23.0 [22.0, 24.0] | +20.2 | −35.6 | +23.2 / +23.6 / +22.2 |
+| joint_fact | M1-lin | +27.6 [26.5, 28.7] | +24.8 | −37.5 | +27.9 / +26.4 / +28.6 |
+| t1_frozen_fact | M1 | +11.7 [11.0, 12.4] | +8.9 | −29.8 | — |
+| t1_frozen_fact | M1-lin | +11.6 [10.8, 12.4] | +9.1 | −27.9 | — |
+
+Pattern (accuracy, seed mean, hops 1/2/3/4): factorized codes remove the terminal shortcut and walk. joint_fact
+M1 answers hop 1 only at L = 1 (86/2/1/1%) and moves along the chain with depth (L = 4: 50/32/16/5%; L = 8 reaches
+hop 5 at 13%), whereas unfactorized joint M1 is near the terminal-guess level on every hop (L = 1: 54/36/35/34%;
+L = 4: 58/46/41/41%). A5: joint_fact M1 follows 48.0% of new terminals at new-path length 1 vs 4.1–4.6% on
+unswapped queries (unfactorized joint M1: 44.2 vs 35.3%). The hop-1 loss is the overshoot seen with oracle_random
+(no reader stops at the chain end). Paired with WP-H, factorized codes are 11–19 pp lower at L = 4 on hops {2, 3}
+but gain 1–25 pp more with depth. T1 factorized writers reach 91–92% val single-hop accuracy (unfactorized 87–88%).
+
+Decision use. F2's registered rule says that if both factorized conditions fail while an oracle condition passes,
+P1-L is not started. That rule (registered 22:11, before any WP-H confirmation metric) presumed that learned
+codes fail to compose; WP-H then showed joint/M1 passing G1/G2, the P1-S criterion for continuing (§5,
+`docs/prereg/P1S.md` interpretation by condition), and F2 shows walk-specific composition failing only hop-1
+preservation. **Deviation (recorded before any P1-L T2 run):** the go/no-go for P1-L follows §5; F2 only decides
+the writer form. The factorization analog (Prop. 10.6) is not P1-L's default (it fails G1 and lowers L = 4
+accuracy); it remains a candidate fix if the LLM writer cannot otherwise learn single-hop retrieval (WP-L2/L3),
+where its better T1 accuracy matters.
+
+Claims, revised: learned codes without the shortcut compose hop by hop at r = 32, consistently across seeds;
+the unfactorized r = 32 pass partly reflects terminal guessing. For walk-like codes, oracle or learned, the
+dominant remaining failure is overshoot, so stopping (P4) is now central: next, the WP-C3 label-free rules on
+the r = 32 learned checkpoints (screening only).
