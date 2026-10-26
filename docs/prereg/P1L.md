@@ -118,3 +118,13 @@ condition, if added, uses the same rule. Information seen: timing only; no score
   compares against a larger-rank single read. B8(r = 128)@4 − B8(r = 32)@4 stays descriptive.
 - Added, descriptive: adapter parameters and measured inference time per question for every reader at each rank.
 - Gates, conditions, runs and the CI level are unchanged.
+
+## Amendment B5 — WP-L4 decision and CI level (2026-10-27 07:00 JST; before any P1-L confirmation score is read)
+- WP-L4 selected no learned writer (`reports/p1l-read-fix/selection.json`, action `stop`; best learned arm R at
+  r = 128, val EM 33.5%, below the 0.80 gate and the 0.50 E8 trigger; merged 39f7f0b). The `learned` condition is
+  not run; P3 is not run (it required the learned condition to pass).
+- Gated conditions: `oracle_random` at r = 32 and at r = 128, so k = 2 and every gate uses **97.5%** intervals
+  (1 − 0.05/2). This is fixed now, before the first confirmation evaluation.
+- Schedule: normal operation ended 2026-10-27 08:00 (HPC Challenge, then maintenance until 2026-10-28 22:00).
+  Runs that could not finish by then (r = 32 B1/B2 seed 43, r = 128 B4 seed 43) and the confirmation evaluation
+  run after 2026-10-28 22:00. No design change.

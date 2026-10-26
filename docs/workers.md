@@ -21,7 +21,7 @@ Open or resume (new tab, worktree cwd):
 | worker | role (owns) | worktree, branch | context to inject | session | state |
 | --- | --- | --- | --- | --- | --- |
 | wk-sym | symbolic mechanism experiments: `src/looplora/sym`, `configs/p1s`, runs under `runs/p1s` | LoopLora-wt/sym, wp/sym | `docs/prereg/P1S.md`, `docs/reports/WP-D.md`, `docs/reports/P1S-pilot.md` | 01a177a0-f742-7c63-8800-0983d801fc19 (resumed 03:46 2026-10-27, GPT-6.1-sol) | idle (WP-P4L done) |
-| wk-llm | LLM module experiments: `src/looplora/llm`, `configs/p1l`, runs under `runs/p1l` | LoopLora-wt/llm, wp/llm | `docs/prereg/P1L.md`, `docs/reports/WP-E.md`, `docs/reports/WP-G.md` | 01a1779d-c123-75a1-9458-ae849ee0fcde (resumed, GPT-6.1-sol) | active: WP-L4 |
+| wk-llm | LLM module experiments: `src/looplora/llm`, `configs/p1l`, runs under `runs/p1l` | LoopLora-wt/llm, wp/llm | `docs/prereg/P1L.md`, `docs/reports/WP-E.md`, `docs/reports/WP-G.md` | 01a1779d-c123-75a1-9458-ae849ee0fcde (resumed, GPT-6.1-sol) | idle (WP-L4 done) |
 | wk-theory | theory and analytical checks: `docs/theory.md`, `tests/test_theory_examples.py` | LoopLora-wt/theory, wp/theory | `docs/theory.md`, `docs/reports/WP-T.md` | 01a177c4-57fb-7f42-a920-533e74680115 (resumed 21:47, GPT-6.1-sol) | idle (WP-T7 done; tab w1:t14) |
 | wk-core | core adapters, memory, accounting: `src/looplora/core` | LoopLora-wt/core, wp/core | `docs/notation.md`, `docs/reports/WP-A.md` | 01a1779d-747b-7df1-8492-b517a9be8c6a (resumed 22:13, GPT-6.1-sol) | idle (WP-C7 done; tab w1:t15) |
 | wk-data | data generators, rendering, real-task preprocessing: `src/looplora/data` | LoopLora-wt/data, wp/data | `docs/reports/WP-B.md`, `docs/tasks/WP-B_contract.md` | 01a1779d-96b3-7431-8fb7-0458e768764e (resumed 21:19, GPT-6.1-sol) | idle (WP-B4 done) |
@@ -41,8 +41,8 @@ Open or resume (new tab, worktree cwd):
 | WP-H P1-S main runs | wk-sym | 758c06a |
 | WP-L1 P1-L Pilot-1 | wk-llm | 9eb0e10 |
 | WP-L2 P1-L writer diagnosis | wk-llm | 44b27cf |
-| WP-L3 P1-L writer fix screen | wk-llm | done on wp/llm (cd5a45c), merged with WP-L4 |
-| WP-L4 P1-L read fix (last writer screen; Amendments A1, A2: parallel r = 128 arms) | wk-llm | (running) |
+| WP-L3 P1-L writer fix screen | wk-llm | 39f7f0b (with WP-L4) |
+| WP-L4 P1-L read fix (last writer screen; Amendments A1, A2: parallel r = 128 arms) | wk-llm | 39f7f0b (no writer selected) |
 | WP-C7 oracle writer in the LLM pipeline | wk-core | d057720 |
 | WP-P4L learned halting on frozen readers (prereg `docs/prereg/P4S-L.md`) | wk-sym | merged after WP-T6 |
 | WP-P2S symbolic budget matching (P2-S) | wk-symf | 0f84084 |
