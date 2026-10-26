@@ -176,8 +176,8 @@ def render(reports: Path) -> Path:
              "Validation split only; training seed 17 and evaluation generator seed 4242. "
              "Percentages below are candidate-set accuracies. These tables reproduce retained report data "
              "and recorded selections; they add no scientific contrasts or gate conclusions.", "",
-             "The plateau flag is a diagnostic: the absolute relative change between mean training CE "
-             "at steps 4001–4500 and 4501–5000 is at most 2%. "
+             "The plateau flag is a diagnostic: the absolute relative change between mean logged training CE "
+             "at steps 4001–4500 and 4501–5000 is at most 2% (50 logged points per window). "
              "Tail loss decrease (%) = 100 × (earlier mean − later mean) / max(|earlier mean|, 1e-12). "
              "A negative value denotes increasing loss. Neither the plateau flag nor step-5000 minibatch CE "
              "is proof of convergence.", ""]
