@@ -20,3 +20,7 @@ gate table `reports/p1s-f1/gates.{json,md}`; trend table/figure of Δ_reach, Δ_
 One node per job, several processes per node as measured; each job ≤ 1 h; F1 total ≤ 6 node·h. wk-sym runs WP-H
 at the same time: do not touch `wp/sym`, `runs/p1s/main` or its jobs. Code changes only if the pipeline cannot
 express a run; keep them minimal and tested.
+
+## Addendum 1 (2026-10-26 21:30)
+Apply `docs/tasks/WP-H_p1s_main.md` Addendum 1 (`swap_successors` diagnostic, merge `master` ≥ `bbe2a24` first)
+to every F1 run; report it in `docs/reports/P1S-F1.md`, never as a gate.
