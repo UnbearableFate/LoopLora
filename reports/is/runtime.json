@@ -1,0 +1,23 @@
+{
+  "execution_module": "scripts/is_runtime.py",
+  "training_entrypoint": "scripts/run_is.py packed-main",
+  "packing": {
+    "jobs": 3,
+    "runs_per_job": 12,
+    "procs": 12,
+    "output_paths": "unchanged locked main plan; shard index selects entries[shard::3]"
+  },
+  "optimization": "All-valid supports use dense ordered delta updates; padded supports fall back to original writer",
+  "equation": "M <- lambda*M + beta*(value - (lambda*M)@key)*key.T; same FP32 operand order",
+  "equivalence": {
+    "tests": 18,
+    "job": "3715583",
+    "forward": "bit-exact CPU/CUDA at E12/24/36",
+    "gradients": "atol1e-5/rtol1e-5; input gradients atol1e-6/rtol1e-5",
+    "optimizer": "three full-model AdamW steps: bit-exact losses, parameters atol1e-7/rtol1e-6",
+    "q3": "real evaluation, immutable-depth audits and chronological obsolete/current path checks"
+  },
+  "source_commit": "4aea3274c1365540b268a3756e83befce6032ac3",
+  "scientific_design_changed": false,
+  "smoke": "Registered 1500-step/200-episode two-writer E36 smoke used original writer; 150-step packing probe reads only time/memory"
+}
