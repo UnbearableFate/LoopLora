@@ -19,6 +19,10 @@ LABELS = ("B8", "M1-L4", "B4", "B5-L4", "B3-L4", "B1", "B2")
 SEEDS = (17, 29, 43)
 
 
+def labels_for_rank(rank: int):
+    return LABELS if rank == 32 else LABELS[:5]
+
+
 def save(path: Path, value) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     temporary = path.with_suffix(path.suffix + ".tmp")
@@ -34,8 +38,9 @@ def digest(path: Path) -> str:
     return h.hexdigest()
 
 
-def config(label: str, seed: int = 17) -> dict:
-    return json.loads((ROOT / "configs/p1l/main" / f"{label}-s{seed}.json").read_text())
+def config(label: str, seed: int = 17, rank: int = 32) -> dict:
+    directory = "main" if rank == 32 else "main-r128"
+    return json.loads((ROOT / "configs/p1l" / directory / f"{label}-s{seed}.json").read_text())
 
 
 def runtime() -> dict:
@@ -108,9 +113,9 @@ def train_stage(args) -> None:
     args.out.mkdir(parents=True, exist_ok=False)
     model, tokenizer = load_model(), load_tokenizer()
     records = []
-    selected = args.labels or LABELS
+    selected = args.labels or labels_for_rank(args.rank)
     for label in selected:
-        base = config(label, args.seed)
+        base = config(label, args.seed, args.rank)
         if args.stage in {"preflight", "smoke"}:
             base["seed"] = derive_seed(20261027, "p1l-main", "timing-smoke")
             base["smoke"] = True
@@ -123,7 +128,8 @@ def train_stage(args) -> None:
             base["train"]["steps"] = args.steps
             base["eval"].update(episodes=1000, hops=[1, 2, 3], counterfactuals=False)
         elif args.stage == "main":
-            lock = json.loads((ROOT / "reports/p1l/lr-S-lock.json").read_text())
+            lock_path = (ROOT / "reports/p1l" / ("r128/lr-S-lock.json" if args.rank == 128 else "lr-S-lock.json"))
+            lock = json.loads(lock_path.read_text())
             if lock["status"] != "locked":
                 raise ValueError("main requires a committed lr/S lock")
             base["train"]["steps"] = lock["S"]
@@ -147,6 +153,7 @@ def main() -> None:
     parser.add_argument("--out", type=Path, required=True)
     parser.add_argument("--steps", type=int)
     parser.add_argument("--seed", type=int, choices=(17, 29, 43), default=17)
+    parser.add_argument("--rank", type=int, choices=(32, 128), default=32)
     parser.add_argument("--labels", nargs="+", choices=(*LABELS, "B0"))
     args = parser.parse_args()
     if args.stage in {"preflight", "smoke"} and (args.steps is None or args.steps < 10):

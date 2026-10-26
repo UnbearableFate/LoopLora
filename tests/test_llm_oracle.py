@@ -50,9 +50,10 @@ def data(cfg):
 
 
 @pytest.mark.parametrize("device", ["cpu", "cuda"])
-def test_exact_symbolic_oracle_rule_with_pair_keys_and_padding(device):
-    writer = OracleRandomWriter(V=32, n_rel=4, seed=17).to(device)
-    reference = OracleWriter(V=32, r_mem=32, seed=17).to(device)
+@pytest.mark.parametrize("rank", [32, 128])
+def test_exact_symbolic_oracle_rule_with_pair_keys_and_padding(device, rank):
+    writer = OracleRandomWriter(V=32, n_rel=4, seed=17, r_mem=rank).to(device)
+    reference = OracleWriter(V=32, r_mem=rank, seed=17).to(device)
     facts = torch.tensor([[[1,0,2],[1,1,3],[1,0,4],[-1,-1,-1]],
                           [[2,3,5],[5,3,8],[-1,-1,-1],[-1,-1,-1]]],device=device)
     valid = torch.tensor([[1,1,1,0],[1,1,0,0]],dtype=torch.bool,device=device)

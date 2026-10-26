@@ -1,0 +1,78 @@
+{
+  "name": "p1l-r128-B4-s43",
+  "seed": 43,
+  "stage": "reader",
+  "variant": "B4",
+  "writer": "oracle_random",
+  "oracle_seed": 17,
+  "protocol": "memory_only",
+  "write_policy": "fact_final",
+  "smoke": false,
+  "model": {
+    "r": 128,
+    "layer": 14,
+    "input_site": "o_proj",
+    "rho": 0.25,
+    "alpha": 1.0
+  },
+  "task": {
+    "name": "t2_chain_end",
+    "E": 12,
+    "Q": 4,
+    "V": 1024,
+    "n_rel": 4,
+    "head_sharing": 0.3,
+    "chain_lengths": [
+      8,
+      4
+    ],
+    "hops": [
+      1,
+      2,
+      3
+    ]
+  },
+  "train": {
+    "steps": 17000,
+    "batch_size": 64,
+    "lr": 0.001,
+    "weight_decay": 0.01,
+    "grad_clip": 1.0,
+    "warmup_steps": 20,
+    "depths": [
+      1
+    ],
+    "log_every": 100,
+    "prefetch_workers": 2
+  },
+  "eval": {
+    "episodes": 1000,
+    "batch_size": 16,
+    "depths": [
+      1
+    ],
+    "splits": [
+      "val"
+    ],
+    "hops": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "seed": 4242,
+    "counterfactuals": false,
+    "protocols": [
+      "memory_only"
+    ],
+    "allow_confirmation": false
+  },
+  "stats": {
+    "resamples": 2000,
+    "seed": 2718
+  }
+}
