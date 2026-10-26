@@ -56,7 +56,7 @@ def swap_successors(experiment, cfg: dict, out: Path) -> dict:
     # swap_successors returns allsource query labels; no oracle answer enters scoring.
     source_episode = np.asarray(swapped.meta["source_episode"])
     source_query = np.asarray(swapped.meta["source_query"])
-    rows = []
+    rows, samples = [], []
     for begin in range(0, len(swapped.episode_seed), cfg["eval"]["batch_size"]):
         end = min(len(swapped.episode_seed), begin + cfg["eval"]["batch_size"])
         part = _slice(swapped, slice(begin, end))
@@ -69,24 +69,33 @@ def swap_successors(experiment, cfg: dict, out: Path) -> dict:
             setattr(original, field, value[np.arange(len(value)), selected][:, None])
         original_batch = experiment.prepare(original)
         swapped_batch = experiment.prepare(part)
-        depth = 1 if cfg["variant"] in {"B0", "B1", "B2", "B4"} else 4
-        before, _ = experiment.score(original_batch, depth)
-        after, _ = experiment.score(swapped_batch, depth)
-        answer = swapped_batch.answer_ids.cpu().numpy().ravel()
-        old = before.argmax(-1).cpu().numpy().ravel()
-        new = after.argmax(-1).cpu().numpy().ravel()
-        for hop in sorted(set(part.q_hop_true.ravel().tolist())):
-            keep = part.q_hop_true.ravel() == hop
-            rows.append(dict(hop=int(hop), n=int(keep.sum()),
-                             follows_new=int((new[keep] == answer[keep]).sum()),
-                             original_predicts_new=int((old[keep] == answer[keep]).sum())))
+        if (not torch.equal(original_batch.question_ids, swapped_batch.question_ids)
+                or not torch.equal(original_batch.question_mask, swapped_batch.question_mask)):
+            raise AssertionError("swap_successors changed source question tokens")
+        for depth in ([1, 4, 8] if cfg["variant"] == "M1" else [4]):
+            before, _ = experiment.score(original_batch, depth)
+            after, _ = experiment.score(swapped_batch, depth)
+            answer = swapped_batch.answer_ids.cpu().numpy().ravel()
+            old = before.argmax(-1).cpu().numpy().ravel()
+            new = after.argmax(-1).cpu().numpy().ravel()
+            samples.append(dict(episode_id=arrays.episode_seed[original_indices],
+                query_id=selected, hop=part.q_hop_true.ravel(), L=np.full(len(answer), depth),
+                original_prediction=old, prediction=new, answer=answer,
+                original_answer=original_batch.answer_ids.cpu().numpy().ravel()))
+            for hop in sorted(set(part.q_hop_true.ravel().tolist())):
+                keep = part.q_hop_true.ravel() == hop
+                rows.append(dict(hop=int(hop), L=depth, n=int(keep.sum()),
+                                 follows_new=int((new[keep] == answer[keep]).sum()),
+                                 original_predicts_new=int((old[keep] == answer[keep]).sum())))
     result = []
-    for hop in sorted({row["hop"] for row in rows}):
-        same = [row for row in rows if row["hop"] == hop]
+    for depth, hop in sorted({(row["L"], row["hop"]) for row in rows}):
+        same = [row for row in rows if row["hop"] == hop and row["L"] == depth]
         n = sum(row["n"] for row in same)
-        result.append(dict(hop=hop, n=n,
+        result.append(dict(hop=hop, L=depth, n=n,
             follows_new=sum(row["follows_new"] for row in same) / n,
             original_predicts_new=sum(row["original_predicts_new"] for row in same) / n))
+    np.savez_compressed(out / "swap-successors-samples.npz",
+                        **{key: np.concatenate([row[key] for row in samples]) for key in samples[0]})
     save(out / "swap-successors.json", result)
     return dict(episodes=len(arrays.episode_seed), eligible_queries=sum(row["n"] for row in rows), table=result)
 

@@ -26,7 +26,8 @@ The main runner refuses to run without `reports/p1l/lr-S-lock.json`.
   preregistered P1-S typed layout. No replication training or lr selection.
 - M1 depth scan is every integer 1 through8 on exactly the same x/u/M and
   write counts; B8 has fixed depth4. Swap-successors retains the terminal set,
-  source queries and source IDs; report prediction-follow rates descriptively.
+  source queries and source IDs; report prediction-follow rates descriptively
+  at M1 depths1/4/8 (the P1-S convention) and B8's fixed depth4.
 
 ## Per-step readout definitions
 

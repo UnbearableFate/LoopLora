@@ -74,7 +74,7 @@ def finalize(args):
         raise ValueError("confirmation manifest does not match the complete training matrix")
     args.out.mkdir(parents=True, exist_ok=True)
     primary, typed = {label: {} for label in LABELS}, {label: {} for label in LABELS}
-    counts, artifact_rows, readouts, faithfulness = [], [], [], []
+    counts, artifact_rows, readouts, faithfulness, swaps = [], [], [], [], []
     oracle_hashes = set()
     reference_memory = None
     for name, directory in evaluations.items():
@@ -115,6 +115,8 @@ def finalize(args):
                     accuracy=row["accuracy"], candidate_correct=int(samples["candidate_correct"][keep].sum()),
                     candidate_accuracy=row["candidate_accuracy"]))
             artifact_rows[-1][f"{setting}_samples_hash"] = digest(directory / "samples.npz")
+            artifact_rows[-1][f"{setting}_metrics_hash"] = digest(directory / "metrics.json")
+            artifact_rows[-1][f"{setting}_config_hash"] = digest(directory / "config.json")
             if setting == "primary" and label in {"B8", "M1-L4", "B4", "B5-L4", "B3-L4"}:
                 training = json.loads((train / "record.json").read_text())
                 oracle_hashes.add(training["writer_hash"])
@@ -129,6 +131,18 @@ def finalize(args):
             data = json.loads((out / "readout.json").read_text())
             readouts.extend(dict(reader=label, seed=seed, **row) for row in data["table"])
             faithfulness.extend(dict(reader=label, seed=seed, **row) for row in data["faithfulness"])
+            swap = json.loads((out / "swap-successors.json").read_text())
+            with np.load(out / "swap-successors-samples.npz", allow_pickle=False) as source:
+                samples = {key: source[key] for key in source.files}
+            for row in swap:
+                keep = (samples["hop"] == row["hop"]) & (samples["L"] == row["L"])
+                if (int(keep.sum()) != row["n"] or row["n"] != 2000
+                        or float((samples["prediction"][keep] == samples["answer"][keep]).mean()) != row["follows_new"]
+                        or float((samples["original_prediction"][keep] == samples["answer"][keep]).mean()) != row["original_predicts_new"]):
+                    raise ValueError("swap_successors table cannot be reproduced from samples")
+                swaps.append(dict(reader=label, seed=seed, **row))
+            artifact_rows[-1]["swap_samples_hash"] = digest(out / "swap-successors-samples.npz")
+            artifact_rows[-1]["readout_hash"] = digest(out / "readout.json")
     if len(oracle_hashes) != 1:
         raise ValueError("oracle code hash differs across primary runs")
     confidence = .95 if authorization["writer_conditions"] == 1 else .975
@@ -138,6 +152,7 @@ def finalize(args):
     write_csv(args.out / "accuracy.csv", counts)
     write_csv(args.out / "per-step-readout.csv", readouts)
     write_csv(args.out / "readout-faithfulness.csv", faithfulness)
+    write_csv(args.out / "swap-successors.csv", swaps)
     save(args.out / "run-manifest.json", dict(status="audited", S=manifest["S"], lrs=manifest["lrs"],
         oracle_hash=next(iter(oracle_hashes)), runs=artifact_rows))
     plot(args.out, counts)
@@ -178,6 +193,18 @@ def plot(out, counts):
     fig.tight_layout()
     fig.savefig(out / "accuracy.png", dpi=180)
     fig.savefig(out / "accuracy.pdf")
+    plt.close(fig)
+    values = np.asarray([[np.mean([r["accuracy"] for r in counts if r["reader"] == "M1-L4"
+        and r["L"] == depth and r["hop"] == hop and r["setting"] == "primary"
+        and r["protocol"] == "memory_only"]) for hop in range(1, 9)] for depth in range(1, 9)])
+    fig, ax = plt.subplots(figsize=(6, 5))
+    image = ax.imshow(100*values, vmin=0, vmax=100, cmap="viridis", origin="lower")
+    ax.set(xticks=range(8), xticklabels=range(1, 9), yticks=range(8), yticklabels=range(1, 9),
+           xlabel="True query hop", ylabel="Read depth", title="M1-L4: same checkpoint and memory")
+    fig.colorbar(image, ax=ax, label="Full-vocabulary EM (%)")
+    fig.tight_layout()
+    fig.savefig(out / "M1-depth.png", dpi=180)
+    fig.savefig(out / "M1-depth.pdf")
     plt.close(fig)
 
 
