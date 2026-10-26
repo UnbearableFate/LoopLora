@@ -1,4 +1,4 @@
-# WP-E implementation interface (working coordination)
+# WP-E implementation interface
 
 WP-E owns `llm/`, `data/render.py`, name assets, `test_llm_*.py`, pilot config.
 Orchestrator confirmed WP-A/WP-B merged at master `dbead6f`; merged into `wp/llm`.
@@ -13,7 +13,7 @@ to base.dtype before addition. These casts preserve autograd and let both refere
 Qwen bf16+fp32 configurations work. WP-A implemented this as addendum 3 before merge.
 WP-E does not edit core. Its full-model bf16 test checks this.
 
-LLM API being implemented:
+Implemented LLM API (full-model validation and pilot results in `WP-E.md`):
 - `load_model(dtype=torch.bfloat16, device="cuda")`, `load_tokenizer()` in `llm/inject.py`; pinned offline Qwen.
 - `attach_adapters(model, cfg, layers=(14,), seed=0) -> AdapterBank`; `cfg` is core AdapterConfig
   (dimensions replaced with real projection sizes); `detach_adapters(model)`.
@@ -31,7 +31,8 @@ LLM API being implemented:
   as answer_scores for the teacher forcing equivalence test.
 - Question batch rows align with snapshot rows; one call per question forks the snapshot.
 - Attention position ids use cumulative valid masks; memory-only starts fresh positions.
-- Rendered outputs expected from data worker agent, independent of protocol input tensors.
+- `data/render.py` returns context IDs, per-fact spans/final masks, and per-query question/answer IDs;
+  callers pad these IDs and masks for protocol input tensors.
 
 Pilot uses synthetic token sequences with declared lengths (support 64/question 16/answer 1 by
-initial default), avoiding linguistic correctness claims. Full 20-cell requested rank/L/batch grid.
+default), avoiding linguistic correctness claims. The full 20-cell rank/L/batch grid completed.

@@ -1,5 +1,8 @@
 # WP-E rendering notes
 
+Primary integration is complete; see [WP-E.md](WP-E.md) for the final 54-test
+run and implementation commits. The following records the rendering handoff.
+
 Implemented `src/looplora/data/render.py`, versioned name assets, and
 `tests/test_llm_render.py`. No core, dependencies, data generator, or data
 `__init__.py` changes. No commits (WP-E primary owns integration/commits).
@@ -60,8 +63,8 @@ versioned in `assets/build_name_pool.py` and `assets/README.md`. Jobs are offlin
   19:02:37 JST. The runner rebuilds the local asset,
   temporarily adds WP-B's sibling worktree package path, then runs the renderer
   test file. The added 16 generator cases span all six tasks/all T3 bases and
-  train/test_unseen, with 32 generated episodes. Persistent generator tests use
-  the normal import after merge (skip if WP-B has not been merged).
+  train/test_unseen, with 32 generated episodes. Final persistent generator tests
+  require the normal WP-B import after merge; they no longer skip missing imports.
   Log: `/work/xg24i002/x10041/LoopLora/logs/pbs/t-llm-render-20261026-190140-1211103.log`.
 
 No remaining rendering blockers. Post-merge full WP-E testing belongs to the

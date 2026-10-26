@@ -1,4 +1,8 @@
-# WP-E throughput pilot implementation
+# WP-E throughput pilot implementation notes
+
+Final primary-agent validation is recorded in [WP-E.md](WP-E.md): 54 integration
+tests passed; pilot job 3711529.opbs completed all 20 cells. The notes below
+describe the subagent's implementation handoff before that validation.
 
 `src/looplora/llm/bench.py` and `configs/pilot_throughput.yaml` implement the full
 20-cell rank × L × batch grid. Default synthetic lengths are support=64,
