@@ -146,24 +146,43 @@ def prefix_reader(adapter, step):
 
 
 @torch.no_grad()
-def read_batch(experiment, prepared, directions):
-    actual, inputs = experiment.score(prepared, 4, capture_inputs=True)
-    b, q, t = prepared.question_ids.shape
+def score_answer_branches(experiment, prepared):
+    """Capture the actual alpha*B*z at each scored question token."""
+    frames = []
+    original = experiment.adapter.branch
+
+    def capture(z):
+        value = original(z)
+        frames.append(value)
+        return value
+
+    with patch.object(experiment.adapter, "branch", side_effect=capture):
+        logits, _ = experiment.score(prepared, 4)
     valid = prepared.question_mask.flatten(0, 1)
+    b, t = valid.shape
     last = torch.where(valid, torch.arange(t, device=valid.device), -1).amax(-1)
-    x = inputs.flatten(0, 1)[torch.arange(b*q, device=valid.device), last].float()
-    u = experiment.adapter.u(x)
-    memory = prepared.snapshot.states[experiment.layer].repeat_interleave(q, dim=0)
-    states = reader_states(experiment.adapter, u, memory)
+    positions = valid.any(0).nonzero(as_tuple=True)[0]
+    if len(frames) != len(positions):
+        raise AssertionError("readout branch calls do not match valid token positions")
+    branches = frames[0].new_zeros((b, experiment.adapter.cfg.d_out))
+    for position, frame in zip(positions, frames, strict=True):
+        rows = valid[:, position].nonzero(as_tuple=True)[0]
+        keep = last[rows] == position
+        branches[rows[keep]] = frame[keep]
+    return logits, branches
+
+
+@torch.no_grad()
+def read_batch(experiment, prepared, directions):
+    actual, _ = experiment.score(prepared, 4)
     names = directions["names"].to(actual.device)
     actual_names = actual.flatten(0, 1)[:, names].argmax(-1)
     outputs = []
-    for step, state in enumerate(states, 1):
+    for step in range(1, 5):
         with prefix_reader(experiment.adapter, step):
-            logits, _ = experiment.score(prepared, 4)
+            logits, branch = score_answer_branches(experiment, prepared)
         if step == 4 and not torch.equal(logits, actual):
             raise AssertionError("final logit-lens replay differs from deployed model")
-        branch = experiment.adapter.branch(state)
         scores = {"logit_lens": logits.flatten(0, 1)[:, names].float()}
         for kind in ("contrastive", "raw_logit", "random"):
             scores[kind] = branch @ directions[kind].to(branch.device).T

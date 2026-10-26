@@ -19,7 +19,7 @@ from looplora.llm.evaluate import evaluate
 from looplora.llm.inject import load_model, load_tokenizer
 from looplora.llm.train import load_checkpoint, make_task_spec
 from looplora.sym.evaluate import stratify_queries
-from readout_p1l import reader_states
+from readout_p1l import reader_states, score_answer_branches
 from run_p1l_main import ROOT, digest, runtime, save
 
 
@@ -51,8 +51,12 @@ def audit_answer_branches(experiment, cfg):
     u = experiment.adapter.u(x)
     memory = prepared.snapshot.states[experiment.layer].repeat_interleave(prepared.answer_ids.shape[1], 0)
     recomputed = experiment.adapter.branch(reader_states(experiment.adapter, u, memory)[-1])
-    return dict(bitwise_equal=bool(torch.equal(actual, recomputed)),
-                max_abs_error=float((actual - recomputed).abs().max()))
+    _, captured = score_answer_branches(experiment, prepared)
+    if not torch.equal(actual, captured):
+        raise AssertionError("probe residual capture differs from the deployed reader")
+    return dict(captured_bitwise_equal=True,
+                recomputed_bitwise_equal=bool(torch.equal(actual, recomputed)),
+                recomputed_max_abs_error=float((actual - recomputed).abs().max()))
 
 
 def main():

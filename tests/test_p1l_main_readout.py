@@ -11,7 +11,7 @@ from transformers import Qwen3Config, Qwen3ForCausalLM
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
 from readout_p1l import (name_gradients, normalize_directions, path_entities,
-                         read_batch, reader_states)
+                         read_batch, reader_states, score_answer_branches)
 import evaluate_p1l_main as evaluator
 from run_p1l_main import LABELS, config, labels_for_rank
 from looplora.core.adapters import make_adapter
@@ -110,6 +110,9 @@ def test_final_logit_lens_replays_actual_model_with_nonzero_branch(variant, rank
         directions = dict(names=names, contrastive=primary, raw_logit=secondary, random=secondary)
         outputs, actual = read_batch(experiment, prepared, directions)
         assert np.array_equal(outputs[-1]["logit_lens"].argmax(-1), actual)
+        _, deployed_branch = score_answer_branches(experiment, prepared)
+        expected = deployed_branch @ primary.cuda().T
+        assert np.array_equal(outputs[-1]["contrastive"], expected.cpu().numpy())
         assert any(not np.array_equal(outputs[0][kind], outputs[-1][kind]) for kind in outputs[0])
     finally:
         experiment.close()
