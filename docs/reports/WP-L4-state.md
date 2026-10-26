@@ -1,5 +1,13 @@
 # WP-L4 CURRENT — Amendment A2, all science submitted
 
+CURRENT OBSERVER: audit3716541, event
+.job-wakeup/8b05200b-6566-43b7-8b35-67220d527791, worker2580418,
+message-mode5minpoll, thread01a1779d-c123-75a1-9458-ae849ee0fcde; noGoal.
+This replaces the alreadyACKNOWLEDGED3716160observer below. Resumeafteraudit,
+inspect/ack, checkexit0 andfinalsummary/exports OR singleE8branch. Preserve
+untracked draftreport and completeit aftervalidateddecision. cf824af records
+allscientificcosts/receipts; no scientific jobs remain active.
+
 LATEST 06:22JST: ALL4 scientific jobs FINISH/exit0, ALL7 records complete.
 3715707mg0856=4759s,3715708mg0859=4483s,3716159mg0852=4920s,
 3716160mg0853=4612s. Frozen schedules/sources matched in records. Still no
