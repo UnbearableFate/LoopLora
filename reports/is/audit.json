@@ -1,0 +1,22 @@
+{
+  "all_depth_snapshots_identical": true,
+  "all_samples_sealed": true,
+  "all_within_load_labels_paired": true,
+  "checkpoints_unchanged": true,
+  "completed_at": "2026-10-26T18:50:52.346905+00:00",
+  "confirmation_look_count": 1,
+  "confirmation_sets": 360,
+  "reference_checkpoints": 54,
+  "sample_barrier_created_at": "2026-10-26T18:50:07.683084+00:00",
+  "sample_rows": 13296000,
+  "status": "passed",
+  "training_barrier": {
+    "created_at": "2026-10-26T18:47:25.098939+00:00",
+    "evaluation_plan_hash": "9f64a7a01549b5d4c1d374ca7b3764d7",
+    "status": "passed",
+    "training_plan_hash": "01fe0d4138c13c8c2b225f650612fbed",
+    "training_stages": 36
+  },
+  "training_stages": 36,
+  "update_cells": 1230
+}

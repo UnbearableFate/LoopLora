@@ -1,0 +1,62 @@
+[
+  {
+    "endpoint": "IS-E1",
+    "interpretation": "consistent with Prop.4",
+    "reader": "M1-mixed",
+    "writer": "oracle_random"
+  },
+  {
+    "endpoint": "IS-E2",
+    "largest_qualifying_trained_E": 36,
+    "nonqualifying_E": [],
+    "qualifying_E": [
+      12,
+      24,
+      36
+    ],
+    "reader": "M1-mixed",
+    "writer": "oracle_random"
+  },
+  {
+    "endpoint": "IS-E2",
+    "largest_qualifying_trained_E": 36,
+    "nonqualifying_E": [],
+    "qualifying_E": [
+      12,
+      24,
+      36
+    ],
+    "reader": "B8",
+    "writer": "oracle_random"
+  },
+  {
+    "endpoint": "IS-E1",
+    "interpretation": "consistent with Prop.4",
+    "reader": "M1-mixed",
+    "writer": "joint_fact"
+  },
+  {
+    "endpoint": "IS-E2",
+    "largest_qualifying_trained_E": 36,
+    "nonqualifying_E": [],
+    "qualifying_E": [
+      12,
+      24,
+      36
+    ],
+    "reader": "M1-mixed",
+    "writer": "joint_fact"
+  },
+  {
+    "endpoint": "IS-E2",
+    "largest_qualifying_trained_E": 36,
+    "nonqualifying_E": [],
+    "qualifying_E": [
+      12,
+      24,
+      36
+    ],
+    "reader": "B8",
+    "writer": "joint_fact"
+  }
+]
