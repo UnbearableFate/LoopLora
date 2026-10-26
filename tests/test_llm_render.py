@@ -163,7 +163,7 @@ def test_explicit_fixture_metadata_and_invalid_ids(tokenizer):
 ])
 @pytest.mark.parametrize("split", ["train", "test_unseen"])
 def test_generated_episode_integration(tokenizer, task, base, split):
-    relations = pytest.importorskip("looplora.data.relations", reason="WP-B generator not merged yet")
+    from looplora.data import relations
     kwargs = {"E": 8, "Q": 3}
     if base is not None:
         kwargs["base"] = base
