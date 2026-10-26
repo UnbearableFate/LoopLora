@@ -14,7 +14,7 @@ from looplora.llm.evaluate import aggregate_samples
 from looplora.sym.stats import load_samples, pooled_compare_runs, pooled_walk_specificity
 
 from evaluate_p1l_main import check_training
-from run_p1l_main import LABELS, SEEDS, digest, save
+from run_p1l_main import LABELS, SEEDS, digest, labels_for_rank, save
 
 
 def endpoint(samples, left, right, *, depth_left=4, depth_right=4, hops=(2, 3),
@@ -70,10 +70,12 @@ def finalize(args):
     evaluations = json.loads(args.evaluations.read_text())["runs"]
     authorization = json.loads(args.authorization.read_text())
     check_training(manifest, authorization)
+    rank = manifest.get("rank", 32)
+    labels = labels_for_rank(rank)
     if evaluations.keys() != manifest["runs"].keys():
         raise ValueError("confirmation manifest does not match the complete training matrix")
     args.out.mkdir(parents=True, exist_ok=True)
-    primary, typed = {label: {} for label in LABELS}, {label: {} for label in LABELS}
+    primary, typed = {label: {} for label in labels}, {label: {} for label in labels}
     counts, artifact_rows, readouts, faithfulness, swaps = [], [], [], [], []
     oracle_hashes = set()
     reference_memory = None
@@ -102,14 +104,14 @@ def finalize(args):
                 raise ValueError("full-vocabulary correctness labels were changed")
             if metrics["table"] != aggregate_samples(samples):
                 raise ValueError("metrics cannot be reproduced from sample arrays")
-            if label in LABELS:
+            if label in labels:
                 (primary if setting == "primary" else typed)[label][seed] = samples
             for row in metrics["table"]:
                 keep = ((samples["condition"] == row["condition"]) & (samples["hop"] == row["hop"])
                         & (samples["L"] == row["L"]))
                 if int(keep.sum()) != 2000:
                     raise ValueError("each condition/depth/hop requires2000 paired queries")
-                counts.append(dict(writer="oracle_random" if label not in {"B0", "B1", "B2"} else "none",
+                counts.append(dict(writer="oracle_random" if label not in {"B0", "B1", "B2"} else "none", rank=rank,
                     reader=label, seed=seed, setting=setting, protocol=row["protocol"], hop=row["hop"],
                     L=row["L"], n=row["n"], correct=int(samples["correct"][keep].sum()),
                     accuracy=row["accuracy"], candidate_correct=int(samples["candidate_correct"][keep].sum()),
@@ -145,8 +147,9 @@ def finalize(args):
             artifact_rows[-1]["readout_hash"] = digest(out / "readout.json")
     if len(oracle_hashes) != 1:
         raise ValueError("oracle code hash differs across primary runs")
-    confidence = .95 if authorization["writer_conditions"] == 1 else .975
+    confidence = 1 - .05 / authorization["gated_conditions"]
     result = endpoints(primary, typed, confidence)
+    result["rank"] = rank
     result["authorization"] = authorization
     save(args.out / "endpoints.json", result)
     write_csv(args.out / "accuracy.csv", counts)
@@ -174,7 +177,8 @@ def plot(out, counts):
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
 
-    labels = ["B8", "M1-L4", "B4", "B5-L4", "B3-L4", "B0", "B1", "B2"]
+    labels = [label for label in ["B8", "M1-L4", "B4", "B5-L4", "B3-L4", "B0", "B1", "B2"]
+              if any(row["reader"] == label for row in counts)]
     values = np.zeros((len(labels), 8))
     for i, label in enumerate(labels):
         depth = 1 if label in {"B0", "B1", "B2", "B4"} else 4

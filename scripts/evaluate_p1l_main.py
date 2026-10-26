@@ -22,16 +22,29 @@ from looplora.llm.train import load_checkpoint, make_task_spec
 from looplora.sym.evaluate import stratify_queries
 
 from readout_p1l import path_entities, read_batch
-from run_p1l_main import LABELS, ROOT, SEEDS, digest, runtime, save
+from run_p1l_main import LABELS, ROOT, SEEDS, digest, labels_for_rank, runtime, save
 
 
-def check_training(manifest: dict, authorization: dict) -> None:
-    expected = {f"{label}-s{seed}" for label in LABELS for seed in SEEDS} | {"B0-s17"}
+def check_training(manifest: dict, authorization: dict, *, check_all: bool = True) -> None:
+    rank = manifest.get("rank", 32)
+    expected = {f"{label}-s{seed}" for label in labels_for_rank(rank) for seed in SEEDS}
+    if rank == 32:
+        expected.add("B0-s17")
     if set(manifest["runs"]) != expected:
-        raise ValueError("confirmation requires all21 trained runs and the untrained B0")
-    if (authorization.get("status") != "allowed" or authorization.get("writer_conditions") not in {1, 2}
-            or not authorization.get("orchestrator_decision")):
+        raise ValueError("confirmation requires all21 trained runs and B0 forr32, or all15 forr128")
+    if authorization.get("status") != "allowed" or not authorization.get("orchestrator_decision"):
         raise ValueError("confirmation is held until the orchestrator decides WP-L4")
+    conditions = authorization.get("condition_manifests", {})
+    k = authorization.get("gated_conditions")
+    if (not isinstance(k, int) or isinstance(k, bool) or k < 2 or k != len(conditions)
+            or not {"oracle-r32", "oracle-r128"} <= conditions.keys()):
+        raise ValueError("B3 requires the fixed count and manifests of every gated condition")
+    if check_all:
+        all_manifests = [json.loads(Path(path).read_text()) for path in conditions.values()]
+        if manifest not in all_manifests:
+            raise ValueError("current condition is absent from the global confirmation lock")
+        for other in all_manifests:
+            check_training(other, authorization, check_all=False)
     for name, path in manifest["runs"].items():
         directory = Path(path)
         record = json.loads((directory / "record.json").read_text())
@@ -39,6 +52,8 @@ def check_training(manifest: dict, authorization: dict) -> None:
         if record["status"] != "complete" or record["checkpoint_hash"] != digest(checkpoint):
             raise ValueError(f"incomplete or changed main checkpoint: {name}")
         cfg = record["config"]
+        if cfg["model"]["r"] != rank:
+            raise ValueError("main run rank differs from its condition manifest")
         if cfg["smoke"] or cfg["eval"]["allow_confirmation"] or cfg["eval"]["splits"] != ["val"]:
             raise ValueError("main training accessed confirmation data or used smoke settings")
         if name != "B0-s17" and (cfg["train"]["steps"] != manifest["S"]

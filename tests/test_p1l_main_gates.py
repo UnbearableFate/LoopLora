@@ -43,6 +43,23 @@ def test_global_training_gate_requires_orchestrator_decision_before_opening_runs
         check_training(manifest, dict(status="allowed", writer_conditions=1, orchestrator_decision="yes"))
 
 
+def test_global_gate_rejects_missing_rank_or_an_incomplete_other_condition(tmp_path):
+    manifest = {"rank": 128, "runs": {f"{label}-s{seed}": "/does-not-exist"
+                for label in LABELS[:5] for seed in SEEDS}}
+    with pytest.raises(ValueError, match="B3"):
+        check_training(manifest, dict(status="allowed", orchestrator_decision="none selected", gated_conditions=1,
+                                       condition_manifests={"oracle-r128": "/missing"}))
+    import json
+    current = tmp_path / "r128.json"
+    current.write_text(json.dumps(manifest))
+    other = tmp_path / "r32.json"
+    other.write_text(json.dumps(dict(rank=32, runs={})))
+    authorization = dict(status="allowed", orchestrator_decision="none selected", gated_conditions=2,
+                         condition_manifests={"oracle-r32": str(other), "oracle-r128": str(current)})
+    with pytest.raises(ValueError, match="all21"):
+        check_training(manifest, authorization)
+
+
 def test_job_margin_is_enforced_before_submission():
     assert walltime(3600) == "01:30:00"
     with pytest.raises(ValueError, match="above2h"):
