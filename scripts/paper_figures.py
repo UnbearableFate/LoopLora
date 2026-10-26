@@ -23,6 +23,9 @@ F2_ENDPOINTS = "reports/p1s-f2/gate_endpoints.csv"
 P2_COST = "reports/p2s/cost.csv"
 P4_HEADLINE = "reports/p4s/headline.csv"
 P4_LATENCY = "reports/p4s/latency.csv"
+IS_DESIGN = "reports/is/design.json"
+IS_ACCURACY = "reports/is/accuracy.csv"
+IS_ENDPOINTS = "reports/is/endpoints.csv"
 DEPTHS = [0, 1, 2, 3, 4, 6, 8, 12, 16]
 SEEDS = [17, 29, 43]
 F2_LIMIT = (
@@ -333,6 +336,113 @@ class Figures:
                          "Five warmups,20 repeats,FP32 GH200. Read-norm costs one more read than updates.",
                          "Absolute quality is overall hops1–8, distinct from H1's long-hop summary."], points=points)
 
+    def memory_load_depth(self) -> None:
+        design = self.data.load(IS_DESIGN)
+        accuracy = self.data.load(IS_ACCURACY)
+        endpoints = self.data.load(IS_ENDPOINTS)
+        if (design["confirmation"] != {"after_all_36_training": True, "episodes": 2000,
+                                      "seed": 999001, "split": "test"}
+                or design["r"] != 32 or design["r_mem"] != 32
+                or design["seeds"] != SEEDS):
+            raise ValueError("IS figure expects the registered rank32 C999 three-seed design")
+        layouts = {int(row["E"]): row["chain_lengths"] for row in design["layouts"]}
+        loads, depths = [6, 12, 18, 24, 36], list(range(1, 9))
+        if set(layouts) != set(loads):
+            raise ValueError("IS load/layout coverage differs from the registered five loads")
+        if design["same_checkpoint_depths"]["M1_mixed"] != depths:
+            raise ValueError("IS mixed-depth checkpoint sweep must contain L1 through L8")
+        fig, axes = self.plt.subplots(2, 2, figsize=(10.2, 7.0), sharex="row", sharey="row")
+        colors = self.plt.get_cmap("tab10").colors
+        points, selectors, checkpoint_ids = [], [], []
+        for column, writer in enumerate(("oracle_random", "joint_fact")):
+            selector = dict(writer=writer, reader="M1-mixed", variant="M1",
+                            train_E=12, update="False")
+            rows = select(accuracy, **selector)
+            references = [row for row in design["checkpoints"]
+                          if row["writer"] == writer and row["reader"] == "M1-mixed"
+                          and row["train_E"] == 12]
+            if sorted(row["seed"] for row in references) != SEEDS:
+                raise ValueError(f"IS has no unique fixed E12 checkpoint per seed for {writer}")
+            checkpoint_ids.extend({key: row[key] for key in (
+                "name", "writer", "reader", "seed", "train_E", "checkpoint_hash", "config_hash")}
+                for row in references)
+            selectors.append(dict(source=IS_ACCURACY, selector=dict(
+                **selector, seed=SEEDS, E=loads, base_E="equal to E", hop=[2, 3], L=depths)))
+            d_points = []
+            for index, load in enumerate(loads):
+                means = []
+                for depth in depths:
+                    seed_points = []
+                    for seed in SEEDS:
+                        cells = [one(rows, seed=seed, E=load, base_E=load, hop=hop, L=depth)
+                                 for hop in (2, 3)]
+                        if any(int(row["n"]) != 2000 for row in cells):
+                            raise ValueError("IS curve cells must contain2000 episodes per seed and hop")
+                        mean = sum(float(row["accuracy"]) for row in cells) / 2
+                        seed_points.append(dict(seed=seed, accuracy=mean, source_cells=cells))
+                    mean = sum(row["accuracy"] for row in seed_points) / len(SEEDS)
+                    means.append(100 * mean)
+                    points.append(dict(kind="absolute_reach_curve", source=IS_ACCURACY,
+                        writer=writer, reader="M1-mixed", train_E=12, E=load,
+                        chain_lengths=layouts[load], L=depth, hops=[2, 3],
+                        training_seeds=SEEDS, accuracy=mean, n_queries=12000,
+                        ci_available=False, per_seed=seed_points))
+                chain_label = ",".join(str(length) for length in layouts[load])
+                axes[0, column].plot(depths, means, color=colors[index], marker="o",
+                    markersize=3.5, linewidth=1.6, label=f"E={load}: ({chain_label})")
+                endpoint_selector = dict(endpoint="IS-E1-D", writer=writer, reader="M1-mixed",
+                                         train_E=12, E=load, subset="reach", confidence="0.975")
+                endpoint = one(endpoints, **endpoint_selector)
+                if (endpoint["descriptive"] != "False" or int(endpoint["n_seeds"]) != 3
+                        or int(endpoint["n_episodes_per_load"]) != 2000):
+                    raise ValueError("IS depth-effect interval has unexpected inference scope")
+                middle, low, high = (100 * float(endpoint[key])
+                                    for key in ("difference", "ci_low", "ci_high"))
+                axes[1, column].errorbar(load, middle, yerr=[[middle - low], [high - middle]],
+                    fmt="o", color=colors[index], capsize=3, markersize=5)
+                d_points.append((load, middle))
+                selectors.append(dict(source=IS_ENDPOINTS, selector=endpoint_selector))
+                points.append(dict(kind="registered_depth_effect", source=IS_ENDPOINTS,
+                                   source_row=endpoint, difference_pp=middle,
+                                   ci_low_pp=low, ci_high_pp=high))
+            axes[0, column].axvspan(1, 4, color="0.85", alpha=.3, zorder=-1)
+            axes[0, column].set(title="Random oracle · M1-mixed" if writer == "oracle_random"
+                                else "Factorized joint · M1-mixed",
+                                xlabel="Reader updates L", xticks=depths, ylim=(-2, 102))
+            axes[1, column].plot([point[0] for point in d_points], [point[1] for point in d_points],
+                                color="0.6", linewidth=.8, zorder=0)
+            axes[1, column].axhline(0, color="0.5", linewidth=.8)
+            axes[1, column].set(title="Registered depth contrast: L4 minus L1",
+                                xlabel="Stored facts E (chain layout also changes)", xticks=loads)
+            for row in (0, 1):
+                axes[row, column].grid(axis="y", color="0.91", linewidth=.6)
+        axes[0, 0].set_ylabel("Candidate accuracy, hops 2–3 (%)")
+        axes[1, 0].set_ylabel("Depth effect on hops 2–3 (pp)")
+        fig.suptitle("Memory load and reader depth: fixed E12-trained checkpoints, rank 32", y=1.01, fontsize=12)
+        fig.legend(*axes[0, 0].get_legend_handles_labels(), loc="lower center", ncol=3,
+                   bbox_to_anchor=(.5, -.015), frameon=False, title="Evaluation load and chain lengths")
+        fig.tight_layout(rect=(0, .13, 1, 1))
+        fig.text(.5, -.08, "C999 (evaluation seed 999001); equal means over seeds 17/29/43 and hops 2–3. "
+                 "The same checkpoint per seed is used at every load.\n"
+                 "Top: absolute means, no supplied CIs; shaded training-depth range (sampled L=1, 2, 4). "
+                 "Bottom: committed 97.5% paired contrast CIs.\n"
+                 "Load, chain layout and candidate count covary; this is not an isolated interference intervention.",
+                 ha="center", fontsize=8)
+        selectors.append(dict(source=IS_DESIGN, selector=dict(
+            fields=["confirmation", "r", "r_mem", "seeds", "layouts", "same_checkpoint_depths"],
+            checkpoints=checkpoint_ids)))
+        self.save(fig, "memory_load_depth", claims=["IS1"],
+                  scope="C999; fixed E12-trained checkpoint per seed across loads; absolute means and existing 97.5% contrasts",
+                  selectors=selectors,
+                  notes=["Plan9.3 item4 complete; no new evaluation, bootstrap or confidence interval.",
+                         "Rank32 M1-mixed, training15000 steps on E12, training hops1–3, sampled L1/2/4.",
+                         "Absolute means equally weight seeds17/29/43 and hops2/3; full per-seed source cells retained.",
+                         "Top curves have no supplied CIs. Bottom bars reuse IS-E1-D,confidence.975 exactly.",
+                         "The paired intervals condition on the three training seeds; load comparisons are not fresh-seed replications.",
+                         "Evaluation E6/12/18/24/36 also changes chain lengths and candidate count; do not attribute changes solely to key interference.",
+                         "No E24/E36-trained models, fixed-L4 retraining, updated-fact episodes, or descriptive joint-writer rows are included."],
+                  points=points)
+
     def write_provenance(self) -> None:
         manifest = {"source_revision": self.data.revision,
                     "scientific_input_policy": "git show resolved-commit:path; no workspace scientific inputs",
@@ -341,8 +451,8 @@ class Figures:
                     "limitations": [F2_LIMIT, "Absolute accuracy and latency have no supplied confidence intervals.",
                                     "P4 p95 columns are means of percentiles, not pooled tail estimates."],
                     "figures": self.entries,
-                    "placeholders": {"plan9.3_item4": "TODO: memory load × L; study IS pending",
-                                     "plan9.3_item6": "TODO: symbolic/end-to-end correspondence; P1-L pending"}}
+                    "completed_plan_items": {"plan9.3_item4": "memory_load_depth"},
+                    "placeholders": {"plan9.3_item6": "TODO: symbolic/end-to-end correspondence; P1-L pending"}}
         (self.destination / "provenance.json").write_text(json.dumps(manifest, indent=2) + "\n")
         lines = ["# Symbolic paper figures", "", f"Committed source revision: `{self.data.revision}`.", "",
                  "Generated by `scripts/paper_figures.py`; all scientific input is read using `git show`.",
@@ -362,7 +472,8 @@ class Figures:
             lines.append(f"| `{path}` | `{source['introducing_commit']}` | `{source['last_change_commit']}` |")
         lines.extend(["", "The JSON manifest records exact plotted points, selectors, source Git objects, and claim scopes.",
                       "Git object IDs are repository provenance, not an independently computed data digest.", "",
-                      "## Required placeholders", "", "- Plan9.3 item4: **TODO — memory load × L; study IS pending.**",
+                      "## Plan9.3 coverage and remaining placeholder", "",
+                      "- Plan9.3 item4: **Complete — [memory load × L](memory_load_depth.png), [PDF](memory_load_depth.pdf).**",
                       "- Plan9.3 item6: **TODO — symbolic/end-to-end correspondence; P1-L pending.**", ""])
         (self.destination / "README.md").write_text("\n".join(lines))
 
@@ -389,6 +500,7 @@ def main() -> None:
     figures.paired_controls()
     figures.budget_latency()
     figures.stopping_latency()
+    figures.memory_load_depth()
     figures.write_provenance()
     print(json.dumps({"status": "complete", "source_revision": data.revision,
                       "output": str(figures.destination), "figures": [entry["name"] for entry in figures.entries],
