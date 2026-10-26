@@ -1,0 +1,40 @@
+{
+  "all_depth_snapshots_identical": true,
+  "all_query_labels_paired": true,
+  "all_samples_sealed": true,
+  "all_tables_reproduced": true,
+  "benchmark": {
+    "all_candidate_decisions_match": true,
+    "all_prepared_inputs_unchanged": true,
+    "candidate_decoding_timed": true,
+    "checkpoints_unchanged": true,
+    "context_preparation_timed": false,
+    "dtype": "float32",
+    "gpu": "NVIDIA GH200 120GB",
+    "host": "mg0016",
+    "job_id": "3714837.opbs",
+    "models": 84,
+    "repeats": 20,
+    "rows": 2862,
+    "seconds": 47.52172513306141,
+    "status": "passed",
+    "torch": "2.14.0+cu132",
+    "warmup": 5
+  },
+  "checkpoints_unchanged": true,
+  "completed_at": "2026-10-26T16:17:42.677348+00:00",
+  "confirmation_look_count": 1,
+  "confirmation_sets": 84,
+  "reference_checkpoints": 60,
+  "sample_barrier_created_at": "2026-10-26T16:16:29.763592+00:00",
+  "sample_rows": 7584000,
+  "status": "passed",
+  "training_barrier": {
+    "created_at": "2026-10-26T16:15:16.393664+00:00",
+    "evaluation_plan_hash": "1d4e767c96d4c5acc7f93ad15a213ec4",
+    "status": "passed",
+    "training_plan_hash": "0c25bda5908d844b13b19f7cc9e82940",
+    "training_stages": 24
+  },
+  "training_stages": 24
+}

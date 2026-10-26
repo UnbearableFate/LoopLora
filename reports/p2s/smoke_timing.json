@@ -1,0 +1,10 @@
+{
+  "families": 8,
+  "job_id": "3714660.opbs",
+  "main_projected_seconds": 4257.399048311636,
+  "pilot_projected_seconds": 1419.1330161038786,
+  "procs": 8,
+  "status": "passed",
+  "steps": 500,
+  "suite_seconds": 47.30443387012929
+}
