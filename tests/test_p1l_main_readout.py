@@ -143,3 +143,24 @@ def test_swap_wrapper_preserves_source_queries_and_writes_reproducible_counts(mo
         keep = (arrays["L"] == row["L"]) & (arrays["hop"] == row["hop"])
         assert row["n"] == 2
         assert row["follows_new"] == (arrays["prediction"][keep] == arrays["answer"][keep]).mean()
+
+
+def test_inference_report_counts_adapter_and_real_batched_score_calls(tmp_path):
+    import json
+    model, tokenizer = tiny(151936).cuda().to(torch.bfloat16), load_tokenizer()
+    cfg = resolve_config(config("B8"))
+    cfg["model"]["layer"] = 0
+    experiment = LLMExperiment(cfg, model=model, tokenizer=tokenizer)
+    try:
+        evaluator.inference_timing(experiment, cfg, tmp_path)
+        expected = sum(p.numel() for p in experiment.adapter.parameters())
+    finally:
+        experiment.close()
+    result = json.loads((tmp_path / "inference.json").read_text())
+    assert result["adapter_parameters"] == expected
+    assert result["adapter_parameters"] > result["trainable_adapter_parameters"] > 0
+    row, = result["timings"]
+    assert row["batch_questions"] == 128 and row["L"] == 4
+    assert len(row["batch_seconds"]) == 20 and row["warmups"] == 5
+    assert row["mean_seconds_per_question"] > 0
+    assert row["mean_seconds_per_question"] == pytest.approx(np.mean(row["batch_seconds"]) / 128)

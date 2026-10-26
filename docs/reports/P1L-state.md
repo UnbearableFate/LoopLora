@@ -27,6 +27,14 @@ on login. Read docs/README.md, task/prereg, this card before continuing.
 - B3 merged masterdf21654 at04:33JST: parallel r128,5readers x3seeds, its own
   Pilot-2; B0/B1/B2 shared fromr32. Configs configs/p1l/main-r128, outputs
   R/r128 and reports/p1l/r128. Design locked7503f54 before any r128 training.
+- B4 merged master379115d: remove B3's B8r32-B4r128 and M1r32-B4r128 contrasts.
+  B8r128-B8r32 stays descriptive; no gate/run/CI change. Add stored/trainable
+  adapter counts and measured inference time per question for every reader/rank.
+  Protocol locked in reports/p1l/design-lock.md; evaluate_p1l_main.py writes
+  inference.json for each run and finalizer writes inference.csv. Fixed16val
+  episodes/128questions,5warmups+20CUDA-synchronized score+argmax calls, trained
+  depth, supports prepared outside timing; no audit capture/hashing. Includes
+  score-path CE and reports amortized batched time, never serial latency.
 - Orchestrator wording: call the diagnostic a **J-lens-inspired name-gradient
   probe**, per master docs/reports/lit_check.md WP-T6; it is not the published
   averaged-transport lens or sparse J-space. Numerics unchanged.
@@ -125,7 +133,8 @@ separately; unchanged regression passed3715942). No further blanket retests.
    values, accuracy/counts/readout/faithfulness/swap tables and figures.
    Inspect end-to-end audit output; fix concrete issues without changing gates.
    Repeat per rank with separate report directory; then run compare_p1l_ranks.py
-   for B3's three secondary cross-rank contrasts. Cite any unequal S flag.
+   for B4's retained descriptive B8 rank contrast. The two cross-rank single-read
+   comparisons are removed. Report adapter counts/inference.csv; cite any unequal S.
 7. Refresh costs on login: `/usr/bin/python3 scripts/p1l_job_ledger.py --out reports/p1l/jobs.json --require-final`.
    Finish <=1page docs/reports/P1L.md with actual results, validation jobs,
    deviations(A1/B1/B2, valid900-step smoke, probe wording), cost, limitations.

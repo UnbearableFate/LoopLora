@@ -164,6 +164,43 @@ def readout(experiment, cfg: dict, directions: dict, out: Path):
     save(out / "readout.json", dict(table=rows, faithfulness=faithfulness))
 
 
+@torch.no_grad()
+def inference_timing(experiment, cfg: dict, out: Path):
+    """B4 descriptive score-path timing; fixed validation questions, no audit hook."""
+    spec = make_task_spec(cfg, evaluation=True)
+    arrays = stratify_queries(generate(spec, "val", 0, 16, 4242), spec, cfg["eval"]["hops"], 4242)
+    depth = 1 if cfg["variant"] in {"B0", "B1", "B2", "B4"} else 4
+    rows = []
+    for protocol in cfg["eval"]["protocols"]:
+        prepared = experiment.prepare(arrays, protocol=protocol)
+        for _ in range(5):
+            logits, _ = experiment.score(prepared, depth)
+            logits.argmax(-1)
+        durations = []
+        for _ in range(20):
+            torch.cuda.synchronize()
+            before = time.perf_counter()
+            logits, _ = experiment.score(prepared, depth, capture_inputs=False)
+            logits.argmax(-1)
+            torch.cuda.synchronize()
+            durations.append(time.perf_counter() - before)
+        questions = int(prepared.answer_ids.numel())
+        rows.append(dict(protocol=protocol, L=depth, batch_episodes=16, batch_questions=questions,
+            question_shape=list(prepared.question_ids.shape), warmups=5, repeats=20,
+            mean_seconds_per_question=float(np.mean(durations)) / questions,
+            median_seconds_per_question=float(np.median(durations)) / questions,
+            batch_seconds=durations))
+    adapter = experiment.adapter
+    save(out / "inference.json", dict(rank=cfg["model"]["r"],
+        adapter_parameters=0 if adapter is None else sum(p.numel() for p in adapter.parameters()),
+        trainable_adapter_parameters=0 if adapter is None else sum(p.numel() for p in adapter.parameters() if p.requires_grad),
+        measurement="Amortized batched question score+full-vocabulary argmax, CUDA synchronized, "
+            "single GPU process; includes frozen backbone, adapter and score-path CE; excludes "
+            "support preparation/writing, tokenization and audit capture/hashing; fixed val[0,16), "
+            "seed4242,8questions/episode,5warmups+20measured repeats.",
+        timings=rows, **runtime()))
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--manifest", type=Path, required=True)
@@ -211,6 +248,7 @@ def main():
                         raise ValueError("name-gradient probe cache changed")
                     directions = torch.load(args.directions, map_location="cpu", weights_only=True)
                     readout(experiment, cfg, directions, out)
+            inference_timing(experiment, cfg, out)
             save(out / "record.json", dict(status="complete", name=name,
                 checkpoint_hash=digest(run / "checkpoint.pt"), seconds=time.perf_counter()-start,
                 authorization_hash=digest(args.authorization), manifest_hash=digest(args.manifest), **runtime()))

@@ -76,7 +76,7 @@ def finalize(args):
         raise ValueError("confirmation manifest does not match the complete training matrix")
     args.out.mkdir(parents=True, exist_ok=True)
     primary, typed = {label: {} for label in labels}, {label: {} for label in labels}
-    counts, artifact_rows, readouts, faithfulness, swaps = [], [], [], [], []
+    counts, artifact_rows, readouts, faithfulness, swaps, inference = [], [], [], [], [], []
     oracle_hashes = set()
     reference_memory = None
     for name, directory in evaluations.items():
@@ -87,9 +87,16 @@ def finalize(args):
             raise ValueError(f"invalid confirmation provenance: {name}")
         label, seed = name.rsplit("-s", 1)
         seed = int(seed)
+        measured = json.loads((out / "inference.json").read_text())
+        for row in measured["timings"]:
+            inference.append(dict(rank=rank, reader=label, seed=seed,
+                adapter_parameters=measured["adapter_parameters"],
+                trainable_adapter_parameters=measured["trainable_adapter_parameters"],
+                **{k: v for k, v in row.items() if k not in {"batch_seconds", "question_shape"}}))
         artifact_rows.append(dict(name=name, run=str(train), evaluation=str(out),
             config_hash=digest(train / "config.json"), checkpoint_hash=digest(train / "checkpoint.pt"),
             record_hash=digest(train / "record.json"), evaluation_record_hash=digest(out / "record.json")))
+        artifact_rows[-1]["inference_hash"] = digest(out / "inference.json")
         for setting in ("primary", "typed"):
             directory = out / setting
             samples = load_samples(directory / "samples.npz")
@@ -156,6 +163,7 @@ def finalize(args):
     write_csv(args.out / "per-step-readout.csv", readouts)
     write_csv(args.out / "readout-faithfulness.csv", faithfulness)
     write_csv(args.out / "swap-successors.csv", swaps)
+    write_csv(args.out / "inference.csv", inference)
     save(args.out / "run-manifest.json", dict(status="audited", rank=rank, condition=manifest["condition"],
         S=manifest["S"], lrs=manifest["lrs"],
         oracle_hash=next(iter(oracle_hashes)), runs=artifact_rows))

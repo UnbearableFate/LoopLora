@@ -40,8 +40,13 @@ must run on Miyabi-G via scripts/submit.py, from a committed source snapshot.
    --evaluations EVAL-MANIFEST --authorization AUTH --out ABS/reports/p1l`.
    This rechecks exact full-vocabulary labels, sample-to-table reproduction,
    oracle code hashes and support snapshots, then computes all registered CIs.
-   Run compare_p1l_ranks.py on the two ranks' final manifests for B3's secondary
-   cross-rank contrasts. R128 configs/locks are separate (main-r128, r128/).
+   Run compare_p1l_ranks.py on the two ranks' final manifests for the descriptive
+   B8r128-minus-B8r32 contrast retained by B4. The two cross-rank single-read
+   contrasts are removed. R128 configs/locks are separate (main-r128, r128/).
+   Every reader/rank also has stored/trainable adapter parameter counts and
+   fixed-validation inference timings (16episode/128question batches,5warmups,
+   20CUDA-synchronized score+argmax calls). See design-lock.md; inference.csv
+   reports amortized seconds per question and timing scope.
 
 Readout/oracle regression tests3715857:33passed onmg0022. J-lens-inspired name-gradient probe timing
 trial3715862 passed onmg0032; full cache3715870 uses only the fixed512 validation

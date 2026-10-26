@@ -20,8 +20,11 @@ only when their measured summed time x1.5 fits2hours. Record every node-hour.
 Same confirmation/typed replication, stepwise exact logit replay and frozen
 512-val-question J-lens-inspired name-gradient probe as r32. The direction
 cache is rank-independent (frozen backbone and same questions) and is shared.
-G1/G2 are separate per rank. Secondary contrasts on hops2/3: B8r32@4-B4r128@1,
-M1-L4r32@4-B4r128@1; B8r128@4-B8r32@4 descriptively, with actual steps stated.
+G1/G2 are separate per rank. B4 removes B3's two multi-readr32 versus single-read
+r128 contrasts. B8r128@4-B8r32@4 remains descriptive, with actual steps stated.
+Report stored/trainable adapter parameters and measured batched question-score
+time per question for every reader at each rank, using the shared timing
+definition in reports/p1l/design-lock.md. Runs, gates and CI level are unchanged.
 
 Confirmation is held until ALL conditions' main runs have finished, including
 any learned condition selected by WP-L4. Before its first evaluation, fix

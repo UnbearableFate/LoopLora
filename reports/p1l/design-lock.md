@@ -72,6 +72,19 @@ supersedes the original one/two-writer CI rule with confidence=1-.05/k above.
 
 ## Cost and artifacts
 
+Amendment B4 removes the B3 cross-rank single-read comparisons. Keep the B8
+rank128-minus-rank32 contrast descriptive. Add adapter parameter counts and
+inference time per question for each reader/rank. Count all stored adapter
+parameters plus its trainable subset (frozen oracle codes are buffers).
+Timing uses val episodes0..15, seed4242, one question per hop1..8; one model/GPU
+process,16episode/128question batches, trained depth (B4/baselines1; others4).
+Prepare the support once outside timing, discard5warmups, measure20 complete
+score-plus-full-vocabulary-argmax calls with CUDA synchronization. No input
+capture or hashing is timed. The production score path includes its CE
+calculation; tokenization and support writing are excluded. Report mean/median
+amortized seconds per question, batch size, protocols and raw batch durations.
+These timings are descriptive and do not change the scientific gates.
+
 Amendment B2 supersedes the original total cap and B1's13/16node-hour limits.
 S=17000, Pilot-2=floor(S/3)=5666, fixed before any Pilot-2 score. The900-step
 timing smokes remain valid by explicit orchestrator instruction. There is no
