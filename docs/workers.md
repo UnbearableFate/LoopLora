@@ -4,7 +4,7 @@
 closed. Each role passes, unchanged (same worktree, branch and context docs), to a Claude Sonnet-5.5 subagent of
 the main session, spawned on demand with its role row, the task file and the WP state file; subagents report by
 committed documents plus a short final reply. Do not reopen codex workers unless the user asks. Codex sessions
-below are kept for provenance only; wk-p1l's handover is `docs/reports/P1L-state.md` on wp/p1l (aa5005c, all codex
+below are kept for provenance only (their herdr tabs were closed at 07:28 on the user's request); wk-p1l's handover is `docs/reports/P1L-state.md` on wp/p1l (aa5005c, all codex
 wake-ups cancelled).
 
 | subagent | role (from the codex worker) | state |
