@@ -56,3 +56,60 @@ def test_zero_jacobian_has_finite_zero_penalty_gradient(backend):
     penalty=torch.relu(spectral_radius(A,backend)-.9).square().mean()
     grad=torch.autograd.grad(penalty,A)[0]
     assert penalty==0 and torch.isfinite(grad).all() and not grad.any()
+
+
+@pytest.mark.parametrize('writer',['oracle_random','joint_fact'])
+def test_trace_matches_deployed_reader_every_depth_and_c3_stopping(tmp_path,monkeypatch,writer):
+    import numpy as np
+    import run_js as driver
+    from looplora.sym.model import SymbolicModel,make_task_spec
+    from looplora.data.relations import generate
+    from looplora.sym.evaluate import stratify_queries
+    from looplora.core.stopping import trace_reader,halting_steps,ReaderTrace
+    from run_p4s_stopping import reader_batch
+    monkeypatch.setattr(driver,'design',lambda:dict(penalty=dict(method=dict(backend='cpu'))))
+    c=driver.config(writer,'RS+J',17,True);model=SymbolicModel(c)
+    with torch.no_grad(): model.adapter.B.normal_(0,.1)
+    checkpoint=tmp_path/'checkpoint.pt';torch.save(dict(config=c,model=model.state_dict()),checkpoint)
+    row=dict(config=c,checkpoint=str(checkpoint),name='trace-test',writer=writer,condition='RS+J')
+    driver.collect(row,'val',4242,6,tmp_path/'trace',True)
+    with np.load(tmp_path/'trace/trace.npz',allow_pickle=False) as z: arrays={k:z[k] for k in z.files}
+    spec=make_task_spec(c,evaluation=True);data=stratify_queries(generate(spec,'val',0,6,4242),spec,list(range(1,9)),4242)
+    prepared=model.prepare(data)
+    with torch.no_grad():
+        for L in range(17):
+            output=model.read(prepared,L)
+            predictions=output['logits'].masked_fill(~prepared.candidate_mask[:,None,:],-torch.inf).argmax(-1)
+            np.testing.assert_array_equal(predictions.cpu().numpy().ravel(),arrays['predictions'][:,L])
+            if L in (4,8,16):
+                radius=spectral_radius(jacobian(model.adapter.R,model.adapter.U,model.adapter.Q,prepared.memory,output['z'],.25),'cpu')
+                np.testing.assert_allclose(radius.cpu().numpy().ravel(),arrays['radii'][:,(4,8,16).index(L)],rtol=1e-5,atol=1e-6)
+        trace=trace_reader(model.adapter,reader_batch(model,prepared),16)
+    np.testing.assert_allclose(trace.relative_change[:,1:].cpu().numpy(),arrays['relative_change'][:,1:],rtol=1e-5,atol=1e-6)
+    saved=ReaderTrace(torch.as_tensor(arrays['predictions']),torch.zeros(48,17),torch.as_tensor(arrays['relative_change']))
+    for threshold in (0,.001,.1,1,4):
+        np.testing.assert_array_equal(halting_steps(trace,'relative_change',threshold).cpu().numpy(),halting_steps(saved,'relative_change',threshold).numpy())
+
+
+def test_paired_initializations_and_registered_new_matrix():
+    import run_js as driver
+    from looplora.sym.model import SymbolicModel
+    seen=set()
+    for writer in driver.WRITERS:
+        for seed in driver.SEEDS:
+            a=driver.config(writer,'RS',seed);b=driver.config(writer,'RS+J',seed)
+            assert a['train']==b['train'] and a['train']['steps']==15000
+            assert a['train']['batch_size']==64 and a['train']['lr']==.003 and a['train']['depths']==[4,5,6,7,8]
+            x=SymbolicModel(a);y=SymbolicModel(b)
+            for p,q in zip(x.parameters(),y.parameters()): torch.testing.assert_close(p,q,atol=0,rtol=0)
+            seen.update((writer,c,seed) for c in driver.CONDITIONS)
+    assert len(seen)==12
+
+
+def test_confirmation_barrier_precedes_all_reference_and_threshold_access(monkeypatch):
+    import run_js as driver
+    def stop(): raise ValueError('global training barrier')
+    def no_read(*a,**k): pytest.fail('opened reference/threshold before all training')
+    monkeypatch.setattr(driver,'all_training',stop);monkeypatch.setattr(Path,'read_text',no_read)
+    with pytest.raises(ValueError,match='training barrier'): driver.evaluation_plan()
+    with pytest.raises(ValueError,match='training barrier'): driver.collect_stage('confirmation',12)

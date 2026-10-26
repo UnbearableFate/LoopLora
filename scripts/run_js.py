@@ -81,6 +81,8 @@ def lock():
 def design():
     from looplora.infra.seeds import stable_hash
     d=json.loads((REPORTS/'design.json').read_text())
+    archive=Path(os.environ.get('LL_SOURCE_ROOT',ROOT))/'reports/js/design.json'
+    if archive.exists() and json.loads(archive.read_text())!=d: raise ValueError('JS design differs from committed source')
     for stage in ('smoke','main','reference'):
         if stable_hash(json.loads((RUNS/f'{stage}_plan.json').read_text()))!=d[f'{stage}_plan_hash']: raise ValueError('JS locked plan changed')
     return d
@@ -252,6 +254,8 @@ def collect_stage(stage,procs):
     else:
         all_training();plan=json.loads((RUNS/'evaluation_plan.json').read_text())
         selection=json.loads((REPORTS/'thresholds.json').read_text())
+        archived=Path(os.environ.get('LL_SOURCE_ROOT',ROOT))/'reports/js/thresholds.json'
+        if not archived.is_file() or json.loads(archived.read_text())!=selection: raise ValueError('JS thresholds not locked in source commit')
         if selection['evaluation_plan_hash']!=stable_hash(plan): raise ValueError('JS threshold plan mismatch')
     pending=[r['name'] for r in plan['runs']];running=[]
     while pending or running:
