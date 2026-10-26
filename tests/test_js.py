@@ -84,7 +84,7 @@ def test_trace_matches_deployed_reader_every_depth_and_c3_stopping(tmp_path,monk
             if L in (4,8,16):
                 radius=spectral_radius(jacobian(model.adapter.R,model.adapter.U,model.adapter.Q,prepared.memory,output['z'],.25),'cpu')
                 np.testing.assert_allclose(radius.cpu().numpy().ravel(),arrays['radii'][:,(4,8,16).index(L)],rtol=1e-5,atol=1e-6)
-        trace=trace_reader(model.adapter,reader_batch(model,prepared),16)
+        trace=trace_reader(model.adapter,reader_batch(prepared),16)
     np.testing.assert_allclose(trace.relative_change[:,1:].cpu().numpy(),arrays['relative_change'][:,1:],rtol=1e-5,atol=1e-6)
     saved=ReaderTrace(torch.as_tensor(arrays['predictions']),torch.zeros(48,17),torch.as_tensor(arrays['relative_change']))
     for threshold in (0,.001,.1,1,4):
