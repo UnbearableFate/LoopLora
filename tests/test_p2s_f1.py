@@ -102,3 +102,61 @@ def test_registered_decision_rules():
 def test_capability_rejects_missing_or_duplicate_budget():
     rows=decision_rows();rows[-1]=copy.deepcopy(rows[-2])
     with pytest.raises(ValueError,match='capability matrix'): analysis.decisions(rows)
+
+
+def test_lr_selection_uses_trained_depth_integer_ties_and_fresh_seeds(tmp_path,monkeypatch):
+    import csv
+    import json
+    from looplora.infra.seeds import stable_hash
+    monkeypatch.setattr(driver,'RUNS',tmp_path/'runs')
+    monkeypatch.setattr(driver,'REPORTS',tmp_path/'reports')
+    for f in driver.families():
+        for i,lr in enumerate(driver.LRS):
+            c=driver.config(f,17,5000,lr)
+            folder=driver.RUNS/'pilot'/f'shard-{i:02d}'/c['name']
+            driver.write(folder/'config.json',dict(config=c))
+            driver.write(folder/'record.json',dict(status='complete',config_hash=stable_hash(c),train_seconds=10))
+            driver.write(folder/'metrics.json',dict(table=[dict(split='val',condition='original',hop=h,
+                L=c['eval']['depths'][0],n=1000,accuracy=.1 if i==0 else .2) for h in (1,2,3)]))
+    driver.select()
+    with (driver.REPORTS/'selected_lrs.csv').open() as f: rows=list(csv.DictReader(f))
+    assert len(rows)==8 and all(float(r['lr'])==.001 and int(r['val_correct'])==600 for r in rows)
+    plan=json.loads((driver.RUNS/'main_plan.json').read_text())
+    assert len(plan['runs'])==24 and {r['seed'] for r in plan['runs']}==set(driver.SEEDS)
+    for r in plan['runs']:
+        c=r['config'];folder=Path(r['training_dir'])
+        assert c['train']['steps']==15000 and c['train']['lr']==.001
+        driver.write(folder/'config.json',dict(config=c))
+        driver.write(folder/'record.json',dict(status='complete',config_hash=stable_hash(c)))
+        (folder/'checkpoint.pt').touch()
+    assert driver.all_training()==plan
+    row=next(r for r in plan['runs'] if r['variant']=='M1')
+    row['config']['train']['depths']=[1,2,4] # self-consistent artifacts still violate the registered design
+    driver.write(driver.RUNS/'main_plan.json',plan)
+    driver.write(Path(row['training_dir'])/'config.json',dict(config=row['config']))
+    driver.write(Path(row['training_dir'])/'record.json',dict(status='complete',config_hash=stable_hash(row['config'])))
+    with pytest.raises(ValueError,match='training barrier'): driver.all_training()
+
+
+def test_all_42_blind_sets_required_before_any_archive_open(tmp_path,monkeypatch):
+    import numpy as np
+    from looplora.infra.seeds import stable_hash
+    monkeypatch.setattr(driver,'RUNS',tmp_path)
+    trained={'runs':[{'name':f'train-{i}'} for i in range(24)]}
+    monkeypatch.setattr(driver,'all_training',lambda:trained)
+    runs=[];samples=[]
+    for i in range(42):
+        folder=tmp_path/'evaluation'/str(i);c={'variant':'M1','eval':{}}
+        runs.append(dict(name=str(i),run_dir=str(folder),config=c))
+        driver.write(folder/'record.json',dict(status='complete',checkpoint_unchanged=True))
+        driver.write(folder/'confirmation/evaluation.json',dict(config=driver.confirmation_config(c),
+            checkpoint_config=c,aggregation_deferred=True))
+        path=folder/'confirmation/samples.npz';path.touch();samples.append(str(path))
+    plan={'runs':runs,'training_plan_hash':stable_hash(trained)}
+    driver.write(tmp_path/'evaluation_plan.json',plan)
+    driver.write(tmp_path/'training_barrier.json',dict(status='passed',training_stages=24,
+        evaluation_plan_hash=stable_hash(plan)))
+    driver.write(tmp_path/'barrier.json',dict(status='passed',runs=[r['name'] for r in runs],
+        evaluation_plan_hash=stable_hash(plan),confirmation_samples=samples[:-1]))
+    monkeypatch.setattr(np,'load',lambda *a,**k:pytest.fail('archive opened before global barrier'))
+    with pytest.raises(ValueError,match='sample membership'): analysis.verify_release()
