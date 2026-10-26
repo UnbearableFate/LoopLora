@@ -70,7 +70,7 @@ def size(args) -> None:
                   packing="one GPU process; runs sequentially reuse backbone, prefetch2 per active run",
                   overhead_seconds=overhead,
                   budget_rule="B2: no total cap; record every job's node-hours",
-                  excludes="smoke, validation, confirmation, J-lens and failed jobs",
+                  excludes="smoke, validation, confirmation, name-gradient probe and failed jobs",
                   timing_rows=rows, source=str(args.root),
                   time=datetime.now(timezone.utc).isoformat())
     save(args.out, result)

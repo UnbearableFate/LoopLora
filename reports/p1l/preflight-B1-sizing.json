@@ -1,7 +1,7 @@
 {
   "S": 9000,
   "budget_cap_steps": 9236,
-  "excludes": "smoke, validation, confirmation, J-lens and failed jobs (3nodeh reserve)",
+  "excludes": "smoke, validation, confirmation, J-lens-inspired name-gradient probe and failed jobs (3nodeh reserve)",
   "job_cap_steps": 17413,
   "longest_step_seconds": 0.27133156365016475,
   "main_plus_pilot_node_hours": 12.673944020509307,

@@ -1,6 +1,6 @@
 {
   "S": 17413,
-  "excludes": "smoke, process/model startup, evaluation, J-lens and failed jobs",
+  "excludes": "smoke, process/model startup, evaluation, J-lens-inspired name-gradient probe and failed jobs",
   "longest_step_seconds": 0.27133156365016475,
   "main_plus_pilot_train_node_hours": 23.988023230819202,
   "pilot_steps": 5804,

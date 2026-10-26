@@ -44,7 +44,7 @@ the query start. Only existing path positions are scored (s<=true hop); report
 the same entity at every other reader step, with its hop and entity-step labels.
 This avoids inventing entities beyond the terminal.
 
-J-lens directions are frozen-backbone name-logit gradients with respect to
+J-lens-inspired name-gradient probe directions are frozen-backbone name-logit gradients with respect to
 the additive layer14 attention residual at the scored token (the o_proj output
 addition, before layer14's MLP), averaged over512 validation questions before
 unit normalization. Use original val episodes0..63, one query per hop1..8,
@@ -53,15 +53,15 @@ with model, question and direction blake2b hashes. Project alpha B z_s onto
 these residual-space directions. The direction definition is shared across
 models/seeds. The baseline is1024 independent unit Gaussian residual-space
 directions, using derive_seed(2718,"p1l","readout-random-directions"). Report
-J-lens and random-direction ranks/top1 by hop, reader step and entity step.
+J-lens-inspired name-gradient probe and random-direction ranks/top1 by hop, reader step and entity step.
 
 ### Amendment A1 — orchestrator instruction, before Pilot-2 scores
 
-The primary J-lens is name-contrastive: for each question subtract the uniform
+The primary J-lens-inspired name-gradient probe is name-contrastive: for each question subtract the uniform
 mean across all1024 name-logit gradients, then average the centered gradients
 across512 questions and unit-normalize each name direction. Retain the raw-logit
 gradient directions above as a secondary readout. Cache and hash both versions.
-For s=4 report, separately for both J-lens versions and the logit lens, the
+For s=4 report, separately for both J-lens-inspired name-gradient probe versions and the logit lens, the
 fraction whose top1 name equals the actual model's top1 name among all1024 names.
 Full-vocabulary EM remains the scientific endpoint; the faithfulness reference
 is the model's name-restricted argmax. The orchestrator accepted the residual

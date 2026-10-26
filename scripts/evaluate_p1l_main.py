@@ -79,11 +79,12 @@ def swap_successors(experiment, cfg: dict, out: Path) -> dict:
             old = before.argmax(-1).cpu().numpy().ravel()
             new = after.argmax(-1).cpu().numpy().ravel()
             samples.append(dict(episode_id=arrays.episode_seed[original_indices],
-                query_id=selected, hop=part.q_hop_true.ravel(), L=np.full(len(answer), depth),
+                query_id=selected, hop=original.q_hop_true.ravel(),
+                counterfactual_hop=part.q_hop_true.ravel(), L=np.full(len(answer), depth),
                 original_prediction=old, prediction=new, answer=answer,
                 original_answer=original_batch.answer_ids.cpu().numpy().ravel()))
-            for hop in sorted(set(part.q_hop_true.ravel().tolist())):
-                keep = part.q_hop_true.ravel() == hop
+            for hop in sorted(set(original.q_hop_true.ravel().tolist())):
+                keep = original.q_hop_true.ravel() == hop
                 rows.append(dict(hop=int(hop), L=depth, n=int(keep.sum()),
                                  follows_new=int((new[keep] == answer[keep]).sum()),
                                  original_predicts_new=int((old[keep] == answer[keep]).sum())))
@@ -187,7 +188,7 @@ def main():
                     if record["trial"] or record["questions"] != 512 or record["names"] != 1024:
                         raise ValueError("readout requires the full registered direction cache")
                     if record["file_hash"] != digest(args.directions):
-                        raise ValueError("J-lens cache changed")
+                        raise ValueError("name-gradient probe cache changed")
                     directions = torch.load(args.directions, map_location="cpu", weights_only=True)
                     readout(experiment, cfg, directions, out)
             save(out / "record.json", dict(status="complete", name=name,

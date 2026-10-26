@@ -11,7 +11,7 @@ job is producing exact steady-state extrapolations in reports/p1l/preflight-sizi
 
 At the preregistered largest S fitting2h/1.5, the21 main trainings plus14
 Pilot-2 trainings alone are projected above16node-hours, before smoke, startup,
-confirmation or J-lens. The two constraints therefore require a decision.
+confirmation or J-lens-inspired name-gradient probe. The two constraints therefore require a decision.
 
 Requested amendment (before any Pilot-2 score): choose the largest common S
 that satisfies BOTH the per-job rule and the total16node-hour limit, with a

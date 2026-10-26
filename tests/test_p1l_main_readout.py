@@ -134,6 +134,7 @@ def test_swap_wrapper_preserves_source_queries_and_writes_reproducible_counts(mo
     assert set(arrays["episode_id"]) == set(fixture.episode_seed)
     assert set(arrays["L"]) == {1, 4, 8}
     assert set(arrays["query_id"]) == set(range(8))
+    assert np.array_equal(arrays["hop"], arrays["query_id"] + 1)
     assert len(arrays["L"]) == 2 * 8 * 3
     for row in result["table"]:
         keep = (arrays["L"] == row["L"]) & (arrays["hop"] == row["hop"])

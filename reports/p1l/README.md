@@ -1,7 +1,7 @@
 # P1-L oracle-random main study
 
 The authoritative science is `docs/prereg/P1L.md`, including B2. Design and
-per-step/J-lens definitions are in `design-lock.md`, including A1. No confirmation
+per-step/J-lens-inspired name-gradient probe definitions are in `design-lock.md`, including A1. No confirmation
 evaluation is authorized yet. S17000; Pilot-2 5666steps, seed17, lr.001/.003.
 The900-step timing-only smokes remain valid by the orchestrator's B2 instruction.
 
@@ -33,13 +33,13 @@ must run on Miyabi-G via scripts/submit.py, from a committed source snapshot.
    file with statusallowed, writer_conditions1/2, and orchestrator_decision text.
    `evaluate_p1l_main.py` checks every main checkpoint against the locked matrix
    before generating any test episode. Evaluate confirmation/typed once, with
-   the cached registered J-lens for M1/B8; preserve all original samples.
+   the cached registered J-lens-inspired name-gradient probe for M1/B8; preserve all original samples.
 8. Finalize on compute with `scripts/finalize_p1l_main.py --manifest R/training-manifest.json
    --evaluations EVAL-MANIFEST --authorization AUTH --out ABS/reports/p1l`.
    This rechecks exact full-vocabulary labels, sample-to-table reproduction,
    oracle code hashes and support snapshots, then computes all registered CIs.
 
-Readout/oracle regression tests3715857:33passed onmg0022. J-lens timing
+Readout/oracle regression tests3715857:33passed onmg0022. J-lens-inspired name-gradient probe timing
 trial3715862 passed onmg0032; full cache3715870 uses only the fixed512 validation
 questions and the frozen model. Gates/authorization tests have a separate job.
 The logit-lens final-step replay must reproduce the deployed logits exactly.

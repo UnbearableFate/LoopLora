@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Frozen-residual J-lens and exact intermediate reader-state diagnostics."""
+"""J-lens-inspired name-gradient probes and exact reader-state diagnostics."""
 from __future__ import annotations
 
 import argparse
@@ -60,14 +60,14 @@ def path_entities(arrays, steps=4):
 def normalize_directions(raw):
     centered = raw - raw.mean(dim=0, keepdim=True)
     if not torch.isfinite(raw).all() or (raw.norm(dim=-1) == 0).any() or (centered.norm(dim=-1) == 0).any():
-        raise ValueError("non-finite or zero J-lens direction")
+        raise ValueError("non-finite or zero name-gradient probe direction")
     return F.normalize(centered, dim=-1), F.normalize(raw, dim=-1)
 
 
 def name_gradients(model, ids, valid, names, *, layer=14, chunk=4):
     """Sum per-question name-logit gradients at the scored attention residual."""
     if hasattr(model, "looplora_adapters"):
-        raise ValueError("J-lens must use the frozen backbone without adapters")
+        raise ValueError("name-gradient probe requires the frozen backbone without adapters")
     last = torch.where(valid, torch.arange(ids.shape[1], device=ids.device), -1).amax(-1)
     perturb = torch.zeros((len(ids), model.config.hidden_size), device=ids.device,
                           dtype=torch.float32, requires_grad=True)
