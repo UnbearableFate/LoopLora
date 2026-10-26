@@ -99,7 +99,7 @@ def cost_tables(plan: dict,accuracy: list[dict]) -> tuple[list[dict],list[dict]]
             'output_projection_flops','candidate_decode_flops')
     per_seed=[]
     cells=defaultdict(dict)
-    for r in accuracy: cells[r['name'],r['L']][r['hop']]=r['accuracy']
+    for r in accuracy: cells[r['name'],r['L']][r['hop']]=r
     for (name,L,batch),rows in sorted(accum.items()):
         run=index[name]
         shared.require(len(rows)==(1 if batch==64 else 8) and
@@ -109,9 +109,15 @@ def cost_tables(plan: dict,accuracy: list[dict]) -> tuple[list[dict],list[dict]]
         for k in counts: shared.require(len({r[k] for r in rows})==1,'cost differs by timed query')
         values=cells[name,L]
         shared.require(set(values)==set(range(1,9)),'E4 accuracy hop coverage differs')
+        totals={}
+        for label,hops in (('hops1to3',(1,2,3)),('hops1to8',tuple(range(1,9)))):
+            totals['n_queries_'+label]=sum(values[h]['n'] for h in hops)
+            totals['n_correct_'+label]=sum(round(values[h]['n']*values[h]['accuracy']) for h in hops)
         per_seed.append({k:run[k] for k in ('name','source','writer','variant','r','r_mem','seed','steps','descriptive_only')}|
-            dict(L=L,batch_size=batch,accuracy_hops1to3=fmean(values[h] for h in (1,2,3)),
-                 accuracy_hops1to8=fmean(values.values()),**{k:int(rows[0][k]) for k in counts},
+            dict(L=L,batch_size=batch,**totals,
+                 accuracy_hops1to3=totals['n_correct_hops1to3']/totals['n_queries_hops1to3'],
+                 accuracy_hops1to8=totals['n_correct_hops1to8']/totals['n_queries_hops1to8'],
+                 **{k:int(rows[0][k]) for k in counts},
                  **{k:fmean(float(r[k]) for r in rows) for k in fields}))
     expected={(r['name'],d,b) for r in plan['runs'] for d in ([4] if r['variant']=='B8' else [1,2,4,8]) for b in (1,64)}
     shared.require(set(accum)==expected,'cost point matrix differs')
@@ -122,8 +128,12 @@ def cost_tables(plan: dict,accuracy: list[dict]) -> tuple[list[dict],list[dict]]
     for key,rows in sorted(groups.items()):
         shared.require(len(rows)==3 and {r['seed'] for r in rows}==set(driver.SEEDS),'cost requires three seeds')
         for k in counts: shared.require(len({r[k] for r in rows})==1,'parameter/state/FLOP cost varies by seed')
-        pooled.append(dict(zip(identity,key))|dict(n_seeds=3,**{k:rows[0][k] for k in counts},
-            **{k:fmean(r[k] for r in rows) for k in ('accuracy_hops1to3','accuracy_hops1to8',*fields)}))
+        totals={k:sum(r[k] for r in rows) for k in
+                ('n_correct_hops1to3','n_queries_hops1to3','n_correct_hops1to8','n_queries_hops1to8')}
+        pooled.append(dict(zip(identity,key))|dict(n_seeds=3,**{k:rows[0][k] for k in counts},**totals,
+            accuracy_hops1to3=totals['n_correct_hops1to3']/totals['n_queries_hops1to3'],
+            accuracy_hops1to8=totals['n_correct_hops1to8']/totals['n_queries_hops1to8'],
+            **{k:fmean(r[k] for r in rows) for k in fields}))
     return pooled,per_seed
 
 
@@ -147,6 +157,11 @@ def plot_cost(costs: list[dict],out: Path) -> None:
             primary.sort(key=lambda r:r['L'])
             ax.plot([r['cuda_ms_mean'] for r in primary],[r['accuracy_hops1to3'] for r in primary],color=colors['M1'],linewidth=.8)
             for r in primary: ax.annotate(str(r['L']),(r['cuda_ms_mean'],r['accuracy_hops1to3']),fontsize=7,xytext=(3,3),textcoords='offset points')
+            for r in costs:
+                if r['writer']==w and r['batch_size']==batch and r['variant'] in ('B6','B7') and r['L']==1:
+                    label=f"{r['variant']}/{'r' if r['variant']=='B6' else 'm'}{r['r'] if r['variant']=='B6' else r['r_mem']}"
+                    ax.annotate(label,(r['cuda_ms_mean'],r['accuracy_hops1to3']),fontsize=6,
+                                xytext=(3,-9 if r['r_mem']==64 else 5),textcoords='offset points')
             ax.set_title(f'{w}, batch {batch}')
             ax.set_xscale('log');ax.set_ylim(0,1);ax.grid(alpha=.2)
             ax.set_xlabel('GPU milliseconds / prepared query batch')

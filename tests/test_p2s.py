@@ -7,12 +7,14 @@ import json
 from pathlib import Path
 import sys
 
+import numpy as np
 import pytest
 
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'scripts'))
 import analyze_p2s as analysis
 import benchmark_p2s as bench
 import run_p2s as driver
+from audit_p2s import audit_evaluation
 from looplora.sym.config import resolve_config
 from looplora.sym.model import SymbolicModel
 from looplora.infra.seeds import stable_hash
@@ -138,3 +140,97 @@ def test_validation_ties_lock_smaller_lr_and_fresh_three_seed_main_runs(tmp_path
     assert len(plan['runs'])==24
     assert {r['seed'] for r in plan['runs']}==set(driver.SEEDS)
     assert all(r['config']['train']['steps']==15000 and r['config']['train']['lr']==.001 for r in plan['runs'])
+
+
+def evaluation_fixture(root,change=None):
+    c={'eval':dict(seed=900101,episodes=2,batch_size=2,splits=['test'],counterfactuals=False,
+                    depths=[0,1,4],hops=list(range(1,9)))}
+    rows=[(ep,q,q+1,d,q+7) for d in (0,1,4) for ep in (2**60+1,2**60+7) for q in range(8)]
+    a=np.asarray(rows,dtype=np.int64)
+    arrays={k:a[:,i] for i,k in enumerate(('episode_id','query_id','hop','L','answer'))}
+    arrays.update(split=np.full(len(a),'test'),condition=np.full(len(a),'original'),
+        prediction=a[:,4].copy(),full_prediction=a[:,4].copy(),correct=np.ones(len(a),dtype=bool),
+        full_correct=np.ones(len(a),dtype=bool),original_answer=a[:,4].copy(),
+        original_prediction=a[:,4].copy(),candidate_size=np.full(len(a),14))
+    if change: change(arrays)
+    root.mkdir(parents=True,exist_ok=True)
+    np.savez_compressed(root/'samples.npz',**arrays)
+    meta=dict(config=c,config_hash=stable_hash(c),samples_hash=analysis.shared.file_hash(root/'samples.npz'),
+        aggregation_deferred=True,gate0_passed=True,memory_hashes=[dict(split='test',condition='original',
+        batch_start=0,L=d,x='a'*32,u='b'*32,memory='c'*32,write_count='d'*32) for d in (0,1,4)])
+    driver.write(root/'evaluation.json',meta)
+    return c,meta
+
+
+def test_audit_preserves_full_64_bit_episode_ids_and_matches_all_depths(tmp_path):
+    c,_=evaluation_fixture(tmp_path)
+    table,audit=audit_evaluation(tmp_path,c)
+    assert len(table)==24 and audit['sample_rows']==48 and audit['snapshots']==1
+    assert set(audit['labels'][:,0])=={2**60+1,2**60+7}
+
+
+def test_audit_rejects_correctness_that_does_not_match_saved_predictions(tmp_path):
+    c,_=evaluation_fixture(tmp_path,lambda a:a['correct'].__setitem__(0,False))
+    with pytest.raises(ValueError,match='correctness'): audit_evaluation(tmp_path,c)
+
+
+def test_audit_rejects_changed_labels_even_with_consistent_predictions(tmp_path):
+    def change(a):
+        for k in ('answer','original_answer','prediction','original_prediction','full_prediction'):a[k][0]+=1
+    c,_=evaluation_fixture(tmp_path,change)
+    with pytest.raises(ValueError,match='depth-dependent'): audit_evaluation(tmp_path,c)
+
+
+def test_audit_rejects_mutated_memory_snapshot(tmp_path):
+    c,meta=evaluation_fixture(tmp_path)
+    meta['memory_hashes'][1]['memory']='e'*32
+    driver.write(tmp_path/'evaluation.json',meta)
+    with pytest.raises(ValueError,match='changes across depths'): audit_evaluation(tmp_path,c)
+
+
+def test_all_84_blind_sets_must_be_released_before_any_archive_read(tmp_path,monkeypatch):
+    monkeypatch.setattr(driver,'RUNS',tmp_path)
+    trained={'runs':[{'name':f'train-{i}'} for i in range(24)]}
+    monkeypatch.setattr(driver,'all_training',lambda:trained)
+    runs=[];samples=[]
+    for i in range(84):
+        folder=tmp_path/'evaluation'/str(i)
+        c={'variant':'M1','eval':{}}
+        runs.append(dict(name=str(i),run_dir=str(folder),config=c))
+        driver.write(folder/'record.json',dict(status='complete',checkpoint_unchanged=True))
+        driver.write(folder/'confirmation/evaluation.json',dict(config=driver.confirmation_config(c),
+            checkpoint_config=c,aggregation_deferred=True))
+        path=folder/'confirmation/samples.npz';path.touch();samples.append(str(path))
+    plan={'runs':runs,'training_plan_hash':stable_hash(trained)}
+    driver.write(tmp_path/'evaluation_plan.json',plan)
+    driver.write(tmp_path/'training_barrier.json',dict(status='passed',training_stages=24,
+        evaluation_plan_hash=stable_hash(plan)))
+    driver.write(tmp_path/'barrier.json',dict(status='passed',runs=[r['name'] for r in runs],
+        evaluation_plan_hash=stable_hash(plan),confirmation_samples=samples[:-1]))
+    monkeypatch.setattr(np,'load',lambda *a,**k:pytest.fail('archive opened before full sample barrier'))
+    with pytest.raises(ValueError,match='sample membership'): analysis.verify_release()
+
+
+def test_cost_summary_keeps_integer_accuracy_totals_and_averages_all_eight_batch_one_queries(tmp_path,monkeypatch):
+    monkeypatch.setattr(driver,'RUNS',tmp_path)
+    runs=[];timing=[];accuracy=[]
+    metrics=('cuda_ms_mean','cuda_ms_median','cuda_ms_p95','wall_ms_mean','wall_ms_median','wall_ms_p95')
+    counts=dict(trainable_parameters=13314,registered_parameters=13314,state_bytes_fp32=4096,
+                read_flops_per_query=32768,output_projection_flops=4096,candidate_decode_flops=1792)
+    for index,seed in enumerate(driver.SEEDS):
+        run=dict(name=f'm{index}',source='wph',writer='joint',variant='M1',r=32,r_mem=32,
+                 seed=seed,steps=15000,descriptive_only=False)
+        runs.append(run)
+        for L in (1,2,4,8):
+            accuracy.extend(dict(name=run['name'],L=L,hop=h,n=2000,accuracy=(h+index)/2000) for h in range(1,9))
+            for batch in (1,64):
+                for hop in (range(1,9) if batch==1 else (0,)):
+                    timing.append(dict(name=run['name'],L=L,batch_size=batch,latency_hop=hop,warmup=5,repeats=20,
+                        **counts,**{k:hop if batch==1 else .5 for k in metrics}))
+    driver.csv_table(tmp_path/'benchmark/latency.csv',timing)
+    pooled,per_seed=analysis.cost_tables({'runs':runs},accuracy)
+    assert len(pooled)==8 and len(per_seed)==24
+    assert all(r['n_correct_hops1to3']==27 and r['n_queries_hops1to3']==18000
+               and r['accuracy_hops1to3']==27/18000 for r in pooled)
+    assert all(r['n_correct_hops1to8']==132 and r['n_queries_hops1to8']==48000 for r in pooled)
+    assert all(r['cuda_ms_mean']==(4.5 if r['batch_size']==1 else .5) for r in pooled)
