@@ -1,0 +1,22 @@
+[
+  {
+    "DeltaS": 0.08433333333333333,
+    "DeltaS_ci_high": 0.09417569444444449,
+    "DeltaS_ci_low": 0.07483263888888889,
+    "S_RS_J": -0.028333333333333335,
+    "S_at_least_minus_one_pp": false,
+    "positive_DeltaS_CI": true,
+    "removes_overshoot": false,
+    "writer": "oracle_random"
+  },
+  {
+    "DeltaS": 0.012444444444444444,
+    "DeltaS_ci_high": 0.022000694444444448,
+    "DeltaS_ci_low": 0.002220138888888889,
+    "S_RS_J": -0.017722222222222223,
+    "S_at_least_minus_one_pp": false,
+    "positive_DeltaS_CI": true,
+    "removes_overshoot": false,
+    "writer": "joint_fact"
+  }
+]

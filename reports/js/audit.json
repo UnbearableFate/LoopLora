@@ -1,0 +1,23 @@
+{
+  "all_inputs_and_memory_immutable": true,
+  "all_query_labels_paired": true,
+  "checkpoints_unchanged": true,
+  "completed_at": "2026-10-26T19:51:52.104385+00:00",
+  "confirmation_look_count": 1,
+  "confirmation_query_contexts": 2000,
+  "confirmation_traces": 24,
+  "normalized_sample_rows": 6528000,
+  "reference_checkpoints": 12,
+  "sample_barrier_created_at": "2026-10-26T19:51:35.708217+00:00",
+  "spectral_measurements": 1152000,
+  "status": "passed",
+  "threshold_hash": "ee4446cf719a69f1bd143a2e83c4d246",
+  "traces_sealed": true,
+  "training_barrier": {
+    "created_at": "2026-10-26T19:49:37.546858+00:00",
+    "evaluation_plan_hash": "db8d4959d7cfe70847af462302aa1f7f",
+    "status": "passed",
+    "training_stages": 12
+  },
+  "training_stages": 12
+}

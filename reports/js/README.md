@@ -6,6 +6,11 @@ compute nodes via `scripts/submit.py`; prior runs and all reference checkpoints 
 Raw plans, checkpoints, logs, validation/confirmation traces and full statistics:
 `/work/xg24i002/x10041/LoopLora-wt/symf/runs/js/`.
 
+Completed [report](../../docs/reports/JS.md): RS+J reduces overshoot, but neither writer meets the
+registered removal criterion. Stopping thresholds were committed in `0c99cc1` before confirmation;
+PBS3716104 completed all 24 traces and the single aggregation. Sixteen tests passed on PBS3716003.
+Actual cost is 1.011/1.5 node-hours, including both corrected pretraining development failures.
+
 - `design.json`, `method.json`: exact ReLU Jacobian at z_L, eigenvalue backend/timing, gradient tests,
   gamma0.9/lambda1, random-depth distribution, reference checkpoint paths and BLAKE2b seals, statistics and
   stopping rules. CPU `torch.linalg.eigvals` is exact; neither singular values nor an unconverged power iteration
