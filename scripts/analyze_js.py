@@ -3,6 +3,7 @@
 from __future__ import annotations
 from collections import defaultdict
 from datetime import datetime,timezone
+import copy
 import json
 import os
 from pathlib import Path
@@ -33,6 +34,10 @@ def verify_set(stage):
     paths=[]
     for r in plan['runs']:
         folder=driver.RUNS/stage/r['name'];meta=shared.read_json(folder/'evaluation.json')
+        expected=copy.deepcopy(r['config']);expected.setdefault('eval',{}).update(
+            seed=4242 if stage=='validation' else 999003,episodes=2000,splits=['val' if stage=='validation' else 'test'],
+            depths=list(range(1,17)),hops=list(range(1,9)),counterfactuals=False)
+        shared.require(meta['config']==expected,'JS trace configuration differs')
         shared.require(meta['status']=='complete' and meta['aggregation_deferred'] and meta['gate0_passed']
             and meta['checkpoint_config']==r['config'] and meta['checkpoint_hash']==r['checkpoint_hash']
             and meta['episodes']==2000 and meta['seed']==(4242 if stage=='validation' else 999003)

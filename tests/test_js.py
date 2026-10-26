@@ -170,8 +170,9 @@ def test_trace_membership_and_committed_thresholds_before_archive_read(tmp_path,
     runs=[];paths=[]
     for i in range(24):
         folder=driver.RUNS/'confirmation'/str(i);row=dict(name=str(i),config={'name':str(i)},checkpoint_hash='seal');runs.append(row)
+        expected={'name':str(i),'eval':dict(seed=999003,episodes=2000,splits=['test'],depths=list(range(1,17)),hops=list(range(1,9)),counterfactuals=False)}
         driver.write(folder/'evaluation.json',dict(status='complete',aggregation_deferred=True,gate0_passed=True,checkpoint_config=row['config'],
-            checkpoint_hash='seal',episodes=2000,seed=999003,split='test',radius_depths=[4,8,16]))
+            checkpoint_hash='seal',config=expected,episodes=2000,seed=999003,split='test',radius_depths=[4,8,16]))
         path=folder/'trace.npz';path.touch();paths.append(str(path))
     plan=dict(runs=runs,training_plan_hash=stable_hash(trained))
     driver.write(driver.RUNS/'evaluation_plan.json',plan)
@@ -185,3 +186,30 @@ def test_trace_membership_and_committed_thresholds_before_archive_read(tmp_path,
     driver.write(driver.REPORTS/'thresholds.json',{'selected':[.03]})
     driver.write(archive/'reports/js/thresholds.json',{'selected':[.1]})
     with pytest.raises(ValueError,match='thresholds differ'): analysis.verify_set('confirmation')
+
+
+@pytest.mark.parametrize('corruption',['seal','snapshot'])
+def test_trace_audit_rejects_modified_archive_and_read_mutation(tmp_path,monkeypatch,corruption):
+    import numpy as np
+    import analyze_js as analysis
+    import run_js as driver
+    from analyze_p1s_main import file_hash
+    monkeypatch.setattr(driver,'RUNS',tmp_path)
+    folder=tmp_path/'confirmation'/'a';folder.mkdir(parents=True)
+    checkpoint=tmp_path/'checkpoint';checkpoint.write_bytes(b'weights')
+    ids=np.repeat(np.arange(2000,dtype=np.int64)+2**55,8);query=np.tile(np.arange(8,dtype=np.int16),2000)
+    relative=np.ones((16000,17),dtype=np.float32);relative[:,0]=np.nan
+    np.savez_compressed(folder/'trace.npz',episode_id=ids,query_id=query,hop=query+1,answer=np.ones(16000,dtype=np.int32),
+        candidate_size=np.full(16000,14,dtype=np.int16),predictions=np.ones((16000,17),dtype=np.int32),relative_change=relative,radii=np.full((16000,3),.5,dtype=np.float32))
+    hashes=[dict(batch_start=b,L=L,x='1'*32,u='2'*32,memory='3'*32,write_count='4'*32) for b in range(0,2000,64) for L in range(1,17)]
+    meta=dict(trace_hash=file_hash(folder/'trace.npz'),memory_hashes=hashes)
+    driver.write(folder/'evaluation.json',meta)
+    row=dict(name='a',checkpoint=str(checkpoint),checkpoint_hash=file_hash(checkpoint))
+    a,labels=analysis.audit_trace(row,'confirmation')
+    assert len(a['answer'])==16000 and len(labels)==16000 and labels[:,0].max()>2**55
+    if corruption=='seal':
+        with (folder/'trace.npz').open('ab') as stream: stream.write(b'tampered')
+        with pytest.raises(ValueError,match='trace seal'): analysis.audit_trace(row,'confirmation')
+    else:
+        hashes[1]['memory']='5'*32;driver.write(folder/'evaluation.json',meta)
+        with pytest.raises(ValueError,match='snapshot changed'): analysis.audit_trace(row,'confirmation')
