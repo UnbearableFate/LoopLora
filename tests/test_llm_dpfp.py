@@ -121,6 +121,9 @@ def test_dpfp_arm_writes_unit_phi_keys_and_every_address_term_lives_in_phi_space
         adapter = experiment.adapter
         assert adapter.cfg.dpfp_nu == nu and adapter.cfg.key_dim == kd and experiment.read_arm == arm
         assert experiment.writer_signature()['dpfp_nu'] == nu and experiment.writer_signature()['read_fix'] == arm
+        # As the runner does: the tiny model's raw activations are about 0.03, which would put phi (quadratic in k)
+        # near the eps clamp of the normalization; standardized inputs keep every phi norm far above it.
+        assert experiment.standardize()['episodes'] == 256
         with torch.no_grad():
             adapter.B.fill_(.1)
         batch = experiment.prepare(data(cfg))
@@ -210,6 +213,7 @@ def test_zero_and_shuffled_memory_controls_work_on_the_rectangular_state(model, 
     cfg = tiny(arm)
     experiment = DPFPExperiment(cfg, arm, model=model, tokenizer=tokenizer)
     try:
+        experiment.standardize()
         with torch.no_grad():
             experiment.adapter.B.fill_(.2)
             batch = experiment.prepare(data(cfg))
@@ -240,6 +244,7 @@ def test_training_loop_validation_and_export_reload_with_dpfp(model, tokenizer, 
     cfg = tiny(arm)
     experiment = DPFPExperiment(cfg, arm, model=model, tokenizer=tokenizer)
     try:
+        assert experiment.standardize()['episodes'] == 256
         result = fit(experiment, tmp_path, 5, evaluate=False)
         assert result['actual_steps'] == 5 and result['metrics'] == {}
         rows = [json.loads(line) for line in (tmp_path / 'train_log.jsonl').read_text().splitlines()]
@@ -312,15 +317,20 @@ def test_selection_follows_candidate_order_thresholds_and_single_E8_gate():
 
 
 def test_step_counts_come_from_the_release_or_the_explicit_smoke_count():
-    release = dict(study='DPFP', E=16, steps_by_arm={'D32-3': 20000, 'D128-1': 19000, 'D128-3': 18000})
+    counts = {'D32-3': 20000, 'D128-1': 19000, 'D128-3': 18000}
+    release = dict(study='DPFP', E=16, steps_by_arm=counts)
     assert [scheduled_steps(arm, None, release) for arm in ARMS] == [20000, 19000, 18000]
     assert scheduled_steps('D32-3', 2400, None, smoke=True) == 2400
+    retrain = dict(study='DPFP', E=8, steps_by_arm={'D128-3': 15000})  # the conditional E8 release names one arm
+    assert scheduled_steps('D128-3', None, retrain, E=8) == 15000
     for call in (lambda: scheduled_steps('D32-3', 8225, release),
                  lambda: scheduled_steps('D32-3', None, None),
                  lambda: scheduled_steps('D32-3', None, release, E=8),
                  lambda: scheduled_steps('D32-3', None, {**release, 'study': 'P1L'}),
-                 lambda: scheduled_steps('D32-3', None, {**release, 'steps_by_arm': {'D32-3': 20001}}),
-                 lambda: scheduled_steps('D32-3', None, {**release, 'steps_by_arm': {'D32-3': True}}),
+                 lambda: scheduled_steps('D32-3', None, {**release, 'steps_by_arm': {**counts, 'D32-3': 20001}}),
+                 lambda: scheduled_steps('D32-3', None, {**release, 'steps_by_arm': {**counts, 'D32-3': True}}),
+                 lambda: scheduled_steps('D32-3', None, {**release, 'steps_by_arm': {'D32-3': 20000}}),
+                 lambda: scheduled_steps('D32-3', None, retrain, E=8),
                  lambda: scheduled_steps('D32-3', 4, None, smoke=True),
                  lambda: scheduled_steps('D32-3', None, None, smoke=True),
                  lambda: scheduled_steps('D32-3', 2400, release, smoke=True)):

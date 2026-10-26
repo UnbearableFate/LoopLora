@@ -47,6 +47,13 @@ def _check_state(M: Tensor) -> None:
         raise ValueError("state must be a floating tensor [B, r_mem, key_dim]")
 
 
+def _check_key_width(M0: Tensor, K: Tensor, feature_map: FeatureMap | None) -> None:
+    """The state's key width must be the width of the projected key after the optional feature map."""
+    width = K.shape[0] if feature_map is None else feature_map(K.new_zeros(1, K.shape[0])).shape[-1]
+    if M0.shape[2] != width:
+        raise ValueError(f"state key width {M0.shape[2]} does not match the written key width {width}")
+
+
 def _mask(value: Tensor | None, shape: tuple[int, ...], device: torch.device, default: bool) -> Tensor:
     if value is None:
         return torch.full(shape, default, dtype=torch.bool, device=device)
@@ -137,6 +144,7 @@ def scan_prewrite(
     _check_state(M0)
     if u.ndim != 3 or u.shape[0] != M0.shape[0] or u.device != M0.device:
         raise ValueError("u must have shape [B,T,r] on the state device")
+    _check_key_width(M0, K, feature_map)
     shape = tuple(u.shape[:2])
     valid_mask = _mask(valid, shape, u.device, True)
     write_mask = _mask(write, shape, u.device, True)
@@ -185,6 +193,7 @@ def scan_final(
         return M0
     if K.shape != (M0.shape[1], u.shape[-1]) or V.shape != K.shape:
         raise ValueError("K and V must have shape [r_mem, r]")
+    _check_key_width(M0, K, feature_map)
     if not math.isfinite(eps) or eps <= 0:
         raise ValueError("eps must be finite and positive")
     if reset is not None and bool(reset_mask[:, 1:].any()):

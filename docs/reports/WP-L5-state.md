@@ -12,14 +12,14 @@ DPFP is `AdapterConfig.dpfp_nu` (default 0 = off). With nu >= 1 the write key an
 | File | Change |
 | --- | --- |
 | `src/looplora/core/config.py` | `dpfp_nu` (last field, memory variants only), `key_dim` property |
-| `src/looplora/core/memory.py` | `dpfp_features(k, nu)`; keyword `feature_map` in `write`, `scan_prewrite`, `scan_final` (applied before the unchanged unit normalization); rectangular states (`zeros_state(..., key_dim)`, `_check_state`, `delta_update` shape checks) |
+| `src/looplora/core/memory.py` | `dpfp_features(k, nu)`; keyword `feature_map` in `write`, `scan_prewrite`, `scan_final` (applied before the unchanged unit normalization); rectangular states (`zeros_state(..., key_dim)`, `_check_state`, `delta_update` shape checks; both scans raise `ValueError` when the state's key width differs from the written key's) |
 | `src/looplora/core/adapters.py` | `key_dim` in state shapes; `MemoryAdapter.query_code` (identity when off) and `_key_features` (passes `feature_map` only when on); `_query` is now an instance method |
 | `src/looplora/core/accounting.py` | MACs and state bytes use `r_mem * key_dim` (identical values when off) |
 | `src/looplora/llm/inject.py`, `train.py` | zero states use `key_dim`; `dpfp_nu` read from `config['model']`; writer signature gains `dpfp_nu` only when nonzero |
 | `src/looplora/llm/writer_fix.py` | recorded keys are the unit phi keys actually written (`FixBatch.keys`), original-space keys in `FixBatch.base_keys`; InfoNCE queries `query_codes` are `q_hat`; W4 + DPFP raises |
 | `src/looplora/llm/read_fix.py` | `question_terms` reads `M q_hat`; `diagnostics` keeps its columns (now phi space for DPFP arms) and adds `key_gram_rms_base`, `key_gram_max_abs_base` |
 | `src/looplora/llm/dpfp.py` (new) | arms `D32-3`, `D128-1`, `D128-3`; `configuration(arm, steps, E=16, smoke=False)` = `read_fix.configuration('R', ...)` at rank 32/128/128 plus `model.dpfp_nu` and a `dpfp` block; `DPFPExperiment(ReadFixExperiment)` |
-| `src/looplora/llm/dpfp_run.py` (new) | one arm per job: `python -m looplora.llm.dpfp_run --arm ARM --out ROOT (--steps N --smoke \| --schedule release.json) [--e8-decision lock.json]`; reuses `read_fix_run.fit` unchanged; record adds rank, nu, key_dim, state bytes, peak CUDA memory; `choose` (registered rule), `scheduled_steps`, `eligible_e8`, `load_inference` |
+| `src/looplora/llm/dpfp_run.py` (new) | one arm per job: `python -m looplora.llm.dpfp_run --arm ARM --out ROOT (--steps N --smoke \| --schedule release.json) [--e8-decision lock.json]`; reuses `read_fix_run.fit` unchanged; record adds rank, nu, key_dim, state bytes, peak CUDA memory; `choose` (registered rule), `scheduled_steps` (an E16 release must fix all three arms at once; an E8 release names the retrained arm), `eligible_e8`, `load_inference` |
 | `tests/test_dpfp.py`, `tests/test_llm_dpfp.py`, `tests/test_llm_dpfp_repro.py`, `tests/assets/memory_before_dpfp.py` (new) | see below |
 | `docs/notation.md` (section 9), `configs/p1l/README.md` | option documented; this file |
 
@@ -35,9 +35,9 @@ state-dict names and shapes equal WP-L4 R at the same rank (only M changes shape
   (nu 1/3, lambda 1/.7); `write` with a feature map; fast scan vs reference scan vs explicit delta updates with
   gradients (cpu/cuda, random/all/initial-reset/interior-reset); **DPFP-off bitwise equality** with a frozen copy of
   the pre-DPFP `memory.py` (forward cpu+cuda, gradients cpu, fp32/fp64, with and without `feature_map=None`);
-  `AdapterConfig` validation; `process_sequence` and `process_sequence_fast` vs token-by-token feature-space
-  equations; Gram read in phi space; accounting.
-- `tests/test_llm_dpfp.py` (tiny Qwen3 on cuda): config equals WP-L4 R plus only the DPFP fields (3 arms x E16/E8);
+  `AdapterConfig` validation; key-width rejection in both scans; `process_sequence` and `process_sequence_fast` vs
+  token-by-token feature-space equations; Gram read in phi space; accounting.
+- `tests/test_llm_dpfp.py` (tiny Qwen3 on cuda, inputs standardized as the runner does): config equals WP-L4 R plus only the DPFP fields (3 arms x E16/E8);
   inconsistent arm/config rejected; W4 guard; per arm (nu 3 and 1): state/key/query shapes, unit nonnegative phi keys,
   memory = ordered delta rule over the recorded keys, InfoNCE and alignment in phi space, `M q_hat` read, gradients of
   the raw-read loss, Gram reconstruction, original- and phi-space key overlap; DPFP-off experiment wiring unchanged;
@@ -47,8 +47,11 @@ state-dict names and shapes equal WP-L4 R at the same rank (only M changes shape
   It compares exactly (`==`) every logged field except step time at steps 1/50/100/150/200 with the committed
   `reports/p1l-read-fix/loss_curves.csv` (steps of record 23590 and 24645; the first 200 steps do not depend on
   them). Each rank trains in a fresh subprocess; run the file alone in its own job. A step-200 match implies
-  the whole trajectory matched. If either rank differs, first check for an environment change since WP-L4
-  (torch/CUDA/driver, maintenance); per the prereg both references are then rerun under the same schedule rule.
+  the whole trajectory matched. WP-L4's rank-128 source (`be07f7f`) has `src/` identical to the base `6da6330`;
+  the rank-32 source (`0b03d60`) differs only by the WP-C7 oracle writer and the A2 rank parameter (diff read, not
+  run), which leave R's learned-writer path unchanged. If either rank differs, first check for an environment
+  change since WP-L4 (torch/CUDA/driver, maintenance); per the prereg both references are then rerun under the
+  same schedule rule.
 
 ## Commands for step 2 (after 2026-10-28 22:00 JST; run from `/work/xg24i002/x10041/LoopLora`)
 `REF` is any committed ref (`wp/llm`, or the commit after the orchestrator merges); submit.py snapshots it by `git archive`.
@@ -89,8 +92,10 @@ Science (later, per arm, after the three step counts are committed in a release 
 The conditional E8 retrain adds `--e8-decision LOCK.json` (the audited lock whose `choice` is `retry_e8` for that arm).
 
 ## Choices where the prereg was silent
-1. Normalization is `x / max(||x||_2, eps)` with the existing eps = 1e-6, at write and read; a feature vector below eps
-   would not be unit, which cannot occur for generic nonzero keys (phi_nu is quadratic).
+1. Normalization is `x / max(||x||_2, eps)` with the existing eps = 1e-6, at write and read. phi_nu is quadratic, so a
+   feature vector below eps (keys of norm about 1e-3 or less) is shrunk instead of unit and loses the exact overwrite for
+   that key. The arms avoid it through WP-L4's input standardization (unit-scale keys); the tiny-model tests standardize
+   first, because the raw activations of the tiny random model are about 0.03.
 2. Diagnostic columns keep their names and are phi space for DPFP arms (`key_gram_rms`, `key_gram_max_abs`, key top-1
    and margin, Gram read); the original space (unit projected key before phi) is added as `*_base`. WP-L4's audit table
    "Mean max abs cos" is the mean of `key_gram_max_abs`, so the same column is compared.
@@ -108,6 +113,10 @@ The conditional E8 retrain adds `--e8-decision LOCK.json` (the audited lock whos
   the smoke fraction in the release as WP-L4 did; step time, not accuracy, is what they measure.
 - The step-count rule is not coded: reuse WP-L4's `read_fix_run.largest_schedule` (1.5 margin, 90 s reserve, 7200 s,
   five evaluations, 1000-episode evaluation time = 10 x the smoke's 100-episode maximum) unless you fix another.
+- Comparing key overlap with WP-L4: phi features are nonnegative, so phi-space cosines have a positive floor. For random
+  Gaussian keys (E = 16, numpy check) the phi-space RMS cosine is about 0.14 (D32-3), 0.12 (D128-1), 0.11 (D128-3)
+  against 0.18, 0.09, 0.09 in the original space, and mean pairwise cosine is about 0.10-0.11 versus 0. Compare WP-L4's
+  key Gram numbers with the `*_base` columns; the phi-space columns measure what the memory actually addresses.
 - D128-3 stores 128 x 768 fp32 states (393 KB per episode, 128 query copies per batch); memory should be fine on a
   GH200 but is measured in the smoke record (`memory`).
 

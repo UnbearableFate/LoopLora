@@ -134,6 +134,24 @@ def test_dpfp_fast_scan_matches_the_reference_scan_and_explicit_delta_updates(de
         torch.testing.assert_close(results[1][0], expected, rtol=1e-10, atol=1e-12)
 
 
+@pytest.mark.parametrize('scan', ['scan_prewrite', 'scan_final'])
+@pytest.mark.parametrize('with_map', [False, True])
+def test_scans_reject_a_state_whose_key_width_does_not_match_the_written_key(scan, with_map):
+    b, t, r, rm, nu = 2, 3, 4, 3, 2
+    g = torch.Generator().manual_seed(derive_seed(17, 'dpfp-width', scan, with_map))
+    K, V = (torch.randn(rm, r, generator=g, dtype=DTYPE) for _ in range(2))
+    u = torch.randn(b, t, r, generator=g, dtype=DTYPE)
+    kwargs = dict(K=K, V=V, lam=.9, beta=.5)
+    right = rm
+    if with_map:
+        kwargs['feature_map'] = partial(memory.dpfp_features, nu=nu)
+        right = 2 * rm * nu
+    getattr(memory, scan)(torch.zeros(b, rm, right, dtype=DTYPE), u, **kwargs)
+    for width in {right + 1, rm if with_map else right + 2}:
+        with pytest.raises(ValueError, match='key width'):
+            getattr(memory, scan)(torch.zeros(b, rm, width, dtype=DTYPE), u, **kwargs)
+
+
 def frozen_memory():
     spec = importlib.util.spec_from_file_location(
         'memory_before_dpfp', Path(__file__).parent / 'assets' / 'memory_before_dpfp.py')

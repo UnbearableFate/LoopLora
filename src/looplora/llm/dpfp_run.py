@@ -42,7 +42,10 @@ def scheduled_steps(arm,steps,schedule,*,smoke=False,E=16):
         raise ValueError('scientific arms require an immutable schedule release')
     if schedule['study']!='DPFP' or schedule['E']!=E:
         raise ValueError('schedule study/capacity mismatch')
-    result=schedule['steps_by_arm'][arm]
+    by_arm=schedule['steps_by_arm']
+    if arm not in by_arm or (E==16 and set(by_arm)!=set(ARMS)):
+        raise ValueError('the E16 release fixes the step counts of all three arms at once (E8: the retrained arm)')
+    result=by_arm[arm]
     if isinstance(result,bool) or not isinstance(result,int) or result<5 or result%5:
         raise ValueError('scientific schedules require five equal integer intervals')
     return result

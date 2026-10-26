@@ -12,13 +12,15 @@ CUDA and cuBLAS state matches the reference runs. Run as a script, it trains one
 import argparse
 import csv
 import json
+import os
 import subprocess
 import sys
 from pathlib import Path
 
 import pytest
 
-CURVES = Path(__file__).resolve().parents[1] / 'reports' / 'p1l-read-fix' / 'loss_curves.csv'
+ROOT = Path(__file__).resolve().parents[1]
+CURVES = ROOT / 'reports' / 'p1l-read-fix' / 'loss_curves.csv'
 STEPS = 200
 LOGGED = [1, 50, 100, 150, 200]
 FIELDS = ('loss', 'main_loss', 'address_loss', 'value_loss', 'read_loss', 'decorrelation_loss',
@@ -51,8 +53,10 @@ def recorded(rank):
 def test_dpfp_off_reproduces_wp_l4_R_training_losses_bitwise(rank, tmp_path):
     reference = recorded(rank)
     assert sorted(reference) == LOGGED
+    # The child imports looplora from the same source tree as this test (job.pbs exports the same PYTHONPATH).
+    env = {**os.environ, 'PYTHONPATH': os.pathsep.join(filter(None, [str(ROOT / 'src'), os.environ.get('PYTHONPATH')]))}
     subprocess.run([sys.executable, str(Path(__file__).resolve()), '--rank', str(rank), '--out', str(tmp_path)],
-                   check=True)
+                   check=True, env=env, timeout=900)
     rows = [json.loads(line) for line in (tmp_path / 'train_log.jsonl').read_text().splitlines()]
     observed = {row['step']: row for row in rows}
     assert sorted(observed) == LOGGED
