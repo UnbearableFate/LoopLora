@@ -105,7 +105,14 @@ def replication_configs(selection1: dict, selection2: dict) -> list[dict]:
     return configs
 
 
-def write_plan(configs: list[dict], out: Path, shards: int = 3) -> dict:
+def write_plan(configs: list[dict], out: Path, shards: int = 3, *, stage: str) -> dict:
+    rules = {
+        "pilot1": "best LR per E; largest qualifying E; LR at selected E per rank",
+        "pilot2": "best LR per writer/variant on val hops1..3 at L4 (B4:L1)",
+        "replication": "reuse Pilot-2 selected LR per writer/variant; no further selection",
+    }
+    if stage not in rules:
+        raise ValueError("unknown pilot stage")
     if shards < 1 or shards > len(configs):
         raise ValueError("invalid shard count")
     if out.exists() and any(out.iterdir()):
@@ -124,8 +131,8 @@ def write_plan(configs: list[dict], out: Path, shards: int = 3) -> dict:
         entries.append(entry)
     for shard in range(shards):
         write_json(out / f"shard-{shard:02d}.yaml", entries[shard::shards])
-    manifest = {"runs": len(configs), "shards": shards, "names": [c["name"] for c in configs],
-                "selection_rule": "best LR per E; largest qualifying E; LR at selected E per rank",
+    manifest = {"stage": stage, "runs": len(configs), "shards": shards, "names": [c["name"] for c in configs],
+                "selection_rule": rules[stage],
                 "lr_tiebreak": "smaller LR", "plateau_rule": "absolute relative loss change <=2% between steps4001..4500 and4501..5000; diagnostic only"}
     write_json(out / "manifest.json", manifest)
     return manifest
@@ -262,7 +269,8 @@ def main(argv: list[str] | None = None) -> None:
             selection1 = json.loads(args.selection1.read_text())
             configs = pilot2_configs(selection1) if args.action == "plan2" else replication_configs(
                 selection1, json.loads(args.selection2.read_text()))
-        print(json.dumps(write_plan(configs, args.out, args.shards)))
+        stage = {"plan1": "pilot1", "plan2": "pilot2", "plan-replication": "replication"}[args.action]
+        print(json.dumps(write_plan(configs, args.out, args.shards, stage=stage)))
     else:
         rows = collect(args.runs, json.loads(args.manifest.read_text()))
         selection = select_pilot1(rows) if args.action == "summarize1" else select_pilot2(rows)

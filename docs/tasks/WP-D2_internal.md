@@ -27,12 +27,16 @@ API additions:
   reader backbone (caller must configure same n_rel); no silent weight mismatch.
 - stats.pooled_compare_runs(samples_a_by_seed: Mapping[int,SampleSource],
   samples_b_by_seed, depth_a, depth_b, *, hops, split='val',
-  condition='original',resamples=2000,seed=2718)->dict. It handles same-checkpoint
+  condition='original',resamples=2000,seed=2718,confidence=0.95)->dict. It handles same-checkpoint
   depth contrasts by passing the same mapping twice. Include CLI --pooled-a
   manifest.json --pooled-b manifest.json, depths/hops/split/condition; seed keys
   JSON strings parsed as ints. Report mean difference, CI, per-seed estimates,
   n_episodes,n_queries_per_seed, resampling/seed details. No averaging unmatched
   subsets or treating queries/seeds as independent clusters.
 
-Do not execute pilots or modify prereg thresholds. Root records and proposes
+Subagents do not execute pilots or modify prereg thresholds. Root records and proposes
 selection decisions; orchestrator confirms prereg changes later.
+
+A1 is integrated: B5-lin is fixedq/identity; grids are60/72/18. Pooled confidence
+0.975 uses the same bootstrap draws as0.95. Pilot-2 uses six shards after measured
+orthogonal-writer step timing; stage-specific selection rules are recorded in plans.

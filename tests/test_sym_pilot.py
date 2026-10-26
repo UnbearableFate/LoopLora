@@ -104,7 +104,9 @@ def test_external_writer_from_is_explicit_and_shards_are_disjoint(tmp_path):
     checkpoint = tmp_path / "writer.pt"
     checkpoint.touch()
     selection["selected"]["joint/r32"]["writer_checkpoint"] = str(checkpoint)
-    manifest = write_plan(pilot2_configs(selection), tmp_path / "plan", shards=3)
+    manifest = write_plan(pilot2_configs(selection), tmp_path / "plan", shards=3, stage="pilot2")
+    assert manifest["stage"] == "pilot2"
+    assert "hops1..3 at L4" in manifest["selection_rule"]
     observed = []
     for shard in range(3):
         jobs = load_suite(tmp_path / "plan" / f"shard-{shard:02d}.yaml", tmp_path / f"shard-{shard:02d}")
@@ -115,7 +117,7 @@ def test_external_writer_from_is_explicit_and_shards_are_disjoint(tmp_path):
                 assert job["config"]["pretrain"]["writer_checkpoint"] == str(checkpoint)
     assert sorted(observed) == sorted(manifest["names"])
     with pytest.raises(FileExistsError):
-        write_plan(pilot2_configs(selection), tmp_path / "plan", shards=3)
+        write_plan(pilot2_configs(selection), tmp_path / "plan", shards=3, stage="pilot2")
 
 
 def test_loss_plateau_is_diagnostic_only_and_requires_late_training_data(tmp_path):
