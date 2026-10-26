@@ -238,6 +238,9 @@ def analyze(root: Path,out: Path) -> None:
     audit['plan_hash']=stable_hash(plan)
     audit['audit_role_aliases']=LEGACY
     for group in audit['controlled_writer_groups']: group['writer']=reverse[group['writer']]
+    shared.require(len(audit['controlled_writer_groups'])==6 and
+                   all(len(g['members'])==6 for g in audit['controlled_writer_groups']),
+                   'F2 must compare all six frozen variants in each seed and dataset')
     shared.write_json(raw/'artifact_audit.json',audit)
     gates,reported=statistics(plan,cache)
     f1.tables(raw,tables,gates,reported)
@@ -252,7 +255,7 @@ def analyze(root: Path,out: Path) -> None:
     shared.write_json(out/'analysis_summary.json',dict(status='complete',runs=39,reader_runs=36,
           gate_rows=4,confirmation_look_count=1,replication_required=False,
           passing_rows=[dict(writer=g['writer'],reader=g['reader']) for g in gates if g['passed']],
-          completed_at=datetime.now(timezone.utc).isoformat(),cross_family='awaiting authorized WP-H release'))
+          completed_at=datetime.now(timezone.utc).isoformat(),cross_family='pending paired WP-H analysis'))
     print('F2 analysis completed: 39 stages,36 readers,4 gate rows',flush=True)
 
 
