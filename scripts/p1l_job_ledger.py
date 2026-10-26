@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import argparse
-from collections import deque
 import json
 from pathlib import Path
 import re
@@ -21,11 +20,16 @@ def main():
     parser.add_argument("--out", type=Path, required=True)
     parser.add_argument("--require-final", action="store_true")
     args = parser.parse_args()
-    with (REPO / "logs/pbs/submissions.jsonl").open() as stream:
-        entries = [json.loads(line) for line in deque(stream, maxlen=256)]
     prefixes = ("pf-p1l", "size-p1l", "sm-p1l", "t-p1l", "p1l-", "ev-p1l", "fin-p1l")
-    entries = [r for r in entries if r["submitted"] >= "2026-10-27T04:07"
-               and r["name"].startswith(prefixes)]
+    submissions = REPO / "logs/pbs/submissions.jsonl"
+    if submissions.stat().st_size > 8 * 1024 * 1024:
+        raise ValueError("submission metadata exceeds the bounded control-plane scan")
+    entries = []
+    with submissions.open() as stream:
+        for line in stream:
+            row = json.loads(line)
+            if row["submitted"] >= "2026-10-27T04:07" and row["name"].startswith(prefixes):
+                entries.append(row)
     history = subprocess.run(["/usr/bin/python3", "-I", str(HELPER), "-H", "--hday", "2", "--hnum", "200",
         "--fields", "job_id,job_name,status,elapsed_seconds,nodes"], capture_output=True, text=True, check=True)
     active = subprocess.run(["/usr/bin/python3", "-I", str(HELPER),
@@ -40,7 +44,13 @@ def main():
     for entry in entries:
         job = states.get(entry["job_id"].split(".")[0])
         if job is None:
-            raise ValueError(f"PBS did not return job{entry['job_id']}; no silent accounting omission")
+            exact = subprocess.run(["/usr/bin/python3", "-I", str(HELPER), "-H", entry["job_id"],
+                "--fields", "job_id,job_name,status,elapsed_seconds,nodes"],
+                capture_output=True, text=True, check=True)
+            value = json.loads(exact.stdout)
+            if not value["ok"] or len(value.get("jobs", [])) != 1:
+                raise ValueError(f"PBS did not return job{entry['job_id']}; no silent accounting omission")
+            job = value["jobs"][0]
         log = Path(entry["log"])
         exit_file = Path(str(log) + ".exit")
         exit_code = int(exit_file.read_text()) if exit_file.exists() else None

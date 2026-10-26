@@ -131,8 +131,8 @@ def finalize(args):
                     raise ValueError("oracle support snapshots/write counts differ across readers/seeds")
         if label in {"M1-L4", "B8"}:
             data = json.loads((out / "readout.json").read_text())
-            readouts.extend(dict(reader=label, seed=seed, **row) for row in data["table"])
-            faithfulness.extend(dict(reader=label, seed=seed, **row) for row in data["faithfulness"])
+            readouts.extend(dict(rank=rank, reader=label, seed=seed, **row) for row in data["table"])
+            faithfulness.extend(dict(rank=rank, reader=label, seed=seed, **row) for row in data["faithfulness"])
             swap = json.loads((out / "swap-successors.json").read_text())
             with np.load(out / "swap-successors-samples.npz", allow_pickle=False) as source:
                 samples = {key: source[key] for key in source.files}
@@ -142,7 +142,7 @@ def finalize(args):
                         or float((samples["prediction"][keep] == samples["answer"][keep]).mean()) != row["follows_new"]
                         or float((samples["original_prediction"][keep] == samples["answer"][keep]).mean()) != row["original_predicts_new"]):
                     raise ValueError("swap_successors table cannot be reproduced from samples")
-                swaps.append(dict(reader=label, seed=seed, **row))
+                swaps.append(dict(rank=rank, reader=label, seed=seed, **row))
             artifact_rows[-1]["swap_samples_hash"] = digest(out / "swap-successors-samples.npz")
             artifact_rows[-1]["readout_hash"] = digest(out / "readout.json")
     if len(oracle_hashes) != 1:
@@ -156,10 +156,11 @@ def finalize(args):
     write_csv(args.out / "per-step-readout.csv", readouts)
     write_csv(args.out / "readout-faithfulness.csv", faithfulness)
     write_csv(args.out / "swap-successors.csv", swaps)
-    save(args.out / "run-manifest.json", dict(status="audited", S=manifest["S"], lrs=manifest["lrs"],
+    save(args.out / "run-manifest.json", dict(status="audited", rank=rank, condition=manifest["condition"],
+        S=manifest["S"], lrs=manifest["lrs"],
         oracle_hash=next(iter(oracle_hashes)), runs=artifact_rows))
     plot(args.out, counts)
-    lines = ["# P1-L oracle-random confirmation", "",
+    lines = [f"# P1-L oracle-random r{rank} confirmation", "",
         f"S={manifest['S']}; seeds17/29/43; {confidence*100:g}% paired episode-bootstrap CIs,2000 draws.",
         f"G1-L: **{'pass' if result['G1_L'] else 'fail'}**. G2-L: **{'pass' if result['G2_L'] else 'fail'}**.", "",
         "| Contrast | Difference(pp) | CI(pp) | Per-seed differences(pp) |",
@@ -177,6 +178,7 @@ def plot(out, counts):
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
 
+    rank = counts[0]["rank"]
     labels = [label for label in ["B8", "M1-L4", "B4", "B5-L4", "B3-L4", "B0", "B1", "B2"]
               if any(row["reader"] == label for row in counts)]
     values = np.zeros((len(labels), 8))
@@ -189,7 +191,7 @@ def plot(out, counts):
     fig, ax = plt.subplots(figsize=(8, 4.5))
     image = ax.imshow(100*values, vmin=0, vmax=100, cmap="viridis")
     ax.set(xticks=range(8), xticklabels=range(1, 9), yticks=range(len(labels)), yticklabels=labels,
-           xlabel="True query hop", title="P1-L oracle memory: full-vocabulary EM (%)")
+           xlabel="True query hop", title=f"P1-L r{rank} oracle memory: full-vocabulary EM (%)")
     for i in range(len(labels)):
         for j in range(8):
             ax.text(j, i, f"{100*values[i,j]:.1f}", ha="center", va="center", color="white", fontsize=8)
@@ -204,7 +206,7 @@ def plot(out, counts):
     fig, ax = plt.subplots(figsize=(6, 5))
     image = ax.imshow(100*values, vmin=0, vmax=100, cmap="viridis", origin="lower")
     ax.set(xticks=range(8), xticklabels=range(1, 9), yticks=range(8), yticklabels=range(1, 9),
-           xlabel="True query hop", ylabel="Read depth", title="M1-L4: same checkpoint and memory")
+           xlabel="True query hop", ylabel="Read depth", title=f"M1-L4 r{rank}: same checkpoint and memory")
     fig.colorbar(image, ax=ax, label="Full-vocabulary EM (%)")
     fig.tight_layout()
     fig.savefig(out / "M1-depth.png", dpi=180)
