@@ -15,7 +15,7 @@ import sys
 from pathlib import Path
 from typing import Any
 
-STAGES = {"pilot1": 60, "pilot2": 60, "replication": 15}
+STAGES = {"pilot1": 60, "pilot2": 72, "replication": 18}
 FIELDS = ("x", "u", "memory", "write_count")
 
 

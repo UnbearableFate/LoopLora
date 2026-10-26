@@ -8,13 +8,14 @@ Run on a compute node with ``PYTHONPATH=src``::
         --label-a M1 --label-b B4 --out paired.json
     python -m looplora.sym.stats --pooled-a m1.json --pooled-b b5.json \
         --depth-a 4 --depth-b 4 --hops 2 3 --split val \
-        --condition original --label-a M1 --label-b B5 --out pooled.json
+        --condition original --confidence 0.975 --label-a M1 --label-b B5 --out pooled.json
 
 Pooled manifests are JSON objects such as ``{"17": "runs/seed17/samples.npz",
 "29": "runs/seed29/samples.npz"}``; relative paths resolve against the manifest
 directory. Pass the same manifest on both sides for a within-checkpoint depth
 contrast. Pooled seeds are fixed experimental replicates: bootstrap uncertainty
 comes from shared evaluation episodes, without independently resampling seeds.
+Pooled confidence defaults to 0.95; preregistered gates use 0.975.
 
 All comparisons retain split and condition labels. Bootstrap draws resample
 whole episodes, retaining every query in each selected episode. The estimand
@@ -24,6 +25,8 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
+from numbers import Real
 from pathlib import Path
 from typing import Any, Mapping
 
@@ -195,6 +198,7 @@ def pooled_compare_runs(
     condition: str = "original",
     resamples: int = 2000,
     seed: int = 2718,
+    confidence: float = 0.95,
 ) -> dict[str, Any]:
     """Mean per-seed A-minus-B accuracy with a joint episode bootstrap.
 
@@ -204,8 +208,15 @@ def pooled_compare_runs(
     the same episodes, including all their selected queries, for every seed;
     it then averages the per-seed accuracy differences with equal seed weights.
     This CI conditions on the supplied training seeds; seeds are not clusters.
+    Confidence changes only the percentile cutoffs, retaining identical draws.
     """
     _check_resamples(resamples)
+    if (isinstance(confidence, bool) or not isinstance(confidence, Real)
+            or not 0 < confidence < 1):
+        raise ValueError("Confidence must be a finite real number strictly between zero and one")
+    confidence = float(confidence)
+    if not math.isfinite(confidence) or not 0 < confidence < 1:
+        raise ValueError("Confidence must be a finite real number strictly between zero and one")
     for sources in (samples_a_by_seed, samples_b_by_seed):
         if not isinstance(sources, Mapping) or not sources:
             raise ValueError("Pooled comparisons require nonempty mappings keyed by training seed")
@@ -286,7 +297,8 @@ def pooled_compare_runs(
         draws = rng.integers(0, n_episodes, size=(stop - start, n_episodes))
         per_seed_boot = totals[:, draws].sum(axis=-1) / counts[draws].sum(axis=-1)
         boot[start:stop] = per_seed_boot.mean(axis=0)
-    low, high = np.quantile(boot, [0.025, 0.975])
+    alpha = (1 - confidence) / 2
+    low, high = np.quantile(boot, [alpha, 1 - alpha])
     return {
         "comparison": "A - B", "split": split, "condition": condition, "hops": selected_hops,
         "depth_a": int(depth_a), "depth_b": int(depth_b),
@@ -295,7 +307,7 @@ def pooled_compare_runs(
         "accuracy_a": float(np.mean([row["accuracy_a"] for row in per_seed])),
         "accuracy_b": float(np.mean([row["accuracy_b"] for row in per_seed])),
         "difference": float(np.mean([row["difference"] for row in per_seed])),
-        "ci_low": float(low), "ci_high": float(high), "confidence": 0.95,
+        "ci_low": float(low), "ci_high": float(high), "confidence": confidence,
         "resamples": int(resamples), "seed": int(seed), "bootstrap_seed": bootstrap_seed,
         "cluster_unit": "episode", "joint_episode_resampling": True,
         "statistic": "mean_per_seed_paired_accuracy_difference",
@@ -344,6 +356,7 @@ def main(argv: list[str] | None = None) -> None:
     parser.add_argument("--hops", nargs="+", type=int)
     parser.add_argument("--split", default="val")
     parser.add_argument("--condition", default="original")
+    parser.add_argument("--confidence", type=float, help="Pooled CI confidence (default: 0.95; gates: 0.975)")
     parser.add_argument("--resamples", type=int, default=2000)
     parser.add_argument("--seed", type=int, default=2718)
     parser.add_argument("--out", required=True, type=Path)
@@ -356,10 +369,12 @@ def main(argv: list[str] | None = None) -> None:
         result = pooled_compare_runs(_load_manifest(args.pooled_a), _load_manifest(args.pooled_b),
                                      args.depth_a, args.depth_b, hops=args.hops,
                                      split=args.split, condition=args.condition,
-                                     resamples=args.resamples, seed=args.seed)
+                                     resamples=args.resamples, seed=args.seed,
+                                     confidence=0.95 if args.confidence is None else args.confidence)
         result["comparison"] = f"{args.label_a} - {args.label_b}"
-    elif args.pooled_b is not None or args.hops is not None or args.split != "val" or args.condition != "original":
-        parser.error("--pooled-b, --hops, --split and --condition require --pooled-a")
+    elif (args.pooled_b is not None or args.hops is not None or args.split != "val"
+          or args.condition != "original" or args.confidence is not None):
+        parser.error("--pooled-b, --hops, --split, --condition and --confidence require --pooled-a")
     elif args.reference is not None:
         if args.depth_a is None or args.depth_b is None:
             parser.error("--reference requires both --depth-a and --depth-b")

@@ -1,12 +1,12 @@
 Symbolic mechanism configurations use `config.resolve_config` defaults. `default.yaml`
 records the 3000-step main configuration; it is preparation only, not authorization
-for a pilot or screening run. `smoke.yaml` contains 24 runs: both T1 and T2 for all
-eight variants, two fixed-L=4 M1 smokes, plus one shared T1 writer and five readers
+for a pilot or screening run. `smoke.yaml` contains 27 runs: both T1 and T2 for all
+nine variants, two fixed-L=4 M1 smokes, plus one shared T1 writer and six readers
 using that exact artifact. B4 also supplies the fixed-L=1 iterative-reader smoke.
 Every training/pretraining stage is 300 steps, one seed (17), with 32 evaluation
 episodes per split/hop; training and pretraining keep the default batch size 32.
 The 10% ratio applies to train/pretrain steps. T1 evaluates only hop 1. B4/B6/B7 fix L=1; B8 fixes L=4.
-M1-lin sets the reader activation to identity.
+M1-lin and B5-lin set the reader activation to identity; B5-lin keeps a fixed query.
 
 Run only inside a Miyabi-G compute allocation, through the repository submit wrapper:
 
@@ -28,7 +28,7 @@ the suite return nonzero. `depends_on: [name]` delays a run; `writer_from: name`
 also sets `pretrain.writer_checkpoint` to `<suite-out>/<name>/writer.pt`.
 Config paths in suite entries are relative to the suite YAML.
 
-B3/B4/B5/M1/M1-lin use the same oracle writer and evaluation episodes for the
+B3/B4/B5/B5-lin/M1/M1-lin use the same oracle writer and evaluation episodes for the
 controlled mechanism comparison. The additional frozen-writer group shares one
 learned writer checkpoint. B6/B7 use joint training with larger dimensions as
 capacity controls; their memory is not held equal to the main comparison.
@@ -104,6 +104,8 @@ loss curve, and selected hop/depth tables. Selection uses the best LR per E,
 then E*, then the LR at E*; ties use the smaller LR. The loss plateau diagnostic
 is not a selection criterion. All pilot training uses seed17 and all pilot
 evaluation uses split val, generator seed4242.
+With amendment A1, Pilot-1/2/replication contain 60/72/18 runs respectively;
+Pilot-2 and replication include all six readers, including B5-lin.
 
 Saved checkpoints support allowlisted evaluation overrides, for example
 `--set eval.episodes=2000 --set 'eval.splits=[val]' --set eval.seed=4242`.
@@ -115,5 +117,6 @@ For pooled paired statistics, `python -m looplora.sym.stats --pooled-a a.json
 accepts JSON maps from training-seed labels to sample archives (paths relative
 to each manifest). Use the same manifest for a within-checkpoint depth contrast.
 Episode draws are shared across seeds; seed-specific accuracy differences are
-averaged with equal seed weight. The reported interval is conditional on the
-provided training seeds.
+averaged with equal seed weight. `--confidence 0.975` supplies the A1 gate
+interval; the default is 0.95. Changing confidence retains the same bootstrap
+draws. The reported interval is conditional on the provided training seeds.

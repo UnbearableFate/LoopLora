@@ -44,6 +44,7 @@ def test_resolution_is_idempotent_and_variant_controls_are_explicit():
         if variant == "B8":
             assert config["train"]["depths"] == config["eval"]["depths"] == [4]
     assert resolve_config({"variant": "M1-lin"})["activation"] == "identity"
+    assert resolve_config({"variant": "B5-lin"})["activation"] == "identity"
     assert resolve_config({"variant": "B6", "writer": "joint",
                            "model": {"r": 96, "r_mem": 96, "reference_r": 64}})["model"]["r"] == 96
     assert resolve_config({"variant": "B7", "writer": "joint",
@@ -66,7 +67,7 @@ def test_invalid_experiment_configs_fail_before_execution(updates):
 def test_smoke_matrix_has_all_variants_and_one_shared_writer(tmp_path):
     defaults = load_config(ROOT / "configs/p1s/default.yaml")
     jobs = run.load_suite(ROOT / "configs/p1s/smoke.yaml", tmp_path)
-    assert len(jobs) == 24
+    assert len(jobs) == 27
     for task in ("t1", "t2_chain_end"):
         main = [job for job in jobs if job["config"]["task"]["name"] == task
                 and job["config"]["writer"] != "t1_frozen"]
@@ -75,7 +76,7 @@ def test_smoke_matrix_has_all_variants_and_one_shared_writer(tmp_path):
     assert all(job["config"]["train"]["steps"] == defaults["train"]["steps"] // 10 for job in jobs)
     assert all(job["config"]["pretrain"]["steps"] == defaults["pretrain"]["steps"] // 10 for job in jobs)
     consumers = [job for job in jobs if job["dependencies"]]
-    assert len(consumers) == 5
+    assert len(consumers) == 6
     assert {job["config"]["pretrain"]["writer_checkpoint"] for job in consumers} == {
         str(tmp_path / "t1-shared-writer/writer.pt")}
     for task in ("t1", "t2"):

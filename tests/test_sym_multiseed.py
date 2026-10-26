@@ -131,7 +131,8 @@ def test_explicit_split_condition_selection_does_not_pool_other_groups():
     assert result["difference"] == 0.5
 
 
-def test_pooled_cli_parses_seed_keys_and_manifest_relative_paths(tmp_path):
+@pytest.mark.parametrize("confidence", [0.95, 0.975])
+def test_pooled_cli_parses_seed_keys_and_manifest_relative_paths(tmp_path, confidence):
     folder = tmp_path / "artifacts"
     folder.mkdir()
     manifest = {}
@@ -144,9 +145,10 @@ def test_pooled_cli_parses_seed_keys_and_manifest_relative_paths(tmp_path):
     path.write_text(json.dumps(manifest))
     output = tmp_path / "pooled.json"
     main(["--pooled-a", str(path), "--pooled-b", str(path), "--depth-a", "4", "--depth-b", "1",
-          "--hops", "2", "--label-a", "L4", "--label-b", "L1", "--out", str(output)])
+          "--hops", "2", "--confidence", str(confidence), "--label-a", "L4", "--label-b", "L1",
+          "--out", str(output)])
     result = json.loads(output.read_text())
-    expected = pooled_compare_runs(arrays, arrays, 4, 1, hops=[2])
+    expected = pooled_compare_runs(arrays, arrays, 4, 1, hops=[2], confidence=confidence)
     expected["comparison"] = "L4 - L1"
     assert result == expected
 
@@ -168,3 +170,54 @@ def test_pooled_requires_at_least_2000_resamples():
     samples = {17: _samples([1, 0])}
     with pytest.raises(ValueError, match="2000"):
         pooled_compare_runs(samples, samples, 4, 4, hops=[2], resamples=1999)
+
+
+def test_higher_confidence_widens_ci_without_changing_estimates_or_bootstrap_draws(monkeypatch):
+    a = {s: _samples([1, 0] * 200) for s in (17, 29, 43)}
+    b = {s: _samples([0] * 400) for s in (17, 29, 43)}
+    bootstrap_distributions = []
+    original_quantile = np.quantile
+
+    def record_distribution(values, quantiles):
+        bootstrap_distributions.append(values.copy())
+        return original_quantile(values, quantiles)
+
+    monkeypatch.setattr(np, "quantile", record_distribution)
+    report = pooled_compare_runs(a, b, 4, 4, hops=[2])
+    gate = pooled_compare_runs(a, b, 4, 4, hops=[2], confidence=0.975)
+    assert report["confidence"] == 0.95
+    assert gate["confidence"] == 0.975
+    assert report["difference"] == gate["difference"] == 0.5
+    assert report["per_seed"] == gate["per_seed"]
+    assert report["bootstrap_seed"] == gate["bootstrap_seed"]
+    np.testing.assert_array_equal(bootstrap_distributions[0], bootstrap_distributions[1])
+    assert gate["ci_low"] <= report["ci_low"] < report["ci_high"] <= gate["ci_high"]
+    assert gate["ci_high"] - gate["ci_low"] > report["ci_high"] - report["ci_low"]
+
+
+@pytest.mark.parametrize("confidence", [
+    True, False, np.bool_(True), 0, 1, -0.5, 1.5,
+    float("nan"), float("inf"), -float("inf"), "0.95", None, 0.95 + 0j,
+])
+def test_pooled_rejects_invalid_confidence(confidence):
+    samples = {17: _samples([1, 0])}
+    with pytest.raises(ValueError, match="Confidence.*finite real"):
+        pooled_compare_runs(samples, samples, 4, 4, hops=[2], confidence=confidence)
+
+
+def test_pooled_accepts_numpy_real_confidence_and_reports_it():
+    samples = {17: _samples([1, 0])}
+    result = pooled_compare_runs(samples, samples, 4, 4, hops=[2], confidence=np.float64(0.975))
+    assert result["confidence"] == 0.975
+
+
+@pytest.mark.parametrize("confidence", ["nan", "inf", "0", "1"])
+def test_pooled_cli_rejects_invalid_confidence(tmp_path, confidence):
+    sample_path = tmp_path / "samples.npz"
+    np.savez(sample_path, **_samples([1, 0]))
+    manifest = tmp_path / "manifest.json"
+    manifest.write_text(json.dumps({"17": str(sample_path)}))
+    with pytest.raises(ValueError, match="Confidence.*finite real"):
+        main(["--pooled-a", str(manifest), "--pooled-b", str(manifest),
+              "--depth-a", "4", "--depth-b", "4", "--hops", "2", "--confidence", confidence,
+              "--out", str(tmp_path / "out.json")])

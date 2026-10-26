@@ -1,4 +1,4 @@
-# B3/B4/B5/M1/M1-lin/B8 use the same fixed oracle codebook and episodes.
+# B3/B4/B5/B5-lin/M1/M1-lin/B8 use the same fixed oracle codebook and episodes.
 # B6/B7 use joint training as capacity controls, not paired writer controls.
 - name: t1-B3
   config: smoke_base.yaml
@@ -9,6 +9,9 @@
 - name: t1-B5
   config: smoke_base.yaml
   overrides: {variant: B5, task: {name: t1, chain_lengths: null, hops: [1]}}
+- name: t1-B5-lin
+  config: smoke_base.yaml
+  overrides: {variant: B5-lin, task: {name: t1, chain_lengths: null, hops: [1]}}
 - name: t1-M1
   config: smoke_base.yaml
   overrides: {variant: M1, task: {name: t1, chain_lengths: null, hops: [1]}}
@@ -33,6 +36,9 @@
 - name: t2-B5
   config: smoke_base.yaml
   overrides: {variant: B5}
+- name: t2-B5-lin
+  config: smoke_base.yaml
+  overrides: {variant: B5-lin}
 - name: t2-M1
   config: smoke_base.yaml
   overrides: {variant: M1}
@@ -58,7 +64,7 @@
 - name: t2-M1-L4
   config: smoke_base.yaml
   overrides: {variant: M1, train: {depths: [4]}}
-# The five learned readers below depend on one exact pretrained writer artifact.
+# The six learned readers below depend on one exact pretrained writer artifact.
 - name: t1-shared-writer
   config: smoke_base.yaml
   overrides:
@@ -77,6 +83,10 @@
   config: smoke_base.yaml
   writer_from: t1-shared-writer
   overrides: {variant: B5, writer: t1_frozen}
+- name: t2-frozen-B5-lin
+  config: smoke_base.yaml
+  writer_from: t1-shared-writer
+  overrides: {variant: B5-lin, writer: t1_frozen}
 - name: t2-frozen-M1
   config: smoke_base.yaml
   writer_from: t1-shared-writer

@@ -1,5 +1,10 @@
 # WP-D2 static pilot/runner review
 
+This review describes the pre-A1 grid. Amendment A1 subsequently adds B5-lin:
+Pilot-2/replication now contain 72/18 runs with six variants; Pilot-1 remains60.
+The audit counts and behavior tests were updated accordingly. The suggested
+distinct-winning-LR regression below has also been added.
+
 Reviewed `sym/pilot.py`, `sym/run.py` cross-stage writer resolution, writer export/load/freeze,
 TaskSpec construction, and focused pilot tests against WP-D2, P1S and the selected LR rule.
 No source changes or runtime execution; compute validation remains with the parent.

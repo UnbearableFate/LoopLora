@@ -11,7 +11,7 @@ from typing import TYPE_CHECKING, Any, Mapping
 if TYPE_CHECKING:
     from looplora.data.relations import TaskSpec
 
-VARIANTS = ("B3", "B4", "B5", "M1", "M1-lin", "B6", "B7", "B8")
+VARIANTS = ("B3", "B4", "B5", "B5-lin", "M1", "M1-lin", "B6", "B7", "B8")
 WRITERS = ("oracle_random", "oracle_orth", "t1_frozen", "joint")
 DEFAULTS: dict[str, Any] = {
     "name": "symbolic", "seed": 17, "backbone_seed": 31415, "device": "cuda",
@@ -86,7 +86,7 @@ def resolve_config(mapping: Mapping[str, Any]) -> dict[str, Any]:
         raise ValueError(f"unknown writer: {config['writer']}")
     if config["activation"] not in ("relu", "identity"):
         raise ValueError("activation must be relu or identity")
-    config["activation"] = "identity" if variant == "M1-lin" else config["activation"]
+    config["activation"] = "identity" if variant in {"M1-lin", "B5-lin"} else config["activation"]
     model = config["model"]
     explicit_model = mapping.get("model", {})
     if "reference_r" not in explicit_model:

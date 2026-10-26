@@ -10,7 +10,7 @@ from typing import Any
 from .config import resolve_config
 
 LRS = (3e-4, 1e-3, 3e-3)
-VARIANTS = ("M1", "M1-lin", "B5", "B3", "B4")
+VARIANTS = ("M1", "M1-lin", "B5", "B5-lin", "B3", "B4")
 WRITERS = ("oracle_random", "oracle_orth", "t1_frozen", "joint")
 
 

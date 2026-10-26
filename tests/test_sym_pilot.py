@@ -68,7 +68,7 @@ def test_pilot2_and_replication_have_locked_shapes_budgets_and_shared_writer(E):
     selection1 = select_pilot1(capacity_rows())
     selection1["E_star"] = E
     configs = pilot2_configs(selection1)
-    assert len(configs) == 60
+    assert len(configs) == 72
     rows = []
     for config in configs:
         assert config["task"]["E"] == E
@@ -76,14 +76,16 @@ def test_pilot2_and_replication_have_locked_shapes_budgets_and_shared_writer(E):
         assert config["eval"]["splits"] == ["val"]
         assert config["train"]["steps"] == 5000
         assert config["pretrain"]["task"]["head_sharing"] == .3
+        if config["variant"] == "B5-lin":
+            assert config["activation"] == "identity"
         if config["writer"] == "t1_frozen":
             assert config["pretrain"]["writer_checkpoint"] == "/selected/writer.pt"
         rows.append({"writer": config["writer"], "variant": config["variant"],
                      "lr": config["train"]["lr"], "accuracy": .5})
     selection2 = select_pilot2(rows)
-    assert len(selection2["selected"]) == 20
+    assert len(selection2["selected"]) == 24
     replicas = replication_configs(selection1, selection2)
-    assert len(replicas) == 15
+    assert len(replicas) == 18
     for config in replicas:
         assert config["train"]["lr"] == 3e-4
         assert config["pretrain"]["task"]["E"] == E
