@@ -11,7 +11,7 @@ from looplora.data.relations import generate
 from looplora.infra.seeds import derive_seed
 from looplora.llm.inject import load_tokenizer
 from looplora.llm.read_fix import (ReadFixExperiment,configuration,gram_read,raw_read_loss,
-    key_decorrelation,question_terms,extra_losses,controlled_score,diagnostics)
+    key_decorrelation,question_terms,extra_losses,controlled_score,diagnostics,RUNS)
 from looplora.llm.read_fix_run import (save_checkpoint,load_inference,require_prior,choose,
     largest_schedule,scheduled_steps,eligible_e8)
 from looplora.llm.train import make_task_spec
@@ -167,15 +167,24 @@ def test_scientific_gate_waits_for_final_L3_report_and_decision(tmp_path):
 
 
 def records(scores):
-    return [dict(arm=arm,status='complete',smoke=False,training=dict(actual_steps=10,
-        metrics={'10':{'correct':scores.get(arm,0)}})) for arm in ('R','Rrho','RK','OArho')]
+    return [dict(rank=rank,arm=arm,status='complete',smoke=False,training=dict(actual_steps=10,
+        metrics={'10':{'correct':scores.get((rank,arm),0)}})) for rank,arm in RUNS]
 
 
 def test_selection_oracle_exclusion_and_single_E8_gate():
-    assert choose(records({'R':800,'RK':999}))['arm']=='R'
-    assert choose(records({'OArho':1000,'RK':499}))['action']=='stop'
-    assert choose(records({'R':500,'Rrho':500}))==dict(action='retry_e8',arm='R',E=8,correct={'R':500,'Rrho':500,'RK':0})
-    assert choose(records({'Rrho':799,'RK':700}))['arm']=='Rrho'
+    assert choose(records({(32,'R'):800,(32,'RK'):999,(128,'W5'):1000}))['arm']=='R'
+    assert choose(records({(32,'OArho'):1000,(128,'OA'):1000,(32,'RK'):499}))['action']=='stop'
+    choice=choose(records({(32,'R'):500,(32,'Rrho'):500}))
+    assert (choice['action'],choice['arm'],choice['rank'],choice['E'])==('retry_e8','R',32,8)
+    assert choose(records({(32,'Rrho'):799,(32,'RK'):700}))['arm']=='Rrho'
+    choice=choose(records({(128,'W5'):800,(128,'R'):999}))
+    assert (choice['action'],choice['rank'],choice['arm'])==('select',128,'W5')
+    choice=choose(records({(32,'RK'):799,(128,'R'):799}))
+    assert (choice['action'],choice['rank'],choice['arm'])==('retry_e8',32,'RK')
+    choice=choose(records({(32,'R'):600,(128,'W5'):700}))
+    assert (choice['action'],choice['rank'],choice['arm'])==('retry_e8',128,'W5')
+    with pytest.raises(ValueError): choose(records({})[:-1])
+    with pytest.raises(ValueError): choose(records({})+[records({})[0]])
 
 
 def test_A1_schedule_is_maximal_with_five_integer_intervals():
@@ -190,13 +199,54 @@ def test_A1_schedule_is_maximal_with_five_integer_intervals():
     with pytest.raises(ValueError): scheduled_steps(['R'],8225,schedule)
     with pytest.raises(ValueError): scheduled_steps(['R'],None,schedule,E=8)
     with pytest.raises(ValueError): scheduled_steps(['R'],None,None)
+    schedule=dict(amendment='A2',rank=128,E=16,steps_by_arm={'W5':20000,'R':19000})
+    assert scheduled_steps(['W5','R'],None,schedule,rank=128)=={'W5':20000,'R':19000}
+    with pytest.raises(ValueError): scheduled_steps(['R'],None,schedule,rank=32)
 
 
 def test_E8_consumes_the_auditor_nested_selection_lock():
-    lock=dict(choice=choose(records({'R':600,'RK':700})),context_hash='locked')
+    lock=dict(choice=choose(records({(32,'R'):600,(32,'RK'):700})),context_hash='locked')
     assert eligible_e8(lock,['RK'])==8
     with pytest.raises(ValueError): eligible_e8(lock,['R'])
-    with pytest.raises(ValueError): eligible_e8(dict(choice=choose(records({'R':800}))),['R'])
+    with pytest.raises(ValueError): eligible_e8(dict(choice=choose(records({(32,'R'):800}))),['R'])
+    lock=dict(choice=choose(records({(128,'R'):700})),context_hash='locked')
+    assert eligible_e8(lock,['R'],128)==8
+    with pytest.raises(ValueError): eligible_e8(lock,['R'],32)
+
+
+@pytest.mark.parametrize('arm',['W5','R','OA'])
+def test_rank128_uses_square_memory_and_the_declared_objective_and_export(model,tokenizer,tmp_path,arm):
+    cfg=configuration(arm,10,rank=128); cfg['model']['layer']=1
+    experiment=ReadFixExperiment(cfg,arm,model=model,tokenizer=tokenizer)
+    try:
+        assert experiment.adapter.cfg.r==experiment.adapter.cfg.r_mem==128
+        batch=experiment.prepare(data(cfg))
+        assert batch.snapshot.states[1].shape==(2,128,128)
+        logits,x=experiment.score(batch,1,capture_inputs=True)
+        read,decor=extra_losses(experiment,batch,x)
+        address,value=auxiliary_losses(experiment,batch,x)
+        assert decor==0
+        if arm=='OA':
+            assert read==address==value==0 and experiment.value_head is None
+            assert torch.equal(question_terms(experiment,batch,x)['m'],question_terms(experiment,batch,x)['clean'])
+        else:
+            assert address>0 and value>0
+            assert sum(p.numel() for p in experiment.value_head.parameters())==132096
+            assert (read>0)==(arm=='R')
+            if arm=='R':
+                grads=torch.autograd.grad(read,[experiment.adapter.Q,experiment.adapter.K,
+                    experiment.adapter.V,experiment.adapter.a_beta],retain_graph=True)
+                assert all(torch.isfinite(g).all() and g.abs().sum()>0 for g in grads)
+        optimizer=torch.optim.AdamW(experiment.trainable_parameters())
+        save_checkpoint(experiment,optimizer,tmp_path,10)
+        with torch.no_grad(): expected,_=experiment.score(experiment.prepare(data(cfg)),1)
+    finally: experiment.close()
+    loaded=load_inference(tmp_path/'writer.pt',model=model,tokenizer=tokenizer)
+    try:
+        assert loaded.adapter.cfg.r_mem==128 and loaded.value_head is None
+        with torch.no_grad(): actual,_=loaded.score(loaded.prepare(data(cfg)),1)
+        assert torch.equal(actual,expected)
+    finally: loaded.close()
 
 
 def test_full_checkpoint_audit_without_optimizer_steps(model,tokenizer,tmp_path):

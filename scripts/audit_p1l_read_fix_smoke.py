@@ -8,7 +8,7 @@ from pathlib import Path
 import numpy as np
 import torch
 
-from looplora.llm.read_fix import ARMS,configuration
+from looplora.llm.read_fix import configuration
 from looplora.llm.run import _write_json,source_metadata
 from looplora.sym.stats import load_samples
 
@@ -19,7 +19,7 @@ if __name__=='__main__':
     parser.add_argument('--out',type=Path,required=True)
     args=parser.parse_args()
     rows=[]; reference={}; sources=set(); normalization=None
-    for arm in ARMS:
+    for arm in ('R','Rrho','RK','OArho'):
         folder=args.root/arm
         rec=json.loads((folder/'record.json').read_text())
         assert rec['status']=='complete' and rec['smoke'] is True and rec['arm']==arm

@@ -68,3 +68,13 @@ watching3715708 does not prove3715707 finished. Spent0.178333nodeh before scienc
 full two jobs4nodeh +conditionalE8job2h still leaves>1.8nodeh below8 for its
 smoke/tests/audits. See pending entries in jobs.json. Do not cancel/change jobs
 or mix numerical sources. No scientific submission existed before A1 steering.
+
+AMENDMENT A2 ACTIVE (master2844d5e, merged through df21654): user adds rank128
+W5,R,OA in parallel; same fixed recipe, own smoke-sized<=2h schedules. DO NOT
+READ ANY WP-L4 VALIDATION SCORE until all three new scientific arms are submitted.
+No WP-L4 quality score has been read by this worker. Existing r32 jobs/source
+remain unchanged. Decision now waits for ALL7 runs: r32 R<Rrho<RK first, then
+r128 W5<R; both oracle arms diagnostic/ineligible. E8 applies to best learned
+arm across BOTH ranks. Total WP-L4 cap REMOVED; record nodeh perjob, each<=2h.
+Prepare separate rank128 release/root directories and re-arm the wake-up after
+submission. Older4-only decisions/8nodeh instructions above are superseded.

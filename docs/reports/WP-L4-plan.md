@@ -80,3 +80,23 @@ repeat-logit drift0. Reconstruct dense coefficients independently and compare
 all baseline predictions with saved A1 samples before release. All scientific
 submissions use --scale-up docs/tasks/WP-L4_p1l_read_fix.md and the frozen
 per-arm schedule JSON; no adaptive length/accuracy-driven extension.
+
+## Amendment A2, before any WP-L4 validation score is read
+
+Merged master2844d5e through df21654. Add r=r_mem128 W5/R/OA, seed17,
+T1E16/B32/Q4/L1/layer14/o_proj, rho.25, lr.003 without search (flagged).
+Rank32 science remains on frozen0b03d60; no running job is modified.
+For rank128, run2400step systems smokes (10% of provisional24000),100episode
+validation at480/960/1440/1920/2400, paired W5/R and soloOA matching science
+packing. Read only artifact/finite-output checks and timings. Each arm then
+gets its own largest multiple5 whose measured training+5validation time,
+multiplied by1.5 plus90s reserve, fits7200s. Freeze a SEPARATE release-r128.json
+before training; do not overwrite rank32release.json. No WP-L4 validation score
+is read until all three rank128 scientific arms are submitted.
+
+Selection waits for ALL7 E16runs. Candidate order r32R<Rrho<RK, then
+r128W5<R, finalEM>=.80. Both oracle arms remain diagnostic only. If none
+passes but best learned arm over both ranks>=.50, exactlyONE E8retrain at
+that arm's rank, own smoke-sized<=2h release, same seed/LR/objective. Ties
+use the candidate order. Totalnodeh cap removed by user; eachjob<=1node2h,
+alljobs still recorded. No later writer screen/extension.

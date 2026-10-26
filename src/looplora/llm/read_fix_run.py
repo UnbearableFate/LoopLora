@@ -23,7 +23,7 @@ from looplora.sym.evaluate import stratify_queries
 from looplora.sym.stats import load_samples
 from .evaluate import _slice
 from .prefetch import BatchStream
-from .read_fix import (ARMS,SIMPLICITY,ReadFixExperiment,configuration,diagnostics,extra_losses)
+from .read_fix import (ARMS,SIMPLICITY,CANDIDATES,RUNS,ReadFixExperiment,configuration,diagnostics,extra_losses)
 from .run import _write_json,source_metadata
 from .train import make_task_spec,synchronize
 from .writer_fix import alignment,auxiliary_losses
@@ -107,14 +107,14 @@ def largest_schedule(step_seconds,eval_seconds,*,evaluations=5,wall_seconds=7200
     return steps
 
 
-def scheduled_steps(arms,steps,schedule,*,smoke=False,E=16):
+def scheduled_steps(arms,steps,schedule,*,smoke=False,E=16,rank=32):
     if smoke:
         if schedule is not None or steps is None or steps<5:
             raise ValueError('smoke requires its explicit step count')
         return {arm:steps for arm in arms}
     if steps is not None or schedule is None:
         raise ValueError('scientific arms require an immutable A1 schedule release')
-    if schedule['amendment']!='A1' or schedule['E']!=E:
+    if schedule['amendment'] not in {'A1','A2'} or schedule['E']!=E or schedule.get('rank',32)!=rank:
         raise ValueError('schedule amendment/capacity mismatch')
     result={arm:schedule['steps_by_arm'][arm] for arm in arms}
     if any(isinstance(v,bool) or not isinstance(v,int) or v<5 or v%5 for v in result.values()):
@@ -122,9 +122,10 @@ def scheduled_steps(arms,steps,schedule,*,smoke=False,E=16):
     return result
 
 
-def eligible_e8(lock,arms):
+def eligible_e8(lock,arms,rank=32):
     choice=lock['choice']
-    if choice['action']!='retry_e8' or choice['arm'] not in SIMPLICITY or arms!=[choice['arm']]:
+    if (choice['action']!='retry_e8' or (choice['rank'],choice['arm']) not in CANDIDATES
+            or arms!=[choice['arm']] or rank!=choice['rank']):
         raise ValueError('E8 requires the one audited eligible arm')
     return 8
 
@@ -192,11 +193,11 @@ def require_prior(decision,report):
         raise ValueError('WP-L3 final inference audit is required')
 
 
-def run_one(arm,out,steps,E=16,smoke=False):
+def run_one(arm,out,steps,E=16,smoke=False,rank=32):
     out=Path(out); out.mkdir(parents=True,exist_ok=False)
-    cfg=configuration(arm,steps,E=E,smoke=smoke)
+    cfg=configuration(arm,steps,E=E,smoke=smoke,rank=rank)
     record=dict(**source_metadata(),arm=arm,config=cfg,config_hash=stable_hash(cfg),status='running',
-        smoke=smoke,seed=17,eval_seed=4242,stage='writer',protocol='memory_only',rank=32,layer=14,L=1,
+        smoke=smoke,seed=17,eval_seed=4242,stage='writer',protocol='memory_only',rank=rank,layer=14,L=1,
         host=socket.gethostname(),job_id=os.environ.get('PBS_JOBID'),created_at=datetime.now(timezone.utc).isoformat())
     experiment=None
     try:
@@ -222,20 +223,26 @@ def _task(args): return run_one(*args)
 
 
 def choose(records):
-    if len(records)!=4 or {r['arm'] for r in records}!=set(ARMS) or any(r['status']!='complete' or r['smoke'] for r in records):
-        raise ValueError('decision requires all four complete scientific E16 arms')
-    by_arm={r['arm']:r for r in records}
-    scores={a:by_arm[a]['training']['metrics'][str(by_arm[a]['training']['actual_steps'])]['correct'] for a in SIMPLICITY}
-    passed=[a for a in SIMPLICITY if scores[a]>=800]
-    if passed: return dict(action='select',arm=passed[0],E=16,correct=scores)
-    best=max(SIMPLICITY,key=lambda a:(scores[a],-SIMPLICITY.index(a)))
-    if scores[best]>=500: return dict(action='retry_e8',arm=best,E=8,correct=scores)
-    return dict(action='stop',arm=None,E=None,correct=scores)
+    by_run={(r['rank'],r['arm']):r for r in records}
+    if len(records)!=7 or set(by_run)!=set(RUNS) or any(r['status']!='complete' or r['smoke'] for r in records):
+        raise ValueError('A2 decision requires all seven complete scientific E16 runs')
+    counts={key:by_run[key]['training']['metrics'][str(by_run[key]['training']['actual_steps'])]['correct'] for key in CANDIDATES}
+    scores={f'r{rank}/{arm}':counts[(rank,arm)] for rank,arm in CANDIDATES}
+    passed=[key for key in CANDIDATES if counts[key]>=800]
+    if passed:
+        rank,arm=passed[0]
+        return dict(action='select',arm=arm,rank=rank,E=16,correct=scores)
+    best=max(CANDIDATES,key=lambda key:(counts[key],-CANDIDATES.index(key)))
+    if counts[best]>=500:
+        rank,arm=best
+        return dict(action='retry_e8',arm=arm,rank=rank,E=8,correct=scores)
+    return dict(action='stop',arm=None,rank=None,E=None,correct=scores)
 
 
 if __name__=='__main__':
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--arms',nargs='+',choices=ARMS,required=True)
+    parser.add_argument('--rank',type=int,choices=(32,128),default=32)
     parser.add_argument('--out',type=Path,required=True)
     budget=parser.add_mutually_exclusive_group(required=True)
     budget.add_argument('--steps',type=int)
@@ -245,17 +252,18 @@ if __name__=='__main__':
     parser.add_argument('--prior-report',type=Path)
     parser.add_argument('--e8-decision',type=Path)
     args=parser.parse_args()
-    if not 1<=len(args.arms)<=2 or len(set(args.arms))!=len(args.arms):
+    if (not 1<=len(args.arms)<=2 or len(set(args.arms))!=len(args.arms)
+            or any((args.rank,a) not in RUNS for a in args.arms)):
         raise ValueError('one job runs one or two distinct arms for at least five steps')
     E=16
     if not args.smoke or args.e8_decision:
         require_prior(args.prior_decision,args.prior_report)
     if args.e8_decision:
-        E=eligible_e8(json.loads(args.e8_decision.read_text()),args.arms)
+        E=eligible_e8(json.loads(args.e8_decision.read_text()),args.arms,args.rank)
     schedule=None if args.schedule is None else json.loads(args.schedule.read_text())
-    steps=scheduled_steps(args.arms,args.steps,schedule,smoke=args.smoke,E=E)
+    steps=scheduled_steps(args.arms,args.steps,schedule,smoke=args.smoke,E=E,rank=args.rank)
     if schedule is not None and schedule['science_commit']!=source_metadata()['git_commit']:
         raise ValueError('scientific code must match its frozen schedule release')
     with ProcessPoolExecutor(max_workers=2,mp_context=multiprocessing.get_context('spawn')) as pool:
-        records=list(pool.map(_task,[(a,str(args.out/a),steps[a],E,args.smoke) for a in args.arms]))
+        records=list(pool.map(_task,[(a,str(args.out/a),steps[a],E,args.smoke,args.rank) for a in args.arms]))
     _write_json(args.out/('shard-'+'-'.join(args.arms)+'.json'),dict(runs=records,procs=len(args.arms)))
