@@ -1,10 +1,10 @@
 # Iterative Queries in a Low-Rank Memory Adapter: Composition, Writer Dependence, and Budget Limits
 
-*Symbolic manuscript draft. Code cutoff: `14af341`; numerical and claim authority:
+*Symbolic manuscript draft. Code cutoff: `5d2efd3`; numerical and claim authority:
 [symbolic evidence ledger](evidence_symbolic.md), introduced in `e8f90d2` and extended
-with IS in `23a5165`.
-Main-text experimental claims carry ledger IDs in HTML comments. IS is included;
-end-to-end results and the planned stability/readout studies remain incomplete.*
+with IS and the subsequent stopping/stability studies.
+Main-text experimental claims carry ledger IDs in HTML comments. P4-S-L and JS are
+included; end-to-end language-model results and per-step readouts remain incomplete.*
 
 ## Abstract
 
@@ -16,14 +16,15 @@ additional reads improve reachable-hop accuracy and exceed fixed-query and memor
 controls. <!-- S1 --><!-- S2 --> Learned writing changes the result: the original joint
 writer gives a smaller, seed-dependent benefit, while factorized writing gives stronger
 walk-specific depth effects but fails to preserve single-hop accuracy. <!-- S3 --><!-- S9 -->
-On hops2–3, four reads at rank32 outperform the tested larger single-read rank/state
-configurations with factorized learned writing, but the original joint-writer practical
-budget gate fails. <!-- B5 --><!-- B7 --> At rank32, the reachable-hop L4−L1 benefit
+The primary comparison is now against a single read at the same rank, with added
+latency reported as a cost; no efficiency advantage over a larger-rank single read
+is claimed. <!-- FR1 --> At rank32, the reachable-hop L4−L1 benefit
 shrinks from E12 to E36 under the registered load/layout changes, while the multi-read
 capability criterion still holds at the tested training loads. <!-- IS1 --><!-- IS2 -->
-Screening stopping policies partly recover random-oracle long-hop accuracy, yet do not
-repair factorized single-hop losses or reduce measured latency in the tested implementation.
-<!-- H1 --><!-- H2 --><!-- H4 --> Conditional theory separates composition inside a fixed
+Post-hoc learned halting fails hop1 preservation in the six primary frozen-reader
+families. <!-- HL1 --> Training-time terminal-Jacobian regularization reduces
+overshoot without meeting the registered removal criterion, and decreases longer-walk accuracy.
+<!-- JS1 --><!-- JS3 --> Conditional theory separates composition inside a fixed
 output subspace, limitations of one-read observations, writer shortcuts, and fixed-point
 certificates. The resulting contribution is a bounded account of when repeated memory
 access helps, together with negative results that prevent capability gains from being
@@ -58,18 +59,21 @@ the full hop-preservation gate. <!-- S9 --> This combination motivates treating 
 design and reader depth as interacting parts of an inference system, rather than
 equating a positive average depth effect with a complete solution.
 
-We distinguish three experimental questions. First, does changing evaluation depth
-improve one trained reader while preserving its input and memory? Second, do separately
-trained evolving-query systems outperform fixed-query or memory-free controls? Third,
-does spending computation on extra reads improve an actual budget frontier relative to
-larger single reads? The positive oracle and factorized capability comparisons address
-specific versions of the first two questions; they do not establish a general favorable
-accuracy–latency frontier. <!-- S1 --><!-- S2 --><!-- S9 --><!-- B5 --><!-- B7 --><!-- B8 -->
+We distinguish three questions. First, does changing evaluation depth improve one
+trained reader while preserving its input and memory? Second, do separately trained
+evolving-query systems outperform single-read, fixed-query, or memory-free controls
+at the same rank? Third, what parameter and measured-latency costs accompany those
+comparisons? The user's comparison decision makes same-rank capability primary and
+accepts extra inference latency as a reported cost. <!-- FR1 --> Earlier P2-S and
+P2-S-F1 comparisons with larger single reads remain historical evidence, including
+the original practical-gate failure; they supply no efficiency claim for this paper.
+<!-- B1 --><!-- B5 --><!-- B7 --><!-- FR1 -->
 
 The paper presents both the useful mechanism and its restrictions. The rank follow-up
 changes training duration as well as rank, the sharing follow-up compares separately
-trained systems, and adaptive stopping is evaluated on screening data without confidence
-intervals. <!-- S8 --><!-- B3 --><!-- H1 --><!-- H4 --> End-to-end language-model performance
+trained systems. <!-- S8 --><!-- B3 --> Early stopping pilots are screening-only;
+P4-S-L and JS subsequently use separate confirmation sets and report adjusted or
+registered intervals. <!-- H1 --><!-- H4 --><!-- HL1 --><!-- JS1 --> End-to-end language-model performance
 is a separate unresolved question, not a consequence of selecting a symbolic reader.
 <!-- B9 --> Keeping these distinctions explicit makes the negative outcomes informative:
 they specify which interpretation of additional reader computation survives each control.
@@ -150,7 +154,8 @@ is not a certified spectral radius or global contraction constant.
 [ReLIT](https://arxiv.org/html/2608.08113v1) combines a frozen-backbone anchor with
 recursive full-sequence answer/scratchpad updates and ACT halting. These precedents
 narrow any claim about reinjection, frozen-backbone latent recurrence, or stabilization.
-They motivate the [JS protocol](../prereg/JS.md), without supplying a result for it.
+They motivate the [JS protocol](../prereg/JS.md); its separate adapter results are
+reported in Section 7.
 
 ### Verbalizable directions and the readout boundary
 
@@ -280,13 +285,15 @@ bound needs decoder-margin and task assumptions before it can say anything about
 label, and label stability alone is not correctness. Residual thresholds without a
 certificate are empirical stopping policies.
 
-The planned JS penalty concerns a different sufficient condition: for a smooth map
+The JS penalty is motivated by a different sufficient condition: for a smooth map
 at an actual fixed point, transition spectral radius below one implies local
 asymptotic stability. A finite last-read state need not be fixed, pointwise radii
 do not control all transient products, and ReLU boundaries need additional care.
-Thus the [preregistered stability study](../prereg/JS.md) is a test of a regularizer,
-not an existing certificate or a demonstrated remedy. The failed sufficient bounds
-from P4 establish no state-divergence claim. <!-- H3 -->
+Thus the [preregistered stability study](../prereg/JS.md) tests a regularizer rather
+than certifying a fixed point. Its reached-state radii and reduced overshoot do not
+verify Proposition 3's exact terminal-annihilation construction or establish a
+contraction or correctness certificate. <!-- JS1 --><!-- JS6 --> The failed sufficient
+bounds from P4 establish no state-divergence claim. <!-- H3 -->
 
 **Writer information and the final decoder (Propositions 10 and 11).** Under specified
 common unit keys, constant gates, and zero initial memory, the writer admits an exact
@@ -450,7 +457,19 @@ This decision did not turn the factorized failures into passes. <!-- S9 --> It b
 in the interpretation of the study, because a preregistered gate and a later justified
 continuation decision are different records.
 
-## 6. Budget experiments: capability does not establish efficiency
+## 6. Same-rank comparisons, reported costs, and historical budget controls
+
+The current baseline is the single read at the same rank, following the user's
+2026-10-27 decision and [P1-L Amendment B4](../prereg/P1L.md). <!-- FR1 --> With an
+otherwise identical architecture, shared M1-L4 and B4 have exactly the same parameter
+count. <!-- FR1 --> At the registered P1-L projection, B8 adds 9,216 registered adapter
+parameters at rank32: 103,426 becomes 112,642, approximately +8.9%, from step-specific
+R/U/Q. <!-- FR1 --> That percentage is specific to the LLM projection and the registered
+adapter count; it is not the symbolic model's overhead or necessarily the proportion
+of trainable oracle parameters. <!-- FR1 --> Extra reader latency is accepted and
+reported, not a superiority criterion against a larger-rank single read. <!-- FR1 -->
+
+### Historical rank, state, and sharing controls
 
 P2-S compares r32 shared M1 at L4 with larger single reads and an unshared reader;
 the reference M1 uses mixed-depth training, while B6/B7 train at L1 and B8 at fixed
@@ -489,15 +508,17 @@ protocol comparison does not identify a unique causal fraction due to depth.
 writers, so its trained-hop advantage is not evidence of superior depth extrapolation.
 <!-- B6 -->
 
-The practical result is negative. <!-- B7 --> Joint M1/r32 at L4 attains 48.017% hops1–3 accuracy
+Under P2-S's original registered practical criterion, the result is negative. <!-- B7 --> Joint M1/r32 at L4 attains 48.017% hops1–3 accuracy
 at 0.848 ms per prepared batch64, whereas joint B6/r128 at L1 attains 57.244% at
 0.352 ms; these are descriptive CUDA-event means without timing intervals. <!-- B7 -->
 Every eligible joint M1 depth point is matched by an equal-or-faster single-step
 point for both tested batch sizes, and Gate 3 fails. <!-- B7 --> Those models spend
 different parameter and state budgets, so the negative practical result does not
 erase the fixed-budget composition contrast; it rejects a broader efficiency claim.
-<!-- S3 --><!-- B7 --> No factorized accuracy–latency benchmark closes that gap in
-the evidence: its frontier remains open. <!-- B8 -->
+<!-- S3 --><!-- B7 --> P2-S-F1 supplies no factorized accuracy–latency benchmark.
+<!-- B8 --> This historical measurement gap is not converted into an efficiency
+claim, and the subsequent same-rank decision does not relabel the earlier gate.
+<!-- B7 --><!-- FR1 -->
 
 The parameter and storage differences make the intended tradeoff concrete: the
 joint M1 point has 13,314 trained parameters and 4,096 persistent FP32 bytes per
@@ -579,11 +600,13 @@ untouched-path stale rates are undefined. <!-- IS4 --> They establish neither a
 causal benefit from updating nor a guarantee that every reader follows updated paths.
 <!-- IS4 -->
 
-## 7. Stopping: accuracy recovery, incomplete preservation, and runtime cost
+## 7. Stopping and overshoot: post-hoc selection and training-time regularization
 
-Stopping policies select thresholds using mean validation accuracy, freeze them,
+### Earlier screening policies
+
+The earlier label-free policies select thresholds using mean validation accuracy, freeze them,
 and evaluate on screening seed4242 without confidence intervals; no confirmation
-result is supplied. <!-- H1 --><!-- H4 --> Relative-change stopping on random-oracle
+result is supplied for those pilots. <!-- H1 --><!-- H4 --> Relative-change stopping on random-oracle
 r128 M1 increases long-hop accuracy from 45.747% at L8 to 70.690%, using 8.301 mean
 updates, but its hop1 accuracy remains below L1: 87.883% versus 99.983%. <!-- H1 -->
 The corresponding linear reader also improves long-hop screening accuracy while
@@ -622,6 +645,128 @@ validation; plotted screening points have no confidence intervals. <!-- H1 --><!
 aggregate timing summaries and must not be read as a pooled request-latency
 distribution. <!-- H2 --> Fewer steps do not establish a speedup. <!-- H1 --><!-- H2 -->
 [PDF](figures/stopping_latency.pdf).*
+
+### Learned post-hoc halting on frozen readers
+
+P4-S-L trains a separate 3,393-parameter halting head for each frozen reader, using
+state and step features with supervised correctness targets. <!-- HL1 --> Inputs
+exclude answer labels, graph distance, correctness, and decoder-confidence features;
+the targets still make head training supervised. <!-- HL1 --> Reader and writer
+parameters remain frozen, and one threshold per family is selected on V4242 and
+locked before fresh confirmation C999002 (test seed999002, 2,000 episodes).
+<!-- HL1 --> The six primary rank32 families are the two activations crossed with
+factorized joint, frozen factorized, and random-oracle writing. <!-- HL1 -->
+
+None qualifies: all pass the reach and specificity requirements but fail the
+hop1 preservation point threshold H≥−1 pp. <!-- HL1 --> Here H/D compare the learned
+policy with L1 on hop1/hops2–3, and W subtracts the far-hop effect on hops6–8.
+<!-- HL1 --> The following intervals are the registered **99.166667%** paired
+episode intervals, adjusted for six primary families, conditional on seeds17/29/43.
+<!-- HL1 -->
+
+| Writer / reader | H, pp | D, pp | W, pp [99.166667% CI] |
+| --- | --- | --- | --- |
+| joint_fact / M1 | −33.900 <!-- HL1 --> | +21.583 <!-- HL1 --> | +16.517 [15.263,17.666] <!-- HL1 --> |
+| joint_fact / M1-lin | −49.150 <!-- HL1 --> | +24.733 <!-- HL1 --> | +15.439 [14.026,16.886] <!-- HL1 --> |
+| oracle_random / M1 | −15.700 <!-- HL1 --> | +32.508 <!-- HL1 --> | +27.975 [26.379,29.575] <!-- HL1 --> |
+| oracle_random / M1-lin | −20.850 <!-- HL1 --> | +37.500 <!-- HL1 --> | +18.839 [16.947,20.678] <!-- HL1 --> |
+| t1_frozen_fact / M1 | −21.900 <!-- HL1 --> | +9.442 <!-- HL1 --> | +6.892 [5.996,7.774] <!-- HL1 --> |
+| t1_frozen_fact / M1-lin | −26.167 <!-- HL1 --> | +10.217 <!-- HL1 --> | +7.550 [6.661,8.447] <!-- HL1 --> |
+
+All eighteen primary per-seed H point estimates also fail preservation. <!-- HL1 -->
+The descriptive unfactorized joint/M1 row satisfies the numerical inequalities,
+but is outside the primary set and is not a formal qualifying repair. <!-- HL5 -->
+Learned halting exceeds each family's validation-selected label-free reference in
+overall accuracy by +0.883 to +1.615 pp in the four joint_fact/oracle_random rows,
+with positive adjusted intervals; the two frozen-factorized intervals include zero.
+<!-- HL2 --> These gains coexist with the preservation failure. <!-- HL1 --><!-- HL2 -->
+The label-informed any-step oracle remains 10.250–36.338 pp above the learned policy
+in primary families; it upper-bounds selection among the tested frozen candidates,
+unlike the distinct true-hop reference. <!-- HL3 --> These results reject this
+head-training and selection scheme as a repair, without ruling out all learned halting.
+<!-- HL1 -->
+
+Selected depth is also different from executed work. On confirmation, primary-family
+means span 5.306–10.038 selected updates but 12.740–15.995 executed updates.
+<!-- HL4 --> If no state crosses the threshold, all 16 updates execute before the
+earliest maximum-probability state is selected; the post-state feature adds one
+memory read beyond the executed updates. <!-- HL4 --> In the separate prepared
+batch64 timing population, primary learned-policy CUDA means are 20.533–25.253 ms
+versus 3.072–3.308 ms for fixed L16, with no timing CIs. <!-- HL4 --> Those timings
+include the halting head and bookkeeping, exclude writer/backbone preparation,
+and do not establish a speedup or end-to-end request cost. <!-- HL4 -->
+
+### Random-depth training with a final-state Jacobian penalty
+
+JS changes training instead of fitting an exit to frozen trajectories. Its RS
+baseline samples one shared-reader depth uniformly from 4–8 per batch; RS+J adds
+\(\max(\operatorname{rad}(J(z_L))-.9,0)^2\) with weight 1, averaged over episode/query
+states at the final training read. <!-- JS1 --><!-- JS6 --> Here rad denotes
+spectral radius, distinct from the reader scale rho. The ReLU transition Jacobian
+uses the next-update gate at reached z_L, with derivative zero at a zero preactivation;
+full numerical eigenvalues are computed in float32, rather than estimated by a power
+method. <!-- JS6 --> This is a regularizer, not certified eigenvalue arithmetic or
+an assertion that the reached state is fixed. <!-- JS6 --> The two conditions share
+initialization and data/depth RNG streams within seed, then optimize separately;
+learned writers may therefore diverge. <!-- JS1 --> Both use M1/ReLU, rank32,
+15,000 steps, batch64, and learning rate 0.003. <!-- JS1 -->
+
+Fresh confirmation C999003 uses test seed999003 and 2,000 episodes, with thresholds
+locked on V4242 before test. <!-- JS1 --><!-- JS4 --> In this study **short** means
+hops1–3, rather than the earlier reach endpoint's hops2–3; long remains hops4–8.
+<!-- JS1 --><!-- JS3 --> The registered overshoot statistic is S=Acc16−Acc4 on short
+hops, and DeltaS=S(RS+J)−S(RS). <!-- JS1 --> All following JS contrast intervals are
+97.5% paired episode intervals conditional on the three fixed training seeds.
+<!-- JS1 -->
+
+| Writer | S(RS), pp [97.5% CI] | S(RS+J), pp [97.5% CI] | DeltaS, pp [97.5% CI] |
+| --- | --- | --- | --- |
+| oracle_random | −11.267 [−12.356,−10.050] <!-- JS1 --> | −2.833 [−3.800,−1.806] <!-- JS1 --> | +8.433 [7.483,9.418] <!-- JS1 --> |
+| joint_fact | −3.017 [−3.789,−2.272] <!-- JS1 --> | −1.772 [−2.484,−1.061] <!-- JS1 --> | +1.244 [0.222,2.200] <!-- JS1 --> |
+
+Both writers reduce overshoot, with positive DeltaS in every seed, but neither
+meets the registered removal criterion: in addition to positive DeltaS and CI,
+S(RS+J) must be at least −1 pp. <!-- JS1 --> Other endpoints expose the cost:
+<!-- JS2 --><!-- JS3 --><!-- JS4 -->
+
+| RS+J−RS endpoint | oracle_random, pp [97.5% CI] | joint_fact, pp [97.5% CI] |
+| --- | --- | --- |
+| E2: short hops at L4 | +0.789 [0.261,1.295] <!-- JS2 --> | −0.728 [−1.567,0.067] <!-- JS2 --> |
+| E3: long hops at L16 | −5.547 [−6.200,−4.890] <!-- JS3 --> | −1.443 [−1.990,−0.933] <!-- JS3 --> |
+| E4: stopped, all hops | −1.040 [−1.538,−0.544] <!-- JS4 --> | −0.677 [−1.227,−0.115] <!-- JS4 --> |
+
+Thus longer-walk and stopped accuracy decline for both writers, while joint_fact's
+L4 short-hop interval crosses zero. <!-- JS2 --><!-- JS3 --><!-- JS4 --> RS+J's stopped
+accuracy is 18.704%/15.879% for oracle_random/joint_fact, with 15.938/15.028 mean
+reads under separately validation-selected relative-change thresholds and cap16;
+absolute-rate and read-count CIs are unavailable. <!-- JS4 --> This supplies no
+measured latency advantage. <!-- JS4 -->
+
+![Depth profiles with final-state Jacobian regularization](figures/js_overshoot.png)
+
+*Figure 7. JS C999003: three-seed mean candidate accuracy versus depth, short
+hops1–3 and long hops4–8, for RS, RS+J, and unchanged M1-L4/M1-mixed references.
+<!-- JS1 --><!-- JS3 --><!-- JS5 --> Shading marks RS training depths4–8; absolute
+curves have no supplied CIs, while callouts reuse the released 97.5% endpoint
+intervals. <!-- JS1 --><!-- JS3 --> Reduced overshoot retains negative S and costs
+longer-walk accuracy. <!-- JS1 --><!-- JS3 --> Y scales differ by column; the
+long-hop panels are labeled as zoomed views. [PDF](figures/js_overshoot.pdf).*
+
+The references distinguish random-depth training from the additional penalty.
+At L4, random-oracle RS scores below both references on short hops; factorized
+RS scores below M1-L4, while its +0.483 pp contrast with M1-mixed has an interval
+crossing zero. <!-- JS5 --> At L16, RS exceeds both on short hops for both writers. <!-- JS5 --> On long hops at L16,
+RS exceeds both references for oracle_random but scores below both for joint_fact.
+<!-- JS5 --> These contrasts change training history; RS+J−RS is the comparison
+that tests adding the penalty. <!-- JS1 --><!-- JS5 -->
+
+The descriptive L16 mean radius falls from 1.307 to 1.053 for oracle_random and
+from 0.861 to 0.834 for joint_fact; only 22.238% and 92.698% of RS+J reached states,
+respectively, have radius below 1. <!-- JS6 --> These summaries pool all hops and
+three seeds and have no radius CIs. <!-- JS6 --> A pointwise radius below 1 at a
+finite state does not certify global contraction, convergence, terminal
+annihilation, or a correct decoded answer. Lower radii coexist here with the
+longer-walk and stopped-accuracy losses. <!-- JS3 --><!-- JS4 --><!-- JS6 -->
 
 ## 8. End-to-end language models — TODO
 
@@ -675,8 +820,9 @@ training seeds, and the follow-ups reuse confirmation samples rather than supply
 independent confirmation of every successive claim. <!-- S3 --><!-- S8 --><!-- B3 --><!-- B5 -->
 Training-seed failures, longer rank-follow-up training, and the disclosed F2 decision
 deviation remain relevant even when a pooled interval is positive. <!-- S3 --><!-- S8 --><!-- S9 -->
-Screening stopping results require their own future confirmation and do not inherit
-the parent study's intervals. <!-- H1 --><!-- H4 --><!-- H5 -->
+The original screening stopping results do not inherit parent-study intervals;
+P4-S-L and JS instead have their own fresh confirmation sets and scoped uncertainty.
+<!-- H1 --><!-- H4 --><!-- H5 --><!-- HL1 --><!-- JS1 -->
 
 IS now supplies a same-checkpoint load/layout sweep and a bounded update-task
 diagnostic. <!-- IS1 --><!-- IS4 --> Its fixed training protocol and varying layouts
@@ -684,8 +830,9 @@ limit interpretation: neither operator-bound tightness, a pure crosstalk effect,
 nor a general benefit from load-specific retraining has been established.
 <!-- IS1 --><!-- IS3 --> The largest tested capability load is not an identified
 failure boundary, and low stale rates do not imply complete current-answer success.
-<!-- IS2 --><!-- IS4 --> Local stability and verbalizable intermediate directions
-remain hypotheses to test under their separate protocols.
+<!-- IS2 --><!-- IS4 --> JS supplies reached-state Jacobian measurements and an
+accuracy tradeoff, not proof of a stable terminal fixed point; verbalizable
+intermediate directions remain a separate diagnostic question. <!-- JS1 --><!-- JS6 -->
 
 Reproduction separates data access from rendering. The figures are produced by
 [paper_figures.py](../../scripts/paper_figures.py) from committed CSV/JSON exports;
@@ -693,18 +840,23 @@ the [figure manifest](figures/provenance.json) identifies revisions, selectors,
 aggregation, and claim IDs. No checkpoints are reevaluated and no bootstrap or
 timing measurement is rerun for this manuscript. The evidence ledger retains exact
 stored values and artifact commits; Appendix B records sets, seeds, and comparisons.
-Preparation cost, training cost per model, and an optimized factorized latency
-frontier remain outside the measured practical claim. <!-- B7 --><!-- B8 -->
+Preparation cost and training cost per model remain outside the prepared-query
+timings. <!-- B7 --><!-- B8 --> The paper's primary same-rank comparison reports
+parameters and extra latency as costs, and makes no larger-rank efficiency claim.
+<!-- FR1 -->
 
 Repeated low-dimensional queries are useful under particular writing and access
 conditions, with the orthogonal-oracle and factorized capability comparisons
-providing the clearest evidence. <!-- S1 --><!-- S2 --><!-- S9 --><!-- B5 --> They do
-not establish the strongest efficiency claim: larger single reads challenge the
-unfactorized joint reader, while the tested stopping rules neither repair all
-short-hop losses nor reduce measured runtime. <!-- B1 --><!-- B7 --><!-- H2 --><!-- H4 -->
+providing the clearest evidence. <!-- S1 --><!-- S2 --><!-- S9 --><!-- B5 --> The current
+claim compares several reads with a single read at the same rank and reports their
+costs. <!-- FR1 --> Historical larger-rank controls and the original practical-gate
+failure remain in the record; neither is rewritten as a system-efficiency success.
+<!-- B1 --><!-- B7 --> Post-hoc halting does not repair hop preservation in the primary
+families, and training-time regularization reduces overshoot at a longer-walk cost.
+<!-- HL1 --><!-- JS1 --><!-- JS3 -->
 The appropriate conclusion is therefore a bounded mechanism result and a set of
-reproducible failures, with broader budget and end-to-end claims left open.
-<!-- B8 --><!-- B9 -->
+reproducible failures, with no efficiency claim over increasing rank and with
+end-to-end language-model performance still unresolved. <!-- FR1 --><!-- B9 -->
 
 The additional load study narrows this result further: depth benefits decrease
 under the registered load/layout changes, while multi-read capability remains
@@ -803,6 +955,9 @@ The ledger's status and conditions take priority over shortened manuscript wordi
 | IS | C999: new confirmation seed999001, 2,000 episodes per load | r32; fixed E12 checkpoints across E6/12/18/24/36; E24/E36 training at inherited LR/15,000 steps; update check uses 14 physical records, base_E12, hops1–4. | IS1–IS4 <!-- IS1 --><!-- IS2 --><!-- IS3 --><!-- IS4 --> |
 | A5 swaps | S4242 screening | Stratum-specific original/new-terminal diagnostics; no CIs; P1-S fitting-path and F2 new-path-length-one strata differ. | S11 <!-- S11 --> |
 | Stopping pilots | V4242 validation and S4242 screening, 2,000 episodes per checkpoint/split | Thresholds selected on validation, fixed before screening. Reuse mixed-depth checkpoints; no retraining or confirmation, no stopping CIs. | H1–H6 <!-- H1 --><!-- H2 --><!-- H3 --><!-- H4 --><!-- H5 --><!-- H6 --> |
+| P4-S-L | C999002: new confirmation seed999002, 2,000 episodes | Six primary frozen-reader families, r32; 3,393-parameter supervised heads, thresholds locked on V4242. Descriptive joint families stay outside primary qualification. | HL1–HL5 <!-- HL1 --><!-- HL2 --><!-- HL3 --><!-- HL4 --><!-- HL5 --> |
+| JS | C999003: new confirmation seed999003, 2,000 episodes | r32 M1; RS/RS+J train 15,000 steps with one uniform depth4–8 draw per batch; unchanged fixed-L4/mixed-depth references freshly evaluated. Stopped policies use locked V4242 thresholds and cap16. | JS1–JS6 <!-- JS1 --><!-- JS2 --><!-- JS3 --><!-- JS4 --><!-- JS5 --><!-- JS6 --> |
+| Current comparison policy | User decision 2026-10-27, P1-L Amendment B4 | Multi-read versus single-read at the same rank; registered adapter parameters and extra latency reported. LLM B8 overhead is dimension-specific architectural accounting, not a measured accuracy result. | FR1 <!-- FR1 --> |
 
 The training seeds are 17/29/43. <!-- S1 --><!-- B3 --> P1-S/P2-S and their follow-ups use 2,000 paired
 episode-bootstrap draws with seed2718 and confidence 97.5%, conditional on those
@@ -815,6 +970,11 @@ they are not current−stale or affected−untouched contrast intervals. <!-- IS
 These intervals are endpoint-specific, not simultaneous guarantees for every
 sentence or model comparison. Absolute accuracy and timing points do not acquire
 intervals from a neighboring contrast. <!-- S7 --><!-- B7 --><!-- H2 -->
+P4-S-L instead uses confidence 1−0.05/6=99.166667% for its six primary families,
+with 2,000 paired episode draws conditional on the same three fixed seeds.
+<!-- HL1 --> JS uses 97.5% paired episode intervals; DeltaS jointly resamples all
+four accuracy terms. <!-- JS1 --> Neither study's uncertainty includes retraining,
+head fitting, or threshold reselection on new training seeds. <!-- HL1 --><!-- JS1 -->
 
 The learned-writer P1-S replication uses typed chains(8,1), E=12, with distractors. <!-- S5 -->
 Both primary oracle rows use a random-code replication at E=18 with chains(8,8,2);
@@ -835,9 +995,15 @@ after the first update; read-norm uses L+1 reads, while relative-change and
 output-stability use L. <!-- H1 --><!-- H4 --><!-- H5 --> Exported tail latency
 summaries are kept descriptive; they are not a pooled end-to-end request percentile.
 <!-- H2 -->
+P4-S-L times a prepared 64-query batch per seed, separately from complete-set
+accuracy/execution counters; selected depth can be less than executed depth on
+fallback, and post-state features require executed updates+1 reads. <!-- HL4 -->
+JS radius summaries pool reached states over seeds and hops at L4/8/16; no radius
+CI, global contraction bound, or fixed-point certificate is exported. <!-- JS6 -->
 
 Reproduction command and compute-job provenance are recorded in
-[WP-T5 report](../reports/WP-T5.md). Figure generation is a rendering job only:
+[WP-T5](../reports/WP-T5.md), [WP-T6](../reports/WP-T6.md), and
+[WP-T7](../reports/WP-T7.md). Figure generation is a rendering job only:
 it neither opens model checkpoints nor changes the scientific estimands or
 registered decisions. Pending figure items are marked in Sections 8–9 rather
 than populated from unmerged or provisional results.
@@ -850,6 +1016,7 @@ than populated from unmerged or provisional results.
 | Figure 4 | 2: quality–latency, larger single reads marked | budget_latency.pdf / budget_latency.png |
 | Figure 5 | 7: stopping quality versus mean and tail latency | stopping_latency.pdf / stopping_latency.png |
 | Figure 6, Section 6 | 4: memory load×L | memory_load_depth.pdf / memory_load_depth.png <!-- IS1 --> |
+| Figure 7, Section 7 | JS extension: overshoot and longer walks | js_overshoot.pdf / js_overshoot.png <!-- JS1 --><!-- JS3 --><!-- JS5 --> |
 | TODO, Section 8 | 6: single-module / end-to-end correspondence | Pending P1-L evidence; no substituted result. |
 
 ## References and source records

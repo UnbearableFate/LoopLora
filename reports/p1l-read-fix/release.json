@@ -1,44 +1,37 @@
 {
-  "status": "prepared_waiting_for_final_WP-L3_decision",
-  "task": "docs/tasks/WP-L4_p1l_read_fix.md",
-  "science_commit": "b1c64c17fa34e57489f15e6ca2993ac55883a05d",
-  "master_merged": "4a27457",
+  "E": 16,
+  "L": 1,
+  "amendment": "A1",
   "arms": [
     "R",
     "Rrho",
     "RK",
     "OArho"
   ],
-  "steps": 8225,
-  "eval_steps": [
-    1645,
-    3290,
-    4935,
-    6580,
-    8225
-  ],
-  "seed": 17,
-  "eval_seed": 4242,
-  "task_name": "t1",
-  "E": 16,
-  "n_rel": 4,
-  "head_sharing": 0.3,
-  "rank": 32,
-  "layer": 14,
-  "L": 1,
-  "input_site": "o_proj",
-  "train_batch": 32,
-  "train_Q": 4,
-  "lr": 0.003,
-  "weight_decay": 0.01,
-  "grad_clip": 1.0,
-  "warmup_steps": 20,
-  "val_episodes": 1000,
-  "protocol": "memory_only",
   "backend": "core.scan_final",
-  "prefetch_workers": 2,
+  "e8_rule": "one best eligible arm only; own smoke-sized A1 schedule, same seed/lr/objective; threshold unchanged",
+  "eval_seed": 4242,
+  "grad_clip": 1.0,
+  "head_sharing": 0.3,
   "initialization_and_data": "fresh paired WP-L3/W5 or OA initialization and absolute seed17 episode stream",
-  "supervision": "W5 answer/address/clean-value objectives plus raw-read regression1; RK key decorrelation1; OA\u03c1 answer only",
+  "input_site": "o_proj",
+  "layer": 14,
+  "lr": 0.003,
+  "master_merged": "ad966aa",
+  "matched_OA_reference_step": 6580,
+  "matched_eval_steps_by_arm": {
+    "OArho": [
+      6580
+    ],
+    "R": [],
+    "RK": [],
+    "Rrho": []
+  },
+  "max_job_nodes": 1,
+  "max_job_seconds": 7200,
+  "max_total_node_hours": 8,
+  "n_rel": 4,
+  "numeric_change_from_smoke": "none; scheduling/timeguard and declared OA matched evaluation only",
   "pairing": [
     [
       "R",
@@ -49,35 +42,111 @@
       "OArho"
     ]
   ],
-  "walltime": "00:50:00",
-  "timing_gate": {
-    "conservative_eval1000_seconds": 12.10191076155752,
-    "expected_seconds_with_margin": 2780.715349748657,
-    "setup_reserve_seconds": 90,
-    "training_margin": 1.5
+  "prefetch_workers": 2,
+  "primary_eval_steps_by_arm": {
+    "OArho": [
+      5408,
+      10816,
+      16224,
+      21632,
+      27040
+    ],
+    "R": [
+      4718,
+      9436,
+      14154,
+      18872,
+      23590
+    ],
+    "RK": [
+      4396,
+      8792,
+      13188,
+      17584,
+      21980
+    ],
+    "Rrho": [
+      4844,
+      9688,
+      14532,
+      19376,
+      24220
+    ]
   },
-  "smoke_quality_used_for_selection": false,
-  "matched_OA_reference_step": 6580,
+  "prior_report_commit": "cd5a45c",
+  "protocol": "memory_only",
+  "rank": 32,
+  "scale_up": "docs/tasks/WP-L4_p1l_read_fix.md",
+  "science_commit": "0b03d606f3c752cddfcfd716946dbbc3e36bf025",
+  "scientific_submission_requires": "final audited WP-L3 selects no writer AND P1L-writer-fix.md is completed/committed",
+  "seed": 17,
   "selection_order": [
     "R",
     "Rrho",
     "RK"
   ],
-  "threshold_correct": 800,
-  "e8_rule": "exactly one best-final-EM nonoracle arm if no E16pass and best>=500/1000; ties simplicity; same schedule",
-  "max_total_node_hours": 4,
-  "max_job_nodes": 1,
-  "max_job_seconds": 3600,
-  "scientific_submission_requires": "final audited WP-L3 selects no writer AND P1L-writer-fix.md is completed/committed",
-  "tests": {
-    "job_id": "3715437.opbs",
-    "host": "mg0379",
-    "passed": 55,
-    "argv": "-m pytest -q -o addopts= tests/test_llm_read_fix.py tests/test_llm_writer_fix.py tests/test_llm_b8.py"
+  "sizing_by_arm": {
+    "OArho": {
+      "eval1000_seconds": 12.10191076155752,
+      "evaluations": 6,
+      "expected_seconds_with_margin": 7199.890832341606,
+      "margin": 1.5,
+      "setup_reserve_seconds": 90,
+      "step_seconds": 0.172607831249694
+    },
+    "R": {
+      "eval1000_seconds": 9.706619991920888,
+      "evaluations": 5,
+      "expected_seconds_with_margin": 7199.449353942535,
+      "margin": 1.5,
+      "setup_reserve_seconds": 90,
+      "step_seconds": 0.19885967794271944
+    },
+    "RK": {
+      "eval1000_seconds": 10.824271528981626,
+      "evaluations": 5,
+      "expected_seconds_with_margin": 7199.987312428494,
+      "margin": 1.5,
+      "setup_reserve_seconds": 90,
+      "step_seconds": 0.21318790645923966
+    },
+    "Rrho": {
+      "eval1000_seconds": 11.362325670197606,
+      "evaluations": 5,
+      "expected_seconds_with_margin": 7198.6379382580635,
+      "margin": 1.5,
+      "setup_reserve_seconds": 90,
+      "step_seconds": 0.1933228873033741
+    }
   },
+  "smoke_audit_job": "3715504.opbs",
   "smoke_jobs": [
     "3715461.opbs",
     "3715462.opbs"
   ],
-  "smoke_audit_job": "3715504.opbs"
+  "smoke_quality_used_for_selection": false,
+  "smoke_source_commit": "b1c64c17fa34e57489f15e6ca2993ac55883a05d",
+  "status": "released_after_final_negative_L3_and_stage0_audit",
+  "steps_by_arm": {
+    "OArho": 27040,
+    "R": 23590,
+    "RK": 21980,
+    "Rrho": 24220
+  },
+  "supervision": "W5 answer/address/clean-value objectives plus raw-read regression1; RK key decorrelation1; OA\u03c1 answer only",
+  "task": "docs/tasks/WP-L4_p1l_read_fix.md",
+  "task_name": "t1",
+  "tests": {
+    "argv": "-m pytest -q -o addopts= tests/test_llm_read_fix.py tests/test_llm_writer_fix.py tests/test_llm_b8.py",
+    "host": "mg0379",
+    "job_id": "3715437.opbs",
+    "passed": 55
+  },
+  "threshold_correct": 800,
+  "train_Q": 4,
+  "train_batch": 32,
+  "val_episodes": 1000,
+  "walltime": "02:00:00",
+  "warmup_steps": 20,
+  "weight_decay": 0.01
 }

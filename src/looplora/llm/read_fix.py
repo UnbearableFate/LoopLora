@@ -10,22 +10,27 @@ from .train import LLMExperiment
 from .writer_fix import WriterFixExperiment,true_fact_indices
 from .writer_fix_run import configuration as writer_configuration
 
-ARMS=('R','Rrho','RK','OArho')
+ARMS=('R','Rrho','RK','OArho','W5','OA')
 SIMPLICITY=('R','Rrho','RK')
-LABELS=dict(R='R',Rrho='Rρ',RK='RK',OArho='OAρ')
+CANDIDATES=((32,'R'),(32,'Rrho'),(32,'RK'),(128,'W5'),(128,'R'))
+RUNS=CANDIDATES+((32,'OArho'),(128,'OA'))
+LABELS=dict(R='R',Rrho='Rρ',RK='RK',OArho='OAρ',W5='W5',OA='OA')
 
 
-def configuration(arm,steps,*,E=16,smoke=False):
-    if arm not in ARMS or E not in (8,16):
+def configuration(arm,steps,*,E=16,smoke=False,rank=32):
+    if (rank,arm) not in RUNS or E not in (8,16):
         raise ValueError('WP-L4 requires a registered arm at E16 or the conditional E8')
-    base='OA' if arm=='OArho' else 'W5'
+    base='OA' if arm in {'OArho','OA'} else 'W5'
     cfg=writer_configuration(base,steps,prefetch_workers=2)
-    cfg['name']=f'read-fix-{arm}-E{E}'
+    cfg['name']=f'read-fix-{arm}-E{E}' if rank==32 else f'read-fix-{arm}-r128-E{E}'
+    cfg['model']['r']=rank
+    if rank!=32 and base=='W5':
+        cfg['writer_fix']['value_head']=f'training_only_{rank}_to_1024_affine'
     cfg['task']['E']=E
     cfg['model']['rho']=.5 if arm in {'Rrho','OArho'} else .25
     cfg['smoke']=smoke
     cfg['eval']['episodes']=100 if smoke else 1000
-    cfg['read_fix']=dict(arm=arm,base=base,read_weight=0 if base=='OA' else 1,
+    cfg['read_fix']=dict(arm=arm,base=base,read_weight=1 if arm in {'R','Rrho','RK'} else 0,
                          decorrelation_weight=1 if arm=='RK' else 0,
                          read_target='stop-gradient raw written true-fact value',epsilon=1e-6)
     return cfg
@@ -72,7 +77,7 @@ def key_decorrelation(keys,facts,eps=1e-6):
 
 def extra_losses(experiment,batch,x):
     zero=batch.values.new_zeros(())
-    if experiment.read_arm=='OArho':
+    if experiment.read_arm in {'OArho','OA','W5'}:
         return zero,zero
     terms=question_terms(experiment,batch,x)
     read=raw_read_loss(terms['m'],terms['clean'])

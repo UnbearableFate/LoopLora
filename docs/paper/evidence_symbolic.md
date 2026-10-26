@@ -1,11 +1,14 @@
 # Symbolic claims and evidence (WP-T4)
 
-Evidence cutoff: `master` at `14af3415035fcbab1c720f9bed4b372c70a92f7c`, merged into
-`wp/theory` for WP-T6. The original WP-T4 audit covered `30f86e2`; the IS extension
-audits results introduced in `e144246` and merged in `641911d`. This is a synthesis of committed results, not a new experiment or a reanalysis of
+Evidence cutoff: `master` at `5d2efd3273ba62fd691219af5f20fdc01cd7bf12`, merged into
+`wp/theory` for WP-T7. The original WP-T4 audit covered `30f86e2`; WP-T6 added IS
+(`e144246`, merge `641911d`), and WP-T7 adds P4-S-L (`95736ec`, merge `9c84f4c`)
+and JS (`96ff2e9`). This is a synthesis of committed results, not a new experiment or a reanalysis of
 sample traces. The defensible result is conditional: evolving queries over a fixed memory can
 improve composition, but the benefit depends on the writer, training protocol, and comparison
-budget. The strongest joint-writer efficiency claim in plan §14.1 has not been established.
+budget. The current comparison policy asks for improvement over the same-rank single read,
+with additional inference latency reported as a cost (FR1). The earlier symbolic P2-S/P2-S-F1
+larger-rank comparisons retain their original findings; the original joint practical gate failed.
 
 ## Reading the tables
 
@@ -18,7 +21,8 @@ All accuracies below are **candidate-restricted**, not full-vocabulary exact mat
 accuracy; `pp` denotes a difference of accuracies. Values are converted from committed fractions
 and rounded to **six decimal places**; the linked files retain the exact stored precision.
 Brackets are **97.5% episode-bootstrap confidence intervals for the displayed contrast**,
-unless explicitly marked as an absolute-rate CI or **CI unavailable**. Comparisons within
+unless explicitly marked as an absolute-rate CI, a P4-S-L **99.166667% adjusted CI**,
+or **CI unavailable**. Comparisons within
 a load/set are paired; IS1's change across loads uses independent load bootstrap streams.
 No interval is supplied for an absolute accuracy merely because its contrast has one.
 IS4 explicitly uses the separately exported absolute-rate intervals, not contrast intervals.
@@ -35,8 +39,10 @@ Set labels used throughout:
 | C777 | Confirmation, split `test`, evaluation seed `777001`, `2,000` episodes. | P1-S, rank follow-up P1-S-F1, factorized-writer follow-up P1-S-F2. Reusing this set across follow-ups is not independent replication. The P1-S registered replication changes the layout; it is distinct from rerunning the primary layout. |
 | C888 | Confirmation, split `test`, evaluation seed `888001`, `2,000` episodes. | P2-S and P2-S-F1. The follow-up explicitly reuses the P2-S confirmation set as registered; it is not a fresh confirmation sample. |
 | C999 | Confirmation, split `test`, evaluation seed `999001`, `2,000` episodes per load. | IS, new relative to C777/C888. Within-load contrasts pair episodes across readers/depths and the fixed seeds; the E36−E12 depth-effect change uses independent load-specific bootstrap streams. IS4 resamples whole episodes within its update-task set. |
+| C999002 | Confirmation, split `test`, evaluation seed `999002`, `2,000` episodes. | P4-S-L; frozen readers and learned heads, validation-selected thresholds locked before confirmation. 99.166667% endpoint intervals. |
+| C999003 | Confirmation, split `test`, evaluation seed `999003`, `2,000` episodes. | JS; 12 newly trained RS/RS+J and 12 unchanged reference models, evaluated on common fresh episodes. 97.5% endpoint intervals. |
 | S4242 | Screening, split `test`, evaluation seed `4242`. | A5 diagnostics and stopping pilots. Stopping uses `2,000` episodes per checkpoint. No stopping CI was computed. |
-| V4242 | Validation, split `val`, evaluation seed `4242`. | Stopping thresholds selected here, then frozen before S4242. No confirmation inference follows from the validation optimum. |
+| V4242 | Validation, split `val`, evaluation seed `4242`. | Earlier pilot thresholds frozen before S4242; P4-S-L and JS thresholds separately locked before C999002/C999003. Validation optima are selection results, not confirmation estimates. |
 
 For P1-S/F1/F2, let **D** = accuracy at `L=4` minus `L=1` on hops `{2,3}`;
 **F** = the same difference on far hops `{6,7,8}`; **W** = `D−F` (walk specificity);
@@ -44,7 +50,9 @@ For P1-S/F1/F2, let **D** = accuracy at `L=4` minus `L=1` on hops `{2,3}`;
 reader B5 at `L=4` on hops `{2,3}`. In P2-S/F1, **reach** is absolute accuracy averaged
 over hops `{2,3}` at the listed evaluation depth. **Long** always means hops `{4,5,6,7,8}`,
 and must not be substituted for the far set. In the r32 stopping table, D/F/H instead compare
-the selected stopping rule with `L=1`; W remains D−F.
+the selected stopping rule with `L=1`; W remains D−F. P4-S-L uses these same H/D/F/W
+hop definitions. JS uses hops `{1,2,3}` for its short-hop endpoints, not P1/P2 reach;
+its overshoot statistic S is `Acc16−Acc4` on hops1–3.
 
 Common task is `t2_chain_end`, primary layout `E=12`, chains `(8,4)`, entity dimension `64`,
 and `rho=0.25`. The primary readers share their step matrices R/U/Q; M1 uses ReLU and
@@ -89,8 +97,17 @@ from rounded report prose.
 | ISE | [is/endpoints.csv](../../reports/is/endpoints.csv), [accuracy.csv](../../reports/is/accuracy.csv), [decision.json](../../reports/is/decision.json), [best_L.csv](../../reports/is/best_L.csv), [audit.json](../../reports/is/audit.json) | `e144246` |
 | ISU | [is/t3_update.csv](../../reports/is/t3_update.csv) | `e144246` |
 | ISD | [is/design.json](../../reports/is/design.json), [training_manifest.csv](../../reports/is/training_manifest.csv) | `fb62cf1` |
+| HLE | [p4s-l/endpoints.csv](../../reports/p4s-l/endpoints.csv), [endpoints_per_seed.csv](../../reports/p4s-l/endpoints_per_seed.csv), [accuracy.csv](../../reports/p4s-l/accuracy.csv), [qualification.csv](../../reports/p4s-l/qualification.csv), [latency.csv](../../reports/p4s-l/latency.csv), [analysis.json](../../reports/p4s-l/analysis.json) | `95736ec` |
+| HLD | [p4s-l/design.json](../../reports/p4s-l/design.json), [label_free_thresholds.csv](../../reports/p4s-l/label_free_thresholds.csv) | `9366da4` |
+| HLT | [p4s-l/theta.json](../../reports/p4s-l/theta.json), [theta.csv](../../reports/p4s-l/theta.csv), [head_manifest.json](../../reports/p4s-l/head_manifest.json), [theta_lock_audit.json](../../reports/p4s-l/theta_lock_audit.json) | `6e4545e` |
+| JSE | [js/endpoints.csv](../../reports/js/endpoints.csv), [accuracy.csv](../../reports/js/accuracy.csv), [stopping.csv](../../reports/js/stopping.csv), [rho.csv](../../reports/js/rho.csv), [rho_per_seed.csv](../../reports/js/rho_per_seed.csv), [decision.json](../../reports/js/decision.json), [audit.json](../../reports/js/audit.json) | `96ff2e9` |
+| JSD | [js/design.json](../../reports/js/design.json), [method.json](../../reports/js/method.json), [training_manifest.csv](../../reports/js/training_manifest.csv) | `852d293` |
+| JST | [js/thresholds.csv](../../reports/js/thresholds.csv), [thresholds.json](../../reports/js/thresholds.json), [checkpoint_manifest.csv](../../reports/js/checkpoint_manifest.csv) | `0c99cc1` |
+| FRP | [P1-L Amendment B4](../prereg/P1L.md), [plan E.2/§11.6](../../plan/recurrent_lora_research_plan_2026-10-26.md) | `379115d` |
+| FRA | [core/accounting.py](../../src/looplora/core/accounting.py); [p1l-writer-fix/runs.csv](../../reports/p1l-writer-fix/runs.csv); P2C | `216febf`; `cd5a45c`; `bb101a6` |
 
-For endpoint CSVs select `confidence=0.975`; both confidence levels occur in the P2 files.
+For P1/P2/IS/JS endpoint CSVs select `confidence=0.975`; both confidence levels occur
+in the P2 files. P4-S-L instead exports `confidence=0.9916666666666667` throughout.
 For accuracy tables select the stated set, `original` condition, writer, reader, rank, L and hop;
 the reported absolute points are equal-seed means. A5 rates below pool the committed counts
 within the explicitly named stratum. These count ratios and unit conversions introduce no
@@ -120,7 +137,16 @@ steps with no replication. F2 uses rank `32`, **15,000** steps with no replicati
 | S11. “Successor-swap diagnostics are consistent with path-sensitive behavior, but do not identify a unique learned algorithm.” | narrowed | S4242, CI unavailable. P1-S L4, `new_hop_le_L=true`, pooling original hops1–8: oracle_orth/M1-lin follows the new terminal **65.594446%** versus unswapped **0.172541%** (`15967/24342`, `42/24342`); joint/M1 **44.219867%/35.292909%** (`10764/24342`, `8591/24342`); joint/M1-lin **48.336209%/47.913072%** (`11766/24342`, `11663/24342`). F2 joint_fact/M1, **new_path_length=1** only: **47.985348%/4.426129%** (`1572/3276`, `145/3276`). | Screening counterfactuals, not confirmation. F2 and P1-S strata differ, so their rates do not estimate a controlled effect of factorization. Responses to local path changes can coexist with global terminal statistics. | P1S `98e70eb`: swap_successors.csv; F2A `a898c87`: swap_successors_new_path_length.csv, primary/L4 strata above. |
 | S12. “Factorized T1 validation performance alone establishes multihop terminal retrieval.” | not supported | V4242, CI unavailable: factorized frozen-writer source T1 accuracies **91.800000/91.200000/92.400000%** (seeds17/29/43). With those writers frozen, F2 t1_frozen_fact/M1 C777 h1/h2/h3/h4 at L1: **85.100000/1.983333/1.033333/1.166667%**; at L4: **55.283333/18.833333/7.550000/4.333333%**. | T1 writer validation and T2 reader confirmation are different tasks. The matched frozen-writer profile supports some multihop use but still fails the full gate (S9); T1 loss/accuracy alone does not certify it. | F2A `a898c87`: writer_t1_scores.csv (`writer=joint_fact`, names f2-writer-s17/s29/s43, the frozen-writer sources) and accuracy_summary.csv (`t1_frozen_fact/M1`). |
 
-## Larger single reads, sharing, and measured budgets
+## Current comparison policy and static accounting
+
+| ID and paper sentence | Status | Numbers, interval, and set | Conditions | Source file and commit |
+| --- | --- | --- | --- | --- |
+| FR1. “The current protocol compares multiple reads with a same-rank single read and reports added latency as a cost; shared M1-L4 and B4 have equal architectural parameter counts under matched dimensions.” | supported | Set/CI not applicable: deterministic accounting and protocol decision, not accuracy evidence. Scalar-gate shared count `r(d_in+d_out)+r²+4*r*r_mem+2`; four-step B8 adds `3*(r²+2*r*r_mem)=9,216` at r=r_mem=32. P1-L adapter 2048→1024: shared **103,426**, derived B8 **112,642**, about **8.9%** extra. Symbolic unfactorized joint 192→64: **13,314/22,530**, about **69.2%** extra. Symbolic oracle registered **7,170/16,386**, trainable **4,096/13,312**. | Equality requires identical rank, memory width, input/output dimensions, writer architecture, and gate type; separately trained weights/writers need not agree. P1-L count includes all registered adapter parameters, excludes the training-only head, and is not a whole-backbone denominator. B8 P1-L count is architectural derivation, not a benchmark measurement. This policy establishes neither P1-L success nor efficiency over a larger-rank single read. | FRP `379115d`; FRA `216febf`, `cd5a45c`; P2C `bb101a6`, writer joint/oracle_random, reader B4/M1/B8, r32. |
+
+The historical P2-S/P2-S-F1 comparisons below retain their original numerical findings and
+practical-gate outcome. The current policy does not retroactively turn a failed gate into a pass.
+
+## Historical larger single reads, sharing, and measured budgets
 
 P2-S primary endpoint models and all P2-S-F1 models use `15,000` steps and the same
 training seeds. The P2-S M1 reference is r32, trained at mixed depths and evaluated at L4;
@@ -173,6 +199,228 @@ P4D); spectral component norms for the sufficient certificate use FP64.
 | H5. “The unfactorized r32 joint/M1 screening flag establishes a benefit from adaptive stopping.” | not supported | S4242: all three rules use exactly **16** mean updates and reproduce fixed-L16 endpoints: H **+5.150000 pp**, D **+8.666667**, F **+6.027778**, W **+2.638889**; minimum seed W **−0.125000 pp**. Read-norm costs **17** reads. | joint/M1/r32. Aggregate `screening_candidate=true` is a point-estimate flag, not confirmation or a formal G1 pass. There is no stopping benefit over fixed L16 here. | P4R `3e15f07`: endpoints.csv, endpoints_per_seed.csv, accuracy.csv. |
 | H6. “Stopping at the true graph distance is an accuracy upper bound for a learned reader.” | not supported | S4242 oracle_random/r128/M1 overall accuracy: true-hop **23.564583%**, relative-change **75.302083%**. | True-hop stopping is a label-informed diagnostic reference, not an upper bound. Learned update count need not equal graph distance. | P4 `9dd0e04`: headline.csv, oracle_true_hop/relative_change. |
 
+## Learned halting confirmation (P4-S-L)
+
+C999002 evaluates 24 unchanged r32 mixed-depth readers with one newly trained halting head
+per checkpoint. Six primary families are `{oracle_random,joint_fact,t1_frozen_fact}` ×
+`{M1,M1-lin}`; unfactorized joint/M1 and joint/M1-lin are descriptive. Head training is
+supervised: 51→64 ReLU→1 sigmoid, **3,393 parameters**, features z, state norm, relative
+change, post-state read-norm ratio and step one-hot, with no answer/hop/correctness or
+decoder-confidence input. Correctness labels supply training targets. Frozen readers/writers
+are not retrained. Training seed 31337 supplies 20,000 episodes, all eight queries and sixteen
+post-update states; BCE/Adam lr .001, 2,000 updates, batches of 256 whole episodes sampled
+with replacement, independently derived head initialization/sampler seeds (HLT manifest).
+
+HLD locked design/reference thresholds before head training. On V4242/2,000 episodes, one
+θ per family was selected from .05,.10,…,.95 to maximize mean accuracy over all eight hops
+and three fixed seeds, ties fewer **chosen** steps then smaller θ. HLT locked θ and head
+seals before C999002; this objective did not require hop 1 preservation. The best label-free
+rule was also chosen on validation (ties read_norm, relative_change, output_stability), using
+18 unchanged C4 thresholds plus six missing oracle thresholds selected on validation before
+head training. No best rule is selected on confirmation.
+
+All 64 exported endpoint CIs are **99.166667%** (`1−.05/6`), 2,000 paired episode-bootstrap
+draws, base 2718, with shared episode draws across fixed seeds 17/29/43. This is the registered
+six-primary-family adjustment, not simultaneous coverage of all 64 claims. The intervals
+condition on the fitted readers/heads and do not resample training or threshold selection.
+Each family has 2,000 confirmation episodes and 48,000 query instances across the three seeds.
+The analysis audit's 768,000 queries includes validation **and** test, not confirmation alone.
+
+| ID and paper sentence | Status | Numbers, interval, and set | Conditions | Source file and commit |
+| --- | --- | --- | --- | --- |
+| HL1. “None of six primary frozen-reader families met the combined learned-halting criterion.” | supported | C999002: all six fail H≥−1 pp, despite D≥3 pp with lower CI>0 and W lower CI>0. All 18 primary per-seed H points are below −1 pp. Full H/D/F/W/overall effects and adjusted CIs appear below. | Learned−L1; H hop 1, D hops 2–3, F hops 6–8, W=D−F. H preservation and D≥3 are point criteria, not lower-CI thresholds. Negative result for this post-hoc head/protocol, not impossibility of learned halting. | HLE `95736ec`: endpoints, endpoints_per_seed, qualification; primary=True. |
+| HL2. “The learned policy improved overall accuracy over the validation-selected label-free reference in four primary families, without repairing preservation.” | supported | C999002: positive adjusted intervals for both oracle_random and joint_fact readers; both frozen-fact estimates are negative with intervals crossing zero. All six effects/CIs and reference rule/threshold below. | Hops 1–8; locked validation-selected rule, not best test rule. These small overall improvements do not overturn HL1. | HLE `95736ec`: learned_minus_best_label_free; HLD `9366da4`: best_label_free. |
+| HL3. “All primary learned policies remained below the any-step oracle, while true-hop depth was not an accuracy upper bound.” | supported | C999002: all six any-step-minus-learned adjusted intervals are positive. Learned−true-hop is positive for oracle_random and joint_fact, negative for frozen_fact; all adjusted intervals exclude zero. Exact six-family values below. | Any-step oracle uses answer labels and succeeds if any post-update state 1…16 is correct; upper bound only for selecting among these frozen predictions. True-hop selects graph distance 1…8 and is a separate label-informed reference, not an upper bound. | HLE `95736ec`: any_step_oracle_minus_learned / learned_minus_true_hop. |
+| HL4. “Earlier chosen states did not yield a measured latency improvement for this learned-halting implementation.” | supported | Full-confirmation chosen/executed/read means and timing table below. Primary chosen depths 5.306125–10.038146, executed 12.739750–15.994521; learned CUDA means 20.533381–25.252794 ms versus fixed 16 means 3.071751–3.308061 ms. CI unavailable. | First p≥θ state; otherwise execute 16 and select earliest max-p state. Executed+1 memory reads, hence 17 on fallback. Timings use a prepared 64-query batch/seed, five warmups/20 repeats; exclude data/backbone/writing/head training/end-to-end LM work. Family timings average three seed summaries. Full-confirmation counters differ from timed microbatch counters. | HLE `95736ec`: accuracy split=test/method=learned/hop=overall; latency method=learned/fixed_4/fixed_16. |
+| HL5. “The descriptive unfactorized joint/M1 row satisfied the numerical inequalities but was not a qualifying primary result.” | supported | C999002: joint/M1 endpoints_satisfied=True, primary=False, qualifies=False; joint/M1-lin specificity CI crosses zero. All 16 descriptive endpoints appear in the same tables below. | Neither descriptive row is a seventh/eighth primary trial or a primary remedy. Joint/M1 has an overall learned-minus-label-free loss; joint/M1-lin's interval crosses zero. | HLE `95736ec`: qualification.csv and endpoints.csv, writer=joint. |
+
+All following effects/CIs are pp, confidence 99.166667%. Family abbreviations retain
+writer/reader, all r32; `P`=primary, `D`=descriptive. Together the next two tables contain
+**all 64 endpoints**, including far and overall; each cell is estimate [lower,upper].
+
+| Family | Scope | θ | H | D | F | W | Overall learned−L1 |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| joint/r32/M1 | D | 0.9 | 6.050000 [4.694306,7.394722] | 8.741667 [7.699896,9.822257] | 5.683333 [4.644444,6.777847] | 3.058333 [1.666667,4.500139] | 6.622917 [5.994436,7.241667] |
+| joint/r32/M1-lin | D | 0.75 | 2.966667 [1.688819,4.077847] | 3.016667 [2.027743,3.944514] | 2.088889 [1.174051,3.087060] | 0.927778 [-0.260231,2.162060] | 2.427083 [1.831936,3.103507] |
+| joint_fact/r32/M1 | P | 0.45 | -33.900000 [-35.777847,-31.872153] | 21.583333 [20.433333,22.755590] | 5.066667 [4.472222,5.709282] | 16.516667 [15.262801,17.665752] | 5.550000 [4.945807,6.131250] |
+| joint_fact/r32/M1-lin | P | 0.4 | -49.150000 [-51.011181,-47.216667] | 24.733333 [23.463715,26.025104] | 9.294444 [8.396273,10.248241] | 15.438889 [14.025914,16.886111] | 7.389583 [6.680512,8.111181] |
+| oracle_random/r32/M1 | P | 0.25 | -15.700000 [-18.227847,-13.688819] | 32.508333 [31.019306,33.938924] | 4.533333 [3.829606,5.144444] | 27.975000 [26.378657,29.575069] | 11.714583 [10.992960,12.455694] |
+| oracle_random/r32/M1-lin | P | 0.3 | -20.850000 [-23.205903,-18.655486] | 37.500000 [35.841667,39.205590] | 18.661111 [17.364769,19.977917] | 18.838889 [16.947188,20.677847] | 20.002083 [18.859019,21.037578] |
+| t1_frozen_fact/r32/M1 | P | 0.25 | -21.900000 [-23.627847,-20.216667] | 9.441667 [8.677743,10.283438] | 2.550000 [2.118495,2.974190] | 6.891667 [5.996273,7.774120] | 1.339583 [0.915929,1.729878] |
+| t1_frozen_fact/r32/M1-lin | P | 0.35 | -26.166667 [-27.911181,-24.338819] | 10.216667 [9.436076,11.116667] | 2.666667 [2.235162,3.088889] | 7.550000 [6.661076,8.447361] | 1.181250 [0.755408,1.585469] |
+
+
+| Family | Best label-free rule / threshold | Learned−best label-free | Any-step oracle−learned | Learned−true-hop |
+| --- | --- | --- | --- | --- |
+| joint/r32/M1 | read_norm / 0.3 | -0.516667 [-0.807648,-0.236788] | 10.000000 [9.545095,10.495148] | 0.981250 [0.631250,1.332674] |
+| joint/r32/M1-lin | relative_change / 0.03 | -0.147917 [-0.436128,0.116693] | 6.720833 [6.173524,7.284731] | 0.125000 [-0.172257,0.400738] |
+| joint_fact/r32/M1 | output_stability / 4 | 0.883333 [0.463160,1.303481] | 21.156250 [20.550686,21.827847] | 0.979167 [0.456250,1.493802] |
+| joint_fact/r32/M1-lin | output_stability / 4 | 1.614583 [1.125000,2.145252] | 28.454167 [27.587474,29.335417] | 2.518750 [1.859679,3.178507] |
+| oracle_random/r32/M1 | relative_change / 0.7 | 1.258333 [0.705486,1.851398] | 36.337500 [35.279826,37.350026] | 6.425000 [5.832622,7.066667] |
+| oracle_random/r32/M1-lin | relative_change / 0.7 | 1.522917 [0.867300,2.234071] | 35.572917 [34.512474,36.584783] | 13.412500 [12.354062,14.421545] |
+| t1_frozen_fact/r32/M1 | output_stability / 4 | -0.102083 [-0.390981,0.175712] | 10.250000 [9.848602,10.647257] | -2.491667 [-2.815981,-2.146519] |
+| t1_frozen_fact/r32/M1-lin | read_norm / 1.0 | -0.097917 [-0.449314,0.256962] | 10.950000 [10.508281,11.401398] | -2.372917 [-2.723628,-2.021519] |
+
+Primary H per-seed point effects in pp (17/29/43); no new per-seed intervals:
+
+| Family | H seed 17 /29 /43 |
+| --- | --- |
+| joint_fact/r32/M1 | -33.850000 / -34.950000 / -32.900000 |
+| joint_fact/r32/M1-lin | -52.050000 / -46.200000 / -49.200000 |
+| oracle_random/r32/M1 | -12.350000 / -19.250000 / -15.500000 |
+| oracle_random/r32/M1-lin | -17.800000 / -20.350000 / -24.400000 |
+| t1_frozen_fact/r32/M1 | -22.300000 / -20.450000 / -22.950000 |
+| t1_frozen_fact/r32/M1-lin | -26.350000 / -25.500000 / -26.650000 |
+
+Confirmation counters and separate timing population (all absolute CIs unavailable):
+
+| Family | Accuracy % | Chosen | Executed | Read calls | Learned CUDA ms | L4 CUDA ms | L16 CUDA ms |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| joint/r32/M1 | 43.245833 | 6.488792 | 15.999792 | 16.999792 | 20.497695 | 0.960222 | 3.219443 |
+| joint/r32/M1-lin | 48.129167 | 4.899479 | 15.998833 | 16.998833 | 20.387726 | 0.912897 | 3.050142 |
+| joint_fact/r32/M1 | 17.208333 | 8.608792 | 15.994521 | 16.994521 | 21.077982 | 0.977411 | 3.308061 |
+| joint_fact/r32/M1-lin | 19.354167 | 10.038146 | 15.971396 | 16.971396 | 20.893956 | 0.931035 | 3.093715 |
+| oracle_random/r32/M1 | 21.452083 | 5.306125 | 14.207396 | 15.207396 | 21.939381 | 0.979735 | 3.273001 |
+| oracle_random/r32/M1-lin | 30.097917 | 8.191250 | 12.739750 | 13.739750 | 25.252794 | 0.922389 | 3.071751 |
+| t1_frozen_fact/r32/M1 | 13.020833 | 6.189854 | 15.994521 | 16.994521 | 20.567235 | 0.973297 | 3.283272 |
+| t1_frozen_fact/r32/M1-lin | 13.147917 | 6.877062 | 15.991417 | 16.991417 | 20.533381 | 0.921618 | 3.080122 |
+
+
+## Jacobian regularization confirmation (JS)
+
+C999003 uses M1/ReLU r=r_mem=32, E12 chains (8,4), train hops 1–3, seeds 17/29/43.
+Twelve new RS/RS+J models train 15,000 steps, batch 64, lr .003; each batch draws one uniform
+L∈{4,5,6,7,8}. At each seed RS/RS+J share initialization and training-data/depth RNG
+streams, then optimize separately. RS+J adds the episode/query mean of
+`max(radius(J(z_L))−.9,0)^2`, lambda 1. Twelve unchanged M1-L4/M1-mixed reference
+checkpoints are newly evaluated on this same confirmation set. References have different
+training-depth histories; only RS+J−RS isolates the tested regularization intervention.
+
+JSD fixed the dense 32×32 CPU float32 eigenvalue method before scores, chosen by timing.
+J(z)=rho diag(1[Rz+UMQz>0])(R+UMQ) uses the **next-update gate at reached z_L**.
+ReLU's chosen zero derivative is zero; gradients flow through matrix factors and trainable
+memory, with locally constant Boolean gates. “Exact eigenvalues” denotes full numerical
+eigensolution, not interval-certified arithmetic. The preregistration is `f5bb486`, method/design
+lock `852d293`, analysis source introduced `731a2a2`; no scores were used to choose the backend.
+
+After all training, JST selected eight relative-change thresholds, one per writer/condition
+across all three seeds, on V4242/2,000 episodes, from
+[0,.001,.003,.01,.03,.1,.2,.3,.5,.7,1,1.5,2,4]. Selection maximizes total correct
+over hops 1–8/seeds, ties fewer total updates then smaller threshold. Lock `0c99cc1`
+precedes confirmation. C999003 has 2,000 episodes, one query/hop 1–8, depths 1–16 and
+stopped cap 16; first qualifying post-update state, else z16. Endpoint L=17 is only a
+stopped-policy sentinel, never a seventeenth update. All 24 traces precede one aggregation.
+
+Endpoint intervals are 97.5%, 2,000 paired episode-bootstrap draws, base 2718, shared draws
+across the three fixed training seeds. DeltaS jointly resamples all four terms. They exclude
+new-training-seed and reselection uncertainty. Short hops 1–3 differ from earlier reach 2–3;
+long hops 4–8 and stopped hops 1–8 are explicit below. Absolute rates, radius summaries,
+and stopping counters have **CI unavailable**. JS measured no latency advantage.
+
+| ID and paper sentence | Status | Numbers, interval, and set | Conditions | Source file and commit |
+| --- | --- | --- | --- | --- |
+| JS1. “Regularization reduced overshoot for both writers but neither met the registered removal criterion.” | supported | C999003: DeltaS positive with positive lower CI and all three seed effects positive for both writers; both S(RS+J) points remain below −1 pp. Exact S/DeltaS estimates and 97.5% CIs below. | S=Acc16−Acc4 on hops 1–3. Removal requires DeltaS point>0 and lower CI>0, plus S(RS+J) point≥−1 pp; not a lower-CI floor on S. No gate or followup depends on JS. | JSE `96ff2e9`: JS-E1-S/JS-E1-DeltaS, decision.json; JSD `852d293`. |
+| JS2. “The L4 short-hop effect was positive for oracle_random, while joint_fact's negative point had an interval crossing zero.” | supported | C999003: RS+J−RS, exact JS-E2 estimates/CIs and all seed effects below. | L4, hops 1–3; no claim that every capability endpoint improves. | JSE `96ff2e9`: JS-E2. |
+| JS3. “Regularization reduced L16 long-hop accuracy in both tested writers.” | supported | C999003: JS-E3 upper CIs below zero, all seed effects negative; exact values below. | RS+J−RS, L16, hops 4–8. Does not imply universal harm outside this protocol. | JSE `96ff2e9`: JS-E3. |
+| JS4. “Regularization reduced the accuracy of the validation-selected stopped policy in both writers.” | supported | C999003: JS-E4 upper CIs below zero, all seed effects negative; stopped rates, thresholds, mean reads and cap fractions below. | Each condition has its own validation-selected threshold; hops 1–8, cap 16. The contrast includes the deployed selection policy. No absolute-rate/counter CI or latency result. | JSE `96ff2e9`: JS-E4/stopping.csv; JST `0c99cc1`. |
+| JS5. “RS-reference outcomes depended on writer, evaluation depth, and hop subset.” | supported | C999003: all 24 descriptive RS−M1-L4/M1-mixed contrasts and 97.5% CIs below. At L4 short hops, oracle RS is below both references; joint_fact versus mixed is +0.483333 [−0.488889,1.466667], inconclusive. All L16 short-hop contrasts are positive; joint_fact L16 long-hop contrasts are negative. | Both references unchanged but newly evaluated on 999003; historical training protocols differ. No stopped RS-reference CI is exported; stopped absolute rates below are descriptive. | JSE `96ff2e9`: endpoint=RS-reference, exact comparator/L/hops selectors below. |
+| JS6. “Regularization lowered the pooled reached-state Jacobian-radius mean at all three measured depths for each writer.” | supported | C999003: all 24 pooled radius summaries below, including references; CI unavailable. L16 RS+J fractions below 1 are oracle .222375 and joint_fact .926979. | hop=0 pools hops 1–8/three seeds, 48,000 query states per row; only L4/8/16 measured. Pointwise radii do not certify fixed points, global contraction, transient products, terminal decoding, or correctness. | JSE `96ff2e9`: rho.csv, hop=0; rho_per_seed.csv retains seed summaries. |
+
+JS primary endpoint estimates/CIs are pp; seed effects ordered 17/29/43. Exact selectors
+are endpoint,writer,condition,comparator,L_a/L_b,hops in JSE endpoints.csv.
+
+| Endpoint | Writer | A−B | L_a/L_b | Hops | Effect [97.5% CI], pp | Seed17 /29 /43, pp |
+| --- | --- | --- | --- | --- | --- | --- |
+| JS-E1-S | oracle_random | RS−RS | 16/4 | 1-3 | -11.266667 [-12.355694,-10.049931] | -11.900000 / -11.016667 / -10.883333 |
+| JS-E1-S | oracle_random | RS+J−RS+J | 16/4 | 1-3 | -2.833333 [-3.800139,-1.805556] | -3.533333 / -2.400000 / -2.566667 |
+| JS-E1-DeltaS | oracle_random | RS+J−RS | 16-4/16-4 | 1-3 | 8.433333 [7.483264,9.417569] | 8.366667 / 8.616667 / 8.316667 |
+| JS-E2 | oracle_random | RS+J−RS | 4/4 | 1-3 | 0.788889 [0.261042,1.294514] | 1.200000 / 0.883333 / 0.283333 |
+| JS-E3 | oracle_random | RS+J−RS | 16/16 | 4-8 | -5.546667 [-6.200000,-4.889917] | -5.670000 / -4.540000 / -6.430000 |
+| JS-E4 | oracle_random | RS+J−RS | 17/17 | 1-8 | -1.039583 [-1.537552,-0.543750] | -0.693750 / -0.512500 / -1.912500 |
+| JS-E1-S | joint_fact | RS−RS | 16/4 | 1-3 | -3.016667 [-3.788889,-2.272153] | -2.800000 / -1.950000 / -4.300000 |
+| JS-E1-S | joint_fact | RS+J−RS+J | 16/4 | 1-3 | -1.772222 [-2.483542,-1.061111] | -1.983333 / -0.900000 / -2.433333 |
+| JS-E1-DeltaS | joint_fact | RS+J−RS | 16-4/16-4 | 1-3 | 1.244444 [0.222014,2.200069] | 0.816667 / 1.050000 / 1.866667 |
+| JS-E2 | joint_fact | RS+J−RS | 4/4 | 1-3 | -0.727778 [-1.566667,0.066875] | -0.233333 / -0.733333 / -1.216667 |
+| JS-E3 | joint_fact | RS+J−RS | 16/16 | 4-8 | -1.443333 [-1.990083,-0.933292] | -0.630000 / -1.250000 / -2.450000 |
+| JS-E4 | joint_fact | RS+J−RS | 17/17 | 1-8 | -0.677083 [-1.227109,-0.114557] | -0.162500 / -0.606250 / -1.262500 |
+
+All 24 RS-reference contrasts (descriptive comparisons, pp):
+
+| Writer | Comparator | L | Hops | RS−reference [97.5% CI] | Seed17 /29 /43 |
+| --- | --- | --- | --- | --- | --- |
+| oracle_random | M1-L4 | 4 | 1-3 | -14.694444 [-15.838958,-13.588611] | -16.500000 / -14.366667 / -13.216667 |
+| oracle_random | M1-L4 | 4 | 4-8 | -0.880000 [-1.166667,-0.593292] | -0.870000 / -0.850000 / -0.920000 |
+| oracle_random | M1-L4 | 4 | 1-8 | -6.060417 [-6.518776,-5.620755] | -6.731250 / -5.918750 / -5.531250 |
+| oracle_random | M1-L4 | 16 | 1-3 | 7.816667 [6.794028,8.805625] | 6.333333 / 8.400000 / 8.716667 |
+| oracle_random | M1-L4 | 16 | 4-8 | 7.493333 [6.563333,8.523333] | 7.820000 / 6.990000 / 7.670000 |
+| oracle_random | M1-L4 | 16 | 1-8 | 7.614583 [6.856198,8.450000] | 7.262500 / 7.518750 / 8.062500 |
+| oracle_random | M1-mixed | 4 | 1-3 | -8.738889 [-9.733403,-7.766667] | -9.233333 / -9.283333 / -7.700000 |
+| oracle_random | M1-mixed | 4 | 4-8 | -2.013333 [-2.303333,-1.719917] | -1.900000 / -2.020000 / -2.120000 |
+| oracle_random | M1-mixed | 4 | 1-8 | -4.535417 [-4.966745,-4.102083] | -4.650000 / -4.743750 / -4.212500 |
+| oracle_random | M1-mixed | 16 | 1-3 | 5.300000 [4.366667,6.239028] | 4.766667 / 5.483333 / 5.650000 |
+| oracle_random | M1-mixed | 16 | 4-8 | 5.080000 [4.209958,6.023375] | 6.180000 / 3.950000 / 5.110000 |
+| oracle_random | M1-mixed | 16 | 1-8 | 5.162500 [4.393620,5.881380] | 5.650000 / 4.525000 / 5.312500 |
+| joint_fact | M1-L4 | 4 | 1-3 | -2.522222 [-3.533403,-1.499931] | -2.500000 / -3.650000 / -1.416667 |
+| joint_fact | M1-L4 | 4 | 4-8 | -1.153333 [-1.466708,-0.846625] | -1.630000 / -0.890000 / -0.940000 |
+| joint_fact | M1-L4 | 4 | 1-8 | -1.666667 [-2.112526,-1.231250] | -1.956250 / -1.925000 / -1.118750 |
+| joint_fact | M1-L4 | 16 | 1-3 | 5.066667 [3.966528,6.172292] | 3.850000 / 6.000000 / 5.350000 |
+| joint_fact | M1-L4 | 16 | 4-8 | -2.620000 [-3.306667,-1.933292] | -2.680000 / -4.340000 / -0.840000 |
+| joint_fact | M1-L4 | 16 | 1-8 | 0.262500 [-0.393776,0.920859] | -0.231250 / -0.462500 / 1.481250 |
+| joint_fact | M1-mixed | 4 | 1-3 | 0.483333 [-0.488889,1.466667] | 0.200000 / -0.566667 / 1.816667 |
+| joint_fact | M1-mixed | 4 | 4-8 | -1.773333 [-2.106708,-1.433292] | -1.840000 / -1.720000 / -1.760000 |
+| joint_fact | M1-mixed | 4 | 1-8 | -0.927083 [-1.372969,-0.485365] | -1.075000 / -1.287500 / -0.418750 |
+| joint_fact | M1-mixed | 16 | 1-3 | 4.911111 [3.855347,6.022222] | 4.900000 / 5.666667 / 4.166667 |
+| joint_fact | M1-mixed | 16 | 4-8 | -1.033333 [-1.620167,-0.383292] | -2.400000 / -1.220000 / 0.520000 |
+| joint_fact | M1-mixed | 16 | 1-8 | 1.195833 [0.579115,1.808359] | 0.337500 / 1.362500 / 1.887500 |
+
+Stopped confirmation counters, pooled equal-size seeds (48,000 queries/row); relative-change
+uses one memory read per update. Reaching cap 16 includes first qualification at 16 and fallback.
+No counter/rate intervals; validation accuracies in thresholds.csv are not confirmation rates.
+
+| Writer | Condition | Threshold | Accuracy % | Mean updates/reads | Fraction before 16 | Fraction at cap 16 |
+| --- | --- | --- | --- | --- | --- | --- |
+| oracle_random | RS | 0.3 | 19.743750 | 12.380438 | 0.479583 | 0.520417 |
+| oracle_random | RS+J | 0.01 | 18.704167 | 15.937500 | 0.015292 | 0.984708 |
+| oracle_random | M1-L4 | 1 | 11.189583 | 12.802479 | 0.218979 | 0.781021 |
+| oracle_random | M1-mixed | 0.7 | 20.343750 | 8.814583 | 0.718625 | 0.281375 |
+| joint_fact | RS | 0.01 | 16.556250 | 15.348292 | 0.228958 | 0.771042 |
+| joint_fact | RS+J | 0.01 | 15.879167 | 15.028479 | 0.316812 | 0.683188 |
+| joint_fact | M1-L4 | 0.3 | 17.225000 | 7.505646 | 0.827667 | 0.172333 |
+| joint_fact | M1-mixed | 0.3 | 15.966667 | 6.692271 | 0.858312 | 0.141688 |
+
+Radius summaries pool query states rather than seed quantiles. These are descriptive
+radii, not spectral norms. `n=48,000,n_seeds=3,hop=0`; each hop-specific row has n=6,000.
+Percentiles are empirical spans, not CIs; no minimum or full observed range is exported.
+All 24 rows follow; per-seed distributions remain in rho_per_seed.csv.
+
+| Writer | Condition | L | Mean | p05 | p25 | Median | p75 | p95 | Maximum | Fraction≤.9 | Fraction<1 |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| joint_fact | M1-L4 | 4 | 0.989793 | 0.764256 | 0.888172 | 0.981061 | 1.081827 | 1.241228 | 1.912912 | 0.278500 | 0.550604 |
+| joint_fact | M1-L4 | 8 | 0.937635 | 0.718047 | 0.838661 | 0.931563 | 1.031757 | 1.175421 | 1.912912 | 0.411271 | 0.678083 |
+| joint_fact | M1-L4 | 16 | 0.913369 | 0.704723 | 0.818281 | 0.908558 | 1.001585 | 1.138885 | 1.651033 | 0.473938 | 0.746479 |
+| joint_fact | M1-mixed | 4 | 0.958940 | 0.739268 | 0.856705 | 0.947863 | 1.048944 | 1.215554 | 1.899726 | 0.363833 | 0.638312 |
+| joint_fact | M1-mixed | 8 | 0.926829 | 0.710374 | 0.829178 | 0.921789 | 1.017651 | 1.160152 | 1.741270 | 0.439979 | 0.708875 |
+| joint_fact | M1-mixed | 16 | 0.907296 | 0.704082 | 0.817077 | 0.903580 | 0.990967 | 1.123866 | 1.552292 | 0.488875 | 0.770812 |
+| joint_fact | RS | 4 | 0.914272 | 0.728813 | 0.832473 | 0.907331 | 0.987391 | 1.122517 | 1.586463 | 0.475042 | 0.782083 |
+| joint_fact | RS | 8 | 0.875872 | 0.683402 | 0.791569 | 0.872439 | 0.955038 | 1.079344 | 1.467736 | 0.589083 | 0.850938 |
+| joint_fact | RS | 16 | 0.861332 | 0.668890 | 0.777233 | 0.860239 | 0.943519 | 1.056833 | 1.441559 | 0.625146 | 0.877604 |
+| joint_fact | RS+J | 4 | 0.876390 | 0.699490 | 0.799213 | 0.869755 | 0.945306 | 1.072570 | 1.609046 | 0.608979 | 0.866521 |
+| joint_fact | RS+J | 8 | 0.845951 | 0.660253 | 0.765791 | 0.843005 | 0.921565 | 1.039391 | 1.605100 | 0.687312 | 0.907396 |
+| joint_fact | RS+J | 16 | 0.834440 | 0.649651 | 0.754675 | 0.832990 | 0.912751 | 1.021459 | 1.406855 | 0.713333 | 0.926979 |
+| oracle_random | M1-L4 | 4 | 2.157681 | 1.965627 | 2.115246 | 2.179317 | 2.225690 | 2.256769 | 2.901083 | 0.000000 | 0.000000 |
+| oracle_random | M1-L4 | 8 | 2.222501 | 2.152510 | 2.216916 | 2.228158 | 2.236275 | 2.263444 | 2.901083 | 0.000000 | 0.000000 |
+| oracle_random | M1-L4 | 16 | 2.230459 | 2.194981 | 2.221781 | 2.230045 | 2.237514 | 2.267407 | 2.671225 | 0.000000 | 0.000000 |
+| oracle_random | M1-mixed | 4 | 1.612574 | 1.391506 | 1.528376 | 1.609965 | 1.696003 | 1.836332 | 2.442857 | 0.000042 | 0.000042 |
+| oracle_random | M1-mixed | 8 | 1.664782 | 1.500866 | 1.597321 | 1.660107 | 1.724806 | 1.848288 | 2.385803 | 0.000000 | 0.000042 |
+| oracle_random | M1-mixed | 16 | 1.673661 | 1.527784 | 1.607157 | 1.673439 | 1.728013 | 1.839008 | 2.352504 | 0.000042 | 0.000042 |
+| oracle_random | RS | 4 | 1.224589 | 1.051677 | 1.163818 | 1.232037 | 1.289379 | 1.375712 | 1.736513 | 0.002667 | 0.019188 |
+| oracle_random | RS | 8 | 1.280159 | 1.161424 | 1.242955 | 1.283830 | 1.321203 | 1.390361 | 1.709372 | 0.000479 | 0.001521 |
+| oracle_random | RS | 16 | 1.307088 | 1.238773 | 1.278106 | 1.302462 | 1.329621 | 1.394285 | 1.643792 | 0.000312 | 0.000625 |
+| oracle_random | RS+J | 4 | 1.010545 | 0.837629 | 0.944092 | 1.011461 | 1.077807 | 1.182706 | 1.606321 | 0.137333 | 0.452792 |
+| oracle_random | RS+J | 8 | 1.039018 | 0.886026 | 0.984700 | 1.039177 | 1.097384 | 1.190965 | 1.692890 | 0.064833 | 0.313292 |
+| oracle_random | RS+J | 16 | 1.052610 | 0.910700 | 1.007045 | 1.053060 | 1.105079 | 1.187647 | 1.482803 | 0.042854 | 0.222375 |
+
+
 ## Memory load, adaptation, and updates (study IS)
 
 IS primary writers are `oracle_random` and `joint_fact`; unfactorized `joint` is
@@ -213,11 +461,11 @@ for referenced claim IDs remain those above.
 | --- | --- | --- | --- |
 | 1: fixed output subspace and frozen-memory input bottleneck | The branch stays in col(B); at fixed M its local input-Jacobian rank is at most r. Depth may change the function inside that bottleneck. Sequence history derivatives need not have this global rank bound. | S1–S3 show accuracy can change within a fixed-r checkpoint; P1A's audit verifies identical snapshots across L. Compatible, **not** a measurement of output-subspace or Jacobian rank; neither was estimated in these symbolic exports. | supported as a theorem, open as a direct rank measurement. Fixed col(B) does not imply useless depth; do not apply the frozen-memory rank bound to the stacked sequence map. |
 | 2: linear matrix polynomial | Shared linear iteration gives `sum_{j=0}^L T^j u`, `T=rho*(R+UMQ)`; memory composition degree can increase with L. At fixed snapshot/L a linear map may be precomputed. | M1-lin depth profiles S4/S6/S7/S8 are compatible with depth-dependent composition and failure. They do not verify a particular polynomial coefficient/gain or show that more degree guarantees correctness. B8 has different per-step matrices. | supported algebraically; accuracy alone does not identify the polynomial or prove serial reads computationally unavoidable. No amortized precomputation benchmark was measured here. |
-| 3: exact chain-terminal decoding | Orthonormal codes, exact oracle writes, nilpotent chains, aligned linear transition with gain greater than one, and matched decoder imply the correct visited node and terminal stability after enough reads. | S7 contradicts the blanket assertion that a **trained** oracle reader automatically has exact one-hop timing or terminal stability. Alignment/gain/decoder assumptions were not measured, so it does **not** contradict the proposition. H6 also shows learned update count is not graph distance. | supported as an existence construction; narrowed empirical claim to the measured hop/depth cells. Exact oracle storage alone is insufficient. |
+| 3: exact chain-terminal decoding | Orthonormal codes, exact oracle writes, nilpotent chains, aligned linear transition with gain greater than one, and matched decoder imply the correct visited node and stable terminal decoding after enough reads. The stable state is a weighted sum of visited codes, not the bare terminal code; the nilpotent transition has spectral radius 0 even with Euclidean norm>1. | S7 contradicts the blanket assertion that a **trained** oracle reader automatically has exact one-hop timing or terminal stability. Alignment/gain/decoder assumptions were not measured, so it does **not** contradict the proposition. H6/HL3 also show learned update count is not graph distance. JS1/JS6 measure trained ReLU reached states, not the exact orthogonal/aligned construction, and neither establish nor refute its assumptions. | supported as an existence construction; narrowed empirical claim to the measured hop/depth cells. Exact oracle storage alone is insufficient. |
 | 4: interference amplification | Delta writes with nonorthogonal keys can erase earlier associations; an operator perturbation bound permits depth-amplified error. Growth is an upper-bound possibility, not a theorem forcing the sign of an accuracy contrast. | IS1/C999 gives negative E36−E12 changes in the fixed-checkpoint depth benefit for both primary writers, consistent with the registered operational prediction. IS2 still meets its capability criterion through the largest tested load, and IS3's load-specific training does not improve accuracy under the inherited protocol. S6/H1 remain compatible observations; S8 also changes training duration. | IS measures a load/layout association, not memory perturbation norms, edge/terminal residuals, causal crosstalk, or bound tightness. Layout, candidate count, and query distribution change with E. No universal monotonic law, failure beyond E36, or `sqrt(E/r)` formula for learned chain values follows. |
 | 5: conditional single-read information limit | B4/B5 receive memory only through one `MQu`; identical full observations force identical predictions. The chain Bayes ceiling additionally needs exact aligned first-hop access and the stated side-information restrictions. | S2 and B2/B5 support limits of **tested** one-read/fixed-query systems. They do not measure indistinguishable-observation pairs or verify a universal Bayes ceiling for arbitrary trained Q/decoders. The proposition explicitly supplies a counterexample to an unrestricted one-read impossibility interpretation. | narrow the capability claim to the tested architectures/ranks/writers. Candidate labels, a general learned query, and nonorthogonal leakage matter. |
 | 6: bias-free ReLU code transmission | A width-r bias-free through-map cannot transmit a positively spanning signed code set exactly; this is not a theorem of universal classification failure for the residual reader. | S1's ReLU success alongside linear hop1 failure is compatible with the theorem: the full reader has reinjection, Rz, and a learned decoder. No exported measurement isolates value-to-query identity transmission. | no claim that the symbolic results disprove the obstruction, or that identity must outperform ReLU for every trained reader. |
-| 7: contraction and stopping error | A valid constant below one bounds distance to a fixed point; answer correctness additionally requires task/decoder information. A sufficient norm upper bound failing does not prove divergence. | H3 supplies **no successful certificate**; H1/H4 stopping policies are empirical. H2 contradicts inferring runtime speedup from fewer updates. Neither a small relative change nor output stability supplies the missing certificate or a correctness proof. | use the negative certificate result and descriptive stopping tradeoff; do not claim certified halting or convergence implies correct answers. |
+| 7: contraction and stopping error | A valid constant below one bounds distance to a fixed point; answer correctness additionally requires task/decoder information. A sufficient norm upper bound failing does not prove divergence. | H3 supplies **no successful certificate**; H1/H4/HL1 stopping policies are empirical. H2/HL4 contradict inferring runtime speedup from fewer updates. JS6 reports reached-state Jacobian radii, not global Lipschitz constants. A smooth map with radius <1 at an actual fixed point has local asymptotic stability; finite reached states, ReLU boundaries, and non-normal transient products need additional control. Neither relative change nor output stability supplies the missing certificate or a correctness proof. | use the negative certificate result and measured stopping tradeoffs; never substitute a pointwise spectral radius for the contraction constant in residual/(1−c), claim certified halting, or infer correctness from convergence. |
 | 8: exact low-dimensional elimination | A recurrence whose entire update lies in a fixed col(B), with reproducible gates, can be represented exactly in low-dimensional coordinates. Extra high-dimensional operations need a separate proof. | No original-versus-eliminated high-dimensional recurrence equivalence/latency comparison is in P1-S/P2-S/P4-S. Their registered V2 recurrence is already low-dimensional. P2C/H2 timings do not measure this elimination. | supported as an algebraic equivalence; open as a measured speedup in this evidence set. Do not claim a new function class or that any full transformer loop can be eliminated. |
 | 9: repeated BA and initialization | Shared linear powers factor through AB; a pure double-BA branch with zero B and zero-at-zero locally Lipschitz activation has zero first derivative. Skip/gated alternatives require their stated nondegeneracy. | No primary symbolic B9 startup/optimization endpoint is included in these CSV/JSON results. Existing theory examples are constructed checks, not an empirical comparison of the trained symbolic readers. | supported analytically; open as a benchmark claim. Do not transfer the pure double-BA dead start to V2's single output factor. |
 | 10: writer shortcut and factorization | Under the explicit common-key/EMA assumptions, endpoint statistics can expose terminals without path following; tail-only factorization removes the direct head-subtraction term, with other shortcuts still possible. | S3/S4's weak/flat depth behavior, S9/S10/S12's changed factorized profiles, S11's swaps, and B1 versus B5 are consistent with this account. They do not measure the exact common-key representation or uniquely identify “pure terminal guessing.” | narrowed mechanistic interpretation. Neither a positive depth contrast/A5 rate proves exact pointer chasing, nor factorization proves all shortcuts absent. |
@@ -253,7 +501,7 @@ scope/interpretation discrepancies; the paper should use the qualified versions 
 6. “Shared reads extrapolate further” in the P2-S decision §6 means the pooled **long-hop
    average at evaluation L4** (B6); it is not an extrapolated B8 depth scan. Likewise pooled
    hop1 gains are not gains in every training seed. The registered follow-up reuses C888.
-7. Gate3's joint practical failure remains a failure (B7). Factorized F-E3 is a capability
+7. The original symbolic P2-S Gate3 joint practical failure remains a failure (B7). Factorized F-E3 is a capability
    comparison with no factorized latency benchmark (B8). Static parameter/state ratios are
    not measurements of end-to-end efficiency.
 8. P4-S contraction counts span validation **and** screening, including checkpoint reuse
@@ -273,6 +521,20 @@ scope/interpretation discrepancies; the paper should use the qualified versions 
     and its absolute-rate CIs are not contrast intervals. The design-locked update-task
     validity changes and undefined untouched stale rates remain part of the result.
 
+11. P4-S-L reports agree with raw adjusted endpoints. Its 20.39 ms timing minimum includes
+    descriptive joint rows; primary-only minimum is 20.533381 ms (HL4). Head supervision
+    includes all eight queries per training episode. Descriptive joint/M1 satisfies numerical
+    inequalities but is intentionally not primary/qualifying (HL5). Any-step oracle and true-hop
+    are different label-informed references; only the former bounds frozen state selection.
+12. JS report rounding agrees with raw exports. Its 97.5% intervals differ from P4-S-L's
+    99.166667% intervals. Reduced overshoot is not removal (JS1); joint_fact E2 crosses zero,
+    and long/stopped effects are negative (JS2–JS4). Radius diagnostics have no intervals or
+    fixed-point certification, and no stopped RS-reference CI is available (JS5/JS6).
+13. FR1's 8.9% is specific to the P1-L adapter denominator. B8 adds 9,216 parameters at
+    r=r_mem=32, but the symbolic unfactorized joint fraction is about 69.2%. Registered and
+    trainable counts differ for oracle/frozen components. Same-rank capability establishes
+    neither historical P2 practical-gate passage nor larger-rank efficiency.
+
 ## Statements the paper must not make
 
 These exclusions incorporate [plan §14.3](../../plan/recurrent_lora_research_plan_2026-10-26.md)
@@ -290,7 +552,8 @@ and the empirical/theory limits above.
   reasoning gain.” The evidence supports specific composition contrasts and several failures.
 - “Convergence/residual stability implies a correct answer,” “these stopping rules are
   certified,” or “fewer updates imply faster inference.” State error, correctness, and measured
-  latency require different evidence (Prop.7, H1–H5).
+  latency require different evidence (Prop.7, H1–H5, HL4, JS6). A reached-state radius below 1
+  is not a fixed-point, global-contraction, or answer certificate.
 - “An r² state stores r² arbitrary facts losslessly,” “fixed col(B) makes depth useless,” or
   “few extra parameters make extra computation almost free.” Capacity, function composition,
   state size, and runtime are separate quantities (Props.1–4, B7, H2).
@@ -300,7 +563,9 @@ and the empirical/theory limits above.
   assumptions (Props.5/10, S5/S9/S11, B1/B5).
 - “The method passes the general efficiency gate,” “the factorized follow-up measured an
   accuracy–latency advantage,” or “prepared-query timings establish end-to-end/training
-  savings.” P2-S Gate3 fails and the missing measurements remain open (B7/B8).
+  savings.” The original symbolic P2-S Gate3 fails and its missing measurements remain open
+  (B7/B8). Current same-rank capability is not larger-rank efficiency. B8 is not parameter
+  matched; its 8.9% overhead cannot be generalized beyond the stated P1-L adapter scope (FR1).
 - “Every seed improves,” “episode CIs establish new-training-seed robustness,” “the reused
   confirmation sample is independent replication,” or “screening stopping flags are
   confirmed gate passes.” Report the actual set, seed effects, selection, and CI scope.
@@ -310,18 +575,26 @@ and the empirical/theory limits above.
 - “IS proves the operator bound is tight,” “load alone caused the loss,” “the capability
   boundary is E36,” “load-specific training is always harmful,” or “low stale rates mean
   all update questions are answered correctly.” IS1–IS4 support only the stated layouts,
-  inherited protocols, readers, and metrics. No local-Jacobian or latent-readout study
-  is a completed result merely because it is preregistered or motivated by prior work.
+  inherited protocols, readers, and metrics. JS is now a completed regularization study,
+  but it does not certify stable terminal states or a successful overshoot remedy. Latent-readout
+  claims still need their own completed evidence.
+- “Learned halting repaired the six primary families,” “descriptive joint/M1 passed the primary
+  criterion,” “true-hop is an oracle upper bound,” or “chosen depth equals executed cost.”
+  HL1–HL5 distinguish the negative primary result, reference semantics, and physical counters.
+- “JS improved every endpoint” or “RS+J removed overshoot.” JS1–JS4 support reduced overshoot,
+  failed removal, a writer-dependent L4 result, and lower long-hop/stopped accuracy.
 
 ## Audit boundary
 
 All displayed empirical numbers were read from the committed CSV/JSON sources identified
 above, using bounded streaming CSV/JSON extraction and checking file provenance with git.
 Only fraction-to-percent conversion, equal-seed means already defined by the exports, and
-the explicitly disclosed A5 count pooling were used; no bootstrap was rerun and no new CI
+the explicitly disclosed A5/JS count pooling and FR1 static parameter accounting were used; no bootstrap was rerun and no new CI
 was invented. The decision/report Markdown was used to find claims and discrepancies,
 not as the numerical source. This task loaded no models or tensor traces, ran no training,
 evaluation, tests, or numerical experiments. The WP-T4 baseline audit submitted no compute
 jobs; WP-T6's committed-data figure render is recorded separately in
 [its report](../reports/WP-T6.md) and adds no scientific run or new interval. Earlier
-theory checks and IS's original audits/tests are historical evidence, not reruns here.
+theory checks, IS audits/tests, P4-S-L tests, and JS tests are historical evidence, not reruns here.
+WP-T7 source artifacts and protocol locks are enumerated above; any committed-data figure
+render is documented separately and supplies no new scientific endpoint or interval.

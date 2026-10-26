@@ -1,0 +1,281 @@
+{
+  "budget_node_hours": 1.5,
+  "checkpoints": [
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora/runs/p1s/main/20261026/runs/primary-oracle_random-M1-r32-s17/checkpoint.pt",
+      "checkpoint_hash": "5cfcfa0a8530ec2da3d01c84ba76754b",
+      "condition": "M1-mixed",
+      "config_hash": "d0e34ee470417a9e9759f89a9d473a49",
+      "name": "E12-oracle_random-M1-mixed-s17",
+      "seed": 17,
+      "writer": "oracle_random"
+    },
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora/runs/p1s/main/20261026/runs/primary-oracle_random-M1-r32-s29/checkpoint.pt",
+      "checkpoint_hash": "f6b35c6f243797d3fd77548de37e374a",
+      "condition": "M1-mixed",
+      "config_hash": "fd4a5262d11b7a164bfbc4bbe9767679",
+      "name": "E12-oracle_random-M1-mixed-s29",
+      "seed": 29,
+      "writer": "oracle_random"
+    },
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora/runs/p1s/main/20261026/runs/primary-oracle_random-M1-r32-s43/checkpoint.pt",
+      "checkpoint_hash": "3f9b21f8658f2c86f3ae8c074589b7b2",
+      "condition": "M1-mixed",
+      "config_hash": "9969584948b3e747b775c5d9a7736607",
+      "name": "E12-oracle_random-M1-mixed-s43",
+      "seed": 43,
+      "writer": "oracle_random"
+    },
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p1s/f2/main-readers/shard-02/f2-main-joint_fact-M1-s17/checkpoint.pt",
+      "checkpoint_hash": "1ca5fabe8741942ee947d643d24581f1",
+      "condition": "M1-mixed",
+      "config_hash": "8c92427ecc994c1d4a77b98c07470eaa",
+      "name": "E12-joint_fact-M1-mixed-s17",
+      "seed": 17,
+      "writer": "joint_fact"
+    },
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p1s/f2/main-readers/shard-00/f2-main-joint_fact-M1-s29/checkpoint.pt",
+      "checkpoint_hash": "020f263d1a74cb51aebf85b666984312",
+      "condition": "M1-mixed",
+      "config_hash": "f3871057d011c91442ae3e596c63cb22",
+      "name": "E12-joint_fact-M1-mixed-s29",
+      "seed": 29,
+      "writer": "joint_fact"
+    },
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p1s/f2/main-readers/shard-02/f2-main-joint_fact-M1-s43/checkpoint.pt",
+      "checkpoint_hash": "645cbdf31dd2853499361c3cd0f1923a",
+      "condition": "M1-mixed",
+      "config_hash": "f1a8387d979dd90f1d01a930123a3fa1",
+      "name": "E12-joint_fact-M1-mixed-s43",
+      "seed": 43,
+      "writer": "joint_fact"
+    },
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p2s-f1/main/shard-00/main-oracle_random-M1-r32-m32-s17-lr0.003/checkpoint.pt",
+      "checkpoint_hash": "d6b4177960c2001c5073aeeb223c808f",
+      "condition": "M1-L4",
+      "config_hash": "fa390f799c5b7990cf8771f0d6da1da1",
+      "name": "E12-oracle_random-M1-L4-s17",
+      "seed": 17,
+      "writer": "oracle_random"
+    },
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p2s-f1/main/shard-01/main-oracle_random-M1-r32-m32-s29-lr0.003/checkpoint.pt",
+      "checkpoint_hash": "a8e70ae634d120026c938d3b83b6e681",
+      "condition": "M1-L4",
+      "config_hash": "b7763772ec47f769a83b8de044ea9510",
+      "name": "E12-oracle_random-M1-L4-s29",
+      "seed": 29,
+      "writer": "oracle_random"
+    },
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p2s-f1/main/shard-02/main-oracle_random-M1-r32-m32-s43-lr0.003/checkpoint.pt",
+      "checkpoint_hash": "8196ca139f65aa5dca9798a94ad13205",
+      "condition": "M1-L4",
+      "config_hash": "bdf5b575e1e3268e2ed110b8b1cb3f4e",
+      "name": "E12-oracle_random-M1-L4-s43",
+      "seed": 43,
+      "writer": "oracle_random"
+    },
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p2s-f1/main/shard-00/main-joint_fact-M1-r32-m32-s17-lr0.003/checkpoint.pt",
+      "checkpoint_hash": "f5c6175686e4f03ffcc6392ce02ab022",
+      "condition": "M1-L4",
+      "config_hash": "3a14d11bff634b58cfb2c92c7fe1d2e3",
+      "name": "E12-joint_fact-M1-L4-s17",
+      "seed": 17,
+      "writer": "joint_fact"
+    },
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p2s-f1/main/shard-01/main-joint_fact-M1-r32-m32-s29-lr0.003/checkpoint.pt",
+      "checkpoint_hash": "86b42025de037499eea42f5d1875b5ba",
+      "condition": "M1-L4",
+      "config_hash": "62b284e2c321a2d5d181f323f783c1be",
+      "name": "E12-joint_fact-M1-L4-s29",
+      "seed": 29,
+      "writer": "joint_fact"
+    },
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p2s-f1/main/shard-02/main-joint_fact-M1-r32-m32-s43-lr0.003/checkpoint.pt",
+      "checkpoint_hash": "d7b36bc43b7eb6a1b9a7585d9f213f3b",
+      "condition": "M1-L4",
+      "config_hash": "dc326b71d57a91bb9c23002d4867bd9d",
+      "name": "E12-joint_fact-M1-L4-s43",
+      "seed": 43,
+      "writer": "joint_fact"
+    }
+  ],
+  "conditions": [
+    "RS",
+    "RS+J"
+  ],
+  "confirmation": {
+    "after_all_12_training": true,
+    "aggregate_after_all_24_traces": true,
+    "depths": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16
+    ],
+    "episodes": 2000,
+    "hops": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "radius_depths": [
+      4,
+      8,
+      16
+    ],
+    "seed": 999003
+  },
+  "execution": "IS-tested all-valid support writes; shared reader update unchanged",
+  "main_plan_hash": "a8069c6281c0b244cbf805bf0ef8cceb",
+  "model": {
+    "activation": "relu",
+    "r": 32,
+    "r_mem": 32,
+    "rho": 0.25,
+    "variant": "M1"
+  },
+  "penalty": {
+    "backend_fixed_before_scores": true,
+    "gamma": 0.9,
+    "gradient_gate": "ReLU derivative at zero is zero; the boolean gate has zero local derivative",
+    "lambda_J": 1,
+    "method": {
+      "backend": "cpu",
+      "dtype": "float32",
+      "eigenvalue_function": "torch.linalg.eigvals(J).abs().amax(-1)",
+      "gradients": "autograd through exact eigenvalues and J parameters/memory; ReLU derivative is locally constant",
+      "jacobian": "rho * diag(1[Rz+UMQz>0]) * (R+UMQ), evaluated at final state z_L",
+      "method": "exact_eigvals",
+      "penalty": "mean_episode mean_query relu(radius-.9)^2; lambda=1",
+      "selection": "minimum measured exact forward/backward time; no scores",
+      "tests": "tests/test_js.py",
+      "timing": [
+        {
+          "backend": "cpu",
+          "batch_episodes": 64,
+          "queries": 4,
+          "r": 32,
+          "repeats": 5,
+          "seconds_forward_backward": 0.07273430461063982
+        },
+        {
+          "backend": "cuda",
+          "batch_episodes": 64,
+          "queries": 4,
+          "r": 32,
+          "repeats": 5,
+          "seconds_forward_backward": 0.36002531021367756
+        }
+      ],
+      "zero_relu_derivative": 0,
+      "acceptance": {
+        "job_id": "3715867",
+        "tests_passed": 6,
+        "source_commit": "5d4abd9b67583eef9a5d0f66a4b4feeffceec62d",
+        "explicit_autograd_jacobian": "float64 r32, atol/rtol 1e-12",
+        "all_parameter_gradients": "atol1e-9/rtol1e-8",
+        "finite_difference": "directional penalty derivative atol1e-7/rtol1e-5",
+        "nonnormal_complex_and_zero_cases": true
+      }
+    },
+    "statistic": "mean_episode mean_query relu(spectral_radius(J(z_L))-.9)^2"
+  },
+  "prereg": "docs/prereg/JS.md",
+  "reference_plan_hash": "681bb97b72355fc316a4b44752f101c2",
+  "seeds": [
+    17,
+    29,
+    43
+  ],
+  "smoke_plan_hash": "036f57328f06edde353d98372fecf399",
+  "statistics": {
+    "cluster": "paired episode; fixed training seeds averaged",
+    "confidence": 0.975,
+    "descriptive": "RS minus each reference at L4/16, hops1-3,4-8,1-8; hop1 by every L; radius distributions",
+    "primary": "DeltaS = (RS+J@16 - RS+J@4) - (RS@16 - RS@4), hops1-3",
+    "removes_overshoot": "DeltaS point > 0 and CI low > 0 and S(RS+J) point >= -.01",
+    "resamples": 2000,
+    "seed": 2718
+  },
+  "stopping": {
+    "eps": 1e-12,
+    "max_steps": 16,
+    "rule": "WP-C3 relative_change",
+    "scope": "one threshold per writer/condition, shared over three seeds; references included",
+    "selected_thresholds_committed_before_confirmation": true,
+    "selection": "maximum validation correct count across hops1-8 and seeds; ties fewer total steps, then smaller threshold",
+    "thresholds": [
+      0,
+      0.001,
+      0.003,
+      0.01,
+      0.03,
+      0.1,
+      0.2,
+      0.3,
+      0.5,
+      0.7,
+      1,
+      1.5,
+      2,
+      4
+    ],
+    "validation_episodes": 2000,
+    "validation_seed": 4242,
+    "statistics_sentinel_L": 17,
+    "display_label": "stopped; sentinel17 denotes the selected z1..z16, never a seventeenth read"
+  },
+  "task": {
+    "E": 12,
+    "chain_lengths": [
+      8,
+      4
+    ],
+    "train_hops": [
+      1,
+      2,
+      3
+    ]
+  },
+  "training": {
+    "batch_size": 64,
+    "data_seed": "derive_seed(training_seed, train_data)",
+    "depth_seed": "derive_seed(training_seed, train, depths)",
+    "loop_sampling": "one independent Uniform{4,5,6,7,8} draw per batch",
+    "lr": 0.003,
+    "paired_randomness": "same data and depth RNG streams across RS and RS+J at each training seed",
+    "steps": 15000
+  },
+  "writers": [
+    "oracle_random",
+    "joint_fact"
+  ]
+}

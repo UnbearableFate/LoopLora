@@ -1,0 +1,70 @@
+{
+  "git_commit": "7e776bd2601ee346805aadb48cb6131b205b2fcc",
+  "provisional_steps": 24000,
+  "quality_scores_exposed": false,
+  "rows": [
+    {
+      "arm": "W5",
+      "artifact_gate_passed": true,
+      "eval100_seconds": [
+        0.8932254877872765,
+        0.8963775727897882,
+        0.9070262783206999,
+        1.157676599919796,
+        0.9015342709608376
+      ],
+      "host": "mg0855",
+      "job_id": "3716039.opbs",
+      "rank": 128,
+      "reload_identical": true,
+      "steady_step_mean_seconds": 0.19005366475243418,
+      "step_p95_seconds": 0.19762717497069388,
+      "steps": 2400,
+      "total_seconds": 477.576263200026
+    },
+    {
+      "arm": "R",
+      "artifact_gate_passed": true,
+      "eval100_seconds": [
+        0.8949541379697621,
+        0.8982153749093413,
+        0.8855008520185947,
+        1.069871723651886,
+        0.9057788052596152
+      ],
+      "host": "mg0855",
+      "job_id": "3716039.opbs",
+      "rank": 128,
+      "reload_identical": true,
+      "steady_step_mean_seconds": 0.19012617637387721,
+      "step_p95_seconds": 0.19771381914615632,
+      "steps": 2400,
+      "total_seconds": 477.57634883280843
+    },
+    {
+      "arm": "OA",
+      "artifact_gate_passed": true,
+      "eval100_seconds": [
+        0.722121266182512,
+        0.7174979830160737,
+        0.7300041490234435,
+        0.9852846791036427,
+        0.723713330924511
+      ],
+      "host": "mg0897",
+      "job_id": "3716040.opbs",
+      "rank": 128,
+      "reload_identical": true,
+      "steady_step_mean_seconds": 0.1504483402198157,
+      "step_p95_seconds": 0.15257573556154966,
+      "steps": 2400,
+      "total_seconds": 383.6543108471669
+    }
+  ],
+  "science_commit": "be07f7fb34c1cdd14b64f65b7f687364fcd6e36f",
+  "smoke_fraction_evaluation": 0.1,
+  "smoke_fraction_provisional_steps": 0.1,
+  "source_and_sample_artifacts_verified": true,
+  "source_dirty": false,
+  "source_hash": "58574e4559f33e9ccfbc5f952d8715be"
+}

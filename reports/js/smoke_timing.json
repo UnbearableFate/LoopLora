@@ -1,0 +1,59 @@
+{
+  "episodes": 200,
+  "job_id": "3715904.opbs",
+  "procs": 4,
+  "scores_read": false,
+  "status": "passed",
+  "steps": 1500,
+  "suite_seconds": 108.32409407291561,
+  "timing": [
+    {
+      "active_batches": 0,
+      "active_queries": 0,
+      "condition": "RS",
+      "max_penalty": 0.0,
+      "max_radius": null,
+      "peak_memory_bytes": 82724864,
+      "penalty_finite": true,
+      "train_seconds": 22.474745801184326,
+      "writer": "oracle_random",
+      "radius_measured_during_training": false
+    },
+    {
+      "active_batches": 1177,
+      "active_queries": 119598,
+      "condition": "RS+J",
+      "max_penalty": 0.019403379410505295,
+      "max_radius": 1.5474669933319092,
+      "peak_memory_bytes": 83607552,
+      "penalty_finite": true,
+      "train_seconds": 89.94358006794937,
+      "writer": "oracle_random",
+      "radius_measured_during_training": true
+    },
+    {
+      "active_batches": 0,
+      "active_queries": 0,
+      "condition": "RS",
+      "max_penalty": 0.0,
+      "max_radius": null,
+      "peak_memory_bytes": 90504192,
+      "penalty_finite": true,
+      "train_seconds": 32.973664889112115,
+      "writer": "joint_fact",
+      "radius_measured_during_training": false
+    },
+    {
+      "active_batches": 737,
+      "active_queries": 2979,
+      "condition": "RS+J",
+      "max_penalty": 0.0038237005937844515,
+      "max_radius": 1.5307931900024414,
+      "peak_memory_bytes": 91419648,
+      "penalty_finite": true,
+      "train_seconds": 98.34792730305344,
+      "writer": "joint_fact",
+      "radius_measured_during_training": true
+    }
+  ]
+}

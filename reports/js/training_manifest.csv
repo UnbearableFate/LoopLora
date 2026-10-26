@@ -1,0 +1,13 @@
+name,writer,condition,seed,checkpoint,steps,batch_size,lr
+js-oracle_random-RS-s17,oracle_random,RS,17,/work/xg24i002/x10041/LoopLora-wt/symf/runs/js/main/js-oracle_random-RS-s17/checkpoint.pt,15000,64,0.003
+js-oracle_random-RS-s29,oracle_random,RS,29,/work/xg24i002/x10041/LoopLora-wt/symf/runs/js/main/js-oracle_random-RS-s29/checkpoint.pt,15000,64,0.003
+js-oracle_random-RS-s43,oracle_random,RS,43,/work/xg24i002/x10041/LoopLora-wt/symf/runs/js/main/js-oracle_random-RS-s43/checkpoint.pt,15000,64,0.003
+js-oracle_random-RSJ-s17,oracle_random,RS+J,17,/work/xg24i002/x10041/LoopLora-wt/symf/runs/js/main/js-oracle_random-RSJ-s17/checkpoint.pt,15000,64,0.003
+js-oracle_random-RSJ-s29,oracle_random,RS+J,29,/work/xg24i002/x10041/LoopLora-wt/symf/runs/js/main/js-oracle_random-RSJ-s29/checkpoint.pt,15000,64,0.003
+js-oracle_random-RSJ-s43,oracle_random,RS+J,43,/work/xg24i002/x10041/LoopLora-wt/symf/runs/js/main/js-oracle_random-RSJ-s43/checkpoint.pt,15000,64,0.003
+js-joint_fact-RS-s17,joint_fact,RS,17,/work/xg24i002/x10041/LoopLora-wt/symf/runs/js/main/js-joint_fact-RS-s17/checkpoint.pt,15000,64,0.003
+js-joint_fact-RS-s29,joint_fact,RS,29,/work/xg24i002/x10041/LoopLora-wt/symf/runs/js/main/js-joint_fact-RS-s29/checkpoint.pt,15000,64,0.003
+js-joint_fact-RS-s43,joint_fact,RS,43,/work/xg24i002/x10041/LoopLora-wt/symf/runs/js/main/js-joint_fact-RS-s43/checkpoint.pt,15000,64,0.003
+js-joint_fact-RSJ-s17,joint_fact,RS+J,17,/work/xg24i002/x10041/LoopLora-wt/symf/runs/js/main/js-joint_fact-RSJ-s17/checkpoint.pt,15000,64,0.003
+js-joint_fact-RSJ-s29,joint_fact,RS+J,29,/work/xg24i002/x10041/LoopLora-wt/symf/runs/js/main/js-joint_fact-RSJ-s29/checkpoint.pt,15000,64,0.003
+js-joint_fact-RSJ-s43,joint_fact,RS+J,43,/work/xg24i002/x10041/LoopLora-wt/symf/runs/js/main/js-joint_fact-RSJ-s43/checkpoint.pt,15000,64,0.003
