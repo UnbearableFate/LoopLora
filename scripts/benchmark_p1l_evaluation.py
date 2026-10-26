@@ -72,8 +72,10 @@ def main():
     try:
         base = copy.deepcopy(experiment.config)
         base["smoke"] = True
+        protocols = (["memory_only", "context_retained"] if base["variant"] in {"B0", "B1", "B2"}
+                     else ["memory_only"])
         base["eval"].update(episodes=200, hops=list(range(1, 9)), splits=["val"],
-                            allow_confirmation=False, counterfactuals=False, protocols=["memory_only"])
+                            allow_confirmation=False, counterfactuals=False, protocols=protocols)
         if base["variant"] == "M1":
             base["eval"]["depths"] = list(range(1, 9))
         cfg = resolve_config(base)
@@ -89,18 +91,19 @@ def main():
             _, timing = evaluate(experiment, current, args.out / setting)
             result["phases"][setting] = dict(seconds=time.perf_counter()-before,
                                                 evaluation_seconds=timing["evaluation_seconds"])
-        before = time.perf_counter()
-        swap_successors(experiment, cfg, args.out)
-        result["phases"]["swap"] = dict(seconds=time.perf_counter()-before)
-        direction_record = json.loads((args.directions.parent / "record.json").read_text())
-        if direction_record["file_hash"] != digest(args.directions) or direction_record["trial"]:
-            raise ValueError("invalid fixed name-gradient probe cache")
-        directions = torch.load(args.directions, map_location="cpu", weights_only=True)
-        before = time.perf_counter()
-        readout(experiment, cfg, directions, args.out)
-        result["phases"]["readout"] = dict(seconds=time.perf_counter()-before)
+        if cfg["variant"] in {"M1", "B8"}:
+            before = time.perf_counter()
+            swap_successors(experiment, cfg, args.out)
+            result["phases"]["swap"] = dict(seconds=time.perf_counter()-before)
+            direction_record = json.loads((args.directions.parent / "record.json").read_text())
+            if direction_record["file_hash"] != digest(args.directions) or direction_record["trial"]:
+                raise ValueError("invalid fixed name-gradient probe cache")
+            directions = torch.load(args.directions, map_location="cpu", weights_only=True)
+            before = time.perf_counter()
+            readout(experiment, cfg, directions, args.out)
+            result["phases"]["readout"] = dict(seconds=time.perf_counter()-before)
+            result["branch_audit"] = audit_answer_branches(experiment, cfg)
         inference_timing(experiment, cfg, args.out)
-        result["branch_audit"] = audit_answer_branches(experiment, cfg)
         result.update(status="complete", total_seconds=time.perf_counter()-started)
         save(args.out / "timing.json", result)
         print(json.dumps(result), flush=True)
