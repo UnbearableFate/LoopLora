@@ -8,18 +8,23 @@ With one module, a fixed input projection and writer, and the same memory snapsh
 multi-read (M1) beat the single read (B4), the fixed-query loop (B5) and the no-memory loop (B3)? (plan §15)
 
 ## Fixed design
-- Backbone: `sym.backbone`, `backbone_seed = 1`, d_e = 64, V = 1024 (seen pool [0,768), unseen [768,1024)).
+- Backbone: `sym.backbone`, `backbone_seed = 31415`, d_e = 64, V = 1024 (seen pool [0,768), unseen [768,1024)).
 - Module: notation v1; ρ = 0.25, α = 1, r_m = r; primary r = 32, secondary r = 16.
 - Writer conditions: `oracle_random`, `oracle_orth` (r = 32), `t1_frozen`, `joint` (WP-D table).
   `t1_frozen` writer: trained on `t1` with n_rel = 4, head_sharing = 0.3, E = E* ⟨pilot⟩, then frozen.
 - Primary task `t2_chain_end`, E = E* facts, chain lengths ⟨pilot: (8,4,2,2) if E*=16, (8,8,4,2,2) if E*=24⟩;
   train hops {1,2,3}; evaluation hops 1–8 (one query per hop per episode).
-- Replication task `t2_typed` (relation-0 chains plus same-head distractors in relations 1–3, same E*).
+- Replication setting: `t2_typed` (relation-0 chains plus same-head distractors in relations 1–3, same E*) for
+  the learned writers; oracle keys ignore relations, so for `oracle_*` the replication is `t2_chain_end` at load
+  1.5·E* (interference condition, `oracle_random`).
 - Exploratory: `t2_walk` (h stated), `test_unseen`, counterfactuals, r = 16, L-extrapolation.
 - Variants: M1 (`iterq`, ReLU), M1-lin (`iterq`, identity), B5 (`fixedq`), B3 (`loop`), B4 (`iterq` at L=1).
   Training depth: L ~ U{1,2,4} per batch (B4: L = 1). Same steps and batch for every variant.
-- Episode sets: val = split `val` [0, 2000); screening test = `test` [0, 2000);
-  **confirmation test = `test` [100000, 102000)**, untouched until the gate evaluation.
+- Episode sets (eval generator seed 4242 unless stated): val = split `val`, 1000 episodes; screening test = split
+  `test`, 2000 episodes; **confirmation test = split `test` with eval seed 777001, 2000 episodes**, untouched until
+  the gate evaluation. Every evaluation episode carries one query per hop 1–8.
+- Optimisation: AdamW, batch 64 episodes, 5000 steps, warmup 20, weight decay 0.01, clip 1.0, constant lr
+  after warmup; identical for all variants within a condition.
 
 ## Pilots (validation only, seed 17)
 - Pilot-1: `t1` writer+L=1 reader, r ∈ {16,32}, E ∈ {8,12,16,24}, lr ∈ {3e-4,1e-3,3e-3}. Output: capacity table.
