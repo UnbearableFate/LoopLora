@@ -100,3 +100,13 @@ waitsforALL7; immutable selection includesrank. ConditionalE8bestacrossboth
 ranks usesrankselected, commonA2implementation/source,smokegate supports
 --E8-decision lock throughCLI --e8-decision, --rank and --arms. Separate
 e8-release.json; scienceROOT/e8/ARM. No furtherwritertrainingotherwise.
+
+CURRENT WAKE-UP (A2 smoke boundary): old3715708 observer46f49560 canceled;
+PBS3715707/08 themselves are untouched. New message-mode observer on smoke
+3716039: .job-wakeup/debda6d3-3982-4fc0-96d7-068d88d57eba, worker2025081,
+5minpoll, thread01a1779d-c123-75a1-9458-ae849ee0fcde, noGoal. Onwake inspect/ack,
+verifyBOTHsmokes, run timing/artifact gate ONCOMPUTE, then submit all3rank128
+scientificarms BEFORE reading ANY WP-L4 validation quality. Noqualityreadyet.
+Usecurrentexplicitc041efef8f3964dd18faf207971647c88e9a4db0 (or laterwp/llm)
+for gate/analyzer code; use FROZENbe07f7f for rank128 science matching smoke.
+Re-arm on finalnewscientificjob aftersubmission; keep both r32jobs unchanged.
