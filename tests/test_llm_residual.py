@@ -1,6 +1,4 @@
 """Residual input changes only A's source and preserves the memory protocol."""
-from dataclasses import replace
-
 import pytest
 import torch
 from torch import nn
@@ -61,7 +59,7 @@ def test_residual_qwen_checkpoint_gradients_dimensions_and_teardown(tmp_path):
     tokenizer = load_tokenizer()
     cfg = writer_config('residual-test',16,'fact_final',.0003,32,1500)
     cfg['model'].update(layer=1,r=4,input_site='residual')
-    cfg['train']['steps']=1
+    cfg['train']['steps']=2
     original = model.model.layers[1].self_attn.o_proj
     original_hooks = len(model.model.layers[1]._forward_pre_hooks)
     experiment,summary = train(cfg,tmp_path,model=model,tokenizer=tokenizer)
@@ -69,7 +67,8 @@ def test_residual_qwen_checkpoint_gradients_dimensions_and_teardown(tmp_path):
     try:
         assert experiment.adapter.A.shape==(4,16)
         assert experiment.bank.modules[1].base.in_features==32
-        assert summary['steps']==1 and experiment.adapter.A.grad.abs().sum()>0
+        # B starts at zero; A first receives a loss gradient on step two.
+        assert summary['steps']==2 and experiment.adapter.A.grad.abs().sum()>0
         assert experiment.adapter.B.dtype==torch.float32
         with torch.no_grad():
             batch = experiment.prepare(arrays)
