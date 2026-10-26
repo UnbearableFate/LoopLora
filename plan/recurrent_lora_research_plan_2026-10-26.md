@@ -47,8 +47,17 @@
 
 ### E.3 任务状态
 
-| 任务 | 状态（2026-10-26 晚） |
+| 任务 | 状态 |
 | --- | --- |
+| T-01 符号表 | 完成（2026-10-26）：`docs/notation.md` |
+| T-02 参考实现与 Gate 0 测试 | 完成（WP-A，`docs/reports/WP-A.md`）：7 种变体、函数式 delta 记忆、写前快照 scan、Appendix-A oracle、混合精度 wrapper、记账与收缩界；304 项测试在计算节点通过 |
+| T-03 关系数据生成器 | 完成（WP-B，`docs/reports/WP-B.md`）：t1/t2_chain_end/t2_walk/t2_typed/t3_update/t3_missing 与三类反事实；105 项测试通过；≥ 20k episodes/s |
+| T-07 LLM 注入与吞吐 pilot | 完成（WP-E，`docs/reports/WP-E.md`）：Qwen3-0.6B-Base 注入、memory-only/context-retained 协议、teacher forcing 与增量解码一致、1024 个单 token 名字；54 项测试通过；吞吐 pilot 见报告 |
+| T-04/T-05 符号机制流水线与首轮实验 | 流水线进行中（WP-D）；P1-S 预注册草稿 `docs/prereg/P1S.md` |
+| T-04/T-05 LLM 单模块流水线 | 进行中（WP-G）；P1-L 预注册草稿 `docs/prereg/P1L.md` |
+| T-06、T-08、T-09、T-10 | 未开始；按阶段门槛决定。文献核查（T-10 前置）已完成：`docs/reports/lit_check.md` |
+
+--- | --- |
 | T-01 符号表 | 完成：`docs/notation.md` |
 | T-02 参考实现与 Gate 0 测试 | 进行中（WP-A，`docs/tasks/WP-A_core.md`） |
 | T-03 关系数据生成器 | 进行中（WP-B） |
