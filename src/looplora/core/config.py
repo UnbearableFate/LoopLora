@@ -1,0 +1,67 @@
+"""Binding adapter shapes and initialization from docs/notation.md."""
+from __future__ import annotations
+
+from dataclasses import dataclass
+import math
+from typing import Literal
+
+Variant = Literal["lora", "parallel", "loop", "iterq", "fixedq", "unshared", "double_ba"]
+MEMORY_VARIANTS = frozenset({"iterq", "fixedq", "unshared"})
+
+
+@dataclass(frozen=True)
+class AdapterConfig:
+    d_in: int
+    d_out: int
+    r: int
+    variant: Variant = "iterq"
+    r_mem: int | None = None
+    rho: float = 0.25
+    alpha: float = 1.0
+    gate: Literal["scalar", "input"] = "scalar"
+    lambda_init: float = 0.99
+    beta_init: float = 0.1
+    eps: float = 1e-6
+    sigma_r: float = 0.5
+    sigma_u: float = 0.5
+    sigma_q: float = 1.0
+    sigma_k: float = 1.0
+    sigma_v: float = 1.0
+    eta: float = 1.0
+    unshared_steps: int = 1
+    double_ba_form: Literal["skip", "gated"] = "skip"
+    activation: Literal["relu", "identity"] = "relu"
+
+    def __post_init__(self) -> None:
+        if self.r_mem is None:
+            object.__setattr__(self, "r_mem", self.r)
+        for name in ("d_in", "d_out", "r", "r_mem"):
+            value = getattr(self, name)
+            if isinstance(value, bool) or not isinstance(value, int) or value <= 0:
+                raise ValueError(f"{name} must be a positive integer")
+        if self.variant not in {"lora", "parallel", "loop", *MEMORY_VARIANTS, "double_ba"}:
+            raise ValueError(f"unknown variant: {self.variant!r}")
+        if self.gate not in {"scalar", "input"}:
+            raise ValueError("gate must be 'scalar' or 'input'")
+        if self.activation not in {"relu", "identity"}:
+            raise ValueError("activation must be 'relu' or 'identity'")
+        if self.double_ba_form not in {"skip", "gated"}:
+            raise ValueError("double_ba_form must be 'skip' or 'gated'")
+        if self.variant == "double_ba" and self.d_in != self.d_out:
+            raise ValueError("double_ba requires d_in == d_out")
+        validate_steps(self.unshared_steps)
+        for name in ("lambda_init", "beta_init"):
+            if not 0 < getattr(self, name) < 1:
+                raise ValueError(f"{name} must lie strictly between 0 and 1")
+        for name in ("rho", "alpha", "eta", "eps", "sigma_r", "sigma_u", "sigma_q", "sigma_k", "sigma_v"):
+            if not math.isfinite(getattr(self, name)):
+                raise ValueError(f"{name} must be finite")
+        if self.eps <= 0:
+            raise ValueError("eps must be positive")
+        if any(getattr(self, name) < 0 for name in ("sigma_r", "sigma_u", "sigma_q", "sigma_k", "sigma_v")):
+            raise ValueError("initialization scales must be nonnegative")
+
+
+def validate_steps(loop_steps: int) -> None:
+    if isinstance(loop_steps, bool) or not isinstance(loop_steps, int) or loop_steps < 0:
+        raise ValueError("loop_steps must be a nonnegative integer")
