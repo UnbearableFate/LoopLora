@@ -1,5 +1,12 @@
 # WP-P1L — in progress
 
+Operation-window correction06:50JST: normal operation ends10/27 08:00 per
+/etc/motd. Orchestrator authorized post10/28 22:00 confirmation and retaining
+B1/B2s43 queued. Four unstarted B4+B3 packs were cancelled and replaced by
+eight same-config/seed/S/lr singles3716612–3716619 at measured1.5x walltime
+(57m26s–58m21s), fitting07:58 if assigned promptly. Manifests updated; cancelled
+receipts retained. Details/evidence in P1L-state.md/dedicated-boundary-splits.json.
+
 Oracle-random design/all22 run configs were committed before training(ea44bb6).
 The orchestrator's J-lens-inspired name-gradient probe A1 amendment was committed before Pilot-2(b5d923c).
 Merged master Amendments B1/B2: B2 supersedes the total cap, fixes S17000 and

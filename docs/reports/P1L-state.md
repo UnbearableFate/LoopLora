@@ -1,5 +1,35 @@
 # wk-p1l continuation card — both ranks' main training submitted
 
+## URGENT operation-window correction — orchestrator 2026-10-27 06:50JST
+
+`/etc/motd` confirms NORMAL OPERATION ENDS TODAY10/27 08:00JST (HPC Challenge
+until10/28 09:00, then maintenance until10/28 22:00). The prior assumption that
+jobs could start up to10/28 09:00 was wrong. Orchestrator explicitly authorizes
+confirmation after10/28 22:00, and leaving B1/B2-s43 queued until then.
+Confirmation remains HELD for all main runs and the explicit WP-L4 decision.
+
+At06:51JST replaced exactly four QUEUED, unstarted B4+B3 packs with eight
+single-run jobs. Original source/configs/seeds/S17000/lrs preserved:
+- r32s43: cancelled3716303 -> B4 3716612, B3-L4 3716613, sourced644b9b.
+- r128s17: cancelled3716399 -> B4 3716614, B3-L4 3716615, source1d1bbfd.
+- r128s29: cancelled3716403 -> B4 3716616, B3-L4 3716617, source1d1bbfd.
+- r128s43: cancelled3716407 -> B4 3716618, B3-L4 3716619, source1d1bbfd.
+Requested walltimes include ceil1.5*(S*measured_step+measured_overhead+30s
+load reserve): r32 B4 57m26s/B3 58m20s; r128 B4 57m38s/B3 58m21s.
+Each fit a07:58JST finish when submitted. Project11/16 running at submission;
+eight new jobs await assignment, so check which start before about06:59JST.
+Do not cancel/alter B1/B2s43 jobs3716304/3716305: retain for10/28 22:00.
+Exact evidence reports/p1l/dedicated-boundary-splits.json; one-time stdlib
+control script scripts/split_p1l_packed_jobs.py. It must NOT be rerun blindly.
+Both main-jobs.json files preserve cancelled receipts under superseded_jobs;
+training manifests now map replacement paths and retain22/15 run identities.
+Rank32 now20 active receipts; rank12815 (cancelled packs retained separately).
+The old r128 watcher404cd2e5 watches CANCELLED3716407: acknowledge its wakeup,
+but this means no training succeeded; inspect replacement singles and arm an
+appropriate remaining replacement job only after reconciling the existing event.
+Rank32 watcher3716305 remains pending for the post-maintenance B2 completion.
+
+
 Worktree /work/xg24i002/x10041/LoopLora-wt/p1l, branchwp/p1l. User assigned
 WP-P1L; finish docs/reports/P1L.md and only then reply exactly
 `WP-P1L done: docs/reports/P1L.md`. Do not call this task complete prematurely.
