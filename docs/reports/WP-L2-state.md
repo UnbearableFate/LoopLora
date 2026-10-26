@@ -15,10 +15,11 @@ Persistent root: /work/xg24i002/x10041/LoopLora/runs/p1l/diagnosis-20261026/
 - 3713139 D2: COMPLETE (root/D2), source99daecb;3 lr,1500steps; bestEM.987.
 - 3713165 D3: COMPLETE (mg1048,root/D3), source99daecb;2 lr,6400steps;
   finalEM.0/.001, keytop1 .071/.075 vs chance.0625. PBS3395s.
-- 3713783 first residual test submission canceled (bad nonexistent test path);
+- 3713783 first residual test submission had a nonexistent test path (exit4);
   scheduler start raced qdel:7 allocated seconds. Include this cost; no check passed.
 - 3713800 residual + training/evaluation/run tests:68passed (mg0746), source3c1cffb.
-- D4 submitted 23:13 JST; root/D4, source3c1cffb; same2lrs,6400steps.
+- 3713853 D4 running (mg0833,root/D4), source3c1cffb; same2lrs,6400steps.
+  Started23:14:43 JST. Log d-l2-residual-20261026-231329-2811503.log.
 Logs: /work/xg24i002/x10041/LoopLora/logs/pbs/d-l2-*-20261026-*.log.
 
 D1: question-final o14 rank32 start99.4%, relation100%; fact-final tail84.15%,

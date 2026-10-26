@@ -63,3 +63,13 @@ Future ordinary validation/test sets start at episode 0, up to 2000 episodes;
 confirmation maps to test [100000,102000) and requires explicit
 `allow_confirmation=true` with `smoke=false`, matching the current P1-L task.
 Those options provide implementation support, not authorization to run them.
+
+WP-L2 adds `model.input_site: residual` as a diagnostic alternative to the
+default `o_proj`. It projects the pre-layer residual with A, while the frozen
+attention projection and adapter output remain at that layer's o_proj. Adapter
+input width is the residual hidden width; output width is unchanged. Use
+`attach_adapters(..., input_site="residual")` for the same lower-level option.
+Residual writer checkpoints record the site and input dimensions and cannot be
+loaded into the default site. Existing default-site checkpoints retain their
+signature and remain loadable. This option alone grants no experiment scope;
+WP-L2's decision is recorded in `docs/reports/P1L-diagnosis.md`.
