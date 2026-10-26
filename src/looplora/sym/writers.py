@@ -81,3 +81,33 @@ class LearnedWriter(nn.Module):
             state = write(state, u[:, t], valid[:, t], K=self.K, V=self.V,
                           lam=self.a_lambda.sigmoid(), beta=self.a_beta.sigmoid(), eps=1e-6)
         return state, F.linear(u, self.V)
+
+
+class FactorizedWriter(nn.Module):
+    """Tail-blind keys/queries and head/relation-blind values, by construction."""
+
+    def __init__(self, d_in: int, r: int, r_mem: int, seed: int,
+                 lambda_init: float = .99, beta_init: float = .1) -> None:
+        super().__init__()
+        if d_in < 3 or d_in % 3:
+            raise ValueError("factorized writer requires d_in = 3 * d_e")
+        self.d_e, self.r_mem = d_in // 3, r_mem
+        # Reuse the exact seeded initialization stream, including K/V and gates.
+        initial = LearnedWriter(d_in, r, r_mem, seed, lambda_init, beta_init)
+        self.A_k = nn.Parameter(initial.A[:, :2 * self.d_e].detach().clone())
+        self.A_v = nn.Parameter(initial.A[:, 2 * self.d_e:].detach().clone())
+        self.K, self.V = initial.K, initial.V
+        self.a_lambda, self.a_beta = initial.a_lambda, initial.a_beta
+
+    def u(self, x: Tensor) -> Tensor:
+        return F.linear(x[..., :2 * self.d_e], self.A_k)
+
+    def forward(self, x: Tensor, valid: Tensor) -> tuple[Tensor, Tensor]:
+        key_raw = F.linear(self.u(x), self.K)
+        keys = key_raw / torch.linalg.vector_norm(key_raw, dim=-1, keepdim=True).clamp_min(1e-6)
+        values = F.linear(F.linear(x[..., 2 * self.d_e:], self.A_v), self.V)
+        state = zeros_state(len(x), self.r_mem, x.dtype, x.device)
+        lam, beta = self.a_lambda.sigmoid(), self.a_beta.sigmoid()
+        for t in range(x.shape[1]):
+            state = delta_update(state, keys[:, t], values[:, t], valid[:, t], lam, beta)
+        return state, values

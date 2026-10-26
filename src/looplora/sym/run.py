@@ -88,7 +88,8 @@ def run_one(config: dict[str, Any], out: str | Path) -> dict[str, Any]:
     _write_json(out / "config.json", {"config": config, "config_hash": config_hash, **provenance})
     from looplora.data.relations import GENERATOR_VERSION
 
-    consumed_writer = config["pretrain"]["writer_checkpoint"] if config["writer"] == "t1_frozen" else None
+    consumed_writer = (config["pretrain"]["writer_checkpoint"]
+                       if config["writer"] in {"t1_frozen", "t1_frozen_fact"} else None)
     record: dict[str, Any] = {
         "experiment_id": config["name"], "status": "running", "config_hash": config_hash,
         **provenance, "data_seed": derive_seed(config["seed"], "train_data"),
