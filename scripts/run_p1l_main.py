@@ -112,7 +112,7 @@ def train_stage(args) -> None:
             base["seed"] = derive_seed(20261027, "p1l-main", "timing-smoke")
             base["smoke"] = True
             base["train"]["steps"] = args.steps
-            base["train"]["log_every"] = max(1, args.steps // 10)
+            base["train"]["log_every"] = 1
             base["eval"]["episodes"] = 100
         elif args.stage == "pilot":
             if args.steps is None:

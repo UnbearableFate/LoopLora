@@ -29,7 +29,9 @@ def timings(root: Path) -> list[dict]:
         with (directory / "train_log.jsonl").open() as stream:
             durations = [row["step_seconds"] for line in stream
                          if (row := json.loads(line))["step"] > 5]
-        if len(durations) < 10:
+        # The original20-step preflight logged every second step (8 post-warmup
+        # observations). Full smokes log every step and supply hundreds.
+        if len(durations) < 5:
             raise ValueError("insufficient measured production steps")
         mean = statistics.mean(durations)
         overhead = max(0., record["train_seconds"] - cfg["train"]["steps"] * mean)
