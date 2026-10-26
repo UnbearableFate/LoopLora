@@ -1,62 +1,46 @@
-# WP-L4 state card — preparation authorized, science still gated
+# WP-L4 complete — 2026-10-27
 
-User: prepare WP-L4 while WP-L3 A1 job3714914 runs. Keep the existing A1 wake-up
-.job-wakeup/bba58d0f-b223-4338-b04c-7399fdf9145b armed. On wake, finish WP-L3
-FIRST: final compute audit/report/commit, then emit exact line
-`WP-L3 done: docs/reports/P1L-writer-fix.md`. THEN continue WP-L4 if no writer
-selected. WP-L4 scientific CLI checks final L3 decision and report. No Goal.
+Branch wp/llm only. Report docs/reports/P1L-read-fix.md; final audit passed.
+No Goal used. All task-owned PBS jobs ended; all wake-ups acknowledged/canceled.
+No further WP-L4 training or compute is required. Do not redo WP-L3/WP-L4.
 
-Merged master4a27457 (WP-C6 includes our previous WP-L3 code). New modules
-read_fix.py/read_fix_run.py; audit_p1l_read_fix.py (no training), tests and
-plan docs/reports/WP-L4-plan.md. ARMS R/Rrho/RK/OArho; Rrho/OArho are Rρ/OAρ.
-Exact raw deployed read regression (stopped true-v target/norm), weight1;
-RK distinct-address squared-cosine penalty1. Other W5 losses unchanged.
-ρ.5 for Rrho/OArho, otherwise.25. Export strips auxiliary head/optimizer.
+Decision: STOP P1-L, no selected writer. Final learned EM r32R0.120,
+Rrho0.122,RK0.120,r128W50.299,r128R0.335. Best0.335 is below0.50 E8 trigger
+and0.80 writer threshold. No E8 run occurred. Oracle r32OArho0.747/r128OA0.840
+are diagnostic/ineligible. Immutable reports/p1l-read-fix/selection.json.
 
-Initial tests3715417 mg0917 failed2/55: audit answer-logit BF16 NumPy conversion;
-untrained shuffle test incorrectly assumed a quantized logit effect. Fixed float
-export and strong exact deployed-memory/oracle-value assertions (production
-control unchanged). Corrected tests3715437 mg0379 passed ALL55 in24.34s;
-sourceb1c64c17fa34e57489f15e6ca2993ac55883a05d; includes existing WP-L3/B8 regressions.
+All7 scientific records complete; all4 sciencejobs exit0, within1node2h:
+3715707mg0856 R/Rrho=4759s;3715708mg0859 RK/OArho=4483s (bothr32);
+3716159mg0852 W5/R=4920s;3716160mg0853 OA=4612s (bothr128).
+R32source0b03d606f3c752cddfcfd716946dbbc3e36bf025/release.json;
+r128sourcebe07f7fb34c1cdd14b64f65b7f687364fcd6e36f/release-r128.json.
+Allr128arms submitted04:56:45JST before ANY WP-L4 validation score was read;
+A2 merged throughdf21654/master2844d5e, rank32 jobs untouched, nojobs canceled.
+SameT1E16/seed17/nrel4/headsharing.3/layer14o_proj/L1/B32Q4/lr.003,
+scan_final/prefetch2,val1000seed4242. Rank128LR unchanged/no search flagged.
+No scientificT2/reader/joint/test/confirmation/otherseeds.
 
-Scientific provisional schedule8225 steps, eval1645/3290/4935/6580/8225; fourth
-checkpoint exactly matches A1 OA6580 for OAρ comparison. Initial13160 proposal
-reduced BEFORE smoke because1.5x A1 paired timing would exceed1h.
-10% smoke823 steps / eval100 (five checkpoints), ALL4 arms/sourceb1c64c1,
-submitted in two paired jobs s-l4-R-Rrho and s-l4-RK-OArho (see PBSspecs).
-Root /work/xg24i002/x10041/LoopLora/runs/p1l/read-fix-20261027/smoke.
-Do NOT read smoke quality scores before schedule lock. After both jobs pass,
-run scripts/audit_p1l_read_fix_smoke.py ON COMPUTE via submit.py to verify all
-samples/checkpoints and emit ONLY timings to reports/p1l-read-fix/smoke-timing.json.
-It gates8225steps with1.5x mean step +5 extrapolated full evaluations +90s reserve.
-Freeze release and schedule before any scientific val; no science before L3 gate.
+Final audit3716541mg0859, sourceb5ff4ee,79s, exit0: every samplemetric/pairedlabel,
+config/source/maximal2hbudget verified, all7 head-free exports reloaded with
+identical1000 predictions each. Full summary.json ande16-summary.json, curves,
+CSVs, selection lock and all7 export-check samples/metrics retained under
+reports/p1l-read-fix. No audit rerun is needed. Compute finished06:47JST before
+user's08:00 normal-operation cutoff. Wake8b05200b-6566-43b7-8b35-67220d527791
+inspected andACKNOWLEDGED. Prior auditwait wasprojectnjobsglimit, resolved.
 
-Remaining: smoke audit, freeze source/schedule, wait existing A1 wake-up if needed.
-After L3 report and negative decision, first no-training audit final A1 OA/W5
-(no third rerun arm exists) with scripts/audit_p1l_read_fix.py --root L3ROOT
---out L4ROOT/audit --prior-decision ABS/L3reports/summary.json --prior-report
-ABS/docs/reports/P1L-writer-fix.md. Then4scientificarms in2paired<=1h jobs,
-seed17/T1E16/r32/layer14/L1/B32Q4/lr.003/scan_final/prefetch2/val1000seed4242.
-Auditperquery b/a/d, exact Gram reconstruction, norms, gM/BgM, value-head decoding,
-age-stratified SIR/parallel interference, zero/shuffle actual deployed memory,
-identical repeated logits, train-minibatch per-loss grads without optimizer steps.
+Tests corrected55/57A1/69A2 passed; initial2failuretestjob counted. All baseline
+and smoke gates passed; detailed evidence/commands/provenance in README.md,
+WP-L4-plan.md and git history. No-training L3A1 audit onlyOA/W5 (thirdarmnever
+existed): zerooptimizersteps, samepriorpredictions, repeatdrift0, maxGram<4e-7,
+allcoefficientvectors independently reconstructed, actualmemoryzero/shuffle.
+Costs ALL16 jobs20642s=5.7338888889nodeh; jobs.json complete,pendingempty.
+A2 removed studytotalcap; everyjob1node<=2h. No torch/pytest/validators onlogin.
 
-scripts/analyze_p1l_read_fix.py audits four arm records/samples and locks decision;
---e16-only first. R<Rrho<RK, finalEM>=.80 selects. Else best>=.50 gets ONE E8
-retrain at same schedule via --e8-decision selection.json, then final audit
-without --e16-only with --verify-export. No other writer screen after WP-L4.
-Max4nodeh for ALL WP-L4 jobs, each1node<=1h. Track failed tests too. Never import
-torch/runpytest or validators on login. Commit on wp/llm only. Final report
-<=1page+tables docs/reports/P1L-read-fix.md and exact final line
-WP-L4 done: docs/reports/P1L-read-fix.md
-
-PREPARATION COMPLETE (03:14 JST): smoke3715461 mg0841 and3715462 mg0880 exit0.
-Smoke artifact/timing audit3715504 mg0880 exit0: all four arm samples/exports
-verified, shared normalization buffers exactly equal. No smoke EM was exposed
-or used for selection. Slow RK mean.213188s; full eval conservative12.102s;
-1.5x train+5eval+90s=2780.715s. Freeze8225steps, five1645-step intervals, source
-b1c64c17fa34e57489f15e6ca2993ac55883a05d, two paired50min jobs WHEN L3gate passes.
-Release reports/p1l-read-fix/release.json; timing/source proof and ledger committed.
-No WP-L4 scientific arms or final A1 diagnostic audit have been submitted.
-Do not rerun tests/smoke without a new failure or code concern. Await original
-A1 wake-up, finish WP-L3 first, then perform audit/science/final WP-L4 report.
+Persistentroot /work/xg24i002/x10041/LoopLora/runs/p1l/read-fix-20261027 contains
+all scientific records/checkpoints/writerexports/percheckpoint samples, original
+andrank128 smokes, no-training auditdensevectors. Preserve these artifacts.
+Report contains everycheckpoint, matchedOArho6580vspriorOA.337, all costs,
+objectives/extra supervision, diagnosticinterpretation, single-seedlimitations.
+Report and evidence are committed on wp/llm by the completion commit containing
+this file. No remaining WP-L4 work. Final EXACTline:
+WP-L4 done: docs/reports/P1L-read-fix.md.

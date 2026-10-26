@@ -1,0 +1,83 @@
+{
+  "E": 16,
+  "L": 1,
+  "arms": [
+    "R",
+    "Rrho",
+    "RK",
+    "OArho"
+  ],
+  "backend": "core.scan_final",
+  "e8_rule": "exactly one best-final-EM nonoracle arm if no E16pass and best>=500/1000; ties simplicity; same schedule",
+  "eval_seed": 4242,
+  "eval_steps": [
+    1645,
+    3290,
+    4935,
+    6580,
+    8225
+  ],
+  "grad_clip": 1.0,
+  "head_sharing": 0.3,
+  "initialization_and_data": "fresh paired WP-L3/W5 or OA initialization and absolute seed17 episode stream",
+  "input_site": "o_proj",
+  "layer": 14,
+  "lr": 0.003,
+  "master_merged": "4a27457",
+  "matched_OA_reference_step": 6580,
+  "max_job_nodes": 1,
+  "max_job_seconds": 3600,
+  "max_total_node_hours": 4,
+  "n_rel": 4,
+  "pairing": [
+    [
+      "R",
+      "Rrho"
+    ],
+    [
+      "RK",
+      "OArho"
+    ]
+  ],
+  "prefetch_workers": 2,
+  "protocol": "memory_only",
+  "rank": 32,
+  "science_commit": "b1c64c17fa34e57489f15e6ca2993ac55883a05d",
+  "scientific_submission_requires": "final audited WP-L3 selects no writer AND P1L-writer-fix.md is completed/committed",
+  "seed": 17,
+  "selection_order": [
+    "R",
+    "Rrho",
+    "RK"
+  ],
+  "smoke_audit_job": "3715504.opbs",
+  "smoke_jobs": [
+    "3715461.opbs",
+    "3715462.opbs"
+  ],
+  "smoke_quality_used_for_selection": false,
+  "status": "prepared_waiting_for_final_WP-L3_decision",
+  "steps": 8225,
+  "supervision": "W5 answer/address/clean-value objectives plus raw-read regression1; RK key decorrelation1; OA\u03c1 answer only",
+  "task": "docs/tasks/WP-L4_p1l_read_fix.md",
+  "task_name": "t1",
+  "tests": {
+    "argv": "-m pytest -q -o addopts= tests/test_llm_read_fix.py tests/test_llm_writer_fix.py tests/test_llm_b8.py",
+    "host": "mg0379",
+    "job_id": "3715437.opbs",
+    "passed": 55
+  },
+  "threshold_correct": 800,
+  "timing_gate": {
+    "conservative_eval1000_seconds": 12.10191076155752,
+    "expected_seconds_with_margin": 2780.715349748657,
+    "setup_reserve_seconds": 90,
+    "training_margin": 1.5
+  },
+  "train_Q": 4,
+  "train_batch": 32,
+  "val_episodes": 1000,
+  "walltime": "00:50:00",
+  "warmup_steps": 20,
+  "weight_decay": 0.01
+}
