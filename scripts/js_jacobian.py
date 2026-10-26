@@ -8,7 +8,7 @@ def jacobian(R,U,Q,memory,z,rho):
     """J(z), including the ReLU gate of the *next* update evaluated at z."""
     h=F.linear(z,R)+F.linear(torch.matmul(memory[:,None],F.linear(z,Q).unsqueeze(-1)).squeeze(-1),U)
     H=R+torch.matmul(torch.matmul(U,memory),Q)
-    return rho*(h>0)[...,None]*H[:,None]
+    return rho*(h>0).to(H.dtype)[...,None]*H[:,None]
 
 
 def spectral_radius(matrix,backend='cpu'):
