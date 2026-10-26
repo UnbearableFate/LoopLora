@@ -1,0 +1,67 @@
+{
+  "steps": 15000,
+  "decided_before_main_matrix": true,
+  "prereg_rule": "P1S final v1 Budget: projected WP-H above 8 node-hours => 15000 steps for every stage",
+  "initial_throughput_job": "3712623.opbs",
+  "initial_throughput_report": "/work/xg24i002/x10041/LoopLora/runs/p1s/main/throughput-20261026/throughput.json",
+  "initial_projections": [
+    {
+      "procs": 2,
+      "steps_every_stage": 20000,
+      "projected_wp_h_node_hours_with_margin": 37.04989019263499,
+      "node_hours_before_margin": 24.660353606908892
+    },
+    {
+      "procs": 2,
+      "steps_every_stage": 15000,
+      "projected_wp_h_node_hours_with_margin": 28.32656590087585,
+      "node_hours_before_margin": 18.844804079069466
+    },
+    {
+      "procs": 4,
+      "steps_every_stage": 20000,
+      "projected_wp_h_node_hours_with_margin": 41.882943986711865,
+      "node_hours_before_margin": 27.88238946962681
+    },
+    {
+      "procs": 4,
+      "steps_every_stage": 15000,
+      "projected_wp_h_node_hours_with_margin": 31.661422988756403,
+      "node_hours_before_margin": 21.068042137656498
+    },
+    {
+      "procs": 8,
+      "steps_every_stage": 20000,
+      "projected_wp_h_node_hours_with_margin": 57.63799868616173,
+      "node_hours_before_margin": 38.38575926926005
+    },
+    {
+      "procs": 8,
+      "steps_every_stage": 15000,
+      "projected_wp_h_node_hours_with_margin": 43.40090117680841,
+      "node_hours_before_margin": 28.89436092969117
+    }
+  ],
+  "execution_sizing": {
+    "optimized_throughput_job": "3712797.opbs",
+    "reader_procs": 8,
+    "writer_procs": 3,
+    "reader_jobs": 13,
+    "writer_jobs": 1,
+    "normal_reader_jobs": 12,
+    "heavy_reader_jobs": 1,
+    "normal_walltime_seconds": 1740,
+    "heavy_walltime_seconds": 2340,
+    "writer_walltime_seconds": 1020,
+    "normal_expected_seconds": 1129.468460418284,
+    "heavy_expected_seconds": 1540.144359986298,
+    "writer_expected_seconds": 668.674904666841,
+    "margin": 1.5,
+    "prep_reserve_node_hours": 0.15,
+    "analysis_reserve_node_hours": 0.4,
+    "projected_wp_h_node_hours": 7.283333333333334,
+    "packing": "One heavy shard: six E18 oracle_random readers + two r32 orthogonal readers. Other nonfrozen shards: at most two orthogonal r32 and one orthogonal r16 per eight processes; frozen readers in three eight-process shards after same-seed writers complete. No eight-orthogonal extrapolation. Twelve normal reader jobs including frozen shards. All jobs at most eight simultaneous workers; at most eight own PBS jobs admitted at a time.",
+    "projection_method": "Explicit one-wave job packing from maximum measured class step time, E18 costfactor1.5,75seconds evaluation/startup allowance perwave;1.5wall margin rounded to1minute. Unlike standalone benchmark upperbound, free slots co-schedule other costclasses; source timings include8processcontention. Includes .15nodeh prep and.4analysis reserve."
+  },
+  "optimized_report": "/work/xg24i002/x10041/LoopLora/runs/p1s/main/throughput-batched-20261026/throughput.json"
+}

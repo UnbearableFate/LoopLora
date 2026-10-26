@@ -1,0 +1,60 @@
+{
+  "status": "complete",
+  "plan_hash": "badd390003095b54e8cc3df07d75f035",
+  "barrier_created_at": "2026-10-26T13:32:07.282165+00:00",
+  "completed_at": "2026-10-26T13:38:41.236386+00:00",
+  "runs": 105,
+  "confirmation_runs": 102,
+  "gate_rows": 8,
+  "passing_readers": [
+    {
+      "writer": "oracle_orth",
+      "reader": "M1"
+    },
+    {
+      "writer": "joint",
+      "reader": "M1"
+    }
+  ],
+  "reported_contrasts": 444,
+  "accuracy_cells": 46227,
+  "figures": [
+    "/work/xg24i002/x10041/LoopLora-wt/sym/reports/figures/p1s/accuracy-depth-oracle_random-M1.png",
+    "/work/xg24i002/x10041/LoopLora-wt/sym/reports/figures/p1s/accuracy-depth-oracle_random-M1-lin.png",
+    "/work/xg24i002/x10041/LoopLora-wt/sym/reports/figures/p1s/hop-depth-oracle_random.png",
+    "/work/xg24i002/x10041/LoopLora-wt/sym/reports/figures/p1s/paired-differences-oracle_random.png",
+    "/work/xg24i002/x10041/LoopLora-wt/sym/reports/figures/p1s/accuracy-depth-oracle_orth-M1.png",
+    "/work/xg24i002/x10041/LoopLora-wt/sym/reports/figures/p1s/accuracy-depth-oracle_orth-M1-lin.png",
+    "/work/xg24i002/x10041/LoopLora-wt/sym/reports/figures/p1s/hop-depth-oracle_orth.png",
+    "/work/xg24i002/x10041/LoopLora-wt/sym/reports/figures/p1s/paired-differences-oracle_orth.png",
+    "/work/xg24i002/x10041/LoopLora-wt/sym/reports/figures/p1s/accuracy-depth-t1_frozen-M1.png",
+    "/work/xg24i002/x10041/LoopLora-wt/sym/reports/figures/p1s/accuracy-depth-t1_frozen-M1-lin.png",
+    "/work/xg24i002/x10041/LoopLora-wt/sym/reports/figures/p1s/hop-depth-t1_frozen.png",
+    "/work/xg24i002/x10041/LoopLora-wt/sym/reports/figures/p1s/paired-differences-t1_frozen.png",
+    "/work/xg24i002/x10041/LoopLora-wt/sym/reports/figures/p1s/accuracy-depth-joint-M1.png",
+    "/work/xg24i002/x10041/LoopLora-wt/sym/reports/figures/p1s/accuracy-depth-joint-M1-lin.png",
+    "/work/xg24i002/x10041/LoopLora-wt/sym/reports/figures/p1s/hop-depth-joint.png",
+    "/work/xg24i002/x10041/LoopLora-wt/sym/reports/figures/p1s/paired-differences-joint.png",
+    "/work/xg24i002/x10041/LoopLora-wt/sym/reports/figures/p1s/load-depth-oracle_random-M1.png",
+    "/work/xg24i002/x10041/LoopLora-wt/sym/reports/figures/p1s/load-depth-oracle_random-M1-lin.png",
+    "/work/xg24i002/x10041/LoopLora-wt/sym/reports/figures/p1s/training-loss-writer-joint.png",
+    "/work/xg24i002/x10041/LoopLora-wt/sym/reports/figures/p1s/training-loss-primary-oracle_random.png",
+    "/work/xg24i002/x10041/LoopLora-wt/sym/reports/figures/p1s/training-loss-primary-oracle_orth.png",
+    "/work/xg24i002/x10041/LoopLora-wt/sym/reports/figures/p1s/training-loss-primary-t1_frozen.png",
+    "/work/xg24i002/x10041/LoopLora-wt/sym/reports/figures/p1s/training-loss-primary-joint.png",
+    "/work/xg24i002/x10041/LoopLora-wt/sym/reports/figures/p1s/training-loss-replication-t1_frozen.png",
+    "/work/xg24i002/x10041/LoopLora-wt/sym/reports/figures/p1s/training-loss-replication-joint.png",
+    "/work/xg24i002/x10041/LoopLora-wt/sym/reports/figures/p1s/training-loss-replication-oracle_random.png",
+    "/work/xg24i002/x10041/LoopLora-wt/sym/reports/figures/p1s/training-loss-secondary-oracle_random.png",
+    "/work/xg24i002/x10041/LoopLora-wt/sym/reports/figures/p1s/training-loss-secondary-oracle_orth.png",
+    "/work/xg24i002/x10041/LoopLora-wt/sym/reports/figures/p1s/training-loss-secondary-joint.png"
+  ],
+  "cache_limit": 12,
+  "bootstrap_resamples": 2000,
+  "gate_confidence": 0.975,
+  "report_confidence": 0.95,
+  "steps": 15000,
+  "prereg_commit": "c24ecba",
+  "selection_source": "docs/prereg/P1S.md final v1; fixed Pilot-2 LR table",
+  "cost_and_registry": "maintained by the main runner"
+}

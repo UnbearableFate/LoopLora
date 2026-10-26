@@ -1,7 +1,8 @@
-# P1-L pre-registration — single module in Qwen3-0.6B-Base (draft v0, 2026-10-26)
+# P1-L pre-registration — single module in Qwen3-0.6B-Base (draft v1, 2026-10-26)
 
-Status: **draft**; finalised after P1-S decides which writer conditions and variants carry over, and after the
-P1-L pilots (validation only). Runs only if P1-S passes G1 in at least one writer condition (P1S.md stop rules).
+Status: **draft v1** (2026-10-26, after the P1-S decision). P1-S passed G1/G2 for M1 with `oracle_orth` and
+`joint`, so P1-L may run; it is finalised after the writer diagnosis (WP-L2; Pilot-1 found no admissible E*_L)
+and Pilot-2 (validation only).
 
 ## Question
 Does the P1-S mechanism survive when x comes from a real LM? Same question as P1-S, plus: does the memory add
@@ -10,17 +11,19 @@ the backbone's attention (context-retained)?
 
 ## Fixed design
 - Backbone `Qwen/Qwen3-0.6B-Base` @ `da87bfb608c14b7cf20ba1ce41287e8de496c0cd`, bf16, sdpa; module at layer 14
-  `o_proj` (2048 → 1024), fp32 adapter/state, r = 32, ρ = 0.25, α = 1.
+  `o_proj` (2048 → 1024), fp32 adapter/state, ρ = 0.25, α = 1 (r below).
 - Text: WP-E templates; every entity a single-token name; answer = one name token; EM = greedy argmax over the
   full vocabulary at the answer position (primary); candidate-restricted accuracy secondary.
 - Protocols: **memory-only** (primary for mechanism claims) and context-retained (secondary).
 - Writer policy ⟨pilot: `fact_final` vs `all_tokens`, chosen by T1 val accuracy⟩.
-- Writer conditions carried from P1-S ⟨P1-S result⟩: `t1_frozen` (writer trained on rendered `t1`, n_rel = 4) and/or
-  `joint`.
-- Variants: the co-primary reader(s) that pass P1-S (M1 and/or M1-lin, P1S.md amendment A1) with their fixed-query
-  comparator (B5 / B5-lin), plus B4 and B3. If both pass in P1-S, both are carried as co-primary (97.5% CIs). Baselines: B0 frozen base (both
-  protocols), B1 LoRA and B2 single-step nonlinear adapter at the same position (both protocols), trained in the
-  context-retained protocol with the same data and steps.
+- Writer condition carried from P1-S (`reports/decisions/P1S.md`): **`joint` only**; `t1_frozen` failed P1-S G1
+  and is not carried.
+- Variants: **M1** (the only reader that passed P1-S) with comparator B5, plus B4 and B3; M1-lin is not carried
+  (failed G1 in all P1-S conditions at r = 32). Gate CIs at 95% (one primary reader). Baselines: B0 frozen base
+  (both protocols), B1 LoRA and B2 single-step nonlinear adapter at the same position (both protocols), trained in
+  the context-retained protocol with the same data and steps.
+- Rank: r = r_m ∈ {32, 64}, fixed by Pilot-2 on validation before any test result (P1-S: joint M1 passes at r = 32
+  with a small, seed-dependent effect; robust at r = 64 in F1). State 4 vs 16 KiB per sequence (FP32), priced in P2.
 - Tasks and episode sets mirror P1-S (`t2_chain_end` primary, `t2_typed` replication, hops 1–3 train / 1–8 eval,
   confirmation set `test` [100000, 102000) untouched until gates).
 

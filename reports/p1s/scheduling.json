@@ -1,0 +1,195 @@
+[
+  {
+    "name": "reader-00",
+    "names": [
+      "replication-oracle_random-M1-r32-s17",
+      "replication-oracle_random-M1-r32-s29",
+      "replication-oracle_random-M1-r32-s43",
+      "replication-oracle_random-M1-lin-r32-s17",
+      "replication-oracle_random-M1-lin-r32-s29",
+      "replication-oracle_random-M1-lin-r32-s43",
+      "primary-oracle_orth-M1-r32-s17",
+      "primary-oracle_orth-M1-r32-s29"
+    ],
+    "procs": 8,
+    "requested_seconds": 2340
+  },
+  {
+    "name": "reader-01",
+    "names": [
+      "primary-oracle_orth-M1-r32-s43",
+      "primary-oracle_orth-M1-lin-r32-s17",
+      "secondary-oracle_orth-M1-r16-s17",
+      "primary-oracle_random-M1-r32-s17",
+      "primary-oracle_random-M1-r32-s29",
+      "primary-oracle_random-M1-r32-s43",
+      "primary-oracle_random-M1-lin-r32-s17",
+      "primary-oracle_random-M1-lin-r32-s29"
+    ],
+    "procs": 8,
+    "requested_seconds": 1740
+  },
+  {
+    "name": "reader-02",
+    "names": [
+      "primary-oracle_orth-M1-lin-r32-s29",
+      "primary-oracle_orth-M1-lin-r32-s43",
+      "secondary-oracle_orth-M1-lin-r16-s17",
+      "primary-oracle_random-M1-lin-r32-s43",
+      "primary-oracle_random-B5-r32-s17",
+      "primary-oracle_random-B5-r32-s29",
+      "primary-oracle_random-B5-r32-s43",
+      "primary-oracle_random-B5-lin-r32-s17"
+    ],
+    "procs": 8,
+    "requested_seconds": 1740
+  },
+  {
+    "name": "reader-03",
+    "names": [
+      "primary-oracle_orth-B5-r32-s17",
+      "primary-oracle_orth-B5-r32-s29",
+      "secondary-oracle_orth-B5-r16-s17",
+      "primary-oracle_random-B5-lin-r32-s29",
+      "primary-oracle_random-B5-lin-r32-s43",
+      "primary-oracle_random-B3-r32-s17",
+      "primary-oracle_random-B3-r32-s29",
+      "primary-oracle_random-B3-r32-s43"
+    ],
+    "procs": 8,
+    "requested_seconds": 1740
+  },
+  {
+    "name": "reader-04",
+    "names": [
+      "primary-oracle_orth-B5-r32-s43",
+      "primary-oracle_orth-B5-lin-r32-s17",
+      "secondary-oracle_orth-B5-lin-r16-s17",
+      "primary-oracle_random-B4-r32-s17",
+      "primary-oracle_random-B4-r32-s29",
+      "primary-oracle_random-B4-r32-s43",
+      "primary-joint-M1-r32-s17",
+      "primary-joint-M1-r32-s29"
+    ],
+    "procs": 8,
+    "requested_seconds": 1740
+  },
+  {
+    "name": "reader-05",
+    "names": [
+      "primary-oracle_orth-B5-lin-r32-s29",
+      "primary-oracle_orth-B5-lin-r32-s43",
+      "primary-joint-M1-r32-s43",
+      "primary-joint-M1-lin-r32-s17",
+      "primary-joint-M1-lin-r32-s29",
+      "primary-joint-M1-lin-r32-s43",
+      "primary-joint-B5-r32-s17",
+      "primary-joint-B5-r32-s29"
+    ],
+    "procs": 8,
+    "requested_seconds": 1740
+  },
+  {
+    "name": "reader-06",
+    "names": [
+      "primary-oracle_orth-B3-r32-s17",
+      "primary-oracle_orth-B3-r32-s29",
+      "primary-joint-B5-r32-s43",
+      "primary-joint-B5-lin-r32-s17",
+      "primary-joint-B5-lin-r32-s29",
+      "primary-joint-B5-lin-r32-s43",
+      "primary-joint-B3-r32-s17",
+      "primary-joint-B3-r32-s29"
+    ],
+    "procs": 8,
+    "requested_seconds": 1740
+  },
+  {
+    "name": "reader-07",
+    "names": [
+      "primary-oracle_orth-B3-r32-s43",
+      "primary-oracle_orth-B4-r32-s17",
+      "primary-joint-B3-r32-s43",
+      "primary-joint-B4-r32-s17",
+      "primary-joint-B4-r32-s29",
+      "primary-joint-B4-r32-s43",
+      "replication-joint-M1-r32-s17",
+      "replication-joint-M1-r32-s29"
+    ],
+    "procs": 8,
+    "requested_seconds": 1740
+  },
+  {
+    "name": "reader-08",
+    "names": [
+      "primary-oracle_orth-B4-r32-s29",
+      "primary-oracle_orth-B4-r32-s43",
+      "replication-joint-M1-r32-s43",
+      "replication-joint-M1-lin-r32-s17",
+      "replication-joint-M1-lin-r32-s29",
+      "replication-joint-M1-lin-r32-s43",
+      "secondary-oracle_random-M1-r16-s17",
+      "secondary-oracle_random-M1-lin-r16-s17"
+    ],
+    "procs": 8,
+    "requested_seconds": 1740
+  },
+  {
+    "name": "reader-09",
+    "names": [
+      "secondary-oracle_random-B5-r16-s17",
+      "secondary-oracle_random-B5-lin-r16-s17",
+      "secondary-joint-M1-r16-s17",
+      "secondary-joint-M1-lin-r16-s17",
+      "secondary-joint-B5-r16-s17",
+      "secondary-joint-B5-lin-r16-s17"
+    ],
+    "procs": 8,
+    "requested_seconds": 1740
+  },
+  {
+    "name": "frozen-00",
+    "names": [
+      "primary-t1_frozen-M1-r32-s17",
+      "primary-t1_frozen-M1-r32-s29",
+      "primary-t1_frozen-M1-r32-s43",
+      "primary-t1_frozen-M1-lin-r32-s17",
+      "primary-t1_frozen-M1-lin-r32-s29",
+      "primary-t1_frozen-M1-lin-r32-s43",
+      "primary-t1_frozen-B5-r32-s17",
+      "primary-t1_frozen-B5-r32-s29"
+    ],
+    "procs": 8,
+    "requested_seconds": 1740
+  },
+  {
+    "name": "frozen-01",
+    "names": [
+      "primary-t1_frozen-B5-r32-s43",
+      "primary-t1_frozen-B5-lin-r32-s17",
+      "primary-t1_frozen-B5-lin-r32-s29",
+      "primary-t1_frozen-B5-lin-r32-s43",
+      "primary-t1_frozen-B3-r32-s17",
+      "primary-t1_frozen-B3-r32-s29",
+      "primary-t1_frozen-B3-r32-s43",
+      "primary-t1_frozen-B4-r32-s17"
+    ],
+    "procs": 8,
+    "requested_seconds": 1740
+  },
+  {
+    "name": "frozen-02",
+    "names": [
+      "primary-t1_frozen-B4-r32-s29",
+      "primary-t1_frozen-B4-r32-s43",
+      "replication-t1_frozen-M1-r32-s17",
+      "replication-t1_frozen-M1-r32-s29",
+      "replication-t1_frozen-M1-r32-s43",
+      "replication-t1_frozen-M1-lin-r32-s17",
+      "replication-t1_frozen-M1-lin-r32-s29",
+      "replication-t1_frozen-M1-lin-r32-s43"
+    ],
+    "procs": 8,
+    "requested_seconds": 1740
+  }
+]

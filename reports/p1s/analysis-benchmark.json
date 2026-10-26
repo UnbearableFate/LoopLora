@@ -1,0 +1,220 @@
+{
+  "synthetic_only": true,
+  "real_artifacts_opened": false,
+  "timings": {
+    "screening_a5_audit": {
+      "wall_seconds": 1.189714249689132,
+      "cpu_seconds": 1.1869867200000002,
+      "measurements": [
+        {
+          "wall_seconds": 1.1896848897449672,
+          "cpu_seconds": 1.184262976
+        },
+        {
+          "wall_seconds": 1.1897436096332967,
+          "cpu_seconds": 1.1897104640000002
+        }
+      ]
+    },
+    "paired_1seed_0.95": {
+      "wall_seconds": 0.11644461238756776,
+      "cpu_seconds": 0.11250329600000031,
+      "measurements": [
+        {
+          "wall_seconds": 0.11644461238756776,
+          "cpu_seconds": 0.11250329600000031
+        }
+      ]
+    },
+    "specificity_1seed_0.95": {
+      "wall_seconds": 0.06328450376167893,
+      "cpu_seconds": 0.06327308799999987,
+      "measurements": [
+        {
+          "wall_seconds": 0.06328450376167893,
+          "cpu_seconds": 0.06327308799999987
+        }
+      ]
+    },
+    "paired_1seed_0.975": {
+      "wall_seconds": 0.07954304106533527,
+      "cpu_seconds": 0.07954383999999992,
+      "measurements": [
+        {
+          "wall_seconds": 0.07954304106533527,
+          "cpu_seconds": 0.07954383999999992
+        }
+      ]
+    },
+    "specificity_1seed_0.975": {
+      "wall_seconds": 0.062464307993650436,
+      "cpu_seconds": 0.06246636799999994,
+      "measurements": [
+        {
+          "wall_seconds": 0.062464307993650436,
+          "cpu_seconds": 0.06246636799999994
+        }
+      ]
+    },
+    "paired_3seed_0.95": {
+      "wall_seconds": 0.24780378630384803,
+      "cpu_seconds": 0.24780396799999993,
+      "measurements": [
+        {
+          "wall_seconds": 0.24780378630384803,
+          "cpu_seconds": 0.24780396799999993
+        }
+      ]
+    },
+    "specificity_3seed_0.95": {
+      "wall_seconds": 0.20592091279104352,
+      "cpu_seconds": 0.20592115200000016,
+      "measurements": [
+        {
+          "wall_seconds": 0.20592091279104352,
+          "cpu_seconds": 0.20592115200000016
+        }
+      ]
+    },
+    "paired_3seed_0.975": {
+      "wall_seconds": 0.246663108933717,
+      "cpu_seconds": 0.24666326399999994,
+      "measurements": [
+        {
+          "wall_seconds": 0.246663108933717,
+          "cpu_seconds": 0.24666326399999994
+        }
+      ]
+    },
+    "specificity_3seed_0.975": {
+      "wall_seconds": 0.20154991699382663,
+      "cpu_seconds": 0.20153855999999992,
+      "measurements": [
+        {
+          "wall_seconds": 0.20154991699382663,
+          "cpu_seconds": 0.20153855999999992
+        }
+      ]
+    },
+    "confirmation_audit": {
+      "wall_seconds": 0.1470822519622743,
+      "cpu_seconds": 0.14708385600000007,
+      "measurements": [
+        {
+          "wall_seconds": 0.14776775892823935,
+          "cpu_seconds": 0.14776851199999985
+        },
+        {
+          "wall_seconds": 0.14639674499630928,
+          "cpu_seconds": 0.14639920000000028
+        }
+      ]
+    },
+    "screening_base_audit": {
+      "wall_seconds": 1.0942158899269998,
+      "cpu_seconds": 1.0941802240000005,
+      "measurements": [
+        {
+          "wall_seconds": 1.0942158899269998,
+          "cpu_seconds": 1.0941802240000005
+        }
+      ]
+    },
+    "screening_a5_hash": {
+      "wall_seconds": 0.009392361622303724,
+      "cpu_seconds": 0.009391392000000387,
+      "measurements": [
+        {
+          "wall_seconds": 0.009392361622303724,
+          "cpu_seconds": 0.009391392000000387
+        }
+      ]
+    },
+    "screening_a5_read": {
+      "wall_seconds": 0.1329075018875301,
+      "cpu_seconds": 0.13190553599999966,
+      "measurements": [
+        {
+          "wall_seconds": 0.1329075018875301,
+          "cpu_seconds": 0.13190553599999966
+        }
+      ]
+    },
+    "screening_base_hash": {
+      "wall_seconds": 0.008761253673583269,
+      "cpu_seconds": 0.008760992000000023,
+      "measurements": [
+        {
+          "wall_seconds": 0.008761253673583269,
+          "cpu_seconds": 0.008760992000000023
+        }
+      ]
+    },
+    "screening_base_read": {
+      "wall_seconds": 0.12243555020540953,
+      "cpu_seconds": 0.12243817600000018,
+      "measurements": [
+        {
+          "wall_seconds": 0.12243555020540953,
+          "cpu_seconds": 0.12243817600000018
+        }
+      ]
+    },
+    "confirmation_hash": {
+      "wall_seconds": 0.0017939601093530655,
+      "cpu_seconds": 0.0017935040000001123,
+      "measurements": [
+        {
+          "wall_seconds": 0.0017939601093530655,
+          "cpu_seconds": 0.0017935040000001123
+        }
+      ]
+    },
+    "confirmation_read": {
+      "wall_seconds": 0.025165998842567205,
+      "cpu_seconds": 0.02516710400000033,
+      "measurements": [
+        {
+          "wall_seconds": 0.025165998842567205,
+          "cpu_seconds": 0.02516710400000033
+        }
+      ]
+    }
+  },
+  "workload": {
+    "screening_a5_runs": 90,
+    "screening_base_runs": 12,
+    "confirmation_runs": 102,
+    "auxiliary_writer_runs": 3,
+    "raw_rows": 92451000,
+    "paired_calls_3seed": 432,
+    "paired_calls_1seed": 468,
+    "specificity_calls_3seed": 64,
+    "specificity_calls_1seed": 68,
+    "bootstrap_resamples": 2000,
+    "bootstrap_episodes": 2000,
+    "largest_screening_array_bytes": 170496000
+  },
+  "projected_total": {
+    "wall_seconds": {
+      "statistics": 169.9804864320904,
+      "raw_archive_audit_hash_read": 152.33852802682668,
+      "subtotal": 322.3190144589171,
+      "with_120second_reporting_allowance": 442.3190144589171,
+      "budget_seconds": 1440
+    },
+    "cpu_seconds": {
+      "statistics": 169.05780422400005,
+      "raw_archive_audit_hash_read": 152.00261635200008,
+      "subtotal": 321.0604205760001,
+      "with_120second_reporting_allowance": 441.0604205760001,
+      "budget_seconds": 1440
+    }
+  },
+  "max_rss_kib": 730624,
+  "limitations": [
+    "Local synthetic NPZ read speed does not measure shared-filesystem contention.",
+    "Reporting allowance includes plots, JSON/CSV, compact writes, logs and frozen CPU checkpoint checks; unmeasured.",
+    "Synthetic diagnostic floats are incompressible; archive-read timing is conservative for repeated memory norms."
+  ]
+}
