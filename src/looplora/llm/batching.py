@@ -40,9 +40,12 @@ class PreparedBatch:
 
 
 def tokenize_batch(arrays: EpisodeArrays, tokenizer, *, device,
-                   name_pool: NamePool | None = None) -> TokenBatch:
+                   name_pool: NamePool | None = None, rendered=None) -> TokenBatch:
     pool = load_name_pool() if name_pool is None else name_pool
-    rendered = render_episodes(arrays, tokenizer=tokenizer, name_pool=pool)
+    rendered = (render_episodes(arrays, tokenizer=tokenizer, name_pool=pool)
+                if rendered is None else rendered)
+    if len(rendered) != len(arrays.facts):
+        raise ValueError("rendered rows must align with episode arrays")
     if not rendered or not rendered[0].queries:
         raise ValueError("a batch requires episodes and queries")
     B, Q = len(rendered), len(rendered[0].queries)
