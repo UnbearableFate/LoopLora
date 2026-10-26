@@ -108,3 +108,13 @@ condition, if added, uses the same rule. Information seen: timing only; no score
 - CI level for every gate: 1 − 0.05/k, where k is the number of gated conditions (oracle r = 32, oracle r = 128,
   plus any learned condition), fixed before the first confirmation evaluation. Confirmation stays held until
   every condition's runs have finished training.
+
+## Amendment B4 — no comparison with a larger-rank single read (2026-10-27 04:46 JST, user decision; before any
+## P1-L confirmation score and before any r = 128 score is read)
+- Criterion (user): a multi-read reader only has to beat the single read at the same rank. M1-L4 has exactly B4's
+  parameters; B8 has 9,216 more adapter parameters at r = r_mem = 32 (+8.9%, its per-step R/U/Q; `param_count`).
+  The extra read latency is accepted as the cost and reported, not tested.
+- Removed from Amendment B3: B8(r = 32)@4 − B4(r = 128)@1 and M1-L4(r = 32)@4 − B4(r = 128)@1. No P1-L claim
+  compares against a larger-rank single read. B8(r = 128)@4 − B8(r = 32)@4 stays descriptive.
+- Added, descriptive: adapter parameters and measured inference time per question for every reader at each rank.
+- Gates, conditions, runs and the CI level are unchanged.
