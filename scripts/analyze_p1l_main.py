@@ -21,7 +21,10 @@ def timings(root: Path, rank: int = 32) -> list[dict]:
     for label in labels_for_rank(rank):
         directory = root / f"{label}-s17"
         if not directory.is_dir():
-            parent = "smoke-context" if label in {"B1", "B2"} else "smoke-oracle"
+            if rank == 128:
+                parent = "smoke-a" if label in {"B8", "M1-L4"} else "smoke-b"
+            else:
+                parent = "smoke-context" if label in {"B1", "B2"} else "smoke-oracle"
             directory = root / parent / f"{label}-s17"
         record = read(directory / "record.json")
         cfg = record["config"]

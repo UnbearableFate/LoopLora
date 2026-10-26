@@ -90,10 +90,11 @@ def test_name_gradient_batches_match_scalar_vjps_and_name_contrast():
 
 
 @pytest.mark.parametrize("variant", ["M1", "B8"])
-def test_final_logit_lens_replays_actual_model_with_nonzero_branch(variant):
+@pytest.mark.parametrize("rank", [32, 128])
+def test_final_logit_lens_replays_actual_model_with_nonzero_branch(variant, rank):
     model, tokenizer = tiny(151936).cuda().to(torch.bfloat16), load_tokenizer()
     cfg = resolve_config(dict(writer="oracle_random", stage="reader", variant=variant,
-        model=dict(r=32, layer=0), task=dict(E=4, Q=2, chain_lengths=[4]),
+        model=dict(r=rank, layer=0), task=dict(E=4, Q=2, chain_lengths=[4]),
         train=dict(batch_size=2, depths=[4]),
         eval=dict(episodes=2, batch_size=2, hops=[1, 2, 3, 4], counterfactuals=False)))
     experiment = LLMExperiment(cfg, model=model, tokenizer=tokenizer)
