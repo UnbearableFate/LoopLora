@@ -18,7 +18,8 @@ multi-read (M1) beat the single read (B4), the fixed-query loop (B5) and the no-
   the learned writers; oracle keys ignore relations, so for `oracle_*` the replication is `t2_chain_end` at load
   1.5·E* (interference condition, `oracle_random`).
 - Exploratory: `t2_walk` (h stated), `test_unseen`, counterfactuals, r = 16, L-extrapolation.
-- Variants: M1 (`iterq`, ReLU), M1-lin (`iterq`, identity), B5 (`fixedq`), B3 (`loop`), B4 (`iterq` at L=1).
+- Variants: M1 (`iterq`, ReLU), M1-lin (`iterq`, identity), B5 (`fixedq`, ReLU), B5-lin (`fixedq`, identity),
+  B3 (`loop`), B4 (`iterq` at L=1). M1 and M1-lin are co-primary (amendment A1).
   Training depth: L ~ U{1,2,4} per batch (B4: L = 1). Same steps and batch for every variant.
 - Episode sets (eval generator seed 4242 unless stated): val = split `val`, 1000 episodes; screening test = split
   `test`, 2000 episodes; **confirmation test = split `test` with eval seed 777001, 2000 episodes**, untouched until
@@ -35,24 +36,33 @@ multi-read (M1) beat the single read (B4), the fixed-query loop (B5) and the no-
   accuracy on hops 1–3 at the variant's training-max L (L=4; B4 at L=1). Steps ⟨pilot⟩ from smoke timing.
 
 ## Endpoints (confirmation set, seeds 17/29/43, paired cluster bootstrap by episode, 2000 resamples, 95% CI)
-- **G1 depth effect** (per writer condition, same checkpoint, identical x/u/M across L):
+- Evaluated separately for each co-primary reader P ∈ {M1, M1-lin}; its fixed-query comparator F is B5 for M1
+  and B5-lin for M1-lin. Because two readers are tested, every pass requires the pooled **97.5%** CI lower bound
+  > 0 (Bonferroni over the two readers); 95% CIs are also reported.
+- **G1 depth effect** (per writer condition and reader P, same checkpoint, identical x/u/M across L):
   Acc(L=4) − Acc(L=1) on hops {2,3} ≥ 3.0 pp, pooled CI lower bound > 0, positive in each seed; replicated on
   `t2_typed` (CI > 0); hop-1 accuracy at L=4 not below L=1 by more than 1.0 pp.
-- **G2 evolving query and memory**: M1@L=4 − B5@L=4 > 0 and M1@L=4 − B3@L=4 > 0 on hops {2,3} (CI > 0).
+- **G2 evolving query and memory**: P@L=4 − F@L=4 > 0 and P@L=4 − B3@L=4 > 0 on hops {2,3} (CI > 0).
+- A condition passes for reader P if P meets G1 and G2; claims name the passing reader(s).
 - Interpretation by condition (plan §11.5): the plan's protocol is `t1_frozen`. If G1/G2 hold only for
   `oracle_*` → the reader works but T1-trained codes do not compose (writer problem). If they hold for `joint`
   with identical-snapshot depth sweeps → keep the fixed-memory read-depth claim, noting that composable codes
   need joint training. If no condition passes → the mechanism fails in this parameterization.
-- Reported, not gating: L=8 vs L=4 on hops 4–8 (H6); M1 vs M1-lin; r = 16; `test_unseen`; counterfactual
+- Reported, not gating: L=8 vs L=4 on hops 4–8 (H6); M1 vs M1-lin at L=4; r = 16; `test_unseen`; counterfactual
   consistency (`replace_key_fact` prediction follows the new answer); `swap_memory` drops to chance.
 
 ## Stop rules
-- No condition passes G1 → do not scale to P1-L; allow one follow-up F1 only if a specific observed failure
-  motivates it (e.g. ReLU fails while M1-lin passes → sign-preserving activation or bias as one ablation).
+- No condition passes G1 for either reader → do not scale to P1-L; allow one follow-up F1 only if a specific
+  observed failure motivates it (e.g. both readers learn hop 1 but neither composes → bias/width ablation per
+  docs/theory.md Prop. 6, or a writer-alignment diagnostic).
 - Single-hop (Pilot-1) below 0.95 at every E for r = 32 → diagnose the writer before any T2 conclusion.
 
 ## Budget
 P1-S total ≤ 12 node·h; every job ≤ 8 nodes × 1 h (user cap). Actual node·h recorded per job.
 
 ## Amendments
-(none yet)
+- A1 (2026-10-26, before any pilot or test result was read by the orchestrator): M1-lin promoted to co-primary
+  with its own fixed-query comparator B5-lin, Bonferroni 97.5% CIs for passes. Reason: docs/theory.md Prop. 6
+  shows a bias-free r-wide ReLU cannot pass a positively spanning set of signed codes through Q φ(U ·), so the
+  ReLU instantiation can fail for a reason unrelated to the evolving-query mechanism; testing only M1 would
+  confound the two. Pilot-2 adds B5-lin to its lr selection.
