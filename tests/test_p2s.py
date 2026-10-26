@@ -122,6 +122,13 @@ def test_capability_requires_every_rank_state_lower_bound_strictly_positive():
     with pytest.raises(ValueError,match='six'): analysis.capability(rows[:5])
 
 
+def test_practical_claim_requires_capability_and_at_least_one_named_setting():
+    settings=[dict(any_primary_M1_point_unmatched=False),dict(any_primary_M1_point_unmatched=True)]
+    assert analysis.practical_claim(True,settings)
+    assert not analysis.practical_claim(False,settings)
+    assert not analysis.practical_claim(True,settings[:1])
+
+
 def test_validation_ties_lock_smaller_lr_and_fresh_three_seed_main_runs(tmp_path,monkeypatch):
     monkeypatch.setattr(driver,'RUNS',tmp_path/'runs')
     monkeypatch.setattr(driver,'REPORTS',tmp_path/'reports')

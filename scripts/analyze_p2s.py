@@ -86,6 +86,11 @@ def practical_rows(costs: list[dict]) -> list[dict]:
     return result
 
 
+def practical_claim(capability_passed: bool,settings: list[dict]) -> bool:
+    """The preregistration requires an unmatched M1 point; name its setting."""
+    return capability_passed and any(r['any_primary_M1_point_unmatched'] for r in settings)
+
+
 def cost_tables(plan: dict,accuracy: list[dict]) -> tuple[list[dict],list[dict]]:
     with (driver.RUNS/'benchmark/latency.csv').open() as f: raw=list(csv.DictReader(f))
     index={r['name']:r for r in plan['runs']}
@@ -211,7 +216,7 @@ def analyze() -> None:
         r['unmatched_by_equal_or_faster_single_step'] for r in practical if r['writer']==w and r['batch_size']==b))
         for w in driver.WRITERS for b in (64,1)]
     driver.write(out/'decision.json',dict(capability_passed=cap,practical_settings=by_setting,
-        practical_passed=cap and all(r['any_primary_M1_point_unmatched'] for r in by_setting),
+        practical_passed=practical_claim(cap,by_setting),
         primary_cost_training_steps=15000,F1_only_descriptive=True,
         single_step_definition='L=1 within writer; includes all 15000-step variants and budgets',
         practical_latency_statistic='three-seed mean CUDA-event milliseconds per prepared batch',
