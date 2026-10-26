@@ -56,3 +56,18 @@ Validation only; seed 17; no T2, reader or joint runs. Each job ≤ 1 node × 2 
 `scripts/submit.py --scale-up docs/prereg/DPFP.md` (justification: WP-L4's curves were still rising at the end of
 fixed budgets, and the user requested this study); tests and smoke ≤ 0.5 node·h; node·h recorded per job.
 Executed by a Claude Sonnet-5.5 subagent (codex workers closed 2026-10-27). Report: `docs/reports/DPFP.md`.
+
+## Amendment A1 — relation to the diagnostic and regression-writer studies (2026-10-27 10:05 JST; before any
+## DPFP run or result)
+Prompted by the external reviews (`docs/review/rv-fable_2026-10-27.md` C3, `docs/review/rv-astra_2026-10-27.md`
+§4, §8) and integrated in `plan/followup_2026-10-27.md`. Arms, schedule rule and decision rule are unchanged.
+- DPFP changes two things at once: the key/query feature geometry and the normalization of the query (raw q
+  becomes unit-norm q̂). The report may not credit an effect to decorrelation alone. The read-failure factorial
+  (RFX, F2 of the follow-up plan, evaluation only on WP-L4 checkpoints) measures the unit-normalized-query effect
+  separately; the DPFP report cites it.
+- A writer screen that is registered before any DPFP result and is triggered by RFX's pre-stated outcome (LSQ, F4:
+  ridge least-squares and repeated-scan Kaczmarz stores) is not "a further writer screen following from this
+  study". It has its own registration and decision rule. If neither DPFP nor LSQ selects a writer, the learned
+  writer line stops.
+- With E = 16 ≤ r an exact interpolating store exists, so DPFP's documented benefit (capacity beyond the key
+  dimension) is not this regime's limit; the question stays as registered (does DPFP remove the read distortion).
