@@ -25,7 +25,8 @@ DEFAULTS: dict[str, Any] = {
                  "warmup_steps": 20, "writer_checkpoint": None, "task": {}},
     "eval": {"episodes": 64, "batch_size": 32, "depths": [0, 1, 2, 3, 4, 6, 8, 12, 16],
              "splits": ["val", "test", "test_unseen"], "hops": list(range(1, 9)),
-             "seed": 4242, "counterfactuals": True},
+             "seed": 4242, "counterfactuals": True, "fixed_depth_sweep": False,
+             "swap_successors": False},
     "stats": {"resamples": 2000, "seed": 2718},
     "runtime": {"threads": 1},
 }
@@ -130,8 +131,9 @@ def resolve_config(mapping: Mapping[str, Any]) -> dict[str, Any]:
     for key in ("episodes", "batch_size"):
         _positive_int(config["eval"][key], f"eval.{key}")
     _positive_int(config["eval"]["seed"], "eval.seed", 0)
-    if not isinstance(config["eval"]["counterfactuals"], bool):
-        raise ValueError("eval.counterfactuals must be boolean")
+    for key in ("counterfactuals", "fixed_depth_sweep", "swap_successors"):
+        if not isinstance(config["eval"][key], bool):
+            raise ValueError(f"eval.{key} must be boolean")
     splits = config["eval"]["splits"]
     if not isinstance(splits, list) or not splits or len(set(splits)) != len(splits) or set(splits) - {"val", "test", "test_unseen"}:
         raise ValueError("eval.splits must contain distinct evaluation splits")
@@ -139,7 +141,9 @@ def resolve_config(mapping: Mapping[str, Any]) -> dict[str, Any]:
     _positive_int(config["stats"]["seed"], "stats.seed", 0)
     _positive_int(config["runtime"]["threads"], "runtime.threads")
     if variant in ("B4", "B6", "B7"):
-        config["train"]["depths"] = config["eval"]["depths"] = [1]
+        config["train"]["depths"] = [1]
+        if not config["eval"]["fixed_depth_sweep"]:
+            config["eval"]["depths"] = [1]
     elif variant == "B8":
         config["train"]["depths"] = config["eval"]["depths"] = [4]
     from looplora.data.relations import TaskSpec
