@@ -43,6 +43,11 @@ Readout/oracle regression tests3715857:33passed onmg0022. J-lens-inspired name-g
 trial3715862 passed onmg0032; full cache3715870 uses only the fixed512 validation
 questions and the frozen model. Gates/authorization tests have a separate job.
 The logit-lens final-step replay must reproduce the deployed logits exactly.
+Gates/authorization3715889 passed4checks. Swap-wrapper fixture3715928 found a
+source-hop stratification error (new path lengths can differ after rewiring);
+corrected wrapper3715942 passed with unchanged assertions, retaining source
+episode/query/hop labels and recording new path lengths separately. Both tests
+used validation fixtures, with the scientific test generator intercepted.
 
 Refresh node-hours on login with
 `/usr/bin/python3 scripts/p1l_job_ledger.py --out reports/p1l/jobs.json`.
