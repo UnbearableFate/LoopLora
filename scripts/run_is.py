@@ -148,6 +148,48 @@ def run(stage: str,shard: int,procs: int) -> None:
     print(f'IS {stage} shard {shard} complete in {time.perf_counter()-started:.2f}s',flush=True)
 
 
+def packed(stage: str,shard: int,procs: int) -> None:
+    design();plan=json.loads((RUNS/'main_plan.json').read_text())
+    rows=([r for r in plan['runs'] if r['seed']==17] if stage=='packing' else plan['runs'][shard::3])
+    jobs=[]
+    for r in rows:
+        c=copy.deepcopy(r['config']);out=Path(r['training_dir'])
+        if stage=='packing':
+            c['name']='packing-'+c['name'];c['train']['steps']=150
+            c['eval'].update(episodes=20)
+            out=RUNS/'packing'/c['name']
+        path=RUNS/'packed_configs'/f"{c['name']}.json";write(path,c)
+        jobs.append((path,out))
+    started=time.perf_counter();running=[]
+    while jobs or running:
+        for child in list(running):
+            rc=child.poll()
+            if rc is not None:
+                running.remove(child)
+                if rc:
+                    for other in running: other.terminate()
+                    raise RuntimeError(f'IS packed training failed: {rc}')
+        while jobs and len(running)<procs:
+            path,out=jobs.pop(0)
+            running.append(subprocess.Popen([sys.executable,str(Path(__file__).resolve()),'train-one',
+                '--config',str(path),'--out',str(out)],env={**os.environ,'OMP_NUM_THREADS':'1'}))
+        if running: time.sleep(.2)
+    if stage=='packing':
+        records=[json.loads(p.read_text()) for p in (RUNS/'packing').glob('*/record.json')]
+        if len(records)!=12 or any(r['status']!='complete' for r in records): raise ValueError('packing matrix incomplete')
+        write(REPORTS/'packing_timing.json',dict(status='passed',suite_seconds=time.perf_counter()-started,
+            steps=150,procs=procs,job_id=os.environ.get('PBS_JOBID'),metrics_read=False,
+            timing=[{k:r[k] for k in ('writer','variant','train_seconds','peak_memory_bytes')} for r in records],
+            projected_main_node_hours=max(r['train_seconds'] for r in records)*100*3/3600))
+    print(f'IS {stage} shard {shard}: {len(rows)} runs in {time.perf_counter()-started:.2f}s',flush=True)
+
+
+def train_one(config_path: str,out: str) -> None:
+    from is_runtime import install
+    from looplora.sym.run import run_one
+    install();run_one(json.loads(Path(config_path).read_text()),out)
+
+
 def all_training() -> dict:
     from looplora.infra.seeds import stable_hash
     locked=design();plan=json.loads((RUNS/'main_plan.json').read_text())
@@ -202,6 +244,8 @@ def evaluate_one(name: str) -> None:
     from looplora.sym.evaluate import evaluate
     from looplora.sym.run import source_metadata
     from looplora.sym.train import load_checkpoint
+    from is_runtime import install
+    install()
     all_training();plan=json.loads((RUNS/'evaluation_plan.json').read_text())
     row=next(r for r in plan['runs'] if r['name']==name);path=Path(row['checkpoint']);out=Path(row['run_dir'])
     if out.exists(): raise FileExistsError(out)
@@ -248,10 +292,12 @@ def evaluate_all(procs: int) -> None:
 
 
 def main() -> None:
-    p=argparse.ArgumentParser(description=__doc__);p.add_argument('stage',choices=('lock','smoke','main','evaluate','evaluate-one'))
-    p.add_argument('--shard',type=int,default=0);p.add_argument('--procs',type=int,default=9);p.add_argument('--name')
+    p=argparse.ArgumentParser(description=__doc__);p.add_argument('stage',choices=('lock','smoke','main','packing','packed-main','train-one','evaluate','evaluate-one'))
+    p.add_argument('--shard',type=int,default=0);p.add_argument('--procs',type=int,default=9);p.add_argument('--name');p.add_argument('--config');p.add_argument('--out')
     a=p.parse_args()
     if a.stage=='lock': lock()
+    elif a.stage=='train-one': train_one(a.config,a.out)
+    elif a.stage in ('packing','packed-main'): packed(a.stage,a.shard,a.procs)
     elif a.stage=='evaluate': evaluate_all(a.procs)
     elif a.stage=='evaluate-one': evaluate_one(a.name)
     else: run(a.stage,a.shard,a.procs)
