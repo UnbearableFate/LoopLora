@@ -31,7 +31,7 @@
 
 - 资源上限（用户指定，当前阶段）：单个实验的训练资源 ≤ 8 节点 × 1 小时；由 `scripts/submit.py` 在提交时检查，实际 walltime 按实测 ×1.5 申请。2026-10-26 用户补充：当已获得的实验结论支持扩大实验时，单次实验预算可扩至 8 节点 × 2 小时。2026-10-27 用户澄清：“单个实验”指单个作业，总预算可以放宽（各研究的总量为自设预算，按作业记录 node·h）（`submit.py --scale-up <决策记录或预注册>`，理由写入该文档）。
 - 平台：Miyabi-G（GH200，aarch64），组 xg24i002；torch 2.14.0+cu132、transformers 4.57.6，uv 管理（`pyproject.toml`/`uv.lock`）。所有测试与实验经 PBS 在计算节点运行。
-- 系统计划停机：2026-10-28 09:00 JST；之前提交的作业须在此前结束。
+- 系统日程（2026-10-27 06:49 从 `/etc/motd` 与 PBS 注释“Job would cross dedicated time boundary”核实；此前误记为 10-28 09:00 才停止）：正常运行到 **2026-10-27 08:00**；10-27 08:00 至 10-28 09:00 为 HPC Challenge 专用时段，普通作业不能运行；10-28 09:00–22:00 系统维护；10-28 22:00 起恢复。不能在 08:00 前结束的作业要到 10-28 22:00 之后才会开始。
 - 执行组织：Claude Code 作为 Orchestrator；codex worker（2026-10-26 19:36 前启动的为 GPT-6-Astra xhigh，此后新开 session 为 GPT-6.1-sol xhigh）经 herdr 在独立 tab 与 git worktree（`wp/*` 分支）中实现子任务；worker 为固定角色、长生命周期（`docs/workers.md`），按需清理并重新注入上下文；交流以 `docs/tasks/`（任务书）与 `docs/reports/`（报告）为准。
 - 代码约定：不使用 SHA-256，内容哈希统一用 blake2b；随机种子由 `derive_seed(base, label…)` 派生。
 
