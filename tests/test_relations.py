@@ -94,6 +94,19 @@ def _assert_acyclic(graph, rel=0):
             node = graph[node, rel]
 
 
+def _chains(graph, rel=0):
+    heads = {head for head, relation in graph if relation == rel}
+    tails = {tail for (_, relation), tail in graph.items() if relation == rel}
+    chains = {}
+    for root in sorted(heads - tails):
+        node, path = root, []
+        while (node, rel) in graph:
+            path.append((node, rel))
+            node = graph[node, rel]
+        chains[root] = node, path
+    return chains
+
+
 def _assert_arrays_equal(left, right):
     for field in ARRAY_FIELDS:
         np.testing.assert_array_equal(getattr(left, field), getattr(right, field))
@@ -408,6 +421,123 @@ def test_swap_memory_is_a_derangement_with_recomputed_labels(spec):
     assert json.dumps(original.meta, sort_keys=True) == saved_meta
 
 
+@pytest.mark.parametrize("name", ("t2_chain_end", "t2_typed"))
+@pytest.mark.parametrize("split", ("test", "test_unseen"))
+def test_swap_successors_preserves_global_counts_and_changes_each_answer(name, split):
+    distractors = 5 if name == "t2_typed" else 0
+    spec = TaskSpec(name, E=16 + distractors, Q=8, chain_lengths=(1, 3, 5, 7),
+                    hops=(1, 3, 5, 7), n_distract=distractors)
+    original = generate(spec, split, 0, 16, 953)
+    saved = {field: getattr(original, field).copy() for field in ARRAY_FIELDS}
+    saved_meta = json.dumps(original.meta, sort_keys=True)
+    changed, answers = counterfactual(original, "swap_successors", seed=967)
+    assert changed.facts.shape == (16 * spec.Q, spec.E, 3)
+    assert changed.answer.shape == (16 * spec.Q, 1)
+    np.testing.assert_array_equal(answers, changed.answer)
+    assert changed.meta["spec"] == asdict(replace(spec, Q=1))
+    assert changed.meta["counterfactual"] == {"kind": "swap_successors", "seed": 967}
+    assert changed.meta["source_episode"] == np.repeat(np.arange(16), spec.Q).tolist()
+    assert changed.meta["source_query"] == np.tile(np.arange(spec.Q), 16).tolist()
+    saw_new_distance = False
+    for row in range(len(changed.facts)):
+        episode, query = divmod(row, spec.Q)
+        before, after = original.facts[episode], changed.facts[row]
+        np.testing.assert_array_equal(changed.fact_valid[row], original.fact_valid[episode])
+        np.testing.assert_array_equal(after[:, :2], before[:, :2])
+        np.testing.assert_array_equal(after[before[:, 1] != 0], before[before[:, 1] != 0])
+        chain_mask = before[:, 1] == 0
+        assert Counter(map(int, after[chain_mask, 0])) == Counter(map(int, before[chain_mask, 0]))
+        assert Counter(map(int, after[chain_mask, 2])) == Counter(map(int, before[chain_mask, 2]))
+        edits = np.flatnonzero(after[:, 2] != before[:, 2])
+        assert len(edits) == 2
+        assert (before[edits, 1] == 0).all()
+        np.testing.assert_array_equal(after[edits, 2], before[edits[::-1], 2])
+        graph = _graph(changed, row)
+        assert len(graph) == int(changed.fact_valid[row].sum())
+        _assert_acyclic(graph)
+        old_chains, new_chains = _chains(_graph(original, episode)), _chains(graph)
+        assert new_chains.keys() == old_chains.keys()
+        assert {terminal for terminal, _ in new_chains.values()} == {
+            terminal for terminal, _ in old_chains.values()
+        }
+        expected, new_path = _oracle(changed, spec, row, 0)
+        old_answer, old_path = _oracle(original, spec, episode, query)
+        assert answers[row, 0] == expected != old_answer
+        assert changed.q_hop_true[row, 0] == len(new_path)
+        saw_new_distance |= len(new_path) != len(old_path)
+        edited_keys = {tuple(map(int, before[position, :2])) for position in edits}
+        assert len(edited_keys.intersection(old_path)) == 1
+        other_key = (edited_keys - set(old_path)).pop()
+        other_terminal = next(terminal for terminal, path in old_chains.values() if other_key in path)
+        assert expected == other_terminal
+        for field in ("q_start", "q_rel", "q_hop_given"):
+            assert getattr(changed, field)[row, 0] == getattr(original, field)[episode, query]
+    assert saw_new_distance
+    for field in ARRAY_FIELDS:
+        np.testing.assert_array_equal(getattr(original, field), saved[field])
+    assert json.dumps(original.meta, sort_keys=True) == saved_meta
+    repeated, repeated_answers = counterfactual(original, "swap_successors", seed=967)
+    _assert_arrays_equal(changed, repeated)
+    assert repeated.meta == changed.meta
+    np.testing.assert_array_equal(repeated_answers, answers)
+
+
+def test_swap_successors_samples_chains_and_each_edge_uniformly():
+    spec = TaskSpec("t2_chain_end", E=12, Q=1, chain_lengths=(4, 2, 6), hops=(4,))
+    original = generate(spec, "train", 0, 1, 971)
+    chains = _chains(_graph(original, 0))
+    root, (terminal, source_path) = next((root, chain) for root, chain in chains.items() if len(chain[1]) == 4)
+    original.q_start[0, 0], original.answer[0, 0] = root, terminal
+    other_paths = [path for other_terminal, path in chains.values() if other_terminal != terminal]
+    partner_counts, source_counts = Counter(), Counter()
+    partner_edges = [Counter() for _ in other_paths]
+    for seed in range(1536):
+        changed, _ = counterfactual(original, "swap_successors", seed)
+        edits = np.flatnonzero(changed.facts[0, :, 2] != original.facts[0, :, 2])
+        keys = [tuple(map(int, original.facts[0, position, :2])) for position in edits]
+        source_key = next(key for key in keys if key in source_path)
+        partner_key = next(key for key in keys if key not in source_path)
+        partner = next(i for i, path in enumerate(other_paths) if partner_key in path)
+        partner_counts[partner] += 1
+        source_counts[source_path.index(source_key)] += 1
+        partner_edges[partner][other_paths[partner].index(partner_key)] += 1
+    for partner, path in enumerate(other_paths):
+        assert abs(partner_counts[partner] / 1536 - 0.5) < 0.07
+        for edge in range(len(path)):
+            assert abs(partner_edges[partner][edge] / partner_counts[partner] - 1 / len(path)) < 0.07
+    for edge in range(len(source_path)):
+        assert abs(source_counts[edge] / 1536 - 1 / len(source_path)) < 0.07
+
+
+@pytest.mark.parametrize("name", ("t2_chain_end", "t2_typed"))
+def test_swap_successors_needs_no_unused_entities(name):
+    spec = TaskSpec(name, E=2, Q=2, V=8, seen=(0, 4), unseen=(4, 8),
+                    chain_lengths=(1, 1), hops=(1,))
+    original = generate(spec, "train", 0, 1, 977)
+    changed, answers = counterfactual(original, "swap_successors", seed=983)
+    for row in range(spec.Q):
+        np.testing.assert_array_equal(changed.facts[row, :, 2], original.facts[0, ::-1, 2])
+        assert answers[row, 0] != original.answer[0, row]
+    assert (changed.q_hop_true == 1).all()
+    _assert_oracle(changed, spec)
+
+
+@pytest.mark.parametrize("name", ("t2_chain_end", "t2_typed"))
+def test_swap_successors_rejects_single_chain(name):
+    spec = TaskSpec(name, E=3, Q=1, chain_lengths=(3,))
+    original = generate(spec, "test", 0, 1, 991)
+    with pytest.raises(ValueError, match="swap_successors.*at least two chains"):
+        counterfactual(original, "swap_successors", seed=997)
+
+
+@pytest.mark.parametrize("spec", [spec for spec in _specs() if spec.name not in ("t2_chain_end", "t2_typed")],
+                         ids=lambda spec: f"{spec.name}-{spec.base}")
+def test_swap_successors_rejects_other_tasks(spec):
+    original = generate(spec, "test", 0, 1, 1009)
+    with pytest.raises(ValueError, match="swap_successors.*t2_chain_end.*t2_typed"):
+        counterfactual(original, "swap_successors", seed=1013)
+
+
 @pytest.mark.parametrize("spec", _specs(), ids=lambda spec: f"{spec.name}-{spec.base}")
 def test_local_randomness_preserves_global_python_and_numpy_states(spec):
     python_saved, numpy_saved = random.getstate(), np.random.get_state()
@@ -421,6 +551,8 @@ def test_local_randomness_preserves_global_python_and_numpy_states(spec):
         first_cf, _ = counterfactual(first, "replace_key_fact", seed=829)
         counterfactual(first, "remove_required_fact", seed=829)
         counterfactual(first, "swap_memory", seed=829)
+        if spec.name in ("t2_chain_end", "t2_typed"):
+            counterfactual(first, "swap_successors", seed=829)
         assert random.getstate() == python_before
         numpy_after = np.random.get_state()
         assert numpy_before[0] == numpy_after[0]

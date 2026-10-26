@@ -453,6 +453,27 @@ def _fresh(
     return rng.choice(choices, count, replace=False)
 
 
+def _swap_successors(
+    facts: NDArray[np.int32], valid: NDArray[np.bool_], path: list[tuple[int, int]],
+    terminal: int, relation: int, insufficient: int, rng: np.random.Generator,
+) -> None:
+    edges = facts[valid & (facts[:, 1] == relation)]
+    roots = np.setdiff1d(edges[:, 0], edges[:, 2])
+    alternatives: list[list[tuple[int, int]]] = []
+    for root in roots:
+        other_terminal, other_path = _walk(facts, valid, int(root), relation, -1, insufficient)
+        if other_terminal != terminal:
+            alternatives.append(other_path)
+    if not alternatives:
+        raise ValueError("swap_successors needs at least two chains in the query relation")
+    other_path = alternatives[int(rng.integers(len(alternatives)))]
+    key = path[int(rng.integers(len(path)))]
+    other_key = other_path[int(rng.integers(len(other_path)))]
+    first = np.flatnonzero(valid & (facts[:, 0] == key[0]) & (facts[:, 1] == key[1]))[-1]
+    second = np.flatnonzero(valid & (facts[:, 0] == other_key[0]) & (facts[:, 1] == other_key[1]))[-1]
+    facts[[first, second], 2] = facts[[second, first], 2]
+
+
 def counterfactual(
     arrays: EpisodeArrays, kind: str, seed: int,
 ) -> tuple[EpisodeArrays, NDArray[np.int32]]:
@@ -460,14 +481,18 @@ def counterfactual(
 
     Path edits return N*Q rows with one query each, in episode-major order.
     ``meta['source_episode']`` and ``meta['source_query']`` identify the originals.
-    Swap keeps the original shape and records ``meta['pairing']``. Its returned
-    labels are the new oracle answers; the control must be scored against the
+    ``swap_successors`` exchanges two chains' tails while preserving terminals
+    and starts; it supports only t2_chain_end and t2_typed.
+    ``swap_memory`` keeps the original shape and records ``meta['pairing']``.
+    Its returned labels are the new oracle answers; score that control against the
     *original* ``arrays.answer``. No input arrays or metadata are mutated.
     """
     _integer("seed", seed, 0)
-    if kind not in ("replace_key_fact", "remove_required_fact", "swap_memory"):
+    if kind not in ("replace_key_fact", "remove_required_fact", "swap_memory", "swap_successors"):
         raise ValueError(f"unknown counterfactual: {kind!r}")
     spec = TaskSpec(**arrays.meta["spec"])
+    if kind == "swap_successors" and spec.name not in ("t2_chain_end", "t2_typed"):
+        raise ValueError("swap_successors only supports t2_chain_end and t2_typed")
     n, q = arrays.answer.shape
     pool = spec.unseen if arrays.meta["split"] == "test_unseen" else spec.seen
     meta = {**arrays.meta, "counterfactual": {"kind": kind, "seed": seed}}
@@ -511,15 +536,18 @@ def counterfactual(
             original, path = _walk(facts, valid, start, relation, hops, spec.V)
             if original == spec.V or not path:
                 raise ValueError(f"path counterfactual needs an answerable nonempty path (episode {i}, query {j})")
-            key = path[-1] if hops >= 0 else path[int(rng.integers(len(path)))]
-            matches = np.flatnonzero(valid & (facts[:, 0] == key[0]) & (facts[:, 1] == key[1]))
-            if kind == "replace_key_fact":
-                fresh = _fresh(facts, arrays.q_start[i], pool, 1, rng)
-                facts[matches[-1], 2] = fresh[0]
+            if kind == "swap_successors":
+                _swap_successors(facts, valid, path, original, relation, spec.V, rng)
             else:
-                fresh = _fresh(facts, arrays.q_start[i], pool, 2 * len(matches), rng)
-                for k, position in enumerate(matches):
-                    facts[position] = fresh[2 * k], relation, fresh[2 * k + 1]
+                key = path[-1] if hops >= 0 else path[int(rng.integers(len(path)))]
+                matches = np.flatnonzero(valid & (facts[:, 0] == key[0]) & (facts[:, 1] == key[1]))
+                if kind == "replace_key_fact":
+                    fresh = _fresh(facts, arrays.q_start[i], pool, 1, rng)
+                    facts[matches[-1], 2] = fresh[0]
+                else:
+                    fresh = _fresh(facts, arrays.q_start[i], pool, 2 * len(matches), rng)
+                    for k, position in enumerate(matches):
+                        facts[position] = fresh[2 * k], relation, fresh[2 * k + 1]
             answer, new_path = _walk(facts, valid, start, relation, hops, spec.V)
             result.facts[row] = facts
             result.fact_valid[row] = valid
