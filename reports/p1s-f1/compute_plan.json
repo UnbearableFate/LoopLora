@@ -1,0 +1,19 @@
+{
+  "selected_processes_per_node": 8,
+  "timing_job": "3712630.opbs",
+  "timing_host": "mg0584",
+  "timing_steps": 2000,
+  "timing_runs_per_pack": 8,
+  "four_process_pack_seconds": 178.99956445209682,
+  "eight_process_pack_seconds": 156.43809504481032,
+  "formal_shards": 6,
+  "formal_runs_per_shard": 10,
+  "formal_steps": 20000,
+  "projected_seconds_per_shard": 1955.476188060129,
+  "projected_formal_node_hours": 3.259126980100215,
+  "requested_walltime_per_shard": "00:50:00",
+  "walltime_rule": "1.5 times measured pack, scaled by steps and run count, rounded to 50 minutes",
+  "total_node_hour_cap": 6,
+  "confirmation_not_started": true,
+  "evaluation_pipeline": "Await tested WP-H pipeline merge; re-evaluate all checkpoints there."
+}

@@ -1,0 +1,47 @@
+{
+  "job_id": "3712630.opbs",
+  "procs": 8,
+  "runs": [
+    {
+      "name": "smoke-f1-joint-r128-M1-lin-s17",
+      "peak_memory_bytes": 366759424,
+      "train_seconds": 143.0618382799439
+    },
+    {
+      "name": "smoke-f1-joint-r128-M1-s17",
+      "peak_memory_bytes": 367152640,
+      "train_seconds": 143.52265283092856
+    },
+    {
+      "name": "smoke-f1-joint-r64-M1-lin-s17",
+      "peak_memory_bytes": 146476544,
+      "train_seconds": 143.03774542128667
+    },
+    {
+      "name": "smoke-f1-joint-r64-M1-s17",
+      "peak_memory_bytes": 146673152,
+      "train_seconds": 143.36495840735734
+    },
+    {
+      "name": "smoke-f1-oracle_random-r128-M1-lin-s17",
+      "peak_memory_bytes": 152520704,
+      "train_seconds": 148.09519269689918
+    },
+    {
+      "name": "smoke-f1-oracle_random-r128-M1-s17",
+      "peak_memory_bytes": 153044992,
+      "train_seconds": 148.11539523815736
+    },
+    {
+      "name": "smoke-f1-oracle_random-r64-M1-lin-s17",
+      "peak_memory_bytes": 92994560,
+      "train_seconds": 148.08454884774983
+    },
+    {
+      "name": "smoke-f1-oracle_random-r64-M1-s17",
+      "peak_memory_bytes": 93256704,
+      "train_seconds": 148.10168993705884
+    }
+  ],
+  "seconds": 156.43809504481032
+}
