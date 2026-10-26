@@ -164,3 +164,25 @@ def test_inference_report_counts_adapter_and_real_batched_score_calls(tmp_path):
     assert len(row["batch_seconds"]) == 20 and row["warmups"] == 5
     assert row["mean_seconds_per_question"] > 0
     assert row["mean_seconds_per_question"] == pytest.approx(np.mean(row["batch_seconds"]) / 128)
+
+
+def test_readout_wrapper_keeps_every_episode_across_partial_batches(tmp_path):
+    import json
+    model, tokenizer = tiny(151936).cuda().to(torch.bfloat16), load_tokenizer()
+    cfg = resolve_config(config("B8"))
+    cfg["model"]["layer"] = 0
+    cfg["eval"].update(episodes=5, batch_size=2)
+    raw = torch.randn((1024, 16), generator=torch.Generator().manual_seed(
+        derive_seed(17, "test-readout-batches")))
+    primary, secondary = normalize_directions(raw)
+    directions = dict(names=torch.tensor(load_name_pool().token_ids[:1024]),
+                      contrastive=primary, raw_logit=secondary, random=secondary)
+    experiment = LLMExperiment(cfg, model=model, tokenizer=tokenizer)
+    try:
+        evaluator.readout(experiment, cfg, directions, tmp_path)
+    finally:
+        experiment.close()
+    result = json.loads((tmp_path / "readout.json").read_text())
+    assert {row["hop"] for row in result["faithfulness"]} == set(range(1, 9))
+    assert {row["reader_step"] for row in result["table"]} == {1, 2, 3, 4}
+    assert all(row["n"] == 5 for row in result["faithfulness"] + result["table"])

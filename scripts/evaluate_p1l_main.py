@@ -129,12 +129,12 @@ def readout(experiment, cfg: dict, directions: dict, out: Path):
     spec = make_task_spec(cfg, evaluation=True)
     split, = cfg["eval"]["splits"]
     generator_split, start = ("test", 100000) if split == "confirm" else (split, 0)
-    count, seed = cfg["eval"]["episodes"], cfg["eval"]["seed"]
-    arrays = stratify_queries(generate(spec, generator_split, start, count, seed),
+    episode_count, seed = cfg["eval"]["episodes"], cfg["eval"]["seed"]
+    arrays = stratify_queries(generate(spec, generator_split, start, episode_count, seed),
                              spec, cfg["eval"]["hops"], seed)
     totals, faithful = {}, {}
-    for begin in range(0, count, cfg["eval"]["batch_size"]):
-        part = _slice(arrays, slice(begin, min(count, begin + cfg["eval"]["batch_size"])))
+    for begin in range(0, episode_count, cfg["eval"]["batch_size"]):
+        part = _slice(arrays, slice(begin, min(episode_count, begin + cfg["eval"]["batch_size"])))
         prepared = experiment.prepare(part)
         outputs, actual = read_batch(experiment, prepared, directions)
         paths, hops = path_entities(part).reshape(-1, 4), part.q_hop_true.ravel()
@@ -145,8 +145,8 @@ def readout(experiment, cfg: dict, directions: dict, out: Path):
                     for hop in np.unique(hops):
                         keep = hops == hop
                         key = method, int(hop)
-                        count, correct = faithful.get(key, (0, 0))
-                        faithful[key] = count + int(keep.sum()), correct + int((prediction[keep] == actual[keep]).sum())
+                        previous_n, correct = faithful.get(key, (0, 0))
+                        faithful[key] = previous_n + int(keep.sum()), correct + int((prediction[keep] == actual[keep]).sum())
                 for entity_step in range(1, 5):
                     targets = paths[:, entity_step - 1]
                     for hop in np.unique(hops):
