@@ -192,6 +192,8 @@ y=Wx+\alpha[BAx+\eta BA\operatorname{ReLU}(BAx)],
 
 原文第 6 页的 key-query 是域专家选择，不能等同于本文的跨 token 关联记忆。
 
+2026-10-26 核查补充（`docs/reports/lit_check.md`）：OpenReview 页面受机器人验证阻挡未能打开；检索摘要将该条目标为 “ICLR 2026 Conference Withdrawn Submission”（未打开原页，属未核实信息）。引用时应写明为撤回/未录用的投稿稿件，页码级主张仍以用户上传稿为准。另：[R5] 附录称增加 inner loop 次数“性能相近”，即在其设置中未见更多内循环读取的收益，这是 H1 的直接先验反例，需在讨论中对照。
+
 该版本没有展示同一 checkpoint 的训练外深度外推，也没有报告充分的实际延迟或平均 token 循环次数。第 9 页 Table 2 与 Figure 2 的 \(K_{\max}=1\) 分别为 61.14 和 66.34，未说明差异；Figure 2 的五个深度结果为 66.34、64.20、68.50、66.05、62.45。这些信息仅用于限定证据范围，不用于推断作者动机或否定全部结果。
 
 ### 2.2 近邻工作矩阵
@@ -209,6 +211,9 @@ y=Wx+\alpha[BAx+\eta BA\operatorname{ReLU}(BAx)],
 | ELR [R11] | 可调循环预算、循环条件化低秩调制 | 不以混合深度训练或 loop-conditioned LoRA 单独立项 |
 | OperLoop [R12] | 优化视角、delta correction、步长与衰减 | 不以“循环是一种优化”单独立项 |
 | LLM Sleep [R13] | 反复处理上下文以形成 fast weights | 增加查询阶段计算，与增加记忆形成计算分开比较 |
+| End-to-End Memory Networks [R19] | 每个输出符号多次 hop 读取记忆，查询逐 hop 更新（bAbI 组合推理） | 本计划为固定大小 delta 记忆、冻结主干与 PEFT 约束；“多次读取+查询更新”本身不认领 |
+| MemReasoner [R20] | 矩阵记忆上的迭代读取与查询更新，直至读出收敛 | 其记忆按 episode 伪逆写入、端到端微调；本计划为逐 token delta 写入、冻结主干、单份写前快照 |
+| Retrofitting Recurrent Depth [R21] | 冻结基座 + 跨循环共享 rank-16 LoRA，深度外推约 1.5× | 其循环整个隐藏状态并重跑主干层，无记忆；本计划不重复主干 |
 
 ### 2.3 预期贡献的证据等级
 
@@ -1417,17 +1422,36 @@ HotpotQA: A Dataset for Diverse, Explainable Multi-hop Question Answering. EMNLP
 
 ### [R17] 小模型候选
 
-Qwen/Qwen3-0.6B.
+Qwen/Qwen3-0.6B-Base（执行中由 Qwen/Qwen3-0.6B 调整，见 E.2）。
 
-- [官方模型页](https://huggingface.co/Qwen/Qwen3-0.6B)
+- [官方模型页](https://huggingface.co/Qwen/Qwen3-0.6B-Base)，固定 revision `da87bfb608c14b7cf20ba1ce41287e8de496c0cd`
 - 用途：降低首轮 LLM 试错成本；运行前固定模型与 tokenizer revision。
 
 ### [R18] 确认规模候选
 
-Qwen/Qwen3-4B.
+Qwen/Qwen3-1.7B-Base（HEAD `ea980cb`，已缓存）或 Qwen/Qwen3-4B-Base（HEAD `906bfd4`），P5 前选定。
 
-- [官方模型页](https://huggingface.co/Qwen/Qwen3-4B)
+- [Qwen3-1.7B-Base](https://huggingface.co/Qwen/Qwen3-1.7B-Base)，[Qwen3-4B-Base](https://huggingface.co/Qwen/Qwen3-4B-Base)
 - 用途：核心效应确认后的规模验证；不在机制未成立时直接扩大模型。
+
+### [R19] End-to-End Memory Networks
+
+Sainbayar Sukhbaatar et al. End-To-End Memory Networks. NeurIPS 2015.
+
+- [arXiv:1503.08895](https://arxiv.org/abs/1503.08895)
+- 用途：多 hop 记忆读取与查询更新的经典先例（2026-10-26 补充）。
+
+### [R20] MemReasoner
+
+- [arXiv:2503.07903](https://arxiv.org/abs/2503.07903)
+- 用途：矩阵记忆上的迭代读取与查询更新（§3.3），端到端微调（2026-10-26 补充）。
+
+### [R21] Retrofitting Recurrent Depth into a Pretrained LM
+
+- [arXiv:2608.11233](https://arxiv.org/abs/2608.11233)
+- 用途：冻结基座 + 跨循环共享 LoRA 的循环深度近邻，无记忆（2026-10-26 补充）。
+
+版本核查（2026-10-26）：[R10] 已至 v2（仅许可证变化），[R13] 已至 v3（仅引用修订），[R14] 已至 v3（ICLR 2025 定稿，结构调整，门控 delta 公式不变）；其余预印本与所列版本一致。详见 `docs/reports/lit_check.md`。
 
 ---
 
