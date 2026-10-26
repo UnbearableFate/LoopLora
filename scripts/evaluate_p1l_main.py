@@ -69,10 +69,13 @@ def check_training(manifest: dict, authorization: dict, *, check_all: bool = Tru
 @torch.no_grad()
 def swap_successors(experiment, cfg: dict, out: Path) -> dict:
     spec = make_task_spec(cfg, evaluation=True)
-    arrays = stratify_queries(generate(spec, "test", 100000, 2000, 4242),
-                             spec, cfg["eval"]["hops"], 4242)
+    split, = cfg["eval"]["splits"]
+    generator_split, start = ("test", 100000) if split == "confirm" else (split, 0)
+    count, seed = cfg["eval"]["episodes"], cfg["eval"]["seed"]
+    arrays = stratify_queries(generate(spec, generator_split, start, count, seed),
+                             spec, cfg["eval"]["hops"], seed)
     swapped, _ = counterfactual(arrays, "swap_successors",
-                               derive_seed(4242, "p1l", "confirm-swap-successors"))
+                               derive_seed(seed, "p1l", f"{split}-swap-successors"))
     # swap_successors returns allsource query labels; no oracle answer enters scoring.
     source_episode = np.asarray(swapped.meta["source_episode"])
     source_query = np.asarray(swapped.meta["source_query"])
@@ -124,11 +127,14 @@ def swap_successors(experiment, cfg: dict, out: Path) -> dict:
 @torch.no_grad()
 def readout(experiment, cfg: dict, directions: dict, out: Path):
     spec = make_task_spec(cfg, evaluation=True)
-    arrays = stratify_queries(generate(spec, "test", 100000, 2000, 4242),
-                             spec, cfg["eval"]["hops"], 4242)
+    split, = cfg["eval"]["splits"]
+    generator_split, start = ("test", 100000) if split == "confirm" else (split, 0)
+    count, seed = cfg["eval"]["episodes"], cfg["eval"]["seed"]
+    arrays = stratify_queries(generate(spec, generator_split, start, count, seed),
+                             spec, cfg["eval"]["hops"], seed)
     totals, faithful = {}, {}
-    for begin in range(0, 2000, cfg["eval"]["batch_size"]):
-        part = _slice(arrays, slice(begin, min(2000, begin + cfg["eval"]["batch_size"])))
+    for begin in range(0, count, cfg["eval"]["batch_size"]):
+        part = _slice(arrays, slice(begin, min(count, begin + cfg["eval"]["batch_size"])))
         prepared = experiment.prepare(part)
         outputs, actual = read_batch(experiment, prepared, directions)
         paths, hops = path_entities(part).reshape(-1, 4), part.q_hop_true.ravel()
