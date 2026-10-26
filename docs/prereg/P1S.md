@@ -74,7 +74,9 @@ multi-read (M1) beat the single read (B4), the fixed-query loop (B5) and the no-
   need joint training. If no condition passes → the mechanism fails in this parameterization.
 - Reported, not gating: every criterion's components; L=8 vs L=4 on hops 4–8 (H6); M1 vs M1-lin at L=4; B4 vs
   M1@L=1; r = 16; screening-set values for seed 17; `test_unseen`; counterfactual consistency
-  (`replace_key_fact` prediction follows the new answer; `swap_memory` drops to chance); training curves.
+  (`replace_key_fact` prediction follows the new answer; `swap_memory` drops to chance); training curves;
+  `swap_successors` follow rate (A5): on the screening set, the share of rows whose prediction is the new
+  terminal, at L = 1, 4, 8, against the share predicting it on the unswapped episode.
 
 ## Stop rules
 - No condition passes G1 for either reader → do not scale to P1-L; allow one follow-up F1 only if a specific
@@ -107,3 +109,7 @@ run starts and recorded.
   exactly hop-1-only (33.3%). The criterion makes passing harder, never easier.
 - A4 (same time): main-run matrix fixed as above (replication limited to the two co-primary readers whose depth
   contrasts it tests; r = 16 limited to four readers and one seed), to fit the budget at 20000 steps.
+- A5 (2026-10-26 21:55, before any test evaluation; diagnostic only, never gating): `swap_successors`
+  counterfactual (`docs/tasks/WP-B2_swap_successors.md`) — rewire two chains so the terminal set is unchanged but
+  the correct terminal changes; walking follows the new terminal, terminal guessing cannot. Evaluated on saved
+  checkpoints after WP-B2 merges.
