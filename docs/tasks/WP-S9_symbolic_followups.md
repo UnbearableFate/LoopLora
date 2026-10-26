@@ -1,0 +1,27 @@
+# WP-S9 — symbolic follow-ups IVD, CVH, TSM, UNS (sn-sym; LoopLora-wt/sym, wp/sym)
+
+Read first: `docs/tasks/_common_rules.md`, `plan/followup_2026-10-27.md` (§1, §3 F8–F11, §7 item 4),
+`docs/paper/evidence_symbolic.md`, the reviews' relevant parts (`docs/review/rv-astra_2026-10-27.md` proposals
+3, 4, 6; `docs/review/rv-fable_2026-10-27.md` C4–C6, R1, R2, E2), the symbolic preregs and reports you need
+(`docs/prereg/P1S.md`, `P2S.md`, `P2S-F1.md`, IS, JS and P4S-L halting under `docs/prereg/` and `docs/reports/`).
+Code: `src/looplora/sym/`, `src/looplora/core/`, the matching `scripts/` (analyze_is.py, analyze_js.py,
+analyze_p4s_*.py …).
+
+## Step 1 (now, no compute)
+1. Inventory: which existing checkpoints each study needs (paths, seeds, writers) and every evaluation seed /
+   confirmation set used so far (C777, C888, 888001, IS, JS, halting …). New confirmation sets must use seeds never
+   used before.
+2. Pre-registration drafts, decision rules as in the follow-up plan:
+   - `docs/prereg/IVD.md` (F8, frozen checkpoints, load × key-overlap, matched write age/order, decay-only control);
+   - `docs/prereg/CVH.md` (F9, continuation-value halting heads vs existing heads and hop-1-constrained thresholds);
+   - `docs/prereg/TSM.md` (F10: T0 M1-L4 retrained under the same code, T1 stay loss at L = 8, T2 stay loss + sticky
+     gate; oracle_random and joint_fact; 3 seeds; B4 reference);
+   - `docs/prereg/UNS.md` (F11, `test_unseen` vs seen pool, descriptive).
+   Also specify the neighbour-confusion rate for single-read hop-2 errors (C4) as a descriptive analysis of
+   existing evaluation samples.
+3. Implement the code and tests for all four plus the confusion rate; off paths bitwise unchanged.
+4. Node·h estimates from the measured costs of IS, JS, P4S-L and P2S-F1; step-2 commands.
+Report: `docs/reports/WP-S9-state.md`. Done line in your final reply: `WP-S9 step 1 done`.
+
+## Step 2 (only when the orchestrator says so)
+Run in the plan's order (IVD, CVH, UNS and the confusion rate first; TSM after). Reports per study.

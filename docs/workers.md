@@ -7,13 +7,18 @@ committed documents plus a short final reply. Do not reopen codex workers unless
 below are kept for provenance only (their herdr tabs were closed at 07:28 on the user's request); wk-p1l's handover is `docs/reports/P1L-state.md` on wp/p1l (aa5005c, all codex
 wake-ups cancelled).
 
-| subagent | role (from the codex worker) | state |
-| --- | --- | --- |
-| sn-llm | wk-llm: LLM module experiments | active: WP-L5 DPFP writer, step 1 (implementation, no compute) |
-| sn-p1l | wk-p1l: P1-L main study | to spawn after 2026-10-28 22:00 from `docs/reports/P1L-state.md` |
-| (on demand) | wk-sym, wk-symf, wk-theory, wk-core, wk-data | no pending work |
-| rv-fable | external reviewer, Claude Fable 5.1 (max), herdr tab w1:t17 (user request 2026-10-27) | active: literature review, `docs/review/brief_2026-10-27.md` → `docs/review/rv-fable_2026-10-27.md` |
-| rv-astra | external reviewer, Codex GPT-6-Astra (max, web search), herdr tab w1:t18 (user request 2026-10-27) | done 08:18 (6179f3a); codex closed, tab closed |
+| subagent | role | worktree, branch | state |
+| --- | --- | --- | --- |
+| sn-llm | wk-llm: LLM module experiments (learned writer line) | LoopLora-wt/llm, wp/llm | WP-L5 step 1 done (8eb24ab; master merged in as 77373ea); active: WP-L7 step 1 (RFX, LSQ code and prereg drafts); WP-L5/L7 step 2 after 2026-10-28 22:00 |
+| sn-p1l | wk-p1l: P1-L main study | LoopLora-wt/p1l, wp/p1l (wp/p1l merged into master as ca85a40) | active: WP-P1LC step A (B7 memory-use check, P1L-C code); step B (remaining training, confirmation) after 2026-10-28 22:00 |
+| sn-oracle | new (2026-10-27): LLM oracle code designs, WP-L6 and P1L-S | LoopLora-wt/oracle, wp/oracle | active: WP-L6 step 1 |
+| sn-sym | wk-sym/wk-symf: symbolic studies | LoopLora-wt/sym, wp/sym | active: WP-S9 step 1 (IVD, CVH, TSM, UNS) |
+| sn-paper | wk-theory/T-tasks: paper and claim contract | LoopLora-wt/paper, wp/paper | active: WP-T9 |
+| (on demand) | wk-core, wk-data, wk-theory | — | no pending work |
+| rv-fable | external reviewer, Claude Fable 5.1 (max), herdr tab w1:t17 (user request 2026-10-27) | — | done (c370e22); tab closed after the report |
+| rv-astra | external reviewer, Codex GPT-6-Astra (max, web search), herdr tab w1:t18 (user request 2026-10-27) | — | done 08:18 (6179f3a); codex closed, tab closed |
+
+Tasks follow `plan/followup_2026-10-27.md`; rules shared by all subagent tasks: `docs/tasks/_common_rules.md`.
 
 Policy (from 2026-10-26 21:02): each worker keeps one role across tasks, in its own herdr tab, worktree and
 branch. The orchestrator reuses it for every task in that role and does not close it after a task. When its
