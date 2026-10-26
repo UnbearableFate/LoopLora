@@ -23,7 +23,7 @@
   "read_norm_cost": "cached next-step read; L+1 Mq operations for a query halting at update L, including the terminal diagnostic read",
   "oracle_reference": "stop at true hop; label-informed reference, not a guarantee of maximal accuracy for a learned reader",
   "certificate": "FP64 exact spectral norms in abs(rho)*(norm(R)+norm(U)*norm(M)*norm(Q)); one c per episode; c>=1 is inconclusive, not proof of divergence",
-  "latency": {"query_batch_sizes": [64, 1], "warmup": 5, "repeats": 20, "scope": "prepared-memory reader plus candidate-restricted prediction and required stopping bookkeeping; no writer/backbone preparation", "clock": "CUDA events plus synchronized wall time", "input_selection": "one query per episode, cycling hops 1..8; same inputs for all methods"},
+  "latency": {"query_batch_sizes": [64, 1], "warmup": 5, "repeats": 20, "scope": "prepared-memory reader plus candidate-restricted prediction and required stopping bookkeeping; no writer/backbone preparation", "clock": "CUDA events plus synchronized wall time", "input_selection": "batch64: one query per episode cycling hops 1..8; batch1: eight separate queries, one per hop; same inputs for all methods"},
   "budget_node_hours": 2,
   "job_max_nodes": 1,
   "job_max_hours": 1
