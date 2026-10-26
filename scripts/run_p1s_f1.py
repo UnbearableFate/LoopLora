@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import copy
+from datetime import datetime, timezone
 import json
 import os
 from pathlib import Path
@@ -121,11 +122,136 @@ def all_training():
     return records
 
 
+def evaluation_plan():
+    rows = all_training()
+    entries = []
+    for row in rows:
+        source = Path(row['directory'])
+        config = json.loads((source / 'config.json').read_text())['config']
+        expected = json.loads((REPORTS / 'configs' / (row['name'] + '.json')).read_text())
+        if config != expected:
+            raise ValueError('F1 trained configuration differs from its frozen manifest')
+        if config['train']['steps'] != 20000 or config['train']['batch_size'] != 64:
+            raise ValueError('F1 training budget changed')
+        entries.append(dict(name=row['name'], group='primary', writer=config['writer'],
+                            variant=config['variant'], seed=config['seed'], r=config['model']['r'],
+                            config=config, run_dir=str(RUNS / 'evaluation' / row['name']),
+                            training_dir=str(source)))
+    return dict(steps=20000, runs=entries, root=str(RUNS),
+                prereg='docs/prereg/P1S-F1.md', training_commit=rows[0]['git_commit'])
+
+
+def evaluate_one(name):
+    import torch
+    from looplora.infra.seeds import stable_hash
+    from looplora.sym.config import resolve_config
+    from looplora.sym.evaluate import evaluate
+    from looplora.sym.run import source_metadata
+    from looplora.sym.train import load_checkpoint
+
+    plan = evaluation_plan()  # Check the global training barrier before loading weights.
+    entry = next(row for row in plan['runs'] if row['name'] == name)
+    training_dir, out = Path(entry['training_dir']), Path(entry['run_dir'])
+    if out.exists():
+        raise FileExistsError(out)
+    out.mkdir(parents=True)
+    (out / 'train_log.jsonl').symlink_to(training_dir / 'train_log.jsonl')
+    torch.set_num_threads(1)
+    torch.cuda.init()
+    torch.cuda.set_device(0)
+    model = load_checkpoint(training_dir / 'checkpoint.pt')
+    checkpoint_config = copy.deepcopy(model.checkpoint_config)
+    if checkpoint_config != entry['config']:
+        raise ValueError('checkpoint and training configuration differ')
+    provenance = dict(checkpoint=str(training_dir / 'checkpoint.pt'),
+                      checkpoint_config=checkpoint_config, **source_metadata())
+    record = json.loads((training_dir / 'record.json').read_text())
+    record.update(status='running', config=checkpoint_config,
+                  training_directory=str(training_dir), training_complete=True,
+                  evaluation_source=source_metadata(), confirmation_samples_written=False)
+    write(out / 'record.json', record)
+    try:
+        screen = resolve_config(checkpoint_config)
+        screen['eval']['swap_successors'] = True
+        metrics, timing = evaluate(model, screen, out / 'screening', provenance=provenance)
+        write(out / 'screening/timing.json', timing)
+        write(out / 'screening/config.json', dict(config=screen, **provenance))
+        confirmation = copy.deepcopy(screen)
+        confirmation['eval'].update(splits=['test'], seed=777001, counterfactuals=False)
+        _, confirmation_timing = evaluate(model, confirmation, out / 'confirmation', samples_only=True,
+                         provenance={**provenance, 'eval_overrides': {'eval.seed': 777001,
+                                     'eval.splits': ['test'], 'eval.counterfactuals': False}})
+        record.update(status='complete', confirmation_samples_written=True,
+                      samples=str(out / 'screening/samples.npz'), scores=metrics['table'],
+                      eval_samples=sum(row['n'] for row in metrics['table']),
+                      confirmation_eval_samples=2000*8*len(DEPTHS),
+                      latency=dict(screening=timing, confirmation=confirmation_timing),
+                      config_hash=stable_hash(checkpoint_config),
+                      confirmation_samples=str(out / 'confirmation/samples.npz'),
+                      evaluation_finished_at=datetime.now(timezone.utc).isoformat())
+    except BaseException as error:
+        record.update(status='failed', failure_reason=f'{type(error).__name__}: {error}')
+        raise
+    finally:
+        write(out / 'record.json', record)
+
+
+def evaluation_shard(shard, procs):
+    entries = evaluation_plan()['runs'][shard::6]
+    pending = [row['name'] for row in entries]
+    running = []
+    while pending or running:
+        for process in list(running):
+            rc = process.poll()
+            if rc is not None:
+                running.remove(process)
+                if rc:
+                    for child in running:
+                        child.terminate()
+                    raise RuntimeError(f'evaluation child failed: {rc}')
+        while pending and len(running) < procs:
+            running.append(subprocess.Popen([sys.executable, str(Path(__file__).resolve()),
+                                             'evaluate-one', '--name', pending.pop(0)],
+                                            env={**os.environ, 'OMP_NUM_THREADS': '1'}))
+        if running:
+            time.sleep(.2)
+
+
+def seal():
+    from looplora.infra.seeds import stable_hash
+    plan = evaluation_plan()
+    paths = []
+    for run in plan['runs']:
+        folder = Path(run['run_dir'])
+        record = json.loads((folder / 'record.json').read_text())
+        if record['status'] != 'complete' or not record['confirmation_samples_written']:
+            raise ValueError('F1 evaluation incomplete')
+        meta = json.loads((folder / 'confirmation/evaluation.json').read_text())
+        settings = meta['config']['eval']
+        if (not meta.get('aggregation_deferred') or 'table' in meta or 'diagnostics' in meta
+                or settings['seed'] != 777001 or settings['episodes'] != 2000
+                or settings['splits'] != ['test'] or settings['counterfactuals']
+                or settings['depths'] != DEPTHS or settings['hops'] != list(range(1, 9))
+                or meta['checkpoint_config'] != run['config']):
+            raise ValueError('F1 confirmation protocol differs')
+        path = folder / 'confirmation/samples.npz'
+        if not path.is_file() or (folder / 'confirmation/metrics.json').exists():
+            raise ValueError('F1 confirmation missing or prematurely aggregated')
+        paths.append(str(path))
+    write(RUNS / 'evaluation_plan.json', plan)
+    write(RUNS / 'barrier.json', dict(status='passed', plan_hash=stable_hash(plan),
+          created_at=datetime.now(timezone.utc).isoformat(),
+          runs=[row['name'] for row in plan['runs']], confirmation_samples=paths))
+    print('F1 global release: 60 trained runs and 60 blind confirmation sample sets', flush=True)
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('stage', choices=['plan', 'smoke', 'train', 'barrier'])
+    parser.add_argument('stage', choices=['plan', 'smoke', 'train', 'barrier',
+                                        'evaluate', 'evaluate-one', 'seal'])
     parser.add_argument('--shard', type=int, choices=range(6), default=0)
     parser.add_argument('--procs', type=int, default=4)
+    parser.add_argument('--name')
     args = parser.parse_args()
     if args.stage == 'plan':
         plan()
@@ -137,8 +263,14 @@ def main():
                        RUNS / 'training' / f'shard-{args.shard:02d}', args.procs)
         if rc:
             raise SystemExit(rc)
-    else:
+    elif args.stage == 'barrier':
         write(RUNS / 'training_barrier.json', all_training())
+    elif args.stage == 'evaluate':
+        evaluation_shard(args.shard, args.procs)
+    elif args.stage == 'evaluate-one':
+        evaluate_one(args.name)
+    else:
+        seal()
 
 
 if __name__ == '__main__':
