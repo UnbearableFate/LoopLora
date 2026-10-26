@@ -18,7 +18,7 @@ if __name__=='__main__':
     parser.add_argument('--root',type=Path,required=True)
     parser.add_argument('--out',type=Path,required=True)
     args=parser.parse_args()
-    rows=[]; reference={}; sources=set()
+    rows=[]; reference={}; sources=set(); normalization=None
     for arm in ARMS:
         folder=args.root/arm
         rec=json.loads((folder/'record.json').read_text())
@@ -45,6 +45,10 @@ if __name__=='__main__':
         assert exported['read_fix_version']==1 and exported['arm']==arm
         assert 'value_head' not in exported and 'optimizer' not in exported
         assert all(torch.isfinite(v).all() for v in exported['adapter'].values())
+        if arm!='OArho':
+            buffers=[exported['adapter'][k] for k in ('input_mean','input_std')]
+            if normalization is None: normalization=buffers
+            else: assert all(torch.equal(a,b) for a,b in zip(normalization,buffers))
         rows.append(dict(arm=arm,job_id=rec['job_id'],host=rec['host'],steps=823,
             steady_step_mean_seconds=training['steady_step_mean_seconds'],
             step_p95_seconds=training['step_p95_seconds'],total_seconds=training['seconds'],
