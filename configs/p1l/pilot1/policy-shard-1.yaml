@@ -1,0 +1,10 @@
+[
+  {
+    "name": "E16-fact_final-lr3e-4",
+    "config": "E16-fact_final-lr3e-4.yaml"
+  },
+  {
+    "name": "E16-all_tokens-lr3e-4",
+    "config": "E16-all_tokens-lr3e-4.yaml"
+  }
+]
