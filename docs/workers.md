@@ -1,5 +1,18 @@
 # Workers: long-lived codex agents with fixed roles (AGENTS.md)
 
+**Handover (2026-10-27 07:27 JST, user: "提前启动交接过程,关闭所有的codex worker").** All seven codex workers are
+closed. Each role passes, unchanged (same worktree, branch and context docs), to a Claude Sonnet-5.5 subagent of
+the main session, spawned on demand with its role row, the task file and the WP state file; subagents report by
+committed documents plus a short final reply. Do not reopen codex workers unless the user asks. Codex sessions
+below are kept for provenance only; wk-p1l's handover is `docs/reports/P1L-state.md` on wp/p1l (aa5005c, all codex
+wake-ups cancelled).
+
+| subagent | role (from the codex worker) | state |
+| --- | --- | --- |
+| sn-llm | wk-llm: LLM module experiments | active: WP-L5 DPFP writer, step 1 (implementation, no compute) |
+| sn-p1l | wk-p1l: P1-L main study | to spawn after 2026-10-28 22:00 from `docs/reports/P1L-state.md` |
+| (on demand) | wk-sym, wk-symf, wk-theory, wk-core, wk-data | no pending work |
+
 Policy (from 2026-10-26 21:02): each worker keeps one role across tasks, in its own herdr tab, worktree and
 branch. The orchestrator reuses it for every task in that role and does not close it after a task. When its
 context is low or stale (repeated compaction, or before a large unrelated task), the orchestrator clears it
@@ -20,13 +33,13 @@ Open or resume (new tab, worktree cwd):
 
 | worker | role (owns) | worktree, branch | context to inject | session | state |
 | --- | --- | --- | --- | --- | --- |
-| wk-sym | symbolic mechanism experiments: `src/looplora/sym`, `configs/p1s`, runs under `runs/p1s` | LoopLora-wt/sym, wp/sym | `docs/prereg/P1S.md`, `docs/reports/WP-D.md`, `docs/reports/P1S-pilot.md` | 01a177a0-f742-7c63-8800-0983d801fc19 (resumed 03:46 2026-10-27, GPT-6.1-sol) | idle (WP-P4L done) |
-| wk-llm | LLM module experiments: `src/looplora/llm`, `configs/p1l`, runs under `runs/p1l` | LoopLora-wt/llm, wp/llm | `docs/prereg/P1L.md`, `docs/reports/WP-E.md`, `docs/reports/WP-G.md` | 01a1779d-c123-75a1-9458-ae849ee0fcde (resumed, GPT-6.1-sol) | idle (WP-L4 done) |
-| wk-theory | theory and analytical checks: `docs/theory.md`, `tests/test_theory_examples.py` | LoopLora-wt/theory, wp/theory | `docs/theory.md`, `docs/reports/WP-T.md` | 01a177c4-57fb-7f42-a920-533e74680115 (resumed 21:47, GPT-6.1-sol) | idle (WP-T8 done; tab w1:t14) |
-| wk-core | core adapters, memory, accounting: `src/looplora/core` | LoopLora-wt/core, wp/core | `docs/notation.md`, `docs/reports/WP-A.md` | 01a1779d-747b-7df1-8492-b517a9be8c6a (resumed 22:13, GPT-6.1-sol) | idle (WP-C7 done; tab w1:t15) |
-| wk-data | data generators, rendering, real-task preprocessing: `src/looplora/data` | LoopLora-wt/data, wp/data | `docs/reports/WP-B.md`, `docs/tasks/WP-B_contract.md` | 01a1779d-96b3-7431-8fb7-0458e768764e (resumed 21:19, GPT-6.1-sol) | idle (WP-B4 done) |
-| wk-symf | symbolic follow-up studies (capacity/rank, later P2-S budget matching): runs under `runs/p1s/f1`, `reports/p1s-f1` | LoopLora-wt/symf, wp/symf | `docs/prereg/P1S.md`, `docs/prereg/P1S-F1.md`, `docs/reports/P1S-pilot.md` | 01a17828-31b5-75f0-89b3-6bfbcb4d89a5 (GPT-6.1-sol, opened 21:24) | idle (WP-JS done; tab w1:t13) |
-| wk-p1l | P1-L main study (Pilot-2, main runs, confirmation, analysis): `configs/p1l` run sets, runs under `runs/p1l/main`, `reports/p1l` | LoopLora-wt/p1l, wp/p1l | `docs/prereg/P1L.md`, `docs/reports/WP-C7.md`, `docs/reports/WP-C6.md`, `configs/p1l/README.md` | 01a17999-7c19-7ac2-a6d2-cf6aee2583c0 (opened 04:05 2026-10-27, GPT-6.1-sol) | active: WP-P1L (tab w1:t16) |
+| wk-sym | symbolic mechanism experiments: `src/looplora/sym`, `configs/p1s`, runs under `runs/p1s` | LoopLora-wt/sym, wp/sym | `docs/prereg/P1S.md`, `docs/reports/WP-D.md`, `docs/reports/P1S-pilot.md` | 01a177a0-f742-7c63-8800-0983d801fc19 (resumed 03:46 2026-10-27, GPT-6.1-sol) | closed 2026-10-27 07:27 (handover) |
+| wk-llm | LLM module experiments: `src/looplora/llm`, `configs/p1l`, runs under `runs/p1l` | LoopLora-wt/llm, wp/llm | `docs/prereg/P1L.md`, `docs/reports/WP-E.md`, `docs/reports/WP-G.md` | 01a1779d-c123-75a1-9458-ae849ee0fcde (resumed, GPT-6.1-sol) | closed 2026-10-27 07:27 (handover) |
+| wk-theory | theory and analytical checks: `docs/theory.md`, `tests/test_theory_examples.py` | LoopLora-wt/theory, wp/theory | `docs/theory.md`, `docs/reports/WP-T.md` | 01a177c4-57fb-7f42-a920-533e74680115 (resumed 21:47, GPT-6.1-sol) | closed 2026-10-27 07:27 (handover) |
+| wk-core | core adapters, memory, accounting: `src/looplora/core` | LoopLora-wt/core, wp/core | `docs/notation.md`, `docs/reports/WP-A.md` | 01a1779d-747b-7df1-8492-b517a9be8c6a (resumed 22:13, GPT-6.1-sol) | closed 2026-10-27 07:27 (handover) |
+| wk-data | data generators, rendering, real-task preprocessing: `src/looplora/data` | LoopLora-wt/data, wp/data | `docs/reports/WP-B.md`, `docs/tasks/WP-B_contract.md` | 01a1779d-96b3-7431-8fb7-0458e768764e (resumed 21:19, GPT-6.1-sol) | closed 2026-10-27 07:27 (handover) |
+| wk-symf | symbolic follow-up studies (capacity/rank, later P2-S budget matching): runs under `runs/p1s/f1`, `reports/p1s-f1` | LoopLora-wt/symf, wp/symf | `docs/prereg/P1S.md`, `docs/prereg/P1S-F1.md`, `docs/reports/P1S-pilot.md` | 01a17828-31b5-75f0-89b3-6bfbcb4d89a5 (GPT-6.1-sol, opened 21:24) | closed 2026-10-27 07:27 (handover) |
+| wk-p1l | P1-L main study (Pilot-2, main runs, confirmation, analysis): `configs/p1l` run sets, runs under `runs/p1l/main`, `reports/p1l` | LoopLora-wt/p1l, wp/p1l | `docs/prereg/P1L.md`, `docs/reports/WP-C7.md`, `docs/reports/WP-C6.md`, `configs/p1l/README.md` | 01a17999-7c19-7ac2-a6d2-cf6aee2583c0 (opened 04:05 2026-10-27, GPT-6.1-sol) | closed 2026-10-27 07:27 (handover) |
 
 ## Task history
 | task | worker | merged into master |
