@@ -1,0 +1,39 @@
+{
+  "backend": "cpu",
+  "dtype": "float32",
+  "eigenvalue_function": "torch.linalg.eigvals(J).abs().amax(-1)",
+  "gradients": "autograd through exact eigenvalues and J parameters/memory; ReLU derivative is locally constant",
+  "jacobian": "rho * diag(1[Rz+UMQz>0]) * (R+UMQ), evaluated at final state z_L",
+  "method": "exact_eigvals",
+  "penalty": "mean_episode mean_query relu(radius-.9)^2; lambda=1",
+  "selection": "minimum measured exact forward/backward time; no scores",
+  "tests": "tests/test_js.py",
+  "timing": [
+    {
+      "backend": "cpu",
+      "batch_episodes": 64,
+      "queries": 4,
+      "r": 32,
+      "repeats": 5,
+      "seconds_forward_backward": 0.07273430461063982
+    },
+    {
+      "backend": "cuda",
+      "batch_episodes": 64,
+      "queries": 4,
+      "r": 32,
+      "repeats": 5,
+      "seconds_forward_backward": 0.36002531021367756
+    }
+  ],
+  "zero_relu_derivative": 0,
+  "acceptance": {
+    "job_id": "3715867",
+    "tests_passed": 6,
+    "source_commit": "5d4abd9b67583eef9a5d0f66a4b4feeffceec62d",
+    "explicit_autograd_jacobian": "float64 r32, atol/rtol 1e-12",
+    "all_parameter_gradients": "atol1e-9/rtol1e-8",
+    "finite_difference": "directional penalty derivative atol1e-7/rtol1e-5",
+    "nonnormal_complex_and_zero_cases": true
+  }
+}

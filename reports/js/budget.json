@@ -1,0 +1,25 @@
+{
+  "status": "passed",
+  "jobs": 10,
+  "node_hours": 1.0108333333333333,
+  "budget_node_hours": 1.5,
+  "stage_node_hours": {
+    "development_check": 0.008333333333333333,
+    "method_check": 0.004722222222222222,
+    "smoke": 0.034166666666666665,
+    "training": 0.9372222222222222,
+    "analysis_check": 0.004166666666666667,
+    "validation_selection": 0.008611111111111111,
+    "confirmation_statistics": 0.01361111111111111
+  },
+  "scientific_stages_all_exit_zero": true,
+  "development_jobs_failed": 2,
+  "development_failures": "Before any training: Jacobian mask dtype promotion in FP64 test; trace test-helper call signature. Both corrected and rechecked before smoke/main.",
+  "requested_node_hours": 1.6500000000000004,
+  "max_nodes_per_job": 1,
+  "max_requested_seconds": 1500,
+  "source": "PBS qstat -H elapsed_seconds; all JS jobs, including failed development checks, tests, smoke, training, validation, confirmation, statistics and figures",
+  "design_lock_commit": "852d293d50fa70810e8b43e7e24efb474d812666",
+  "main_source_commit": "731a2a239c97b141a02c552821a191845efbbff7",
+  "threshold_lock_and_analysis_source_commit": "0c99cc179c43a6d805fc4b1ab1ba1a8314b544c0"
+}
