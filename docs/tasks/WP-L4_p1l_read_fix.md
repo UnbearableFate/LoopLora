@@ -38,3 +38,13 @@ Reason: the 8,225-step schedule ends where OA was still below 40%, so an arm tha
 whose smoke-measured time × 1.5 fits one ≤ 2 h job (`scripts/submit.py --scale-up
 docs/tasks/WP-L4_p1l_read_fix.md`), fixed before training, with val EM at five evenly spaced checkpoints. The
 decision rule is unchanged and applies at the final checkpoint. WP-L4 total ≤ 8 node·h.
+
+## Amendment A2 (2026-10-27 04:31 JST, user request "并行验证 r = 128"; before any WP-L4 validation score is read)
+Reason: the read noise in WP-L3 (key top-1 82% but EM 14%) is what interference among E = 16 facts at r_mem = 32
+predicts (Prop. 11); a larger rank lowers it. Add, in parallel with the running arms, three arms at
+**r = r_mem = 128**: W5 (WP-L3's base), R (W5 + raw-read loss) and OA (diagnostic), everything else as A1 (T1 E = 16,
+seed 17, batch 32, lr 3e-3 without a new search, flagged; largest step count whose smoke-measured time × 1.5 fits
+one ≤ 2 h job; val EM at five checkpoints). Decision rule: the threshold is unchanged; the candidate order is
+r = 32 first (R < Rρ < RK), then r = 128 (W5 < R); the E = 8 retrain branch applies to the best arm over both ranks.
+The P1-L learned condition, if any, uses the selected arm at its rank. The WP-L4 node·h total is no longer capped
+(user, 2026-10-27: the cap is per job); record node·h per job. This is still WP-L4, the last writer screen.

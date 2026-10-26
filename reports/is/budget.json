@@ -1,0 +1,23 @@
+{
+  "status": "passed",
+  "jobs": 11,
+  "all_exit_zero": true,
+  "node_hours": 0.8188888888888889,
+  "budget_node_hours": 2,
+  "stage_node_hours": {
+    "confirmation_statistics": 0.06,
+    "design": 0.0025,
+    "figure": 0.002777777777777778,
+    "packing": 0.009166666666666667,
+    "smoke": 0.02722222222222222,
+    "test": 0.015555555555555555,
+    "training": 0.7016666666666667
+  },
+  "requested_node_hours": 1.5666666666666667,
+  "max_nodes_per_job": 1,
+  "max_requested_seconds": 1380,
+  "source": "PBS qstat -H elapsed_seconds; every job, including all development and figure overhead",
+  "design_lock_commit": "fb62cf1f0151b47355711b39634f05c5b527a347",
+  "main_source_commit": "b4b215e8041fdcf341341524df76e320237f15f6",
+  "analysis_source_commit": "0366e4be7c04e0100e9fc28343a25019f286a422"
+}

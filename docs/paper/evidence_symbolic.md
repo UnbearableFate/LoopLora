@@ -1,7 +1,8 @@
 # Symbolic claims and evidence (WP-T4)
 
-Evidence cutoff: `master` at `30f86e20f4cd3b275a71e06e3138579e6f66a1f0`, merged into
-`wp/theory`. This is a synthesis of committed results, not a new experiment or a reanalysis of
+Evidence cutoff: `master` at `14af3415035fcbab1c720f9bed4b372c70a92f7c`, merged into
+`wp/theory` for WP-T6. The original WP-T4 audit covered `30f86e2`; the IS extension
+audits results introduced in `e144246` and merged in `641911d`. This is a synthesis of committed results, not a new experiment or a reanalysis of
 sample traces. The defensible result is conditional: evolving queries over a fixed memory can
 improve composition, but the benefit depends on the writer, training protocol, and comparison
 budget. The strongest joint-writer efficiency claim in plan §14.1 has not been established.
@@ -16,10 +17,14 @@ conditions in the same row. **Supported** means supported within those condition
 All accuracies below are **candidate-restricted**, not full-vocabulary exact match. `%` denotes
 accuracy; `pp` denotes a difference of accuracies. Values are converted from committed fractions
 and rounded to **six decimal places**; the linked files retain the exact stored precision.
-Brackets are **97.5% paired episode-bootstrap confidence intervals for the displayed contrast**,
-unless explicitly marked **CI unavailable**. No interval is supplied for an absolute accuracy
-merely because its contrast has one. Confirmation intervals use the same fixed training seeds
-`17/29/43`, with `2,000` paired episode-bootstrap draws and bootstrap seed `2718`; they condition
+Brackets are **97.5% episode-bootstrap confidence intervals for the displayed contrast**,
+unless explicitly marked as an absolute-rate CI or **CI unavailable**. Comparisons within
+a load/set are paired; IS1's change across loads uses independent load bootstrap streams.
+No interval is supplied for an absolute accuracy merely because its contrast has one.
+IS4 explicitly uses the separately exported absolute-rate intervals, not contrast intervals.
+Confirmation intervals use the same fixed training seeds
+`17/29/43`, with `2,000` episode-bootstrap draws using purpose-derived streams from base
+seed `2718`, with pairing/independence as specified above; they condition
 on those training seeds and do not quantify uncertainty over new training seeds. They are the
 registered endpoint intervals, not simultaneous intervals for every sentence in this synthesis.
 
@@ -29,6 +34,7 @@ Set labels used throughout:
 | --- | --- | --- |
 | C777 | Confirmation, split `test`, evaluation seed `777001`, `2,000` episodes. | P1-S, rank follow-up P1-S-F1, factorized-writer follow-up P1-S-F2. Reusing this set across follow-ups is not independent replication. The P1-S registered replication changes the layout; it is distinct from rerunning the primary layout. |
 | C888 | Confirmation, split `test`, evaluation seed `888001`, `2,000` episodes. | P2-S and P2-S-F1. The follow-up explicitly reuses the P2-S confirmation set as registered; it is not a fresh confirmation sample. |
+| C999 | Confirmation, split `test`, evaluation seed `999001`, `2,000` episodes per load. | IS, new relative to C777/C888. Within-load contrasts pair episodes across readers/depths and the fixed seeds; the E36−E12 depth-effect change uses independent load-specific bootstrap streams. IS4 resamples whole episodes within its update-task set. |
 | S4242 | Screening, split `test`, evaluation seed `4242`. | A5 diagnostics and stopping pilots. Stopping uses `2,000` episodes per checkpoint. No stopping CI was computed. |
 | V4242 | Validation, split `val`, evaluation seed `4242`. | Stopping thresholds selected here, then frozen before S4242. No confirmation inference follows from the validation optimum. |
 
@@ -80,6 +86,9 @@ from rounded report prose.
 | P4D | [p4s/design.json](../../reports/p4s/design.json) | `7888cf0` |
 | P4R | [p4s-r32/endpoints.csv](../../reports/p4s-r32/endpoints.csv), [endpoints_per_seed.csv](../../reports/p4s-r32/endpoints_per_seed.csv), [accuracy.csv](../../reports/p4s-r32/accuracy.csv), [thresholds.csv](../../reports/p4s-r32/thresholds.csv), [manifest.json](../../reports/p4s-r32/manifest.json), [audit.json](../../reports/p4s-r32/audit.json) | `3e15f07` |
 | P4RD | [p4s-r32/design.json](../../reports/p4s-r32/design.json) | `ce77e74` |
+| ISE | [is/endpoints.csv](../../reports/is/endpoints.csv), [accuracy.csv](../../reports/is/accuracy.csv), [decision.json](../../reports/is/decision.json), [best_L.csv](../../reports/is/best_L.csv), [audit.json](../../reports/is/audit.json) | `e144246` |
+| ISU | [is/t3_update.csv](../../reports/is/t3_update.csv) | `e144246` |
+| ISD | [is/design.json](../../reports/is/design.json), [training_manifest.csv](../../reports/is/training_manifest.csv) | `fb62cf1` |
 
 For endpoint CSVs select `confidence=0.975`; both confidence levels occur in the P2 files.
 For accuracy tables select the stated set, `original` condition, writer, reader, rank, L and hop;
@@ -164,6 +173,32 @@ P4D); spectral component norms for the sufficient certificate use FP64.
 | H5. “The unfactorized r32 joint/M1 screening flag establishes a benefit from adaptive stopping.” | not supported | S4242: all three rules use exactly **16** mean updates and reproduce fixed-L16 endpoints: H **+5.150000 pp**, D **+8.666667**, F **+6.027778**, W **+2.638889**; minimum seed W **−0.125000 pp**. Read-norm costs **17** reads. | joint/M1/r32. Aggregate `screening_candidate=true` is a point-estimate flag, not confirmation or a formal G1 pass. There is no stopping benefit over fixed L16 here. | P4R `3e15f07`: endpoints.csv, endpoints_per_seed.csv, accuracy.csv. |
 | H6. “Stopping at the true graph distance is an accuracy upper bound for a learned reader.” | not supported | S4242 oracle_random/r128/M1 overall accuracy: true-hop **23.564583%**, relative-change **75.302083%**. | True-hop stopping is a label-informed diagnostic reference, not an upper bound. Learned update count need not equal graph distance. | P4 `9dd0e04`: headline.csv, oracle_true_hop/relative_change. |
 
+## Memory load, adaptation, and updates (study IS)
+
+IS primary writers are `oracle_random` and `joint_fact`; unfactorized `joint` is
+descriptive only. All models have `r=r_mem=32`, ReLU, and train hops `{1,2,3}`.
+The fixed-checkpoint scan reuses E12-trained mixed-depth M1 at `L=1…8` for loads/layouts
+`E6:(4,2)`, `E12:(8,4)`, `E18:(8,8,2)`, `E24:(8,8,8)`, and
+`E36:(8,8,8,8,4)`. Thus load, graph layout, query distribution, and candidate count
+change together; this is not an isolated crosstalk manipulation. E6 has hops1–4 and no
+far-hop stratum. New E24/E36 training uses `15,000` steps, batch64, and the inherited
+learning rate `0.003` for every primary writer/reader, without a load-specific search.
+M1 samples training depths `{1,2,4}`; B8 is unshared fixed-L4; B4 is L1.
+
+The design and update-task validity changes were locked before inference/training.
+C999 is opened after training. All IS intervals condition on seeds17/29/43 and use
+`2,000` episode-bootstrap draws with purpose-derived streams from base seed2718.
+IS1's DeltaD uses independent E12/E36 streams; it is not obtained by pairing episode
+IDs across different layouts or subtracting endpoints of marginal CIs. The printed
+`best_L` values are descriptive confirmation-set maxima, not selected deployment depths.
+
+| ID and paper sentence | Status | Exact numbers, interval, and set | Conditions | Source file and commit |
+| --- | --- | --- | --- | --- |
+| IS1. “For fixed E12-trained checkpoints, the reachable-hop depth benefit decreased from E12 to E36 under both registered load/layout families.” | narrowed | C999, D(E)=M1@4−same checkpoint@1 on hops2–3. Oracle_random: D12 **+34.750000 pp [33.458333,36.066771]**, D36 **+7.491667 [6.791563,8.200104]**, DeltaD **−27.258333 [−28.800000,−25.816250]**, seed effects **−28.725000/−25.900000/−27.150000 pp**. Joint_fact: D12 **+24.041667 [23.024896,25.083333]**, D36 **+4.641667 [4.091667,5.166667]**, DeltaD **−19.400000 [−20.541667,−18.241458]**, seed effects **−20.525000/−19.200000/−18.475000 pp**. | r32 shared M1, original mixed-depth checkpoints; load and layout vary together. Consistent with the registered operational depth-amplification prediction, not proof of Prop.4's causal mechanism, bound tightness, or universal monotonic accuracy loss. | ISE `e144246`: endpoints.csv, IS-E1-D/IS-E1-DeltaD, train_E12, E12/36, subset reach; ISD `fb62cf1`. |
+| IS2. “At every tested training load, M1@4 and B8@4 exceeded B4@1 under the registered reachable-hop capability criterion; E36 was the largest tested qualifying load.” | supported | C999: all **12** primary writer×reader×E12/24/36 contrasts have point estimate≥**3 pp** and CI lower>0; all **36** tested-seed effects positive. At E36, M1/B8 minus B4: oracle **+4.483333 pp [3.949896,5.033438] / +5.941667 [5.225000,6.675104]**; joint_fact **+3.433333 [2.983333,3.866667] / +5.008333 [4.500000,5.500000]**. | Each system trained at its evaluation load, r32; M1 mixed-depth, B8 fixed-L4, B4 L1. Joint_fact writers are separately trained across variants; B8 has step-specific parameters. Criterion is point≥3 and CI>0, not CI lower≥3. The failure boundary beyond E36 was not located; no hop1-preservation, efficiency, or original-gate conclusion follows. | ISE `e144246`: endpoints.csv IS-E2, subset reach; decision.json qualifying_E; ISD `fb62cf1`. |
+| IS3. “Under the fixed inherited training protocol, training at E24/E36 reduced reachable-hop accuracy relative to evaluating E12-trained checkpoints at that same load.” | supported | C999 load-trained minus E12-trained, both @4. Oracle M1 E24/E36: **−2.750000 pp [−3.650104,−1.874896] / −3.175000 [−3.900104,−2.483125]**; oracle B8: **−4.900000 [−5.825104,−3.974896] / −6.283333 [−7.158437,−5.433229]**. Joint_fact M1: **−3.291667 [−4.150000,−2.383125] / −2.041667 [−2.691875,−1.383229]**; joint_fact B8: **−2.450000 [−3.458438,−1.475000] / −3.491667 [−4.208437,−2.733229]**. All eight intervals and all **24** seed effects are negative. | Same evaluation E within each comparison, r32. All training uses the inherited LR .003, 15,000 steps and batch64, without load-specific tuning or matched convergence; this is not a general claim that adaptation is harmful. | ISE `e144246`: endpoints.csv IS-E3, reader M1-mixed/B8, train_E=E24/36, subset reach; ISD `fb62cf1`. |
+| IS4. “On updated-path queries, the tested B8@4 systems selected current terminals more often than obsolete terminals, with partial rather than complete task success.” | narrowed | C999, absolute percentages and their **97.5% rate CIs**. Oracle affected current **41.749696% [40.235159,43.299799]**, untouched current **37.606178% [36.051074,39.211368]**, affected stale **0.510328% [0.331909,0.712153]**. Joint_fact affected current **28.618874% [27.451917,29.735415]**, untouched current **30.467610% [29.357424,31.647769]**, affected stale **6.034832% [5.486256,6.591167]**. Affected/untouched denominators are **12,345/11,655** predictions pooled over three fixed seeds, not independent episode counts. | Unchanged E12-trained B8, r32, L4; update task has **14 stored facts = 12 current edges + 2 obsolete facts**, current chains(8,4), queries hops1–4 pooled (`hop=0`). Stale target follows first occurrences of repeated keys, current target follows latest. Untouched stale rate is undefined, not zero. No paired CI for current−stale or affected−untouched was exported; strata do not establish a causal update effect, and the claim does not cover every reader. | ISU `e144246`: t3_update.csv, writer oracle_random/joint_fact, reader B8, E14/base_E12/n_updates2, hop0/L4, updated_path True/False; ISD `fb62cf1`. |
+
 ## Theory-to-measurement ledger
 
 The propositions are conditional mathematical results, not fitted explanations of these
@@ -179,7 +214,7 @@ for referenced claim IDs remain those above.
 | 1: fixed output subspace and frozen-memory input bottleneck | The branch stays in col(B); at fixed M its local input-Jacobian rank is at most r. Depth may change the function inside that bottleneck. Sequence history derivatives need not have this global rank bound. | S1–S3 show accuracy can change within a fixed-r checkpoint; P1A's audit verifies identical snapshots across L. Compatible, **not** a measurement of output-subspace or Jacobian rank; neither was estimated in these symbolic exports. | supported as a theorem, open as a direct rank measurement. Fixed col(B) does not imply useless depth; do not apply the frozen-memory rank bound to the stacked sequence map. |
 | 2: linear matrix polynomial | Shared linear iteration gives `sum_{j=0}^L T^j u`, `T=rho*(R+UMQ)`; memory composition degree can increase with L. At fixed snapshot/L a linear map may be precomputed. | M1-lin depth profiles S4/S6/S7/S8 are compatible with depth-dependent composition and failure. They do not verify a particular polynomial coefficient/gain or show that more degree guarantees correctness. B8 has different per-step matrices. | supported algebraically; accuracy alone does not identify the polynomial or prove serial reads computationally unavoidable. No amortized precomputation benchmark was measured here. |
 | 3: exact chain-terminal decoding | Orthonormal codes, exact oracle writes, nilpotent chains, aligned linear transition with gain greater than one, and matched decoder imply the correct visited node and terminal stability after enough reads. | S7 contradicts the blanket assertion that a **trained** oracle reader automatically has exact one-hop timing or terminal stability. Alignment/gain/decoder assumptions were not measured, so it does **not** contradict the proposition. H6 also shows learned update count is not graph distance. | supported as an existence construction; narrowed empirical claim to the measured hop/depth cells. Exact oracle storage alone is insufficient. |
-| 4: interference amplification | Delta writes with nonorthogonal keys can erase earlier associations; an operator perturbation bound permits depth-amplified error. Growth is an upper-bound possibility, not universal monotonic damage. | S6's random-code hop1 damage and H1's incomplete recovery are compatible. S8's larger-rank gains are compatible but also change training duration. These tables do not measure edge/terminal residuals or isolate the bound's tightness/causal contribution. | use as a mechanism to investigate, not a proved explanation of every loss or a universal `sqrt(E/r)` law for learned chain values. |
+| 4: interference amplification | Delta writes with nonorthogonal keys can erase earlier associations; an operator perturbation bound permits depth-amplified error. Growth is an upper-bound possibility, not a theorem forcing the sign of an accuracy contrast. | IS1/C999 gives negative E36−E12 changes in the fixed-checkpoint depth benefit for both primary writers, consistent with the registered operational prediction. IS2 still meets its capability criterion through the largest tested load, and IS3's load-specific training does not improve accuracy under the inherited protocol. S6/H1 remain compatible observations; S8 also changes training duration. | IS measures a load/layout association, not memory perturbation norms, edge/terminal residuals, causal crosstalk, or bound tightness. Layout, candidate count, and query distribution change with E. No universal monotonic law, failure beyond E36, or `sqrt(E/r)` formula for learned chain values follows. |
 | 5: conditional single-read information limit | B4/B5 receive memory only through one `MQu`; identical full observations force identical predictions. The chain Bayes ceiling additionally needs exact aligned first-hop access and the stated side-information restrictions. | S2 and B2/B5 support limits of **tested** one-read/fixed-query systems. They do not measure indistinguishable-observation pairs or verify a universal Bayes ceiling for arbitrary trained Q/decoders. The proposition explicitly supplies a counterexample to an unrestricted one-read impossibility interpretation. | narrow the capability claim to the tested architectures/ranks/writers. Candidate labels, a general learned query, and nonorthogonal leakage matter. |
 | 6: bias-free ReLU code transmission | A width-r bias-free through-map cannot transmit a positively spanning signed code set exactly; this is not a theorem of universal classification failure for the residual reader. | S1's ReLU success alongside linear hop1 failure is compatible with the theorem: the full reader has reinjection, Rz, and a learned decoder. No exported measurement isolates value-to-query identity transmission. | no claim that the symbolic results disprove the obstruction, or that identity must outperform ReLU for every trained reader. |
 | 7: contraction and stopping error | A valid constant below one bounds distance to a fixed point; answer correctness additionally requires task/decoder information. A sufficient norm upper bound failing does not prove divergence. | H3 supplies **no successful certificate**; H1/H4 stopping policies are empirical. H2 contradicts inferring runtime speedup from fewer updates. Neither a small relative change nor output stability supplies the missing certificate or a correctness proof. | use the negative certificate result and descriptive stopping tradeoff; do not claim certified halting or convergence implies correct answers. |
@@ -229,6 +264,14 @@ scope/interpretation discrepancies; the paper should use the qualified versions 
    joint_fact/M1 C777 hop1/L1 is **86.083333% candidate** but **40.516667% full-vocabulary**;
    hop2/L4 is **32.333333% candidate** but **7.600000% full-vocabulary** (F2A `a898c87`,
    matching accuracy-table fields). No candidate accuracy above is a full-vocabulary EM claim.
+10. The [IS report](../reports/IS.md) agrees with the audited CSV/JSON at its stated
+    rounding. Its “consistent with Prop.4” wording refers to the registered operational
+    prediction, not a proof that the upper bound must be tight or that interference alone
+    caused the loss. “Capability through E36” means the tested loads and point≥3 pp,
+    CI lower>0 rule (IS2); no failure boundary was located. IS-E4's current-over-obsolete
+    description is restricted to the displayed primary B8 systems, not every reader,
+    and its absolute-rate CIs are not contrast intervals. The design-locked update-task
+    validity changes and undefined untouched stale rates remain part of the result.
 
 ## Statements the paper must not make
 
@@ -264,6 +307,11 @@ and the empirical/theory limits above.
 - “Low normalized addressing/value auxiliary loss guarantees a useful raw memory read or
   final answer.” The missing scale, erasure, interference, and decoding conditions are explicit
   in Prop.11 and are not measured by this symbolic evidence table.
+- “IS proves the operator bound is tight,” “load alone caused the loss,” “the capability
+  boundary is E36,” “load-specific training is always harmful,” or “low stale rates mean
+  all update questions are answered correctly.” IS1–IS4 support only the stated layouts,
+  inherited protocols, readers, and metrics. No local-Jacobian or latent-readout study
+  is a completed result merely because it is preregistered or motivated by prior work.
 
 ## Audit boundary
 
@@ -273,5 +321,7 @@ Only fraction-to-percent conversion, equal-seed means already defined by the exp
 the explicitly disclosed A5 count pooling were used; no bootstrap was rerun and no new CI
 was invented. The decision/report Markdown was used to find claims and discrepancies,
 not as the numerical source. This task loaded no models or tensor traces, ran no training,
-evaluation, tests, or numerical experiments, and submitted no compute jobs, as required by
-the WP-T4 no-new-runs instruction. Earlier theory checks are historical evidence only.
+evaluation, tests, or numerical experiments. The WP-T4 baseline audit submitted no compute
+jobs; WP-T6's committed-data figure render is recorded separately in
+[its report](../reports/WP-T6.md) and adds no scientific run or new interval. Earlier
+theory checks and IS's original audits/tests are historical evidence, not reruns here.

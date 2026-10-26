@@ -1,0 +1,199 @@
+{
+  "task": "WP-C7",
+  "status": "complete",
+  "trial": true,
+  "settings": {
+    "writer": "oracle_random",
+    "oracle_seed": 17,
+    "variants": [
+      "M1-L4",
+      "B8",
+      "B4"
+    ],
+    "depths": [
+      4,
+      4,
+      1
+    ],
+    "batch_size": 64,
+    "steps": 10,
+    "warmup": 5,
+    "processes": 1,
+    "prefetch_workers": 2,
+    "stage": "reader",
+    "protocol": "memory_only",
+    "r": 32,
+    "layer": 14,
+    "input_site": "o_proj",
+    "E": 12,
+    "Q": 4,
+    "n_rel": 4,
+    "head_sharing": 0.3,
+    "chain_lengths": [
+      8,
+      4
+    ],
+    "train_hops": [
+      1,
+      2,
+      3
+    ]
+  },
+  "model": "Qwen/Qwen3-0.6B-Base",
+  "revision": "da87bfb608c14b7cf20ba1ce41287e8de496c0cd",
+  "dtypes": "bf16 backbone, fp32 adapter/state/codes",
+  "measurement": "CUDA-synchronized production train() steps, including batch wait, fact-only oracle write, question forward/backward, clipping and AdamW. Five warmups discarded. Cell time also includes prefetch startup/shutdown and checkpoint export.",
+  "science_scope": "Acceptance smoke only, train split and development seed; no evaluation or selection.",
+  "started_at": "2026-10-26T18:53:28.452847+00:00",
+  "git_commit": "b54ec3a21cc4037910396663f3c9b717bcaefbc9",
+  "source_dirty": false,
+  "source_hash": "969882e12ed9f74381b26c9031e6d382",
+  "runtime": {
+    "host": "mg0037",
+    "job_id": "3715702.opbs",
+    "torch": "2.14.0+cu132",
+    "gpu": "NVIDIA GH200 120GB"
+  },
+  "cells": [
+    {
+      "variant": "M1-L4",
+      "L": 4,
+      "batch_size": 64,
+      "steps": 10,
+      "measured_steps": 5,
+      "mean_step_ms": 198.0487854219973,
+      "median_step_ms": 198.35759908892214,
+      "p95_step_ms": 198.43785604462028,
+      "episodes_per_second": 323.1527013085712,
+      "step_seconds": [
+        0.19724095589481294,
+        0.1974741080775857,
+        0.19843785604462028,
+        0.1987334080040455,
+        0.19835759908892214
+      ],
+      "writer_signature": {
+        "writer": "oracle_random",
+        "version": 1,
+        "r_mem": 32,
+        "V": 1024,
+        "n_rel": 4,
+        "seed": 17,
+        "keys": "global_entity_relation_pairs",
+        "values": "OracleWriter.global_codes"
+      },
+      "code_hash": "55179f8658c8c3a00a8aa58ed68deacd",
+      "oracle_writes": 10,
+      "learned_scan_final_calls": 0,
+      "support_lm_calls": 0,
+      "final_loss": 10.384664535522461,
+      "gradient_norms": {
+        "A": 0.45715704560279846,
+        "B": 0.8893465995788574,
+        "R": 0.008249516598880291,
+        "U": 0.0010303788585588336,
+        "Q": 0.000327815068885684
+      },
+      "peak_allocated_bytes": 7175995904,
+      "train_seconds": 20.583043484948575,
+      "cell_seconds": 20.65702841198072
+    },
+    {
+      "variant": "B8",
+      "L": 4,
+      "batch_size": 64,
+      "steps": 10,
+      "measured_steps": 5,
+      "mean_step_ms": 199.9475358054042,
+      "median_step_ms": 199.94857907295227,
+      "p95_step_ms": 200.29974705539644,
+      "episodes_per_second": 320.08396473706483,
+      "step_seconds": [
+        0.2004125479143113,
+        0.1993777621537447,
+        0.19994857907295227,
+        0.19969904283061624,
+        0.20029974705539644
+      ],
+      "writer_signature": {
+        "writer": "oracle_random",
+        "version": 1,
+        "r_mem": 32,
+        "V": 1024,
+        "n_rel": 4,
+        "seed": 17,
+        "keys": "global_entity_relation_pairs",
+        "values": "OracleWriter.global_codes"
+      },
+      "code_hash": "55179f8658c8c3a00a8aa58ed68deacd",
+      "oracle_writes": 10,
+      "learned_scan_final_calls": 0,
+      "support_lm_calls": 0,
+      "final_loss": 10.37452507019043,
+      "gradient_norms": {
+        "A": 0.44218170642852783,
+        "B": 0.8968728184700012,
+        "R.0": 2.4340590698557207e-06,
+        "R.1": 4.601172258844599e-05,
+        "R.2": 0.0009116852306760848,
+        "R.3": 0.00958460383117199,
+        "U.0": 6.892280453030253e-07,
+        "U.1": 6.846696123830043e-06,
+        "U.2": 9.463011519983411e-05,
+        "U.3": 0.0008856583153828979,
+        "Q.0": 2.7432912474978366e-07,
+        "Q.1": 3.179880650350242e-06,
+        "Q.2": 4.355233977548778e-05,
+        "Q.3": 0.0003662206290755421
+      },
+      "peak_allocated_bytes": 7175918080,
+      "train_seconds": 18.28721971390769,
+      "cell_seconds": 18.305482770083472
+    },
+    {
+      "variant": "B4",
+      "L": 1,
+      "batch_size": 64,
+      "steps": 10,
+      "measured_steps": 5,
+      "mean_step_ms": 132.72473816759884,
+      "median_step_ms": 132.7509400434792,
+      "p95_step_ms": 133.17625294439495,
+      "episodes_per_second": 482.2009889308177,
+      "step_seconds": [
+        0.13317625294439495,
+        0.13234604289755225,
+        0.1321161538362503,
+        0.1332343011163175,
+        0.1327509400434792
+      ],
+      "writer_signature": {
+        "writer": "oracle_random",
+        "version": 1,
+        "r_mem": 32,
+        "V": 1024,
+        "n_rel": 4,
+        "seed": 17,
+        "keys": "global_entity_relation_pairs",
+        "values": "OracleWriter.global_codes"
+      },
+      "code_hash": "55179f8658c8c3a00a8aa58ed68deacd",
+      "oracle_writes": 10,
+      "learned_scan_final_calls": 0,
+      "support_lm_calls": 0,
+      "final_loss": 10.384201049804688,
+      "gradient_norms": {
+        "A": 0.45630505681037903,
+        "B": 0.8897742033004761,
+        "R": 0.009264698252081871,
+        "U": 0.0008860459201969206,
+        "Q": 0.00031095798476599157
+      },
+      "peak_allocated_bytes": 7167255040,
+      "train_seconds": 17.45358408195898,
+      "cell_seconds": 17.46786530315876
+    }
+  ],
+  "seconds": 57.631730906898156,
+  "finished_at": "2026-10-26T18:54:26.094772+00:00"
+}

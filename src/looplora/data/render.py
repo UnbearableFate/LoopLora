@@ -136,6 +136,7 @@ def render_episode(
     name_pool: NamePool | None = None,
     task: str | None = None,
     entity_count: int | None = None,
+    include_support: bool = True,
 ) -> RenderedEpisode:
     """Render one episode without consulting oracle hop lengths or changing IDs.
 
@@ -166,8 +167,9 @@ def render_episode(
 
     lines, chars = [], []
     char_cursor = 0
-    for fact_index, (fact, valid) in enumerate(zip(arrays.facts[episode_index],
-                                                  arrays.fact_valid[episode_index], strict=True)):
+    fact_rows = (zip(arrays.facts[episode_index], arrays.fact_valid[episode_index], strict=True)
+                 if include_support else ())
+    for fact_index, (fact, valid) in enumerate(fact_rows):
         if not valid:
             continue
         head, relation, tail = map(int, fact)
@@ -176,7 +178,8 @@ def render_episode(
         chars.append((fact_index, char_cursor, char_cursor + len(line)))
         char_cursor += len(line)
     context = "".join(lines)
-    encoded = tokenizer(context, add_special_tokens=False, return_offsets_mapping=True)
+    encoded = (tokenizer(context, add_special_tokens=False, return_offsets_mapping=True)
+               if include_support else {"input_ids": [], "offset_mapping": []})
     ids = tuple(encoded["input_ids"])
     offsets = encoded["offset_mapping"]
     starts, ends = [p[0] for p in offsets], [p[1] for p in offsets]
@@ -209,10 +212,11 @@ def render_episode(
 
 
 def render_episodes(arrays: EpisodeArrays, *, tokenizer: Any, name_pool: NamePool | None = None,
-                    task: str | None = None, entity_count: int | None = None) -> tuple[RenderedEpisode, ...]:
+                    task: str | None = None, entity_count: int | None = None,
+                    include_support: bool = True) -> tuple[RenderedEpisode, ...]:
     pool = load_name_pool() if name_pool is None else name_pool
     return tuple(render_episode(arrays, index, tokenizer=tokenizer, name_pool=pool,
-                                task=task, entity_count=entity_count)
+                                task=task, entity_count=entity_count, include_support=include_support)
                  for index in range(len(arrays.facts)))
 
 

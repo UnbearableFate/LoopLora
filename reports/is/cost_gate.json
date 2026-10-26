@@ -1,0 +1,14 @@
+{
+  "status": "passed",
+  "budget_node_hours": 2,
+  "packing_projected_training_node_hours": 0.7397325858279752,
+  "training_safety_factor": 1.5,
+  "evaluation_and_statistics_reserve_node_hours": 0.5,
+  "projected_total_with_safety": 1.6695988787419629,
+  "main_walltime": "00:23:00",
+  "main_walltime_basis": "1.5 times slowest packed 150-step training scaled to 15000, plus startup, rounded up",
+  "slowest_projected_main_seconds": 887.6791029935703,
+  "design_lock_commit": "fb62cf1f0151b47355711b39634f05c5b527a347",
+  "tests_job": "3715583",
+  "tests_passed": 18
+}

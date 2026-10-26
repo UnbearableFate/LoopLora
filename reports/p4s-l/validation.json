@@ -1,0 +1,10 @@
+{
+  "status": "passed",
+  "tests": 159,
+  "job_id": "3715743.opbs",
+  "source": "afda7abd3dd1022f2a066fa857c82d1776b8c747",
+  "log": "/work/xg24i002/x10041/LoopLora/logs/pbs/p4l-smoke2-20261027-040139-1764891.log",
+  "command": "python -m pytest -q -o addopts= tests/test_stopping.py tests/test_p4s_r32.py tests/test_learned_halting.py tests/test_p4s_learned_prepare.py tests/test_p4s_learned_runner.py tests/test_p4s_learned_analysis.py",
+  "initial_failed_fixture_job": "3715740.opbs",
+  "fixture_correction": "Deep-copied best-rule row shared its source threshold dictionary; the negative test now replaces only its own copied row. Production checks were not weakened."
+}

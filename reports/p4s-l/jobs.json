@@ -1,0 +1,75 @@
+{
+  "budget_node_hours": 1,
+  "source_master": "49eea5c",
+  "design_lock_commit": "9366da4035aa15bfe97be14acec92574c6d3e894",
+  "jobs": [
+    {
+      "job_id": "3715724.opbs",
+      "stage": "Preparation tests and pre-head reference selection",
+      "source": "643c8c2afd2732d3de09169b131b7fab73872e3a",
+      "nodes": 1,
+      "requested_seconds": 180,
+      "elapsed_seconds": 18,
+      "exit_code": 0,
+      "host": "mg0873",
+      "log": "/work/xg24i002/x10041/LoopLora/logs/pbs/p4l-prepare-20261027-035547-1719237.log",
+      "node_hours": 0.005
+    },
+    {
+      "job_id": "3715740.opbs",
+      "stage": "Initial compute tests; smoke blocked by aliased test fixture",
+      "source": "7265cdbe261d609d45ab09eb390e36ff39787046",
+      "nodes": 1,
+      "requested_seconds": 300,
+      "elapsed_seconds": 19,
+      "exit_code": 1,
+      "host": "mg0836",
+      "log": "/work/xg24i002/x10041/LoopLora/logs/pbs/p4l-smoke-20261027-035955-1739281.log",
+      "node_hours": 0.005277777777777778
+    },
+    {
+      "job_id": "3715743.opbs",
+      "stage": "Corrected compute tests and 10-percent smoke",
+      "source": "afda7abd3dd1022f2a066fa857c82d1776b8c747",
+      "nodes": 1,
+      "requested_seconds": 300,
+      "elapsed_seconds": 60,
+      "exit_code": 0,
+      "host": "mg0897",
+      "log": "/work/xg24i002/x10041/LoopLora/logs/pbs/p4l-smoke2-20261027-040139-1764891.log",
+      "node_hours": 0.016666666666666666
+    },
+    {
+      "job_id": "3715784.opbs",
+      "stage": "Formal24head training and validation-only theta selection",
+      "source": "ccb4ec55ba85ab051d394181fd619a240d1c4094",
+      "nodes": 1,
+      "requested_seconds": 600,
+      "elapsed_seconds": 351,
+      "exit_code": 0,
+      "host": "mg0855",
+      "log": "/work/xg24i002/x10041/LoopLora/logs/pbs/p4l-train-20261027-040610-1788777.log",
+      "node_hours": 0.0975
+    },
+    {
+      "job_id": "3715868.opbs",
+      "stage": "Fresh confirmation, prepared-batch timing and adjusted-CI analysis",
+      "source": "6e4545e2a52fe420b7f66702fd1856d366fdac98",
+      "nodes": 1,
+      "requested_seconds": 180,
+      "elapsed_seconds": 72,
+      "exit_code": 0,
+      "host": "mg0852",
+      "log": "/work/xg24i002/x10041/LoopLora/logs/pbs/p4l-confirm-20261027-041814-1853789.log",
+      "node_hours": 0.02
+    }
+  ],
+  "theta_lock_commit": "6e4545e2a52fe420b7f66702fd1856d366fdac98",
+  "wakeup_event": "/work/xg24i002/x10041/LoopLora/runs/p4s-l/20261027/wakeups/36f5cee2-5f7b-47a9-aa86-3074bbb6c9ec/state.json",
+  "total_node_hours": 0.14444444444444443,
+  "requested_node_hours": 0.4333333333333333,
+  "study_runtime_stages_complete": true,
+  "scientific_stages_exit_zero": true,
+  "initial_failed_fixture_job": "3715740.opbs",
+  "head_exports_verified": 24
+}

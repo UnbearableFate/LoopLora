@@ -1,0 +1,24 @@
+{
+  "checkpoint_seals_verified": 24,
+  "checkpoints_unchanged": true,
+  "confirmation_inputs_opened": false,
+  "design_hash": "93655f15c777e581e4c23d80f9712f6b",
+  "design_path": "/work/xg24i002/x10041/LoopLora-wt/sym/reports/p4s-l/design.json",
+  "head_training_performed": false,
+  "newly_selected_threshold_rows": 6,
+  "primary_families": 6,
+  "reused_threshold_rows": 18,
+  "runs": 24,
+  "runtime": {
+    "gpu": "NVIDIA GH200 120GB",
+    "host": "mg0873",
+    "job_id": "3715724.opbs",
+    "threads": 1,
+    "torch": "2.14.0+cu132"
+  },
+  "seconds": 6.057084949687123,
+  "status": "complete",
+  "validation_episodes": 12000,
+  "validation_queries": 96000,
+  "validation_trace_files": 6
+}

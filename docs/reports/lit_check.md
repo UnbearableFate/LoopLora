@@ -51,3 +51,91 @@ Nothing found that combines (i) a frozen backbone with a low-rank adapter state 
 
 Screened, not close (single read or no adapter): Q-Delta 2606.08804, CCQ 2606.01294, In-Place TTT 2604.06169, Trained Persistent Memory for Frozen Decoder-Only LLMs 2603.22329, ARMT 2607.11614, The Recurrent Transformer 2604.21215, RecurTrace 2609.03379. Pre-2025 context, abstract only: End-to-End Memory Networks [1503.08895](https://arxiv.org/abs/1503.08895) ("multiple computational steps (hops) are performed per output symbol"); its query-update rule was not checked (unverified).
 The search index is US-only and incomplete; absence of results is not proof of absence.
+
+## WP-T6: latent recurrence, verbalizable directions, and stability
+
+Checked **2026-10-27 JST**, against the project at `14af341`. Method: opened primary
+metadata/version histories and the pinned full-text method/analysis sections below
+through web tools; distinguished author descriptions from our mathematical inferences.
+Author lists are abbreviated here but their identities were checked in the linked records.
+Version histories were checked, not body-diffed. No external performance comparison was
+reproduced. “Full body” means the body was accessible and relevant sections read, not that
+all code, image-only algorithms, or experimental artifacts were audited. The earlier
+search remains a dated, incomplete search, not a novelty proof.
+
+| Work; verified record and version | Access and inspected method | Overlap and implication for LoopLora |
+| --- | --- | --- |
+| Gurnee et al., **Verbalizable Representations Form a Global Workspace in Language Models**; [arXiv 2607.15495](https://arxiv.org/abs/2607.15495), v1 **2026-07-16**. [Official paper](https://transformer-circuits.pub/2026/workspace/index.html) and [Anthropic summary](https://www.anthropic.com/research/global-workspace) date publication **2026-07-06**, before arXiv submission; both dates are retained. | Full official body, Methods/J-Space/limitations opened. J-lens averages Jacobians from an earlier residual stream to later final-layer residuals and combines that transport with unembedding. J-space uses sparse nonnegative combinations of an overcomplete frame, generally a union of cones. | Prior work on verbalizable directions and intermediate representations; motivates stepwise probes and interventions. It is not the reader's transition Jacobian or a fixed rank-r linear subspace. Its feedforward-broadcast evidence is not a recurrence/stability theorem for our adapter. |
+| Yang et al., **Stabilizing Recurrent Dynamics for Test-Time Scalable Latent Reasoning in Looped Language Models (STARS)**; [2605.26733](https://arxiv.org/abs/2605.26733), v1 **2026-05-26**. | [Full HTML v1](https://arxiv.org/html/2605.26733v1), §§3–5 and Appendices A–B opened. Combines random depth with a sampled-state Jacobian-vector penalty. §5 sets practical K=1 in the K-step Algorithm 1; its squared JVP is a proxy, not a certified spectral radius. ICML metadata was not independently checked against proceedings. | Direct precedent for depth sampling plus dynamical regularization, motivating JS rather than establishing a new combination. The fixed-point motivation and the finite-state proxy must be separated. Neither reported scaling behavior nor the proxy certifies our reader, terminal correctness, or halting policy. |
+| Panwar, Singh, and Bansal, **Think Deep, Speak Once: Relit, A Recursive Latent Implicit Transformer Framework**; [2608.08113](https://arxiv.org/abs/2608.08113), v1 **2026-08-08**; body styling **ReLIT**. | [Full HTML v1](https://arxiv.org/html/2608.08113v1), §§2–4/Appendix A opened; Figure 6's image-only algorithm was not separately inspected. A frozen-backbone anchor conditions full-sequence answer/scratchpad recurrence, with step embeddings, warm-up, deep supervision, and ACT halting. | Frozen-backbone latent recurrence and input reinjection have precedent. Its scratchpad is not a separately delta-written compact associative matrix. Appendix A.2's spectral-radius-to-Banach step lacks the general uniform-contraction assumptions; do not transfer that stronger conclusion. Information sufficiency in A.3 also does not guarantee training success or correctness. |
+| Zhu et al., **A Survey on Latent Reasoning**; [2507.06203](https://arxiv.org/abs/2507.06203), v1 **2025-07-08**, latest v2 **2025-07-10**. | [Full HTML v2](https://arxiv.org/html/2507.06203v2), §§2–3/Table 1 opened. Distinguishes activation recurrence at fixed token/time from hidden-state recurrence across sequence history, and tabulates sharing, reinjection, depth conditioning, and stopping. | Our reader is vertical activation recurrence at fixed (u,M); the writer evolves memory horizontally across tokens. This taxonomy supplies terminology, not evidence that every step reasons or is verbalizable. The pinned survey predates the newer papers above. |
+| Geiping et al., **Scaling up Test-Time Compute with Latent Reasoning: A Recurrent Depth Approach (Huginn)**; [2502.05171](https://arxiv.org/abs/2502.05171), v1 **2025-02-07**, latest v2 **2025-02-17**. | [Full HTML v2](https://arxiv.org/html/2502.05171v2), §§3,6–7 opened. Prelude/core/coda model with input reinjection, shared Transformer recurrence, heavy-tailed depth sampling and truncated backpropagation; successive prediction-KL supports heuristic exits. | Precedent for shared vertical recurrence, sampled depth, and label-free stopping. It iterates full hidden states, not an r-dimensional adapter over our delta memory. Token-dependent trajectories/orbits are not contraction certificates. No Huginn overshoot diagnosis or speedup is transferred to our setting. |
+| Zhu et al., **Scaling Latent Reasoning via Looped Language Models (Ouro)**; [2510.25741](https://arxiv.org/abs/2510.25741), v1 **2025-10-29**, latest v6 **2026-10-11**; [official project](https://ouro-llm.github.io/). This is distinct from the earlier **Ouroboros** entry. | [Full PDF v6](https://arxiv.org/pdf/2510.25741v6), §§3,5.3,7.2 opened; v6 HTML returned **404**, so PDF was used. Shared Transformer loops, per-loop supervision, entropy-regularized exits, then gate refinement with model weights frozen. §5.3 reports degradation beyond trained depth. | Learned allocation and nonmonotone depth have precedent. Its exit gate differs from random depth sampling or a residual certificate. Instrumented latent readouts and extrapolation losses do not identify our writer interference, terminal dynamics, or causal use of decoded intermediates. |
+| Bae et al., **Relaxed Recursive Transformers: Effective Parameter Sharing with Layer-wise LoRA**; [2410.20672](https://arxiv.org/abs/2410.20672), v1 **2024-10-28**, latest v3 **2025-02-28**. | [Full HTML v3](https://arxiv.org/html/2410.20672v3), §§2.2–2.4,3.7–3.8/Appendix K opened. Full-block recursion with depth-specific LoRA relaxations; §2.3 trains all model parameters. Intermediate supervision supports exits. Continuous-depth batching throughput uses oracle-exit simulations with exclusions. | Direct boundary against novelty claims for recursion plus LoRA or relaxed sharing. Different training/frozen-weight contract and full-state loop from our reader. Oracle-exit simulations are not an implemented learned halting policy or evidence for our measured efficiency. No overshoot/verbalizability claim is inferred from these sections. |
+| Bae et al., **Mixture-of-Recursions: Learning Dynamic Recursive Depths for Adaptive Token-Level Computation**; [2507.10524](https://arxiv.org/abs/2507.10524), v1 **2025-07-14**, latest v3 **2025-10-25**. | [Full HTML v3](https://arxiv.org/html/2507.10524v3), §§2.1–2.2,4.2–4.3 opened. Shared blocks with expert-choice or token-choice routing; recursion-wise active-token KV caching, or reuse of first-recursion KV for later queries. | Shared adaptive depth and a fixed-KV/evolving-query variant already exist. Do not claim that every looped LM rewrites all context per loop. Our precise distinction is compact delta-written state and low-dimensional adapter computation; routing/caching efficiency or guarantees do not transfer automatically. |
+| Hao et al., **Training Large Language Models to Reason in a Continuous Latent Space (Coconut)**; [2412.06769](https://arxiv.org/abs/2412.06769), v1 **2024-12-09**, latest v4 **2026-08-23**. | [Full HTML v4](https://arxiv.org/html/2412.06769v4), §§3–5/Appendix C.1 opened. Reuses the last hidden state as the next input embedding at additional latent sequence positions; curriculum replaces language reasoning steps. Classifier stopping is optional; default experiments use fixed latent length. | Horizontal latent positions differ from fixed-token vertical reader updates. Not emitting a word does not imply nonverbalizability. Its tree-search interpretation is not established for our chain reader; reported curriculum instability is not fixed-checkpoint inference overshoot. No stopping or transfer guarantee follows. |
+
+All nine requested bodies were accessible by the stated route. Remaining access limits:
+Ouro's pinned HTML failed (PDF opened); ReLIT's image-only algorithm and external code
+were not inspected; the original RecLoRA full-text block remains unresolved. This audit
+does not promote its earlier withdrawal snippet into verified status.
+
+### Two Jacobians, and the project's proposed readouts
+
+The published J-lens uses an averaged downstream transport
+\(J_\ell=\mathbb E[\partial h_{final,t'}/\partial h_{\ell,t}]\), with later positions
+included by its sampling scheme. Its lens applies final normalization and unembedding
+to transported activations. The compact reader instead has, away from activation kinks,
+
+\[
+J_{read}(z)=\rho D_\phi((R+UMQ)z)(R+UMQ),
+\]
+
+holding u and M fixed. This r×r derivative governs recurrent perturbations; it is not
+the residual-to-output Jacobian used to define vocabulary-associated directions.
+Neither J-space's sparse cones nor the adapter's col(B) should be identified with the other.
+
+Our inference for [P1-L's preregistered per-step probes](../prereg/P1L.md): if
+\(g_j=\nabla_{h_{inj}}\mathrm{logit}_j\) is the name-logit gradient at the actual
+injection point, the induced local direction in reader coordinates is
+\(\alpha B^Tg_j\). Averaging name-logit gradients over validation questions is a
+**J-lens-inspired sensitivity probe**; normalization and averaging mean it is not
+automatically the published averaged-transport lens or its sparse J-space construction.
+Decoding each z_s through hypothetical injection and frozen upper layers is another
+explicit diagnostic path, not merely direct unembedding of z_s. Extra diagnostic forwards
+must be costed separately from the adapter's inference loop. Ordered intermediate-name
+readability would concern content; causal path-following still needs counterfactuals or
+interventions. Output-direction alignment remains a proposed intervention, not a result.
+
+### Stability qualifications for JS and plan E.2
+
+These are our mathematical deductions, not new experiments or claims of reproduced
+results from those papers. They qualify the shorthand in plan E.2 and the motivation of
+[JS](../prereg/JS.md):
+
+- For a continuously differentiable map near an **actual fixed point**, spectral radius
+  below one implies local asymptotic stability. Penalizing a Jacobian at finite z_L does
+  not establish that it is fixed, that the trajectory enters a suitable neighborhood, or
+  that its decoded answer is correct. Residual and accuracy require separate measurements.
+- A pointwise spectral radius is not a Euclidean Lipschitz bound. Nonnormal transient
+  amplification and products of changing Jacobians matter. ReLU kinks require an invariant
+  smooth active region or a suitable nonsmooth argument; one autodiff derivative is not
+  a certificate for every neighboring direction. Do not import ReLIT Appendix A.2's stronger
+  Banach conclusion without a complete invariant domain and uniform common-norm control.
+- Our calculation for STARS Algorithm 1 at K=1, with normalized isotropic initial direction v, is
+  \(\mathbb E\|Jv\|^2=\mathrm{tr}(J^TJ\mathbb E[vv^T])=\|J\|_F^2/d\).
+  A single random JVP therefore penalizes a Frobenius proxy in expectation, not spectral
+  radius squared. Even exact eigenvalues for JS's small reader matrix would not remove
+  the fixed-point, neighborhood, nonsmoothness, or correctness requirements above.
+- The failed P4 sufficient bounds (evidence H3) prove no nonconvergence claim; overshoot
+  measures decoded-accuracy degradation, not necessarily state divergence. Prop.3 itself
+  has nilpotent, radius-zero transitions with Euclidean gain above one and finite settling.
+  Its fixed state is a weighted sum of visited codes, not the bare terminal code. A strict
+  contraction cannot move successive equally distant bare codes to equally distant codes,
+  but this special observation does not prohibit useful multistep computation in general.
+
+The broad ideas of latent recurrence, depth sampling, relaxed sharing, adaptive halting,
+reinjection, and dynamical regularization have established precedents. The defensible
+project description is its specified compact adapter/delta-writer/read schedule and
+the controlled results actually measured. The new literature supplies motivations and
+claim boundaries, not a priority proof or predicted success of JS/P1-L.

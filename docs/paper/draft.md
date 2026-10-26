@@ -1,9 +1,10 @@
 # Iterative Queries in a Low-Rank Memory Adapter: Composition, Writer Dependence, and Budget Limits
 
-*Symbolic manuscript draft. Code cutoff: `5e5afff`; numerical and claim authority:
-[symbolic evidence ledger](evidence_symbolic.md), introduced in `e8f90d2`.
-Main-text experimental claims carry ledger IDs in HTML comments. End-to-end results and
-the memory-load study remain explicitly incomplete.*
+*Symbolic manuscript draft. Code cutoff: `14af341`; numerical and claim authority:
+[symbolic evidence ledger](evidence_symbolic.md), introduced in `e8f90d2` and extended
+with IS in `23a5165`.
+Main-text experimental claims carry ledger IDs in HTML comments. IS is included;
+end-to-end results and the planned stability/readout studies remain incomplete.*
 
 ## Abstract
 
@@ -17,7 +18,9 @@ writer gives a smaller, seed-dependent benefit, while factorized writing gives s
 walk-specific depth effects but fails to preserve single-hop accuracy. <!-- S3 --><!-- S9 -->
 On hops2–3, four reads at rank32 outperform the tested larger single-read rank/state
 configurations with factorized learned writing, but the original joint-writer practical
-budget gate fails. <!-- B5 --><!-- B7 -->
+budget gate fails. <!-- B5 --><!-- B7 --> At rank32, the reachable-hop L4−L1 benefit
+shrinks from E12 to E36 under the registered load/layout changes, while the multi-read
+capability criterion still holds at the tested training loads. <!-- IS1 --><!-- IS2 -->
 Screening stopping policies partly recover random-oracle long-hop accuracy, yet do not
 repair factorized single-hop losses or reduce measured latency in the tested implementation.
 <!-- H1 --><!-- H2 --><!-- H4 --> Conditional theory separates composition inside a fixed
@@ -116,6 +119,50 @@ page-level claims. We consequently make no claim about absent nonlinearities, ro
 or token mixing in that work, and do not use its unverified publication status in the
 argument. The contribution sought here is a reproducible composition-and-budget study
 with explicit writer controls and conditional analysis.
+
+### Latent recurrence, sharing, and stopping
+
+The [latent-reasoning survey](https://arxiv.org/html/2507.06203v2) distinguishes
+vertical activation recurrence at fixed token/time from evolution across sequence
+history. Our reader uses the former axis while the writer updates memory across
+tokens. [Huginn](https://arxiv.org/html/2502.05171v2) supplies precedents for shared
+Transformer recurrence, reinjected input, heavy-tailed training-depth sampling,
+and heuristic prediction-KL exits. [Coconut](https://arxiv.org/html/2412.06769v4)
+instead adds latent sequence positions by reusing hidden states as input embeddings;
+its default fixed latent length should not be confused with guaranteed adaptive
+halting. These are different placements of latent computation, with different caches
+and training objectives.
+
+[Ouro](https://arxiv.org/pdf/2510.25741v6) learns exit allocation for shared Transformer
+loops and reports degradation beyond trained depth. That is a precedent for studying
+nonmonotone depth, not a diagnosis of this reader's failure mechanism.
+[Relaxed Recursive Transformers](https://arxiv.org/html/2410.20672v3) use depth-specific
+LoRA to relax full-block sharing and train all model parameters; their oracle-exit
+batching simulations do not establish this adapter's measured efficiency.
+[Mixture-of-Recursions](https://arxiv.org/html/2507.10524v3) adds learned token-level
+depth routing, including a variant that reuses first-recursion KV for later queries.
+Consequently fixed context alone is not a unique distinction. Our specified compact
+delta state, low-dimensional reader, and separate write schedule define the comparison.
+
+[STARS](https://arxiv.org/html/2605.26733v1) already combines sampled depth with
+Jacobian-vector regularization of looped dynamics. Its practical sampled-state proxy
+is not a certified spectral radius or global contraction constant.
+[ReLIT](https://arxiv.org/html/2608.08113v1) combines a frozen-backbone anchor with
+recursive full-sequence answer/scratchpad updates and ACT halting. These precedents
+narrow any claim about reinjection, frozen-backbone latent recurrence, or stabilization.
+They motivate the [JS protocol](../prereg/JS.md), without supplying a result for it.
+
+### Verbalizable directions and the readout boundary
+
+[Verbalizable Representations Form a Global Workspace in Language Models](https://transformer-circuits.pub/2026/workspace/index.html)
+defines J-lens using averaged transport from intermediate residuals toward final-layer
+representations and vocabulary readout. Its sparse J-space construction is generally
+a union of cones from an overcomplete frame, not the adapter's fixed col(B) or a single
+rank-r subspace. It motivates asking whether intermediate reader states expose the
+expected entities, while separating readability from causal use. The downstream
+transport Jacobian and the reader's recurrent transition Jacobian are different
+objects. The [expanded primary-source audit](../reports/lit_check.md#wp-t6-latent-recurrence-verbalizable-directions-and-stability)
+records versions, access limits, and these distinctions; it supports no new priority claim.
 
 ## 3. Method: one write schedule, repeated low-dimensional reads
 
@@ -232,6 +279,14 @@ A bound above one is inconclusive about actual contraction. Even a valid state-e
 bound needs decoder-margin and task assumptions before it can say anything about a
 label, and label stability alone is not correctness. Residual thresholds without a
 certificate are empirical stopping policies.
+
+The planned JS penalty concerns a different sufficient condition: for a smooth map
+at an actual fixed point, transition spectral radius below one implies local
+asymptotic stability. A finite last-read state need not be fixed, pointwise radii
+do not control all transient products, and ReLU boundaries need additional care.
+Thus the [preregistered stability study](../prereg/JS.md) is a test of a regularizer,
+not an existing certificate or a demonstrated remedy. The failed sufficient bounds
+from P4 establish no state-divergence claim. <!-- H3 -->
 
 **Writer information and the final decoder (Propositions 10 and 11).** Under specified
 common unit keys, constant gates, and zero initial memory, the writer admits an exact
@@ -462,6 +517,68 @@ exclude writer/context preparation and are descriptive means. <!-- B7 --> Differ
 different parameters and persistent-state budgets. <!-- B7 --><!-- B8 -->
 [PDF](figures/budget_latency.pdf).*
 
+### Memory load, adaptation, and updated facts
+
+Study IS uses a new confirmation set, C999 (evaluation seed999001, 2,000 episodes
+per load), at r=r_mem=32, with oracle_random and joint_fact as primary writers.
+<!-- IS1 --><!-- IS2 --> Its fixed E12-trained M1 checkpoints are evaluated at
+E6/12/18/24/36; increasing load also changes chain layout and candidate count.
+<!-- IS1 --> D(E) compares L4 with L1 on reachable hops2–3 within each checkpoint.
+For oracle writing, D falls from 34.750 pp at E12 to 7.492 pp at E36, with
+DeltaD=−27.258 pp [−28.800,−25.816]; for factorized writing it falls from
+24.042 to 4.642 pp, with DeltaD=−19.400 pp [−20.542,−18.241]. <!-- IS1 -->
+Both changes are negative in every tested seed; their 97.5% intervals use independent
+load bootstrap streams rather than cross-layout episode pairing. <!-- IS1 -->
+This supports the registered operational load/depth prediction without identifying
+crosstalk as its sole cause or validating Proposition 4's operator bound as tight.
+<!-- IS1 -->
+
+![Memory load and depth on fixed checkpoints](figures/memory_load_depth.png)
+
+*Figure 6. Plan §9.3 item4: fixed E12-trained shared M1 checkpoints across load/layout
+conditions, averaging seeds17/29/43 and hops2–3 on C999. <!-- IS1 --> Top panels show
+absolute accuracy means without supplied CIs; bottom panels reuse the released
+97.5% within-load L4−L1 intervals. <!-- IS1 --> The same checkpoint per seed is used
+at every load, while chain layouts and candidate counts covary. <!-- IS1 -->
+[PDF](figures/memory_load_depth.pdf).*
+
+For models trained at their evaluation load, all tested E12/24/36 M1@4 and B8@4
+contrasts against B4@1 meet the registered point≥3 pp and CI lower>0 rule.
+<!-- IS2 --> At the largest tested load, E36, their reachable-hop margins are:
+<!-- IS2 -->
+
+| Writer | M1-mixed@4−B4@1, pp [97.5% CI] | B8@4−B4@1, pp [97.5% CI] |
+| --- | --- | --- |
+| oracle_random | +4.483 [3.950,5.033] <!-- IS2 --> | +5.942 [5.225,6.675] <!-- IS2 --> |
+| joint_fact | +3.433 [2.983,3.867] <!-- IS2 --> | +5.008 [4.500,5.500] <!-- IS2 --> |
+
+The factorized M1 interval need not have its lower endpoint above 3 pp to qualify;
+the threshold applies to the point estimate. <!-- IS2 --> These are separately trained
+systems with different depth/sharing conditions, not a recheck of hop1 preservation
+or the practical latency gate; the capability failure boundary beyond E36 was not
+located. <!-- IS2 --><!-- B7 --> Under the inherited learning rate and fixed-step
+protocol, all eight load-specific E24/E36 training contrasts against E12-trained
+models evaluated at the same load are negative, ranging from −6.283 to −2.042 pp,
+with negative intervals. <!-- IS3 --> That result does not show that independently
+tuned or convergence-matched load adaptation is generally harmful. <!-- IS3 -->
+
+The update-task check uses unchanged E12-trained readers with 14 stored facts:
+12 current edges plus two obsolete records; its pooled queries cover hops1–4.
+<!-- IS4 --> For B8@4, the absolute current/stale rates are:
+<!-- IS4 -->
+
+| Writer | Current, affected paths, % [97.5% CI] | Current, untouched paths, % [97.5% CI] | Obsolete terminal, affected paths, % [97.5% CI] |
+| --- | --- | --- | --- |
+| oracle_random | 41.750 [40.235,43.300] <!-- IS4 --> | 37.606 [36.051,39.211] <!-- IS4 --> | 0.510 [0.332,0.712] <!-- IS4 --> |
+| joint_fact | 28.619 [27.452,29.735] <!-- IS4 --> | 30.468 [29.357,31.648] <!-- IS4 --> | 6.035 [5.486,6.591] <!-- IS4 --> |
+
+Current terminals are selected more often than obsolete ones in these primary B8
+conditions, with partial overall success. <!-- IS4 --> These are absolute-rate
+intervals, not paired intervals for current−stale or affected−untouched effects;
+untouched-path stale rates are undefined. <!-- IS4 --> They establish neither a
+causal benefit from updating nor a guarantee that every reader follows updated paths.
+<!-- IS4 -->
+
 ## 7. Stopping: accuracy recovery, incomplete preservation, and runtime cost
 
 Stopping policies select thresholds using mean validation accuracy, freeze them,
@@ -510,10 +627,11 @@ distribution. <!-- H2 --> Fewer steps do not establish a speedup. <!-- H1 --><!-
 
 The symbolic follow-up selects fixed-L4 B8 with a shared fixed-L4 comparator for
 the next stage; this protocol choice supplies no end-to-end language-model effect.
-<!-- B9 --> At the code cutoff, merged development records include the
-[initial writer pilot](../reports/P1L-pilot1.md),
-[writer diagnosis](../reports/P1L-diagnosis.md), and
-[writer-fix screen state](../reports/WP-L3-state.md). <!-- B9 -->
+<!-- B9 --> At the code cutoff, merged design/development records include the
+[updated P1-L preregistration](../prereg/P1L.md),
+[writer-fix screen report](../reports/P1L-writer-fix.md),
+[read-fix state](../reports/WP-L4-state.md), and
+[oracle-writer implementation report](../reports/WP-C7.md). <!-- B9 -->
 They are the boundary of this draft's available implementation history, rather
 than a completed comparative LLM result. <!-- B9 -->
 
@@ -525,6 +643,20 @@ No provisional screen metric is inserted here. Proposition 11 motivates checking
 raw read scale, interference, and the actual value-to-answer path; it does not
 predict which writer correction will succeed. The current symbolic reader
 selection cannot substitute for this evidence. <!-- B9 -->
+
+The updated P1-L protocol plans to decode intermediate reader states through the
+trained output path and frozen upper layers, and to compare name-logit-gradient
+directions with a random-direction baseline. These are proposed diagnostics, not
+readout results in this manuscript. A name gradient at the injection residual,
+g_j, induces local reader sensitivity alpha B^T g_j. Averaging these gradients is
+a J-lens-inspired probe; it should be distinguished from the published averaged
+residual-transport lens and from the transition Jacobian that JS regularizes.
+Hypothetical per-step upper-layer forwards incur diagnostic cost separate from
+the deployed reader loop. Ordered entity readability would not alone establish
+causal path following, so the existing counterfactual controls remain necessary.
+The [primary-source audit](../reports/lit_check.md#two-jacobians-and-the-projects-proposed-readouts)
+states the mapping and its limitations. No name-direction alignment intervention
+or local terminal-stability remedy is reported as successful here.
 
 **TODO — plan §9.3 item 6:** corresponding single-module and end-to-end results,
 using separately identified protocols and uncertainty once the end-to-end evidence
@@ -546,11 +678,14 @@ deviation remain relevant even when a pooled interval is positive. <!-- S3 --><!
 Screening stopping results require their own future confirmation and do not inherit
 the parent study's intervals. <!-- H1 --><!-- H4 --><!-- H5 -->
 
-**TODO — plan §9.3 item 4:** memory load×L from the preregistered
-[IS study](../prereg/IS.md). The draft makes no new numerical load-dependence or
-stale-update claim while that study is pending. Proposition 4 supplies a conditional
-perturbation bound, not a measured load curve. The primary and replication layouts
-cannot replace the planned same-checkpoint load sweep.
+IS now supplies a same-checkpoint load/layout sweep and a bounded update-task
+diagnostic. <!-- IS1 --><!-- IS4 --> Its fixed training protocol and varying layouts
+limit interpretation: neither operator-bound tightness, a pure crosstalk effect,
+nor a general benefit from load-specific retraining has been established.
+<!-- IS1 --><!-- IS3 --> The largest tested capability load is not an identified
+failure boundary, and low stale rates do not imply complete current-answer success.
+<!-- IS2 --><!-- IS4 --> Local stability and verbalizable intermediate directions
+remain hypotheses to test under their separate protocols.
 
 Reproduction separates data access from rendering. The figures are produced by
 [paper_figures.py](../../scripts/paper_figures.py) from committed CSV/JSON exports;
@@ -570,6 +705,12 @@ short-hop losses nor reduce measured runtime. <!-- B1 --><!-- B7 --><!-- H2 --><
 The appropriate conclusion is therefore a bounded mechanism result and a set of
 reproducible failures, with broader budget and end-to-end claims left open.
 <!-- B8 --><!-- B9 -->
+
+The additional load study narrows this result further: depth benefits decrease
+under the registered load/layout changes, while multi-read capability remains
+positive at the tested training loads through E36. <!-- IS1 --><!-- IS2 --> Existing
+latent-recurrence and interpretability research motivates the next diagnostics;
+it supplies no missing efficiency, convergence, or end-to-end result for this adapter.
 
 ## Appendix A. Proof sketches and non-implications
 
@@ -659,13 +800,18 @@ The ledger's status and conditions take priority over shortened manuscript wordi
 | Factorized F2 | C777 reused | r32; 15,000 steps; joint_fact and t1_frozen_fact; mixed depths; no replication. No factorized condition passes hop1 preservation. | S9–S12 <!-- S9 --><!-- S10 --><!-- S11 --><!-- S12 --> |
 | P2-S | C888: confirmation seed888001, 2,000 episodes | Primary endpoint models use 15,000 steps. Mixed-depth M1/r32 at L4 versus larger one-read B6/B7 or fixed-L4 B8; descriptive longer-trained references excluded from the primary gate. | B1/B2/B7 <!-- B1 --><!-- B2 --><!-- B7 --> |
 | P2-S-F1 | C888 explicitly reused | Fixed-L4 M1 versus B8; fixed versus mixed M1; factorized mixed M1 versus larger one-read systems. No factorized timing benchmark. | B3–B6/B8/B9 <!-- B3 --><!-- B4 --><!-- B5 --><!-- B6 --><!-- B8 --><!-- B9 --> |
+| IS | C999: new confirmation seed999001, 2,000 episodes per load | r32; fixed E12 checkpoints across E6/12/18/24/36; E24/E36 training at inherited LR/15,000 steps; update check uses 14 physical records, base_E12, hops1–4. | IS1–IS4 <!-- IS1 --><!-- IS2 --><!-- IS3 --><!-- IS4 --> |
 | A5 swaps | S4242 screening | Stratum-specific original/new-terminal diagnostics; no CIs; P1-S fitting-path and F2 new-path-length-one strata differ. | S11 <!-- S11 --> |
 | Stopping pilots | V4242 validation and S4242 screening, 2,000 episodes per checkpoint/split | Thresholds selected on validation, fixed before screening. Reuse mixed-depth checkpoints; no retraining or confirmation, no stopping CIs. | H1–H6 <!-- H1 --><!-- H2 --><!-- H3 --><!-- H4 --><!-- H5 --><!-- H6 --> |
 
-The training seeds are 17/29/43. <!-- S1 --><!-- B3 --> Released decision intervals use 2,000 paired
+The training seeds are 17/29/43. <!-- S1 --><!-- B3 --> P1-S/P2-S and their follow-ups use 2,000 paired
 episode-bootstrap draws with seed2718 and confidence 97.5%, conditional on those
 seeds; episodes are the pairing units, and the same episode is not independent
 merely because several queries or model seeds are scored on it. <!-- S1 --><!-- S3 --><!-- B3 -->
+IS uses the same fixed-seed episode-bootstrap convention within a load, but its
+E36−E12 change uses independent load-specific streams derived from base seed2718.
+<!-- IS1 --> IS4 additionally exports absolute-rate episode-bootstrap intervals;
+they are not current−stale or affected−untouched contrast intervals. <!-- IS4 -->
 These intervals are endpoint-specific, not simultaneous guarantees for every
 sentence or model comparison. Absolute accuracy and timing points do not acquire
 intervals from a neighboring contrast. <!-- S7 --><!-- B7 --><!-- H2 -->
@@ -703,7 +849,7 @@ than populated from unmerged or provisional results.
 | Figure 3 | 5: fixed-query and memory-free paired contrasts | paired_controls.pdf / paired_controls.png |
 | Figure 4 | 2: quality–latency, larger single reads marked | budget_latency.pdf / budget_latency.png |
 | Figure 5 | 7: stopping quality versus mean and tail latency | stopping_latency.pdf / stopping_latency.png |
-| TODO, Section 9 | 4: memory load×L | Pending IS evidence; no substituted result. |
+| Figure 6, Section 6 | 4: memory load×L | memory_load_depth.pdf / memory_load_depth.png <!-- IS1 --> |
 | TODO, Section 8 | 6: single-module / end-to-end correspondence | Pending P1-L evidence; no substituted result. |
 
 ## References and source records
@@ -715,6 +861,15 @@ than populated from unmerged or provisional results.
 - Lin et al., [*Allocating Recurrent Compute in Looped Language Models*](https://arxiv.org/abs/2608.18230).
 - Das et al., [*Can Memory-Augmented Language Models Generalize on Reasoning-in-a-Haystack Tasks?*](https://arxiv.org/abs/2503.07903).
 - Bai, Kolter, and Koltun, [*Deep Equilibrium Models*](https://arxiv.org/abs/1909.01377).
+- Gurnee et al., [*Verbalizable Representations Form a Global Workspace in Language Models*](https://transformer-circuits.pub/2026/workspace/index.html).
+- Yang et al., [*Stabilizing Recurrent Dynamics for Test-Time Scalable Latent Reasoning in Looped Language Models*](https://arxiv.org/html/2605.26733v1).
+- Geiping et al., [*Scaling up Test-Time Compute with Latent Reasoning: A Recurrent Depth Approach*](https://arxiv.org/html/2502.05171v2).
+- Zhu et al., [*Scaling Latent Reasoning via Looped Language Models*](https://arxiv.org/pdf/2510.25741v6).
+- Panwar, Singh, and Bansal, [*Think Deep, Speak Once: Relit, A Recursive Latent Implicit Transformer Framework*](https://arxiv.org/html/2608.08113v1).
+- Zhu et al., [*A Survey on Latent Reasoning*](https://arxiv.org/html/2507.06203v2).
+- Bae et al., [*Relaxed Recursive Transformers: Effective Parameter Sharing with Layer-wise LoRA*](https://arxiv.org/html/2410.20672v3).
+- Bae et al., [*Mixture-of-Recursions: Learning Dynamic Recursive Depths for Adaptive Token-Level Computation*](https://arxiv.org/html/2507.10524v3).
+- Hao et al., [*Training Large Language Models to Reason in a Continuous Latent Space*](https://arxiv.org/html/2412.06769v4).
 - Project source records: [dated literature audit](../reports/lit_check.md),
   [symbolic evidence ledger](evidence_symbolic.md), [binding notation](../notation.md),
   and [full theory](../theory.md). The unresolved RecLoRA comparison remains a TODO.

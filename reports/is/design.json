@@ -1,0 +1,842 @@
+{
+  "IS_E4": {
+    "breakdowns": [
+      "writer",
+      "reader",
+      "hop",
+      "L",
+      "training_seed",
+      "updated_path"
+    ],
+    "obsolete_graph": "first occurrence per key; all repeated keys reverted to obsolete tails",
+    "stale_rate": "prediction equals stale terminal, denominator updated-path queries only",
+    "stale_terminal": "terminal from query start in obsolete graph; generator obsolete tails are terminal",
+    "unavailable_strata": "n=0, rates null; no imputation",
+    "untouched_stale_rate": null,
+    "updated_path": "current path includes a key with two chronological facts"
+  },
+  "batch_size": 64,
+  "best_L": "highest pooled hops-2/3 accuracy of mixed M1 across L1..8; ties choose smaller L; descriptive only",
+  "budget_node_hours": 2,
+  "checkpoints": [
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora/runs/p1s/main/20261026/runs/primary-oracle_random-M1-r32-s17/checkpoint.pt",
+      "checkpoint_hash": "5cfcfa0a8530ec2da3d01c84ba76754b",
+      "config_hash": "d0e34ee470417a9e9759f89a9d473a49",
+      "name": "E12-oracle_random-M1-mixed-s17",
+      "reader": "M1-mixed",
+      "seed": 17,
+      "train_E": 12,
+      "variant": "M1",
+      "writer": "oracle_random"
+    },
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora/runs/p1s/main/20261026/runs/primary-oracle_random-M1-r32-s29/checkpoint.pt",
+      "checkpoint_hash": "f6b35c6f243797d3fd77548de37e374a",
+      "config_hash": "fd4a5262d11b7a164bfbc4bbe9767679",
+      "name": "E12-oracle_random-M1-mixed-s29",
+      "reader": "M1-mixed",
+      "seed": 29,
+      "train_E": 12,
+      "variant": "M1",
+      "writer": "oracle_random"
+    },
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora/runs/p1s/main/20261026/runs/primary-oracle_random-M1-r32-s43/checkpoint.pt",
+      "checkpoint_hash": "3f9b21f8658f2c86f3ae8c074589b7b2",
+      "config_hash": "9969584948b3e747b775c5d9a7736607",
+      "name": "E12-oracle_random-M1-mixed-s43",
+      "reader": "M1-mixed",
+      "seed": 43,
+      "train_E": 12,
+      "variant": "M1",
+      "writer": "oracle_random"
+    },
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora/runs/p1s/main/20261026/runs/primary-oracle_random-B5-r32-s17/checkpoint.pt",
+      "checkpoint_hash": "2045f6b32dcc381446d4ebb4c74f69fb",
+      "config_hash": "39fbb2c6d6784475cc35a3fd62a04c3f",
+      "name": "E12-oracle_random-B5-s17",
+      "reader": "B5",
+      "seed": 17,
+      "train_E": 12,
+      "variant": "B5",
+      "writer": "oracle_random"
+    },
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora/runs/p1s/main/20261026/runs/primary-oracle_random-B5-r32-s29/checkpoint.pt",
+      "checkpoint_hash": "cf9ec84be8f78caea1ed821b73ed1821",
+      "config_hash": "26589145b569466e3879c54ef60a2a5f",
+      "name": "E12-oracle_random-B5-s29",
+      "reader": "B5",
+      "seed": 29,
+      "train_E": 12,
+      "variant": "B5",
+      "writer": "oracle_random"
+    },
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora/runs/p1s/main/20261026/runs/primary-oracle_random-B5-r32-s43/checkpoint.pt",
+      "checkpoint_hash": "8017b42cd145291b91a92941cb74e82f",
+      "config_hash": "87d488f05cadc0eb3059bacb8fcb2d85",
+      "name": "E12-oracle_random-B5-s43",
+      "reader": "B5",
+      "seed": 43,
+      "train_E": 12,
+      "variant": "B5",
+      "writer": "oracle_random"
+    },
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora/runs/p1s/main/20261026/runs/primary-oracle_random-B3-r32-s17/checkpoint.pt",
+      "checkpoint_hash": "bc1b6c7d2560677dc30532a9284e7dd0",
+      "config_hash": "3f0f16833de8b79bbfbcd45f6b0a2a71",
+      "name": "E12-oracle_random-B3-s17",
+      "reader": "B3",
+      "seed": 17,
+      "train_E": 12,
+      "variant": "B3",
+      "writer": "oracle_random"
+    },
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora/runs/p1s/main/20261026/runs/primary-oracle_random-B3-r32-s29/checkpoint.pt",
+      "checkpoint_hash": "28b3fe996ad8ea9a213927b7cf5bc466",
+      "config_hash": "c7ee35ab914d287c045389c69bf39a97",
+      "name": "E12-oracle_random-B3-s29",
+      "reader": "B3",
+      "seed": 29,
+      "train_E": 12,
+      "variant": "B3",
+      "writer": "oracle_random"
+    },
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora/runs/p1s/main/20261026/runs/primary-oracle_random-B3-r32-s43/checkpoint.pt",
+      "checkpoint_hash": "53157b17b52a5c1a263d18131a040d39",
+      "config_hash": "ba5e9b14a48afc5b18f4031d38a3755a",
+      "name": "E12-oracle_random-B3-s43",
+      "reader": "B3",
+      "seed": 43,
+      "train_E": 12,
+      "variant": "B3",
+      "writer": "oracle_random"
+    },
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora/runs/p1s/main/20261026/runs/primary-oracle_random-B4-r32-s17/checkpoint.pt",
+      "checkpoint_hash": "02111fa5ee0aa739f26085f505d8a9f0",
+      "config_hash": "0de3e9ec887193c9afeac5407a67820b",
+      "name": "E12-oracle_random-B4-s17",
+      "reader": "B4",
+      "seed": 17,
+      "train_E": 12,
+      "variant": "B4",
+      "writer": "oracle_random"
+    },
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora/runs/p1s/main/20261026/runs/primary-oracle_random-B4-r32-s29/checkpoint.pt",
+      "checkpoint_hash": "61c41ad0a22ebe7b7e58dc4496d04822",
+      "config_hash": "0e9e540b731e290e1df2ab9c81e3fc2d",
+      "name": "E12-oracle_random-B4-s29",
+      "reader": "B4",
+      "seed": 29,
+      "train_E": 12,
+      "variant": "B4",
+      "writer": "oracle_random"
+    },
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora/runs/p1s/main/20261026/runs/primary-oracle_random-B4-r32-s43/checkpoint.pt",
+      "checkpoint_hash": "1c4fccbf0ef51ec293d4553c3787c7e2",
+      "config_hash": "5ae9b4576435787479616c1f5ccfd191",
+      "name": "E12-oracle_random-B4-s43",
+      "reader": "B4",
+      "seed": 43,
+      "train_E": 12,
+      "variant": "B4",
+      "writer": "oracle_random"
+    },
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora/runs/p1s/main/20261026/runs/primary-joint-M1-r32-s17/checkpoint.pt",
+      "checkpoint_hash": "6e18bec6997ce261a00f2697fc441c73",
+      "config_hash": "26cf64179fd954eb88c8ae37a8945e0c",
+      "name": "E12-joint-M1-mixed-s17",
+      "reader": "M1-mixed",
+      "seed": 17,
+      "train_E": 12,
+      "variant": "M1",
+      "writer": "joint"
+    },
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora/runs/p1s/main/20261026/runs/primary-joint-M1-r32-s29/checkpoint.pt",
+      "checkpoint_hash": "7153919166a10705afe093414f2b1339",
+      "config_hash": "f8e32de3ad469df9eeb5b6b1bab9b5e9",
+      "name": "E12-joint-M1-mixed-s29",
+      "reader": "M1-mixed",
+      "seed": 29,
+      "train_E": 12,
+      "variant": "M1",
+      "writer": "joint"
+    },
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora/runs/p1s/main/20261026/runs/primary-joint-M1-r32-s43/checkpoint.pt",
+      "checkpoint_hash": "74052cf2cd30f1327dda605aeca37a89",
+      "config_hash": "8ed2161138a480aa60fa8e38fd4f3219",
+      "name": "E12-joint-M1-mixed-s43",
+      "reader": "M1-mixed",
+      "seed": 43,
+      "train_E": 12,
+      "variant": "M1",
+      "writer": "joint"
+    },
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora/runs/p1s/main/20261026/runs/primary-joint-B5-r32-s17/checkpoint.pt",
+      "checkpoint_hash": "7e2d836c3349d88a2c994d35667712b2",
+      "config_hash": "201a8ac5c99f673229a2188868f9de27",
+      "name": "E12-joint-B5-s17",
+      "reader": "B5",
+      "seed": 17,
+      "train_E": 12,
+      "variant": "B5",
+      "writer": "joint"
+    },
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora/runs/p1s/main/20261026/runs/primary-joint-B5-r32-s29/checkpoint.pt",
+      "checkpoint_hash": "639d1654104b49372782fda1a7c4c635",
+      "config_hash": "9ef05081fac4582037071b2836bf6e03",
+      "name": "E12-joint-B5-s29",
+      "reader": "B5",
+      "seed": 29,
+      "train_E": 12,
+      "variant": "B5",
+      "writer": "joint"
+    },
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora/runs/p1s/main/20261026/runs/primary-joint-B5-r32-s43/checkpoint.pt",
+      "checkpoint_hash": "e38a6efd5727023a4de1c17af44ddee9",
+      "config_hash": "8d7ac33c028568c424ed72a49ea6e0cc",
+      "name": "E12-joint-B5-s43",
+      "reader": "B5",
+      "seed": 43,
+      "train_E": 12,
+      "variant": "B5",
+      "writer": "joint"
+    },
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora/runs/p1s/main/20261026/runs/primary-joint-B3-r32-s17/checkpoint.pt",
+      "checkpoint_hash": "a95915df728df2853de0b364b61f9e40",
+      "config_hash": "d8527ed54b47916d06e95cd950da616b",
+      "name": "E12-joint-B3-s17",
+      "reader": "B3",
+      "seed": 17,
+      "train_E": 12,
+      "variant": "B3",
+      "writer": "joint"
+    },
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora/runs/p1s/main/20261026/runs/primary-joint-B3-r32-s29/checkpoint.pt",
+      "checkpoint_hash": "950be479f40529eed64fce009323e7d6",
+      "config_hash": "b9e96618733454ce5054304627b678f8",
+      "name": "E12-joint-B3-s29",
+      "reader": "B3",
+      "seed": 29,
+      "train_E": 12,
+      "variant": "B3",
+      "writer": "joint"
+    },
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora/runs/p1s/main/20261026/runs/primary-joint-B3-r32-s43/checkpoint.pt",
+      "checkpoint_hash": "02fbdc70967239af83975a94fdbab825",
+      "config_hash": "a50ddb2860b609d5e9f2cd65f8585639",
+      "name": "E12-joint-B3-s43",
+      "reader": "B3",
+      "seed": 43,
+      "train_E": 12,
+      "variant": "B3",
+      "writer": "joint"
+    },
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora/runs/p1s/main/20261026/runs/primary-joint-B4-r32-s17/checkpoint.pt",
+      "checkpoint_hash": "8dc86ba45cf185051fa924c572b6b910",
+      "config_hash": "4a823d1c4707bd72f484b7cd488e4101",
+      "name": "E12-joint-B4-s17",
+      "reader": "B4",
+      "seed": 17,
+      "train_E": 12,
+      "variant": "B4",
+      "writer": "joint"
+    },
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora/runs/p1s/main/20261026/runs/primary-joint-B4-r32-s29/checkpoint.pt",
+      "checkpoint_hash": "d1dd77428dbe5e777e7305723261ff2a",
+      "config_hash": "e133cfd9923d4b9cd3f8f72f5e3ca679",
+      "name": "E12-joint-B4-s29",
+      "reader": "B4",
+      "seed": 29,
+      "train_E": 12,
+      "variant": "B4",
+      "writer": "joint"
+    },
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora/runs/p1s/main/20261026/runs/primary-joint-B4-r32-s43/checkpoint.pt",
+      "checkpoint_hash": "f67350d548e9b11bf5f445fd373699ef",
+      "config_hash": "d5c734e11c35fed5f7889838ced9aab6",
+      "name": "E12-joint-B4-s43",
+      "reader": "B4",
+      "seed": 43,
+      "train_E": 12,
+      "variant": "B4",
+      "writer": "joint"
+    },
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p1s/f2/main-readers/shard-02/f2-main-joint_fact-M1-s17/checkpoint.pt",
+      "checkpoint_hash": "1ca5fabe8741942ee947d643d24581f1",
+      "config_hash": "8c92427ecc994c1d4a77b98c07470eaa",
+      "name": "E12-joint_fact-M1-mixed-s17",
+      "reader": "M1-mixed",
+      "seed": 17,
+      "train_E": 12,
+      "variant": "M1",
+      "writer": "joint_fact"
+    },
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p1s/f2/main-readers/shard-00/f2-main-joint_fact-B5-s17/checkpoint.pt",
+      "checkpoint_hash": "d1fdb4378744dc5b3c414170959345cf",
+      "config_hash": "547ee3f30144262985018512a5ed03ee",
+      "name": "E12-joint_fact-B5-s17",
+      "reader": "B5",
+      "seed": 17,
+      "train_E": 12,
+      "variant": "B5",
+      "writer": "joint_fact"
+    },
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p1s/f2/main-readers/shard-02/f2-main-joint_fact-B3-s17/checkpoint.pt",
+      "checkpoint_hash": "a4fb88a7be1445e34f0af13137a0e1d0",
+      "config_hash": "9f6bb6e82cedcdce995aaf8e1450625f",
+      "name": "E12-joint_fact-B3-s17",
+      "reader": "B3",
+      "seed": 17,
+      "train_E": 12,
+      "variant": "B3",
+      "writer": "joint_fact"
+    },
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p1s/f2/main-readers/shard-03/f2-main-joint_fact-B4-s17/checkpoint.pt",
+      "checkpoint_hash": "d721243c107610e7f0636984ccb2cb47",
+      "config_hash": "09d1814532918fdee372647a0f8d522e",
+      "name": "E12-joint_fact-B4-s17",
+      "reader": "B4",
+      "seed": 17,
+      "train_E": 12,
+      "variant": "B4",
+      "writer": "joint_fact"
+    },
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p1s/f2/main-readers/shard-00/f2-main-joint_fact-M1-s29/checkpoint.pt",
+      "checkpoint_hash": "020f263d1a74cb51aebf85b666984312",
+      "config_hash": "f3871057d011c91442ae3e596c63cb22",
+      "name": "E12-joint_fact-M1-mixed-s29",
+      "reader": "M1-mixed",
+      "seed": 29,
+      "train_E": 12,
+      "variant": "M1",
+      "writer": "joint_fact"
+    },
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p1s/f2/main-readers/shard-02/f2-main-joint_fact-B5-s29/checkpoint.pt",
+      "checkpoint_hash": "57c0f151bf814ebb43a1c4d533513331",
+      "config_hash": "21db4db6d190ae1afa4d006891b18742",
+      "name": "E12-joint_fact-B5-s29",
+      "reader": "B5",
+      "seed": 29,
+      "train_E": 12,
+      "variant": "B5",
+      "writer": "joint_fact"
+    },
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p1s/f2/main-readers/shard-00/f2-main-joint_fact-B3-s29/checkpoint.pt",
+      "checkpoint_hash": "4afe83aebb6f9f5f7fa4f21039a28248",
+      "config_hash": "b329abb7b1842c50c3aed01e6d49d032",
+      "name": "E12-joint_fact-B3-s29",
+      "reader": "B3",
+      "seed": 29,
+      "train_E": 12,
+      "variant": "B3",
+      "writer": "joint_fact"
+    },
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p1s/f2/main-readers/shard-01/f2-main-joint_fact-B4-s29/checkpoint.pt",
+      "checkpoint_hash": "31614c46884f12a85f0a4107dcaa4af1",
+      "config_hash": "241f1137967640c042392ec20f01ade9",
+      "name": "E12-joint_fact-B4-s29",
+      "reader": "B4",
+      "seed": 29,
+      "train_E": 12,
+      "variant": "B4",
+      "writer": "joint_fact"
+    },
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p1s/f2/main-readers/shard-02/f2-main-joint_fact-M1-s43/checkpoint.pt",
+      "checkpoint_hash": "645cbdf31dd2853499361c3cd0f1923a",
+      "config_hash": "f1a8387d979dd90f1d01a930123a3fa1",
+      "name": "E12-joint_fact-M1-mixed-s43",
+      "reader": "M1-mixed",
+      "seed": 43,
+      "train_E": 12,
+      "variant": "M1",
+      "writer": "joint_fact"
+    },
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p1s/f2/main-readers/shard-00/f2-main-joint_fact-B5-s43/checkpoint.pt",
+      "checkpoint_hash": "40c451baf01c688a621cd017fc9d33f2",
+      "config_hash": "6ed19070b40078785a59c5cbf7cdbf02",
+      "name": "E12-joint_fact-B5-s43",
+      "reader": "B5",
+      "seed": 43,
+      "train_E": 12,
+      "variant": "B5",
+      "writer": "joint_fact"
+    },
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p1s/f2/main-readers/shard-02/f2-main-joint_fact-B3-s43/checkpoint.pt",
+      "checkpoint_hash": "b8687da2901ba65990467c3208a99e3c",
+      "config_hash": "a484d56d8cd7ebd1a754eaae16f25af4",
+      "name": "E12-joint_fact-B3-s43",
+      "reader": "B3",
+      "seed": 43,
+      "train_E": 12,
+      "variant": "B3",
+      "writer": "joint_fact"
+    },
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p1s/f2/main-readers/shard-03/f2-main-joint_fact-B4-s43/checkpoint.pt",
+      "checkpoint_hash": "a5fd45ff91f207081ee59ee0a48ea593",
+      "config_hash": "805fffbedb3ebc5228b99bf4b0aa4219",
+      "name": "E12-joint_fact-B4-s43",
+      "reader": "B4",
+      "seed": 43,
+      "train_E": 12,
+      "variant": "B4",
+      "writer": "joint_fact"
+    },
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p2s/main/shard-00/main-joint-B8-r32-m32-s17-lr0.003/checkpoint.pt",
+      "checkpoint_hash": "731190fae3f70a2a4f8ceb0e9b0f66f3",
+      "config_hash": "dd6a48647f06ded676e52077269948f3",
+      "name": "E12-joint-B8-s17",
+      "reader": "B8",
+      "seed": 17,
+      "train_E": 12,
+      "variant": "B8",
+      "writer": "joint"
+    },
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p2s/main/shard-01/main-joint-B8-r32-m32-s29-lr0.003/checkpoint.pt",
+      "checkpoint_hash": "9a0dab1019031564dd157760e598b84d",
+      "config_hash": "4d58f6b0050d972896054f2c963a6ae5",
+      "name": "E12-joint-B8-s29",
+      "reader": "B8",
+      "seed": 29,
+      "train_E": 12,
+      "variant": "B8",
+      "writer": "joint"
+    },
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p2s/main/shard-02/main-joint-B8-r32-m32-s43-lr0.003/checkpoint.pt",
+      "checkpoint_hash": "5be8fcdcb0f181ba9255378b0d36159c",
+      "config_hash": "3d264e157cd123c8163f3cf0242186b8",
+      "name": "E12-joint-B8-s43",
+      "reader": "B8",
+      "seed": 43,
+      "train_E": 12,
+      "variant": "B8",
+      "writer": "joint"
+    },
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p2s/main/shard-00/main-oracle_random-B8-r32-m32-s17-lr0.003/checkpoint.pt",
+      "checkpoint_hash": "ed3abbb40ae45d5498ee17601fc675a2",
+      "config_hash": "7a4a6f49918a72a5ad4493b0040ba6aa",
+      "name": "E12-oracle_random-B8-s17",
+      "reader": "B8",
+      "seed": 17,
+      "train_E": 12,
+      "variant": "B8",
+      "writer": "oracle_random"
+    },
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p2s/main/shard-01/main-oracle_random-B8-r32-m32-s29-lr0.003/checkpoint.pt",
+      "checkpoint_hash": "2ee4410098ce75e1bc7293c864b51beb",
+      "config_hash": "b84bdcc043b15e7be55d797b402d059b",
+      "name": "E12-oracle_random-B8-s29",
+      "reader": "B8",
+      "seed": 29,
+      "train_E": 12,
+      "variant": "B8",
+      "writer": "oracle_random"
+    },
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p2s/main/shard-02/main-oracle_random-B8-r32-m32-s43-lr0.003/checkpoint.pt",
+      "checkpoint_hash": "94b3d0a98f67375fa8f5c838043031bf",
+      "config_hash": "da071672d6a04c6032cd8df92a698aa7",
+      "name": "E12-oracle_random-B8-s43",
+      "reader": "B8",
+      "seed": 43,
+      "train_E": 12,
+      "variant": "B8",
+      "writer": "oracle_random"
+    },
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p2s-f1/main/shard-00/main-joint-M1-r32-m32-s17-lr0.003/checkpoint.pt",
+      "checkpoint_hash": "baa774a450bf5870b47b3a7e7ff96dc5",
+      "config_hash": "01d984c9cfd118c9169c0a9691e564fc",
+      "name": "E12-joint-M1-L4-s17",
+      "reader": "M1-L4",
+      "seed": 17,
+      "train_E": 12,
+      "variant": "M1",
+      "writer": "joint"
+    },
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p2s-f1/main/shard-01/main-joint-M1-r32-m32-s29-lr0.003/checkpoint.pt",
+      "checkpoint_hash": "43eb7429aca1cd3ab3ba50db14081fc2",
+      "config_hash": "bb28c46eccaf8511e12771d61e0159ae",
+      "name": "E12-joint-M1-L4-s29",
+      "reader": "M1-L4",
+      "seed": 29,
+      "train_E": 12,
+      "variant": "M1",
+      "writer": "joint"
+    },
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p2s-f1/main/shard-02/main-joint-M1-r32-m32-s43-lr0.003/checkpoint.pt",
+      "checkpoint_hash": "7e4918d9047c8fa5fdc3b4eff95bdfce",
+      "config_hash": "aede035caae69d3a81f2bda9b50db186",
+      "name": "E12-joint-M1-L4-s43",
+      "reader": "M1-L4",
+      "seed": 43,
+      "train_E": 12,
+      "variant": "M1",
+      "writer": "joint"
+    },
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p2s-f1/main/shard-00/main-oracle_random-M1-r32-m32-s17-lr0.003/checkpoint.pt",
+      "checkpoint_hash": "d6b4177960c2001c5073aeeb223c808f",
+      "config_hash": "fa390f799c5b7990cf8771f0d6da1da1",
+      "name": "E12-oracle_random-M1-L4-s17",
+      "reader": "M1-L4",
+      "seed": 17,
+      "train_E": 12,
+      "variant": "M1",
+      "writer": "oracle_random"
+    },
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p2s-f1/main/shard-01/main-oracle_random-M1-r32-m32-s29-lr0.003/checkpoint.pt",
+      "checkpoint_hash": "a8e70ae634d120026c938d3b83b6e681",
+      "config_hash": "b7763772ec47f769a83b8de044ea9510",
+      "name": "E12-oracle_random-M1-L4-s29",
+      "reader": "M1-L4",
+      "seed": 29,
+      "train_E": 12,
+      "variant": "M1",
+      "writer": "oracle_random"
+    },
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p2s-f1/main/shard-02/main-oracle_random-M1-r32-m32-s43-lr0.003/checkpoint.pt",
+      "checkpoint_hash": "8196ca139f65aa5dca9798a94ad13205",
+      "config_hash": "bdf5b575e1e3268e2ed110b8b1cb3f4e",
+      "name": "E12-oracle_random-M1-L4-s43",
+      "reader": "M1-L4",
+      "seed": 43,
+      "train_E": 12,
+      "variant": "M1",
+      "writer": "oracle_random"
+    },
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p2s-f1/main/shard-00/main-joint_fact-M1-r32-m32-s17-lr0.003/checkpoint.pt",
+      "checkpoint_hash": "f5c6175686e4f03ffcc6392ce02ab022",
+      "config_hash": "3a14d11bff634b58cfb2c92c7fe1d2e3",
+      "name": "E12-joint_fact-M1-L4-s17",
+      "reader": "M1-L4",
+      "seed": 17,
+      "train_E": 12,
+      "variant": "M1",
+      "writer": "joint_fact"
+    },
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p2s-f1/main/shard-01/main-joint_fact-M1-r32-m32-s29-lr0.003/checkpoint.pt",
+      "checkpoint_hash": "86b42025de037499eea42f5d1875b5ba",
+      "config_hash": "62b284e2c321a2d5d181f323f783c1be",
+      "name": "E12-joint_fact-M1-L4-s29",
+      "reader": "M1-L4",
+      "seed": 29,
+      "train_E": 12,
+      "variant": "M1",
+      "writer": "joint_fact"
+    },
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p2s-f1/main/shard-02/main-joint_fact-M1-r32-m32-s43-lr0.003/checkpoint.pt",
+      "checkpoint_hash": "d7b36bc43b7eb6a1b9a7585d9f213f3b",
+      "config_hash": "dc326b71d57a91bb9c23002d4867bd9d",
+      "name": "E12-joint_fact-M1-L4-s43",
+      "reader": "M1-L4",
+      "seed": 43,
+      "train_E": 12,
+      "variant": "M1",
+      "writer": "joint_fact"
+    },
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p2s-f1/main/shard-00/main-joint_fact-B8-r32-m32-s17-lr0.003/checkpoint.pt",
+      "checkpoint_hash": "c2495f53682373806cd5c8c56842af68",
+      "config_hash": "0287f31430476d743c05025cd7760130",
+      "name": "E12-joint_fact-B8-s17",
+      "reader": "B8",
+      "seed": 17,
+      "train_E": 12,
+      "variant": "B8",
+      "writer": "joint_fact"
+    },
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p2s-f1/main/shard-01/main-joint_fact-B8-r32-m32-s29-lr0.003/checkpoint.pt",
+      "checkpoint_hash": "a47af210b0487ed66547f7c0743a8627",
+      "config_hash": "745b1c5ff7ca1c3339cb16bf70829942",
+      "name": "E12-joint_fact-B8-s29",
+      "reader": "B8",
+      "seed": 29,
+      "train_E": 12,
+      "variant": "B8",
+      "writer": "joint_fact"
+    },
+    {
+      "checkpoint": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p2s-f1/main/shard-02/main-joint_fact-B8-r32-m32-s43-lr0.003/checkpoint.pt",
+      "checkpoint_hash": "f8980ac4bbeb45df16ff30cb30fe1419",
+      "config_hash": "ee35923239aca968beed1c1af5c22839",
+      "name": "E12-joint_fact-B8-s43",
+      "reader": "B8",
+      "seed": 43,
+      "train_E": 12,
+      "variant": "B8",
+      "writer": "joint_fact"
+    }
+  ],
+  "confirmation": {
+    "after_all_36_training": true,
+    "episodes": 2000,
+    "seed": 999001,
+    "split": "test"
+  },
+  "descriptive_writer": "joint",
+  "deviations": [
+    "Inherited E12 LRs without a new pilot, as preregistered.",
+    "Q3 E=14 total stored facts preserves registered 12 current edges (8,4) plus two obsolete facts; generator counts obsolete facts in E.",
+    "Q3 hops1-4 preserves default mixed update_query_rate=.5: (8,4) cannot supply updated and untouched chains at every hop above4.",
+    "Q3 B8 is defined only at L4; other readers scanned L1-8. E6 has no hops6-8 and those summaries are unavailable."
+  ],
+  "layouts": [
+    {
+      "E": 6,
+      "chain_lengths": [
+        4,
+        2
+      ],
+      "eval_hops": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "validated_rows": 2
+    },
+    {
+      "E": 12,
+      "chain_lengths": [
+        8,
+        4
+      ],
+      "eval_hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "validated_rows": 2
+    },
+    {
+      "E": 18,
+      "chain_lengths": [
+        8,
+        8,
+        2
+      ],
+      "eval_hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "validated_rows": 2
+    },
+    {
+      "E": 24,
+      "chain_lengths": [
+        8,
+        8,
+        8
+      ],
+      "eval_hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "validated_rows": 2
+    },
+    {
+      "E": 36,
+      "chain_lengths": [
+        8,
+        8,
+        8,
+        8,
+        4
+      ],
+      "eval_hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "validated_rows": 2
+    }
+  ],
+  "locked_lrs": [
+    {
+      "lr": 0.003,
+      "source": "wph",
+      "variant": "M1",
+      "writer": "oracle_random"
+    },
+    {
+      "lr": 0.003,
+      "source": "p2s",
+      "variant": "B8",
+      "writer": "oracle_random"
+    },
+    {
+      "lr": 0.003,
+      "source": "wph",
+      "variant": "B4",
+      "writer": "oracle_random"
+    },
+    {
+      "lr": 0.003,
+      "source": "f2",
+      "variant": "M1",
+      "writer": "joint_fact"
+    },
+    {
+      "lr": 0.003,
+      "source": "p2sf1",
+      "variant": "B8",
+      "writer": "joint_fact"
+    },
+    {
+      "lr": 0.003,
+      "source": "f2",
+      "variant": "B4",
+      "writer": "joint_fact"
+    }
+  ],
+  "main_plan_hash": "01fe0d4138c13c8c2b225f650612fbed",
+  "main_steps": 15000,
+  "prereg": "docs/prereg/IS.md",
+  "r": 32,
+  "r_mem": 32,
+  "reference_plan_hash": "40a0a14a5bfec843369037b9ad5e76e7",
+  "same_checkpoint_depths": {
+    "B3": [
+      4
+    ],
+    "B4": [
+      1
+    ],
+    "B5": [
+      4
+    ],
+    "B8": [
+      4
+    ],
+    "M1_L4": [
+      4
+    ],
+    "M1_mixed": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8
+    ]
+  },
+  "seeds": [
+    17,
+    29,
+    43
+  ],
+  "statistics": {
+    "across_load": "independent bootstrap streams keyed by load; DeltaD uses independent D36 minus D12 draws",
+    "capability_rule": "report largest trained E meeting difference >= .03 and CI low > 0 separately per writer and reader",
+    "confidence": 0.975,
+    "resamples": 2000,
+    "seed": 2718,
+    "within_load": "paired episodes shared across fixed training seeds"
+  },
+  "t3_update": {
+    "B8_depths": [
+      4
+    ],
+    "E": 14,
+    "base": "t2_chain_end",
+    "chain_lengths": [
+      8,
+      4
+    ],
+    "current_edges": 12,
+    "depths": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "eval_hops": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "n_updates": 2,
+    "query_protocol": "one query per hop from unchanged current support; generator defaults otherwise",
+    "update_query_rate": 0.5
+  },
+  "writers": [
+    "oracle_random",
+    "joint_fact"
+  ]
+}

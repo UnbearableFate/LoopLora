@@ -44,16 +44,17 @@ class PreparedBatch:
 
 
 def tokenize_batch(arrays: EpisodeArrays, tokenizer, *, device,
-                   name_pool: NamePool | None = None, rendered=None) -> TokenBatch:
+                   name_pool: NamePool | None = None, rendered=None,
+                   include_support: bool = True) -> TokenBatch:
     pool = load_name_pool() if name_pool is None else name_pool
-    rendered = (render_episodes(arrays, tokenizer=tokenizer, name_pool=pool)
+    rendered = (render_episodes(arrays, tokenizer=tokenizer, name_pool=pool, include_support=include_support)
                 if rendered is None else rendered)
     if len(rendered) != len(arrays.facts):
         raise ValueError("rendered rows must align with episode arrays")
     if not rendered or not rendered[0].queries:
         raise ValueError("a batch requires episodes and queries")
     B, Q = len(rendered), len(rendered[0].queries)
-    if any(len(row.queries) != Q or not row.context_ids for row in rendered):
+    if any(len(row.queries) != Q or (include_support and not row.context_ids) for row in rendered):
         raise ValueError("episodes need nonempty supports and equal query counts")
     pad = tokenizer.pad_token_id
     if pad is None:

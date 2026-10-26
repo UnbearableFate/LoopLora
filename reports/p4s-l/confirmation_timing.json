@@ -1,0 +1,242 @@
+[
+  {
+    "episodes": 2000,
+    "generator_seed": 999002,
+    "name": "f2-main-joint_fact-M1-lin-s17",
+    "prepare_seconds": 0.4778724415227771,
+    "queries": 16000,
+    "split": "test",
+    "total_seconds": 1.413970218040049,
+    "trace_seconds": 0.5051174792461097
+  },
+  {
+    "episodes": 2000,
+    "generator_seed": 999002,
+    "name": "f2-main-joint_fact-M1-lin-s29",
+    "prepare_seconds": 0.16383991576731205,
+    "queries": 16000,
+    "split": "test",
+    "total_seconds": 0.9944323692470789,
+    "trace_seconds": 0.45860329270362854
+  },
+  {
+    "episodes": 2000,
+    "generator_seed": 999002,
+    "name": "f2-main-joint_fact-M1-lin-s43",
+    "prepare_seconds": 0.1644229283556342,
+    "queries": 16000,
+    "split": "test",
+    "total_seconds": 1.0031516798771918,
+    "trace_seconds": 0.4609830682165921
+  },
+  {
+    "episodes": 2000,
+    "generator_seed": 999002,
+    "name": "f2-main-joint_fact-M1-s17",
+    "prepare_seconds": 0.16299207601696253,
+    "queries": 16000,
+    "split": "test",
+    "total_seconds": 1.0057640681043267,
+    "trace_seconds": 0.4650492207147181
+  },
+  {
+    "episodes": 2000,
+    "generator_seed": 999002,
+    "name": "f2-main-joint_fact-M1-s29",
+    "prepare_seconds": 0.16353585245087743,
+    "queries": 16000,
+    "split": "test",
+    "total_seconds": 1.000639930833131,
+    "trace_seconds": 0.4654010618105531
+  },
+  {
+    "episodes": 2000,
+    "generator_seed": 999002,
+    "name": "f2-main-joint_fact-M1-s43",
+    "prepare_seconds": 0.16361057246103883,
+    "queries": 16000,
+    "split": "test",
+    "total_seconds": 1.0083188563585281,
+    "trace_seconds": 0.4655436547473073
+  },
+  {
+    "episodes": 2000,
+    "generator_seed": 999002,
+    "name": "f2-main-t1_frozen_fact-M1-lin-s17",
+    "prepare_seconds": 0.1625169380567968,
+    "queries": 16000,
+    "split": "test",
+    "total_seconds": 0.9922968139871955,
+    "trace_seconds": 0.4541206923313439
+  },
+  {
+    "episodes": 2000,
+    "generator_seed": 999002,
+    "name": "f2-main-t1_frozen_fact-M1-lin-s29",
+    "prepare_seconds": 0.16270868061110377,
+    "queries": 16000,
+    "split": "test",
+    "total_seconds": 0.9929366940632463,
+    "trace_seconds": 0.45488634007051587
+  },
+  {
+    "episodes": 2000,
+    "generator_seed": 999002,
+    "name": "f2-main-t1_frozen_fact-M1-lin-s43",
+    "prepare_seconds": 0.16203821497038007,
+    "queries": 16000,
+    "split": "test",
+    "total_seconds": 0.9864010699093342,
+    "trace_seconds": 0.45534109184518456
+  },
+  {
+    "episodes": 2000,
+    "generator_seed": 999002,
+    "name": "f2-main-t1_frozen_fact-M1-s17",
+    "prepare_seconds": 0.1628637509420514,
+    "queries": 16000,
+    "split": "test",
+    "total_seconds": 0.9981148610822856,
+    "trace_seconds": 0.46259240666404366
+  },
+  {
+    "episodes": 2000,
+    "generator_seed": 999002,
+    "name": "f2-main-t1_frozen_fact-M1-s29",
+    "prepare_seconds": 0.16225206851959229,
+    "queries": 16000,
+    "split": "test",
+    "total_seconds": 1.0016160220839083,
+    "trace_seconds": 0.4625493041239679
+  },
+  {
+    "episodes": 2000,
+    "generator_seed": 999002,
+    "name": "f2-main-t1_frozen_fact-M1-s43",
+    "prepare_seconds": 0.16215315693989396,
+    "queries": 16000,
+    "split": "test",
+    "total_seconds": 1.0001120492815971,
+    "trace_seconds": 0.46086718887090683
+  },
+  {
+    "episodes": 2000,
+    "generator_seed": 999002,
+    "name": "primary-joint-M1-lin-r32-s17",
+    "prepare_seconds": 0.2631215206347406,
+    "queries": 16000,
+    "split": "test",
+    "total_seconds": 1.09371965425089,
+    "trace_seconds": 0.45453260373324156
+  },
+  {
+    "episodes": 2000,
+    "generator_seed": 999002,
+    "name": "primary-joint-M1-lin-r32-s29",
+    "prepare_seconds": 0.2607490262016654,
+    "queries": 16000,
+    "split": "test",
+    "total_seconds": 1.0903350380249321,
+    "trace_seconds": 0.4538459600880742
+  },
+  {
+    "episodes": 2000,
+    "generator_seed": 999002,
+    "name": "primary-joint-M1-lin-r32-s43",
+    "prepare_seconds": 0.26067018089815974,
+    "queries": 16000,
+    "split": "test",
+    "total_seconds": 1.088506135623902,
+    "trace_seconds": 0.4535101745277643
+  },
+  {
+    "episodes": 2000,
+    "generator_seed": 999002,
+    "name": "primary-joint-M1-r32-s17",
+    "prepare_seconds": 0.2608821508474648,
+    "queries": 16000,
+    "split": "test",
+    "total_seconds": 1.1019417219795287,
+    "trace_seconds": 0.4620324084535241
+  },
+  {
+    "episodes": 2000,
+    "generator_seed": 999002,
+    "name": "primary-joint-M1-r32-s29",
+    "prepare_seconds": 0.26014420203864574,
+    "queries": 16000,
+    "split": "test",
+    "total_seconds": 1.0935166757553816,
+    "trace_seconds": 0.4607239793986082
+  },
+  {
+    "episodes": 2000,
+    "generator_seed": 999002,
+    "name": "primary-joint-M1-r32-s43",
+    "prepare_seconds": 0.2607838190160692,
+    "queries": 16000,
+    "split": "test",
+    "total_seconds": 1.1008153529837728,
+    "trace_seconds": 0.4623726620338857
+  },
+  {
+    "episodes": 2000,
+    "generator_seed": 999002,
+    "name": "primary-oracle_random-M1-lin-r32-s17",
+    "prepare_seconds": 0.1917332042939961,
+    "queries": 16000,
+    "split": "test",
+    "total_seconds": 1.0218412573449314,
+    "trace_seconds": 0.4538725446909666
+  },
+  {
+    "episodes": 2000,
+    "generator_seed": 999002,
+    "name": "primary-oracle_random-M1-lin-r32-s29",
+    "prepare_seconds": 0.1921453606337309,
+    "queries": 16000,
+    "split": "test",
+    "total_seconds": 1.0203433339484036,
+    "trace_seconds": 0.44992722338065505
+  },
+  {
+    "episodes": 2000,
+    "generator_seed": 999002,
+    "name": "primary-oracle_random-M1-lin-r32-s43",
+    "prepare_seconds": 0.19309938233345747,
+    "queries": 16000,
+    "split": "test",
+    "total_seconds": 1.0142380706965923,
+    "trace_seconds": 0.44847080344334245
+  },
+  {
+    "episodes": 2000,
+    "generator_seed": 999002,
+    "name": "primary-oracle_random-M1-r32-s17",
+    "prepare_seconds": 0.1923690801486373,
+    "queries": 16000,
+    "split": "test",
+    "total_seconds": 1.025411443784833,
+    "trace_seconds": 0.456214661244303
+  },
+  {
+    "episodes": 2000,
+    "generator_seed": 999002,
+    "name": "primary-oracle_random-M1-r32-s29",
+    "prepare_seconds": 0.19211967196315527,
+    "queries": 16000,
+    "split": "test",
+    "total_seconds": 1.022058644797653,
+    "trace_seconds": 0.4561175429262221
+  },
+  {
+    "episodes": 2000,
+    "generator_seed": 999002,
+    "name": "primary-oracle_random-M1-r32-s43",
+    "prepare_seconds": 0.19333817111328244,
+    "queries": 16000,
+    "split": "test",
+    "total_seconds": 1.025341372936964,
+    "trace_seconds": 0.4561652853153646
+  }
+]

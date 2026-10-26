@@ -1,0 +1,25 @@
+{
+  "episodes": 200,
+  "job_id": "3715540.opbs",
+  "metrics_read": false,
+  "procs": 2,
+  "status": "passed",
+  "steps": 1500,
+  "suite_seconds": 89.90166423399933,
+  "timing": [
+    {
+      "peak_memory_bytes": 78067712,
+      "train_seconds": 62.4784967340529,
+      "writer": "oracle_random"
+    },
+    {
+      "peak_memory_bytes": 110448640,
+      "train_seconds": 81.34675192693248,
+      "writer": "joint_fact"
+    }
+  ],
+  "writers": [
+    "oracle_random",
+    "joint_fact"
+  ]
+}
