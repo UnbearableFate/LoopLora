@@ -12,7 +12,8 @@ Raw plans, checkpoints, blind samples, complete metadata and analysis cache stay
 - `packing_timing.json`, `runtime.json`, `cost_gate.json`: timing-only packing probe, tested all-valid execution,
   and job sizing. `scripts/is_runtime.py` removes per-fact GPU synchronizations with the same ordered FP32
   writes, using the reference for padding. Source and checkpoints remain reproducible through `run_is.py`.
-- `accuracy.csv`: every writer/reader/variant/training-load/evaluation-load/update/hop/L/seed with counts;
+- `training.csv`: validation counts, finite initial/final loss and resource use for all 36 runs; no selection.
+- `accuracy.csv`: every writer/reader/variant/training-load/evaluation-load/update/hop/L/seed with counts (E is physical stored facts, base_E excludes obsolete update facts);
   `best_L.csv`: descriptive best mixed-M1 L per load (hops2/3, pooled fixed seeds, ties choose smaller L).
 - `endpoints.csv`, `tables.md`: IS-E1 D(E), independent-load DeltaD, IS-E2 capability, IS-E3 load adaptation;
   all 97.5% CIs and per-seed effects. No model or LR is selected using confirmation.

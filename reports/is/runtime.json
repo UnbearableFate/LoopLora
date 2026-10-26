@@ -19,5 +19,15 @@
   },
   "source_commit": "4aea3274c1365540b268a3756e83befce6032ac3",
   "scientific_design_changed": false,
-  "smoke": "Registered 1500-step/200-episode two-writer E36 smoke used original writer; 150-step packing probe reads only time/memory"
+  "smoke": "Registered 1500-step/200-episode two-writer E36 smoke used original writer; 150-step packing probe reads only time/memory",
+  "target_batch_acceptance": {
+    "batch_size": 64,
+    "tests_passed": 23,
+    "job": "3715626",
+    "host": "mg0031",
+    "source_commit": "bcb1c489c2c810f2c898ecf0cdb726fd4f2d9eba",
+    "memory_forward": "bit-exact",
+    "optimizer_losses": "bit-exact for three full-model AdamW steps",
+    "statistics": "independent-load bootstrap intervals reproduce shared sym.stats; all-360 barrier covered"
+  }
 }

@@ -216,7 +216,7 @@ def update_table(events,labels,out):
         w,reader,h,L,changed=key;total=n[:,i].sum();nc=c[:,i].sum();ns=s[:,i].sum()
         acc_ci=np.quantile(cb[:,i],[.0125,.9875]).tolist() if total else [None,None]
         stale_ci=np.quantile(sb[:,i],[.0125,.9875]).tolist() if total and changed else [None,None]
-        pooled.append(dict(writer=w,reader=reader,hop=h,L=L,updated_path=changed,n=int(total),n_episodes=len(episodes),
+        pooled.append(dict(writer=w,reader=reader,E=14,base_E=12,n_updates=2,hop=h,L=L,updated_path=changed,n=int(total),n_episodes=len(episodes),
             n_correct=int(nc),accuracy=float(nc/total) if total else None,accuracy_ci_low=acc_ci[0],accuracy_ci_high=acc_ci[1],
             stale_n=int(ns) if changed else None,stale_rate=float(ns/total) if changed and total else None,
             stale_ci_low=stale_ci[0],stale_ci_high=stale_ci[1],confidence=.975,
@@ -274,7 +274,7 @@ def analyze():
         references[key]=audit['labels'];sample_rows+=audit['sample_rows'];a=audit['arrays']
         cache.save(r['name'],'confirmation',a,'test')
         for cell in table:
-            accuracy.append({k:r[k] for k in ('writer','reader','variant','seed','train_E','update')}|dict(E=r['eval_E'],hop=cell['hop'],L=cell['L'],n=cell['n'],
+            accuracy.append({k:r[k] for k in ('writer','reader','variant','seed','train_E','update')}|dict(E=14 if r['update'] else r['eval_E'],base_E=r['eval_E'],hop=cell['hop'],L=cell['L'],n=cell['n'],
                 correct=round(cell['n']*cell['accuracy']),accuracy=cell['accuracy'],full_accuracy=cell['full_accuracy'],chance_accuracy=cell['chance_accuracy']))
         if r['update']:
             if labels is None:
