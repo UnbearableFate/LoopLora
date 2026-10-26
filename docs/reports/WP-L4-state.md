@@ -78,3 +78,24 @@ r128 W5<R; both oracle arms diagnostic/ineligible. E8 applies to best learned
 arm across BOTH ranks. Total WP-L4 cap REMOVED; record nodeh perjob, each<=2h.
 Prepare separate rank128 release/root directories and re-arm the wake-up after
 submission. Older4-only decisions/8nodeh instructions above are superseded.
+
+A2 IMPLEMENTATION SOURCE be07f7fb34c1cdd14b64f65b7f687364fcd6e36f (mergedmaster
+df21654/2844d5e). Tests3716019 onmg0851; wait for terminal/result, not dots.
+Smokes2400steps (10% of provisional24000), eval100 five480step intervals:
+3716039.opbs W5/R, log /work/xg24i002/x10041/LoopLora/logs/pbs/s-l4-128-W5-R-20261027-044344-1999311.log
+3716040.opbs OA, log /work/xg24i002/x10041/LoopLora/logs/pbs/s-l4-128-OA-20261027-044344-1999323.log
+Bothsourcebe07f7f,1node20min, unchangedrank32jobs. AfterBOTHsmokes pass, compute
+scripts/prepare_p1l_read_fix_a2.py --root ROOT/smoke-r128 --out ABSREPORTS
+verifies allsamples/exports/lossfiniteness without exposing quality; freezes
+smoke-r128-timing.json and release-r128.json, largestperarm2hschedule. All
+scientificrank128 submissions mustusebe07f7f (sameassmoke), --rank128,
+--schedule ABS/release-r128.json --out ROOT/arms-r128, pairsW5/R andsoloOA,
+samepriorL3decision/report arguments,2h and --scale-up task. Only AFTERALL3
+scientificarms are submitted may ANY WP-L4 quality score be read. Recordthis
+boundary explicitly and replace the old rank32 wake-up withoneonthelast128job.
+
+Finalanalyzer isrank-aware, requires --rank128-release ABS/release-r128.json,
+waitsforALL7; immutable selection includesrank. ConditionalE8bestacrossboth
+ranks usesrankselected, commonA2implementation/source,smokegate supports
+--E8-decision lock throughCLI --e8-decision, --rank and --arms. Separate
+e8-release.json; scienceROOT/e8/ARM. No furtherwritertrainingotherwise.

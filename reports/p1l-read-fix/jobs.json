@@ -114,12 +114,12 @@
     }
   ],
   "completed_node_hours": 0.17833333333333334,
-  "max_total_node_hours": 8,
+  "max_total_node_hours": null,
   "separate_from": "WP-L3 costs",
   "pending_roles": [
-    "A1 scientific R/Rrho",
-    "A1 scientific RK/OArho",
-    "conditional E8 and final audits"
+    "A1 rank32 scientific jobs unchanged",
+    "A2 rank128 smokes/release and scientific jobs",
+    "conditional E8 across both ranks and final audits"
   ],
   "pending": [
     {
@@ -135,6 +135,28 @@
       "source": "0b03d60",
       "nodes": 1,
       "requested_seconds": 7200
+    },
+    {
+      "job_id": "3716019.opbs",
+      "role": "A2 rank128 tests",
+      "source": "be07f7f",
+      "nodes": 1,
+      "requested_seconds": 300
+    },
+    {
+      "job_id": "3716039.opbs",
+      "role": "A2 rank128 2400-step smoke W5/R",
+      "source": "be07f7f",
+      "nodes": 1,
+      "requested_seconds": 1200
+    },
+    {
+      "job_id": "3716040.opbs",
+      "role": "A2 rank128 2400-step smoke OA",
+      "source": "be07f7f",
+      "nodes": 1,
+      "requested_seconds": 1200
     }
-  ]
+  ],
+  "budget_amendment": "A2: user removed total cap; every job <=1node2h"
 }

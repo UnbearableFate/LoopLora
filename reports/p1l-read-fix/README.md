@@ -1,4 +1,23 @@
-# WP-L4 read-fix, Amendment A1
+# WP-L4 read-fix, Amendments A1/A2
+
+A2 overrides the four-run decision and total8nodeh limit below. Master2844d5e
+was merged through df21654 before any WP-L4 validation score was read. Add
+r=r_mem128 W5/R/OA, same lr.003 without search (flagged), alongside unchanged
+rank32 jobs. All seven E16runs must finish before selection: r32R<Rrho<RK,
+then r128W5<R; both oracle arms diagnostic only. E8 is at most one retrain
+of the best learned arm across both ranks if its finalEM>=.50 and none>=.80.
+Totalnodeh is uncapped by the user; eachjob<=1node2h and all costs are recorded.
+The rank32 `release.json` is historical and immutable. Rank128 has its own
+`release-r128.json`, `smoke-r128-timing.json` and persistent `arms-r128/` runs.
+Before the three rank128 scientific arms are submitted, do not inspect any
+WP-L4 validation quality score. Rank128 smoke is2400steps/100evalepisodes,
+five equal checkpoints, pairedW5/R and soloOA; it exposes only timing/artifact
+checks and freezes each largest2h schedule before science. Scientific source
+is the exact tested/smoked commit, recorded by that release.
+
+The seven-run analyzer now additionally requires `--rank128-release` and
+preserves rank in all tables, selection locks and export checks. E8release
+also records rank. This paragraph supersedes older rank32-only commands below.
 
 Task `docs/tasks/WP-L4_p1l_read_fix.md`; choices `docs/reports/WP-L4-plan.md`;
 continuation `docs/reports/WP-L4-state.md`. Persistent root:
