@@ -1,0 +1,14 @@
+name: smoke-lora
+seed: 20261027
+stage: lora_ctx
+variant: B1
+protocol: context_retained
+write_policy: fact_final
+smoke: true
+train:
+  steps: 100
+  warmup_steps: 2
+eval:
+  episodes: 200
+  splits: [val]
+  protocols: [memory_only, context_retained]

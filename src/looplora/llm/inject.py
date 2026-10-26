@@ -3,6 +3,7 @@ from __future__ import annotations
 
 from contextlib import contextmanager
 from dataclasses import replace
+import os
 from typing import TYPE_CHECKING, Iterator
 
 import torch
@@ -20,6 +21,19 @@ MODEL_REVISION = "da87bfb608c14b7cf20ba1ce41287e8de496c0cd"
 CACHE_DIR = "/work/xg24i002/x10041/hf_home/hub"
 
 
+def configure_numerics() -> None:
+    """Make exact Gate 0 comparisons reproducible across worker processes.
+
+    Configure before the first model operation: default GPU kernel selection
+    produced process-dependent BF16 support states in the full smoke suite.
+    Deterministic algorithms fail explicitly if an unsupported operation is used.
+    """
+    os.environ["CUBLAS_WORKSPACE_CONFIG"] = ":4096:8"
+    torch.use_deterministic_algorithms(True)
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False
+
+
 def load_tokenizer():
     return AutoTokenizer.from_pretrained(
         MODEL_ID, revision=MODEL_REVISION, cache_dir=CACHE_DIR, local_files_only=True,
@@ -27,6 +41,7 @@ def load_tokenizer():
 
 
 def load_model(*, dtype: torch.dtype = torch.bfloat16, device: str = "cuda"):
+    configure_numerics()
     model = AutoModelForCausalLM.from_pretrained(
         MODEL_ID, revision=MODEL_REVISION, cache_dir=CACHE_DIR, local_files_only=True,
         torch_dtype=dtype, attn_implementation="sdpa",

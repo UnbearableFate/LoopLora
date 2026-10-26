@@ -1,0 +1,14 @@
+# writer_checkpoint is supplied by smoke.yaml's writer_from dependency.
+name: smoke-reader
+seed: 20261027
+stage: reader
+variant: M1
+protocol: memory_only
+write_policy: fact_final
+smoke: true
+train:
+  steps: 100
+  warmup_steps: 2
+eval:
+  episodes: 200
+  splits: [val]
