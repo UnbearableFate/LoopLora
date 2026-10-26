@@ -28,6 +28,9 @@ end07:56:49JST fits07:58. Its locked config was verified from the running record
 R128 B4-s43/3716618 alone remains queued among replacements (project16-job
 limit); its latest07:58-compatible start is07:00:22. No further slot expected
 before that cutoff; leave it queued for10/28 22:00 if it cannot fit.
+Checked again after07:00:22:3716618 still QUEUED, forecast10/28 22:00; retain
+it for that window. Seven split runs were recovered before the boundary;
+remaining training after maintenance is B1-s43/B2-s43(r32) and B4-s43(r128).
 All seven actual starts and requested ends verified in
 reports/p1l/dedicated-boundary-starts.json. Do not count cancelled packs as runs.
 Do not cancel/alter B1/B2s43 jobs3716304/3716305: retain for10/28 22:00.
