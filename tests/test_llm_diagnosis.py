@@ -1,14 +1,15 @@
 """Output oracle bypasses identity inference and writes no support or answers."""
-import copy
 import torch
 from transformers import Qwen3Config,Qwen3ForCausalLM
 
 from looplora.data.relations import generate
 from looplora.infra.seeds import derive_seed
-from looplora.llm.diagnosis import inject_last, OutputOracle
+from looplora.llm.diagnosis import inject_last, OutputOracle, fit
 from looplora.llm.inject import load_tokenizer
 from looplora.llm.pilot1_select import writer_config
 from looplora.llm.train import make_task_spec
+from looplora.llm.train import LLMExperiment
+from looplora.sym.stats import load_samples
 
 
 def test_oracle_injects_only_actual_last_token_and_preserves_gradients():
@@ -61,3 +62,29 @@ def test_oracle_only_table_and_B_train_and_disabled_equals_frozen_backbone():
     finally:
         oracle.close()
     assert not hasattr(model,'looplora_adapters')
+
+
+def test_budget_writer_preserves_val_samples_and_records_source_key_matching(tmp_path):
+    with torch.random.fork_rng(devices=[]):
+        torch.random.default_generator.manual_seed(derive_seed(17,'D3-tiny'))
+        model = Qwen3ForCausalLM(Qwen3Config(vocab_size=151936,hidden_size=16,
+            intermediate_size=32,num_hidden_layers=2,num_attention_heads=4,
+            num_key_value_heads=2,head_dim=4,attention_dropout=0.)).cuda().eval()
+    config = writer_config('test',16,'fact_final',.0003,32,1500)
+    config['model'].update(layer=1,r=4)
+    experiment = LLMExperiment(config,model=model,tokenizer=load_tokenizer())
+    try:
+        result = fit(experiment,tmp_path,steps=1,checkpoints=[1])
+        assert result['actual_steps']==1 and result['train_episodes']==32
+        metric = result['evaluations']['1']
+        assert metric['n']==1000 and metric['loss']>0
+        assert 0<=metric['matching']['key_top1']<=1
+        assert metric['matching']['chance']==1/16
+        sample = load_samples(tmp_path/'val-1'/'samples.npz')
+        assert len(sample['correct'])==1000
+        assert metric['correct']==int(sample['correct'].sum())
+        assert metric['em']==float(sample['correct'].mean())
+        assert (sample['split']=='val').all() and (sample['hop']==1).all()
+        assert (tmp_path/'checkpoint.pt').exists()
+    finally:
+        experiment.close()

@@ -184,7 +184,7 @@ def _checkpoint(experiment,out,step):
     torch.save(dict(config=experiment.config,step=step,**payload),out/'checkpoint.pt')
 
 
-def fit(experiment,out: Path,*,steps: int, checkpoints: list[int], max_seconds=3400):
+def fit(experiment,out: Path,*,steps: int, checkpoints: list[int], max_seconds=3500):
     config,options = experiment.config,experiment.config['train']
     spec = make_task_spec(config)
     data_seed = derive_seed(17,'llm','writer-data')
