@@ -176,9 +176,6 @@ def scan_final(
     enabled = torch.arange(maximum, device=u.device)[None] < counts[:, None]
     packed = u.gather(1, positions[..., None].expand(-1, -1, u.shape[-1]))
     packed = torch.where(enabled[..., None], packed, torch.zeros_like(packed))
-    raw = F.linear(packed, K)
-    keys = (raw / torch.linalg.vector_norm(raw, dim=-1, keepdim=True).clamp_min(eps)).to(M0.dtype)
-    values = F.linear(packed, V).to(M0.dtype)
 
     def pack_gate(value: Tensor | float) -> Tensor:
         gate = torch.as_tensor(value, dtype=M0.dtype, device=M0.device)
@@ -190,7 +187,12 @@ def scan_final(
     lambdas, betas = pack_gate(lam), pack_gate(beta)
     for step in range(maximum):
         mask = enabled[:, step, None, None]
-        key, value = keys[:, step], values[:, step]
+        # Keep the reference's per-token projections. A single larger GEMM
+        # changes FP32 rounding enough to affect a subsequent BF16 backbone.
+        token = packed[:, step].contiguous()
+        raw = F.linear(token, K)
+        key = (raw / torch.linalg.vector_norm(raw, dim=-1, keepdim=True).clamp_min(eps)).to(M0.dtype)
+        value = F.linear(token, V).to(M0.dtype)
         active_state = torch.where(mask, state, torch.zeros_like(state))
         decayed = lambdas[:, step, None, None] * active_state
         error = value - torch.bmm(decayed, key.unsqueeze(-1)).squeeze(-1)
