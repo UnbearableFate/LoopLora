@@ -1,4 +1,4 @@
-# P1-S follow-up F2 — input-factorized learned writer (pre-registered 2026-10-26, before any confirmation metric)
+# P1-S follow-up F2 — input-factorized learned writer (pre-registered 2026-10-26 22:11 JST, commit 74ad11c)
 
 Registered before any WP-H, F1 or F2 confirmation-set metric has been computed (WP-H and F1 report only
 training progress at this time). Deviation from the P1-S stop rule's "one follow-up": recorded as P1S.md A6.
