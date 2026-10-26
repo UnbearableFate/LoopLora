@@ -13,7 +13,7 @@ wake-ups cancelled).
 | sn-p1l | wk-p1l: P1-L main study | to spawn after 2026-10-28 22:00 from `docs/reports/P1L-state.md` |
 | (on demand) | wk-sym, wk-symf, wk-theory, wk-core, wk-data | no pending work |
 | rv-fable | external reviewer, Claude Fable 5.1 (max), herdr tab w1:t17 (user request 2026-10-27) | active: literature review, `docs/review/brief_2026-10-27.md` → `docs/review/rv-fable_2026-10-27.md` |
-| rv-astra | external reviewer, Codex GPT-6-Astra (max, web search), herdr tab w1:t18 (user request 2026-10-27) | active: same brief → `docs/review/rv-astra_2026-10-27.md` |
+| rv-astra | external reviewer, Codex GPT-6-Astra (max, web search), herdr tab w1:t18 (user request 2026-10-27) | done 08:18 (6179f3a); codex closed, tab closed |
 
 Policy (from 2026-10-26 21:02): each worker keeps one role across tasks, in its own herdr tab, worktree and
 branch. The orchestrator reuses it for every task in that role and does not close it after a task. When its
