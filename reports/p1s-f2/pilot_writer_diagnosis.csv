@@ -1,0 +1,3 @@
+stratum,n_queries,n_correct,accuracy,chance_accuracy,mean_first_read_cosine,n_finite_first_read_cosine,mean_memory_norm,mean_write_age,min_write_age,max_write_age
+one_fact,551,505,0.9165154264972777,0.04725350262662774,0.7839339971542358,551,4.19516658782959,5.279491833030853,0,11
+multiple_relation_specific_facts,449,360,0.8017817371937639,0.04972393427992101,0.7143769860267639,449,4.177189826965332,5.184855233853007,0,11

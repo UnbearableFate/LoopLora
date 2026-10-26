@@ -6,7 +6,12 @@ import argparse
 import copy
 import csv
 import json
+import os
 from pathlib import Path
+import subprocess
+import sys
+import time
+from datetime import datetime, timezone
 
 ROOT = Path('/work/xg24i002/x10041/LoopLora-wt/symf')
 RUNS = ROOT / 'runs/p1s/f2'
@@ -152,6 +157,18 @@ def select_readers() -> None:
     print('Locked selected LRs, 3 fresh main writers and 36 main readers', flush=True)
 
 
+def diagnose_writer() -> None:
+    from diagnose_p1s_writer import _diagnose_run
+    from looplora.sym.pilot import loss_diagnostic
+    selected=json.loads((REPORTS/'pilot_writer_selection.json').read_text())
+    row=dict(selected,r=32,E=12,accuracy=selected['val_accuracy'],n=1000,
+             **loss_diagnostic(Path(selected['run_dir'])/'train_log.jsonl'))
+    result=_diagnose_run(row,REPORTS)
+    write(REPORTS/'pilot_writer_diagnosis.json',result)
+    csv_table(REPORTS/'pilot_writer_diagnosis.csv',
+              [dict(stratum=n,**values) for n,values in result['head_multiplicity'].items()])
+
+
 def run(stage: str, shard: int, procs: int) -> None:
     from looplora.sym.run import run_suite
     rc = run_suite(RUNS/'plans'/stage/f'shard-{shard:02d}.json', RUNS/stage/f'shard-{shard:02d}', procs)
@@ -159,16 +176,134 @@ def run(stage: str, shard: int, procs: int) -> None:
         raise SystemExit(rc)
 
 
+def all_training() -> dict:
+    from looplora.infra.seeds import stable_hash
+    plan = json.loads((RUNS/'main_plan.json').read_text())
+    if len(plan['runs'])!=39 or sum(r['group']=='primary' for r in plan['runs'])!=36:
+        raise ValueError('F2 requires 3 writers and 36 readers')
+    for run in plan['runs']:
+        folder = Path(run['training_dir'])
+        rec = json.loads((folder/'record.json').read_text())
+        c = json.loads((folder/'config.json').read_text())['config']
+        if (rec['status']!='complete' or c!=run['config'] or rec['config_hash']!=stable_hash(c)
+                or c['train']['steps']!=15000 or not (folder/'checkpoint.pt').is_file()):
+            raise ValueError(f'F2 global training barrier failed: {run["name"]}')
+    return plan
+
+
+def evaluate_one(name: str) -> None:
+    import torch
+    from looplora.infra.seeds import stable_hash
+    from looplora.sym.evaluate import evaluate
+    from looplora.sym.run import source_metadata
+    from looplora.sym.train import load_checkpoint
+    plan = all_training()
+    entry = next(r for r in plan['runs'] if r['name']==name)
+    source, out = Path(entry['training_dir']), Path(entry['run_dir'])
+    if out.exists(): raise FileExistsError(out)
+    out.mkdir(parents=True)
+    for filename in ('train_log.jsonl', 'checkpoint.pt', 'writer.pt'):
+        (out/filename).symlink_to(source/filename)
+    torch.set_num_threads(1)
+    torch.cuda.init()
+    torch.cuda.set_device(0)
+    model = load_checkpoint(source/'checkpoint.pt')
+    c = copy.deepcopy(model.checkpoint_config)
+    if c!=entry['config']: raise ValueError('F2 checkpoint configuration differs')
+    provenance = dict(checkpoint=str(source/'checkpoint.pt'), checkpoint_config=c, **source_metadata())
+    rec = json.loads((source/'record.json').read_text())
+    rec.update(status='running', config=c, training_complete=True,
+               evaluation_source=source_metadata(), confirmation_samples_written=False)
+    write(out/'record.json', rec)
+    try:
+        if entry['group']=='writer':
+            metrics, timing = evaluate(model,c,out/'writer_validation',provenance=provenance)
+            write(out/'writer_validation/timing.json', timing)
+            rec.update(samples=str(out/'writer_validation/samples.npz'), scores=metrics['table'])
+        else:
+            screen = copy.deepcopy(c)
+            screen['eval'].update(episodes=2000, splits=['test','test_unseen'], seed=4242,
+                                  counterfactuals=True, swap_successors=True)
+            metrics, timing = evaluate(model, screen, out/'screening',provenance=provenance)
+            write(out/'screening/timing.json',timing)
+            confirmation = copy.deepcopy(screen)
+            confirmation['eval'].update(splits=['test'],seed=777001,counterfactuals=False)
+            _, confirm_timing = evaluate(model,confirmation,out/'confirmation',samples_only=True,
+                                         provenance=provenance)
+            rec.update(samples=str(out/'screening/samples.npz'), scores=metrics['table'],
+                       confirmation_samples_written=True,
+                       confirmation_samples=str(out/'confirmation/samples.npz'),
+                       eval_samples=sum(r['n'] for r in metrics['table']),
+                       latency=dict(screening=timing, confirmation=confirm_timing))
+        rec.update(status='complete', evaluation_finished_at=datetime.now(timezone.utc).isoformat())
+    except BaseException as error:
+        rec.update(status='failed', failure_reason=f'{type(error).__name__}: {error}')
+        raise
+    finally:
+        write(out/'record.json',rec)
+
+
+def evaluation_shard(shard: int, procs: int) -> None:
+    plan = all_training()
+    pending = [r['name'] for r in plan['runs'][shard::4]]
+    running = []
+    while pending or running:
+        for p in list(running):
+            rc = p.poll()
+            if rc is not None:
+                running.remove(p)
+                if rc:
+                    for child in running: child.terminate()
+                    raise RuntimeError(f'F2 evaluation child failed: {rc}')
+        while pending and len(running)<procs:
+            running.append(subprocess.Popen([sys.executable,str(Path(__file__).resolve()),
+                       'evaluate-one','--name',pending.pop(0)],env={**os.environ,'OMP_NUM_THREADS':'1'}))
+        if running: time.sleep(.2)
+
+
+def seal() -> None:
+    from looplora.infra.seeds import stable_hash
+    plan = all_training()
+    paths = []
+    for r in plan['runs']:
+        folder = Path(r['run_dir'])
+        rec = json.loads((folder/'record.json').read_text())
+        if rec['status']!='complete': raise ValueError('F2 evaluation incomplete')
+        if r['group']=='writer': continue
+        meta = json.loads((folder/'confirmation/evaluation.json').read_text())
+        settings = meta['config']['eval']
+        if (not meta['aggregation_deferred'] or 'table' in meta or 'diagnostics' in meta
+                or settings['seed']!=777001 or settings['episodes']!=2000
+                or settings['splits']!=['test'] or settings['counterfactuals']
+                or settings['depths']!=DEPTHS or settings['hops']!=list(range(1,9))
+                or meta['checkpoint_config']!=r['config']
+                or (folder/'confirmation/metrics.json').exists()):
+            raise ValueError('F2 confirmation embargo/protocol mismatch')
+        sample=folder/'confirmation/samples.npz'
+        if not sample.is_file(): raise FileNotFoundError(sample)
+        paths.append(str(sample))
+    write(RUNS/'barrier.json',dict(status='passed',plan_hash=stable_hash(plan),
+          created_at=datetime.now(timezone.utc).isoformat(),runs=[r['name'] for r in plan['runs']],
+          confirmation_samples=paths))
+    print('F2 release: 39 completed stages and 36 blind confirmation sets',flush=True)
+
+
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument('stage', choices=('plan-writers','pilot-writers','select-writer','pilot-readers',
-                                      'select-readers','main-writers','main-readers'))
+                                      'select-readers','main-writers','main-readers',
+                                      'evaluate','evaluate-one','seal','diagnose-writer'))
     ap.add_argument('--shard', type=int, default=0)
     ap.add_argument('--procs', type=int, default=8)
+    ap.add_argument('--name')
     args = ap.parse_args()
     if args.stage=='plan-writers': plan_writers()
     elif args.stage=='select-writer': select_writer()
     elif args.stage=='select-readers': select_readers()
+    elif args.stage=='evaluate': evaluation_shard(args.shard,args.procs)
+    elif args.stage=='evaluate-one': evaluate_one(args.name)
+    elif args.stage=='seal': seal()
+    elif args.stage=='diagnose-writer': diagnose_writer()
     else: run(args.stage,args.shard,args.procs)
 
 
