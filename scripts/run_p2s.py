@@ -100,12 +100,13 @@ def select() -> None:
             cells=[r for r in metrics['table'] if r['split']=='val' and r['condition']=='original'
                    and r['hop'] in (1,2,3) and r['L']==c['eval']['depths'][0]]
             if sum(r['n'] for r in cells)!=3000: raise ValueError('pilot query coverage differs')
-            all_rows.append(dict(**f,lr=lr,val_accuracy=sum(r['n']*r['accuracy'] for r in cells)/3000,
+            correct=sum(round(r['n']*r['accuracy']) for r in cells)
+            all_rows.append(dict(**f,lr=lr,val_correct=correct,val_accuracy=correct/3000,
                 depth=c['eval']['depths'][0],train_seconds=record['train_seconds']))
     selected=[]
     for f in families():
         matching=[r for r in all_rows if all(r[k]==v for k,v in f.items())]
-        selected.append(max(matching,key=lambda r:(r['val_accuracy'],-r['lr'])))
+        selected.append(max(matching,key=lambda r:(r['val_correct'],-r['lr'])))
     csv_table(REPORTS/'pilot_grid.csv',all_rows)
     csv_table(REPORTS/'selected_lrs.csv',selected)
     configs=[config(f,s,15000,f['lr']) for f in selected for s in SEEDS]

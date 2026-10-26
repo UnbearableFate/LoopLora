@@ -2,6 +2,8 @@
 from __future__ import annotations
 
 import copy
+import csv
+import json
 from pathlib import Path
 import sys
 
@@ -13,6 +15,7 @@ import benchmark_p2s as bench
 import run_p2s as driver
 from looplora.sym.config import resolve_config
 from looplora.sym.model import SymbolicModel
+from looplora.infra.seeds import stable_hash
 
 
 def test_exact_registered_eight_families_and_twenty_four_seeded_stages():
@@ -115,3 +118,23 @@ def test_capability_requires_every_rank_state_lower_bound_strictly_positive():
     rows[5]['statistics']['gate']['ci_low']=0.
     assert not analysis.capability(rows)
     with pytest.raises(ValueError,match='six'): analysis.capability(rows[:5])
+
+
+def test_validation_ties_lock_smaller_lr_and_fresh_three_seed_main_runs(tmp_path,monkeypatch):
+    monkeypatch.setattr(driver,'RUNS',tmp_path/'runs')
+    monkeypatch.setattr(driver,'REPORTS',tmp_path/'reports')
+    for f in driver.families():
+        for i,lr in enumerate(driver.LRS):
+            c=driver.config(f,17,5000,lr)
+            folder=driver.RUNS/'pilot'/f'shard-{i:02d}'/c['name']
+            driver.write(folder/'config.json',dict(config=c))
+            driver.write(folder/'record.json',dict(status='complete',config_hash=stable_hash(c),train_seconds=10))
+            driver.write(folder/'metrics.json',dict(table=[dict(split='val',condition='original',hop=h,
+                L=4 if f['variant']=='B8' else 1,n=1000,accuracy=.1 if i==0 else .2) for h in (1,2,3)]))
+    driver.select()
+    with (driver.REPORTS/'selected_lrs.csv').open() as f: rows=list(csv.DictReader(f))
+    assert len(rows)==8 and all(float(r['lr'])==.001 and int(r['val_correct'])==600 for r in rows)
+    plan=json.loads((driver.RUNS/'main_plan.json').read_text())
+    assert len(plan['runs'])==24
+    assert {r['seed'] for r in plan['runs']}==set(driver.SEEDS)
+    assert all(r['config']['train']['steps']==15000 and r['config']['train']['lr']==.001 for r in plan['runs'])
