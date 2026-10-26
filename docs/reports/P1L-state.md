@@ -1,4 +1,4 @@
-# wk-p1l continuation card — r32 Pilot-2 locked; main launching
+# wk-p1l continuation card — r32 main submitted; r128 Pilot-2 running
 
 Worktree /work/xg24i002/x10041/LoopLora-wt/p1l, branchwp/p1l. User assigned
 WP-P1L; finish docs/reports/P1L.md and only then reply exactly
@@ -67,9 +67,20 @@ R/pilot-jobs.json retains exact job IDs/log/spec/source. R/pilot/<LABEL>/
 All seven pilots completed, boundary verified. Compute selection3716286 onmg0019
 passed, source716110a. reports/p1l/lr-S-lock.json fixes S17000, M1-L4 lr.003;
 B8/B4/B5-L4/B3-L4/B1/B2 lr.001 (ties lower). All22 configs updated before
-main submission. Pilot full-vocabulary pooled val EM is0.033–0.133% for oracle/
+main submission, committed d644b9b. Pilot full-vocabulary pooled val EM is0.033–0.133% for oracle/
 no-memory readers across candidates; context-retained B1/B2 is99.33–99.83%.
 These are validation results only; no change to design, gates or main schedule.
+
+R32 main launched source d644b9ba3b30f7fcc2f13020272f457ee60aae40,
+19jobs/22runs, all1node, requests5min–1h55min. R/main-jobs.json retains
+receipts; R/training-manifest.json maps all22 runs. Raw R/main/<GROUP>/<RUN>.
+Seed17:3716288B8,3716289M1,3716290B5,3716291B4+B3,3716292B1,3716293B2.
+Seed29:3716294B8,3716295M1,3716296B5,3716297B4+B3,3716298B1,3716299B2.
+Seed43:3716300B8,3716301M1,3716302B5,3716303B4+B3,3716304B1,3716305B2.
+B0 untrained checkpoint:3716306. Never rerun the launcher blindly or duplicate
+submitted groups. All main run records must complete before confirmation;
+main training performs no quality evaluation. Arrange wakeup on3716305 (late
+long job), then inspect all19 receipts/22 artifacts on wake, not only that job.
 
 Probe full cache3715870, source d276308, R/jlens/directions.pt,512 fixed val
 questions only, frozen model, completed onmg0865 in932.28s. Small metadata
@@ -135,8 +146,10 @@ separately; unchanged regression passed3715942). No further blanket retests.
 ## Immediate next actions
 
 1. Validation-only evaluation acceptance is complete; never read its raw scores.
-2. R32 pilot wakeup acknowledged; commit the lock/configs and launch main.
+2. R32 pilot wakeup acknowledged; lock/configs committed and main submitted.
    R128 pilot3716169 has its own independent armed watcher above; retain it.
+3. Arrange r32 main3716305 wakeup before going idle. At either wake preserve
+   the other pending event; independently advance whichever rank is ready.
 
 ## Next actions after each rank's pilot wakeup
 

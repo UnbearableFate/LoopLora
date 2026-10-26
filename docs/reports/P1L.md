@@ -5,15 +5,18 @@ The orchestrator's J-lens-inspired name-gradient probe A1 amendment was committe
 Merged master Amendments B1/B2: B2 supersedes the total cap, fixes S17000 and
 Pilot-2 5666steps; per-job<=8nodes x2h and maintenance deadline remain binding.
 Single GPU process, sequential backbone reuse, prefetch2. Smoke timing audit
-3715950 passed; S/packing locked1dc8a76. Pilot-2 jobs3715959–3715965 are running
-from that source,5666steps per lr candidate. Lrs and main remain pending.
+3715950 passed; S/packing locked1dc8a76. Pilot-2 jobs3715959–3715965 passed,
+5666steps per lr candidate. Selection3716286 onmg0019 fixed M1-L4 lr.003,
+all other trained readers lr.001; lr/S/config lockd644b9b precedes main.
+R32 main jobs3716288–3716306 submitted (19jobs/22runs), one node each,
+maximum request1h55min, B4/B3 pairs sequentially packed.
 Confirmation remains held for all main runs and the WP-L4 decision.
 Amendment B3 adds oracle r128 (15runs, own Pilot-2, B0–B2 reused); confirmation
 is now held for ALL conditions, with confidence1-.05/k fixed beforehand.
 B4 removes cross-rank single-read contrasts and adds descriptive adapter counts/
 inference timing; wrapper3716084 passed onmg0025. R128 smokes completed,
 sizing3716162 locked S17000(e955765), and Pilot-2 jobs3716168–3716172 are
-running. R32 Pilot-2 watcher remains armed; see P1L-state.md for continuation.
+running. R128 pilot watcher remains armed; see P1L-state.md for continuation.
 No test or confirmation data have been accessed.
 
 Raw root: /work/xg24i002/x10041/LoopLora/runs/p1l/main/.
