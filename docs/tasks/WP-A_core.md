@@ -60,3 +60,5 @@ Run: `scripts/submit.py --name t-core --walltime 00:15:00 --worktree . --wait --
    decay-first rule and mask semantics); `write()` is built on it. Used by the symbolic oracle writer.
 2. `AdapterConfig.activation ∈ {relu, identity}` (default relu); identity is the linear-reader mechanism control
    of plan §6.2. Covered by the reference-equivalence tests.
+3. (from WP-E) `AdaptedLinear` mixed precision: adapter receives `x.to(adapter dtype)`, base keeps the original
+   x, branch cast to the base output dtype before the sum; differentiable casts; bf16-base + fp32-adapter test.
