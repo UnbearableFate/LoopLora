@@ -176,7 +176,8 @@ def collect(runs: Path, manifest: dict) -> list[dict]:
                      "r": config["model"]["r"], "E": config["task"]["E"], "lr": config["train"]["lr"],
                      "accuracy": accuracy, "depth": depth, "n": count,
                      "train_seconds": record["train_seconds"], "run_dir": str(path.parent.resolve()),
-                     "writer_checkpoint": str(path.with_name("writer.pt").resolve()),
+                     "writer_checkpoint": (str(path.with_name("writer.pt").resolve())
+                                           if record["writer_checkpoint"] is not None else None),
                      **loss_diagnostic(path.with_name("train_log.jsonl"))})
     names = [row["name"] for row in rows]
     if len(set(names)) != len(names) or set(names) != set(manifest["names"]):
