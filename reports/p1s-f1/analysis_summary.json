@@ -1,0 +1,34 @@
+{
+  "status": "complete",
+  "runs": 60,
+  "gate_rows": 8,
+  "confirmation_sets": 60,
+  "plan_hash": "f22be50b887ecc8ecfe792f5fb92bfa8",
+  "passing_rows": [
+    {
+      "writer": "joint",
+      "r": 64,
+      "reader": "M1"
+    },
+    {
+      "writer": "joint",
+      "r": 64,
+      "reader": "M1-lin"
+    },
+    {
+      "writer": "joint",
+      "r": 128,
+      "reader": "M1"
+    },
+    {
+      "writer": "joint",
+      "r": 128,
+      "reader": "M1-lin"
+    }
+  ],
+  "confirmation_look_count": 1,
+  "replication_required": false,
+  "training_commit": "7aed0f38becc837b4a763cc0f19d7fca3073c3cc",
+  "shared_pipeline": "b900d92",
+  "completed_at": "2026-10-26T13:25:12.874205+00:00"
+}

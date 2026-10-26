@@ -1,0 +1,2381 @@
+{
+  "status": "passed",
+  "plan_hash": "a79085e5e20c31d69b3fefa416525826",
+  "barrier_created_at": "2026-10-26T13:21:57.349811+00:00",
+  "runs_checked": 30,
+  "reader_runs_checked": 30,
+  "frozen_writers_checked": 0,
+  "sample_rows": 27360000,
+  "evaluations": [
+    {
+      "name": "f1-oracle_random-r64-M1-s17",
+      "dataset": "screening",
+      "rows": 768000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original",
+        "test/remove_required_fact",
+        "test/replace_key_fact",
+        "test/swap_memory",
+        "test/swap_successors",
+        "test_unseen/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "e6c438ec2ff690d4704f7e842115c4ef",
+        "test/remove_required_fact": "2a99a7c4440159ea332c04457a580711",
+        "test/replace_key_fact": "70076d39d7d5fcb499796d15b1233000",
+        "test/swap_memory": "e03178002cc17f33dd7d6f678ac96199",
+        "test/swap_successors": "dacb5a9107b173726b5eed5c88c85498",
+        "test_unseen/original": "8d6df77728a982d92fcbc58bee11cd72"
+      }
+    },
+    {
+      "name": "f1-oracle_random-r64-M1-s17",
+      "dataset": "confirmation",
+      "rows": 144000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "0c9cb1ea4686f5870da5ad5da3f06538"
+      }
+    },
+    {
+      "name": "f1-oracle_random-r64-M1-lin-s17",
+      "dataset": "screening",
+      "rows": 768000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original",
+        "test/remove_required_fact",
+        "test/replace_key_fact",
+        "test/swap_memory",
+        "test/swap_successors",
+        "test_unseen/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "e6c438ec2ff690d4704f7e842115c4ef",
+        "test/remove_required_fact": "2a99a7c4440159ea332c04457a580711",
+        "test/replace_key_fact": "70076d39d7d5fcb499796d15b1233000",
+        "test/swap_memory": "e03178002cc17f33dd7d6f678ac96199",
+        "test/swap_successors": "dacb5a9107b173726b5eed5c88c85498",
+        "test_unseen/original": "8d6df77728a982d92fcbc58bee11cd72"
+      }
+    },
+    {
+      "name": "f1-oracle_random-r64-M1-lin-s17",
+      "dataset": "confirmation",
+      "rows": 144000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "0c9cb1ea4686f5870da5ad5da3f06538"
+      }
+    },
+    {
+      "name": "f1-oracle_random-r64-B5-s17",
+      "dataset": "screening",
+      "rows": 768000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original",
+        "test/remove_required_fact",
+        "test/replace_key_fact",
+        "test/swap_memory",
+        "test/swap_successors",
+        "test_unseen/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "e6c438ec2ff690d4704f7e842115c4ef",
+        "test/remove_required_fact": "2a99a7c4440159ea332c04457a580711",
+        "test/replace_key_fact": "70076d39d7d5fcb499796d15b1233000",
+        "test/swap_memory": "e03178002cc17f33dd7d6f678ac96199",
+        "test/swap_successors": "dacb5a9107b173726b5eed5c88c85498",
+        "test_unseen/original": "8d6df77728a982d92fcbc58bee11cd72"
+      }
+    },
+    {
+      "name": "f1-oracle_random-r64-B5-s17",
+      "dataset": "confirmation",
+      "rows": 144000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "0c9cb1ea4686f5870da5ad5da3f06538"
+      }
+    },
+    {
+      "name": "f1-oracle_random-r64-B5-lin-s17",
+      "dataset": "screening",
+      "rows": 768000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original",
+        "test/remove_required_fact",
+        "test/replace_key_fact",
+        "test/swap_memory",
+        "test/swap_successors",
+        "test_unseen/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "e6c438ec2ff690d4704f7e842115c4ef",
+        "test/remove_required_fact": "2a99a7c4440159ea332c04457a580711",
+        "test/replace_key_fact": "70076d39d7d5fcb499796d15b1233000",
+        "test/swap_memory": "e03178002cc17f33dd7d6f678ac96199",
+        "test/swap_successors": "dacb5a9107b173726b5eed5c88c85498",
+        "test_unseen/original": "8d6df77728a982d92fcbc58bee11cd72"
+      }
+    },
+    {
+      "name": "f1-oracle_random-r64-B5-lin-s17",
+      "dataset": "confirmation",
+      "rows": 144000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "0c9cb1ea4686f5870da5ad5da3f06538"
+      }
+    },
+    {
+      "name": "f1-oracle_random-r64-B3-s17",
+      "dataset": "screening",
+      "rows": 768000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original",
+        "test/remove_required_fact",
+        "test/replace_key_fact",
+        "test/swap_memory",
+        "test/swap_successors",
+        "test_unseen/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "e6c438ec2ff690d4704f7e842115c4ef",
+        "test/remove_required_fact": "2a99a7c4440159ea332c04457a580711",
+        "test/replace_key_fact": "70076d39d7d5fcb499796d15b1233000",
+        "test/swap_memory": "e03178002cc17f33dd7d6f678ac96199",
+        "test/swap_successors": "dacb5a9107b173726b5eed5c88c85498",
+        "test_unseen/original": "8d6df77728a982d92fcbc58bee11cd72"
+      }
+    },
+    {
+      "name": "f1-oracle_random-r64-B3-s17",
+      "dataset": "confirmation",
+      "rows": 144000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "0c9cb1ea4686f5870da5ad5da3f06538"
+      }
+    },
+    {
+      "name": "f1-oracle_random-r64-M1-s29",
+      "dataset": "screening",
+      "rows": 768000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original",
+        "test/remove_required_fact",
+        "test/replace_key_fact",
+        "test/swap_memory",
+        "test/swap_successors",
+        "test_unseen/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "e6c438ec2ff690d4704f7e842115c4ef",
+        "test/remove_required_fact": "2a99a7c4440159ea332c04457a580711",
+        "test/replace_key_fact": "70076d39d7d5fcb499796d15b1233000",
+        "test/swap_memory": "e03178002cc17f33dd7d6f678ac96199",
+        "test/swap_successors": "dacb5a9107b173726b5eed5c88c85498",
+        "test_unseen/original": "8d6df77728a982d92fcbc58bee11cd72"
+      }
+    },
+    {
+      "name": "f1-oracle_random-r64-M1-s29",
+      "dataset": "confirmation",
+      "rows": 144000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "0c9cb1ea4686f5870da5ad5da3f06538"
+      }
+    },
+    {
+      "name": "f1-oracle_random-r64-M1-lin-s29",
+      "dataset": "screening",
+      "rows": 768000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original",
+        "test/remove_required_fact",
+        "test/replace_key_fact",
+        "test/swap_memory",
+        "test/swap_successors",
+        "test_unseen/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "e6c438ec2ff690d4704f7e842115c4ef",
+        "test/remove_required_fact": "2a99a7c4440159ea332c04457a580711",
+        "test/replace_key_fact": "70076d39d7d5fcb499796d15b1233000",
+        "test/swap_memory": "e03178002cc17f33dd7d6f678ac96199",
+        "test/swap_successors": "dacb5a9107b173726b5eed5c88c85498",
+        "test_unseen/original": "8d6df77728a982d92fcbc58bee11cd72"
+      }
+    },
+    {
+      "name": "f1-oracle_random-r64-M1-lin-s29",
+      "dataset": "confirmation",
+      "rows": 144000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "0c9cb1ea4686f5870da5ad5da3f06538"
+      }
+    },
+    {
+      "name": "f1-oracle_random-r64-B5-s29",
+      "dataset": "screening",
+      "rows": 768000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original",
+        "test/remove_required_fact",
+        "test/replace_key_fact",
+        "test/swap_memory",
+        "test/swap_successors",
+        "test_unseen/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "e6c438ec2ff690d4704f7e842115c4ef",
+        "test/remove_required_fact": "2a99a7c4440159ea332c04457a580711",
+        "test/replace_key_fact": "70076d39d7d5fcb499796d15b1233000",
+        "test/swap_memory": "e03178002cc17f33dd7d6f678ac96199",
+        "test/swap_successors": "dacb5a9107b173726b5eed5c88c85498",
+        "test_unseen/original": "8d6df77728a982d92fcbc58bee11cd72"
+      }
+    },
+    {
+      "name": "f1-oracle_random-r64-B5-s29",
+      "dataset": "confirmation",
+      "rows": 144000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "0c9cb1ea4686f5870da5ad5da3f06538"
+      }
+    },
+    {
+      "name": "f1-oracle_random-r64-B5-lin-s29",
+      "dataset": "screening",
+      "rows": 768000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original",
+        "test/remove_required_fact",
+        "test/replace_key_fact",
+        "test/swap_memory",
+        "test/swap_successors",
+        "test_unseen/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "e6c438ec2ff690d4704f7e842115c4ef",
+        "test/remove_required_fact": "2a99a7c4440159ea332c04457a580711",
+        "test/replace_key_fact": "70076d39d7d5fcb499796d15b1233000",
+        "test/swap_memory": "e03178002cc17f33dd7d6f678ac96199",
+        "test/swap_successors": "dacb5a9107b173726b5eed5c88c85498",
+        "test_unseen/original": "8d6df77728a982d92fcbc58bee11cd72"
+      }
+    },
+    {
+      "name": "f1-oracle_random-r64-B5-lin-s29",
+      "dataset": "confirmation",
+      "rows": 144000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "0c9cb1ea4686f5870da5ad5da3f06538"
+      }
+    },
+    {
+      "name": "f1-oracle_random-r64-B3-s29",
+      "dataset": "screening",
+      "rows": 768000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original",
+        "test/remove_required_fact",
+        "test/replace_key_fact",
+        "test/swap_memory",
+        "test/swap_successors",
+        "test_unseen/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "e6c438ec2ff690d4704f7e842115c4ef",
+        "test/remove_required_fact": "2a99a7c4440159ea332c04457a580711",
+        "test/replace_key_fact": "70076d39d7d5fcb499796d15b1233000",
+        "test/swap_memory": "e03178002cc17f33dd7d6f678ac96199",
+        "test/swap_successors": "dacb5a9107b173726b5eed5c88c85498",
+        "test_unseen/original": "8d6df77728a982d92fcbc58bee11cd72"
+      }
+    },
+    {
+      "name": "f1-oracle_random-r64-B3-s29",
+      "dataset": "confirmation",
+      "rows": 144000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "0c9cb1ea4686f5870da5ad5da3f06538"
+      }
+    },
+    {
+      "name": "f1-oracle_random-r64-M1-s43",
+      "dataset": "screening",
+      "rows": 768000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original",
+        "test/remove_required_fact",
+        "test/replace_key_fact",
+        "test/swap_memory",
+        "test/swap_successors",
+        "test_unseen/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "e6c438ec2ff690d4704f7e842115c4ef",
+        "test/remove_required_fact": "2a99a7c4440159ea332c04457a580711",
+        "test/replace_key_fact": "70076d39d7d5fcb499796d15b1233000",
+        "test/swap_memory": "e03178002cc17f33dd7d6f678ac96199",
+        "test/swap_successors": "dacb5a9107b173726b5eed5c88c85498",
+        "test_unseen/original": "8d6df77728a982d92fcbc58bee11cd72"
+      }
+    },
+    {
+      "name": "f1-oracle_random-r64-M1-s43",
+      "dataset": "confirmation",
+      "rows": 144000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "0c9cb1ea4686f5870da5ad5da3f06538"
+      }
+    },
+    {
+      "name": "f1-oracle_random-r64-M1-lin-s43",
+      "dataset": "screening",
+      "rows": 768000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original",
+        "test/remove_required_fact",
+        "test/replace_key_fact",
+        "test/swap_memory",
+        "test/swap_successors",
+        "test_unseen/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "e6c438ec2ff690d4704f7e842115c4ef",
+        "test/remove_required_fact": "2a99a7c4440159ea332c04457a580711",
+        "test/replace_key_fact": "70076d39d7d5fcb499796d15b1233000",
+        "test/swap_memory": "e03178002cc17f33dd7d6f678ac96199",
+        "test/swap_successors": "dacb5a9107b173726b5eed5c88c85498",
+        "test_unseen/original": "8d6df77728a982d92fcbc58bee11cd72"
+      }
+    },
+    {
+      "name": "f1-oracle_random-r64-M1-lin-s43",
+      "dataset": "confirmation",
+      "rows": 144000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "0c9cb1ea4686f5870da5ad5da3f06538"
+      }
+    },
+    {
+      "name": "f1-oracle_random-r64-B5-s43",
+      "dataset": "screening",
+      "rows": 768000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original",
+        "test/remove_required_fact",
+        "test/replace_key_fact",
+        "test/swap_memory",
+        "test/swap_successors",
+        "test_unseen/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "e6c438ec2ff690d4704f7e842115c4ef",
+        "test/remove_required_fact": "2a99a7c4440159ea332c04457a580711",
+        "test/replace_key_fact": "70076d39d7d5fcb499796d15b1233000",
+        "test/swap_memory": "e03178002cc17f33dd7d6f678ac96199",
+        "test/swap_successors": "dacb5a9107b173726b5eed5c88c85498",
+        "test_unseen/original": "8d6df77728a982d92fcbc58bee11cd72"
+      }
+    },
+    {
+      "name": "f1-oracle_random-r64-B5-s43",
+      "dataset": "confirmation",
+      "rows": 144000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "0c9cb1ea4686f5870da5ad5da3f06538"
+      }
+    },
+    {
+      "name": "f1-oracle_random-r64-B5-lin-s43",
+      "dataset": "screening",
+      "rows": 768000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original",
+        "test/remove_required_fact",
+        "test/replace_key_fact",
+        "test/swap_memory",
+        "test/swap_successors",
+        "test_unseen/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "e6c438ec2ff690d4704f7e842115c4ef",
+        "test/remove_required_fact": "2a99a7c4440159ea332c04457a580711",
+        "test/replace_key_fact": "70076d39d7d5fcb499796d15b1233000",
+        "test/swap_memory": "e03178002cc17f33dd7d6f678ac96199",
+        "test/swap_successors": "dacb5a9107b173726b5eed5c88c85498",
+        "test_unseen/original": "8d6df77728a982d92fcbc58bee11cd72"
+      }
+    },
+    {
+      "name": "f1-oracle_random-r64-B5-lin-s43",
+      "dataset": "confirmation",
+      "rows": 144000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "0c9cb1ea4686f5870da5ad5da3f06538"
+      }
+    },
+    {
+      "name": "f1-oracle_random-r64-B3-s43",
+      "dataset": "screening",
+      "rows": 768000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original",
+        "test/remove_required_fact",
+        "test/replace_key_fact",
+        "test/swap_memory",
+        "test/swap_successors",
+        "test_unseen/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "e6c438ec2ff690d4704f7e842115c4ef",
+        "test/remove_required_fact": "2a99a7c4440159ea332c04457a580711",
+        "test/replace_key_fact": "70076d39d7d5fcb499796d15b1233000",
+        "test/swap_memory": "e03178002cc17f33dd7d6f678ac96199",
+        "test/swap_successors": "dacb5a9107b173726b5eed5c88c85498",
+        "test_unseen/original": "8d6df77728a982d92fcbc58bee11cd72"
+      }
+    },
+    {
+      "name": "f1-oracle_random-r64-B3-s43",
+      "dataset": "confirmation",
+      "rows": 144000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "0c9cb1ea4686f5870da5ad5da3f06538"
+      }
+    },
+    {
+      "name": "f1-joint-r64-M1-s17",
+      "dataset": "screening",
+      "rows": 768000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original",
+        "test/remove_required_fact",
+        "test/replace_key_fact",
+        "test/swap_memory",
+        "test/swap_successors",
+        "test_unseen/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "e6c438ec2ff690d4704f7e842115c4ef",
+        "test/remove_required_fact": "2a99a7c4440159ea332c04457a580711",
+        "test/replace_key_fact": "70076d39d7d5fcb499796d15b1233000",
+        "test/swap_memory": "e03178002cc17f33dd7d6f678ac96199",
+        "test/swap_successors": "dacb5a9107b173726b5eed5c88c85498",
+        "test_unseen/original": "8d6df77728a982d92fcbc58bee11cd72"
+      }
+    },
+    {
+      "name": "f1-joint-r64-M1-s17",
+      "dataset": "confirmation",
+      "rows": 144000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "0c9cb1ea4686f5870da5ad5da3f06538"
+      }
+    },
+    {
+      "name": "f1-joint-r64-M1-lin-s17",
+      "dataset": "screening",
+      "rows": 768000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original",
+        "test/remove_required_fact",
+        "test/replace_key_fact",
+        "test/swap_memory",
+        "test/swap_successors",
+        "test_unseen/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "e6c438ec2ff690d4704f7e842115c4ef",
+        "test/remove_required_fact": "2a99a7c4440159ea332c04457a580711",
+        "test/replace_key_fact": "70076d39d7d5fcb499796d15b1233000",
+        "test/swap_memory": "e03178002cc17f33dd7d6f678ac96199",
+        "test/swap_successors": "dacb5a9107b173726b5eed5c88c85498",
+        "test_unseen/original": "8d6df77728a982d92fcbc58bee11cd72"
+      }
+    },
+    {
+      "name": "f1-joint-r64-M1-lin-s17",
+      "dataset": "confirmation",
+      "rows": 144000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "0c9cb1ea4686f5870da5ad5da3f06538"
+      }
+    },
+    {
+      "name": "f1-joint-r64-B5-s17",
+      "dataset": "screening",
+      "rows": 768000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original",
+        "test/remove_required_fact",
+        "test/replace_key_fact",
+        "test/swap_memory",
+        "test/swap_successors",
+        "test_unseen/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "e6c438ec2ff690d4704f7e842115c4ef",
+        "test/remove_required_fact": "2a99a7c4440159ea332c04457a580711",
+        "test/replace_key_fact": "70076d39d7d5fcb499796d15b1233000",
+        "test/swap_memory": "e03178002cc17f33dd7d6f678ac96199",
+        "test/swap_successors": "dacb5a9107b173726b5eed5c88c85498",
+        "test_unseen/original": "8d6df77728a982d92fcbc58bee11cd72"
+      }
+    },
+    {
+      "name": "f1-joint-r64-B5-s17",
+      "dataset": "confirmation",
+      "rows": 144000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "0c9cb1ea4686f5870da5ad5da3f06538"
+      }
+    },
+    {
+      "name": "f1-joint-r64-B5-lin-s17",
+      "dataset": "screening",
+      "rows": 768000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original",
+        "test/remove_required_fact",
+        "test/replace_key_fact",
+        "test/swap_memory",
+        "test/swap_successors",
+        "test_unseen/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "e6c438ec2ff690d4704f7e842115c4ef",
+        "test/remove_required_fact": "2a99a7c4440159ea332c04457a580711",
+        "test/replace_key_fact": "70076d39d7d5fcb499796d15b1233000",
+        "test/swap_memory": "e03178002cc17f33dd7d6f678ac96199",
+        "test/swap_successors": "dacb5a9107b173726b5eed5c88c85498",
+        "test_unseen/original": "8d6df77728a982d92fcbc58bee11cd72"
+      }
+    },
+    {
+      "name": "f1-joint-r64-B5-lin-s17",
+      "dataset": "confirmation",
+      "rows": 144000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "0c9cb1ea4686f5870da5ad5da3f06538"
+      }
+    },
+    {
+      "name": "f1-joint-r64-B3-s17",
+      "dataset": "screening",
+      "rows": 768000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original",
+        "test/remove_required_fact",
+        "test/replace_key_fact",
+        "test/swap_memory",
+        "test/swap_successors",
+        "test_unseen/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "e6c438ec2ff690d4704f7e842115c4ef",
+        "test/remove_required_fact": "2a99a7c4440159ea332c04457a580711",
+        "test/replace_key_fact": "70076d39d7d5fcb499796d15b1233000",
+        "test/swap_memory": "e03178002cc17f33dd7d6f678ac96199",
+        "test/swap_successors": "dacb5a9107b173726b5eed5c88c85498",
+        "test_unseen/original": "8d6df77728a982d92fcbc58bee11cd72"
+      }
+    },
+    {
+      "name": "f1-joint-r64-B3-s17",
+      "dataset": "confirmation",
+      "rows": 144000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "0c9cb1ea4686f5870da5ad5da3f06538"
+      }
+    },
+    {
+      "name": "f1-joint-r64-M1-s29",
+      "dataset": "screening",
+      "rows": 768000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original",
+        "test/remove_required_fact",
+        "test/replace_key_fact",
+        "test/swap_memory",
+        "test/swap_successors",
+        "test_unseen/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "e6c438ec2ff690d4704f7e842115c4ef",
+        "test/remove_required_fact": "2a99a7c4440159ea332c04457a580711",
+        "test/replace_key_fact": "70076d39d7d5fcb499796d15b1233000",
+        "test/swap_memory": "e03178002cc17f33dd7d6f678ac96199",
+        "test/swap_successors": "dacb5a9107b173726b5eed5c88c85498",
+        "test_unseen/original": "8d6df77728a982d92fcbc58bee11cd72"
+      }
+    },
+    {
+      "name": "f1-joint-r64-M1-s29",
+      "dataset": "confirmation",
+      "rows": 144000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "0c9cb1ea4686f5870da5ad5da3f06538"
+      }
+    },
+    {
+      "name": "f1-joint-r64-M1-lin-s29",
+      "dataset": "screening",
+      "rows": 768000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original",
+        "test/remove_required_fact",
+        "test/replace_key_fact",
+        "test/swap_memory",
+        "test/swap_successors",
+        "test_unseen/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "e6c438ec2ff690d4704f7e842115c4ef",
+        "test/remove_required_fact": "2a99a7c4440159ea332c04457a580711",
+        "test/replace_key_fact": "70076d39d7d5fcb499796d15b1233000",
+        "test/swap_memory": "e03178002cc17f33dd7d6f678ac96199",
+        "test/swap_successors": "dacb5a9107b173726b5eed5c88c85498",
+        "test_unseen/original": "8d6df77728a982d92fcbc58bee11cd72"
+      }
+    },
+    {
+      "name": "f1-joint-r64-M1-lin-s29",
+      "dataset": "confirmation",
+      "rows": 144000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "0c9cb1ea4686f5870da5ad5da3f06538"
+      }
+    },
+    {
+      "name": "f1-joint-r64-B5-s29",
+      "dataset": "screening",
+      "rows": 768000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original",
+        "test/remove_required_fact",
+        "test/replace_key_fact",
+        "test/swap_memory",
+        "test/swap_successors",
+        "test_unseen/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "e6c438ec2ff690d4704f7e842115c4ef",
+        "test/remove_required_fact": "2a99a7c4440159ea332c04457a580711",
+        "test/replace_key_fact": "70076d39d7d5fcb499796d15b1233000",
+        "test/swap_memory": "e03178002cc17f33dd7d6f678ac96199",
+        "test/swap_successors": "dacb5a9107b173726b5eed5c88c85498",
+        "test_unseen/original": "8d6df77728a982d92fcbc58bee11cd72"
+      }
+    },
+    {
+      "name": "f1-joint-r64-B5-s29",
+      "dataset": "confirmation",
+      "rows": 144000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "0c9cb1ea4686f5870da5ad5da3f06538"
+      }
+    },
+    {
+      "name": "f1-joint-r64-B5-lin-s29",
+      "dataset": "screening",
+      "rows": 768000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original",
+        "test/remove_required_fact",
+        "test/replace_key_fact",
+        "test/swap_memory",
+        "test/swap_successors",
+        "test_unseen/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "e6c438ec2ff690d4704f7e842115c4ef",
+        "test/remove_required_fact": "2a99a7c4440159ea332c04457a580711",
+        "test/replace_key_fact": "70076d39d7d5fcb499796d15b1233000",
+        "test/swap_memory": "e03178002cc17f33dd7d6f678ac96199",
+        "test/swap_successors": "dacb5a9107b173726b5eed5c88c85498",
+        "test_unseen/original": "8d6df77728a982d92fcbc58bee11cd72"
+      }
+    },
+    {
+      "name": "f1-joint-r64-B5-lin-s29",
+      "dataset": "confirmation",
+      "rows": 144000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "0c9cb1ea4686f5870da5ad5da3f06538"
+      }
+    },
+    {
+      "name": "f1-joint-r64-B3-s29",
+      "dataset": "screening",
+      "rows": 768000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original",
+        "test/remove_required_fact",
+        "test/replace_key_fact",
+        "test/swap_memory",
+        "test/swap_successors",
+        "test_unseen/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "e6c438ec2ff690d4704f7e842115c4ef",
+        "test/remove_required_fact": "2a99a7c4440159ea332c04457a580711",
+        "test/replace_key_fact": "70076d39d7d5fcb499796d15b1233000",
+        "test/swap_memory": "e03178002cc17f33dd7d6f678ac96199",
+        "test/swap_successors": "dacb5a9107b173726b5eed5c88c85498",
+        "test_unseen/original": "8d6df77728a982d92fcbc58bee11cd72"
+      }
+    },
+    {
+      "name": "f1-joint-r64-B3-s29",
+      "dataset": "confirmation",
+      "rows": 144000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "0c9cb1ea4686f5870da5ad5da3f06538"
+      }
+    },
+    {
+      "name": "f1-joint-r64-M1-s43",
+      "dataset": "screening",
+      "rows": 768000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original",
+        "test/remove_required_fact",
+        "test/replace_key_fact",
+        "test/swap_memory",
+        "test/swap_successors",
+        "test_unseen/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "e6c438ec2ff690d4704f7e842115c4ef",
+        "test/remove_required_fact": "2a99a7c4440159ea332c04457a580711",
+        "test/replace_key_fact": "70076d39d7d5fcb499796d15b1233000",
+        "test/swap_memory": "e03178002cc17f33dd7d6f678ac96199",
+        "test/swap_successors": "dacb5a9107b173726b5eed5c88c85498",
+        "test_unseen/original": "8d6df77728a982d92fcbc58bee11cd72"
+      }
+    },
+    {
+      "name": "f1-joint-r64-M1-s43",
+      "dataset": "confirmation",
+      "rows": 144000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "0c9cb1ea4686f5870da5ad5da3f06538"
+      }
+    },
+    {
+      "name": "f1-joint-r64-M1-lin-s43",
+      "dataset": "screening",
+      "rows": 768000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original",
+        "test/remove_required_fact",
+        "test/replace_key_fact",
+        "test/swap_memory",
+        "test/swap_successors",
+        "test_unseen/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "e6c438ec2ff690d4704f7e842115c4ef",
+        "test/remove_required_fact": "2a99a7c4440159ea332c04457a580711",
+        "test/replace_key_fact": "70076d39d7d5fcb499796d15b1233000",
+        "test/swap_memory": "e03178002cc17f33dd7d6f678ac96199",
+        "test/swap_successors": "dacb5a9107b173726b5eed5c88c85498",
+        "test_unseen/original": "8d6df77728a982d92fcbc58bee11cd72"
+      }
+    },
+    {
+      "name": "f1-joint-r64-M1-lin-s43",
+      "dataset": "confirmation",
+      "rows": 144000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "0c9cb1ea4686f5870da5ad5da3f06538"
+      }
+    },
+    {
+      "name": "f1-joint-r64-B5-s43",
+      "dataset": "screening",
+      "rows": 768000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original",
+        "test/remove_required_fact",
+        "test/replace_key_fact",
+        "test/swap_memory",
+        "test/swap_successors",
+        "test_unseen/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "e6c438ec2ff690d4704f7e842115c4ef",
+        "test/remove_required_fact": "2a99a7c4440159ea332c04457a580711",
+        "test/replace_key_fact": "70076d39d7d5fcb499796d15b1233000",
+        "test/swap_memory": "e03178002cc17f33dd7d6f678ac96199",
+        "test/swap_successors": "dacb5a9107b173726b5eed5c88c85498",
+        "test_unseen/original": "8d6df77728a982d92fcbc58bee11cd72"
+      }
+    },
+    {
+      "name": "f1-joint-r64-B5-s43",
+      "dataset": "confirmation",
+      "rows": 144000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "0c9cb1ea4686f5870da5ad5da3f06538"
+      }
+    },
+    {
+      "name": "f1-joint-r64-B5-lin-s43",
+      "dataset": "screening",
+      "rows": 768000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original",
+        "test/remove_required_fact",
+        "test/replace_key_fact",
+        "test/swap_memory",
+        "test/swap_successors",
+        "test_unseen/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "e6c438ec2ff690d4704f7e842115c4ef",
+        "test/remove_required_fact": "2a99a7c4440159ea332c04457a580711",
+        "test/replace_key_fact": "70076d39d7d5fcb499796d15b1233000",
+        "test/swap_memory": "e03178002cc17f33dd7d6f678ac96199",
+        "test/swap_successors": "dacb5a9107b173726b5eed5c88c85498",
+        "test_unseen/original": "8d6df77728a982d92fcbc58bee11cd72"
+      }
+    },
+    {
+      "name": "f1-joint-r64-B5-lin-s43",
+      "dataset": "confirmation",
+      "rows": 144000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "0c9cb1ea4686f5870da5ad5da3f06538"
+      }
+    },
+    {
+      "name": "f1-joint-r64-B3-s43",
+      "dataset": "screening",
+      "rows": 768000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original",
+        "test/remove_required_fact",
+        "test/replace_key_fact",
+        "test/swap_memory",
+        "test/swap_successors",
+        "test_unseen/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "e6c438ec2ff690d4704f7e842115c4ef",
+        "test/remove_required_fact": "2a99a7c4440159ea332c04457a580711",
+        "test/replace_key_fact": "70076d39d7d5fcb499796d15b1233000",
+        "test/swap_memory": "e03178002cc17f33dd7d6f678ac96199",
+        "test/swap_successors": "dacb5a9107b173726b5eed5c88c85498",
+        "test_unseen/original": "8d6df77728a982d92fcbc58bee11cd72"
+      }
+    },
+    {
+      "name": "f1-joint-r64-B3-s43",
+      "dataset": "confirmation",
+      "rows": 144000,
+      "episodes": 2000,
+      "depths": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16
+      ],
+      "hops": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "groups": [
+        "test/original"
+      ],
+      "data_fingerprints": {
+        "test/original": "0c9cb1ea4686f5870da5ad5da3f06538"
+      }
+    }
+  ],
+  "controlled_writer_groups": [
+    {
+      "writer": "oracle_random",
+      "seed": 17,
+      "dataset": "screening",
+      "r": 64,
+      "fingerprint": "5aaec16ae96ee6c20d2c16394fd0f581",
+      "members": [
+        "f1-oracle_random-r64-M1-s17",
+        "f1-oracle_random-r64-M1-lin-s17",
+        "f1-oracle_random-r64-B5-s17",
+        "f1-oracle_random-r64-B5-lin-s17",
+        "f1-oracle_random-r64-B3-s17"
+      ]
+    },
+    {
+      "writer": "oracle_random",
+      "seed": 17,
+      "dataset": "confirmation",
+      "r": 64,
+      "fingerprint": "1f97b553230c2312afd92c1cdad713bb",
+      "members": [
+        "f1-oracle_random-r64-M1-s17",
+        "f1-oracle_random-r64-M1-lin-s17",
+        "f1-oracle_random-r64-B5-s17",
+        "f1-oracle_random-r64-B5-lin-s17",
+        "f1-oracle_random-r64-B3-s17"
+      ]
+    },
+    {
+      "writer": "oracle_random",
+      "seed": 29,
+      "dataset": "screening",
+      "r": 64,
+      "fingerprint": "5aaec16ae96ee6c20d2c16394fd0f581",
+      "members": [
+        "f1-oracle_random-r64-M1-s29",
+        "f1-oracle_random-r64-M1-lin-s29",
+        "f1-oracle_random-r64-B5-s29",
+        "f1-oracle_random-r64-B5-lin-s29",
+        "f1-oracle_random-r64-B3-s29"
+      ]
+    },
+    {
+      "writer": "oracle_random",
+      "seed": 29,
+      "dataset": "confirmation",
+      "r": 64,
+      "fingerprint": "1f97b553230c2312afd92c1cdad713bb",
+      "members": [
+        "f1-oracle_random-r64-M1-s29",
+        "f1-oracle_random-r64-M1-lin-s29",
+        "f1-oracle_random-r64-B5-s29",
+        "f1-oracle_random-r64-B5-lin-s29",
+        "f1-oracle_random-r64-B3-s29"
+      ]
+    },
+    {
+      "writer": "oracle_random",
+      "seed": 43,
+      "dataset": "screening",
+      "r": 64,
+      "fingerprint": "5aaec16ae96ee6c20d2c16394fd0f581",
+      "members": [
+        "f1-oracle_random-r64-M1-s43",
+        "f1-oracle_random-r64-M1-lin-s43",
+        "f1-oracle_random-r64-B5-s43",
+        "f1-oracle_random-r64-B5-lin-s43",
+        "f1-oracle_random-r64-B3-s43"
+      ]
+    },
+    {
+      "writer": "oracle_random",
+      "seed": 43,
+      "dataset": "confirmation",
+      "r": 64,
+      "fingerprint": "1f97b553230c2312afd92c1cdad713bb",
+      "members": [
+        "f1-oracle_random-r64-M1-s43",
+        "f1-oracle_random-r64-M1-lin-s43",
+        "f1-oracle_random-r64-B5-s43",
+        "f1-oracle_random-r64-B5-lin-s43",
+        "f1-oracle_random-r64-B3-s43"
+      ]
+    }
+  ],
+  "all_sample_tables_reproduced": true,
+  "all_depth_snapshots_identical": true,
+  "all_controlled_groups_identical": true,
+  "all_frozen_writers_match_source": true
+}
