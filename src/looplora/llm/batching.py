@@ -1,7 +1,7 @@
 """Render episode batches once and fork their support snapshots by question."""
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, fields
 
 import torch
 from torch import Tensor
@@ -21,6 +21,10 @@ class TokenBatch:
     answer_ids: Tensor
     candidate_ids: Tensor
     candidate_mask: Tensor
+
+    def to(self, device) -> TokenBatch:
+        return TokenBatch(**{field.name: getattr(self, field.name).to(device)
+                             for field in fields(self)})
 
 
 @dataclass(frozen=True)
