@@ -1,9 +1,10 @@
 # P1-L pre-registration — single module in Qwen3-0.6B-Base (draft v2, 2026-10-27)
 
-Status: **draft v2** (2026-10-27 03:19 JST; writer conditions revised 03:43 JST). Written after P2-S-F1
+Status: **v2 final for the `oracle_random` condition** (2026-10-27 04:05 JST, after WP-C7 passed its tests,
+`docs/reports/WP-C7.md`; drafted 03:19, writer conditions revised 03:43). Written after P2-S-F1
 (`reports/decisions/P2S.md` §6) and WP-L3 (`docs/reports/P1L-writer-fix.md`), before any P1-L T2 run; no T2 result
-exists. Finalised before Pilot-2, when WP-L4 has decided and WP-C7 (oracle writer in the LLM pipeline) has passed
-its tests.
+exists. The `learned` condition is added by an addendum filled from WP-L4's registered rule before its own
+Pilot-2; nothing in it depends on P1-L results.
 
 ## Changes from v1 (reasons in `reports/decisions/P2S.md` §6, `docs/reports/P1L-diagnosis.md`, `P1L-writer-fix.md`)
 - Primary reader **B8** (step-specific reads, trained at fixed L = 4); M1 trained at fixed L = 4 (M1-L4) is the
@@ -36,7 +37,8 @@ its tests.
 - Optimisation: AdamW, batch 64, warmup 20, weight decay 0.01, clip 1.0, constant lr; steps S fixed from the
   Pilot-2 smoke (the largest S whose longest run fits 2 h / 1.5), identical for every reader.
 - Episode sets: val = split `val`, eval seed 4242, 1000 episodes; **confirmation = split `test` [100000, 102000),
-  untouched until every primary run has finished training**.
+  evaluated for a writer condition only after all of its primary runs, B3-L4 and B0–B2 have finished training,
+  and only once WP-L4 has decided (which fixes the CI level below)**.
 - Order: the `oracle_random` condition starts when WP-C7 passes; the learned condition follows if selected.
 
 ## Pilot-2 (validation only, seed 17)
@@ -54,6 +56,12 @@ Per writer condition:
 - Secondary, not gating: M1-L4 against the same comparators; M1-L4 depth scan L = 1…8 on the same x/u/M
   (Δ_reach and walk specificity as P1-S where hops 6–8 exist); B8 − M1-L4; `swap_successors` follow rates;
   B0/B1/B2 in both protocols; per-hop accuracy tables.
+- Per-step readout (descriptive; latent-reasoning check, motivated by the J-lens / J-space work): for M1-L4 and
+  B8, decode each intermediate state z_s (s = 1…4) (a) through the trained output path and the frozen top layers
+  (logit lens at the answer position) and (b) by projection onto J-lens directions of the 1024 names (each name's
+  logit gradient w.r.t. the layer-14 residual at the answer position, averaged over 512 validation questions);
+  report the rank and top-1 rate of the hop-s entity at step s against the other steps and a random-direction
+  baseline, by hop.
 
 ## Decision use
 - `oracle_random` passes G1-L and G2-L: the multi-read reader composes inside the LM when the memory is clean;
