@@ -1,0 +1,89 @@
+{
+  "S": 17000,
+  "budget_cap_steps": 9320,
+  "budget_rule": "B2: no total cap; record every job's node-hours",
+  "excludes": "smoke, validation, confirmation, name-gradient probe and failed jobs",
+  "job_cap_steps": 17770,
+  "longest_step_seconds": 0.26583992089040825,
+  "main_plus_pilot_node_hours": 23.476323789526266,
+  "overhead_seconds": 1027.6510779809614,
+  "packing": "one GPU process; runs sequentially reuse backbone, prefetch2 per active run",
+  "pilot_steps": 5666,
+  "reserve_seconds": 75.97784248865261,
+  "smoke_steps": 1700,
+  "source": "/work/xg24i002/x10041/LoopLora/runs/p1l/main",
+  "status": "sized",
+  "time": "2026-10-26T19:28:43.862319+00:00",
+  "timing_rows": [
+    {
+      "checkpoint_hash": "7b6ebb3b9b589260a67f6d84965827f9",
+      "host": "mg0037",
+      "job_id": "3715854.opbs",
+      "label": "B8",
+      "overhead_seconds": 15.977842488652612,
+      "peak_memory_bytes": 7176106496,
+      "step_seconds": 0.19284879665811386,
+      "steps": 900
+    },
+    {
+      "checkpoint_hash": "236f3e074a0aeb7a02c1864cedf4da09",
+      "host": "mg0037",
+      "job_id": "3715854.opbs",
+      "label": "M1-L4",
+      "overhead_seconds": 13.73424342596465,
+      "peak_memory_bytes": 7175799296,
+      "step_seconds": 0.1965309546877989,
+      "steps": 900
+    },
+    {
+      "checkpoint_hash": "06102b25f0434d9675535c4c7c27f69d",
+      "host": "mg0037",
+      "job_id": "3715854.opbs",
+      "label": "B4",
+      "overhead_seconds": 13.712867013682143,
+      "peak_memory_bytes": 7167246848,
+      "step_seconds": 0.13253041621474498,
+      "steps": 900
+    },
+    {
+      "checkpoint_hash": "153ab4e6b7e0eb1251f570c0d7e2d808",
+      "host": "mg0037",
+      "job_id": "3715854.opbs",
+      "label": "B5-L4",
+      "overhead_seconds": 14.105799123369081,
+      "peak_memory_bytes": 7172948480,
+      "step_seconds": 0.1517801671840417,
+      "steps": 900
+    },
+    {
+      "checkpoint_hash": "5f41a72979eefce78f7f691fa9d478e5",
+      "host": "mg0037",
+      "job_id": "3715854.opbs",
+      "label": "B3-L4",
+      "overhead_seconds": 14.825057331325652,
+      "peak_memory_bytes": 7141555712,
+      "step_seconds": 0.13459292839426942,
+      "steps": 900
+    },
+    {
+      "checkpoint_hash": "dacbccc51914cdb759771b28b5f075c3",
+      "host": "mg0045",
+      "job_id": "3715855.opbs",
+      "label": "B1",
+      "overhead_seconds": 15.264113856452212,
+      "peak_memory_bytes": 17709904384,
+      "step_seconds": 0.2652709404061231,
+      "steps": 900
+    },
+    {
+      "checkpoint_hash": "6fa62759ca20ec7690d98b040f74e11d",
+      "host": "mg0045",
+      "job_id": "3715855.opbs",
+      "label": "B2",
+      "overhead_seconds": 12.910292356745913,
+      "peak_memory_bytes": 17709183488,
+      "step_seconds": 0.26583992089040825,
+      "steps": 900
+    }
+  ]
+}
