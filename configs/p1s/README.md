@@ -85,3 +85,35 @@ new entities to unused orthogonal slots; their union must fit `r_mem`.
 T3 missing-data evaluation requires generated query coverage for each requested
 hop; answer-changing counterfactuals require answerable source queries, as in
 the data-generator contract. These constraints do not affect the T1/T2 smoke.
+
+WP-D2 adds `model.reference_r` (defaults to `model.r`): B6 requires an explicit
+larger `model.r`, and B7 an explicit `model.r_mem` larger than both reader and
+reference ranks. `pretrain.task` merges overrides into the T1 writer task;
+`n_rel` and `V` must remain compatible with the reader backbone. Joint runs also
+export `writer.pt`. Cross-stage reuse accepts
+`writer_from: {checkpoint: /absolute/path/to/writer.pt}`. `runtime.threads`
+defaults to one CPU thread per packed worker and is recorded in run provenance.
+
+On compute, `python -m looplora.sym.pilot plan1 --out <plan-dir> --shards 3`
+creates the validation-only Pilot-1 grid. Run each shard through `sym.run` and
+collect it with `sym.pilot summarize1 --runs <runs-dir> --manifest
+<plan-dir>/manifest.json --out <report-dir>`. The `plan2` action consumes
+`--selection1 <report-dir>/selection.json`; `plan-replication` also consumes
+`--selection2`. The corresponding summary actions retain every LR result and
+loss curve, and selected hop/depth tables. Selection uses the best LR per E,
+then E*, then the LR at E*; ties use the smaller LR. The loss plateau diagnostic
+is not a selection criterion. All pilot training uses seed17 and all pilot
+evaluation uses split val, generator seed4242.
+
+Saved checkpoints support allowlisted evaluation overrides, for example
+`--set eval.episodes=2000 --set 'eval.splits=[val]' --set eval.seed=4242`.
+Effective inputs, the original checkpoint config, and overrides are retained.
+No pilot command evaluates the screening or confirmation sets.
+
+For pooled paired statistics, `python -m looplora.sym.stats --pooled-a a.json
+--pooled-b b.json --depth-a 4 --depth-b 1 --hops 2 3 --split val --out stats.json`
+accepts JSON maps from training-seed labels to sample archives (paths relative
+to each manifest). Use the same manifest for a within-checkpoint depth contrast.
+Episode draws are shared across seeds; seed-specific accuracy differences are
+averaged with equal seed weight. The reported interval is conditional on the
+provided training seeds.

@@ -17,10 +17,10 @@
   overrides: {variant: M1-lin, task: {name: t1, chain_lengths: null, hops: [1]}}
 - name: t1-B6
   config: smoke_base.yaml
-  overrides: {variant: B6, writer: joint, task: {name: t1, chain_lengths: null, hops: [1]}}
+  overrides: {variant: B6, writer: joint, model: {r: 96, r_mem: 96, reference_r: 64}, task: {name: t1, chain_lengths: null, hops: [1]}}
 - name: t1-B7
   config: smoke_base.yaml
-  overrides: {variant: B7, writer: joint, task: {name: t1, chain_lengths: null, hops: [1]}}
+  overrides: {variant: B7, writer: joint, model: {r: 64, r_mem: 96, reference_r: 64}, task: {name: t1, chain_lengths: null, hops: [1]}}
 - name: t1-B8
   config: smoke_base.yaml
   overrides: {variant: B8, task: {name: t1, chain_lengths: null, hops: [1]}}
@@ -41,10 +41,10 @@
   overrides: {variant: M1-lin}
 - name: t2-B6
   config: smoke_base.yaml
-  overrides: {variant: B6, writer: joint}
+  overrides: {variant: B6, writer: joint, model: {r: 96, r_mem: 96, reference_r: 64}}
 - name: t2-B7
   config: smoke_base.yaml
-  overrides: {variant: B7, writer: joint}
+  overrides: {variant: B7, writer: joint, model: {r: 64, r_mem: 96, reference_r: 64}}
 - name: t2-B8
   config: smoke_base.yaml
   overrides: {variant: B8}

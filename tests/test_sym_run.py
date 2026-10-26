@@ -35,15 +35,19 @@ def small_config(**updates):
 
 def test_resolution_is_idempotent_and_variant_controls_are_explicit():
     for variant in VARIANTS:
-        config = resolve_config({"variant": variant, "writer": "joint"})
+        model = ({"r": 96, "r_mem": 96, "reference_r": 64} if variant == "B6" else
+                 {"r": 64, "r_mem": 96, "reference_r": 64} if variant == "B7" else {})
+        config = resolve_config({"variant": variant, "writer": "joint", "model": model})
         assert resolve_config(config) == config
         if variant in {"B4", "B6", "B7"}:
             assert config["train"]["depths"] == config["eval"]["depths"] == [1]
         if variant == "B8":
             assert config["train"]["depths"] == config["eval"]["depths"] == [4]
     assert resolve_config({"variant": "M1-lin"})["activation"] == "identity"
-    assert resolve_config({"variant": "B6", "writer": "joint"})["model"]["r"] == 96
-    assert resolve_config({"variant": "B7", "writer": "joint"})["model"]["r_mem"] == 96
+    assert resolve_config({"variant": "B6", "writer": "joint",
+                           "model": {"r": 96, "r_mem": 96, "reference_r": 64}})["model"]["r"] == 96
+    assert resolve_config({"variant": "B7", "writer": "joint",
+                           "model": {"r": 64, "r_mem": 96, "reference_r": 64}})["model"]["r_mem"] == 96
     assert resolve_config({"task": {"name": "t1"}})["eval"]["hops"] == [1]
 
 
