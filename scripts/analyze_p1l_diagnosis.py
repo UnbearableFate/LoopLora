@@ -41,6 +41,7 @@ def audit(root: Path,out: Path,jobs: Path | None):
     (out/'probes.csv').write_bytes((root/'D1/probes.csv').read_bytes())
     write_json(out/'D1.json',d1)
     rows,loss_rows,run_records = [],[],[]
+    reference_labels = None
     for kind,lrs in (('D2',(.0003,.001,.003)),('D3',(.0003,.001)),('D4',(.0003,.001))):
         folder = root/kind
         if kind=='D4' and not folder.exists():
@@ -84,6 +85,14 @@ def audit(root: Path,out: Path,jobs: Path | None):
                 assert metric['em']==float(sample['correct'].mean())
                 assert metric['loss']==float(sample['nll'].mean())
                 assert metric['candidate_accuracy']==float(sample['candidate_correct'].mean())
+                labels = {key:sample[key] for key in ('episode_id','query_id','answer')}
+                if reference_labels is None:
+                    reference_labels = labels
+                assert all(np.array_equal(labels[key],reference_labels[key]) for key in labels)
+                if kind!='D2':
+                    assert metric['matching']['chance']==1/16
+                    for key in ('key_top1','key_target_cosine','key_margin'):
+                        assert metric['matching'][key]==float(sample[key].mean())
                 rows.append(dict(diagnostic=kind,input_site=rec['input_site'],lr=lr,step=step,
                     n=metric['n'],correct=metric['correct'],em=metric['em'],loss=metric['loss'],
                     candidate_accuracy=metric['candidate_accuracy'],validation_seconds=metric['seconds'],
