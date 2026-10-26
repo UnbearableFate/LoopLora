@@ -11,6 +11,8 @@ use 5000. F2 has **no replication setting**, a weaker design than P1-S main.
   variants share their seed's main writer, never the pilot checkpoint.
 - `job_ledger.csv`: exact submit specifications, code sources, compute hosts,
   scheduler elapsed seconds and exit statuses. Node-hours exclude queue time.
+- `compute_budget.json`, `training_barriers.csv`, `release_barrier.json`:
+  final cost accounting and the complete training/sample release receipts.
 - `gate_endpoints.csv`, `gate_criteria.csv`, `gates.csv`, `gates.md`: every
   confirmation endpoint, per-seed effect and decision for four condition/reader
   rows. CSV differences/intervals are fractions; Markdown uses percentage points.

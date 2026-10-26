@@ -1,0 +1,5 @@
+writer,reader,g1_passed,g2_passed,passed,replication_required
+joint_fact,M1,False,True,False,False
+joint_fact,M1-lin,False,True,False,False
+t1_frozen_fact,M1,False,True,False,False
+t1_frozen_fact,M1-lin,False,True,False,False
