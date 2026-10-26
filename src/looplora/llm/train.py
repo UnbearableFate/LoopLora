@@ -20,7 +20,7 @@ from looplora.data.relations import TaskSpec, generate
 from looplora.infra.seeds import derive_seed
 from .batching import PreparedBatch, repeat_snapshot, tokenize_batch
 from .inject import (MODEL_ID, MODEL_REVISION, AdapterBank, attach_adapters,
-                     detach_adapters, load_model, load_tokenizer)
+                     configure_numerics, detach_adapters, load_model, load_tokenizer)
 from .protocols import SupportSnapshot, answer_scores, encode_support
 
 WRITER_NAMES = ("A", "K", "V", "a_lambda", "a_beta", "w_lambda", "w_beta")
@@ -52,6 +52,7 @@ class LLMExperiment:
 
     def __init__(self, config: dict[str, Any], *, model=None, tokenizer=None,
                  writer_record: dict[str, Any] | None = None):
+        configure_numerics()
         self.config = copy.deepcopy(config)
         self.model = load_model(device=config["device"]) if model is None else model
         self.tokenizer = load_tokenizer() if tokenizer is None else tokenizer

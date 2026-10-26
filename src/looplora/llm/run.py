@@ -132,6 +132,9 @@ def run_one(config: dict[str, Any], out: str | Path, *, model=None, tokenizer=No
             "transformers": transformers.__version__, "host": socket.gethostname(),
             "job_id": os.environ.get("PBS_JOBID"), "device": str(device),
             "dtype": "bfloat16 backbone / float32 adapter", "threads": torch.get_num_threads(),
+            "deterministic_algorithms": torch.are_deterministic_algorithms_enabled(),
+            "cublas_workspace_config": os.environ.get("CUBLAS_WORKSPACE_CONFIG"),
+            "cudnn_deterministic": torch.backends.cudnn.deterministic,
             "gpu": torch.cuda.get_device_name(device) if device.type == "cuda" else None,
         }
         experiment, summary = train(config, out, model=model, tokenizer=tokenizer)

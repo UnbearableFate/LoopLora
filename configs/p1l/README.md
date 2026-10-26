@@ -47,7 +47,11 @@ pooling. Counterfactual replacements preserve source episode/query labels;
 swaps replace M but preserve source questions, labels and candidates (and source
 KV in retained-context mode). Cross-variant comparisons explicitly use only the
 common memory-only protocol. Gate 0 hashes x/u/M/write count across depth and
-across readers with the same frozen writer.
+across readers with the same frozen writer. Model loading enables deterministic
+Torch algorithms, a fixed cuBLAS workspace (`:4096:8`), and deterministic cuDNN;
+these settings are recorded in every run. Unsupported nondeterministic operations
+fail explicitly. Default GPU settings produced one process-dependent support
+state in the initial smoke, so that suite was rejected rather than relaxing hashes.
 
 `scripts/smoke_llm.py --audit-only` verifies artifacts, full-vocabulary labels,
 sample-to-metric reproduction, unchanged frozen checkpoints, Gate 0 and paired
