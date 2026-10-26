@@ -159,21 +159,36 @@ def run(root,out,release_path,*,screen_only=False,verify_export=False,rerun_rele
                         linestyle='--' if extended else '-',lw=1)
         ax.set(title=arm,xlabel='Steps',ylabel='CE'); ax.grid(alpha=.2); ax.legend(fontsize=8)
     axes.flat[-1].axis('off'); fig.tight_layout(); fig.savefig(out/'loss_curves.png',dpi=160); plt.close(fig)
+    fig,ax=plt.subplots(figsize=(9,4))
+    for arm in ARMS:
+        for rerun in (False,True):
+            subset=sorted((r for r in rows if r['arm']==arm and r['extension']==rerun),key=lambda r:r['step'])
+            if subset:
+                ax.plot([r['step'] for r in subset],[r['em'] for r in subset],marker='o',
+                        linestyle='--' if rerun else '-',label=arm+(' A1' if rerun else ' screen'))
+    ax.axhline(.8,color='black',lw=1,label='writer gate')
+    ax.set(xlabel='Steps',ylabel='Validation EM',ylim=(0,1))
+    ax.grid(alpha=.2); ax.legend(fontsize=8,ncol=2)
+    fig.tight_layout(); fig.savefig(out/'em_curves.png',dpi=160); plt.close(fig)
     check=None
     if verify_export and not screen_only:
-        arm=selected or 'OA'
-        folder=(root/'rerun'/arm if choice['action']=='rerun' else root/'screen'/arm)
-        rec=next(r for r in reversed(records) if r['arm']==arm)
-        experiment=load_inference(folder/'writer.pt')
-        try:
-            check=validate(experiment,out/'export-check')
-        finally:
-            experiment.close()
-        step=rec['training']['actual_steps']
-        expected=load_samples(folder/f'val-{step}'/'samples.npz')
-        actual=load_samples(out/'export-check/samples.npz')
-        assert np.array_equal(actual['prediction'],expected['prediction'])
-        check.update(arm=arm,identical_predictions=True,training_head_absent=True)
+        check=[]
+        arms=choice['arms'] if choice['action']=='rerun' else [selected]
+        for arm in arms:
+            folder=(root/'rerun'/arm if choice['action']=='rerun' else root/'screen'/arm)
+            rec=next(r for r in reversed(records) if r['arm']==arm)
+            experiment=load_inference(folder/'writer.pt')
+            check_out=out/f'export-check-{arm}'
+            try:
+                metric=validate(experiment,check_out)
+            finally:
+                experiment.close()
+            step=rec['training']['actual_steps']
+            expected=load_samples(folder/f'val-{step}'/'samples.npz')
+            actual=load_samples(check_out/'samples.npz')
+            assert np.array_equal(actual['prediction'],expected['prediction'])
+            metric.update(arm=arm,identical_predictions=True,training_head_absent=True)
+            check.append(metric)
     result=dict(**source_metadata(),all_sample_tables_reproduced=True,paired_labels_verified=True,
         normalization_buffers_identical=True,probes=probes,records=records,rows=rows,
         selection=lock,selected_arm=selected,screen_only=screen_only,

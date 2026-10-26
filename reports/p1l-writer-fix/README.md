@@ -1,47 +1,49 @@
-# WP-L3 writer screen
+# WP-L3 writer screen and Amendment A1
 
-Binding task: `docs/tasks/WP-L3_p1l_writer_fix.md`; before-results choices:
-`docs/reports/WP-L3-plan.md`; frozen numeric release: `release.json`.
-All scientific jobs use source `3fbc504`, including WP-C5 from master7f68a3c.
-
-Persistent root:
+Task: `docs/tasks/WP-L3_p1l_writer_fix.md`. Before-results intervention choices
+and amendment receipt: `docs/reports/WP-L3-plan.md`. Persistent artifacts:
 `/work/xg24i002/x10041/LoopLora/runs/p1l/writer-fix-20261027/`.
-The pre-tail probe job completed before any screen job was submitted.
-Screen jobs pair OA/W0, W1/W4, W2/W3; W5 is the final single arm.
-No scores choose system settings. Exact PBS specs and costs are recorded at close.
 
-After all seven arms complete, audit on compute through submit.py:
+`release.json` preserves the original screen source3fbc504 (WP-C5 scan_final),
+including its superseded extension rule. The pre-tail probe job completed before
+any screen submission. All seven arms finished before master3548d6e/WP-B4 was
+merged for A1. No running job was changed.
+
+A1 replaces the original stop-below.30 and single-arm extension rules. The two
+highest-final-EM arms are ranked over all seven arms, including diagnostic OA,
+with lower final main loss breaking ties; OA is added only if absent. This follows
+A1's explicit "plus OA ... if it is not among them" wording. OA is never eligible
+as the P1-L writer. The audited immutable `selection.json` locks the chosen arms.
+
+The custom writer-fix loop consumes WP-B4 `BatchStream` with two spawn workers
+per training process, reusing CPU token tensors and deriving the same fact
+positions without rerendering. `check_p1l_writer_fix_prefetch.py` compares two
+concurrent real-model OA/W5 processes with workers0/2, 100 steps per setting:
+exact final adapter/auxiliary-head parameters and logged losses, plus timings.
+It reads no validation scores. This check sizes a common fixed rerun schedule.
+
+Run every command below ON COMPUTE, using `scripts/submit.py --commit <hash>`,
+never directly on login. Audit the completed screen before any rerun:
 
 ```sh
 scripts/analyze_p1l_writer_fix.py --root <persistent-root> \
-  --out /work/xg24i002/x10041/LoopLora-wt/llm/reports/p1l-writer-fix \
-  --release /work/xg24i002/x10041/LoopLora-wt/llm/reports/p1l-writer-fix/release.json \
-  --screen-only
+  --out <absolute-reports-directory> --release <absolute-release.json> --screen-only
 ```
 
-This writes an immutable `selection.json`. Only action `extend` authorizes
-one further training run of its named non-oracle arm, with the same frozen
-source, initialization and episode stream:
+A1's locked rerun uses the common source/schedule in `rerun-release.json`:
 
 ```sh
--m looplora.llm.writer_fix_run --extension <selected-arm> \
-  --out <persistent-root>/extension/<selected-arm>
+-m looplora.llm.writer_fix_run --rerun-selection <absolute-selection.json> \
+  --steps <registered-steps> --out <persistent-root>/rerun
 ```
 
-Request <=1node/1h; the extension's3450s elapsed guard leaves evaluation/export
-reserve. It starts from scratch; upper bound100000steps is a sentinel, not a
-promised step count. Final selection still requires EM>=.80. No other extension
-or tuning is allowed. Final audit omits `--screen-only` and adds `--verify-export`;
-it reloads the chosen inference export (OA if no writer passes) and checks all
-1000 predictions. `writer.pt` has no training head or optimizer; `checkpoint.pt`
-retains training state. Every auxiliary term is supervision beyond the answer.
-# Amendment A1
+One node, two concurrent training processes, <=2h via
+`--scale-up docs/tasks/WP-L3_p1l_writer_fix.md`; total task<=4nodeh. Fresh same
+seed/initialization/episode stream, batch32, lr.003, scan_final, prefetch_workers2,
+five equally spaced validation checkpoints. The final checkpoint applies the
+original.80 writer threshold; OA is diagnostic. No other tuning or training.
 
-The original extension instructions below are superseded by Amendment A1 in
-`docs/tasks/WP-L3_p1l_writer_fix.md` on master3548d6e. The original screen remains
-on3fbc504. After it finishes, merge master and use a common rerun source with
-scan_final and actual prefetch_workers:2; lock two highest-EM arms (ties lower
-final main loss) plus OA if absent, if no writer reaches.80. One<=2h packed job,
-five evenly spaced evaluations, total task<=4nodeh. See the updated state card
-and plan before using the original analyzer's selection or extension commands.
-
+Final audit omits `--screen-only`, adds `--rerun-release <absolute-rerun-release>`
+and `--verify-export`, and reproduces all saved sample metrics and paired labels.
+`writer.pt` contains neither optimizer nor auxiliary head; `checkpoint.pt` retains
+training state. Auxiliary address/value labels are supervision beyond the answer.
