@@ -113,3 +113,8 @@ run starts and recorded.
   counterfactual (`docs/tasks/WP-B2_swap_successors.md`) — rewire two chains so the terminal set is unchanged but
   the correct terminal changes; walking follows the new terminal, terminal guessing cannot. Evaluated on saved
   checkpoints after WP-B2 merges.
+- A6 (2026-10-26 22:20, before any confirmation-set metric of WP-H or F1 was computed): a second follow-up, F2
+  (`docs/prereg/P1S-F2.md`, input-factorized learned writer), is registered. This deviates from the stop rule's
+  "one follow-up F1". Reason: the pilots' learned-writer failure (terminal guessing) has a specific mechanism
+  (`docs/theory.md` Prop. 10) that F1 (rank) cannot address, and P1-L can only use learned writers. F2 is
+  registered before any result it could be tuned to; it changes no P1-S gate, threshold or claim.
