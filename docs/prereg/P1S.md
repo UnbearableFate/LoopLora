@@ -1,6 +1,6 @@
 # P1-S pre-registration — symbolic mechanism stage (final v1, 2026-10-26)
 
-Status: **final** (v1, 2026-10-26 21:40 JST). Pilot-determined values are filled in from Pilot-1/2 on validation
+Status: **final** (v1, 2026-10-26 21:15 JST, commit 3b700ee). Pilot-determined values are filled in from Pilot-1/2 on validation
 data only (`docs/reports/P1S-pilot.md`); no `test` or confirmation episode has been evaluated. Changes are listed
 under "Amendments" with reason and date. Draft v0 is in git history.
 
@@ -109,7 +109,7 @@ run starts and recorded.
   exactly hop-1-only (33.3%). The criterion makes passing harder, never easier.
 - A4 (same time): main-run matrix fixed as above (replication limited to the two co-primary readers whose depth
   contrasts it tests; r = 16 limited to four readers and one seed), to fit the budget at 20000 steps.
-- A5 (2026-10-26 21:55, before any test evaluation; diagnostic only, never gating): `swap_successors`
+- A5 (2026-10-26 21:19, commit f6e5cb9, before any test evaluation; diagnostic only, never gating): `swap_successors`
   counterfactual (`docs/tasks/WP-B2_swap_successors.md`) — rewire two chains so the terminal set is unchanged but
   the correct terminal changes; walking follows the new terminal, terminal guessing cannot. Evaluated on saved
   checkpoints after WP-B2 merges.

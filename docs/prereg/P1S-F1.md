@@ -1,4 +1,4 @@
-# P1-S follow-up F1 — code interference and rank (pre-registered 2026-10-26 22:00, before any WP-H result)
+# P1-S follow-up F1 — code interference and rank (pre-registered 2026-10-26 21:20 JST, commit 6cbc2ec, before any WP-H result)
 
 Motivation (validation pilots, `docs/reports/P1S-pilot.md`): with interference-free codes (`oracle_orth`, r = 32)
 M1-lin walks the chain (94% on hops 1–3 at L = 4), with random codes (`oracle_random`, r = 32) depth gains are
