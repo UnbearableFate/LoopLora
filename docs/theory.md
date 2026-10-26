@@ -611,11 +611,529 @@ output factor similarly permits a \(B\) gradient at zero when \(z^{(L)}\) and
 the loss gradient are nondegenerate, although its internal branch gradients
 are initially blocked by \(B=0\).
 
+## Proposition 10 — Writer shortcuts, factorization, and diagnostic specificity (WP-T2)
+
+This section is a **local derivation** for the implementation at `d243aec` and
+[P1-S final v1](prereg/P1S.md), whose primary layout is now (8,4), not the
+original proposed loads in Proposition 3. “Proved” refers to the stated model;
+“constructed” means an existence example; “measured” refers only to the named
+artifacts. The [validation pilot report](reports/P1S-pilot.md) measures joint
+memory readers near 46–48% on its selection metric, including B4; the frozen
+writer rows are lower, about 25–33%. Those results motivate the hypothesis and
+do not identify its mechanism. No WP-H/F1 confirmation results are used here.
+
+### 10.1 Common keys: exact delta algebra before telescoping
+
+**Proved.** Suppose a relation's facts have one common unit key \(k\), values
+\(v_i=D(e_{t_i}-e_{h_i})\), zero initial memory, constant scalar gates, and
+queries with \(k^Tq=\theta>0\). Normalization must be above its clamp. Put
+\(a=\lambda(1-\beta)\). The actual decay-first delta writer satisfies
+
+\[
+M_E=m_Ek^T,\quad m_E=\beta\sum_{i=1}^Ea^{E-i}v_i,\quad M_Eq=\theta m_E.
+\tag{10.1}
+\]
+
+Indeed substituting \(M_{i-1}=m_{i-1}k^T\) into the writer gives
+\(m_i=a m_{i-1}+\beta v_i\); induction gives (10.1). Thus shared relation
+overlap *permits* a global read but does not imply an unweighted sum. With
+\(\beta=1\) it keeps only the last fact. On \(a\to b\to c\), the rescaled
+read is \(-a e_a+(a-1)e_b+e_c\), after applying \(D\), rather than
+\(D(e_c-e_a)\), unless the coefficients agree. Here the italic node labels
+are embeddings and the scalar \(a\) is the decay factor.
+
+If \(H=\max_i\|v_i\|\), then
+
+\[
+\left\|m_E/\beta-\sum_i v_i\right\|
+\le H\sum_{j=0}^{E-1}(1-a^j)
+\le H(1-a)E(E-1)/2.\tag{10.2}
+\]
+
+The first inequality is the triangle inequality; the second uses
+\(1-a^j=(1-a)\sum_{k<j}a^k\le j(1-a)\). Both near-unit \(\lambda\) and
+small \(\beta\) make the bound small. Uniformly permuting the facts makes
+the *expected* read a scalar multiple of \(\sum_i v_i\), since every value
+occupies every position equally often; this does not remove realized order noise.
+With distractor facts whose raw key is zero, their writes add no value but still
+decay memory. The same conservative bound holds using all \(E\) write positions
+and target values only, because each intervening factor is either \(a\) or
+\(\lambda\), both at least \(a\).
+
+An exact running average would use \(\lambda=1,\beta_i=1/(c+i)\): induction
+gives \(m_i=\sum_{j\le i}v_j/(c+i)\). This is a **different**, position-aware
+gate, not the implemented constant sigmoid gate. The reported pretrained writer
+has \(\lambda=0.999968,\beta=0.565222\), hence \(a\) near 0.435; that particular
+measurement is outside the small-\(\beta\) construction. Other keys, value
+weights, or a different joint writer may still encode terminal statistics.
+
+**Constructed shared-input parameters.** Let \(D\in\mathbb R^{p\times64}\)
+have orthonormal rows. Choose a relation-block functional \(g\) with
+\(g(e_0)=1\), \(g(e_r)=0\) for other relations, and \(g(e_{\rm hop})=0\)
+for all used hop vectors, including hop 0 (unknown hop is encoded this way).
+These are at most 21 independent constraints for four relations and hop 0–16;
+independent Gaussian vectors in 64 dimensions permit a solution almost surely.
+An ill-conditioned solution need not be numerically robust. Use shared \(A\)
+to define input, anchor, and initially zero output slots:
+
+\[
+u_{\rm fact}=(D(e_t-e_h),g(e_r),0_p),\qquad
+u_{\rm query}=(-De_s,1,0_p).
+\]
+
+Set \(K\) and \(Q\) to map only the anchor to a fixed unit memory vector
+\(k\), and \(V\) to copy the input \(p\)-block into the first \(p\) memory
+coordinates. Thus every target fact has key \(k\), and every target query has
+the same \(q=k\), regardless of its start or true hop. Non-target raw keys
+are zero. With identity activation, \(R=0\), let \(U\) copy those memory
+coordinates into the output slots, and let \(\alpha B\) decode only those
+slots by \(D^T/(\rho\beta)\). For \(\alpha\rho\ne0\),
+
+\[
+\delta y^{(L)}=D^T m_E[1:p]/\beta\quad\text{for every }L\ge1.\tag{10.3}
+\]
+
+The anchor is unchanged by every update, so \(Rz\) and \(MQz\) remain the
+same; output slots start at zero and \(B\) ignores the query-dependent input
+slots. This proves depth and query invariance for M1-lin, B5-lin, and B4,
+using the specified \(\rho=0.25\) by rescaling \(B\).
+
+For the **specified bias-free ReLU**, add one zero baseline slot. Let \(R\)
+copy the anchor as a positive constant \(T\) into each output slot and the
+baseline, while \(U\) copies the read into output slots only. Choose
+\(T>\max|m_i[j]|\) over the bounded frozen table and allowed lengths. ReLU
+then gives output \(\rho(T\mathbf1+m_E[1:p])\), baseline \(\rho T\).
+Decode their difference with \(D^T/(\rho\beta)\) to obtain (10.3) again.
+This uses a relation-dependent constant through \(Rz\), not an added bias;
+it does not contradict Proposition 6. Sufficient widths are \(r\ge2p+1\)
+for identity and \(r\ge2p+2\) for this ReLU construction: \(p=7,15,31,63\)
+fit \(r=16,32,64,128\), respectively. These are sufficient budgets, not lower
+bounds on every possible shortcut. The initialized zero \(B\) is replaced by
+the displayed trained parameters; this is expressibility, not an optimization proof.
+
+For disjoint relation-0 chains, the unweighted values telescope exactly:
+\(S=\sum_iD(e_t-e_h)=\sum_{j=1}^cD(e_{T_j}-e_{R_j})\).
+Under (10.2), (10.3) approximates \(D^TS\). The starts here are chain roots
+\(R_j\), not necessarily the queried start. This is the precise conditional
+version of the orchestrator's hypothesis. Relation overlap alone, arbitrary
+gates, or an uncorrected signed ReLU do not prove it.
+
+### 10.2 Terminal-score margins at Gaussian dimension 64
+
+**Proved distributional calculation, not a learned-code guarantee.** Assume
+\(e_i\stackrel{iid}{\sim}N(0,I_d/d)\), \(d=64\), distinct endpoints, fixed
+orthonormal-row \(D\) independent of the embedding table, and exact endpoint
+sum decoding \(y=D^T\sum_{j=1}^cD(e_{T_j}-e_{R_j})\). For a terminal,
+interior node, and root respectively, \(\ell_i=e_i^Ty\) has moments
+
+\[
+\begin{array}{c|ccc}
+ &T&\mathrm{interior}&R\\\hline
+\mathbb E\ell_i&p/d&0&-p/d\\
+\operatorname{Var}(\ell_i)&(2c+1)p/d^2&2cp/d^2&(2c+1)p/d^2
+\end{array}\tag{10.4}
+\]
+
+For example the terminal includes its squared norm (variance \(2p/d^2\))
+and \(2c-1\) uncorrelated cross terms (variance \(p/d^2\) each); conditioning
+on that terminal makes the cross covariances zero. The interior is independent
+of all \(2c\) endpoints. This proves the table. Terminal-minus-interior
+margin has mean \(p/d\), variance \((4c+1)p/d^2\), and signal/SD
+\(\sqrt{p/(4c+1)}\). At two chains it is \(\sqrt{p/9}\), not automatically
+\(\sqrt{64/9}\) at a rank-32 insertion.
+
+More exactly, this pairwise margin has the law
+
+\[
+\ell_T-\ell_i\ \overset{d}{=}
+\frac{(\sqrt{4c}+1)X-(\sqrt{4c}-1)Y}{2d},\qquad
+X,Y\stackrel{ind}{\sim}\chi_p^2.\tag{10.5}
+\]
+
+To see this, in each projected coordinate write the difference as
+\((t-v)(t+w)\), with independent standardized Gaussians \(t,v\) and
+\(w\sim N(0,2c-1)\). The quadratic form has two nonzero eigenvalues
+\((1\pm\sqrt{4c})/2\); orthogonal diagonalization and summing \(p\) independent
+coordinates prove (10.5). The Gaussian integral
+\(\mathbb E e^{-s\chi_p^2}=(1+2s)^{-p/2}\) gives
+\(\mathbb E e^{-t d(\ell_T-\ell_i)}
+=[1+2t-(4c-1)t^2]^{-p/2}\) in its finite domain. Markov's inequality
+at \(t=1/(4c-1)\) gives
+
+\[
+\Pr(\ell_T-\ell_i\le\eta)
+\le e^{d\eta/(4c-1)}(1-1/(4c))^{p/2},\quad\eta\ge0.\tag{10.6}
+\]
+
+At zero margin, terminal-versus-root error similarly is at most
+\((1-1/c)^{p/2}\) for \(c>1\): the product factors are
+\((t-r)\) and \((t-r+w)\), with variances 2 and \(2c\), covariance 2;
+the same Gaussian integral gives the bound. At \(c=1\) the difference is a
+squared norm and positive almost surely. A union bound over
+\(c(N-2c)\) terminal/interior and \(c^2\) terminal/root comparisons bounds
+failure to rank **all** terminals first. It can be vacuous at small \(p\);
+neither dimension 64 nor positive expected margin guarantees terminal-first
+ranking in an episode. A learned \(D\) fitted to these codes also falls outside
+the independence assumption.
+
+A deterministic sufficient condition is more direct. If every endpoint's
+projected norm squared is at least \(\nu\), and every distinct projected
+candidate pair has absolute inner product at most \(\mu\), terminal scores
+are at least \(\nu-(2c-1)\mu\), interior scores at most \(2c\mu\), and root
+scores at most \(-\nu+(2c-1)\mu\). Thus the terminal/interior margin is at
+least \(m_0=\nu-(4c-1)\mu\), and a positive \(m_0\) also separates roots.
+For approximate delta storage subtract
+\(\max_{T,i}\|D(e_T-e_i)\|\,H(1-a)E(E-1)/2\) from these margins, by
+Cauchy–Schwarz and (10.2). This gives an explicit geometry/gate condition
+under which the constructed single read ranks the terminal set first.
+
+**Measured constructed example (not a trained writer).** Compute job
+`3712948.opbs` used 256 validation-only (8,4) episodes, frozen backbone seed
+31415, a derived generation seed, and \(D\) selecting the first \(p\)
+coordinates. It computed the ideal unweighted endpoint statistic directly;
+the separate shared-writer checks used the actual delta rule at small beta.
+No empirical moment was required to equal its population value. Counts below
+are descriptive for this fixed table and episode sample, not confidence bounds.
+
+| \(p\) | Top prediction is a terminal | Both terminals precede all others | Minimum terminal/nonterminal margin |
+| ---: | ---: | ---: | ---: |
+| 7 | 150/256 | 46/256 | −0.2963 |
+| 15 | 219/256 | 126/256 | −0.3607 |
+| 31 | 251/256 | 205/256 | −0.3563 |
+| 63 | 256/256 | 251/256 | −0.4358 |
+| 64 | 256/256 | 252/256 | −0.3974 |
+
+At \(p=15\), measured terminal/interior means were 0.23090/−0.00248, versus
+theory 15/64 and 0; pair-margin variance was 0.02941 versus theory
+135/4096. Negative minimum margins even at \(p=64\) demonstrate why an
+expected Gaussian margin is not an all-episode guarantee. The larger projections
+in this table are hypothetical endpoint statistics, not claims about the
+rank-32 construction or any WP-H/F1 checkpoint. Full moments and provenance
+are retained in the log linked from [WP-T2's report](reports/WP-T2.md).
+
+### 10.3 Tail-only values: a removed statistic and remaining shortcuts
+
+**Proved, with limited scope.** Write \(A=[A_h,A_r,A_t]\). In a factorized
+writer, keys/initial queries see head and relation only and values are \(Pe_t\).
+The direct linear value term \(P(e_t-e_h)\) is excluded. Nevertheless an
+additive exact memory read is
+
+\[
+Mq=\sum_iPe_{t_i}\langle k(h_i,r_i),q\rangle.
+\]
+
+For delta storage the coefficient is instead
+\(\beta\lambda^{E-i}k_i^T\prod_{j=i+1}^E(I-\beta k_jk_j^T)q\), with
+products in chronological order, by expanding each writer update. Head
+information therefore remains in coefficients even with tail-only values.
+Factorization does not imply an aligned first-hop query or a universal chance
+ceiling. Proposition 5's generic-probe counterexample still applies whenever
+the stored memories are distinct.
+
+An explicit finite-real example strengthens this caveat. Give entities two
+independent continuous coordinates \((a_i,b_i)\), normalized keys
+\((a_h,1)/\sqrt{1+a_h^2}\), values \(b_t\), and query \((1,0)\) supplied by
+the relation. The additive scalar read is \(w^TFb\), where \(F\) is the
+edge-count matrix and \(w_h=a_h/\sqrt{1+a_h^2}\). For \(F\ne G\),
+\((F-G)^Tw\ne0\) almost surely; conditioning on \(w\), its product with the
+independent continuous \(b\) is nonzero almost surely. A finite union over
+graphs remains null. Thus one real read can distinguish a finite graph family
+with an unrestricted lookup decoder. Small finite \(\beta=\epsilon\),
+\(\lambda=1-\epsilon^2\) preserves separation for sufficiently small
+\(\epsilon>0\), since its delta read is \(\epsilon w^TFb+O(\epsilon^2)\)
+and finitely many nonzero leading differences remain separated. This is a
+noiseless existence counterexample, not a practical FP32 decoder construction.
+
+For an **equal-weight generic relation probe**, however, exact orthonormal
+storage gives only \(b_1=\sum_{\rm edges}c_t\). Interior nodes and terminals
+receive identical coefficients. For example, \(a\to b\to c\) and
+\(a\to c\to b\), with the other chains unchanged, have identical candidate
+and tail sets but different terminals. No function of this unweighted tail
+sum alone can distinguish them. Uniform selection among its \(E_0\) target
+tails has accuracy \(1/E_0\), rather than \(1/c\) or full-candidate chance
+\(1/N\). This specifies an algorithm, not a bound on every decoder with
+additional query information. An aligned exact first-hop read instead has
+hop-1 accuracy 1 and the conditional multihop bound of Proposition 5.
+
+**Constructed iterated generic reads.** Assume the ideal finite-episode code
+geometry of Proposition 3, and that a relation-derived probe with equal overlap
+on all target keys is available. This is an additional query/key condition,
+not a consequence of factorization or a claim about all 1024 global codes.
+Let \(S c_{j,d}=c_{j,d+1}\) along a chain with root depth zero and kill its
+terminal. Induction gives
+
+\[
+b_s=S^{s-1}b_1=\sum_j\sum_{d=s}^{n_j}c_{j,d}.\tag{10.7}
+\]
+
+An evolving query can compose this operator; a cached fixed query does not
+acquire these new observations. With enough separate latent channels for the
+relation seed, head features and returned states, reinjection produces
+\(\sum_{s=1}^La^sb_s\), \(a>0\). Each depth-\(d\) node has coefficient
+\(\sum_{s=1}^{\min(d,L)}a^s\). Thus the top-scoring set is depth at least
+\(L\), until the longest chain depth is reached; thereafter it remains the
+deepest nodes. Nonnegative coordinate codes allow ReLU; signed codes need a
+sign-preserving construction. This is a generic **root-depth filtration**, not
+a walk from the queried start.
+
+Equal-length chains of length \(H\) have \(b_H\) equal to their terminal sum.
+For (8,4), no \(L\le4\) filtration isolates terminals: \(b_4\) includes five
+long-chain nodes and the short-chain terminal. At \(L=8\) it isolates only the
+long terminal. Differences such as \(b_2-b_3\) isolate a root-depth layer;
+this is further global information even when no full terminal set is isolated.
+
+Let \(n_L=\sum_j(n_j-L+1)_+\), \(c_h=\#\{j:n_j\ge h\}\). Uniformly
+choosing among the top-depth nodes gives the **proved policy-specific** accuracy
+
+\[
+A_L(h)=\frac{\#\{j:n_j\ge\max(h,L)\}}{c_h n_L},\quad
+1\le L\le\max_j n_j.\tag{10.8}
+\]
+
+There is one query-eligible chain per terminal, selected uniformly by the
+per-hop evaluator; count its terminal if it belongs to the top set and divide
+by the top-set size. This proves (10.8) and the following exact predictions.
+Typed rows assume perfect rejection of nonzero relations.
+
+| Layout; candidates | Generic one-read | Generic \(L=4\) | Generic \(L=8\) | Candidate chance |
+| --- | --- | --- | --- | --- |
+| (8,4); 14 | 1/12, all hops | 1/6, all hops | 1/2 at \(h\le4\); 1 at \(h\ge5\) | 1/14 |
+| (8,1) typed; 14 | 1/9, all hops | 1/10 at \(h=1\); 1/5 otherwise | 1/2 at \(h=1\); 1 otherwise | 1/14 |
+| (8,8,2); 21 | 1/18, all hops | 1/15 at \(h\le2\); 1/10 otherwise | 1/3 at \(h\le2\); 1/2 otherwise | 1/21 |
+
+Including typed distractor tails changes the one-read support from 9 to 12,
+giving 1/12 for uniform tail selection. Their relation weights and decay can
+also break all ideal formulas; these must be measured in an actual model.
+
+### 10.4 Quantitative predictions and what A3/A5 identify
+
+**Proved for the specified policies; predictions for trained rows.** If a
+query-independent endpoint statistic selects uniformly among \(c\) terminals,
+its accuracy is \(1/c\) at **every** hop, even when only one chain is eligible
+at that hop. In the construction (10.3), B4, M1, M1-lin, B5 and B5-lin all
+have that same prediction for every \(L\ge1\) when terminal decoding succeeds.
+There is no extra graph information at larger \(L\). If only a fraction
+\(p_T\) of queries' global selections are terminals, exchangeability of
+terminal roles gives accuracy \(p_T/c\), rather than a guaranteed \(1/c\).
+This is not a theorem about an arbitrary trained classifier or a length-biased
+terminal selector. B3 has no access to the stored statistic; uniform candidate
+guessing is a reference, not a bound on every no-memory reader.
+
+| Layout | Terminal-guess B4; M1/M1-lin; B5/B5-lin, all \(h\), \(L\ge1\) | Uniform candidates |
+| --- | --- | --- |
+| (8,4) | 1/2 = 50% | 1/14 ≈ 7.14% |
+| (8,1) typed, target relation isolated | 1/2 = 50% | 1/14 ≈ 7.14% |
+| (8,8,2) | 1/3 ≈ 33.33% | 1/21 ≈ 4.76% |
+
+Thus the observed joint pilot plateau is **consistent** with a terminal statistic,
+while its exact head-subtraction/common-key implementation remains unmeasured.
+WP-H/F1 should check key/query start dependence, \(VA_h+VA_t\), relation
+channels, gate weights, first-read/global-endpoint alignment, and memory/logit
+responses to rewiring before identifying the mechanism. A higher-rank joint
+row can improve terminal decoding and still remain at 50% without walking.
+The fixed-projector Gaussian analysis predicts less decoding noise as its
+effective dimension grows; it does not predict trained accuracy at each rank.
+The tail feature's linear rank is at most 64, which is a dimension cap, not a
+universal lower bound on interference after learning an anisotropic projection.
+
+**A3 for the generic filtration policy.** Substituting (10.8) into the
+registered contrasts gives:
+
+| Layout | \(\Delta_{reach}\), hops 2–3 | \(\Delta_{far}\), hops 6–8 | Difference |
+| --- | --- | --- | --- |
+| (8,4) | 1/12 | 1/12 | 0 |
+| (8,1) typed | 4/45 | 4/45 | 0 |
+| (8,8,2) | 1/36 | 2/45 | −1/60 |
+
+Pure terminal guessing has both deltas zero. A3 therefore rejects these
+particular generic policies in expectation. In typed filtration, hop-1 accuracy
+also drops by \(1/90\), slightly more than the permitted 1 percentage point.
+But A3 is not an identification theorem. In (8,8,2), \(b_2-b_3\) contains
+the three depth-2 nodes, including the short terminal. A policy that predicts
+the start at \(L=1\) (always wrong) and uniformly selects these three nodes
+at \(L=4\) has \(\Delta_{reach}=1/18>3\%\), \(\Delta_{far}=0\), and improves
+hop 1, using only generic reads and subtraction. A reader with adequate
+history/clock channels can construct this statistic. This is a counterexample
+to universal A3 specificity, not a claim that a registered checkpoint implements
+it or that it passes all G1/G2 and replication requirements.
+
+**A5 paired prediction.** `swap_successors` preserves heads, tail multiplicities,
+roots, terminal sets, and relation labels, but changes edge assignments. Any
+prediction depending only on the unweighted endpoint sum or tail sum plus
+unchanged query features is exactly unchanged. Thus
+
+\[
+\Pr(\widehat y_{swap}=T_{new})-
+\Pr(\widehat y_{original}=T_{new})=0.\tag{10.9}
+\]
+
+This equality holds pointwise with matched tie breaking, hence also in every
+old-hop and \(h_{new}\le L\) stratum. Uniform terminal guessing has both
+rates 1/2 in the two-chain layouts and 1/3 in (8,8,2). A high absolute follow
+rate alone is therefore insufficient. Approximate delta weighting or ties
+between terminals can change predictions after a swap; (10.2) certifies
+invariance only if its score perturbation is smaller than the winning-terminal
+margin, not merely the terminal-versus-interior margin.
+
+For an ideal query-local walk, let the original remaining distance be \(h\)
+and the other chain length be \(b\). The generator chooses a cut uniformly
+on the query's suffix and another uniformly on the entire other chain. The new
+distance is \(h'=p+q\), with independent uniform
+\(p\in\{1,\ldots,h\},q\in\{0,\ldots,b-1\}\). Therefore
+
+\[
+C_L(h,b)=\Pr(h'\le L)=
+\frac{\sum_{p=1}^{h}\min(b,\max(0,L-p+1))}{hb}.\tag{10.10}
+\]
+
+This follows by counting the allowed suffix lengths at each first cut.
+Proposition 3 then gives swapped follow \(C_L\) and unswapped new-terminal
+rate zero: the other terminal was never on the original query path. Conditional
+on \(h'\le L\) the ideal follow is 1; otherwise it is 0. Average (10.10) over
+uniformly eligible original chains and uniformly selected other chains to get
+the following **ideal-walk** predictions. Every paired unswapped entry is zero.
+
+| (8,4), original \(h\) | \(L=1\) | \(L=4\) | \(L=8\) |
+| ---: | ---: | ---: | ---: |
+| 1 | 3/16 | 3/4 | 1 |
+| 2 | 3/32 | 21/32 | 31/32 |
+| 3 | 1/16 | 9/16 | 15/16 |
+| 4 | 3/64 | 15/32 | 29/32 |
+| 5 | 1/20 | 1/2 | 1 |
+| 6 | 1/24 | 5/12 | 23/24 |
+| 7 | 1/28 | 5/14 | 25/28 |
+| 8 | 1/32 | 5/16 | 13/16 |
+
+| (8,1) typed, original \(h\) | \(L=1\) | \(L=4\) | \(L=8\) |
+| ---: | ---: | ---: | ---: |
+| 1 | 9/16 | 3/4 | 1 |
+| 2 | 1/2 | 1 | 1 |
+| 3 | 1/3 | 1 | 1 |
+| 4 | 1/4 | 1 | 1 |
+| 5 | 1/5 | 4/5 | 1 |
+| 6 | 1/6 | 2/3 | 1 |
+| 7 | 1/7 | 4/7 | 1 |
+| 8 | 1/8 | 1/2 | 1 |
+
+| (8,8,2), original \(h\) | \(L=1\) | \(L=4\) | \(L=8\) |
+| ---: | ---: | ---: | ---: |
+| 1 | 1/4 | 2/3 | 1 |
+| 2 | 1/8 | 5/8 | 23/24 |
+| 3 | 5/48 | 11/16 | 15/16 |
+| 4 | 5/64 | 19/32 | 29/32 |
+| 5 | 1/16 | 19/40 | 7/8 |
+| 6 | 5/96 | 19/48 | 27/32 |
+| 7 | 5/112 | 19/56 | 13/16 |
+| 8 | 5/128 | 19/64 | 3/4 |
+
+In particular, old \(h\le L\) does not imply new reachability, and even
+\(L=8\) can miss new paths of length up to 15.
+
+**Remaining diagnostic counterexample.** Root-depth filtrations are not swap
+invariants: swapping changes root-to-node depths and chain lengths. If the
+queried chain originally has length \(a\), new lengths of it and the other
+chain are \(a'=a-h+h'\), \(b'=h+b-h'\). For the generic positive-coefficient
+policy put \(s=\min(L,\max_j n'_j)\). Its swapped follow is
+\(\mathbf1[a'\ge s]/\sum_j(n'_j-s+1)_+\) for a fixed pair of cuts;
+average this over the cuts to get its expected follow. Its unswapped rate is
+\(\mathbf1[b\ge s_0]/n_{s_0}\), \(s_0=\min(L,\max_j n_j)\).
+This is not the law (10.10). For typed (8,1), query the long chain's last
+predecessor and swap its final edge with the short edge. At \(L=4\), the
+generic policy originally scores the five deepest long-chain nodes, excluding
+the new target (the old short terminal). After the swap it includes that target:
+follow rises from 0 to 1/5 without a query-directed walk. At \(L=8\) it rises
+from 0 to 1. A5 detects exactly invariant terminal guessing, but positive paired
+follow alone does not exclude all global-statistic solutions. Stratify by new
+reachability, inspect paired logit changes, and compare B5 controls; none alone
+constitutes a proof of an internal algorithm.
+
+### 10.5 Minimal symbolic writer changes and their guarantees
+
+**Proved removal of the direct value mechanism.** A hard constraint
+\(VA_h=0\) excludes the linear head subtraction in (10.1), while allowing
+\(KA_h\ne0\) for addressing. Also imposing \(VA_r=0\) makes the value
+exactly tail-only. For keys to be tail-blind require \(KA_t=0\). These product
+constraints concern the effective maps, not merely the names of latent slots.
+They are feasible with one shared \(u\): reserve head/relation slots and tail
+slots in \(A\), restrict \(K,Q\) to the former initially, and \(V\) to the
+latter. Query feedback from returned values still needs a specified map into
+key coordinates. The allocated subspaces share the total rank budget; this is
+the coherent one-\(u\) counterpart of factorizing the writer inputs. Zeroing
+\(A_h\) instead would also remove the head from keys and the query, defeating
+the intended associative addressing.
+
+A smaller contract change is hard \(VA_h=0\) alone. It removes this direct
+head term but allows relation-valued statistics and tail-dependent keys. It
+therefore provides a narrower guarantee than full head/relation-key,
+tail-only-value factorization. Neither design removes generic graph encoding,
+overwrite-dependent coefficients, or (10.7). A stronger first-hop theorem also
+needs aligned addressing, controlled interference, and decoder side-information
+assumptions as in Proposition 5; it does not follow from a value mask alone.
+
+**Soft penalties are predictions, not exclusions.** Penalizing
+\(\|VA_h\|_F^2\) encourages the hard condition but a finite weight does not
+enforce it. An empirical dot-product penalty is weaker still: a skew-symmetric
+rotation \(J\) gives \(e_h^TJe_h=0\) while \(Je_h\) preserves head information
+when \(J\) is invertible. In the independent isotropic Gaussian population,
+complete centered cross-covariance satisfies
+\(\operatorname{Cov}(v,e_h)=VA_h/d\), so making that entire matrix exactly
+zero would remove the linear head term. Finite-sample scalar orthogonality,
+conditional correlations, or approximate covariance penalties do not establish
+this identity. Compare hard masks and penalties at matched effective rank,
+writer cost, and state size; predict reduced endpoint-difference alignment and
+possibly poorer single-hop storage if useful head components were removed.
+No writer change is implemented or preregistration amended in this task.
+
+### 10.6 P1-L analog: token positions do not guarantee factorization
+
+**Observed code contract.** [The LLM interface](reports/WP-E-interface.md),
+`llm/inject.py`, and `core/wrapper.py` pass the layer-14 self-attention output
+*before* `o_proj` into the shared \(A,K,V\). `fact_final` chooses one position
+per fact: the renderer marks `span.token_end-1` on the full span including its
+trailing newline, so this need not be the tail-name token. `all_tokens` chooses
+every valid position. These are write masks, not information restrictions.
+At a fact-final or tail position the attention result can
+depend on the head, relation, earlier facts and the current tail through causal
+attention and preceding layers. A value can therefore carry head information
+even at the tail-name position. `all_tokens` additionally writes
+head/prefix positions and changes write count, forgetting, and order effects.
+Dropping backbone KV in memory-only does not remove information already in
+\(M\). No claim is made that the symbolic linear telescoping identity holds
+for contextual Qwen features or its full-vocabulary decoder.
+
+**Design options, predictions only.** A coherent strong analog buffers a key
+from the head/relation prefix position immediately **before** the current tail,
+and forms the value from the tail's raw single-token embedding (or a tail-only
+encoder). Causality prevents that prefix activation from seeing the current
+tail token; raw tail embeddings exclude contextual head information. One paired
+write per fact needs explicit span alignment, a temporary key buffer, resets,
+and a declared query/key representation map. Prefix features may still contain
+earlier facts, so a strict head/relation-only key also needs per-fact attention
+isolation or a separate prefix encoder. A lower-layer contextual tail state
+alone is not a proof of value independence: even its first attention layer can
+mix the head. A position before the tail also cannot by itself make a *tail*
+value pure if the value is still taken from the contextual tail state.
+
+A softer analog keeps contextual values but penalizes their conditional
+predictability of the head given the tail, or projects out a measured head
+subspace. This may suppress linear leakage while retaining useful semantics;
+nonlinear head information can remain. Hard symbolic block masks have no exact
+semantic equivalent in an already mixed feature vector. Predict that raw-tail
+values reduce head reconstruction and endpoint-like global statistics, possibly
+at the expense of relation/context fidelity and T1 EM. Compare paired rewiring
+and hop/depth profiles in memory-only; retain context-retained as a separately
+named protocol because backbone attention can solve the relation task itself.
+Choose any follow-up using validation data and explicit cost accounting; this
+note provides designs and falsifiable predictions, not new P1-L results.
+
 ## Validation and interpretation
 
 [tests/test_theory_examples.py](../tests/test_theory_examples.py) checks small,
 deterministic algebraic examples and the consequential counterexamples using
-FP64. Execution is through `scripts/submit.py` on a Miyabi-G compute node; the
-job, command, outcome, and scope are recorded in [the WP-T report](reports/WP-T.md).
+FP64. Execution is through `scripts/submit.py` on a Miyabi-G compute node. The
+original checks are recorded in [the WP-T report](reports/WP-T.md); Proposition
+10's checks and descriptive measurements are recorded in
+[the WP-T2 report](reports/WP-T2.md), job `3712948.opbs` on `mg0851`
+(36 tests passed, including the 16 original cases).
 These checks support the derivations and implementation correspondence. They
 are not P1-S training experiments or evidence that G1/G2 pass.

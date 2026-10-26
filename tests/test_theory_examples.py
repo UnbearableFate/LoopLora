@@ -195,3 +195,246 @@ def test_double_ba_zero_first_derivative_but_not_a_two_sided_hessian():
     output, _, _ = skip.process_sequence(torch.ones(1, 1, 1, dtype=DTYPE))
     assert output.item() == 0
     assert torch.autograd.grad(output.sum(), skip.B)[0].item() == 1
+
+
+# WP-T2: constructed witnesses, not an interpretation of any trained checkpoint.
+def _wpt2_model(variant="M1", activation="identity", beta=1e-5):
+    from looplora.sym.config import resolve_config
+    from looplora.sym.model import SymbolicModel
+
+    config = resolve_config({
+        "device": "cpu", "writer": "joint", "variant": variant,
+        "activation": activation, "seed": derive_seed(17, "WP-T2", "parameters"),
+        "backbone_seed": 31415, "model": {"r": 32, "r_mem": 32,
+        "d_e": 64, "beta_init": beta, "lambda_init": 1 - 1e-9},
+        "task": {"name": "t2_chain_end", "E": 12, "Q": 8,
+                 "chain_lengths": [8, 4], "hops": list(range(1, 9))}})
+    model = SymbolicModel(config).double()
+    p, anchor, out, baseline = 15, 15, slice(16, 31), 31
+    backbone, reader, writer = model.backbone, model.adapter, model.writer
+    constraints = torch.cat((backbone.relations, backbone.hops))
+    target = torch.zeros(len(constraints), dtype=DTYPE)
+    target[0] = 1
+    # Exact finite-table hop erasure; a relation channel supplies the offset.
+    g = torch.linalg.lstsq(constraints, target).solution
+    torch.testing.assert_close(constraints @ g, target, atol=1e-12, rtol=1e-12)
+    with torch.no_grad():
+        for name in ("A", "K", "V", "Q", "U", "R", "B"):
+            getattr(reader, name).zero_()
+        writer.A[:p, :p] = -torch.eye(p, dtype=DTYPE)
+        writer.A[:p, 128:128 + p] = torch.eye(p, dtype=DTYPE)
+        writer.A[anchor, 64:128] = g
+        writer.K[0, anchor] = reader.Q[0, anchor] = 1
+        writer.V[:p, :p] = torch.eye(p, dtype=DTYPE)
+        reader.U[out, :p] = torch.eye(p, dtype=DTYPE)
+        actual_beta = writer.a_beta.sigmoid().item()
+        scale = model.config["model"]["alpha"] * model.config["model"]["rho"] * actual_beta
+        reader.B[:p, out] = torch.eye(p, dtype=DTYPE) / scale
+        if activation == "relu":
+            shift = 2 * backbone.entities[:, :p].abs().max().item() + 1
+            reader.R[out, anchor] = shift
+            reader.R[baseline, anchor] = shift
+            reader.B[:p, baseline] = -1 / scale
+    assert reader.A is writer.A and reader.K is writer.K and reader.V is writer.V
+    return model
+
+
+@pytest.mark.parametrize("variant", ["B4", "B5", "M1"])
+@pytest.mark.parametrize("activation", ["identity", "relu"])
+@pytest.mark.parametrize("ideal_geometry", [False, True])
+@torch.no_grad()
+def test_wpt2_actual_shared_writer_ema_and_depth_flat_shortcut(
+        variant, activation, ideal_geometry):
+    from looplora.data.relations import TaskSpec, generate
+
+    model = _wpt2_model(variant, activation)
+    arrays = generate(TaskSpec(**model.config["task"]), "val", 0, 1,
+                      derive_seed(17, "WP-T2", "shared-validation"))
+    facts = torch.as_tensor(arrays.facts, dtype=torch.long)
+    entities = facts[0, :, (0, 2)].unique()
+    if ideal_geometry:
+        # Fourteen orthogonal episode entities fit in p=15; no random margin claim.
+        model.backbone.entities.zero_()
+        model.backbone.entities[entities, :len(entities)] = torch.eye(len(entities), dtype=DTYPE)
+    batch = model.prepare(arrays)
+    values = model.writer(model.backbone.facts(facts), torch.ones(1, 12, dtype=torch.bool))[1]
+    beta = model.writer.a_beta.sigmoid().item()
+    lam = model.writer.a_lambda.sigmoid().item()
+    a, n = lam * (1 - beta), facts.shape[1]
+    weights = beta * a ** torch.arange(n - 1, -1, -1, dtype=DTYPE)
+    expected = (values * weights[None, :, None]).sum(1)
+    torch.testing.assert_close(batch.memory[:, :, 0], expected, atol=1e-13, rtol=1e-11)
+    torch.testing.assert_close(batch.memory[:, :, 1:], torch.zeros_like(batch.memory[:, :, 1:]),
+                               atol=1e-13, rtol=0)
+    ideal_sum = values.sum(1)[:, :15]
+    actual_sum = batch.memory[:, :15, 0] / beta
+    bound = values.norm(dim=-1).max() * (1 - a) * n * (n - 1) / 2
+    assert (actual_sum - ideal_sum).norm() <= bound + 1e-11
+    heads, tails = facts[0, :, 0], facts[0, :, 2]
+    terminals = tails[~torch.isin(tails, heads)]
+    roots = heads[~torch.isin(heads, tails)]
+    endpoint_sum = (model.backbone.entities[terminals, :15].sum(0)
+                    - model.backbone.entities[roots, :15].sum(0))
+    torch.testing.assert_close(ideal_sum[0], endpoint_sum, atol=1e-12, rtol=1e-12)
+    # Independently vary both query entity and stated hop, including unknown hop.
+    starts = entities[:, None].expand(-1, 5)
+    hops = torch.tensor([-1, 0, 1, 4, 8]).expand_as(starts)
+    u = model.writer.u(model.backbone.queries(starts, torch.zeros_like(starts), hops))
+    q = u @ model.adapter.Q.T
+    torch.testing.assert_close(q, torch.nn.functional.one_hot(
+        torch.zeros_like(starts), 32).to(DTYPE), atol=1e-12, rtol=1e-12)
+    expected_output = torch.zeros_like(batch.x[..., :64])
+    expected_output[..., :15] = actual_sum[:, None]
+    varied_memory = batch.memory[:, None].expand(len(entities), 5, -1, -1)
+    varied_output = model.adapter.branch(model.adapter.read(
+        u, varied_memory, 1 if variant == "B4" else 4))
+    torch.testing.assert_close(varied_output, expected_output[:, :1].expand_as(varied_output),
+                               atol=2e-9, rtol=1e-9)
+    for depth in ([1] if variant == "B4" else [1, 2, 4, 8]):
+        result = model.read(batch, depth)
+        output = model.adapter.branch(result["z"])
+        torch.testing.assert_close(output, expected_output, atol=2e-9, rtol=1e-9)
+        if ideal_geometry:
+            scores = result["logits"][0, 0]
+            nonterminals = entities[~torch.isin(entities, terminals)]
+            assert scores[terminals].min() > scores[nonterminals].max()
+    assert model.read(batch, 0)["logits"].abs().max() == 0
+
+
+@torch.no_grad()
+def test_wpt2_large_beta_constant_key_does_not_telescope():
+    model = _wpt2_model(beta=.8)
+    model.backbone.entities.zero_()
+    model.backbone.entities[:3, :3] = torch.eye(3, dtype=DTYPE)
+    # Latest write is the first edge: its internal tail outranks the terminal.
+    facts = torch.tensor([[[1, 0, 2], [0, 0, 1]]])
+    memory, values = model.writer(model.backbone.facts(facts), torch.ones(1, 2, dtype=torch.bool))
+    beta, lam = (getattr(model.writer, name).sigmoid().item()
+                 for name in ("a_beta", "a_lambda"))
+    expected = beta * (lam * (1 - beta) * values[:, 0] + values[:, 1])
+    torch.testing.assert_close(memory[:, :, 0], expected, atol=1e-13, rtol=1e-12)
+    assert memory[0, 1, 0] > memory[0, 2, 0]
+    assert (memory[:, :, 0] / beta - values.sum(1)).norm() > .5
+
+
+def _wpt2_chain_graph(lengths, typed=False):
+    edges, depths, terminals, roots, offset = [], [], [], [], 0
+    for length in lengths:
+        roots.append(offset)
+        terminals.append(offset + length)
+        depths.extend(range(length + 1))
+        edges.extend((offset + d, offset + d + 1) for d in range(length))
+        offset += length + 1
+    # Typed distractor tails are candidates but absent from relation-zero S.
+    return edges, torch.tensor(depths + ([-1] * 3 if typed else [])), terminals, roots
+
+
+@pytest.mark.parametrize("lengths,typed", [((8, 4), False), ((8, 1), True),
+                                           ((8, 8, 2), False), ((4, 4), False)])
+def test_wpt2_factorized_exact_store_filtrations_and_swap(lengths, typed):
+    edges, depths, terminals, roots = _wpt2_chain_graph(lengths, typed)
+    size = len(depths)
+    S = _store(size, edges)[0]
+    ones = torch.ones(size, dtype=DTYPE)
+    b1 = S @ ones
+    torch.testing.assert_close(b1, (depths >= 1).to(DTYPE), atol=0, rtol=0)
+    assert int(b1.sum()) == sum(lengths)  # tie-breaking accuracy 1/E_r, chance 1/N.
+    accumulated = torch.zeros(size, dtype=DTYPE)
+    for step in range(1, max(lengths) + 1):
+        filtration = torch.linalg.matrix_power(S, step) @ ones
+        torch.testing.assert_close(filtration, (depths >= step).to(DTYPE), atol=0, rtol=0)
+        accumulated = b1 + S @ accumulated
+        expected = torch.clamp(depths, min=0, max=step).to(DTYPE)
+        torch.testing.assert_close(accumulated, expected, atol=0, rtol=0)
+        top = set(torch.where(accumulated == accumulated.max())[0].tolist())
+        assert top == set(torch.where(depths >= step)[0].tolist())
+        if lengths == (8, 4) and step <= 4:
+            assert top != set(terminals)
+    last_support = set(torch.where((torch.linalg.matrix_power(S, max(lengths)) @ ones) > 0)[0].tolist())
+    assert (last_support == set(terminals)) == (len(set(lengths)) == 1)
+    # Swap an edge at depth 1 in chain A with an edge at depth 0 in chain B.
+    second_root = roots[1]
+    swapped = list(edges)
+    i, j = swapped.index((1, 2)), swapped.index((second_root, second_root + 1))
+    swapped[i], swapped[j] = (1, second_root + 1), (second_root, 2)
+    T = _store(size, swapped)[0]
+    torch.testing.assert_close(S @ ones, T @ ones, atol=0, rtol=0)
+    torch.testing.assert_close(S @ ones - S.T @ ones,
+                               T @ ones - T.T @ ones, atol=0, rtol=0)
+    assert set(torch.where((S @ ones > 0) & (S.T @ ones == 0))[0].tolist()) == set(terminals)
+    assert set(torch.where((T @ ones > 0) & (T.T @ ones == 0))[0].tolist()) == set(terminals)
+    assert not torch.equal(S @ S @ ones, T @ T @ ones)
+
+
+def test_wpt2_swap_walk_length_law_by_exhaustive_cuts():
+    for hop in range(1, 9):
+        for other_length in (1, 2, 4, 8):
+            for budget in (1, 4, 8):
+                counts = sum(p + q <= budget for p in range(1, hop + 1)
+                             for q in range(other_length))
+                formula = sum(min(other_length, max(0, budget - p + 1))
+                              for p in range(1, hop + 1))
+                assert counts == formula
+
+
+@torch.no_grad()
+def test_wpt2_descriptive_frozen_gaussian_endpoint_margins():
+    import json
+
+    from looplora.data.relations import TaskSpec, generate
+    from looplora.sym.backbone import SymbolicBackbone
+
+    # Validation only. This ideal uniform endpoint statistic is constructed;
+    # it is neither delta accumulation at trained gates nor a learned checkpoint.
+    spec = TaskSpec(name="t2_chain_end", E=12, Q=1, chain_lengths=(8, 4), hops=(1,))
+    arrays = generate(spec, "val", 0, 256, derive_seed(17, "WP-T2", "gaussian-validation"))
+    table = SymbolicBackbone(backbone_seed=31415).double().entities
+    descriptions = []
+    for p in (7, 15, 31, 63, 64):
+        terminal_scores, interior_scores, margins, top, all_top = [], [], [], [], []
+        pair_differences = []
+        for row in arrays.facts:
+            heads, tails = torch.as_tensor(row[:, 0]).long(), torch.as_tensor(row[:, 2]).long()
+            terminals = tails[~torch.isin(tails, heads)]
+            roots = heads[~torch.isin(heads, tails)]
+            candidates = torch.cat((heads, tails)).unique()
+            interior = candidates[~torch.isin(candidates, torch.cat((terminals, roots)))]
+            nonterminals = candidates[~torch.isin(candidates, terminals)]
+            projected = table[:, :p]
+            endpoint = projected[terminals].sum(0) - projected[roots].sum(0)
+            scores = projected[candidates] @ endpoint
+            direct = (projected[tails] - projected[heads]).sum(0)
+            torch.testing.assert_close(direct, endpoint, atol=1e-12, rtol=1e-12)
+            t, v = projected[terminals] @ endpoint, projected[interior] @ endpoint
+            terminal_scores.extend(t.tolist())
+            interior_scores.extend(v.tolist())
+            pair_differences.extend((t[:, None] - v).flatten().tolist())
+            margin = (t.min() - (projected[nonterminals] @ endpoint).max()).item()
+            margins.append(margin)
+            top.append(int(candidates[scores.argmax()]) in terminals.tolist())
+            all_top.append(margin > 0)
+        def moments(values):
+            value = torch.tensor(values, dtype=DTYPE)
+            return {"mean": value.mean().item(), "variance": value.var(unbiased=False).item()}
+        descriptions.append({"p": p, "terminal": moments(terminal_scores),
+            "interior": moments(interior_scores), "terminal_minus_interior": moments(pair_differences),
+            "theory_terminal_mean": p / 64, "theory_terminal_variance": 5 * p / 64**2,
+            "theory_interior_variance": 4 * p / 64**2,
+            "theory_pair_variance": 9 * p / 64**2,
+            "top_one_terminal_fraction": sum(top) / len(top),
+            "all_terminals_first_fraction": sum(all_top) / len(all_top),
+            "minimum_terminal_nonterminal_margin": min(margins)})
+    print("WP-T2 constructed Gaussian measurements " + json.dumps({
+        "label": "constructed descriptive validation; no learned mechanism claim",
+        "backbone_seed": 31415, "episodes": 256, "layout": [8, 4],
+        "projection_ranks": descriptions}, sort_keys=True))
+
+
+def test_wpt2_tail_sum_alone_does_not_determine_terminal_set():
+    ones = torch.ones(6, dtype=DTYPE)
+    S = _store(6, [(0, 1), (1, 2), (3, 4), (4, 5)])[0]
+    T = _store(6, [(0, 2), (2, 1), (3, 4), (4, 5)])[0]
+    torch.testing.assert_close(S @ ones, T @ ones, atol=0, rtol=0)
+    first = set(torch.where((S @ ones > 0) & (S.T @ ones == 0))[0].tolist())
+    second = set(torch.where((T @ ones > 0) & (T.T @ ones == 0))[0].tolist())
+    assert first == {2, 5} and second == {1, 5}
