@@ -24,6 +24,13 @@ the backbone's attention (context-retained)?
 - Tasks and episode sets mirror P1-S (`t2_chain_end` primary, `t2_typed` replication, hops 1–3 train / 1–8 eval,
   confirmation set `test` [100000, 102000) untouched until gates).
 
+## Pilots (validation only, seed 17)
+- Pilot-1 (writer feasibility; runs in parallel with P1-S because it does not depend on P1-S results; task
+  `docs/tasks/WP-L1_p1l_pilot1.md`): batch/procs by throughput; `write_policy` × lr ∈ {3e-4, 1e-3, 3e-3} at E = 16;
+  then E ∈ {8, 12, 24} at the selected (policy, lr). Rule: E*_L = largest E ∈ {16, 24} with val single-hop EM
+  ≥ 0.95, else 12 if ≥ 0.95, else 8 if ≥ 0.80 (flagged); otherwise no P1-L T2 run before a writer diagnosis.
+- Pilot-2 (after P1-S): lr per (writer condition × carried reader) by val EM on hops 1–3 at L = 4 (B4: L = 1).
+
 ## Endpoints
 Same G1/G2 definitions and thresholds as P1-S on the memory-only protocol (identical x/u/M across L verified by
 hashes of the support snapshots and question activations). Context-retained results and B0/B1 comparisons are
