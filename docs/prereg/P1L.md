@@ -128,3 +128,12 @@ condition, if added, uses the same rule. Information seen: timing only; no score
 - Schedule: normal operation ended 2026-10-27 08:00 (HPC Challenge, then maintenance until 2026-10-28 22:00).
   Runs that could not finish by then (r = 32 B1/B2 seed 43, r = 128 B4 seed 43) and the confirmation evaluation
   run after 2026-10-28 22:00. No design change.
+
+## Amendment B6 — equal-parameter claim rule (2026-10-27 08:18 JST; before any P1-L confirmation score is read)
+Prompted by an external review (`docs/review/rv-astra_2026-10-27.md`). Gates G1-L/G2-L are unchanged.
+- Parameters (`param_count`, adapter only): B4 = M1-L4 = 103,426 at r = 32 and 475,138 at r = 128; B8 = 112,642
+  (+8.9%) and 622,594 (+31.0%). B8 − B4 is a same-rank contrast, not an equal-parameter one.
+- A claim that more reads beat one read **at equal parameters** is made only from the already registered secondary
+  contrast M1-L4@4 − B4@1 (hops {2, 3}, per rank), and only if it meets the G1-L criterion: ≥ 3 pp, 97.5% CI > 0,
+  positive in every seed. Otherwise the paper states the B8 result with its parameter difference and makes no
+  equal-parameter claim for the LLM.
