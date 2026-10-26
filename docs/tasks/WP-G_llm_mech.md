@@ -38,3 +38,8 @@ B0 memory-only accuracy is at chance on a small set; per-sample records reproduc
 Build, test, and run the smoke suite (all stages and variants, 10% steps, one seed) with timing; report measured
 time per 1k steps and per eval set so jobs can be sized (≤ 8 nodes × 1 h each). Do not run pilots or screening;
 the orchestrator finalises `docs/prereg/P1L.md` first.
+
+## Addendum 1 (orchestrator, 2026-10-26)
+Plan §8.1 lists B2 (single-step nonlinear bottleneck, `parallel`) as a required baseline. Let the
+`lora_ctx` stage take the adapter variant (`lora` = B1, `parallel` = B2), same position, rank, data and
+steps; evaluate B2 like B1 (both protocols). Include a B2 smoke config.

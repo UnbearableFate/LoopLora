@@ -38,3 +38,8 @@ whether training converged. Also run the replication-setting configs at the sele
 ## 4. Do not
 Evaluate on `test` or the confirmation set; change prereg thresholds; run seeds other than 17.
 Each PBS job ≤ 8 nodes × 1 h (use one node, several procs). Record node·h per job in the report.
+
+## Addendum A1 (orchestrator, 2026-10-26; see `docs/prereg/P1S.md` amendment A1)
+Add variant `B5-lin` (`fixedq` with identity activation, named like `M1-lin`) to the config/variant tables,
+tests and Pilot-2 (same conditions, lr grid and selection rule as B5). `looplora.sym.stats` pooled CIs must
+take a confidence level (gates use 0.975, reports also 0.95). Report Pilot-2 tables for B5-lin as well.
