@@ -1,0 +1,4178 @@
+{
+  "selection1": "/work/xg24i002/x10041/LoopLora-wt/sym/reports/p1s-pilot/pilot1/selection.json",
+  "full_table": "/work/xg24i002/x10041/LoopLora-wt/sym/reports/p1s-pilot/pilot1/full_table.json",
+  "scope": "completed Pilot-1 validation artifacts only; no training or model evaluation",
+  "selection_rule": "best validation LR per writer/rank/E; smaller LR breaks accuracy ties",
+  "stop_rule": "joint/r32 accuracy < 0.95 at each E in {8,12,16,24}",
+  "stop_rule_triggered": true,
+  "query_protocol": "generate(spec,val,0,1000,4242), then stratify_queries(spec,[1],4242)",
+  "interpretation": [
+    "Compare one-fact and shared-head strata within each run; report counts alongside accuracy.",
+    "Oracle keys use only the head, so relation-specific facts for the same head overwrite the same key; last-head-write strata expose this representational limitation.",
+    "A learned-writer shortfall on one-fact heads also involves capacity, optimization, query/readout alignment or random-code interference; these descriptive strata do not establish a cause.",
+    "Write-age and gate associations are observational; plateau status is the recorded loss diagnostic, not proof of convergence.",
+    "Do not use this report to retune learning rates, alter preregistered thresholds, or make a T2 mechanism conclusion."
+  ],
+  "runs": [
+    {
+      "name": "p1-joint-r16-E8-lr0.003",
+      "writer": "joint",
+      "r": 16,
+      "E": 8,
+      "lr": 0.003,
+      "run_dir": "/work/xg24i002/x10041/LoopLora/runs/p1s/pilot-20261026/pilot1/shard-02/p1-joint-r16-E8-lr0.003",
+      "samples": "/work/xg24i002/x10041/LoopLora/runs/p1s/pilot-20261026/pilot1/shard-02/p1-joint-r16-E8-lr0.003/samples.npz",
+      "config_hash": "2168ca98021b6501a2aaec51db29e77d",
+      "runtime": {
+        "device": "cuda:0",
+        "dtype": "float32",
+        "gpu": "NVIDIA GH200 120GB",
+        "host": "mg0661",
+        "job_id": "3711861.opbs",
+        "python": "3.13.13",
+        "threads": 1,
+        "torch": "2.14.0+cu132"
+      },
+      "reconstructed_episode_count": 1000,
+      "joined_answers_equivalent": true,
+      "selection_accuracy": 0.691,
+      "convergence": {
+        "loss_tail_early": 0.8964578986167908,
+        "loss_tail_late": 0.883567875623703,
+        "relative_loss_improvement": 0.014378838106035739,
+        "plateau_2pct": true,
+        "final_step": 5000
+      },
+      "writer_gates": {
+        "source": "/work/xg24i002/x10041/LoopLora/runs/p1s/pilot-20261026/pilot1/shard-02/p1-joint-r16-E8-lr0.003/checkpoint.pt",
+        "lambda": 0.9999738931655884,
+        "beta": 0.6149301528930664
+      },
+      "overall": {
+        "n_queries": 1000,
+        "n_correct": 691,
+        "accuracy": 0.691,
+        "chance_accuracy": 0.07239197052947051,
+        "mean_first_read_cosine": 0.7657636404037476,
+        "n_finite_first_read_cosine": 1000,
+        "mean_memory_norm": 9.052099227905273,
+        "mean_write_age": 3.565,
+        "min_write_age": 0,
+        "max_write_age": 7
+      },
+      "head_multiplicity": {
+        "one_fact": {
+          "n_queries": 571,
+          "n_correct": 399,
+          "accuracy": 0.6987740805604203,
+          "chance_accuracy": 0.06959160949966554,
+          "mean_first_read_cosine": 0.7752066254615784,
+          "n_finite_first_read_cosine": 571,
+          "mean_memory_norm": 9.054634094238281,
+          "mean_write_age": 3.5674255691768826,
+          "min_write_age": 0,
+          "max_write_age": 7
+        },
+        "multiple_relation_specific_facts": {
+          "n_queries": 429,
+          "n_correct": 292,
+          "accuracy": 0.6806526806526807,
+          "chance_accuracy": 0.07611925758778905,
+          "mean_first_read_cosine": 0.7531948089599609,
+          "n_finite_first_read_cosine": 429,
+          "mean_memory_norm": 9.048727035522461,
+          "mean_write_age": 3.561771561771562,
+          "min_write_age": 0,
+          "max_write_age": 7
+        }
+      },
+      "queried_fact_is_last_write_for_head": {
+        "yes": {
+          "n_queries": 748,
+          "n_correct": 534,
+          "accuracy": 0.713903743315508,
+          "chance_accuracy": 0.07088151932737494,
+          "mean_first_read_cosine": 0.7809560894966125,
+          "n_finite_first_read_cosine": 748,
+          "mean_memory_norm": 9.04431438446045,
+          "mean_write_age": 3.1524064171122994,
+          "min_write_age": 0,
+          "max_write_age": 7
+        },
+        "no": {
+          "n_queries": 252,
+          "n_correct": 157,
+          "accuracy": 0.623015873015873,
+          "chance_accuracy": 0.07687537330394473,
+          "mean_first_read_cosine": 0.7206684947013855,
+          "n_finite_first_read_cosine": 252,
+          "mean_memory_norm": 9.07520866394043,
+          "mean_write_age": 4.7896825396825395,
+          "min_write_age": 1,
+          "max_write_age": 7
+        }
+      },
+      "head_multiplicity_and_last_write": {
+        "one_fact/last": {
+          "n_queries": 571,
+          "n_correct": 399,
+          "accuracy": 0.6987740805604203,
+          "chance_accuracy": 0.06959160949966554,
+          "mean_first_read_cosine": 0.7752066254615784,
+          "n_finite_first_read_cosine": 571,
+          "mean_memory_norm": 9.054634094238281,
+          "mean_write_age": 3.5674255691768826,
+          "min_write_age": 0,
+          "max_write_age": 7
+        },
+        "one_fact/not_last": {
+          "n_queries": 0,
+          "n_correct": 0,
+          "accuracy": null,
+          "chance_accuracy": null,
+          "mean_first_read_cosine": null,
+          "n_finite_first_read_cosine": 0,
+          "mean_memory_norm": null,
+          "mean_write_age": null,
+          "min_write_age": null,
+          "max_write_age": null
+        },
+        "multiple_relation_specific_facts/last": {
+          "n_queries": 177,
+          "n_correct": 135,
+          "accuracy": 0.7627118644067796,
+          "chance_accuracy": 0.07504275385631316,
+          "mean_first_read_cosine": 0.7995035648345947,
+          "n_finite_first_read_cosine": 177,
+          "mean_memory_norm": 9.011024475097656,
+          "mean_write_age": 1.8135593220338984,
+          "min_write_age": 0,
+          "max_write_age": 6
+        },
+        "multiple_relation_specific_facts/not_last": {
+          "n_queries": 252,
+          "n_correct": 157,
+          "accuracy": 0.623015873015873,
+          "chance_accuracy": 0.07687537330394473,
+          "mean_first_read_cosine": 0.7206684947013855,
+          "n_finite_first_read_cosine": 252,
+          "mean_memory_norm": 9.07520866394043,
+          "mean_write_age": 4.7896825396825395,
+          "min_write_age": 1,
+          "max_write_age": 7
+        }
+      },
+      "write_age_quartiles": {
+        "definition": "number of valid fact writes after the queried fact; lower age is more recent",
+        "cutpoints": [
+          2.0,
+          4.0,
+          6.0
+        ],
+        "boundary_rule": "Q1 <= p25; Q2 > p25 and <= p50; Q3 > p50 and <= p75; Q4 > p75; ties stay together",
+        "groups": {
+          "Q1": {
+            "n_queries": 367,
+            "n_correct": 283,
+            "accuracy": 0.771117166212534,
+            "chance_accuracy": 0.07219086544699622,
+            "mean_first_read_cosine": 0.8013656735420227,
+            "n_finite_first_read_cosine": 367,
+            "mean_memory_norm": 9.057717323303223,
+            "mean_write_age": 1.0381471389645776,
+            "min_write_age": 0,
+            "max_write_age": 2
+          },
+          "Q2": {
+            "n_queries": 249,
+            "n_correct": 170,
+            "accuracy": 0.6827309236947792,
+            "chance_accuracy": 0.07276744339997351,
+            "mean_first_read_cosine": 0.7528837323188782,
+            "n_finite_first_read_cosine": 249,
+            "mean_memory_norm": 9.047402381896973,
+            "mean_write_age": 3.4779116465863456,
+            "min_write_age": 3,
+            "max_write_age": 4
+          },
+          "Q3": {
+            "n_queries": 253,
+            "n_correct": 159,
+            "accuracy": 0.6284584980237155,
+            "chance_accuracy": 0.07242380478546485,
+            "mean_first_read_cosine": 0.7560964226722717,
+            "n_finite_first_read_cosine": 253,
+            "mean_memory_norm": 9.038945198059082,
+            "mean_write_age": 5.537549407114624,
+            "min_write_age": 5,
+            "max_write_age": 6
+          },
+          "Q4": {
+            "n_queries": 131,
+            "n_correct": 79,
+            "accuracy": 0.6030534351145038,
+            "chance_accuracy": 0.07218020529089231,
+            "mean_first_read_cosine": 0.7091756463050842,
+            "n_finite_first_read_cosine": 131,
+            "mean_memory_norm": 9.070698738098145,
+            "mean_write_age": 7.0,
+            "min_write_age": 7,
+            "max_write_age": 7
+          }
+        }
+      }
+    },
+    {
+      "name": "p1-joint-r16-E12-lr0.003",
+      "writer": "joint",
+      "r": 16,
+      "E": 12,
+      "lr": 0.003,
+      "run_dir": "/work/xg24i002/x10041/LoopLora/runs/p1s/pilot-20261026/pilot1/shard-02/p1-joint-r16-E12-lr0.003",
+      "samples": "/work/xg24i002/x10041/LoopLora/runs/p1s/pilot-20261026/pilot1/shard-02/p1-joint-r16-E12-lr0.003/samples.npz",
+      "config_hash": "10f76d76ea6137e710d0620d764ebdf4",
+      "runtime": {
+        "device": "cuda:0",
+        "dtype": "float32",
+        "gpu": "NVIDIA GH200 120GB",
+        "host": "mg0661",
+        "job_id": "3711861.opbs",
+        "python": "3.13.13",
+        "threads": 1,
+        "torch": "2.14.0+cu132"
+      },
+      "reconstructed_episode_count": 1000,
+      "joined_answers_equivalent": true,
+      "selection_accuracy": 0.534,
+      "convergence": {
+        "loss_tail_early": 1.505433578491211,
+        "loss_tail_late": 1.4823707723617554,
+        "relative_loss_improvement": 0.015319710187791718,
+        "plateau_2pct": true,
+        "final_step": 5000
+      },
+      "writer_gates": {
+        "source": "/work/xg24i002/x10041/LoopLora/runs/p1s/pilot-20261026/pilot1/shard-02/p1-joint-r16-E12-lr0.003/checkpoint.pt",
+        "lambda": 0.9999759197235107,
+        "beta": 0.5582683086395264
+      },
+      "overall": {
+        "n_queries": 1000,
+        "n_correct": 534,
+        "accuracy": 0.534,
+        "chance_accuracy": 0.048362726438956415,
+        "mean_first_read_cosine": -0.6941295266151428,
+        "n_finite_first_read_cosine": 1000,
+        "mean_memory_norm": 10.098090171813965,
+        "mean_write_age": 5.237,
+        "min_write_age": 0,
+        "max_write_age": 11
+      },
+      "head_multiplicity": {
+        "one_fact": {
+          "n_queries": 551,
+          "n_correct": 310,
+          "accuracy": 0.5626134301270418,
+          "chance_accuracy": 0.04725350262662774,
+          "mean_first_read_cosine": -0.7027904391288757,
+          "n_finite_first_read_cosine": 551,
+          "mean_memory_norm": 10.098196029663086,
+          "mean_write_age": 5.279491833030853,
+          "min_write_age": 0,
+          "max_write_age": 11
+        },
+        "multiple_relation_specific_facts": {
+          "n_queries": 449,
+          "n_correct": 224,
+          "accuracy": 0.49888641425389757,
+          "chance_accuracy": 0.04972393427992101,
+          "mean_first_read_cosine": -0.6835010647773743,
+          "n_finite_first_read_cosine": 449,
+          "mean_memory_norm": 10.097959518432617,
+          "mean_write_age": 5.184855233853007,
+          "min_write_age": 0,
+          "max_write_age": 11
+        }
+      },
+      "queried_fact_is_last_write_for_head": {
+        "yes": {
+          "n_queries": 773,
+          "n_correct": 438,
+          "accuracy": 0.5666235446313066,
+          "chance_accuracy": 0.04788339520371536,
+          "mean_first_read_cosine": -0.7052798867225647,
+          "n_finite_first_read_cosine": 773,
+          "mean_memory_norm": 10.10190200805664,
+          "mean_write_age": 4.517464424320828,
+          "min_write_age": 0,
+          "max_write_age": 11
+        },
+        "no": {
+          "n_queries": 227,
+          "n_correct": 96,
+          "accuracy": 0.42290748898678415,
+          "chance_accuracy": 0.0499949865483896,
+          "mean_first_read_cosine": -0.6561591625213623,
+          "n_finite_first_read_cosine": 227,
+          "mean_memory_norm": 10.085104942321777,
+          "mean_write_age": 7.687224669603524,
+          "min_write_age": 1,
+          "max_write_age": 11
+        }
+      },
+      "head_multiplicity_and_last_write": {
+        "one_fact/last": {
+          "n_queries": 551,
+          "n_correct": 310,
+          "accuracy": 0.5626134301270418,
+          "chance_accuracy": 0.04725350262662774,
+          "mean_first_read_cosine": -0.7027904391288757,
+          "n_finite_first_read_cosine": 551,
+          "mean_memory_norm": 10.098196029663086,
+          "mean_write_age": 5.279491833030853,
+          "min_write_age": 0,
+          "max_write_age": 11
+        },
+        "one_fact/not_last": {
+          "n_queries": 0,
+          "n_correct": 0,
+          "accuracy": null,
+          "chance_accuracy": null,
+          "mean_first_read_cosine": null,
+          "n_finite_first_read_cosine": 0,
+          "mean_memory_norm": null,
+          "mean_write_age": null,
+          "min_write_age": null,
+          "max_write_age": null
+        },
+        "multiple_relation_specific_facts/last": {
+          "n_queries": 222,
+          "n_correct": 128,
+          "accuracy": 0.5765765765765766,
+          "chance_accuracy": 0.049446777230631046,
+          "mean_first_read_cosine": -0.7114586234092712,
+          "n_finite_first_read_cosine": 222,
+          "mean_memory_norm": 10.111104011535645,
+          "mean_write_age": 2.626126126126126,
+          "min_write_age": 0,
+          "max_write_age": 10
+        },
+        "multiple_relation_specific_facts/not_last": {
+          "n_queries": 227,
+          "n_correct": 96,
+          "accuracy": 0.42290748898678415,
+          "chance_accuracy": 0.0499949865483896,
+          "mean_first_read_cosine": -0.6561591625213623,
+          "n_finite_first_read_cosine": 227,
+          "mean_memory_norm": 10.085104942321777,
+          "mean_write_age": 7.687224669603524,
+          "min_write_age": 1,
+          "max_write_age": 11
+        }
+      },
+      "write_age_quartiles": {
+        "definition": "number of valid fact writes after the queried fact; lower age is more recent",
+        "cutpoints": [
+          2.0,
+          5.0,
+          8.0
+        ],
+        "boundary_rule": "Q1 <= p25; Q2 > p25 and <= p50; Q3 > p50 and <= p75; Q4 > p75; ties stay together",
+        "groups": {
+          "Q1": {
+            "n_queries": 289,
+            "n_correct": 174,
+            "accuracy": 0.6020761245674741,
+            "chance_accuracy": 0.04833488287990214,
+            "mean_first_read_cosine": -0.7309440970420837,
+            "n_finite_first_read_cosine": 289,
+            "mean_memory_norm": 10.102616310119629,
+            "mean_write_age": 0.9826989619377162,
+            "min_write_age": 0,
+            "max_write_age": 2
+          },
+          "Q2": {
+            "n_queries": 257,
+            "n_correct": 155,
+            "accuracy": 0.603112840466926,
+            "chance_accuracy": 0.04808705822285479,
+            "mean_first_read_cosine": -0.713567852973938,
+            "n_finite_first_read_cosine": 257,
+            "mean_memory_norm": 10.071560859680176,
+            "mean_write_age": 4.0778210116731515,
+            "min_write_age": 3,
+            "max_write_age": 5
+          },
+          "Q3": {
+            "n_queries": 221,
+            "n_correct": 102,
+            "accuracy": 0.46153846153846156,
+            "chance_accuracy": 0.048545808699380154,
+            "mean_first_read_cosine": -0.6557175517082214,
+            "n_finite_first_read_cosine": 221,
+            "mean_memory_norm": 10.134584426879883,
+            "mean_write_age": 7.0542986425339365,
+            "min_write_age": 6,
+            "max_write_age": 8
+          },
+          "Q4": {
+            "n_queries": 233,
+            "n_correct": 103,
+            "accuracy": 0.44206008583690987,
+            "chance_accuracy": 0.04852767210655796,
+            "mean_first_read_cosine": -0.6634596586227417,
+            "n_finite_first_read_cosine": 233,
+            "mean_memory_norm": 10.087121963500977,
+            "mean_write_age": 10.068669527896995,
+            "min_write_age": 9,
+            "max_write_age": 11
+          }
+        }
+      }
+    },
+    {
+      "name": "p1-joint-r16-E16-lr0.003",
+      "writer": "joint",
+      "r": 16,
+      "E": 16,
+      "lr": 0.003,
+      "run_dir": "/work/xg24i002/x10041/LoopLora/runs/p1s/pilot-20261026/pilot1/shard-02/p1-joint-r16-E16-lr0.003",
+      "samples": "/work/xg24i002/x10041/LoopLora/runs/p1s/pilot-20261026/pilot1/shard-02/p1-joint-r16-E16-lr0.003/samples.npz",
+      "config_hash": "bf857e0bbd19480aec14d673be8e9602",
+      "runtime": {
+        "device": "cuda:0",
+        "dtype": "float32",
+        "gpu": "NVIDIA GH200 120GB",
+        "host": "mg0661",
+        "job_id": "3711861.opbs",
+        "python": "3.13.13",
+        "threads": 1,
+        "torch": "2.14.0+cu132"
+      },
+      "reconstructed_episode_count": 1000,
+      "joined_answers_equivalent": true,
+      "selection_accuracy": 0.341,
+      "convergence": {
+        "loss_tail_early": 2.140209176540375,
+        "loss_tail_late": 2.1103034949302675,
+        "relative_loss_improvement": 0.013973251744696063,
+        "plateau_2pct": true,
+        "final_step": 5000
+      },
+      "writer_gates": {
+        "source": "/work/xg24i002/x10041/LoopLora/runs/p1s/pilot-20261026/pilot1/shard-02/p1-joint-r16-E16-lr0.003/checkpoint.pt",
+        "lambda": 0.999971866607666,
+        "beta": 0.512694776058197
+      },
+      "overall": {
+        "n_queries": 1000,
+        "n_correct": 341,
+        "accuracy": 0.341,
+        "chance_accuracy": 0.036468020408012176,
+        "mean_first_read_cosine": -0.6629491448402405,
+        "n_finite_first_read_cosine": 1000,
+        "mean_memory_norm": 9.662461280822754,
+        "mean_write_age": 7.525,
+        "min_write_age": 0,
+        "max_write_age": 15
+      },
+      "head_multiplicity": {
+        "one_fact": {
+          "n_queries": 500,
+          "n_correct": 174,
+          "accuracy": 0.348,
+          "chance_accuracy": 0.03567478653953577,
+          "mean_first_read_cosine": -0.6704897284507751,
+          "n_finite_first_read_cosine": 500,
+          "mean_memory_norm": 9.663945198059082,
+          "mean_write_age": 7.54,
+          "min_write_age": 0,
+          "max_write_age": 15
+        },
+        "multiple_relation_specific_facts": {
+          "n_queries": 500,
+          "n_correct": 167,
+          "accuracy": 0.334,
+          "chance_accuracy": 0.03726125427648858,
+          "mean_first_read_cosine": -0.6554085612297058,
+          "n_finite_first_read_cosine": 500,
+          "mean_memory_norm": 9.660975456237793,
+          "mean_write_age": 7.51,
+          "min_write_age": 0,
+          "max_write_age": 15
+        }
+      },
+      "queried_fact_is_last_write_for_head": {
+        "yes": {
+          "n_queries": 701,
+          "n_correct": 251,
+          "accuracy": 0.35805991440798857,
+          "chance_accuracy": 0.03608110645708121,
+          "mean_first_read_cosine": -0.6751807332038879,
+          "n_finite_first_read_cosine": 701,
+          "mean_memory_norm": 9.673762321472168,
+          "mean_write_age": 6.4308131241084165,
+          "min_write_age": 0,
+          "max_write_age": 15
+        },
+        "no": {
+          "n_queries": 299,
+          "n_correct": 90,
+          "accuracy": 0.3010033444816054,
+          "chance_accuracy": 0.03737513304882361,
+          "mean_first_read_cosine": -0.6342724561691284,
+          "n_finite_first_read_cosine": 299,
+          "mean_memory_norm": 9.63596248626709,
+          "mean_write_age": 10.090301003344482,
+          "min_write_age": 1,
+          "max_write_age": 15
+        }
+      },
+      "head_multiplicity_and_last_write": {
+        "one_fact/last": {
+          "n_queries": 500,
+          "n_correct": 174,
+          "accuracy": 0.348,
+          "chance_accuracy": 0.03567478653953577,
+          "mean_first_read_cosine": -0.6704897284507751,
+          "n_finite_first_read_cosine": 500,
+          "mean_memory_norm": 9.663945198059082,
+          "mean_write_age": 7.54,
+          "min_write_age": 0,
+          "max_write_age": 15
+        },
+        "one_fact/not_last": {
+          "n_queries": 0,
+          "n_correct": 0,
+          "accuracy": null,
+          "chance_accuracy": null,
+          "mean_first_read_cosine": null,
+          "n_finite_first_read_cosine": 0,
+          "mean_memory_norm": null,
+          "mean_write_age": null,
+          "min_write_age": null,
+          "max_write_age": null
+        },
+        "multiple_relation_specific_facts/last": {
+          "n_queries": 201,
+          "n_correct": 77,
+          "accuracy": 0.38308457711442784,
+          "chance_accuracy": 0.03709185252062706,
+          "mean_first_read_cosine": -0.6868497729301453,
+          "n_finite_first_read_cosine": 201,
+          "mean_memory_norm": 9.698183059692383,
+          "mean_write_age": 3.671641791044776,
+          "min_write_age": 0,
+          "max_write_age": 12
+        },
+        "multiple_relation_specific_facts/not_last": {
+          "n_queries": 299,
+          "n_correct": 90,
+          "accuracy": 0.3010033444816054,
+          "chance_accuracy": 0.03737513304882361,
+          "mean_first_read_cosine": -0.6342724561691284,
+          "n_finite_first_read_cosine": 299,
+          "mean_memory_norm": 9.63596248626709,
+          "mean_write_age": 10.090301003344482,
+          "min_write_age": 1,
+          "max_write_age": 15
+        }
+      },
+      "write_age_quartiles": {
+        "definition": "number of valid fact writes after the queried fact; lower age is more recent",
+        "cutpoints": [
+          3.0,
+          7.0,
+          11.0
+        ],
+        "boundary_rule": "Q1 <= p25; Q2 > p25 and <= p50; Q3 > p50 and <= p75; Q4 > p75; ties stay together",
+        "groups": {
+          "Q1": {
+            "n_queries": 262,
+            "n_correct": 111,
+            "accuracy": 0.42366412213740456,
+            "chance_accuracy": 0.03647240503120792,
+            "mean_first_read_cosine": -0.716482400894165,
+            "n_finite_first_read_cosine": 262,
+            "mean_memory_norm": 9.672569274902344,
+            "mean_write_age": 1.4809160305343512,
+            "min_write_age": 0,
+            "max_write_age": 3
+          },
+          "Q2": {
+            "n_queries": 240,
+            "n_correct": 80,
+            "accuracy": 0.3333333333333333,
+            "chance_accuracy": 0.03636852500880038,
+            "mean_first_read_cosine": -0.6456587314605713,
+            "n_finite_first_read_cosine": 240,
+            "mean_memory_norm": 9.655579566955566,
+            "mean_write_age": 5.575,
+            "min_write_age": 4,
+            "max_write_age": 7
+          },
+          "Q3": {
+            "n_queries": 254,
+            "n_correct": 84,
+            "accuracy": 0.33070866141732286,
+            "chance_accuracy": 0.03647323473045446,
+            "mean_first_read_cosine": -0.6594252586364746,
+            "n_finite_first_read_cosine": 254,
+            "mean_memory_norm": 9.655621528625488,
+            "mean_write_age": 9.645669291338583,
+            "min_write_age": 8,
+            "max_write_age": 11
+          },
+          "Q4": {
+            "n_queries": 244,
+            "n_correct": 66,
+            "accuracy": 0.27049180327868855,
+            "chance_accuracy": 0.03655574863191878,
+            "mean_first_read_cosine": -0.6261420249938965,
+            "n_finite_first_read_cosine": 244,
+            "mean_memory_norm": 9.665491104125977,
+            "mean_write_age": 13.725409836065573,
+            "min_write_age": 12,
+            "max_write_age": 15
+          }
+        }
+      }
+    },
+    {
+      "name": "p1-joint-r16-E24-lr0.003",
+      "writer": "joint",
+      "r": 16,
+      "E": 24,
+      "lr": 0.003,
+      "run_dir": "/work/xg24i002/x10041/LoopLora/runs/p1s/pilot-20261026/pilot1/shard-02/p1-joint-r16-E24-lr0.003",
+      "samples": "/work/xg24i002/x10041/LoopLora/runs/p1s/pilot-20261026/pilot1/shard-02/p1-joint-r16-E24-lr0.003/samples.npz",
+      "config_hash": "35aeb2c3948d51f7a94a8cc228ac9ee6",
+      "runtime": {
+        "device": "cuda:0",
+        "dtype": "float32",
+        "gpu": "NVIDIA GH200 120GB",
+        "host": "mg0661",
+        "job_id": "3711861.opbs",
+        "python": "3.13.13",
+        "threads": 1,
+        "torch": "2.14.0+cu132"
+      },
+      "reconstructed_episode_count": 1000,
+      "joined_answers_equivalent": true,
+      "selection_accuracy": 0.173,
+      "convergence": {
+        "loss_tail_early": 2.8995433378219606,
+        "loss_tail_late": 2.9078293514251707,
+        "relative_loss_improvement": -0.0028576960706627355,
+        "plateau_2pct": true,
+        "final_step": 5000
+      },
+      "writer_gates": {
+        "source": "/work/xg24i002/x10041/LoopLora/runs/p1s/pilot-20261026/pilot1/shard-02/p1-joint-r16-E24-lr0.003/checkpoint.pt",
+        "lambda": 0.999884843826294,
+        "beta": 0.35444891452789307
+      },
+      "overall": {
+        "n_queries": 1000,
+        "n_correct": 173,
+        "accuracy": 0.173,
+        "chance_accuracy": 0.02445332761841167,
+        "mean_first_read_cosine": 0.499644935131073,
+        "n_finite_first_read_cosine": 1000,
+        "mean_memory_norm": 10.195971488952637,
+        "mean_write_age": 11.434,
+        "min_write_age": 0,
+        "max_write_age": 23
+      },
+      "head_multiplicity": {
+        "one_fact": {
+          "n_queries": 509,
+          "n_correct": 99,
+          "accuracy": 0.1944990176817289,
+          "chance_accuracy": 0.024119675219895345,
+          "mean_first_read_cosine": 0.5042724013328552,
+          "n_finite_first_read_cosine": 509,
+          "mean_memory_norm": 10.192902565002441,
+          "mean_write_age": 11.37524557956778,
+          "min_write_age": 0,
+          "max_write_age": 23
+        },
+        "multiple_relation_specific_facts": {
+          "n_queries": 491,
+          "n_correct": 74,
+          "accuracy": 0.15071283095723015,
+          "chance_accuracy": 0.02479921167308542,
+          "mean_first_read_cosine": 0.49484774470329285,
+          "n_finite_first_read_cosine": 491,
+          "mean_memory_norm": 10.199153900146484,
+          "mean_write_age": 11.494908350305499,
+          "min_write_age": 0,
+          "max_write_age": 23
+        }
+      },
+      "queried_fact_is_last_write_for_head": {
+        "yes": {
+          "n_queries": 718,
+          "n_correct": 137,
+          "accuracy": 0.19080779944289694,
+          "chance_accuracy": 0.024267632961566157,
+          "mean_first_read_cosine": 0.5102123022079468,
+          "n_finite_first_read_cosine": 718,
+          "mean_memory_norm": 10.200494766235352,
+          "mean_write_age": 10.118384401114206,
+          "min_write_age": 0,
+          "max_write_age": 23
+        },
+        "no": {
+          "n_queries": 282,
+          "n_correct": 36,
+          "accuracy": 0.1276595744680851,
+          "chance_accuracy": 0.02492612465250769,
+          "mean_first_read_cosine": 0.4727393090724945,
+          "n_finite_first_read_cosine": 282,
+          "mean_memory_norm": 10.184455871582031,
+          "mean_write_age": 14.78368794326241,
+          "min_write_age": 1,
+          "max_write_age": 23
+        }
+      },
+      "head_multiplicity_and_last_write": {
+        "one_fact/last": {
+          "n_queries": 509,
+          "n_correct": 99,
+          "accuracy": 0.1944990176817289,
+          "chance_accuracy": 0.024119675219895345,
+          "mean_first_read_cosine": 0.5042724013328552,
+          "n_finite_first_read_cosine": 509,
+          "mean_memory_norm": 10.192902565002441,
+          "mean_write_age": 11.37524557956778,
+          "min_write_age": 0,
+          "max_write_age": 23
+        },
+        "one_fact/not_last": {
+          "n_queries": 0,
+          "n_correct": 0,
+          "accuracy": null,
+          "chance_accuracy": null,
+          "mean_first_read_cosine": null,
+          "n_finite_first_read_cosine": 0,
+          "mean_memory_norm": null,
+          "mean_write_age": null,
+          "min_write_age": null,
+          "max_write_age": null
+        },
+        "multiple_relation_specific_facts/last": {
+          "n_queries": 209,
+          "n_correct": 38,
+          "accuracy": 0.18181818181818182,
+          "chance_accuracy": 0.024627970236735748,
+          "mean_first_read_cosine": 0.5246782302856445,
+          "n_finite_first_read_cosine": 209,
+          "mean_memory_norm": 10.218984603881836,
+          "mean_write_age": 7.057416267942584,
+          "min_write_age": 0,
+          "max_write_age": 21
+        },
+        "multiple_relation_specific_facts/not_last": {
+          "n_queries": 282,
+          "n_correct": 36,
+          "accuracy": 0.1276595744680851,
+          "chance_accuracy": 0.02492612465250769,
+          "mean_first_read_cosine": 0.4727393090724945,
+          "n_finite_first_read_cosine": 282,
+          "mean_memory_norm": 10.184455871582031,
+          "mean_write_age": 14.78368794326241,
+          "min_write_age": 1,
+          "max_write_age": 23
+        }
+      },
+      "write_age_quartiles": {
+        "definition": "number of valid fact writes after the queried fact; lower age is more recent",
+        "cutpoints": [
+          6.0,
+          11.0,
+          17.0
+        ],
+        "boundary_rule": "Q1 <= p25; Q2 > p25 and <= p50; Q3 > p50 and <= p75; Q4 > p75; ties stay together",
+        "groups": {
+          "Q1": {
+            "n_queries": 289,
+            "n_correct": 67,
+            "accuracy": 0.23183391003460208,
+            "chance_accuracy": 0.024474369995399578,
+            "mean_first_read_cosine": 0.5362852215766907,
+            "n_finite_first_read_cosine": 289,
+            "mean_memory_norm": 10.19723892211914,
+            "mean_write_age": 3.0311418685121105,
+            "min_write_age": 0,
+            "max_write_age": 6
+          },
+          "Q2": {
+            "n_queries": 212,
+            "n_correct": 40,
+            "accuracy": 0.18867924528301888,
+            "chance_accuracy": 0.02448498236658989,
+            "mean_first_read_cosine": 0.5222591757774353,
+            "n_finite_first_read_cosine": 212,
+            "mean_memory_norm": 10.20207691192627,
+            "mean_write_age": 9.014150943396226,
+            "min_write_age": 7,
+            "max_write_age": 11
+          },
+          "Q3": {
+            "n_queries": 264,
+            "n_correct": 38,
+            "accuracy": 0.14393939393939395,
+            "chance_accuracy": 0.024412154925439848,
+            "mean_first_read_cosine": 0.49199363589286804,
+            "n_finite_first_read_cosine": 264,
+            "mean_memory_norm": 10.206896781921387,
+            "mean_write_age": 14.363636363636363,
+            "min_write_age": 12,
+            "max_write_age": 17
+          },
+          "Q4": {
+            "n_queries": 235,
+            "n_correct": 28,
+            "accuracy": 0.11914893617021277,
+            "chance_accuracy": 0.024445146926417083,
+            "mean_first_read_cosine": 0.44277966022491455,
+            "n_finite_first_read_cosine": 235,
+            "mean_memory_norm": 10.176634788513184,
+            "mean_write_age": 20.659574468085108,
+            "min_write_age": 18,
+            "max_write_age": 23
+          }
+        }
+      }
+    },
+    {
+      "name": "p1-joint-r32-E8-lr0.003",
+      "writer": "joint",
+      "r": 32,
+      "E": 8,
+      "lr": 0.003,
+      "run_dir": "/work/xg24i002/x10041/LoopLora/runs/p1s/pilot-20261026/pilot1/shard-02/p1-joint-r32-E8-lr0.003",
+      "samples": "/work/xg24i002/x10041/LoopLora/runs/p1s/pilot-20261026/pilot1/shard-02/p1-joint-r32-E8-lr0.003/samples.npz",
+      "config_hash": "ceb6f20b0754d3288d5e887da001460b",
+      "runtime": {
+        "device": "cuda:0",
+        "dtype": "float32",
+        "gpu": "NVIDIA GH200 120GB",
+        "host": "mg0661",
+        "job_id": "3711861.opbs",
+        "python": "3.13.13",
+        "threads": 1,
+        "torch": "2.14.0+cu132"
+      },
+      "reconstructed_episode_count": 1000,
+      "joined_answers_equivalent": true,
+      "selection_accuracy": 0.894,
+      "convergence": {
+        "loss_tail_early": 0.3148178127408028,
+        "loss_tail_late": 0.284803426861763,
+        "relative_loss_improvement": 0.09533890607311774,
+        "plateau_2pct": false,
+        "final_step": 5000
+      },
+      "writer_gates": {
+        "source": "/work/xg24i002/x10041/LoopLora/runs/p1s/pilot-20261026/pilot1/shard-02/p1-joint-r32-E8-lr0.003/checkpoint.pt",
+        "lambda": 0.999958872795105,
+        "beta": 0.5637453198432922
+      },
+      "overall": {
+        "n_queries": 1000,
+        "n_correct": 894,
+        "accuracy": 0.894,
+        "chance_accuracy": 0.07239197052947051,
+        "mean_first_read_cosine": 0.7916923761367798,
+        "n_finite_first_read_cosine": 1000,
+        "mean_memory_norm": 11.064992904663086,
+        "mean_write_age": 3.565,
+        "min_write_age": 0,
+        "max_write_age": 7
+      },
+      "head_multiplicity": {
+        "one_fact": {
+          "n_queries": 571,
+          "n_correct": 520,
+          "accuracy": 0.9106830122591943,
+          "chance_accuracy": 0.06959160949966554,
+          "mean_first_read_cosine": 0.8115624189376831,
+          "n_finite_first_read_cosine": 571,
+          "mean_memory_norm": 11.076223373413086,
+          "mean_write_age": 3.5674255691768826,
+          "min_write_age": 0,
+          "max_write_age": 7
+        },
+        "multiple_relation_specific_facts": {
+          "n_queries": 429,
+          "n_correct": 374,
+          "accuracy": 0.8717948717948718,
+          "chance_accuracy": 0.07611925758778905,
+          "mean_first_read_cosine": 0.7652454376220703,
+          "n_finite_first_read_cosine": 429,
+          "mean_memory_norm": 11.05004596710205,
+          "mean_write_age": 3.561771561771562,
+          "min_write_age": 0,
+          "max_write_age": 7
+        }
+      },
+      "queried_fact_is_last_write_for_head": {
+        "yes": {
+          "n_queries": 748,
+          "n_correct": 685,
+          "accuracy": 0.9157754010695187,
+          "chance_accuracy": 0.07088151932737494,
+          "mean_first_read_cosine": 0.8086084127426147,
+          "n_finite_first_read_cosine": 748,
+          "mean_memory_norm": 11.060737609863281,
+          "mean_write_age": 3.1524064171122994,
+          "min_write_age": 0,
+          "max_write_age": 7
+        },
+        "no": {
+          "n_queries": 252,
+          "n_correct": 209,
+          "accuracy": 0.8293650793650794,
+          "chance_accuracy": 0.07687537330394473,
+          "mean_first_read_cosine": 0.741481363773346,
+          "n_finite_first_read_cosine": 252,
+          "mean_memory_norm": 11.077629089355469,
+          "mean_write_age": 4.7896825396825395,
+          "min_write_age": 1,
+          "max_write_age": 7
+        }
+      },
+      "head_multiplicity_and_last_write": {
+        "one_fact/last": {
+          "n_queries": 571,
+          "n_correct": 520,
+          "accuracy": 0.9106830122591943,
+          "chance_accuracy": 0.06959160949966554,
+          "mean_first_read_cosine": 0.8115624189376831,
+          "n_finite_first_read_cosine": 571,
+          "mean_memory_norm": 11.076223373413086,
+          "mean_write_age": 3.5674255691768826,
+          "min_write_age": 0,
+          "max_write_age": 7
+        },
+        "one_fact/not_last": {
+          "n_queries": 0,
+          "n_correct": 0,
+          "accuracy": null,
+          "chance_accuracy": null,
+          "mean_first_read_cosine": null,
+          "n_finite_first_read_cosine": 0,
+          "mean_memory_norm": null,
+          "mean_write_age": null,
+          "min_write_age": null,
+          "max_write_age": null
+        },
+        "multiple_relation_specific_facts/last": {
+          "n_queries": 177,
+          "n_correct": 165,
+          "accuracy": 0.9322033898305084,
+          "chance_accuracy": 0.07504275385631316,
+          "mean_first_read_cosine": 0.7990790009498596,
+          "n_finite_first_read_cosine": 177,
+          "mean_memory_norm": 11.010778427124023,
+          "mean_write_age": 1.8135593220338984,
+          "min_write_age": 0,
+          "max_write_age": 6
+        },
+        "multiple_relation_specific_facts/not_last": {
+          "n_queries": 252,
+          "n_correct": 209,
+          "accuracy": 0.8293650793650794,
+          "chance_accuracy": 0.07687537330394473,
+          "mean_first_read_cosine": 0.741481363773346,
+          "n_finite_first_read_cosine": 252,
+          "mean_memory_norm": 11.077629089355469,
+          "mean_write_age": 4.7896825396825395,
+          "min_write_age": 1,
+          "max_write_age": 7
+        }
+      },
+      "write_age_quartiles": {
+        "definition": "number of valid fact writes after the queried fact; lower age is more recent",
+        "cutpoints": [
+          2.0,
+          4.0,
+          6.0
+        ],
+        "boundary_rule": "Q1 <= p25; Q2 > p25 and <= p50; Q3 > p50 and <= p75; Q4 > p75; ties stay together",
+        "groups": {
+          "Q1": {
+            "n_queries": 367,
+            "n_correct": 339,
+            "accuracy": 0.9237057220708447,
+            "chance_accuracy": 0.07219086544699622,
+            "mean_first_read_cosine": 0.806502103805542,
+            "n_finite_first_read_cosine": 367,
+            "mean_memory_norm": 11.055819511413574,
+            "mean_write_age": 1.0381471389645776,
+            "min_write_age": 0,
+            "max_write_age": 2
+          },
+          "Q2": {
+            "n_queries": 249,
+            "n_correct": 219,
+            "accuracy": 0.8795180722891566,
+            "chance_accuracy": 0.07276744339997351,
+            "mean_first_read_cosine": 0.792087197303772,
+            "n_finite_first_read_cosine": 249,
+            "mean_memory_norm": 11.115989685058594,
+            "mean_write_age": 3.4779116465863456,
+            "min_write_age": 3,
+            "max_write_age": 4
+          },
+          "Q3": {
+            "n_queries": 253,
+            "n_correct": 220,
+            "accuracy": 0.8695652173913043,
+            "chance_accuracy": 0.07242380478546485,
+            "mean_first_read_cosine": 0.7769144177436829,
+            "n_finite_first_read_cosine": 253,
+            "mean_memory_norm": 11.020791053771973,
+            "mean_write_age": 5.537549407114624,
+            "min_write_age": 5,
+            "max_write_age": 6
+          },
+          "Q4": {
+            "n_queries": 131,
+            "n_correct": 116,
+            "accuracy": 0.8854961832061069,
+            "chance_accuracy": 0.07218020529089231,
+            "mean_first_read_cosine": 0.7779933214187622,
+            "n_finite_first_read_cosine": 131,
+            "mean_memory_norm": 11.079127311706543,
+            "mean_write_age": 7.0,
+            "min_write_age": 7,
+            "max_write_age": 7
+          }
+        }
+      }
+    },
+    {
+      "name": "p1-joint-r32-E12-lr0.003",
+      "writer": "joint",
+      "r": 32,
+      "E": 12,
+      "lr": 0.003,
+      "run_dir": "/work/xg24i002/x10041/LoopLora/runs/p1s/pilot-20261026/pilot1/shard-02/p1-joint-r32-E12-lr0.003",
+      "samples": "/work/xg24i002/x10041/LoopLora/runs/p1s/pilot-20261026/pilot1/shard-02/p1-joint-r32-E12-lr0.003/samples.npz",
+      "config_hash": "6691d19fb0e57fc0a15eb205bf4d5453",
+      "runtime": {
+        "device": "cuda:0",
+        "dtype": "float32",
+        "gpu": "NVIDIA GH200 120GB",
+        "host": "mg0661",
+        "job_id": "3711861.opbs",
+        "python": "3.13.13",
+        "threads": 1,
+        "torch": "2.14.0+cu132"
+      },
+      "reconstructed_episode_count": 1000,
+      "joined_answers_equivalent": true,
+      "selection_accuracy": 0.847,
+      "convergence": {
+        "loss_tail_early": 0.5436540693044662,
+        "loss_tail_late": 0.503960445523262,
+        "relative_loss_improvement": 0.07301264907662143,
+        "plateau_2pct": false,
+        "final_step": 5000
+      },
+      "writer_gates": {
+        "source": "/work/xg24i002/x10041/LoopLora/runs/p1s/pilot-20261026/pilot1/shard-02/p1-joint-r32-E12-lr0.003/checkpoint.pt",
+        "lambda": 0.9999679327011108,
+        "beta": 0.5652220249176025
+      },
+      "overall": {
+        "n_queries": 1000,
+        "n_correct": 847,
+        "accuracy": 0.847,
+        "chance_accuracy": 0.048362726438956415,
+        "mean_first_read_cosine": 0.7334679365158081,
+        "n_finite_first_read_cosine": 1000,
+        "mean_memory_norm": 13.090265274047852,
+        "mean_write_age": 5.237,
+        "min_write_age": 0,
+        "max_write_age": 11
+      },
+      "head_multiplicity": {
+        "one_fact": {
+          "n_queries": 551,
+          "n_correct": 504,
+          "accuracy": 0.9147005444646098,
+          "chance_accuracy": 0.04725350262662774,
+          "mean_first_read_cosine": 0.758886456489563,
+          "n_finite_first_read_cosine": 551,
+          "mean_memory_norm": 13.111414909362793,
+          "mean_write_age": 5.279491833030853,
+          "min_write_age": 0,
+          "max_write_age": 11
+        },
+        "multiple_relation_specific_facts": {
+          "n_queries": 449,
+          "n_correct": 343,
+          "accuracy": 0.7639198218262806,
+          "chance_accuracy": 0.04972393427992101,
+          "mean_first_read_cosine": 0.7022749781608582,
+          "n_finite_first_read_cosine": 449,
+          "mean_memory_norm": 13.064311981201172,
+          "mean_write_age": 5.184855233853007,
+          "min_write_age": 0,
+          "max_write_age": 11
+        }
+      },
+      "queried_fact_is_last_write_for_head": {
+        "yes": {
+          "n_queries": 773,
+          "n_correct": 701,
+          "accuracy": 0.906856403622251,
+          "chance_accuracy": 0.04788339520371536,
+          "mean_first_read_cosine": 0.7551140189170837,
+          "n_finite_first_read_cosine": 773,
+          "mean_memory_norm": 13.105709075927734,
+          "mean_write_age": 4.517464424320828,
+          "min_write_age": 0,
+          "max_write_age": 11
+        },
+        "no": {
+          "n_queries": 227,
+          "n_correct": 146,
+          "accuracy": 0.6431718061674009,
+          "chance_accuracy": 0.0499949865483896,
+          "mean_first_read_cosine": 0.6597567200660706,
+          "n_finite_first_read_cosine": 227,
+          "mean_memory_norm": 13.037679672241211,
+          "mean_write_age": 7.687224669603524,
+          "min_write_age": 1,
+          "max_write_age": 11
+        }
+      },
+      "head_multiplicity_and_last_write": {
+        "one_fact/last": {
+          "n_queries": 551,
+          "n_correct": 504,
+          "accuracy": 0.9147005444646098,
+          "chance_accuracy": 0.04725350262662774,
+          "mean_first_read_cosine": 0.758886456489563,
+          "n_finite_first_read_cosine": 551,
+          "mean_memory_norm": 13.111414909362793,
+          "mean_write_age": 5.279491833030853,
+          "min_write_age": 0,
+          "max_write_age": 11
+        },
+        "one_fact/not_last": {
+          "n_queries": 0,
+          "n_correct": 0,
+          "accuracy": null,
+          "chance_accuracy": null,
+          "mean_first_read_cosine": null,
+          "n_finite_first_read_cosine": 0,
+          "mean_memory_norm": null,
+          "mean_write_age": null,
+          "min_write_age": null,
+          "max_write_age": null
+        },
+        "multiple_relation_specific_facts/last": {
+          "n_queries": 222,
+          "n_correct": 197,
+          "accuracy": 0.8873873873873874,
+          "chance_accuracy": 0.049446777230631046,
+          "mean_first_read_cosine": 0.745750904083252,
+          "n_finite_first_read_cosine": 222,
+          "mean_memory_norm": 13.091544151306152,
+          "mean_write_age": 2.626126126126126,
+          "min_write_age": 0,
+          "max_write_age": 10
+        },
+        "multiple_relation_specific_facts/not_last": {
+          "n_queries": 227,
+          "n_correct": 146,
+          "accuracy": 0.6431718061674009,
+          "chance_accuracy": 0.0499949865483896,
+          "mean_first_read_cosine": 0.6597567200660706,
+          "n_finite_first_read_cosine": 227,
+          "mean_memory_norm": 13.037679672241211,
+          "mean_write_age": 7.687224669603524,
+          "min_write_age": 1,
+          "max_write_age": 11
+        }
+      },
+      "write_age_quartiles": {
+        "definition": "number of valid fact writes after the queried fact; lower age is more recent",
+        "cutpoints": [
+          2.0,
+          5.0,
+          8.0
+        ],
+        "boundary_rule": "Q1 <= p25; Q2 > p25 and <= p50; Q3 > p50 and <= p75; Q4 > p75; ties stay together",
+        "groups": {
+          "Q1": {
+            "n_queries": 289,
+            "n_correct": 253,
+            "accuracy": 0.8754325259515571,
+            "chance_accuracy": 0.04833488287990214,
+            "mean_first_read_cosine": 0.7510327696800232,
+            "n_finite_first_read_cosine": 289,
+            "mean_memory_norm": 13.098755836486816,
+            "mean_write_age": 0.9826989619377162,
+            "min_write_age": 0,
+            "max_write_age": 2
+          },
+          "Q2": {
+            "n_queries": 257,
+            "n_correct": 232,
+            "accuracy": 0.9027237354085603,
+            "chance_accuracy": 0.04808705822285479,
+            "mean_first_read_cosine": 0.7417518496513367,
+            "n_finite_first_read_cosine": 257,
+            "mean_memory_norm": 13.082247734069824,
+            "mean_write_age": 4.0778210116731515,
+            "min_write_age": 3,
+            "max_write_age": 5
+          },
+          "Q3": {
+            "n_queries": 221,
+            "n_correct": 183,
+            "accuracy": 0.8280542986425339,
+            "chance_accuracy": 0.048545808699380154,
+            "mean_first_read_cosine": 0.7253077030181885,
+            "n_finite_first_read_cosine": 221,
+            "mean_memory_norm": 13.09894847869873,
+            "mean_write_age": 7.0542986425339365,
+            "min_write_age": 6,
+            "max_write_age": 8
+          },
+          "Q4": {
+            "n_queries": 233,
+            "n_correct": 179,
+            "accuracy": 0.7682403433476395,
+            "chance_accuracy": 0.04852767210655796,
+            "mean_first_read_cosine": 0.7102844715118408,
+            "n_finite_first_read_cosine": 233,
+            "mean_memory_norm": 13.080341339111328,
+            "mean_write_age": 10.068669527896995,
+            "min_write_age": 9,
+            "max_write_age": 11
+          }
+        }
+      }
+    },
+    {
+      "name": "p1-joint-r32-E16-lr0.003",
+      "writer": "joint",
+      "r": 32,
+      "E": 16,
+      "lr": 0.003,
+      "run_dir": "/work/xg24i002/x10041/LoopLora/runs/p1s/pilot-20261026/pilot1/shard-02/p1-joint-r32-E16-lr0.003",
+      "samples": "/work/xg24i002/x10041/LoopLora/runs/p1s/pilot-20261026/pilot1/shard-02/p1-joint-r32-E16-lr0.003/samples.npz",
+      "config_hash": "46a03792fad1dfec3c040bb8d26877f3",
+      "runtime": {
+        "device": "cuda:0",
+        "dtype": "float32",
+        "gpu": "NVIDIA GH200 120GB",
+        "host": "mg0661",
+        "job_id": "3711861.opbs",
+        "python": "3.13.13",
+        "threads": 1,
+        "torch": "2.14.0+cu132"
+      },
+      "reconstructed_episode_count": 1000,
+      "joined_answers_equivalent": true,
+      "selection_accuracy": 0.747,
+      "convergence": {
+        "loss_tail_early": 0.8412157905101776,
+        "loss_tail_late": 0.748532794713974,
+        "relative_loss_improvement": 0.11017743228523263,
+        "plateau_2pct": false,
+        "final_step": 5000
+      },
+      "writer_gates": {
+        "source": "/work/xg24i002/x10041/LoopLora/runs/p1s/pilot-20261026/pilot1/shard-02/p1-joint-r32-E16-lr0.003/checkpoint.pt",
+        "lambda": 0.9999678134918213,
+        "beta": 0.5493597984313965
+      },
+      "overall": {
+        "n_queries": 1000,
+        "n_correct": 747,
+        "accuracy": 0.747,
+        "chance_accuracy": 0.036468020408012176,
+        "mean_first_read_cosine": -0.6856546401977539,
+        "n_finite_first_read_cosine": 1000,
+        "mean_memory_norm": 13.43242073059082,
+        "mean_write_age": 7.525,
+        "min_write_age": 0,
+        "max_write_age": 15
+      },
+      "head_multiplicity": {
+        "one_fact": {
+          "n_queries": 500,
+          "n_correct": 407,
+          "accuracy": 0.814,
+          "chance_accuracy": 0.03567478653953577,
+          "mean_first_read_cosine": -0.7131640911102295,
+          "n_finite_first_read_cosine": 500,
+          "mean_memory_norm": 13.456990242004395,
+          "mean_write_age": 7.54,
+          "min_write_age": 0,
+          "max_write_age": 15
+        },
+        "multiple_relation_specific_facts": {
+          "n_queries": 500,
+          "n_correct": 340,
+          "accuracy": 0.68,
+          "chance_accuracy": 0.03726125427648858,
+          "mean_first_read_cosine": -0.6581452488899231,
+          "n_finite_first_read_cosine": 500,
+          "mean_memory_norm": 13.407851219177246,
+          "mean_write_age": 7.51,
+          "min_write_age": 0,
+          "max_write_age": 15
+        }
+      },
+      "queried_fact_is_last_write_for_head": {
+        "yes": {
+          "n_queries": 701,
+          "n_correct": 565,
+          "accuracy": 0.8059914407988588,
+          "chance_accuracy": 0.03608110645708121,
+          "mean_first_read_cosine": -0.7118927836418152,
+          "n_finite_first_read_cosine": 701,
+          "mean_memory_norm": 13.444707870483398,
+          "mean_write_age": 6.4308131241084165,
+          "min_write_age": 0,
+          "max_write_age": 15
+        },
+        "no": {
+          "n_queries": 299,
+          "n_correct": 182,
+          "accuracy": 0.6086956521739131,
+          "chance_accuracy": 0.03737513304882361,
+          "mean_first_read_cosine": -0.6241397857666016,
+          "n_finite_first_read_cosine": 299,
+          "mean_memory_norm": 13.403613090515137,
+          "mean_write_age": 10.090301003344482,
+          "min_write_age": 1,
+          "max_write_age": 15
+        }
+      },
+      "head_multiplicity_and_last_write": {
+        "one_fact/last": {
+          "n_queries": 500,
+          "n_correct": 407,
+          "accuracy": 0.814,
+          "chance_accuracy": 0.03567478653953577,
+          "mean_first_read_cosine": -0.7131640911102295,
+          "n_finite_first_read_cosine": 500,
+          "mean_memory_norm": 13.456990242004395,
+          "mean_write_age": 7.54,
+          "min_write_age": 0,
+          "max_write_age": 15
+        },
+        "one_fact/not_last": {
+          "n_queries": 0,
+          "n_correct": 0,
+          "accuracy": null,
+          "chance_accuracy": null,
+          "mean_first_read_cosine": null,
+          "n_finite_first_read_cosine": 0,
+          "mean_memory_norm": null,
+          "mean_write_age": null,
+          "min_write_age": null,
+          "max_write_age": null
+        },
+        "multiple_relation_specific_facts/last": {
+          "n_queries": 201,
+          "n_correct": 158,
+          "accuracy": 0.7860696517412935,
+          "chance_accuracy": 0.03709185252062706,
+          "mean_first_read_cosine": -0.7087304592132568,
+          "n_finite_first_read_cosine": 201,
+          "mean_memory_norm": 13.414156913757324,
+          "mean_write_age": 3.671641791044776,
+          "min_write_age": 0,
+          "max_write_age": 12
+        },
+        "multiple_relation_specific_facts/not_last": {
+          "n_queries": 299,
+          "n_correct": 182,
+          "accuracy": 0.6086956521739131,
+          "chance_accuracy": 0.03737513304882361,
+          "mean_first_read_cosine": -0.6241397857666016,
+          "n_finite_first_read_cosine": 299,
+          "mean_memory_norm": 13.403613090515137,
+          "mean_write_age": 10.090301003344482,
+          "min_write_age": 1,
+          "max_write_age": 15
+        }
+      },
+      "write_age_quartiles": {
+        "definition": "number of valid fact writes after the queried fact; lower age is more recent",
+        "cutpoints": [
+          3.0,
+          7.0,
+          11.0
+        ],
+        "boundary_rule": "Q1 <= p25; Q2 > p25 and <= p50; Q3 > p50 and <= p75; Q4 > p75; ties stay together",
+        "groups": {
+          "Q1": {
+            "n_queries": 262,
+            "n_correct": 223,
+            "accuracy": 0.851145038167939,
+            "chance_accuracy": 0.03647240503120792,
+            "mean_first_read_cosine": -0.7180425524711609,
+            "n_finite_first_read_cosine": 262,
+            "mean_memory_norm": 13.415251731872559,
+            "mean_write_age": 1.4809160305343512,
+            "min_write_age": 0,
+            "max_write_age": 3
+          },
+          "Q2": {
+            "n_queries": 240,
+            "n_correct": 179,
+            "accuracy": 0.7458333333333333,
+            "chance_accuracy": 0.03636852500880038,
+            "mean_first_read_cosine": -0.6834134459495544,
+            "n_finite_first_read_cosine": 240,
+            "mean_memory_norm": 13.446629524230957,
+            "mean_write_age": 5.575,
+            "min_write_age": 4,
+            "max_write_age": 7
+          },
+          "Q3": {
+            "n_queries": 254,
+            "n_correct": 193,
+            "accuracy": 0.7598425196850394,
+            "chance_accuracy": 0.03647323473045446,
+            "mean_first_read_cosine": -0.6904526352882385,
+            "n_finite_first_read_cosine": 254,
+            "mean_memory_norm": 13.439929008483887,
+            "mean_write_age": 9.645669291338583,
+            "min_write_age": 8,
+            "max_write_age": 11
+          },
+          "Q4": {
+            "n_queries": 244,
+            "n_correct": 152,
+            "accuracy": 0.6229508196721312,
+            "chance_accuracy": 0.03655574863191878,
+            "mean_first_read_cosine": -0.6480871438980103,
+            "n_finite_first_read_cosine": 244,
+            "mean_memory_norm": 13.429062843322754,
+            "mean_write_age": 13.725409836065573,
+            "min_write_age": 12,
+            "max_write_age": 15
+          }
+        }
+      }
+    },
+    {
+      "name": "p1-joint-r32-E24-lr0.003",
+      "writer": "joint",
+      "r": 32,
+      "E": 24,
+      "lr": 0.003,
+      "run_dir": "/work/xg24i002/x10041/LoopLora/runs/p1s/pilot-20261026/pilot1/shard-02/p1-joint-r32-E24-lr0.003",
+      "samples": "/work/xg24i002/x10041/LoopLora/runs/p1s/pilot-20261026/pilot1/shard-02/p1-joint-r32-E24-lr0.003/samples.npz",
+      "config_hash": "5ccbf29c81363e16f48be9e49cb5b8b3",
+      "runtime": {
+        "device": "cuda:0",
+        "dtype": "float32",
+        "gpu": "NVIDIA GH200 120GB",
+        "host": "mg0661",
+        "job_id": "3711861.opbs",
+        "python": "3.13.13",
+        "threads": 1,
+        "torch": "2.14.0+cu132"
+      },
+      "reconstructed_episode_count": 1000,
+      "joined_answers_equivalent": true,
+      "selection_accuracy": 0.6,
+      "convergence": {
+        "loss_tail_early": 1.3397397518157959,
+        "loss_tail_late": 1.336616666316986,
+        "relative_loss_improvement": 0.0023311135573733407,
+        "plateau_2pct": true,
+        "final_step": 5000
+      },
+      "writer_gates": {
+        "source": "/work/xg24i002/x10041/LoopLora/runs/p1s/pilot-20261026/pilot1/shard-02/p1-joint-r32-E24-lr0.003/checkpoint.pt",
+        "lambda": 0.9999746084213257,
+        "beta": 0.499279648065567
+      },
+      "overall": {
+        "n_queries": 1000,
+        "n_correct": 600,
+        "accuracy": 0.6,
+        "chance_accuracy": 0.02445332761841167,
+        "mean_first_read_cosine": -0.6326906681060791,
+        "n_finite_first_read_cosine": 1000,
+        "mean_memory_norm": 15.894086837768555,
+        "mean_write_age": 11.434,
+        "min_write_age": 0,
+        "max_write_age": 23
+      },
+      "head_multiplicity": {
+        "one_fact": {
+          "n_queries": 509,
+          "n_correct": 357,
+          "accuracy": 0.7013752455795678,
+          "chance_accuracy": 0.024119675219895345,
+          "mean_first_read_cosine": -0.6681398749351501,
+          "n_finite_first_read_cosine": 509,
+          "mean_memory_norm": 15.896073341369629,
+          "mean_write_age": 11.37524557956778,
+          "min_write_age": 0,
+          "max_write_age": 23
+        },
+        "multiple_relation_specific_facts": {
+          "n_queries": 491,
+          "n_correct": 243,
+          "accuracy": 0.49490835030549896,
+          "chance_accuracy": 0.02479921167308542,
+          "mean_first_read_cosine": -0.5959418416023254,
+          "n_finite_first_read_cosine": 491,
+          "mean_memory_norm": 15.8920259475708,
+          "mean_write_age": 11.494908350305499,
+          "min_write_age": 0,
+          "max_write_age": 23
+        }
+      },
+      "queried_fact_is_last_write_for_head": {
+        "yes": {
+          "n_queries": 718,
+          "n_correct": 494,
+          "accuracy": 0.6880222841225627,
+          "chance_accuracy": 0.024267632961566157,
+          "mean_first_read_cosine": -0.6622871160507202,
+          "n_finite_first_read_cosine": 718,
+          "mean_memory_norm": 15.896739959716797,
+          "mean_write_age": 10.118384401114206,
+          "min_write_age": 0,
+          "max_write_age": 23
+        },
+        "no": {
+          "n_queries": 282,
+          "n_correct": 106,
+          "accuracy": 0.375886524822695,
+          "chance_accuracy": 0.02492612465250769,
+          "mean_first_read_cosine": -0.5573352575302124,
+          "n_finite_first_read_cosine": 282,
+          "mean_memory_norm": 15.88733196258545,
+          "mean_write_age": 14.78368794326241,
+          "min_write_age": 1,
+          "max_write_age": 23
+        }
+      },
+      "head_multiplicity_and_last_write": {
+        "one_fact/last": {
+          "n_queries": 509,
+          "n_correct": 357,
+          "accuracy": 0.7013752455795678,
+          "chance_accuracy": 0.024119675219895345,
+          "mean_first_read_cosine": -0.6681398749351501,
+          "n_finite_first_read_cosine": 509,
+          "mean_memory_norm": 15.896073341369629,
+          "mean_write_age": 11.37524557956778,
+          "min_write_age": 0,
+          "max_write_age": 23
+        },
+        "one_fact/not_last": {
+          "n_queries": 0,
+          "n_correct": 0,
+          "accuracy": null,
+          "chance_accuracy": null,
+          "mean_first_read_cosine": null,
+          "n_finite_first_read_cosine": 0,
+          "mean_memory_norm": null,
+          "mean_write_age": null,
+          "min_write_age": null,
+          "max_write_age": null
+        },
+        "multiple_relation_specific_facts/last": {
+          "n_queries": 209,
+          "n_correct": 137,
+          "accuracy": 0.6555023923444976,
+          "chance_accuracy": 0.024627970236735748,
+          "mean_first_read_cosine": -0.6480330228805542,
+          "n_finite_first_read_cosine": 209,
+          "mean_memory_norm": 15.898358345031738,
+          "mean_write_age": 7.057416267942584,
+          "min_write_age": 0,
+          "max_write_age": 21
+        },
+        "multiple_relation_specific_facts/not_last": {
+          "n_queries": 282,
+          "n_correct": 106,
+          "accuracy": 0.375886524822695,
+          "chance_accuracy": 0.02492612465250769,
+          "mean_first_read_cosine": -0.5573352575302124,
+          "n_finite_first_read_cosine": 282,
+          "mean_memory_norm": 15.88733196258545,
+          "mean_write_age": 14.78368794326241,
+          "min_write_age": 1,
+          "max_write_age": 23
+        }
+      },
+      "write_age_quartiles": {
+        "definition": "number of valid fact writes after the queried fact; lower age is more recent",
+        "cutpoints": [
+          6.0,
+          11.0,
+          17.0
+        ],
+        "boundary_rule": "Q1 <= p25; Q2 > p25 and <= p50; Q3 > p50 and <= p75; Q4 > p75; ties stay together",
+        "groups": {
+          "Q1": {
+            "n_queries": 289,
+            "n_correct": 210,
+            "accuracy": 0.726643598615917,
+            "chance_accuracy": 0.024474369995399578,
+            "mean_first_read_cosine": -0.6651363372802734,
+            "n_finite_first_read_cosine": 289,
+            "mean_memory_norm": 15.892868995666504,
+            "mean_write_age": 3.0311418685121105,
+            "min_write_age": 0,
+            "max_write_age": 6
+          },
+          "Q2": {
+            "n_queries": 212,
+            "n_correct": 134,
+            "accuracy": 0.6320754716981132,
+            "chance_accuracy": 0.02448498236658989,
+            "mean_first_read_cosine": -0.6517609357833862,
+            "n_finite_first_read_cosine": 212,
+            "mean_memory_norm": 15.862767219543457,
+            "mean_write_age": 9.014150943396226,
+            "min_write_age": 7,
+            "max_write_age": 11
+          },
+          "Q3": {
+            "n_queries": 264,
+            "n_correct": 137,
+            "accuracy": 0.5189393939393939,
+            "chance_accuracy": 0.024412154925439848,
+            "mean_first_read_cosine": -0.6142962574958801,
+            "n_finite_first_read_cosine": 264,
+            "mean_memory_norm": 15.911432266235352,
+            "mean_write_age": 14.363636363636363,
+            "min_write_age": 12,
+            "max_write_age": 17
+          },
+          "Q4": {
+            "n_queries": 235,
+            "n_correct": 119,
+            "accuracy": 0.5063829787234042,
+            "chance_accuracy": 0.024445146926417083,
+            "mean_first_read_cosine": -0.5962499976158142,
+            "n_finite_first_read_cosine": 235,
+            "mean_memory_norm": 15.904353141784668,
+            "mean_write_age": 20.659574468085108,
+            "min_write_age": 18,
+            "max_write_age": 23
+          }
+        }
+      }
+    },
+    {
+      "name": "p1-oracle_orth-r16-E8-lr0.003",
+      "writer": "oracle_orth",
+      "r": 16,
+      "E": 8,
+      "lr": 0.003,
+      "run_dir": "/work/xg24i002/x10041/LoopLora/runs/p1s/pilot-20261026/pilot1/shard-02/p1-oracle_orth-r16-E8-lr0.003",
+      "samples": "/work/xg24i002/x10041/LoopLora/runs/p1s/pilot-20261026/pilot1/shard-02/p1-oracle_orth-r16-E8-lr0.003/samples.npz",
+      "config_hash": "d715e69e5504d89f249d144587af36ec",
+      "runtime": {
+        "device": "cuda:0",
+        "dtype": "float32",
+        "gpu": "NVIDIA GH200 120GB",
+        "host": "mg0661",
+        "job_id": "3711861.opbs",
+        "python": "3.13.13",
+        "threads": 1,
+        "torch": "2.14.0+cu132"
+      },
+      "reconstructed_episode_count": 1000,
+      "joined_answers_equivalent": true,
+      "selection_accuracy": 0.747,
+      "convergence": {
+        "loss_tail_early": 1.3151621556282043,
+        "loss_tail_late": 1.2904730892181397,
+        "relative_loss_improvement": 0.018772640548093834,
+        "plateau_2pct": true,
+        "final_step": 5000
+      },
+      "writer_gates": {
+        "source": "fixed oracle rule",
+        "lambda": 1.0,
+        "beta": 1.0
+      },
+      "overall": {
+        "n_queries": 1000,
+        "n_correct": 747,
+        "accuracy": 0.747,
+        "chance_accuracy": 0.07239197052947051,
+        "mean_first_read_cosine": -0.747519314289093,
+        "n_finite_first_read_cosine": 1000,
+        "mean_memory_norm": 2.420564651489258,
+        "mean_write_age": 3.565,
+        "min_write_age": 0,
+        "max_write_age": 7
+      },
+      "head_multiplicity": {
+        "one_fact": {
+          "n_queries": 571,
+          "n_correct": 570,
+          "accuracy": 0.9982486865148862,
+          "chance_accuracy": 0.06959160949966554,
+          "mean_first_read_cosine": -0.9993178248405457,
+          "n_finite_first_read_cosine": 571,
+          "mean_memory_norm": 2.53092622756958,
+          "mean_write_age": 3.5674255691768826,
+          "min_write_age": 0,
+          "max_write_age": 7
+        },
+        "multiple_relation_specific_facts": {
+          "n_queries": 429,
+          "n_correct": 177,
+          "accuracy": 0.4125874125874126,
+          "chance_accuracy": 0.07611925758778905,
+          "mean_first_read_cosine": -0.4123748540878296,
+          "n_finite_first_read_cosine": 429,
+          "mean_memory_norm": 2.2736732959747314,
+          "mean_write_age": 3.561771561771562,
+          "min_write_age": 0,
+          "max_write_age": 7
+        }
+      },
+      "queried_fact_is_last_write_for_head": {
+        "yes": {
+          "n_queries": 748,
+          "n_correct": 747,
+          "accuracy": 0.9986631016042781,
+          "chance_accuracy": 0.07088151932737494,
+          "mean_first_read_cosine": -0.9993574023246765,
+          "n_finite_first_read_cosine": 748,
+          "mean_memory_norm": 2.4796078205108643,
+          "mean_write_age": 3.1524064171122994,
+          "min_write_age": 0,
+          "max_write_age": 7
+        },
+        "no": {
+          "n_queries": 252,
+          "n_correct": 0,
+          "accuracy": 0.0,
+          "chance_accuracy": 0.07687537330394473,
+          "mean_first_read_cosine": 1.7894697279530192e-08,
+          "n_finite_first_read_cosine": 252,
+          "mean_memory_norm": 2.245309829711914,
+          "mean_write_age": 4.7896825396825395,
+          "min_write_age": 1,
+          "max_write_age": 7
+        }
+      },
+      "head_multiplicity_and_last_write": {
+        "one_fact/last": {
+          "n_queries": 571,
+          "n_correct": 570,
+          "accuracy": 0.9982486865148862,
+          "chance_accuracy": 0.06959160949966554,
+          "mean_first_read_cosine": -0.9993178248405457,
+          "n_finite_first_read_cosine": 571,
+          "mean_memory_norm": 2.53092622756958,
+          "mean_write_age": 3.5674255691768826,
+          "min_write_age": 0,
+          "max_write_age": 7
+        },
+        "one_fact/not_last": {
+          "n_queries": 0,
+          "n_correct": 0,
+          "accuracy": null,
+          "chance_accuracy": null,
+          "mean_first_read_cosine": null,
+          "n_finite_first_read_cosine": 0,
+          "mean_memory_norm": null,
+          "mean_write_age": null,
+          "min_write_age": null,
+          "max_write_age": null
+        },
+        "multiple_relation_specific_facts/last": {
+          "n_queries": 177,
+          "n_correct": 177,
+          "accuracy": 1.0,
+          "chance_accuracy": 0.07504275385631316,
+          "mean_first_read_cosine": -0.9994848966598511,
+          "n_finite_first_read_cosine": 177,
+          "mean_memory_norm": 2.3140554428100586,
+          "mean_write_age": 1.8135593220338984,
+          "min_write_age": 0,
+          "max_write_age": 6
+        },
+        "multiple_relation_specific_facts/not_last": {
+          "n_queries": 252,
+          "n_correct": 0,
+          "accuracy": 0.0,
+          "chance_accuracy": 0.07687537330394473,
+          "mean_first_read_cosine": 1.7894697279530192e-08,
+          "n_finite_first_read_cosine": 252,
+          "mean_memory_norm": 2.245309829711914,
+          "mean_write_age": 4.7896825396825395,
+          "min_write_age": 1,
+          "max_write_age": 7
+        }
+      },
+      "write_age_quartiles": {
+        "definition": "number of valid fact writes after the queried fact; lower age is more recent",
+        "cutpoints": [
+          2.0,
+          4.0,
+          6.0
+        ],
+        "boundary_rule": "Q1 <= p25; Q2 > p25 and <= p50; Q3 > p50 and <= p75; Q4 > p75; ties stay together",
+        "groups": {
+          "Q1": {
+            "n_queries": 367,
+            "n_correct": 332,
+            "accuracy": 0.9046321525885559,
+            "chance_accuracy": 0.07219086544699622,
+            "mean_first_read_cosine": -0.9068083167076111,
+            "n_finite_first_read_cosine": 367,
+            "mean_memory_norm": 2.4287452697753906,
+            "mean_write_age": 1.0381471389645776,
+            "min_write_age": 0,
+            "max_write_age": 2
+          },
+          "Q2": {
+            "n_queries": 249,
+            "n_correct": 178,
+            "accuracy": 0.714859437751004,
+            "chance_accuracy": 0.07276744339997351,
+            "mean_first_read_cosine": -0.7143685817718506,
+            "n_finite_first_read_cosine": 249,
+            "mean_memory_norm": 2.4054951667785645,
+            "mean_write_age": 3.4779116465863456,
+            "min_write_age": 3,
+            "max_write_age": 4
+          },
+          "Q3": {
+            "n_queries": 253,
+            "n_correct": 161,
+            "accuracy": 0.6363636363636364,
+            "chance_accuracy": 0.07242380478546485,
+            "mean_first_read_cosine": -0.6359608769416809,
+            "n_finite_first_read_cosine": 253,
+            "mean_memory_norm": 2.4194324016571045,
+            "mean_write_age": 5.537549407114624,
+            "min_write_age": 5,
+            "max_write_age": 6
+          },
+          "Q4": {
+            "n_queries": 131,
+            "n_correct": 76,
+            "accuracy": 0.5801526717557252,
+            "chance_accuracy": 0.07218020529089231,
+            "mean_first_read_cosine": -0.5797312259674072,
+            "n_finite_first_read_cosine": 131,
+            "mean_memory_norm": 2.4284770488739014,
+            "mean_write_age": 7.0,
+            "min_write_age": 7,
+            "max_write_age": 7
+          }
+        }
+      }
+    },
+    {
+      "name": "p1-oracle_orth-r32-E8-lr0.001",
+      "writer": "oracle_orth",
+      "r": 32,
+      "E": 8,
+      "lr": 0.001,
+      "run_dir": "/work/xg24i002/x10041/LoopLora/runs/p1s/pilot-20261026/pilot1/shard-01/p1-oracle_orth-r32-E8-lr0.001",
+      "samples": "/work/xg24i002/x10041/LoopLora/runs/p1s/pilot-20261026/pilot1/shard-01/p1-oracle_orth-r32-E8-lr0.001/samples.npz",
+      "config_hash": "8f5684f54a164f46a1ae297c8eb89079",
+      "runtime": {
+        "device": "cuda:0",
+        "dtype": "float32",
+        "gpu": "NVIDIA GH200 120GB",
+        "host": "mg0660",
+        "job_id": "3711860.opbs",
+        "python": "3.13.13",
+        "threads": 1,
+        "torch": "2.14.0+cu132"
+      },
+      "reconstructed_episode_count": 1000,
+      "joined_answers_equivalent": true,
+      "selection_accuracy": 0.748,
+      "convergence": {
+        "loss_tail_early": 1.2969635820388794,
+        "loss_tail_late": 1.2798566365242003,
+        "relative_loss_improvement": 0.013189996813778108,
+        "plateau_2pct": true,
+        "final_step": 5000
+      },
+      "writer_gates": {
+        "source": "fixed oracle rule",
+        "lambda": 1.0,
+        "beta": 1.0
+      },
+      "overall": {
+        "n_queries": 1000,
+        "n_correct": 748,
+        "accuracy": 0.748,
+        "chance_accuracy": 0.07239197052947051,
+        "mean_first_read_cosine": -0.7471138834953308,
+        "n_finite_first_read_cosine": 1000,
+        "mean_memory_norm": 2.420564651489258,
+        "mean_write_age": 3.565,
+        "min_write_age": 0,
+        "max_write_age": 7
+      },
+      "head_multiplicity": {
+        "one_fact": {
+          "n_queries": 571,
+          "n_correct": 571,
+          "accuracy": 1.0,
+          "chance_accuracy": 0.06959160949966554,
+          "mean_first_read_cosine": -0.9987406134605408,
+          "n_finite_first_read_cosine": 571,
+          "mean_memory_norm": 2.53092622756958,
+          "mean_write_age": 3.5674255691768826,
+          "min_write_age": 0,
+          "max_write_age": 7
+        },
+        "multiple_relation_specific_facts": {
+          "n_queries": 429,
+          "n_correct": 177,
+          "accuracy": 0.4125874125874126,
+          "chance_accuracy": 0.07611925758778905,
+          "mean_first_read_cosine": -0.41219815611839294,
+          "n_finite_first_read_cosine": 429,
+          "mean_memory_norm": 2.2736732959747314,
+          "mean_write_age": 3.561771561771562,
+          "min_write_age": 0,
+          "max_write_age": 7
+        }
+      },
+      "queried_fact_is_last_write_for_head": {
+        "yes": {
+          "n_queries": 748,
+          "n_correct": 748,
+          "accuracy": 1.0,
+          "chance_accuracy": 0.07088151932737494,
+          "mean_first_read_cosine": -0.9988153576850891,
+          "n_finite_first_read_cosine": 748,
+          "mean_memory_norm": 2.4796078205108643,
+          "mean_write_age": 3.1524064171122994,
+          "min_write_age": 0,
+          "max_write_age": 7
+        },
+        "no": {
+          "n_queries": 252,
+          "n_correct": 0,
+          "accuracy": 0.0,
+          "chance_accuracy": 0.07687537330394473,
+          "mean_first_read_cosine": -2.5870070530231715e-09,
+          "n_finite_first_read_cosine": 252,
+          "mean_memory_norm": 2.245309829711914,
+          "mean_write_age": 4.7896825396825395,
+          "min_write_age": 1,
+          "max_write_age": 7
+        }
+      },
+      "head_multiplicity_and_last_write": {
+        "one_fact/last": {
+          "n_queries": 571,
+          "n_correct": 571,
+          "accuracy": 1.0,
+          "chance_accuracy": 0.06959160949966554,
+          "mean_first_read_cosine": -0.9987406134605408,
+          "n_finite_first_read_cosine": 571,
+          "mean_memory_norm": 2.53092622756958,
+          "mean_write_age": 3.5674255691768826,
+          "min_write_age": 0,
+          "max_write_age": 7
+        },
+        "one_fact/not_last": {
+          "n_queries": 0,
+          "n_correct": 0,
+          "accuracy": null,
+          "chance_accuracy": null,
+          "mean_first_read_cosine": null,
+          "n_finite_first_read_cosine": 0,
+          "mean_memory_norm": null,
+          "mean_write_age": null,
+          "min_write_age": null,
+          "max_write_age": null
+        },
+        "multiple_relation_specific_facts/last": {
+          "n_queries": 177,
+          "n_correct": 177,
+          "accuracy": 1.0,
+          "chance_accuracy": 0.07504275385631316,
+          "mean_first_read_cosine": -0.9990565180778503,
+          "n_finite_first_read_cosine": 177,
+          "mean_memory_norm": 2.3140552043914795,
+          "mean_write_age": 1.8135593220338984,
+          "min_write_age": 0,
+          "max_write_age": 6
+        },
+        "multiple_relation_specific_facts/not_last": {
+          "n_queries": 252,
+          "n_correct": 0,
+          "accuracy": 0.0,
+          "chance_accuracy": 0.07687537330394473,
+          "mean_first_read_cosine": -2.5870070530231715e-09,
+          "n_finite_first_read_cosine": 252,
+          "mean_memory_norm": 2.245309829711914,
+          "mean_write_age": 4.7896825396825395,
+          "min_write_age": 1,
+          "max_write_age": 7
+        }
+      },
+      "write_age_quartiles": {
+        "definition": "number of valid fact writes after the queried fact; lower age is more recent",
+        "cutpoints": [
+          2.0,
+          4.0,
+          6.0
+        ],
+        "boundary_rule": "Q1 <= p25; Q2 > p25 and <= p50; Q3 > p50 and <= p75; Q4 > p75; ties stay together",
+        "groups": {
+          "Q1": {
+            "n_queries": 367,
+            "n_correct": 333,
+            "accuracy": 0.9073569482288828,
+            "chance_accuracy": 0.07219086544699622,
+            "mean_first_read_cosine": -0.9062840938568115,
+            "n_finite_first_read_cosine": 367,
+            "mean_memory_norm": 2.4287450313568115,
+            "mean_write_age": 1.0381471389645776,
+            "min_write_age": 0,
+            "max_write_age": 2
+          },
+          "Q2": {
+            "n_queries": 249,
+            "n_correct": 178,
+            "accuracy": 0.714859437751004,
+            "chance_accuracy": 0.07276744339997351,
+            "mean_first_read_cosine": -0.7140337228775024,
+            "n_finite_first_read_cosine": 249,
+            "mean_memory_norm": 2.4054951667785645,
+            "mean_write_age": 3.4779116465863456,
+            "min_write_age": 3,
+            "max_write_age": 4
+          },
+          "Q3": {
+            "n_queries": 253,
+            "n_correct": 161,
+            "accuracy": 0.6363636363636364,
+            "chance_accuracy": 0.07242380478546485,
+            "mean_first_read_cosine": -0.6356275081634521,
+            "n_finite_first_read_cosine": 253,
+            "mean_memory_norm": 2.4194324016571045,
+            "mean_write_age": 5.537549407114624,
+            "min_write_age": 5,
+            "max_write_age": 6
+          },
+          "Q4": {
+            "n_queries": 131,
+            "n_correct": 76,
+            "accuracy": 0.5801526717557252,
+            "chance_accuracy": 0.07218020529089231,
+            "mean_first_read_cosine": -0.5793851017951965,
+            "n_finite_first_read_cosine": 131,
+            "mean_memory_norm": 2.4284770488739014,
+            "mean_write_age": 7.0,
+            "min_write_age": 7,
+            "max_write_age": 7
+          }
+        }
+      }
+    },
+    {
+      "name": "p1-oracle_orth-r32-E12-lr0.001",
+      "writer": "oracle_orth",
+      "r": 32,
+      "E": 12,
+      "lr": 0.001,
+      "run_dir": "/work/xg24i002/x10041/LoopLora/runs/p1s/pilot-20261026/pilot1/shard-01/p1-oracle_orth-r32-E12-lr0.001",
+      "samples": "/work/xg24i002/x10041/LoopLora/runs/p1s/pilot-20261026/pilot1/shard-01/p1-oracle_orth-r32-E12-lr0.001/samples.npz",
+      "config_hash": "34e2cb5fe9a5a23014f4f5ed758e8fda",
+      "runtime": {
+        "device": "cuda:0",
+        "dtype": "float32",
+        "gpu": "NVIDIA GH200 120GB",
+        "host": "mg0660",
+        "job_id": "3711860.opbs",
+        "python": "3.13.13",
+        "threads": 1,
+        "torch": "2.14.0+cu132"
+      },
+      "reconstructed_episode_count": 1000,
+      "joined_answers_equivalent": true,
+      "selection_accuracy": 0.773,
+      "convergence": {
+        "loss_tail_early": 1.4866248059272766,
+        "loss_tail_late": 1.459384503364563,
+        "relative_loss_improvement": 0.018323589418193963,
+        "plateau_2pct": true,
+        "final_step": 5000
+      },
+      "writer_gates": {
+        "source": "fixed oracle rule",
+        "lambda": 1.0,
+        "beta": 1.0
+      },
+      "overall": {
+        "n_queries": 1000,
+        "n_correct": 773,
+        "accuracy": 0.773,
+        "chance_accuracy": 0.048362726438956415,
+        "mean_first_read_cosine": -0.7720908522605896,
+        "n_finite_first_read_cosine": 1000,
+        "mean_memory_norm": 2.952657699584961,
+        "mean_write_age": 5.237,
+        "min_write_age": 0,
+        "max_write_age": 11
+      },
+      "head_multiplicity": {
+        "one_fact": {
+          "n_queries": 551,
+          "n_correct": 551,
+          "accuracy": 1.0,
+          "chance_accuracy": 0.04725350262662774,
+          "mean_first_read_cosine": -0.9987781643867493,
+          "n_finite_first_read_cosine": 551,
+          "mean_memory_norm": 3.0329864025115967,
+          "mean_write_age": 5.279491833030853,
+          "min_write_age": 0,
+          "max_write_age": 11
+        },
+        "multiple_relation_specific_facts": {
+          "n_queries": 449,
+          "n_correct": 222,
+          "accuracy": 0.49443207126948774,
+          "chance_accuracy": 0.04972393427992101,
+          "mean_first_read_cosine": -0.4939066469669342,
+          "n_finite_first_read_cosine": 449,
+          "mean_memory_norm": 2.854081153869629,
+          "mean_write_age": 5.184855233853007,
+          "min_write_age": 0,
+          "max_write_age": 11
+        }
+      },
+      "queried_fact_is_last_write_for_head": {
+        "yes": {
+          "n_queries": 773,
+          "n_correct": 773,
+          "accuracy": 1.0,
+          "chance_accuracy": 0.04788339520371536,
+          "mean_first_read_cosine": -0.9988238215446472,
+          "n_finite_first_read_cosine": 773,
+          "mean_memory_norm": 2.987326145172119,
+          "mean_write_age": 4.517464424320828,
+          "min_write_age": 0,
+          "max_write_age": 11
+        },
+        "no": {
+          "n_queries": 227,
+          "n_correct": 0,
+          "accuracy": 0.0,
+          "chance_accuracy": 0.0499949865483896,
+          "mean_first_read_cosine": 8.301899612206398e-09,
+          "n_finite_first_read_cosine": 227,
+          "mean_memory_norm": 2.8346028327941895,
+          "mean_write_age": 7.687224669603524,
+          "min_write_age": 1,
+          "max_write_age": 11
+        }
+      },
+      "head_multiplicity_and_last_write": {
+        "one_fact/last": {
+          "n_queries": 551,
+          "n_correct": 551,
+          "accuracy": 1.0,
+          "chance_accuracy": 0.04725350262662774,
+          "mean_first_read_cosine": -0.9987781643867493,
+          "n_finite_first_read_cosine": 551,
+          "mean_memory_norm": 3.0329864025115967,
+          "mean_write_age": 5.279491833030853,
+          "min_write_age": 0,
+          "max_write_age": 11
+        },
+        "one_fact/not_last": {
+          "n_queries": 0,
+          "n_correct": 0,
+          "accuracy": null,
+          "chance_accuracy": null,
+          "mean_first_read_cosine": null,
+          "n_finite_first_read_cosine": 0,
+          "mean_memory_norm": null,
+          "mean_write_age": null,
+          "min_write_age": null,
+          "max_write_age": null
+        },
+        "multiple_relation_specific_facts/last": {
+          "n_queries": 222,
+          "n_correct": 222,
+          "accuracy": 1.0,
+          "chance_accuracy": 0.049446777230631046,
+          "mean_first_read_cosine": -0.9989373683929443,
+          "n_finite_first_read_cosine": 222,
+          "mean_memory_norm": 2.8739981651306152,
+          "mean_write_age": 2.626126126126126,
+          "min_write_age": 0,
+          "max_write_age": 10
+        },
+        "multiple_relation_specific_facts/not_last": {
+          "n_queries": 227,
+          "n_correct": 0,
+          "accuracy": 0.0,
+          "chance_accuracy": 0.0499949865483896,
+          "mean_first_read_cosine": 8.301899612206398e-09,
+          "n_finite_first_read_cosine": 227,
+          "mean_memory_norm": 2.8346028327941895,
+          "mean_write_age": 7.687224669603524,
+          "min_write_age": 1,
+          "max_write_age": 11
+        }
+      },
+      "write_age_quartiles": {
+        "definition": "number of valid fact writes after the queried fact; lower age is more recent",
+        "cutpoints": [
+          2.0,
+          5.0,
+          8.0
+        ],
+        "boundary_rule": "Q1 <= p25; Q2 > p25 and <= p50; Q3 > p50 and <= p75; Q4 > p75; ties stay together",
+        "groups": {
+          "Q1": {
+            "n_queries": 289,
+            "n_correct": 275,
+            "accuracy": 0.9515570934256056,
+            "chance_accuracy": 0.04833488287990214,
+            "mean_first_read_cosine": -0.9504460096359253,
+            "n_finite_first_read_cosine": 289,
+            "mean_memory_norm": 2.9546303749084473,
+            "mean_write_age": 0.9826989619377162,
+            "min_write_age": 0,
+            "max_write_age": 2
+          },
+          "Q2": {
+            "n_queries": 257,
+            "n_correct": 216,
+            "accuracy": 0.8404669260700389,
+            "chance_accuracy": 0.04808705822285479,
+            "mean_first_read_cosine": -0.8394440412521362,
+            "n_finite_first_read_cosine": 257,
+            "mean_memory_norm": 2.9722139835357666,
+            "mean_write_age": 4.0778210116731515,
+            "min_write_age": 3,
+            "max_write_age": 5
+          },
+          "Q3": {
+            "n_queries": 221,
+            "n_correct": 152,
+            "accuracy": 0.6877828054298643,
+            "chance_accuracy": 0.048545808699380154,
+            "mean_first_read_cosine": -0.6870226263999939,
+            "n_finite_first_read_cosine": 221,
+            "mean_memory_norm": 2.9398415088653564,
+            "mean_write_age": 7.0542986425339365,
+            "min_write_age": 6,
+            "max_write_age": 8
+          },
+          "Q4": {
+            "n_queries": 233,
+            "n_correct": 130,
+            "accuracy": 0.5579399141630901,
+            "chance_accuracy": 0.04852767210655796,
+            "mean_first_read_cosine": -0.5572652816772461,
+            "n_finite_first_read_cosine": 233,
+            "mean_memory_norm": 2.9407968521118164,
+            "mean_write_age": 10.068669527896995,
+            "min_write_age": 9,
+            "max_write_age": 11
+          }
+        }
+      }
+    },
+    {
+      "name": "p1-oracle_orth-r32-E16-lr0.001",
+      "writer": "oracle_orth",
+      "r": 32,
+      "E": 16,
+      "lr": 0.001,
+      "run_dir": "/work/xg24i002/x10041/LoopLora/runs/p1s/pilot-20261026/pilot1/shard-01/p1-oracle_orth-r32-E16-lr0.001",
+      "samples": "/work/xg24i002/x10041/LoopLora/runs/p1s/pilot-20261026/pilot1/shard-01/p1-oracle_orth-r32-E16-lr0.001/samples.npz",
+      "config_hash": "30d6e787a030965fb74988259923c830",
+      "runtime": {
+        "device": "cuda:0",
+        "dtype": "float32",
+        "gpu": "NVIDIA GH200 120GB",
+        "host": "mg0660",
+        "job_id": "3711860.opbs",
+        "python": "3.13.13",
+        "threads": 1,
+        "torch": "2.14.0+cu132"
+      },
+      "reconstructed_episode_count": 1000,
+      "joined_answers_equivalent": true,
+      "selection_accuracy": 0.701,
+      "convergence": {
+        "loss_tail_early": 1.6207913780212402,
+        "loss_tail_late": 1.5831203365325928,
+        "relative_loss_improvement": 0.02324237529856464,
+        "plateau_2pct": false,
+        "final_step": 5000
+      },
+      "writer_gates": {
+        "source": "fixed oracle rule",
+        "lambda": 1.0,
+        "beta": 1.0
+      },
+      "overall": {
+        "n_queries": 1000,
+        "n_correct": 701,
+        "accuracy": 0.701,
+        "chance_accuracy": 0.036468020408012176,
+        "mean_first_read_cosine": -0.7002130150794983,
+        "n_finite_first_read_cosine": 1000,
+        "mean_memory_norm": 3.3862690925598145,
+        "mean_write_age": 7.525,
+        "min_write_age": 0,
+        "max_write_age": 15
+      },
+      "head_multiplicity": {
+        "one_fact": {
+          "n_queries": 500,
+          "n_correct": 500,
+          "accuracy": 1.0,
+          "chance_accuracy": 0.03567478653953577,
+          "mean_first_read_cosine": -0.9988333582878113,
+          "n_finite_first_read_cosine": 500,
+          "mean_memory_norm": 3.4742441177368164,
+          "mean_write_age": 7.54,
+          "min_write_age": 0,
+          "max_write_age": 15
+        },
+        "multiple_relation_specific_facts": {
+          "n_queries": 500,
+          "n_correct": 201,
+          "accuracy": 0.402,
+          "chance_accuracy": 0.03726125427648858,
+          "mean_first_read_cosine": -0.4015926420688629,
+          "n_finite_first_read_cosine": 500,
+          "mean_memory_norm": 3.2982938289642334,
+          "mean_write_age": 7.51,
+          "min_write_age": 0,
+          "max_write_age": 15
+        }
+      },
+      "queried_fact_is_last_write_for_head": {
+        "yes": {
+          "n_queries": 701,
+          "n_correct": 701,
+          "accuracy": 1.0,
+          "chance_accuracy": 0.03608110645708121,
+          "mean_first_read_cosine": -0.998877227306366,
+          "n_finite_first_read_cosine": 701,
+          "mean_memory_norm": 3.4291162490844727,
+          "mean_write_age": 6.4308131241084165,
+          "min_write_age": 0,
+          "max_write_age": 15
+        },
+        "no": {
+          "n_queries": 299,
+          "n_correct": 0,
+          "accuracy": 0.0,
+          "chance_accuracy": 0.03737513304882361,
+          "mean_first_read_cosine": -2.7098684407533824e-10,
+          "n_finite_first_read_cosine": 299,
+          "mean_memory_norm": 3.285815477371216,
+          "mean_write_age": 10.090301003344482,
+          "min_write_age": 1,
+          "max_write_age": 15
+        }
+      },
+      "head_multiplicity_and_last_write": {
+        "one_fact/last": {
+          "n_queries": 500,
+          "n_correct": 500,
+          "accuracy": 1.0,
+          "chance_accuracy": 0.03567478653953577,
+          "mean_first_read_cosine": -0.9988333582878113,
+          "n_finite_first_read_cosine": 500,
+          "mean_memory_norm": 3.4742441177368164,
+          "mean_write_age": 7.54,
+          "min_write_age": 0,
+          "max_write_age": 15
+        },
+        "one_fact/not_last": {
+          "n_queries": 0,
+          "n_correct": 0,
+          "accuracy": null,
+          "chance_accuracy": null,
+          "mean_first_read_cosine": null,
+          "n_finite_first_read_cosine": 0,
+          "mean_memory_norm": null,
+          "mean_write_age": null,
+          "min_write_age": null,
+          "max_write_age": null
+        },
+        "multiple_relation_specific_facts/last": {
+          "n_queries": 201,
+          "n_correct": 201,
+          "accuracy": 1.0,
+          "chance_accuracy": 0.03709185252062706,
+          "mean_first_read_cosine": -0.9989867210388184,
+          "n_finite_first_read_cosine": 201,
+          "mean_memory_norm": 3.316856861114502,
+          "mean_write_age": 3.671641791044776,
+          "min_write_age": 0,
+          "max_write_age": 12
+        },
+        "multiple_relation_specific_facts/not_last": {
+          "n_queries": 299,
+          "n_correct": 0,
+          "accuracy": 0.0,
+          "chance_accuracy": 0.03737513304882361,
+          "mean_first_read_cosine": -2.7098684407533824e-10,
+          "n_finite_first_read_cosine": 299,
+          "mean_memory_norm": 3.285815477371216,
+          "mean_write_age": 10.090301003344482,
+          "min_write_age": 1,
+          "max_write_age": 15
+        }
+      },
+      "write_age_quartiles": {
+        "definition": "number of valid fact writes after the queried fact; lower age is more recent",
+        "cutpoints": [
+          3.0,
+          7.0,
+          11.0
+        ],
+        "boundary_rule": "Q1 <= p25; Q2 > p25 and <= p50; Q3 > p50 and <= p75; Q4 > p75; ties stay together",
+        "groups": {
+          "Q1": {
+            "n_queries": 262,
+            "n_correct": 244,
+            "accuracy": 0.9312977099236641,
+            "chance_accuracy": 0.03647240503120792,
+            "mean_first_read_cosine": -0.930250883102417,
+            "n_finite_first_read_cosine": 262,
+            "mean_memory_norm": 3.386061906814575,
+            "mean_write_age": 1.4809160305343512,
+            "min_write_age": 0,
+            "max_write_age": 3
+          },
+          "Q2": {
+            "n_queries": 240,
+            "n_correct": 173,
+            "accuracy": 0.7208333333333333,
+            "chance_accuracy": 0.03636852500880038,
+            "mean_first_read_cosine": -0.7200263738632202,
+            "n_finite_first_read_cosine": 240,
+            "mean_memory_norm": 3.3971352577209473,
+            "mean_write_age": 5.575,
+            "min_write_age": 4,
+            "max_write_age": 7
+          },
+          "Q3": {
+            "n_queries": 254,
+            "n_correct": 163,
+            "accuracy": 0.6417322834645669,
+            "chance_accuracy": 0.03647323473045446,
+            "mean_first_read_cosine": -0.6410040855407715,
+            "n_finite_first_read_cosine": 254,
+            "mean_memory_norm": 3.3851497173309326,
+            "mean_write_age": 9.645669291338583,
+            "min_write_age": 8,
+            "max_write_age": 11
+          },
+          "Q4": {
+            "n_queries": 244,
+            "n_correct": 121,
+            "accuracy": 0.4959016393442623,
+            "chance_accuracy": 0.03655574863191878,
+            "mean_first_read_cosine": -0.49535199999809265,
+            "n_finite_first_read_cosine": 244,
+            "mean_memory_norm": 3.3769686222076416,
+            "mean_write_age": 13.725409836065573,
+            "min_write_age": 12,
+            "max_write_age": 15
+          }
+        }
+      }
+    },
+    {
+      "name": "p1-oracle_random-r16-E8-lr0.003",
+      "writer": "oracle_random",
+      "r": 16,
+      "E": 8,
+      "lr": 0.003,
+      "run_dir": "/work/xg24i002/x10041/LoopLora/runs/p1s/pilot-20261026/pilot1/shard-02/p1-oracle_random-r16-E8-lr0.003",
+      "samples": "/work/xg24i002/x10041/LoopLora/runs/p1s/pilot-20261026/pilot1/shard-02/p1-oracle_random-r16-E8-lr0.003/samples.npz",
+      "config_hash": "553b7fbf5fc16126a14bb1daf2958788",
+      "runtime": {
+        "device": "cuda:0",
+        "dtype": "float32",
+        "gpu": "NVIDIA GH200 120GB",
+        "host": "mg0661",
+        "job_id": "3711861.opbs",
+        "python": "3.13.13",
+        "threads": 1,
+        "torch": "2.14.0+cu132"
+      },
+      "reconstructed_episode_count": 1000,
+      "joined_answers_equivalent": true,
+      "selection_accuracy": 0.689,
+      "convergence": {
+        "loss_tail_early": 1.5938700151443481,
+        "loss_tail_late": 1.565963487625122,
+        "relative_loss_improvement": 0.017508659585831234,
+        "plateau_2pct": true,
+        "final_step": 5000
+      },
+      "writer_gates": {
+        "source": "fixed oracle rule",
+        "lambda": 1.0,
+        "beta": 1.0
+      },
+      "overall": {
+        "n_queries": 1000,
+        "n_correct": 689,
+        "accuracy": 0.689,
+        "chance_accuracy": 0.07239197052947051,
+        "mean_first_read_cosine": -0.667296826839447,
+        "n_finite_first_read_cosine": 1000,
+        "mean_memory_norm": 2.263354778289795,
+        "mean_write_age": 3.565,
+        "min_write_age": 0,
+        "max_write_age": 7
+      },
+      "head_multiplicity": {
+        "one_fact": {
+          "n_queries": 571,
+          "n_correct": 520,
+          "accuracy": 0.9106830122591943,
+          "chance_accuracy": 0.06959160949966554,
+          "mean_first_read_cosine": -0.8742189407348633,
+          "n_finite_first_read_cosine": 571,
+          "mean_memory_norm": 2.34332275390625,
+          "mean_write_age": 3.5674255691768826,
+          "min_write_age": 0,
+          "max_write_age": 7
+        },
+        "multiple_relation_specific_facts": {
+          "n_queries": 429,
+          "n_correct": 169,
+          "accuracy": 0.3939393939393939,
+          "chance_accuracy": 0.07611925758778905,
+          "mean_first_read_cosine": -0.391882985830307,
+          "n_finite_first_read_cosine": 429,
+          "mean_memory_norm": 2.156917095184326,
+          "mean_write_age": 3.561771561771562,
+          "min_write_age": 0,
+          "max_write_age": 7
+        }
+      },
+      "queried_fact_is_last_write_for_head": {
+        "yes": {
+          "n_queries": 748,
+          "n_correct": 689,
+          "accuracy": 0.9211229946524064,
+          "chance_accuracy": 0.07088151932737494,
+          "mean_first_read_cosine": -0.8877828121185303,
+          "n_finite_first_read_cosine": 748,
+          "mean_memory_norm": 2.3064374923706055,
+          "mean_write_age": 3.1524064171122994,
+          "min_write_age": 0,
+          "max_write_age": 7
+        },
+        "no": {
+          "n_queries": 252,
+          "n_correct": 0,
+          "accuracy": 0.0,
+          "chance_accuracy": 0.07687537330394473,
+          "mean_first_read_cosine": -0.012838640250265598,
+          "n_finite_first_read_cosine": 252,
+          "mean_memory_norm": 2.135474681854248,
+          "mean_write_age": 4.7896825396825395,
+          "min_write_age": 1,
+          "max_write_age": 7
+        }
+      },
+      "head_multiplicity_and_last_write": {
+        "one_fact/last": {
+          "n_queries": 571,
+          "n_correct": 520,
+          "accuracy": 0.9106830122591943,
+          "chance_accuracy": 0.06959160949966554,
+          "mean_first_read_cosine": -0.8742189407348633,
+          "n_finite_first_read_cosine": 571,
+          "mean_memory_norm": 2.34332275390625,
+          "mean_write_age": 3.5674255691768826,
+          "min_write_age": 0,
+          "max_write_age": 7
+        },
+        "one_fact/not_last": {
+          "n_queries": 0,
+          "n_correct": 0,
+          "accuracy": null,
+          "chance_accuracy": null,
+          "mean_first_read_cosine": null,
+          "n_finite_first_read_cosine": 0,
+          "mean_memory_norm": null,
+          "mean_write_age": null,
+          "min_write_age": null,
+          "max_write_age": null
+        },
+        "multiple_relation_specific_facts/last": {
+          "n_queries": 177,
+          "n_correct": 169,
+          "accuracy": 0.9548022598870056,
+          "chance_accuracy": 0.07504275385631316,
+          "mean_first_read_cosine": -0.9315394163131714,
+          "n_finite_first_read_cosine": 177,
+          "mean_memory_norm": 2.1874451637268066,
+          "mean_write_age": 1.8135593220338984,
+          "min_write_age": 0,
+          "max_write_age": 6
+        },
+        "multiple_relation_specific_facts/not_last": {
+          "n_queries": 252,
+          "n_correct": 0,
+          "accuracy": 0.0,
+          "chance_accuracy": 0.07687537330394473,
+          "mean_first_read_cosine": -0.012838640250265598,
+          "n_finite_first_read_cosine": 252,
+          "mean_memory_norm": 2.135474681854248,
+          "mean_write_age": 4.7896825396825395,
+          "min_write_age": 1,
+          "max_write_age": 7
+        }
+      },
+      "write_age_quartiles": {
+        "definition": "number of valid fact writes after the queried fact; lower age is more recent",
+        "cutpoints": [
+          2.0,
+          4.0,
+          6.0
+        ],
+        "boundary_rule": "Q1 <= p25; Q2 > p25 and <= p50; Q3 > p50 and <= p75; Q4 > p75; ties stay together",
+        "groups": {
+          "Q1": {
+            "n_queries": 367,
+            "n_correct": 329,
+            "accuracy": 0.896457765667575,
+            "chance_accuracy": 0.07219086544699622,
+            "mean_first_read_cosine": -0.8674660921096802,
+            "n_finite_first_read_cosine": 367,
+            "mean_memory_norm": 2.2676992416381836,
+            "mean_write_age": 1.0381471389645776,
+            "min_write_age": 0,
+            "max_write_age": 2
+          },
+          "Q2": {
+            "n_queries": 249,
+            "n_correct": 165,
+            "accuracy": 0.6626506024096386,
+            "chance_accuracy": 0.07276744339997351,
+            "mean_first_read_cosine": -0.629726767539978,
+            "n_finite_first_read_cosine": 249,
+            "mean_memory_norm": 2.2514359951019287,
+            "mean_write_age": 3.4779116465863456,
+            "min_write_age": 3,
+            "max_write_age": 4
+          },
+          "Q3": {
+            "n_queries": 253,
+            "n_correct": 135,
+            "accuracy": 0.5335968379446641,
+            "chance_accuracy": 0.07242380478546485,
+            "mean_first_read_cosine": -0.5185774564743042,
+            "n_finite_first_read_cosine": 253,
+            "mean_memory_norm": 2.2638397216796875,
+            "mean_write_age": 5.537549407114624,
+            "min_write_age": 5,
+            "max_write_age": 6
+          },
+          "Q4": {
+            "n_queries": 131,
+            "n_correct": 60,
+            "accuracy": 0.4580152671755725,
+            "chance_accuracy": 0.07218020529089231,
+            "mean_first_read_cosine": -0.4651506245136261,
+            "n_finite_first_read_cosine": 131,
+            "mean_memory_norm": 2.272902727127075,
+            "mean_write_age": 7.0,
+            "min_write_age": 7,
+            "max_write_age": 7
+          }
+        }
+      }
+    },
+    {
+      "name": "p1-oracle_random-r16-E12-lr0.003",
+      "writer": "oracle_random",
+      "r": 16,
+      "E": 12,
+      "lr": 0.003,
+      "run_dir": "/work/xg24i002/x10041/LoopLora/runs/p1s/pilot-20261026/pilot1/shard-02/p1-oracle_random-r16-E12-lr0.003",
+      "samples": "/work/xg24i002/x10041/LoopLora/runs/p1s/pilot-20261026/pilot1/shard-02/p1-oracle_random-r16-E12-lr0.003/samples.npz",
+      "config_hash": "9fbbecab4659573284053569b5e3c848",
+      "runtime": {
+        "device": "cuda:0",
+        "dtype": "float32",
+        "gpu": "NVIDIA GH200 120GB",
+        "host": "mg0661",
+        "job_id": "3711861.opbs",
+        "python": "3.13.13",
+        "threads": 1,
+        "torch": "2.14.0+cu132"
+      },
+      "reconstructed_episode_count": 1000,
+      "joined_answers_equivalent": true,
+      "selection_accuracy": 0.644,
+      "convergence": {
+        "loss_tail_early": 1.965104305744171,
+        "loss_tail_late": 1.9363622641563416,
+        "relative_loss_improvement": 0.014626216788500212,
+        "plateau_2pct": true,
+        "final_step": 5000
+      },
+      "writer_gates": {
+        "source": "fixed oracle rule",
+        "lambda": 1.0,
+        "beta": 1.0
+      },
+      "overall": {
+        "n_queries": 1000,
+        "n_correct": 644,
+        "accuracy": 0.644,
+        "chance_accuracy": 0.048362726438956415,
+        "mean_first_read_cosine": -0.6504337191581726,
+        "n_finite_first_read_cosine": 1000,
+        "mean_memory_norm": 2.6594293117523193,
+        "mean_write_age": 5.237,
+        "min_write_age": 0,
+        "max_write_age": 11
+      },
+      "head_multiplicity": {
+        "one_fact": {
+          "n_queries": 551,
+          "n_correct": 442,
+          "accuracy": 0.8021778584392014,
+          "chance_accuracy": 0.04725350262662774,
+          "mean_first_read_cosine": -0.8074969053268433,
+          "n_finite_first_read_cosine": 551,
+          "mean_memory_norm": 2.708099842071533,
+          "mean_write_age": 5.279491833030853,
+          "min_write_age": 0,
+          "max_write_age": 11
+        },
+        "multiple_relation_specific_facts": {
+          "n_queries": 449,
+          "n_correct": 202,
+          "accuracy": 0.44988864142538976,
+          "chance_accuracy": 0.04972393427992101,
+          "mean_first_read_cosine": -0.4576902985572815,
+          "n_finite_first_read_cosine": 449,
+          "mean_memory_norm": 2.5997021198272705,
+          "mean_write_age": 5.184855233853007,
+          "min_write_age": 0,
+          "max_write_age": 11
+        }
+      },
+      "queried_fact_is_last_write_for_head": {
+        "yes": {
+          "n_queries": 773,
+          "n_correct": 644,
+          "accuracy": 0.833117723156533,
+          "chance_accuracy": 0.04788339520371536,
+          "mean_first_read_cosine": -0.8341069221496582,
+          "n_finite_first_read_cosine": 773,
+          "mean_memory_norm": 2.681516170501709,
+          "mean_write_age": 4.517464424320828,
+          "min_write_age": 0,
+          "max_write_age": 11
+        },
+        "no": {
+          "n_queries": 227,
+          "n_correct": 0,
+          "accuracy": 0.0,
+          "chance_accuracy": 0.0499949865483896,
+          "mean_first_read_cosine": -0.02497405745089054,
+          "n_finite_first_read_cosine": 227,
+          "mean_memory_norm": 2.5842173099517822,
+          "mean_write_age": 7.687224669603524,
+          "min_write_age": 1,
+          "max_write_age": 11
+        }
+      },
+      "head_multiplicity_and_last_write": {
+        "one_fact/last": {
+          "n_queries": 551,
+          "n_correct": 442,
+          "accuracy": 0.8021778584392014,
+          "chance_accuracy": 0.04725350262662774,
+          "mean_first_read_cosine": -0.8074969053268433,
+          "n_finite_first_read_cosine": 551,
+          "mean_memory_norm": 2.708099842071533,
+          "mean_write_age": 5.279491833030853,
+          "min_write_age": 0,
+          "max_write_age": 11
+        },
+        "one_fact/not_last": {
+          "n_queries": 0,
+          "n_correct": 0,
+          "accuracy": null,
+          "chance_accuracy": null,
+          "mean_first_read_cosine": null,
+          "n_finite_first_read_cosine": 0,
+          "mean_memory_norm": null,
+          "mean_write_age": null,
+          "min_write_age": null,
+          "max_write_age": null
+        },
+        "multiple_relation_specific_facts/last": {
+          "n_queries": 222,
+          "n_correct": 202,
+          "accuracy": 0.9099099099099099,
+          "chance_accuracy": 0.049446777230631046,
+          "mean_first_read_cosine": -0.900152325630188,
+          "n_finite_first_read_cosine": 222,
+          "mean_memory_norm": 2.6155357360839844,
+          "mean_write_age": 2.626126126126126,
+          "min_write_age": 0,
+          "max_write_age": 10
+        },
+        "multiple_relation_specific_facts/not_last": {
+          "n_queries": 227,
+          "n_correct": 0,
+          "accuracy": 0.0,
+          "chance_accuracy": 0.0499949865483896,
+          "mean_first_read_cosine": -0.02497405745089054,
+          "n_finite_first_read_cosine": 227,
+          "mean_memory_norm": 2.5842173099517822,
+          "mean_write_age": 7.687224669603524,
+          "min_write_age": 1,
+          "max_write_age": 11
+        }
+      },
+      "write_age_quartiles": {
+        "definition": "number of valid fact writes after the queried fact; lower age is more recent",
+        "cutpoints": [
+          2.0,
+          5.0,
+          8.0
+        ],
+        "boundary_rule": "Q1 <= p25; Q2 > p25 and <= p50; Q3 > p50 and <= p75; Q4 > p75; ties stay together",
+        "groups": {
+          "Q1": {
+            "n_queries": 289,
+            "n_correct": 266,
+            "accuracy": 0.9204152249134948,
+            "chance_accuracy": 0.04833488287990214,
+            "mean_first_read_cosine": -0.899893581867218,
+            "n_finite_first_read_cosine": 289,
+            "mean_memory_norm": 2.6558847427368164,
+            "mean_write_age": 0.9826989619377162,
+            "min_write_age": 0,
+            "max_write_age": 2
+          },
+          "Q2": {
+            "n_queries": 257,
+            "n_correct": 183,
+            "accuracy": 0.7120622568093385,
+            "chance_accuracy": 0.04808705822285479,
+            "mean_first_read_cosine": -0.6927542686462402,
+            "n_finite_first_read_cosine": 257,
+            "mean_memory_norm": 2.672865629196167,
+            "mean_write_age": 4.0778210116731515,
+            "min_write_age": 3,
+            "max_write_age": 5
+          },
+          "Q3": {
+            "n_queries": 221,
+            "n_correct": 111,
+            "accuracy": 0.502262443438914,
+            "chance_accuracy": 0.048545808699380154,
+            "mean_first_read_cosine": -0.5374488830566406,
+            "n_finite_first_read_cosine": 221,
+            "mean_memory_norm": 2.6556856632232666,
+            "mean_write_age": 7.0542986425339365,
+            "min_write_age": 6,
+            "max_write_age": 8
+          },
+          "Q4": {
+            "n_queries": 233,
+            "n_correct": 84,
+            "accuracy": 0.3605150214592275,
+            "chance_accuracy": 0.04852767210655796,
+            "mean_first_read_cosine": -0.4015040695667267,
+            "n_finite_first_read_cosine": 233,
+            "mean_memory_norm": 2.6525564193725586,
+            "mean_write_age": 10.068669527896995,
+            "min_write_age": 9,
+            "max_write_age": 11
+          }
+        }
+      }
+    },
+    {
+      "name": "p1-oracle_random-r16-E16-lr0.003",
+      "writer": "oracle_random",
+      "r": 16,
+      "E": 16,
+      "lr": 0.003,
+      "run_dir": "/work/xg24i002/x10041/LoopLora/runs/p1s/pilot-20261026/pilot1/shard-02/p1-oracle_random-r16-E16-lr0.003",
+      "samples": "/work/xg24i002/x10041/LoopLora/runs/p1s/pilot-20261026/pilot1/shard-02/p1-oracle_random-r16-E16-lr0.003/samples.npz",
+      "config_hash": "7d115d37e5357b501efb1377090cb83d",
+      "runtime": {
+        "device": "cuda:0",
+        "dtype": "float32",
+        "gpu": "NVIDIA GH200 120GB",
+        "host": "mg0661",
+        "job_id": "3711861.opbs",
+        "python": "3.13.13",
+        "threads": 1,
+        "torch": "2.14.0+cu132"
+      },
+      "reconstructed_episode_count": 1000,
+      "joined_answers_equivalent": true,
+      "selection_accuracy": 0.5,
+      "convergence": {
+        "loss_tail_early": 2.2642622709274294,
+        "loss_tail_late": 2.24428373336792,
+        "relative_loss_improvement": 0.008823420244213275,
+        "plateau_2pct": true,
+        "final_step": 5000
+      },
+      "writer_gates": {
+        "source": "fixed oracle rule",
+        "lambda": 1.0,
+        "beta": 1.0
+      },
+      "overall": {
+        "n_queries": 1000,
+        "n_correct": 500,
+        "accuracy": 0.5,
+        "chance_accuracy": 0.036468020408012176,
+        "mean_first_read_cosine": -0.5352123975753784,
+        "n_finite_first_read_cosine": 1000,
+        "mean_memory_norm": 2.9427330493927,
+        "mean_write_age": 7.525,
+        "min_write_age": 0,
+        "max_write_age": 15
+      },
+      "head_multiplicity": {
+        "one_fact": {
+          "n_queries": 500,
+          "n_correct": 328,
+          "accuracy": 0.656,
+          "chance_accuracy": 0.03567478653953577,
+          "mean_first_read_cosine": -0.7161878943443298,
+          "n_finite_first_read_cosine": 500,
+          "mean_memory_norm": 2.9874463081359863,
+          "mean_write_age": 7.54,
+          "min_write_age": 0,
+          "max_write_age": 15
+        },
+        "multiple_relation_specific_facts": {
+          "n_queries": 500,
+          "n_correct": 172,
+          "accuracy": 0.344,
+          "chance_accuracy": 0.03726125427648858,
+          "mean_first_read_cosine": -0.3542368710041046,
+          "n_finite_first_read_cosine": 500,
+          "mean_memory_norm": 2.898020029067993,
+          "mean_write_age": 7.51,
+          "min_write_age": 0,
+          "max_write_age": 15
+        }
+      },
+      "queried_fact_is_last_write_for_head": {
+        "yes": {
+          "n_queries": 701,
+          "n_correct": 497,
+          "accuracy": 0.7089871611982882,
+          "chance_accuracy": 0.03608110645708121,
+          "mean_first_read_cosine": -0.7520100474357605,
+          "n_finite_first_read_cosine": 701,
+          "mean_memory_norm": 2.9636759757995605,
+          "mean_write_age": 6.4308131241084165,
+          "min_write_age": 0,
+          "max_write_age": 15
+        },
+        "no": {
+          "n_queries": 299,
+          "n_correct": 3,
+          "accuracy": 0.010033444816053512,
+          "chance_accuracy": 0.03737513304882361,
+          "mean_first_read_cosine": -0.02693415805697441,
+          "n_finite_first_read_cosine": 299,
+          "mean_memory_norm": 2.893632650375366,
+          "mean_write_age": 10.090301003344482,
+          "min_write_age": 1,
+          "max_write_age": 15
+        }
+      },
+      "head_multiplicity_and_last_write": {
+        "one_fact/last": {
+          "n_queries": 500,
+          "n_correct": 328,
+          "accuracy": 0.656,
+          "chance_accuracy": 0.03567478653953577,
+          "mean_first_read_cosine": -0.7161878943443298,
+          "n_finite_first_read_cosine": 500,
+          "mean_memory_norm": 2.9874463081359863,
+          "mean_write_age": 7.54,
+          "min_write_age": 0,
+          "max_write_age": 15
+        },
+        "one_fact/not_last": {
+          "n_queries": 0,
+          "n_correct": 0,
+          "accuracy": null,
+          "chance_accuracy": null,
+          "mean_first_read_cosine": null,
+          "n_finite_first_read_cosine": 0,
+          "mean_memory_norm": null,
+          "mean_write_age": null,
+          "min_write_age": null,
+          "max_write_age": null
+        },
+        "multiple_relation_specific_facts/last": {
+          "n_queries": 201,
+          "n_correct": 169,
+          "accuracy": 0.8407960199004975,
+          "chance_accuracy": 0.03709185252062706,
+          "mean_first_read_cosine": -0.8411200046539307,
+          "n_finite_first_read_cosine": 201,
+          "mean_memory_norm": 2.9045469760894775,
+          "mean_write_age": 3.671641791044776,
+          "min_write_age": 0,
+          "max_write_age": 12
+        },
+        "multiple_relation_specific_facts/not_last": {
+          "n_queries": 299,
+          "n_correct": 3,
+          "accuracy": 0.010033444816053512,
+          "chance_accuracy": 0.03737513304882361,
+          "mean_first_read_cosine": -0.02693415805697441,
+          "n_finite_first_read_cosine": 299,
+          "mean_memory_norm": 2.893632650375366,
+          "mean_write_age": 10.090301003344482,
+          "min_write_age": 1,
+          "max_write_age": 15
+        }
+      },
+      "write_age_quartiles": {
+        "definition": "number of valid fact writes after the queried fact; lower age is more recent",
+        "cutpoints": [
+          3.0,
+          7.0,
+          11.0
+        ],
+        "boundary_rule": "Q1 <= p25; Q2 > p25 and <= p50; Q3 > p50 and <= p75; Q4 > p75; ties stay together",
+        "groups": {
+          "Q1": {
+            "n_queries": 262,
+            "n_correct": 220,
+            "accuracy": 0.8396946564885496,
+            "chance_accuracy": 0.03647240503120792,
+            "mean_first_read_cosine": -0.8613409996032715,
+            "n_finite_first_read_cosine": 262,
+            "mean_memory_norm": 2.943000555038452,
+            "mean_write_age": 1.4809160305343512,
+            "min_write_age": 0,
+            "max_write_age": 3
+          },
+          "Q2": {
+            "n_queries": 240,
+            "n_correct": 137,
+            "accuracy": 0.5708333333333333,
+            "chance_accuracy": 0.03636852500880038,
+            "mean_first_read_cosine": -0.5667180418968201,
+            "n_finite_first_read_cosine": 240,
+            "mean_memory_norm": 2.946659803390503,
+            "mean_write_age": 5.575,
+            "min_write_age": 4,
+            "max_write_age": 7
+          },
+          "Q3": {
+            "n_queries": 254,
+            "n_correct": 85,
+            "accuracy": 0.3346456692913386,
+            "chance_accuracy": 0.03647323473045446,
+            "mean_first_read_cosine": -0.4124360978603363,
+            "n_finite_first_read_cosine": 254,
+            "mean_memory_norm": 2.937246799468994,
+            "mean_write_age": 9.645669291338583,
+            "min_write_age": 8,
+            "max_write_age": 11
+          },
+          "Q4": {
+            "n_queries": 244,
+            "n_correct": 58,
+            "accuracy": 0.23770491803278687,
+            "chance_accuracy": 0.03655574863191878,
+            "mean_first_read_cosine": -0.2818440794944763,
+            "n_finite_first_read_cosine": 244,
+            "mean_memory_norm": 2.9442944526672363,
+            "mean_write_age": 13.725409836065573,
+            "min_write_age": 12,
+            "max_write_age": 15
+          }
+        }
+      }
+    },
+    {
+      "name": "p1-oracle_random-r16-E24-lr0.003",
+      "writer": "oracle_random",
+      "r": 16,
+      "E": 24,
+      "lr": 0.003,
+      "run_dir": "/work/xg24i002/x10041/LoopLora/runs/p1s/pilot-20261026/pilot1/shard-02/p1-oracle_random-r16-E24-lr0.003",
+      "samples": "/work/xg24i002/x10041/LoopLora/runs/p1s/pilot-20261026/pilot1/shard-02/p1-oracle_random-r16-E24-lr0.003/samples.npz",
+      "config_hash": "993cf6d10aa471c05508c74ec75205a1",
+      "runtime": {
+        "device": "cuda:0",
+        "dtype": "float32",
+        "gpu": "NVIDIA GH200 120GB",
+        "host": "mg0661",
+        "job_id": "3711861.opbs",
+        "python": "3.13.13",
+        "threads": 1,
+        "torch": "2.14.0+cu132"
+      },
+      "reconstructed_episode_count": 1000,
+      "joined_answers_equivalent": true,
+      "selection_accuracy": 0.395,
+      "convergence": {
+        "loss_tail_early": 2.8235959148406984,
+        "loss_tail_late": 2.8137599277496337,
+        "relative_loss_improvement": 0.0034834967140188783,
+        "plateau_2pct": true,
+        "final_step": 5000
+      },
+      "writer_gates": {
+        "source": "fixed oracle rule",
+        "lambda": 1.0,
+        "beta": 1.0
+      },
+      "overall": {
+        "n_queries": 1000,
+        "n_correct": 395,
+        "accuracy": 0.395,
+        "chance_accuracy": 0.02445332761841167,
+        "mean_first_read_cosine": -0.4603007137775421,
+        "n_finite_first_read_cosine": 1000,
+        "mean_memory_norm": 3.328409194946289,
+        "mean_write_age": 11.434,
+        "min_write_age": 0,
+        "max_write_age": 23
+      },
+      "head_multiplicity": {
+        "one_fact": {
+          "n_queries": 509,
+          "n_correct": 250,
+          "accuracy": 0.4911591355599214,
+          "chance_accuracy": 0.024119675219895345,
+          "mean_first_read_cosine": -0.599188506603241,
+          "n_finite_first_read_cosine": 509,
+          "mean_memory_norm": 3.3491744995117188,
+          "mean_write_age": 11.37524557956778,
+          "min_write_age": 0,
+          "max_write_age": 23
+        },
+        "multiple_relation_specific_facts": {
+          "n_queries": 491,
+          "n_correct": 145,
+          "accuracy": 0.2953156822810591,
+          "chance_accuracy": 0.02479921167308542,
+          "mean_first_read_cosine": -0.31632137298583984,
+          "n_finite_first_read_cosine": 491,
+          "mean_memory_norm": 3.306882381439209,
+          "mean_write_age": 11.494908350305499,
+          "min_write_age": 0,
+          "max_write_age": 23
+        }
+      },
+      "queried_fact_is_last_write_for_head": {
+        "yes": {
+          "n_queries": 718,
+          "n_correct": 393,
+          "accuracy": 0.5473537604456824,
+          "chance_accuracy": 0.024267632961566157,
+          "mean_first_read_cosine": -0.6400646567344666,
+          "n_finite_first_read_cosine": 718,
+          "mean_memory_norm": 3.3404619693756104,
+          "mean_write_age": 10.118384401114206,
+          "min_write_age": 0,
+          "max_write_age": 23
+        },
+        "no": {
+          "n_queries": 282,
+          "n_correct": 2,
+          "accuracy": 0.0070921985815602835,
+          "chance_accuracy": 0.02492612465250769,
+          "mean_first_read_cosine": -0.0026040147058665752,
+          "n_finite_first_read_cosine": 282,
+          "mean_memory_norm": 3.2977216243743896,
+          "mean_write_age": 14.78368794326241,
+          "min_write_age": 1,
+          "max_write_age": 23
+        }
+      },
+      "head_multiplicity_and_last_write": {
+        "one_fact/last": {
+          "n_queries": 509,
+          "n_correct": 250,
+          "accuracy": 0.4911591355599214,
+          "chance_accuracy": 0.024119675219895345,
+          "mean_first_read_cosine": -0.599188506603241,
+          "n_finite_first_read_cosine": 509,
+          "mean_memory_norm": 3.3491744995117188,
+          "mean_write_age": 11.37524557956778,
+          "min_write_age": 0,
+          "max_write_age": 23
+        },
+        "one_fact/not_last": {
+          "n_queries": 0,
+          "n_correct": 0,
+          "accuracy": null,
+          "chance_accuracy": null,
+          "mean_first_read_cosine": null,
+          "n_finite_first_read_cosine": 0,
+          "mean_memory_norm": null,
+          "mean_write_age": null,
+          "min_write_age": null,
+          "max_write_age": null
+        },
+        "multiple_relation_specific_facts/last": {
+          "n_queries": 209,
+          "n_correct": 143,
+          "accuracy": 0.6842105263157895,
+          "chance_accuracy": 0.024627970236735748,
+          "mean_first_read_cosine": -0.7396146655082703,
+          "n_finite_first_read_cosine": 209,
+          "mean_memory_norm": 3.3192434310913086,
+          "mean_write_age": 7.057416267942584,
+          "min_write_age": 0,
+          "max_write_age": 21
+        },
+        "multiple_relation_specific_facts/not_last": {
+          "n_queries": 282,
+          "n_correct": 2,
+          "accuracy": 0.0070921985815602835,
+          "chance_accuracy": 0.02492612465250769,
+          "mean_first_read_cosine": -0.0026040147058665752,
+          "n_finite_first_read_cosine": 282,
+          "mean_memory_norm": 3.2977216243743896,
+          "mean_write_age": 14.78368794326241,
+          "min_write_age": 1,
+          "max_write_age": 23
+        }
+      },
+      "write_age_quartiles": {
+        "definition": "number of valid fact writes after the queried fact; lower age is more recent",
+        "cutpoints": [
+          6.0,
+          11.0,
+          17.0
+        ],
+        "boundary_rule": "Q1 <= p25; Q2 > p25 and <= p50; Q3 > p50 and <= p75; Q4 > p75; ties stay together",
+        "groups": {
+          "Q1": {
+            "n_queries": 289,
+            "n_correct": 231,
+            "accuracy": 0.7993079584775087,
+            "chance_accuracy": 0.024474369995399578,
+            "mean_first_read_cosine": -0.7907910346984863,
+            "n_finite_first_read_cosine": 289,
+            "mean_memory_norm": 3.3319451808929443,
+            "mean_write_age": 3.0311418685121105,
+            "min_write_age": 0,
+            "max_write_age": 6
+          },
+          "Q2": {
+            "n_queries": 212,
+            "n_correct": 83,
+            "accuracy": 0.3915094339622642,
+            "chance_accuracy": 0.02448498236658989,
+            "mean_first_read_cosine": -0.46439850330352783,
+            "n_finite_first_read_cosine": 212,
+            "mean_memory_norm": 3.3070850372314453,
+            "mean_write_age": 9.014150943396226,
+            "min_write_age": 7,
+            "max_write_age": 11
+          },
+          "Q3": {
+            "n_queries": 264,
+            "n_correct": 50,
+            "accuracy": 0.1893939393939394,
+            "chance_accuracy": 0.024412154925439848,
+            "mean_first_read_cosine": -0.3011617064476013,
+            "n_finite_first_read_cosine": 264,
+            "mean_memory_norm": 3.3308157920837402,
+            "mean_write_age": 14.363636363636363,
+            "min_write_age": 12,
+            "max_write_age": 17
+          },
+          "Q4": {
+            "n_queries": 235,
+            "n_correct": 31,
+            "accuracy": 0.13191489361702127,
+            "chance_accuracy": 0.024445146926417083,
+            "mean_first_read_cosine": -0.22894874215126038,
+            "n_finite_first_read_cosine": 235,
+            "mean_memory_norm": 3.3405942916870117,
+            "mean_write_age": 20.659574468085108,
+            "min_write_age": 18,
+            "max_write_age": 23
+          }
+        }
+      }
+    },
+    {
+      "name": "p1-oracle_random-r32-E8-lr0.003",
+      "writer": "oracle_random",
+      "r": 32,
+      "E": 8,
+      "lr": 0.003,
+      "run_dir": "/work/xg24i002/x10041/LoopLora/runs/p1s/pilot-20261026/pilot1/shard-02/p1-oracle_random-r32-E8-lr0.003",
+      "samples": "/work/xg24i002/x10041/LoopLora/runs/p1s/pilot-20261026/pilot1/shard-02/p1-oracle_random-r32-E8-lr0.003/samples.npz",
+      "config_hash": "9cbbd3cc036cdbc67c7ed36e820e9c3a",
+      "runtime": {
+        "device": "cuda:0",
+        "dtype": "float32",
+        "gpu": "NVIDIA GH200 120GB",
+        "host": "mg0661",
+        "job_id": "3711861.opbs",
+        "python": "3.13.13",
+        "threads": 1,
+        "torch": "2.14.0+cu132"
+      },
+      "reconstructed_episode_count": 1000,
+      "joined_answers_equivalent": true,
+      "selection_accuracy": 0.746,
+      "convergence": {
+        "loss_tail_early": 1.3814692711830139,
+        "loss_tail_late": 1.3637494039535523,
+        "relative_loss_improvement": 0.012826826914714724,
+        "plateau_2pct": true,
+        "final_step": 5000
+      },
+      "writer_gates": {
+        "source": "fixed oracle rule",
+        "lambda": 1.0,
+        "beta": 1.0
+      },
+      "overall": {
+        "n_queries": 1000,
+        "n_correct": 746,
+        "accuracy": 0.746,
+        "chance_accuracy": 0.07239197052947051,
+        "mean_first_read_cosine": -0.7089674472808838,
+        "n_finite_first_read_cosine": 1000,
+        "mean_memory_norm": 2.340341806411743,
+        "mean_write_age": 3.565,
+        "min_write_age": 0,
+        "max_write_age": 7
+      },
+      "head_multiplicity": {
+        "one_fact": {
+          "n_queries": 571,
+          "n_correct": 569,
+          "accuracy": 0.9964973730297724,
+          "chance_accuracy": 0.06959160949966554,
+          "mean_first_read_cosine": -0.9392575025558472,
+          "n_finite_first_read_cosine": 571,
+          "mean_memory_norm": 2.4357986450195312,
+          "mean_write_age": 3.5674255691768826,
+          "min_write_age": 0,
+          "max_write_age": 7
+        },
+        "multiple_relation_specific_facts": {
+          "n_queries": 429,
+          "n_correct": 177,
+          "accuracy": 0.4125874125874126,
+          "chance_accuracy": 0.07611925758778905,
+          "mean_first_read_cosine": -0.4024507701396942,
+          "n_finite_first_read_cosine": 429,
+          "mean_memory_norm": 2.2132883071899414,
+          "mean_write_age": 3.561771561771562,
+          "min_write_age": 0,
+          "max_write_age": 7
+        }
+      },
+      "queried_fact_is_last_write_for_head": {
+        "yes": {
+          "n_queries": 748,
+          "n_correct": 746,
+          "accuracy": 0.9973262032085561,
+          "chance_accuracy": 0.07088151932737494,
+          "mean_first_read_cosine": -0.9463713765144348,
+          "n_finite_first_read_cosine": 748,
+          "mean_memory_norm": 2.391284227371216,
+          "mean_write_age": 3.1524064171122994,
+          "min_write_age": 0,
+          "max_write_age": 7
+        },
+        "no": {
+          "n_queries": 252,
+          "n_correct": 0,
+          "accuracy": 0.0,
+          "chance_accuracy": 0.07687537330394473,
+          "mean_first_read_cosine": -0.004292274359613657,
+          "n_finite_first_read_cosine": 252,
+          "mean_memory_norm": 2.189131498336792,
+          "mean_write_age": 4.7896825396825395,
+          "min_write_age": 1,
+          "max_write_age": 7
+        }
+      },
+      "head_multiplicity_and_last_write": {
+        "one_fact/last": {
+          "n_queries": 571,
+          "n_correct": 569,
+          "accuracy": 0.9964973730297724,
+          "chance_accuracy": 0.06959160949966554,
+          "mean_first_read_cosine": -0.9392575025558472,
+          "n_finite_first_read_cosine": 571,
+          "mean_memory_norm": 2.4357986450195312,
+          "mean_write_age": 3.5674255691768826,
+          "min_write_age": 0,
+          "max_write_age": 7
+        },
+        "one_fact/not_last": {
+          "n_queries": 0,
+          "n_correct": 0,
+          "accuracy": null,
+          "chance_accuracy": null,
+          "mean_first_read_cosine": null,
+          "n_finite_first_read_cosine": 0,
+          "mean_memory_norm": null,
+          "mean_write_age": null,
+          "min_write_age": null,
+          "max_write_age": null
+        },
+        "multiple_relation_specific_facts/last": {
+          "n_queries": 177,
+          "n_correct": 177,
+          "accuracy": 1.0,
+          "chance_accuracy": 0.07504275385631316,
+          "mean_first_read_cosine": -0.96932053565979,
+          "n_finite_first_read_cosine": 177,
+          "mean_memory_norm": 2.247681140899658,
+          "mean_write_age": 1.8135593220338984,
+          "min_write_age": 0,
+          "max_write_age": 6
+        },
+        "multiple_relation_specific_facts/not_last": {
+          "n_queries": 252,
+          "n_correct": 0,
+          "accuracy": 0.0,
+          "chance_accuracy": 0.07687537330394473,
+          "mean_first_read_cosine": -0.004292274359613657,
+          "n_finite_first_read_cosine": 252,
+          "mean_memory_norm": 2.189131498336792,
+          "mean_write_age": 4.7896825396825395,
+          "min_write_age": 1,
+          "max_write_age": 7
+        }
+      },
+      "write_age_quartiles": {
+        "definition": "number of valid fact writes after the queried fact; lower age is more recent",
+        "cutpoints": [
+          2.0,
+          4.0,
+          6.0
+        ],
+        "boundary_rule": "Q1 <= p25; Q2 > p25 and <= p50; Q3 > p50 and <= p75; Q4 > p75; ties stay together",
+        "groups": {
+          "Q1": {
+            "n_queries": 367,
+            "n_correct": 333,
+            "accuracy": 0.9073569482288828,
+            "chance_accuracy": 0.07219086544699622,
+            "mean_first_read_cosine": -0.8843609690666199,
+            "n_finite_first_read_cosine": 367,
+            "mean_memory_norm": 2.3464431762695312,
+            "mean_write_age": 1.0381471389645776,
+            "min_write_age": 0,
+            "max_write_age": 2
+          },
+          "Q2": {
+            "n_queries": 249,
+            "n_correct": 176,
+            "accuracy": 0.7068273092369478,
+            "chance_accuracy": 0.07276744339997351,
+            "mean_first_read_cosine": -0.6711998581886292,
+            "n_finite_first_read_cosine": 249,
+            "mean_memory_norm": 2.3297977447509766,
+            "mean_write_age": 3.4779116465863456,
+            "min_write_age": 3,
+            "max_write_age": 4
+          },
+          "Q3": {
+            "n_queries": 253,
+            "n_correct": 161,
+            "accuracy": 0.6363636363636364,
+            "chance_accuracy": 0.07242380478546485,
+            "mean_first_read_cosine": -0.5868250131607056,
+            "n_finite_first_read_cosine": 253,
+            "mean_memory_norm": 2.3398239612579346,
+            "mean_write_age": 5.537549407114624,
+            "min_write_age": 5,
+            "max_write_age": 6
+          },
+          "Q4": {
+            "n_queries": 131,
+            "n_correct": 76,
+            "accuracy": 0.5801526717557252,
+            "chance_accuracy": 0.07218020529089231,
+            "mean_first_read_cosine": -0.5252780914306641,
+            "n_finite_first_read_cosine": 131,
+            "mean_memory_norm": 2.3442890644073486,
+            "mean_write_age": 7.0,
+            "min_write_age": 7,
+            "max_write_age": 7
+          }
+        }
+      }
+    },
+    {
+      "name": "p1-oracle_random-r32-E12-lr0.003",
+      "writer": "oracle_random",
+      "r": 32,
+      "E": 12,
+      "lr": 0.003,
+      "run_dir": "/work/xg24i002/x10041/LoopLora/runs/p1s/pilot-20261026/pilot1/shard-02/p1-oracle_random-r32-E12-lr0.003",
+      "samples": "/work/xg24i002/x10041/LoopLora/runs/p1s/pilot-20261026/pilot1/shard-02/p1-oracle_random-r32-E12-lr0.003/samples.npz",
+      "config_hash": "002fdc536cfa41991dc9491e0c011dcf",
+      "runtime": {
+        "device": "cuda:0",
+        "dtype": "float32",
+        "gpu": "NVIDIA GH200 120GB",
+        "host": "mg0661",
+        "job_id": "3711861.opbs",
+        "python": "3.13.13",
+        "threads": 1,
+        "torch": "2.14.0+cu132"
+      },
+      "reconstructed_episode_count": 1000,
+      "joined_answers_equivalent": true,
+      "selection_accuracy": 0.768,
+      "convergence": {
+        "loss_tail_early": 1.627499792575836,
+        "loss_tail_late": 1.6043682718276977,
+        "relative_loss_improvement": 0.01421291778570875,
+        "plateau_2pct": true,
+        "final_step": 5000
+      },
+      "writer_gates": {
+        "source": "fixed oracle rule",
+        "lambda": 1.0,
+        "beta": 1.0
+      },
+      "overall": {
+        "n_queries": 1000,
+        "n_correct": 768,
+        "accuracy": 0.768,
+        "chance_accuracy": 0.048362726438956415,
+        "mean_first_read_cosine": -0.716124415397644,
+        "n_finite_first_read_cosine": 1000,
+        "mean_memory_norm": 2.80733585357666,
+        "mean_write_age": 5.237,
+        "min_write_age": 0,
+        "max_write_age": 11
+      },
+      "head_multiplicity": {
+        "one_fact": {
+          "n_queries": 551,
+          "n_correct": 546,
+          "accuracy": 0.9909255898366606,
+          "chance_accuracy": 0.04725350262662774,
+          "mean_first_read_cosine": -0.9081425070762634,
+          "n_finite_first_read_cosine": 551,
+          "mean_memory_norm": 2.868884563446045,
+          "mean_write_age": 5.279491833030853,
+          "min_write_age": 0,
+          "max_write_age": 11
+        },
+        "multiple_relation_specific_facts": {
+          "n_queries": 449,
+          "n_correct": 222,
+          "accuracy": 0.49443207126948774,
+          "chance_accuracy": 0.04972393427992101,
+          "mean_first_read_cosine": -0.4804852306842804,
+          "n_finite_first_read_cosine": 449,
+          "mean_memory_norm": 2.7318053245544434,
+          "mean_write_age": 5.184855233853007,
+          "min_write_age": 0,
+          "max_write_age": 11
+        }
+      },
+      "queried_fact_is_last_write_for_head": {
+        "yes": {
+          "n_queries": 773,
+          "n_correct": 768,
+          "accuracy": 0.9935316946959897,
+          "chance_accuracy": 0.04788339520371536,
+          "mean_first_read_cosine": -0.9208966493606567,
+          "n_finite_first_read_cosine": 773,
+          "mean_memory_norm": 2.83461856842041,
+          "mean_write_age": 4.517464424320828,
+          "min_write_age": 0,
+          "max_write_age": 11
+        },
+        "no": {
+          "n_queries": 227,
+          "n_correct": 0,
+          "accuracy": 0.0,
+          "chance_accuracy": 0.0499949865483896,
+          "mean_first_read_cosine": -0.01881648600101471,
+          "n_finite_first_read_cosine": 227,
+          "mean_memory_norm": 2.714431047439575,
+          "mean_write_age": 7.687224669603524,
+          "min_write_age": 1,
+          "max_write_age": 11
+        }
+      },
+      "head_multiplicity_and_last_write": {
+        "one_fact/last": {
+          "n_queries": 551,
+          "n_correct": 546,
+          "accuracy": 0.9909255898366606,
+          "chance_accuracy": 0.04725350262662774,
+          "mean_first_read_cosine": -0.9081425070762634,
+          "n_finite_first_read_cosine": 551,
+          "mean_memory_norm": 2.868884563446045,
+          "mean_write_age": 5.279491833030853,
+          "min_write_age": 0,
+          "max_write_age": 11
+        },
+        "one_fact/not_last": {
+          "n_queries": 0,
+          "n_correct": 0,
+          "accuracy": null,
+          "chance_accuracy": null,
+          "mean_first_read_cosine": null,
+          "n_finite_first_read_cosine": 0,
+          "mean_memory_norm": null,
+          "mean_write_age": null,
+          "min_write_age": null,
+          "max_write_age": null
+        },
+        "multiple_relation_specific_facts/last": {
+          "n_queries": 222,
+          "n_correct": 222,
+          "accuracy": 1.0,
+          "chance_accuracy": 0.049446777230631046,
+          "mean_first_read_cosine": -0.9525519013404846,
+          "n_finite_first_read_cosine": 222,
+          "mean_memory_norm": 2.749570846557617,
+          "mean_write_age": 2.626126126126126,
+          "min_write_age": 0,
+          "max_write_age": 10
+        },
+        "multiple_relation_specific_facts/not_last": {
+          "n_queries": 227,
+          "n_correct": 0,
+          "accuracy": 0.0,
+          "chance_accuracy": 0.0499949865483896,
+          "mean_first_read_cosine": -0.01881648600101471,
+          "n_finite_first_read_cosine": 227,
+          "mean_memory_norm": 2.714431047439575,
+          "mean_write_age": 7.687224669603524,
+          "min_write_age": 1,
+          "max_write_age": 11
+        }
+      },
+      "write_age_quartiles": {
+        "definition": "number of valid fact writes after the queried fact; lower age is more recent",
+        "cutpoints": [
+          2.0,
+          5.0,
+          8.0
+        ],
+        "boundary_rule": "Q1 <= p25; Q2 > p25 and <= p50; Q3 > p50 and <= p75; Q4 > p75; ties stay together",
+        "groups": {
+          "Q1": {
+            "n_queries": 289,
+            "n_correct": 275,
+            "accuracy": 0.9515570934256056,
+            "chance_accuracy": 0.04833488287990214,
+            "mean_first_read_cosine": -0.931527853012085,
+            "n_finite_first_read_cosine": 289,
+            "mean_memory_norm": 2.8114521503448486,
+            "mean_write_age": 0.9826989619377162,
+            "min_write_age": 0,
+            "max_write_age": 2
+          },
+          "Q2": {
+            "n_queries": 257,
+            "n_correct": 215,
+            "accuracy": 0.8365758754863813,
+            "chance_accuracy": 0.04808705822285479,
+            "mean_first_read_cosine": -0.7780856490135193,
+            "n_finite_first_read_cosine": 257,
+            "mean_memory_norm": 2.824141263961792,
+            "mean_write_age": 4.0778210116731515,
+            "min_write_age": 3,
+            "max_write_age": 5
+          },
+          "Q3": {
+            "n_queries": 221,
+            "n_correct": 151,
+            "accuracy": 0.6832579185520362,
+            "chance_accuracy": 0.048545808699380154,
+            "mean_first_read_cosine": -0.6115946173667908,
+            "n_finite_first_read_cosine": 221,
+            "mean_memory_norm": 2.798081398010254,
+            "mean_write_age": 7.0542986425339365,
+            "min_write_age": 6,
+            "max_write_age": 8
+          },
+          "Q4": {
+            "n_queries": 233,
+            "n_correct": 127,
+            "accuracy": 0.5450643776824035,
+            "chance_accuracy": 0.04852767210655796,
+            "mean_first_read_cosine": -0.4797530174255371,
+            "n_finite_first_read_cosine": 233,
+            "mean_memory_norm": 2.7924723625183105,
+            "mean_write_age": 10.068669527896995,
+            "min_write_age": 9,
+            "max_write_age": 11
+          }
+        }
+      }
+    },
+    {
+      "name": "p1-oracle_random-r32-E16-lr0.003",
+      "writer": "oracle_random",
+      "r": 32,
+      "E": 16,
+      "lr": 0.003,
+      "run_dir": "/work/xg24i002/x10041/LoopLora/runs/p1s/pilot-20261026/pilot1/shard-02/p1-oracle_random-r32-E16-lr0.003",
+      "samples": "/work/xg24i002/x10041/LoopLora/runs/p1s/pilot-20261026/pilot1/shard-02/p1-oracle_random-r32-E16-lr0.003/samples.npz",
+      "config_hash": "39b88b182b7f13df9697b99709c94fd5",
+      "runtime": {
+        "device": "cuda:0",
+        "dtype": "float32",
+        "gpu": "NVIDIA GH200 120GB",
+        "host": "mg0661",
+        "job_id": "3711861.opbs",
+        "python": "3.13.13",
+        "threads": 1,
+        "torch": "2.14.0+cu132"
+      },
+      "reconstructed_episode_count": 1000,
+      "joined_answers_equivalent": true,
+      "selection_accuracy": 0.682,
+      "convergence": {
+        "loss_tail_early": 1.8223337054252624,
+        "loss_tail_late": 1.7882018566131592,
+        "relative_loss_improvement": 0.018729746758504983,
+        "plateau_2pct": true,
+        "final_step": 5000
+      },
+      "writer_gates": {
+        "source": "fixed oracle rule",
+        "lambda": 1.0,
+        "beta": 1.0
+      },
+      "overall": {
+        "n_queries": 1000,
+        "n_correct": 682,
+        "accuracy": 0.682,
+        "chance_accuracy": 0.036468020408012176,
+        "mean_first_read_cosine": -0.6177825331687927,
+        "n_finite_first_read_cosine": 1000,
+        "mean_memory_norm": 3.165710926055908,
+        "mean_write_age": 7.525,
+        "min_write_age": 0,
+        "max_write_age": 15
+      },
+      "head_multiplicity": {
+        "one_fact": {
+          "n_queries": 500,
+          "n_correct": 483,
+          "accuracy": 0.966,
+          "chance_accuracy": 0.03567478653953577,
+          "mean_first_read_cosine": -0.8681870102882385,
+          "n_finite_first_read_cosine": 500,
+          "mean_memory_norm": 3.230714797973633,
+          "mean_write_age": 7.54,
+          "min_write_age": 0,
+          "max_write_age": 15
+        },
+        "multiple_relation_specific_facts": {
+          "n_queries": 500,
+          "n_correct": 199,
+          "accuracy": 0.398,
+          "chance_accuracy": 0.03726125427648858,
+          "mean_first_read_cosine": -0.3673780858516693,
+          "n_finite_first_read_cosine": 500,
+          "mean_memory_norm": 3.1007070541381836,
+          "mean_write_age": 7.51,
+          "min_write_age": 0,
+          "max_write_age": 15
+        }
+      },
+      "queried_fact_is_last_write_for_head": {
+        "yes": {
+          "n_queries": 701,
+          "n_correct": 682,
+          "accuracy": 0.9728958630527818,
+          "chance_accuracy": 0.03608110645708121,
+          "mean_first_read_cosine": -0.883567750453949,
+          "n_finite_first_read_cosine": 701,
+          "mean_memory_norm": 3.1968655586242676,
+          "mean_write_age": 6.4308131241084165,
+          "min_write_age": 0,
+          "max_write_age": 15
+        },
+        "no": {
+          "n_queries": 299,
+          "n_correct": 0,
+          "accuracy": 0.0,
+          "chance_accuracy": 0.03737513304882361,
+          "mean_first_read_cosine": 0.005345997400581837,
+          "n_finite_first_read_cosine": 299,
+          "mean_memory_norm": 3.092670202255249,
+          "mean_write_age": 10.090301003344482,
+          "min_write_age": 1,
+          "max_write_age": 15
+        }
+      },
+      "head_multiplicity_and_last_write": {
+        "one_fact/last": {
+          "n_queries": 500,
+          "n_correct": 483,
+          "accuracy": 0.966,
+          "chance_accuracy": 0.03567478653953577,
+          "mean_first_read_cosine": -0.8681870102882385,
+          "n_finite_first_read_cosine": 500,
+          "mean_memory_norm": 3.230714797973633,
+          "mean_write_age": 7.54,
+          "min_write_age": 0,
+          "max_write_age": 15
+        },
+        "one_fact/not_last": {
+          "n_queries": 0,
+          "n_correct": 0,
+          "accuracy": null,
+          "chance_accuracy": null,
+          "mean_first_read_cosine": null,
+          "n_finite_first_read_cosine": 0,
+          "mean_memory_norm": null,
+          "mean_write_age": null,
+          "min_write_age": null,
+          "max_write_age": null
+        },
+        "multiple_relation_specific_facts/last": {
+          "n_queries": 201,
+          "n_correct": 199,
+          "accuracy": 0.9900497512437811,
+          "chance_accuracy": 0.03709185252062706,
+          "mean_first_read_cosine": -0.9218282103538513,
+          "n_finite_first_read_cosine": 201,
+          "mean_memory_norm": 3.1126623153686523,
+          "mean_write_age": 3.671641791044776,
+          "min_write_age": 0,
+          "max_write_age": 12
+        },
+        "multiple_relation_specific_facts/not_last": {
+          "n_queries": 299,
+          "n_correct": 0,
+          "accuracy": 0.0,
+          "chance_accuracy": 0.03737513304882361,
+          "mean_first_read_cosine": 0.005345997400581837,
+          "n_finite_first_read_cosine": 299,
+          "mean_memory_norm": 3.092670202255249,
+          "mean_write_age": 10.090301003344482,
+          "min_write_age": 1,
+          "max_write_age": 15
+        }
+      },
+      "write_age_quartiles": {
+        "definition": "number of valid fact writes after the queried fact; lower age is more recent",
+        "cutpoints": [
+          3.0,
+          7.0,
+          11.0
+        ],
+        "boundary_rule": "Q1 <= p25; Q2 > p25 and <= p50; Q3 > p50 and <= p75; Q4 > p75; ties stay together",
+        "groups": {
+          "Q1": {
+            "n_queries": 262,
+            "n_correct": 242,
+            "accuracy": 0.9236641221374046,
+            "chance_accuracy": 0.03647240503120792,
+            "mean_first_read_cosine": -0.8907301425933838,
+            "n_finite_first_read_cosine": 262,
+            "mean_memory_norm": 3.163522958755493,
+            "mean_write_age": 1.4809160305343512,
+            "min_write_age": 0,
+            "max_write_age": 3
+          },
+          "Q2": {
+            "n_queries": 240,
+            "n_correct": 171,
+            "accuracy": 0.7125,
+            "chance_accuracy": 0.03636852500880038,
+            "mean_first_read_cosine": -0.6357185244560242,
+            "n_finite_first_read_cosine": 240,
+            "mean_memory_norm": 3.170696496963501,
+            "mean_write_age": 5.575,
+            "min_write_age": 4,
+            "max_write_age": 7
+          },
+          "Q3": {
+            "n_queries": 254,
+            "n_correct": 157,
+            "accuracy": 0.6181102362204725,
+            "chance_accuracy": 0.03647323473045446,
+            "mean_first_read_cosine": -0.5389420986175537,
+            "n_finite_first_read_cosine": 254,
+            "mean_memory_norm": 3.1683480739593506,
+            "mean_write_age": 9.645669291338583,
+            "min_write_age": 8,
+            "max_write_age": 11
+          },
+          "Q4": {
+            "n_queries": 244,
+            "n_correct": 112,
+            "accuracy": 0.45901639344262296,
+            "chance_accuracy": 0.03655574863191878,
+            "mean_first_read_cosine": -0.389129102230072,
+            "n_finite_first_read_cosine": 244,
+            "mean_memory_norm": 3.1604113578796387,
+            "mean_write_age": 13.725409836065573,
+            "min_write_age": 12,
+            "max_write_age": 15
+          }
+        }
+      }
+    },
+    {
+      "name": "p1-oracle_random-r32-E24-lr0.003",
+      "writer": "oracle_random",
+      "r": 32,
+      "E": 24,
+      "lr": 0.003,
+      "run_dir": "/work/xg24i002/x10041/LoopLora/runs/p1s/pilot-20261026/pilot1/shard-02/p1-oracle_random-r32-E24-lr0.003",
+      "samples": "/work/xg24i002/x10041/LoopLora/runs/p1s/pilot-20261026/pilot1/shard-02/p1-oracle_random-r32-E24-lr0.003/samples.npz",
+      "config_hash": "c47b9404283792fad7c154394304c857",
+      "runtime": {
+        "device": "cuda:0",
+        "dtype": "float32",
+        "gpu": "NVIDIA GH200 120GB",
+        "host": "mg0661",
+        "job_id": "3711861.opbs",
+        "python": "3.13.13",
+        "threads": 1,
+        "torch": "2.14.0+cu132"
+      },
+      "reconstructed_episode_count": 1000,
+      "joined_answers_equivalent": true,
+      "selection_accuracy": 0.674,
+      "convergence": {
+        "loss_tail_early": 2.1070709252357482,
+        "loss_tail_late": 2.094854850769043,
+        "relative_loss_improvement": 0.005797656984583214,
+        "plateau_2pct": true,
+        "final_step": 5000
+      },
+      "writer_gates": {
+        "source": "fixed oracle rule",
+        "lambda": 1.0,
+        "beta": 1.0
+      },
+      "overall": {
+        "n_queries": 1000,
+        "n_correct": 674,
+        "accuracy": 0.674,
+        "chance_accuracy": 0.02445332761841167,
+        "mean_first_read_cosine": -0.59059739112854,
+        "n_finite_first_read_cosine": 1000,
+        "mean_memory_norm": 3.7109644412994385,
+        "mean_write_age": 11.434,
+        "min_write_age": 0,
+        "max_write_age": 23
+      },
+      "head_multiplicity": {
+        "one_fact": {
+          "n_queries": 509,
+          "n_correct": 473,
+          "accuracy": 0.9292730844793713,
+          "chance_accuracy": 0.024119675219895345,
+          "mean_first_read_cosine": -0.7992849946022034,
+          "n_finite_first_read_cosine": 509,
+          "mean_memory_norm": 3.7523980140686035,
+          "mean_write_age": 11.37524557956778,
+          "min_write_age": 0,
+          "max_write_age": 23
+        },
+        "multiple_relation_specific_facts": {
+          "n_queries": 491,
+          "n_correct": 201,
+          "accuracy": 0.4093686354378819,
+          "chance_accuracy": 0.02479921167308542,
+          "mean_first_read_cosine": -0.37425941228866577,
+          "n_finite_first_read_cosine": 491,
+          "mean_memory_norm": 3.668011426925659,
+          "mean_write_age": 11.494908350305499,
+          "min_write_age": 0,
+          "max_write_age": 23
+        }
+      },
+      "queried_fact_is_last_write_for_head": {
+        "yes": {
+          "n_queries": 718,
+          "n_correct": 674,
+          "accuracy": 0.9387186629526463,
+          "chance_accuracy": 0.024267632961566157,
+          "mean_first_read_cosine": -0.8171947598457336,
+          "n_finite_first_read_cosine": 718,
+          "mean_memory_norm": 3.734208822250366,
+          "mean_write_age": 10.118384401114206,
+          "min_write_age": 0,
+          "max_write_age": 23
+        },
+        "no": {
+          "n_queries": 282,
+          "n_correct": 0,
+          "accuracy": 0.0,
+          "chance_accuracy": 0.02492612465250769,
+          "mean_first_read_cosine": -0.013658142648637295,
+          "n_finite_first_read_cosine": 282,
+          "mean_memory_norm": 3.6517815589904785,
+          "mean_write_age": 14.78368794326241,
+          "min_write_age": 1,
+          "max_write_age": 23
+        }
+      },
+      "head_multiplicity_and_last_write": {
+        "one_fact/last": {
+          "n_queries": 509,
+          "n_correct": 473,
+          "accuracy": 0.9292730844793713,
+          "chance_accuracy": 0.024119675219895345,
+          "mean_first_read_cosine": -0.7992849946022034,
+          "n_finite_first_read_cosine": 509,
+          "mean_memory_norm": 3.7523980140686035,
+          "mean_write_age": 11.37524557956778,
+          "min_write_age": 0,
+          "max_write_age": 23
+        },
+        "one_fact/not_last": {
+          "n_queries": 0,
+          "n_correct": 0,
+          "accuracy": null,
+          "chance_accuracy": null,
+          "mean_first_read_cosine": null,
+          "n_finite_first_read_cosine": 0,
+          "mean_memory_norm": null,
+          "mean_write_age": null,
+          "min_write_age": null,
+          "max_write_age": null
+        },
+        "multiple_relation_specific_facts/last": {
+          "n_queries": 209,
+          "n_correct": 201,
+          "accuracy": 0.9617224880382775,
+          "chance_accuracy": 0.024627970236735748,
+          "mean_first_read_cosine": -0.8608123064041138,
+          "n_finite_first_read_cosine": 209,
+          "mean_memory_norm": 3.689910650253296,
+          "mean_write_age": 7.057416267942584,
+          "min_write_age": 0,
+          "max_write_age": 21
+        },
+        "multiple_relation_specific_facts/not_last": {
+          "n_queries": 282,
+          "n_correct": 0,
+          "accuracy": 0.0,
+          "chance_accuracy": 0.02492612465250769,
+          "mean_first_read_cosine": -0.013658142648637295,
+          "n_finite_first_read_cosine": 282,
+          "mean_memory_norm": 3.6517815589904785,
+          "mean_write_age": 14.78368794326241,
+          "min_write_age": 1,
+          "max_write_age": 23
+        }
+      },
+      "write_age_quartiles": {
+        "definition": "number of valid fact writes after the queried fact; lower age is more recent",
+        "cutpoints": [
+          6.0,
+          11.0,
+          17.0
+        ],
+        "boundary_rule": "Q1 <= p25; Q2 > p25 and <= p50; Q3 > p50 and <= p75; Q4 > p75; ties stay together",
+        "groups": {
+          "Q1": {
+            "n_queries": 289,
+            "n_correct": 264,
+            "accuracy": 0.9134948096885813,
+            "chance_accuracy": 0.024474369995399578,
+            "mean_first_read_cosine": -0.8505728244781494,
+            "n_finite_first_read_cosine": 289,
+            "mean_memory_norm": 3.7037949562072754,
+            "mean_write_age": 3.0311418685121105,
+            "min_write_age": 0,
+            "max_write_age": 6
+          },
+          "Q2": {
+            "n_queries": 212,
+            "n_correct": 146,
+            "accuracy": 0.6886792452830188,
+            "chance_accuracy": 0.02448498236658989,
+            "mean_first_read_cosine": -0.60163414478302,
+            "n_finite_first_read_cosine": 212,
+            "mean_memory_norm": 3.7060904502868652,
+            "mean_write_age": 9.014150943396226,
+            "min_write_age": 7,
+            "max_write_age": 11
+          },
+          "Q3": {
+            "n_queries": 264,
+            "n_correct": 152,
+            "accuracy": 0.5757575757575758,
+            "chance_accuracy": 0.024412154925439848,
+            "mean_first_read_cosine": -0.4754806458950043,
+            "n_finite_first_read_cosine": 264,
+            "mean_memory_norm": 3.717655658721924,
+            "mean_write_age": 14.363636363636363,
+            "min_write_age": 12,
+            "max_write_age": 17
+          },
+          "Q4": {
+            "n_queries": 235,
+            "n_correct": 112,
+            "accuracy": 0.4765957446808511,
+            "chance_accuracy": 0.024445146926417083,
+            "mean_first_read_cosine": -0.390249103307724,
+            "n_finite_first_read_cosine": 235,
+            "mean_memory_norm": 3.716660261154175,
+            "mean_write_age": 20.659574468085108,
+            "min_write_age": 18,
+            "max_write_age": 23
+          }
+        }
+      }
+    }
+  ]
+}
