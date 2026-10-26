@@ -18,6 +18,10 @@ Armed wakeups (message mode,300s polling, no Goal):
   acknowledged; all five jobs exit0 and all ten candidates complete.
 - r32 main3716305: .job-wakeup/a101bbc0-d502-4bf4-8978-4e613b043510,
   worker PID2276624; verify all19 jobs/22 run artifacts on wake.
+- r128 main3716407: .job-wakeup/404cd2e5-fa6f-482e-beb3-11f09a424a15,
+  worker PID2354422; verify all12 jobs/15 run artifacts on wake.
+- early queue-progress3716290: .job-wakeup/e098924a-8adc-43d9-b03c-063317e048ab,
+  worker PID2354519; recheck queued jobs as running jobs release slots.
 Read the event state and acknowledge with the exact argv from the wakeup
 message. Do not register duplicates or cancel the other pending watcher.
 
@@ -124,8 +128,8 @@ seed29:3716400B8,3716401M1,3716402B5,3716403B4+B3;
 seed43:3716404B8,3716405M1,3716406B5,3716407B4+B3.
 R/r128/main-jobs.json and R/r128/training-manifest.json retain receipts/map.
 Each1node,1h10–2h requested. B4/B3 sequential packing measured; no repeat B0–B2.
-Arrange rank128 end watcher3716407 and early progress watcher3716290 (r32 B5)
-to recheck queued jobs as project slots release, retaining r32 end watcher.
+Rank128 end watcher3716407 and early progress watcher3716290 (r32 B5) are
+armed above to recheck queued jobs as slots release; retain r32 end watcher.
 
 Scheduler05:39JST: regular project limit16 active jobs; queued r32 seeds43
 have placeholder/predicted starts after maintenance. Detail3716304 states
@@ -175,7 +179,7 @@ separately; unchanged regression passed3715942). No further blanket retests.
    R128 lock/configs committed; main submitted. Both condition manifests exist.
 3. R32 main3716305 wakeup armed. At either wake preserve
    the other pending event; independently advance whichever rank is ready.
-4. Before idle arm rank128 end3716407 and early running r32 progress3716290.
+4. Rank128 end3716407 and early running r32 progress3716290 are armed.
    Early progress is needed because PBS currently predicts queued starts after
    maintenance while reporting the group16-job limit as the blocker.
 
