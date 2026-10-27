@@ -6,6 +6,7 @@ from dataclasses import replace
 import torch
 from torch.nn import functional as F
 
+from looplora.core.memory import gram_conditions,ridge_coefficients,sweep_coefficients
 from .train import LLMExperiment
 from .writer_fix import WriterFixExperiment,true_fact_indices
 from .writer_fix_run import configuration as writer_configuration
@@ -100,10 +101,23 @@ def gram_read(keys,values,q,lam,beta):
     return dict(b=b,a=a,d=d,gram=gram,reconstructed=reconstructed)
 
 
+def store_read(adapter,keys,values,q):
+    """Exact coefficients of the deployed read for the adapter's store (WP-L7 adds the two least-squares stores)."""
+    store=adapter.cfg.store
+    if store=='delta':
+        return gram_read(keys,values,q,adapter.lam,adapter.beta)
+    if store=='ridge':
+        result=ridge_coefficients(keys,q,adapter.lam,adapter.cfg.store_eta)
+    else:
+        result=sweep_coefficients(keys,q,adapter.lam,adapter.cfg.store_sweeps)
+    result['reconstructed']=torch.einsum('bqe,ber->bqr',result['d'],values.double())
+    return result
+
+
 def diagnostics(experiment,batch,x):
     terms=question_terms(experiment,batch,x)
     adapter=experiment.adapter
-    exact=gram_read(batch.keys,batch.values,terms['q'],adapter.lam,adapter.beta)
+    exact=store_read(adapter,batch.keys,batch.values,terms['q'])
     target=terms['target']
     coeff=exact['d'].gather(-1,target[...,None]).squeeze(-1)
     signal=coeff[...,None]*terms['clean'].double()
@@ -136,6 +150,14 @@ def diagnostics(experiment,batch,x):
         base_pair=(base@base.transpose(-1,-2))[:,~eye]
         result.update(key_gram_rms_base=base_pair.square().mean(-1).sqrt()[:,None].expand_as(target),
                       key_gram_max_abs_base=base_pair.abs().amax(-1)[:,None].expand_as(target))
+    if adapter.cfg.store!='delta':
+        # Least-squares stores: conditioning of the key Gram (and of the weighted ridge system), as log10.
+        ridge=adapter.cfg.store=='ridge'
+        cond=gram_conditions(batch.keys.detach(),adapter.lam.detach() if ridge else None,
+                             adapter.cfg.store_eta if ridge else None)
+        result.update(key_gram_log10_cond=cond['gram'].log10()[:,None].expand_as(target))
+        if ridge:
+            result.update(ridge_log10_cond=cond['ridge'].log10()[:,None].expand_as(target))
     if experiment.value_head is not None:
         answers=torch.as_tensor(batch.arrays.answer,device=x.device)
         result.update(clean_value_correct=experiment.value_head(terms['clean']).argmax(-1)==answers,

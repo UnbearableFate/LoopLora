@@ -242,3 +242,164 @@ def scan_final(
 
 # The public scan's `write` mask intentionally has the task-specified name.
 _write_token = write
+
+
+# --- Least-squares stores (WP-L7 LSQ). Final-only: the support is written as one batch, never token by token. ---
+
+def _scalar_gate(value: Tensor | float, M0: Tensor, name: str) -> Tensor:
+    gate = torch.as_tensor(value, dtype=M0.dtype, device=M0.device)
+    if gate.numel() != 1:
+        raise ValueError(f"the least-squares stores require a scalar {name} gate")
+    return gate.reshape(())
+
+
+def ridge_final(
+    M0: Tensor, u: Tensor, valid: Tensor | None = None, write: Tensor | None = None,
+    reset: Tensor | None = None, *, K: Tensor, V: Tensor, lam: Tensor | float, eta: float,
+    eps: float = 1e-6,
+) -> Tensor:
+    """Recency-weighted ridge least-squares store of a row's n packed writes (unit keys k_j, values v_j).
+
+    The state minimizes  sum_j w_j |M k_j - v_j|^2 + eta |M - lam^n M0|_F^2  with w_j = lam^(n-1-j) (the last write has
+    weight one; lam is the scalar decay gate), i.e.  M = Mb + (V - Mb K) W K^T (K W K^T + eta I)^-1  with Mb = lam^n M0.
+    For M0 = 0 and eta -> 0 it is the interpolant M k_j = v_j whenever the keys are independent (n <= r_mem), whatever
+    lam. It is solved in float64 through the n x n system (K^T W K + eta I; a Cholesky solve, differentiable). A reset at
+    token zero clears M0; interior resets are unsupported. Keys and values use the per-token projections of scan_final.
+    """
+    _check_state(M0)
+    if u.ndim != 3 or u.shape[0] != M0.shape[0] or u.device != M0.device:
+        raise ValueError("u must have shape [B,T,r] on the state device")
+    shape = tuple(u.shape[:2])
+    valid_mask = _mask(valid, shape, u.device, True)
+    write_mask = _mask(write, shape, u.device, True)
+    reset_mask = _mask(reset, shape, u.device, False)
+    lam_t = _scalar_gate(lam, M0, "decay")
+    if isinstance(eta, bool) or not math.isfinite(eta) or eta <= 0:
+        raise ValueError("eta must be finite and positive")
+    if u.shape[1] == 0:
+        return M0
+    if K.shape != (M0.shape[1], u.shape[-1]) or V.shape != K.shape:
+        raise ValueError("K and V must have shape [r_mem, r]")
+    _check_key_width(M0, K, None)
+    if not math.isfinite(eps) or eps <= 0:
+        raise ValueError("eps must be finite and positive")
+    if bool(reset_mask[:, 1:].any()):
+        raise ValueError("interior resets are not supported by the least-squares stores")
+    base = torch.where(reset_mask[:, 0, None, None], torch.zeros_like(M0), M0)
+    if u.shape[0] == 0:
+        return base
+    permitted = valid_mask & write_mask
+    counts = permitted.sum(dim=1)
+    maximum = int(counts.max().item())
+    if maximum == 0:
+        return base
+    positions = torch.arange(u.shape[1], device=u.device).expand(shape)
+    positions = positions.masked_fill(~permitted, u.shape[1]).sort(dim=1).values[:, :maximum]
+    positions = positions.clamp_max(u.shape[1] - 1)
+    enabled = torch.arange(maximum, device=u.device)[None] < counts[:, None]
+    packed = u.gather(1, positions[..., None].expand(-1, -1, u.shape[-1]))
+    packed = torch.where(enabled[..., None], packed, torch.zeros_like(packed))
+    keys, values = [], []
+    for step in range(maximum):
+        token = packed[:, step].contiguous()
+        raw = F.linear(token, K)
+        keys.append(raw / torch.linalg.vector_norm(raw, dim=-1, keepdim=True).clamp_min(eps))
+        values.append(F.linear(token, V))
+    keys, values = torch.stack(keys, 1).double(), torch.stack(values, 1).double()
+    lam64 = lam_t.double()
+    ages = (counts[:, None] - 1 - torch.arange(maximum, device=u.device)[None]).clamp_min(0).double()
+    # sqrt(w_j) = lam^(age/2); disabled slots get exactly zero (no sqrt at zero, so no NaN gradients).
+    root = torch.where(enabled, lam64 ** (0.5 * ages), torch.zeros_like(ages))
+    prior = (lam64 ** counts.double())[:, None, None] * base.double()
+    residual = values - torch.einsum("bij,bnj->bni", prior, keys)
+    scaled = keys * root[..., None]
+    system = scaled @ scaled.transpose(1, 2)
+    system = system + eta * torch.eye(maximum, dtype=system.dtype, device=system.device)
+    solved = torch.cholesky_solve(scaled, torch.linalg.cholesky(system))
+    update = (residual * root[..., None]).transpose(1, 2) @ solved
+    return (prior + update).to(M0.dtype)
+
+
+def sweep_final(
+    M0: Tensor, u: Tensor, valid: Tensor | None = None, write: Tensor | None = None,
+    reset: Tensor | None = None, *, K: Tensor, V: Tensor, lam: Tensor | float, eps: float = 1e-6,
+    sweeps: int = 4,
+) -> Tensor:
+    """K-sweep store: the final-only beta = 1 delta scan repeated `sweeps` times over the same ordered writes.
+
+    Each pass is the unchanged scan_final with unit keys and beta = 1, so every write overwrites exactly along its key
+    (a Kaczmarz step); a reset at token zero clears M0 once, before the first pass, and interior resets are unsupported.
+    With lam = 1 and independent keys the states converge to the interpolant as `sweeps` grows; sweeps = 1 is
+    scan_final(beta = 1).
+    """
+    if isinstance(sweeps, bool) or not isinstance(sweeps, int) or sweeps < 1:
+        raise ValueError("sweeps must be a positive integer")
+    if reset is not None and bool(reset[:, 1:].any()):
+        raise ValueError("interior resets are not supported by the least-squares stores")
+    state = scan_final(M0, u, valid, write, reset, K=K, V=V, lam=lam, beta=1.0, eps=eps)
+    for _ in range(sweeps - 1):
+        state = scan_final(state, u, valid, write, None, K=K, V=V, lam=lam, beta=1.0, eps=eps)
+    return state
+
+
+def ridge_coefficients(keys: Tensor, q: Tensor, lam: Tensor | float, eta: float) -> dict[str, Tensor]:
+    """Float64 coefficients of the ridge_final read m = sum_j d_j v_j for M0 = 0 and n valid writes.
+
+    keys [B,n,r] are the unit written keys, q [B,Q,r] the queries. With W = diag(lam^(n-1-j)):
+    a = (W^1/2 K^T K W^1/2 + eta I)^-1 W^1/2 (K^T q) and d = W^1/2 a (b = K^T q, gram = K^T K).
+    """
+    keys, q = keys.double(), q.double()
+    n = keys.shape[1]
+    lam = torch.as_tensor(lam, dtype=torch.float64, device=keys.device)
+    root = (lam ** torch.arange(n - 1, -1, -1, device=keys.device, dtype=torch.float64)).sqrt()
+    gram = keys @ keys.transpose(1, 2)
+    b = torch.einsum("bnr,bqr->bqn", keys, q)
+    system = root[:, None] * gram * root[None, :] + eta * torch.eye(n, dtype=gram.dtype, device=gram.device)
+    a = torch.linalg.solve(system[:, None], (root * b)[..., None]).squeeze(-1)
+    return dict(b=b, a=a, d=root * a, gram=gram)
+
+
+def sweep_coefficients(keys: Tensor, q: Tensor, lam: Tensor | float, sweeps: int) -> dict[str, Tensor]:
+    """Float64 coefficients d of the sweep_final read m = sum_j d_j v_j, by the dual form of the delta rule.
+
+    The state is M = sum_i v_i c_i^T; one beta = 1 write of (k, v_j) maps every c_i to  lam c_i - (lam c_i . k) k  and adds
+    k to c_j. There is no separate pre-decay coefficient: a = d.
+    """
+    keys, q = keys.double(), q.double()
+    batch, n, width = keys.shape
+    lam = torch.as_tensor(lam, dtype=torch.float64, device=keys.device)
+    eye = torch.eye(n, dtype=keys.dtype, device=keys.device)
+    coefficients = torch.zeros(batch, n, width, dtype=keys.dtype, device=keys.device)
+    for _ in range(sweeps):
+        for j in range(n):
+            coefficients = lam * coefficients
+            overlap = torch.einsum("bir,br->bi", coefficients, keys[:, j])
+            coefficients = coefficients + (eye[j] - overlap)[..., None] * keys[:, j, None, :]
+    d = torch.einsum("bnr,bqr->bqn", coefficients, q)
+    return dict(b=torch.einsum("bnr,bqr->bqn", keys, q), a=d, d=d, gram=keys @ keys.transpose(1, 2))
+
+
+def gram_conditions(keys: Tensor, lam: Tensor | float | None = None, eta: float | None = None,
+                    floor: float = 1e-30) -> dict[str, Tensor]:
+    """Finite float64 condition numbers (largest / smallest eigenvalue, the smallest floored) per episode.
+
+    keys [B,n,r]. 'gram' is the condition of K^T K; with eta, 'ridge' is that of the ridge system
+    W^1/2 K^T K W^1/2 + eta I (W = I when lam is None).
+    """
+    keys = keys.double()
+    n = keys.shape[1]
+    gram = keys @ keys.transpose(1, 2)
+
+    def condition(matrix: Tensor) -> Tensor:
+        eigenvalues = torch.linalg.eigvalsh(matrix)
+        return eigenvalues[:, -1] / eigenvalues[:, 0].clamp_min(floor)
+
+    result = dict(gram=condition(gram))
+    if eta is not None:
+        root = torch.ones(n, dtype=keys.dtype, device=keys.device)
+        if lam is not None:
+            lam = torch.as_tensor(lam, dtype=torch.float64, device=keys.device)
+            root = (lam ** torch.arange(n - 1, -1, -1, device=keys.device, dtype=torch.float64)).sqrt()
+        system = root[:, None] * gram * root[None, :] + eta * torch.eye(n, dtype=keys.dtype, device=keys.device)
+        result["ridge"] = condition(system)
+    return result

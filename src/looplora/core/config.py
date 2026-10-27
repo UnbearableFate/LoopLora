@@ -32,6 +32,10 @@ class AdapterConfig:
     double_ba_form: Literal["skip", "gated"] = "skip"
     activation: Literal["relu", "identity"] = "relu"
     dpfp_nu: int = 0
+    store: Literal["delta", "ridge", "sweep"] = "delta"
+    store_eta: float = 1e-3
+    store_sweeps: int = 4
+    unit_query: bool = False
 
     def __post_init__(self) -> None:
         if self.r_mem is None:
@@ -55,6 +59,20 @@ class AdapterConfig:
             raise ValueError("dpfp_nu must be a nonnegative integer")
         if self.dpfp_nu and self.variant not in MEMORY_VARIANTS:
             raise ValueError("dpfp_nu requires a memory variant")
+        if self.store not in {"delta", "ridge", "sweep"}:
+            raise ValueError("store must be 'delta', 'ridge' or 'sweep'")
+        if not isinstance(self.unit_query, bool):
+            raise ValueError("unit_query must be a bool")
+        if isinstance(self.store_sweeps, bool) or not isinstance(self.store_sweeps, int) or self.store_sweeps < 1:
+            raise ValueError("store_sweeps must be a positive integer")
+        if isinstance(self.store_eta, bool) or not math.isfinite(self.store_eta) or self.store_eta <= 0:
+            raise ValueError("store_eta must be finite and positive")
+        if (self.store != "delta" or self.unit_query) and self.variant not in MEMORY_VARIANTS:
+            raise ValueError("store and unit_query require a memory variant")
+        if self.store != "delta" and (self.gate != "scalar" or self.dpfp_nu):
+            raise ValueError("least-squares stores require scalar gates and no DPFP features")
+        if self.unit_query and self.dpfp_nu:
+            raise ValueError("unit_query is part of the DPFP query map; enable one of them")
         for name in ("lambda_init", "beta_init"):
             if not 0 < getattr(self, name) < 1:
                 raise ValueError(f"{name} must lie strictly between 0 and 1")

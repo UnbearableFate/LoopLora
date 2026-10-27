@@ -84,7 +84,9 @@ class LLMExperiment:
                             gate=m.get("gate", "scalar"),
                             unshared_steps=4 if variant == "B8" else 1,
                             lambda_init=m.get("lambda_init", .99), beta_init=m.get("beta_init", .1),
-                            dpfp_nu=m.get("dpfp_nu", 0))
+                            dpfp_nu=m.get("dpfp_nu", 0), store=m.get("store", "delta"),
+                            store_eta=m.get("store_eta", 1e-3), store_sweeps=m.get("store_sweeps", 4),
+                            unit_query=m.get("unit_query", False))
         init_seed = derive_seed(config["seed"], "llm", stage, "reader", variant)
         self.bank = attach_adapters(self.model, cfg, layers=(self.layer,), seed=init_seed,
                                     input_site=self.input_site)
@@ -147,6 +149,12 @@ class LLMExperiment:
             signature["input_site"] = self.input_site
         if cfg.dpfp_nu:
             signature["dpfp_nu"] = cfg.dpfp_nu
+        if cfg.store == "ridge":
+            signature.update(store="ridge", store_eta=cfg.store_eta)
+        elif cfg.store == "sweep":
+            signature.update(store="sweep", store_sweeps=cfg.store_sweeps)
+        if cfg.unit_query:
+            signature["unit_query"] = True
         return signature
 
     def writer_state(self) -> dict[str, Tensor]:

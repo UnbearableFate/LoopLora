@@ -187,11 +187,15 @@ class MemoryAdapter(AdapterBase):
         return {"feature_map": partial(memory.dpfp_features, nu=nu)} if nu else {}
 
     def query_code(self, raw: Tensor) -> Tensor:
-        """Read-side address of a raw query projection: itself, or its unit-norm DPFP features."""
+        """Read-side address of a raw query projection: itself, its unit norm, or its unit-norm DPFP features."""
         nu = self.cfg.dpfp_nu
-        return F.normalize(memory.dpfp_features(raw, nu), dim=-1, eps=self.cfg.eps) if nu else raw
+        if nu:
+            return F.normalize(memory.dpfp_features(raw, nu), dim=-1, eps=self.cfg.eps)
+        return F.normalize(raw, dim=-1, eps=self.cfg.eps) if self.cfg.unit_query else raw
 
     def write(self, M_prev: Tensor, u: Tensor, write_mask: Tensor | None) -> Tensor:
+        if self.cfg.store != "delta" and (write_mask is None or bool(write_mask.any())):
+            raise ValueError("least-squares stores are defined for the final-only support write (scan_final) only")
         lam, beta = self.gates(u)
         return memory.write(M_prev, u, write_mask, K=self.K, V=self.V, lam=lam, beta=beta,
                             eps=self.cfg.eps, **self._key_features())
@@ -200,6 +204,8 @@ class MemoryAdapter(AdapterBase):
         self, M0: Tensor, u: Tensor, valid: Tensor | None = None,
         write: Tensor | None = None, reset: Tensor | None = None,
     ) -> tuple[Tensor, Tensor]:
+        if self.cfg.store != "delta":
+            raise ValueError("least-squares stores are defined for the final-only support write (scan_final) only")
         lam, beta = self.gates(u)
         return memory.scan_prewrite(M0, u, valid, write, reset, K=self.K, V=self.V,
                                     lam=lam, beta=beta, eps=self.cfg.eps, **self._key_features())
@@ -209,6 +215,13 @@ class MemoryAdapter(AdapterBase):
         write: Tensor | None = None, reset: Tensor | None = None,
     ) -> Tensor:
         lam, beta = self.gates(u)
+        store = self.cfg.store
+        if store == "ridge":
+            return memory.ridge_final(M0, u, valid, write, reset, K=self.K, V=self.V, lam=lam,
+                                      eta=self.cfg.store_eta, eps=self.cfg.eps)
+        if store == "sweep":
+            return memory.sweep_final(M0, u, valid, write, reset, K=self.K, V=self.V, lam=lam,
+                                      eps=self.cfg.eps, sweeps=self.cfg.store_sweeps)
         return memory.scan_final(M0, u, valid, write, reset, K=self.K, V=self.V,
                                  lam=lam, beta=beta, eps=self.cfg.eps, **self._key_features())
 
