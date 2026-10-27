@@ -29,6 +29,15 @@ the manifest) grants further identical attempts; an allocation failure (CUDA out
 record the code of every attempt. The §6 sheet states all three. As before, nothing was run with torch, pytest or on a compute node;
 §10.7 says what was checked and how.
 
+Step 1e (2026-10-27, §10.8): Clarification C3 of `docs/prereg/TSM.md` (master d335fe7, identical on `wp/sym` at 3ca4d89) and the independent static
+review of the failure rules (`docs/review/static_2026-10-27/tsm.md`, findings F1 to F8; it found no break of a registered quantity or decision rule)
+reopened the TSM failure protocol once, and the scripts changed accordingly. The first evaluation attempt runs at the training code (F1), and `train`
+refuses a code that differs from any record of its root (F2). torch's checkpoint-serialization errors, its CPU-allocator failure and
+`CUBLAS_STATUS_NOT_INITIALIZED` reported by `cublasCreate` are infrastructure failures (F3, F4). A stopping failure starts no pending run and lets the
+running ones finish (F5). The pause after three attempts and the orchestrator's recorded decision (`train --max-attempts N --decision FILE`) are enforced
+in code (F6), a live evaluation writes a heartbeat file (F7), and the §6 sheet words the check of an evaluation fix at code level (F8). As before,
+nothing was run with torch, pytest or on a compute node; §10.9 says what was checked and how.
+
 ```bash
 SYM=/work/xg24i002/x10041/LoopLora-wt/sym     # worktree; step-2 outputs go to $SYM/runs/<study> (git-ignored)
                                               # and compact results to $SYM/reports/<study> (committed)
@@ -219,7 +228,7 @@ $SUB --name uns-b --queue regular-g --walltime <measured x 1.5> --commit $CODE -
   --design-commit $UNS_LOCK --root $SYM/runs/uns/main
 $SUB --name uns-b-audit --queue debug-g --walltime 00:20:00 --commit $CODE --wait -- scripts/audit_uns.py --extension-root $SYM/runs/uns/main --out $SYM/reports/uns/part-b
 
-# 4. TSM   (after the others; failure rules: docs/prereg/TSM.md, "Decisions at registration" and Clarifications C1 and C2)
+# 4. TSM   (after the others; failure rules: docs/prereg/TSM.md, "Decisions at registration" and Clarifications C1, C2 and C3)
 $SUB --name tsm-lock  --queue debug-g --walltime 00:05:00 --commit $CODE --wait -- scripts/run_tsm.py lock --out $SYM/reports/tsm/design.json
 #    STOP: report $SYM/reports/tsm/design.json; the orchestrator commits it on wp/sym. TSM_LOCK = that commit's full SHA
 $SUB --name tsm-smoke --queue regular-g --walltime 00:20:00 --commit $CODE --wait -- scripts/run_tsm.py smoke --design $SYM/reports/tsm/design.json --root $SYM/runs/tsm/smoke --procs 6
@@ -230,43 +239,63 @@ done
 #    After every job read $SYM/runs/tsm/main/train_manifest-<label>.json (exit status 0 = every selected run is final):
 #      "training_failures" lists registered failures (a non-finite loss or gradient norm in a T1/T2 run): no retry, no re-tuning; report them, the evaluation goes on;
 #      status "stopped": the study stops. Report it to the orchestrator; do not evaluate and submit no further TSM job (jobs that are already running
-#        may finish). Two causes, named in the manifest's "reason": a non-finite loss or gradient norm in a T0 run, or a code defect, that is a run that
-#        ended with any exception other than those, an OSError or an allocation failure (CUDA out-of-memory, a cuBLAS or cuDNN allocation failure, a host
-#        MemoryError); any other CUDA runtime error, an illegal memory access for example, is a code defect (its record.json says failure_kind code_defect;
-#        the traceback is in logs/<run>.log). After a code defect the fixed code must retrain every TSM run before the confirmation set is opened: the
-#        orchestrator decides, nothing continues by itself (TSM.md, Clarification C1). If the orchestrator's diagnosis finds a hardware fault behind the
-#        error it records that, and the run is retried as an infrastructure failure (C2): the scripts have no option for it, so the operator moves
+#        may finish: the stopped job itself starts no pending run, lets the runs that were already running finish, keeps their records and then ends
+#        with an error; the manifest's "run_states" says what each selected run ended as, "missing" for a run that was never started). Two causes,
+#        named in the manifest's "reason": a non-finite loss or gradient norm in a T0 run, or a code defect, that is a run that ended with any
+#        exception other than those, an I/O error and an allocation failure. An I/O error is an OSError, or a failure of torch's checkpoint
+#        serialization (a RuntimeError "PytorchStreamWriter failed ..." or "PytorchStreamReader failed ..."). An allocation failure is CUDA
+#        out-of-memory, a cuBLAS or cuDNN allocation failure, CUBLAS_STATUS_NOT_INITIALIZED reported by cublasCreate, torch's CPU-allocator failure
+#        ("DefaultCPUAllocator: not enough memory") or a host MemoryError (Clarification C3). Any other CUDA runtime error, an illegal memory access
+#        for example, and CUBLAS_STATUS_NOT_INITIALIZED from any other call, is a code defect (its record.json says failure_kind code_defect; the
+#        traceback is in logs/<run>.log). A code defect that was misread as one of the failures above repeats identically and reaches the pause
+#        below (C3); if the diagnosis then finds a code defect, the stop applies. After a code defect the fixed code must retrain every TSM run, in
+#        a new --root (one root holds one source_hash, and every later train of the stopped root refuses), before the confirmation set is opened: the
+#        orchestrator decides, nothing continues by itself (TSM.md, Clarification C1). If the orchestrator's diagnosis finds a hardware fault behind
+#        the error it records that, and the run is retried as an infrastructure failure (C2): the scripts have no option for it, so the operator moves
 #        runs/<run> to attempts/<run>-attempt<k> and logs/<run>.log to attempts/<run>-attempt<k>.log (k = the attempts of that run already moved + 1: what
 #        --rerun-incomplete does) and submits the identical train job again, which counts as an attempt;
-#      status "incomplete" (the job ended before its runs did: walltime or node fault, an I/O error = OSError, or an allocation failure, that is CUDA
-#        out-of-memory, a cuBLAS or cuDNN allocation failure or a host MemoryError; failure_kind infrastructure, and for an allocation failure the remedy
-#        may be a lower --procs): once qstat shows the job has ended, submit the
+#      status "incomplete" (the job ended before its runs did: walltime or node fault, an I/O error or an allocation failure as above; failure_kind
+#        infrastructure, and for an allocation failure the remedy may be a lower --procs): once qstat shows the job has ended, submit the
 #        identical command again at the same --commit with a new --label (s17-r2) and --rerun-incomplete, restricted to the runs of that job
-#        (--seeds ...); at most twice per run (3 attempts; `train` refuses a fourth: report it, the orchestrator diagnoses, Clarification C1). After the
-#        orchestrator's recorded decision the same command with --max-attempts N allows N attempts in all (--max-attempts 4 permits a fourth attempt; the
-#        default is 3, a smaller N is refused, the manifest records N, and every attempt is still compared with the one before it). `train` refuses a
+#        (--seeds ...); at most twice per run (3 attempts). A run that is not final and has used its 3 attempts, the last one ended, pauses the study
+#        (Clarification C1): `train` then refuses every job, whatever it selects. Report it: the orchestrator diagnoses. After the orchestrator's recorded
+#        decision, written to a file, the same command with --max-attempts N --decision FILE allows N attempts in all (--max-attempts 4 permits a
+#        fourth attempt; the default is 3, a smaller N is refused, an N above 3 is refused without --decision, FILE is an absolute path of a non-empty
+#        file, the manifest records N and the file's path and blake2b digest, and every attempt is still compared with the one before it). The pause is
+#        read at each job's own N: until the paused run is final, every later `train` job, whatever it selects, passes the same --max-attempts N --decision
+#        FILE (a run that fails again at its N-th attempt pauses the study again). `train` refuses a
 #        run marked "running" that was written to in the last 5 minutes
 #        (its job may be alive): wait and submit again. A rerun job that itself ends before its runs started is submitted again the same way.
 #        A run reported as unfinished that has no record.json (an error before its run directory exists: its child died, or the design, the
 #        configuration or the code version could not be read) is not rerun blindly: read logs/<run>.log and report the traceback; the orchestrator
 #        classifies it (C1, C2).
-#      All 18 runs must come from the same $CODE and every attempt must equal the one before it (configuration and source_hash); `train`,
-#      `evaluate` and the analysis refuse otherwise (a different code version is a decision for the orchestrator, §9).
+#      All 18 runs must come from the same $CODE and every attempt must equal the one before it (configuration and source_hash): `train` refuses a job
+#      whose source_hash differs from that of any record under runs/ or attempts/ of its root, before it starts anything, and `evaluate` and the
+#      analysis refuse otherwise (a different code version is a decision for the orchestrator, §9; a retraining at another code starts in a new --root).
 $SUB --name tsm-eval  --queue regular-g --walltime <about 00:20:00> --commit $CODE -- scripts/run_tsm.py evaluate --design $SYM/reports/tsm/design.json --design-commit $TSM_LOCK --root $SYM/runs/tsm/main
+#    tsm-eval runs at the training $CODE: its first attempt at another source_hash is refused, and so is --new-evaluation-code without an earlier attempt.
+#    A live evaluation writes evaluation/heartbeat every 30 s, so that the silence rule below cannot mistake it for an ended one.
 #    tsm-eval ends before it completes (walltime or node fault; evaluation/manifest.json says "running", or "failed" if the job could write its own end):
 #      once qstat shows the job has ended, submit the identical command again (same --commit, same $TSM_LOCK) with --restart-interrupted, at most twice
 #      (3 attempts in all). `evaluate` moves the partial evaluation/ to attempts/evaluation-attempt<k> without opening anything in it, requires identical
 #      inputs (design lock, source_hash, the 18 run checkpoints) and records `attempt` and `restarts` in the new manifest; a "running" manifest must have
-#      been silent for 5 minutes. Never open the moved files; report each restart. The analysis audits the record and prints it in summary.md and summary.json.
-#      A defect in the evaluation code (not in the training code) is for the orchestrator (C2). It checks that the fix changes no file the training path
-#      uses (for example a diff of the training CODE and the fixed commit over src/, scripts/ and configs/) and names the fixed commit. The evaluation
+#      been silent for 5 minutes (any file written in evaluation/ counts, the heartbeat included). Never open the moved files; report each restart. The
+#      analysis audits the record and prints it in summary.md and summary.json.
+#      A defect in the evaluation code (not in the training code) is for the orchestrator (C2, C3). It checks the fix at code level, not at file level,
+#      and records the check with its decision: the fix must change no function, class or module-level statement that the training path executes (the
+#      training path is `train`, `train-one` and everything they call, shared helpers included; evaluation and training share scripts/run_tsm.py and
+#      src/looplora/sym/tsm.py, so a check by file could never pass). For example: a diff of the training CODE and the fixed commit over src/, scripts/ and
+#      configs/, read hunk by hunk, where every hunk must lie in code that the training path does not execute. It names the fixed commit. The evaluation
 #      is then submitted at that commit (--commit <fixed>, the same $TSM_LOCK) with `--restart-interrupted --new-evaluation-code`: the 18 trained runs
 #      are kept, the partial evaluation/ is moved aside unread, and the restart runs at the new source_hash. Without --new-evaluation-code a restart at
-#      another source_hash is refused, and the flag without --restart-interrupted is refused (also when nothing is in place after an aborted restart).
+#      another source_hash is refused, and the flag without --restart-interrupted, or without an earlier attempt, is refused (an attempt moved aside by an
+#      aborted restart is an earlier attempt). A restart that has no readable manifest of an earlier attempt to compare with runs at the training $CODE,
+#      unless the flag says otherwise.
 #      Nothing else may differ (the design, its lock commit --design-commit, the checkpoints), the 18 training records must still share one source_hash (checked),
 #      and three attempts in all remain the limit. The manifest records the source_hash of this attempt (`source`), of every moved one
 #      (`restarts[].source_hash`) and the one the 18 runs were trained at (`training_source_hash`); summary.json adds evaluation_source_hash, and
-#      summary.md names the change of code with the source_hash of each attempt.
+#      summary.md always prints both hashes ("the same code" or "a DIFFERENT code"), says so when the first attempt ran at another code (outside the
+#      rule) and names the change of code at a restart with the source_hash of each attempt.
 $SUB --name tsm-analyze --queue debug-g --walltime 00:15:00 --commit $CODE --wait -- scripts/analyze_tsm.py --root $SYM/runs/tsm/main --out $SYM/reports/tsm/results
 ```
 
@@ -275,8 +304,8 @@ Jobs longer than the Bash tool's limit are submitted without `--wait` and follow
 `git show <commit>:<path>` in the file's own repository; a commit of the same file on master at the same relative path
 is equally valid. TSM's rerun rules are in the comments of block 4: the `train` stage itself moves an unfinished run to `<root>/attempts/`
 (with `--rerun-incomplete`), never touches a complete run or a registered failure, and `evaluate` refuses anything else; an `evaluate` job that
-was interrupted is started again with `--restart-interrupted` as described there (without the flag it refuses: "already started"); `--max-attempts N`
-and `--new-evaluation-code` are described there too.
+was interrupted is started again with `--restart-interrupted` as described there (without the flag it refuses: "already started"); `--max-attempts N
+--decision FILE` and `--new-evaluation-code` are described there too.
 
 **Interrupted evaluation jobs of IVD, CVH, UNS and NCR.** The same operational rule as for TSM (Clarification C1) applies: a job that ends before
 it completes (walltime, node or I/O fault) is restarted from scratch with identical inputs (same `--commit $CODE`, same lock commits and
@@ -386,12 +415,13 @@ as to its thresholds; each fills something the plan leaves open.
 | --- | --- |
 | IVD | decision load L24 (L6 reported); per-writer decision with a 97.5% interval; `nat` arm and second load level added (reported only); manipulation check (overlap gap ≥ 0.2, label `inconclusive`) added, same action as `not_supported`; frozen readers see 18 or 36 stored facts, outside their training distribution |
 | CVH | the plan's three heads: A0 is a reference, the rule applies to A1 and A2 (six comparisons); margin 0.25 nats fixed before any data; the hop-1 constraint is applied to the threshold choice of both A1 and A2; "mean executed depth" read as mean executed updates (fallback = 16), stricter than the mean selected step; a family whose A1 and A2 are both infeasible is not traced on the confirmation set; wall time is the primary latency clock; the A0 recomputation must reproduce the P4-S-L validation accuracy within 1e-3 |
-| TSM | T0 = released recipe at the fixed depth 4 (P2-S-F1 recipe), retrained; stay uses L4 and L16, far uses L8 for arm and T0 (L16 reported), gain uses L4 against B4 at L1; an arm passes only if both writers pass (rv-astra), intervals corrected for four comparisons; stay-loss weighting (mean over steps s ≥ hop, equal over queries); T2 without PonderNet step cost, with explicit init (a, b) = (0, 4); same released lr (0.003) for every arm, no retry; training failures as registered at 40ddf08 and in Clarifications C1 and C2, implemented in steps 1b, 1c and 1d (§10): a non-finite loss or gradient norm in T1/T2 fails that arm for that writer (completed seeds reported descriptively, other arms evaluated), in T0 it stops the study, an infrastructure failure (walltime, node fault, `OSError`, an allocation failure: CUDA out-of-memory, a cuBLAS or cuDNN allocation failure, a host `MemoryError`) is rerun identically at most twice (more with `train --max-attempts N` on the orchestrator's recorded decision), any other exception is a code defect that stops the study, an interrupted `evaluate` is restarted from scratch with identical inputs at most twice (at another evaluation code only with `--new-evaluation-code`), a single-writer pass is a writer-specific result, not a remedy |
+| TSM | T0 = released recipe at the fixed depth 4 (P2-S-F1 recipe), retrained; stay uses L4 and L16, far uses L8 for arm and T0 (L16 reported), gain uses L4 against B4 at L1; an arm passes only if both writers pass (rv-astra), intervals corrected for four comparisons; stay-loss weighting (mean over steps s ≥ hop, equal over queries); T2 without PonderNet step cost, with explicit init (a, b) = (0, 4); same released lr (0.003) for every arm, no retry; training failures as registered at 40ddf08 and in Clarifications C1, C2 and C3, implemented in steps 1b to 1e (§10): a non-finite loss or gradient norm in T1/T2 fails that arm for that writer (completed seeds reported descriptively, other arms evaluated), in T0 it stops the study, an infrastructure failure (walltime, node fault, `OSError`, a torch checkpoint-serialization error, an allocation failure: CUDA out-of-memory, a cuBLAS or cuDNN allocation failure, `CUBLAS_STATUS_NOT_INITIALIZED` reported by `cublasCreate`, torch's CPU-allocator failure, a host `MemoryError`) is rerun identically at most twice (more with `train --max-attempts N --decision FILE` on the orchestrator's recorded decision; a run that is not final and has used its attempts pauses the study and `train` refuses to start), any other exception is a code defect that stops the study (the job starts no pending run and lets the running ones finish), one root holds one `source_hash`, an interrupted `evaluate` is restarted from scratch with identical inputs at most twice (the first attempt runs at the training code; another evaluation code only at a restart, with `--new-evaluation-code`), a single-writer pass is a writer-specific result, not a remedy |
 | UNS | split into Part A (zero-evaluation audit of the committed rows) and Part B (what is missing; registered as run, not optional); "M1-L4 and B4" covered by Part A (released M1 at L4/L1, B4) and Part B (M1 trained at L = 4); `oracle_random` added as a control; a 3 pp wording rule for the scope row (changes no gate); disclosure that the unseen rows were seen before registration |
 | NCR | single read = L = 1 of M1 and B4; both rate and share reported; category priority and the h = 2 case fixed before any neighbour-confusion quantity is computed; the already analysed C777 confirmation samples are re-read, not re-evaluated |
 
 Answered (orchestrator; 40ddf08, the step-1b message, for item 6 Clarification C1 of `docs/prereg/TSM.md` (master 3477526, identical on
-`wp/sym` at 68c19da) and for item 7 Clarification C2 (master d488b78, identical on `wp/sym` at a5c093a)), no longer open:
+`wp/sym` at 68c19da), for item 7 Clarification C2 (master d488b78, identical on `wp/sym` at a5c093a) and for item 8 the step-1e message with
+Clarification C3 (master d335fe7, identical on `wp/sym` at 3ca4d89)), no longer open:
 1. UNS Part B runs; it is not optional (only its two-checkpoint timing run stays optional).
 2. TSM: both writers must pass; a single-writer pass is reported as writer-specific, not as a remedy. Failures: infrastructure
    failure, identical rerun, at most twice; non-finite loss in T1/T2, that arm fails for that writer and the other arms are still
@@ -419,13 +449,25 @@ Answered (orchestrator; 40ddf08, the step-1b message, for item 6 Clarification C
    the fix changes no file the training path uses, and the evaluation restarts from scratch at the fixed commit with `evaluate --restart-interrupted
    --new-evaluation-code`, the partial output moved aside unread and both code hashes recorded (change 3; the orchestrator's check is not
    automated); (4) the evaluation job's `source_hash` is recorded and compared with the training hash by no script: C2 asks for no check, the training
-   jobs share one `CODE` commit and the evaluation job may use a later commit only under C2 (no further code); (5) allocation failures (CUDA
+   jobs share one `CODE` commit and the evaluation job may use a later commit only under C2 (no further code; superseded in step 1e: item 8, F1, the
+   first evaluation attempt now has its `source_hash` compared with the training hash by `evaluate`); (5) allocation failures (CUDA
    out-of-memory, cuBLAS or cuDNN allocation failures, host `MemoryError`) are infrastructure failures and other CUDA runtime errors are code defects
    (change 2); if the orchestrator's diagnosis finds a hardware fault, it records that and the run is retried as an infrastructure failure (a
    manual move in the §6 sheet, no option in the scripts); (6) an error before a run directory exists leaves no record: the operator reports the
    traceback and the orchestrator classifies it (the sheet; no further code).
 
-Nothing is open for the orchestrator after step 1d. The TSM failure protocol is closed (the step-1d message): a further edge case is decided by the
+8. The findings of the independent static review of the failure rules (`docs/review/static_2026-10-27/tsm.md`) that the step-1e message and Clarification C3
+   answered (the code follows them, §10.8): (F1) the first evaluation attempt runs at the training code, and `--new-evaluation-code` needs an earlier
+   attempt; (F2) `train` refuses a `source_hash` that differs from any record under `runs/` or `attempts/` of its root, in `stage_train` and in `train-one`
+   before `mkdir`; (F3, F4) torch's checkpoint-serialization errors ("PytorchStreamWriter failed", "PytorchStreamReader failed"), its CPU-allocator failure
+   ("DefaultCPUAllocator: not enough memory") and `CUBLAS_STATUS_NOT_INITIALIZED` reported by `cublasCreate` are infrastructure failures, and a code defect
+   that is misread as one of them repeats identically and reaches the pause (C3, bounded exposure); (F5) a stopping failure starts no pending run, the
+   running runs of the same job finish and their records are kept; (F6) `train` refuses to start while a run that is not final has used its attempts, and
+   `--max-attempts N` above 3 needs `--decision FILE` (the manifest records the file's path and blake2b digest); (F7) an evaluation heartbeat file, and a test
+   that pins `QUIET_SECONDS == 300`; (F8) the orchestrator's check of an evaluation fix works at code level and is recorded with its decision (C3; the sheet
+   words it, the check is not automated). The `--rerun-incomplete` help text names the allocation failures and `--max-attempts`.
+
+Nothing is open for the orchestrator after step 1e. The TSM failure protocol is closed again (Clarification C3): a further edge case is decided by the
 orchestrator when it occurs and recorded in this report.
 
 ## 10. Step 1b (2026-10-27): aligned with the registrations
@@ -692,3 +734,114 @@ Interpretations made in step 1d, stated as they are implemented (none changes a 
   walltime kill or an I/O fault on a compute node, the clock and file timestamps across nodes of the shared filesystem (the 300 s rule), and the
   `--max-attempts` and `--new-evaluation-code` jobs on a compute node. The first compute-node run of `tests/test_tsm_scripts.py` is part of the
   step-0 test job of §6.
+
+### 10.8 Step 1e (2026-10-27): the static review of the failure rules and Clarification C3 in the code
+
+Task: `docs/tasks/WP-S9_symbolic_followups.md`, section "Step 1e" (master 45060c7). It covers the independent static review
+`docs/review/static_2026-10-27/tsm.md` (findings F1 to F8; no break of a registered quantity or decision rule) and Clarification C3 of
+`docs/prereg/TSM.md` (master d335fe7, byte-identical on `wp/sym` at 3ca4d89; not edited, and C1 and C2 are as they were). Commits: fab4006
+(`scripts/run_tsm.py`, `scripts/analyze_tsm.py`, `tests/test_tsm_scripts.py`) and the commit of this report. Nothing else changed: the IVD, CVH, UNS
+and NCR code, the five preregs, `pyproject.toml` and `uv.lock` are as they were.
+
+| finding (rule) | implementation |
+| --- | --- |
+| F1, Medium: the first evaluation attempt runs at the training code (C1: every TSM training and evaluation job runs at one `CODE` commit; C2: another evaluation code only under the `--new-evaluation-code` rule) | `evaluation_attempt`, before anything is created or generated. `--new-evaluation-code` needs an earlier attempt (an evaluation in place or moved aside) and, as before, `--restart-interrupted`: the first attempt refuses it. An attempt that has no readable earlier manifest to compare with must run at `training_source_hash` ("the evaluation runs at source_hash ... but the 18 runs were trained at ..."); a restart whose earlier attempt has a readable manifest is compared with it as before, `--new-evaluation-code` exempting only the code. `analyze_tsm.py` always prints "Code (source_hash): the 18 runs were trained at ...; the evaluation ran at ... (the same code, or a DIFFERENT code)". If the first attempt of a record ran at another code (a manifest that did not pass this check), a sentence says that this is outside the rule, to be reported before the result is used, with the code of each attempt; a restart at another code is worded as in step 1d |
+| F2, Low: `train` compares the `source_hash` across the runs of a root | `require_one_code(root, source)` in `stage_train` (after the stop check, before the pause check, the run states, any log and the manifest: a refused job writes neither a manifest nor a log) and in `train_one` (before `check_rerun` and `mkdir`: the child creates no run directory). It compares the job's `source_hash` with that of every readable `runs/*/record.json` and `attempts/*/record.json` (`recorded_source_hashes`; a cut-off record, or one without a source, is no evidence). The message says that a retraining at another code starts in a new `--root` |
+| F3, Low-Medium (C3: I/O errors include torch's checkpoint-serialization errors) | `is_serialization_failure`: a `RuntimeError` whose lower-case text contains "pytorchstreamwriter failed" or "pytorchstreamreader failed". `classify_failure` makes it `infrastructure`, as it does an `OSError` |
+| F4, Low (C3: allocation failures include torch's CPU-allocator failure and `CUBLAS_STATUS_NOT_INITIALIZED` reported by `cublasCreate`) | `is_allocation_failure` also accepts a `RuntimeError` that contains "defaultcpuallocator: not enough memory" (lower case), or both "cublas_status_not_initialized" and "cublascreate". The same status from another call (`cublasSetStream`, or none named) and another status of `cublasCreate` stay code defects. The bounded exposure of C3 is not coded: a code defect that was misread as one of these repeats identically and reaches the pause (F6) |
+| F5, Low (C1: running jobs may finish, and their outputs are kept) | `schedule` with `fatal` (the training stage): the first stopping failure (a T0 numerical failure, or a code defect) clears the pending runs, and the loop goes on until the running children have ended. Nothing is terminated and the records of the finishing runs are kept. `stage_train` then reads the records on disk: `study_stop` names the first run that stopped the study (a code defect before a T0 failure, as before), and the `stopped` manifest carries `run_states` (what each selected run ended as, `missing` for a run that was never started). Without `fatal` (the smoke stage) the first non-zero exit still stops everything at once, and a child that cannot be started still does |
+| F6, Low (C1: three failed attempts pause the study; C2: `--max-attempts N` after the recorded decision) | `paused_runs(root, N)`: a run of the 18 that is not final (`missing` or `incomplete`), has used N attempts (`attempts_used`: those moved aside and the one in place) and whose last attempt has ended (`has_ended`: its record says `failed`, or nothing was written for 300 s; always the case for a run with no run directory) pauses the study. `stage_train` then refuses every job, whatever it selects, before it writes anything ("... the study is paused ..."). `--max-attempts N` above 3 is refused without `--decision FILE` (an absolute path of an existing, non-empty file), and the manifest records `decision` = `{path, blake2b}` (blake2b-128 of the file; `None` without `--decision`). Nothing reads the content of the file |
+| F7, Low | `heartbeat(path)` in `stage_evaluate`: a daemon thread rewrites `evaluation/heartbeat` (the current time) every `HEARTBEAT_SECONDS` = 30 s, with a first beat before the evaluation starts, until the evaluation completes or fails; a beat that cannot be written (`OSError`) is skipped. The silence rule counts it (any file written in `evaluation/` does). A test pins `QUIET_SECONDS == 300` and `0 < HEARTBEAT_SECONDS <= 60` |
+| F8, Low (C3: the check of an evaluation fix is made at code level and recorded with the decision) | the sheet only (§6, block 4): the check works on the functions, classes and module-level statements that the training path executes, not on files; it stays the orchestrator's and is not automated; the example is a diff of the training `CODE` and the fixed commit, read hunk by hunk |
+| the `--rerun-incomplete` help | names walltime or a node fault, an I/O or serialization error and an allocation failure, and says "at most twice per run, or `--max-attempts` attempts in all". The `--max-attempts` help names `--decision`, and the `--new-evaluation-code` help says that the first attempt refuses it |
+
+Interpretations made in step 1e, stated as they are implemented (none changes a registered threshold, statistic or sample):
+- "The training code" is the `source_hash` that the 18 run records share (`training_source_hash`). `--commit`, `git_commit` and `source_dirty` are compared by no script, as before.
+- "No earlier attempt" is no evaluation in place and none moved aside. An earlier attempt whose manifest is not readable (a job killed before it wrote one) still counts as an attempt, and a restart then runs at the training code unless `--new-evaluation-code` says otherwise: there is no earlier manifest to compare with, and the flag is the orchestrator's decision (C2). The code of such an attempt is `null` in `restarts` and "unknown" in `summary.md`, as in step 1d.
+- The pause is read at the job's own `--max-attempts`. A job at N = 4 passes a run that has used 3 attempts and a job at the default refuses it: until the paused run is final, every later `train` job passes the same `--max-attempts N --decision FILE` (the sheet says so), and a run that fails again at its N-th attempt pauses the study again.
+- A run whose last attempt may still be alive (marked "running", written to in the last 5 minutes) is not paused: it has not failed yet. A run with attempts moved aside and no run directory (a rerun whose child died at once) is paused once its attempts are used.
+- `--max-attempts 3` with `--decision FILE` is accepted and the decision is recorded; the registered number needs none. The file must exist and not be empty. Whether it is the orchestrator's decision is not checked; the digest ties the manifest to the file.
+- A stopping failure stops the job the way C1 lets a study stop: nothing new starts, the running children finish and none is terminated. The job lives until its running children have ended or its walltime does (a child that the walltime ends first is an unfinished run like any other). A child that fails after the first stopping failure is recorded as well, and `study_stop` names the first code defect in the plan's order, else the first T0 failure. Failures that do not stop the study (a numerical failure of a T1 or T2 run, an infrastructure failure) are recorded as before and stop nothing.
+- The three C3 texts are read in a `RuntimeError`, as are the C2 library statuses (the libraries raise a `RuntimeError`); the same text in a `ValueError` is a code defect.
+- The heartbeat shows that the evaluation process is alive, not that it progresses: an evaluation that hangs while its interpreter still runs goes on beating until its walltime ends. The interval (30 s) is half the required 60 s. The silent gap of a live evaluation was not measured (no compute node); the heartbeat makes it irrelevant to the silence rule.
+- Statements of 10.1 to 10.7 that step 1e supersedes: the CPU allocator "can't allocate memory" and `CUBLAS_STATUS_NOT_INITIALIZED` as code defects (torch 2.14 says "not enough memory", and under C3 both are infrastructure failures; `CUBLAS_STATUS_NOT_INITIALIZED` reported by any call other than `cublasCreate` stays a code defect), "the evaluation job's hash is compared with the training hash by no script" (F1), the running siblings of a stopping failure being terminated (they finish), and the 300 s rule being untested (F7).
+
+### 10.9 Verification of step 1e (all static or torch-free; nothing was run with torch, pytest or on a compute node)
+
+- `python3 -m pyflakes` (2.4.0, Python 3.9.25) on the three changed Python files: clean. `py_compile` with the bytecode written outside the worktree
+  under Python 3.9.25 and 3.13.13 (`-I -B`): ok; no `__pycache__` in the worktree. The `ast` checks of step 1 on the final tree: 846 module-attribute
+  references, none unresolved; 1194 calls with 6 hits, the 4 re-exports of §7 and two uses of `run_tsm.digest_checkpoint` in tests (re-exported by
+  `from s9_common import ... digest_checkpoint ...`, `run_tsm.py:64`; it resolves at run time). No added line of code or tests is longer than 120 columns.
+- 139 test functions in the ten files (127 after step 1d); `test_tsm_scripts.py` went from 39 to 51: twelve new functions. F5: a stopping failure through the
+  real `schedule` with stub children (the default path stops everything at once; with the predicate no pending run starts, the running children end, the error
+  names the first stopping failure; a failure the predicate does not name stops nothing). F2: `train_one` refuses another code and creates nothing (records
+  in place and moved aside count, a cut-off or source-less record does not), and a training job at another code is refused by the real `main` before it
+  starts, logs or writes anything (two selections). F6: a larger cap needs a decision that exists (absent, empty, a directory and a relative path are
+  refused with nothing created; the registered number with a decision records it; a manifest without one says `None`), the pause rule on a bare directory
+  (a registered training failure is final, an unfinished run pauses, a missing run with three moved attempts pauses), and the pause across real jobs
+  (three killed attempts; the last attempt still alive pauses nothing; after it ended five different selections are refused with nothing written; a decision at 4
+  lets another job go on and then the paused run's fourth attempt completes). F1: the summary states both codes (8 cases of attempt codes, the unknown
+  one included), the first evaluation attempt runs at the training code (refused at another code with or without `--restart-interrupted`, the flag refused
+  with no earlier attempt, nothing created; a manifest edited to say another code is audited and flagged), and a restart with no readable earlier manifest runs
+  at the training code unless the flag says otherwise. F7: `QUIET_SECONDS == 300` and `0 < HEARTBEAT_SECONDS <= 60`, a live evaluation writes a heartbeat
+  while its work writes nothing else (several different beats, one thread, the first beat before the work, nothing after the end), and the heartbeat stops
+  at a failure, skips a beat that cannot be written and lets an error of its block propagate. Existing tests changed: the classification has 36 cases (27
+  before): the real torch 2.14 texts of the three C3 failures, their near misses (`CUBLAS_STATUS_NOT_INITIALIZED` from `cublasSetStream` or with no call named,
+  another status of `cublasCreate`, another text of the CPU allocator, the C3 texts in a `ValueError`, a stream error with neither marker); the old
+  `DefaultCPUAllocator: can't allocate memory` text is gone. The end-to-end allocation test (renamed) has six outcomes (adds a serialization error, the CPU
+  allocator and the `cublasCreate` initialisation), the fixture's children have `serialize`, `cpualloc`, `cublasinit` and `slow` (a child still running for a
+  few polls, replacing `hang`), the two study-stop tests expect the sibling to finish with its record kept and `run_states` in the manifest, the larger-cap
+  tests pass a decision file and check its recorded path and digest, the rerun test has a configuration-mismatch leg, the restart-waits test has a heartbeat leg,
+  and the pipeline and restart tests check the code sentence of `summary.md`.
+- The repository's own test bodies of `tests/test_tsm_scripts.py` through the stand-in for pytest's fixture machinery of 10.3 (venv python, stub
+  `torch` package, file and numpy stand-ins for the model, `train`, `train_arm`, `evaluate_arm` and the loaders): 105 of 105 cases passed (50 functions;
+  `test_t0_is_the_unchanged_training_function` is skipped as before). The heartbeat tests run on the real clock.
+- Mutation check of the logic by the same stand-in: 190 one-line mutants of `scripts/run_tsm.py` and `scripts/analyze_tsm.py`, each applied to a copy of the
+  tree (the repository is not touched) and run against the whole test file (4 workers). 123 are those of steps 1b to 1d (16 of them re-written for code
+  that step 1e changed), 67 were written for step 1e: F1 13 (the first attempt allowed at any code, no way round for a restart with no manifest, the flag
+  accepted with no earlier attempt or refused for a first restart, the two codes compared with themselves or swapped, an earlier manifest not compared, and
+  six changes of the code line and the sentences of `summary.md`), F2 7 (no check in the stage or in the child, only the records of `runs/` or of
+  `attempts/`, any record or one without a code counted, only the first code compared), F3 and F4 10 (the CPU allocator, the cuBLAS status and the
+  `cublasCreate` condition dropped or widened, the writer or the reader marker alone, no `RuntimeError` requirement, serialization read as a code defect), F5 8
+  (starts not stopped, running children terminated, the stop not reported or the last one reported, the default path draining too, the predicate inverted,
+  no `run_states`, a stopping failure that drains without clearing the pending runs), F6 17 (no decision required, the checks of the file dropped one by one,
+  the digest, the manifest, the pause dropped, widened or narrowed, the floor of the cap, the attempts counted), F7 12 (the interval above 60 s, the silence rule
+  changed, the file elsewhere, no first beat, the thread not stopped or not joined, a failed beat ending the evaluation, no heartbeat, the silence rule not reading
+  it, an interval as long as the silence rule, a single beat, an unnamed thread). Result of the full
+  run on the final tests: 188 of 190 killed, each by at least one failing test and none by a crash of the run. The two survivors are not gaps in the tests. D12
+  (the loop of `stage_train` that compares an attempt with the one before it allowing one attempt more than the cap) is equivalent: a run for which that cap matters
+  has been refused earlier, by the pause check (its last attempt has ended, or it has no run directory) or by `require_ended` (it may be alive), and the child's own
+  `check_rerun` applies the true cap. D20 (a step-1d mutant that adds the phrase "allocate memory" to the library statuses, so that the invented CPU-allocator text of
+  step 1d counted) is obsolete: the case that killed it pinned that invented text, which F4 replaced (no library of torch 2.14 contains it), and I01 and I07 check
+  the registered text. The first full run, on the tests as they were before three changes, killed 187: the survivors were M01 (the identity comparison of an
+  unfinished run's configuration, shadowed for the code by `require_one_code`; a configuration-mismatch leg was added to the rerun test), L10 (a heartbeat interval as
+  long as the silence rule; the heartbeat test now sets the silence rule to an hour, so the interval is tested on its own) and D12; the three were run again after
+  the two test changes (M01 and L10 killed), and the full run was repeated after the third change, the replacement of the invented text, which is the run
+  reported here.
+- Real subprocess scenarios (real `Popen` children and parents, logs, SIGTERM to the process group, stub torch, fake training and evaluation with sleeps;
+  scripts in the session scratchpad; the harness runs the real `start_child`, replacing only the script in its command). The seven scenarios of 10.2 to
+  10.5 and scenario 8 of 10.7 were run again on the final code: the outputs of 1, 4, 6 and 7 are identical to the earlier ones except for times, process ids
+  and the seals that contain them (scenario 1 still ends in the error of its own last line, as before); in 2 the refusal of the changed code now comes from the
+  stage ("the code differs from the earlier TSM records"); in 3 and 5 the siblings of a stopping failure now end `complete` where they were left `running`
+  after the termination; in 8 the fourth attempt is refused as the pause ("used 3 of 3 attempts and is not final: the study is paused") and the larger caps
+  pass a decision file. New: (9, F5) a non-finite loss in a T0 run while two T0 siblings train (6 s each) and three T1 runs are pending: the siblings end
+  `complete` with their checkpoints, the pending runs have no log and are `missing` in the `stopped` manifest's `run_states`, no process is left, a later job
+  of any selection and `evaluate` refuse, and with a T0 failure and a code defect in one batch the manifest names the code defect; (10, F7) an evaluation
+  that takes 5 s per checkpoint under a silence rule of 2 s: with the heartbeat (every 0.5 s) the restart is refused while the first evaluation is alive
+  (the newest file is 0.1 s old, the newest sample 3 s old) and accepted after it was killed and 2.5 s had passed, with the heartbeat at an interval of 3600 s
+  (the control) the same restart is accepted under the live job; (11, F6, F2) after three failed attempts of one run (cuBLAS, host memory, CUDA out-of-memory) a job for
+  another run is refused with nothing started or written, and so is `--max-attempts 4` without a decision, with a relative path and with an empty file;
+  `--max-attempts 4 --decision FILE` lets that other run train, the manifest's `decision` equals the path and an independently computed blake2b-128 of the
+  file, and the paused run completes as attempt 4; a job at another code (`LL_SOURCE_ROOT` at a second snapshot) is refused with nothing created, and so is the `train-one` child run by hand
+  (no run directory), while at the first code it runs; (12, F1) at another code the first evaluation attempt is refused with and without
+  `--restart-interrupted`, `--new-evaluation-code` is refused without an earlier attempt and without `--restart-interrupted`, nothing is created, at the
+  training code it completes, and the analysis prints "the evaluation ran at ... (the same code)".
+- Read statically in the installed torch 2.14.0+cu132, not run: `libtorch_cpu.so` contains "PytorchStreamWriter failed ", "PytorchStreamReader failed " and
+  "file write failed"; `libc10.so` contains "DefaultCPUAllocator: not enough memory: you tried to allocate " next to `alloc_cpu.cpp` and the enforce
+  expression `data`; none of the torch libraries contains "can't allocate memory"; `libtorch_cuda.so` contains `CUBLAS_STATUS_NOT_INITIALIZED` and " when calling `cublasCreate(handle)`". The test texts are assembled from these
+  strings; the enforce prefix and its line number (`alloc_cpu.cpp:121`), the file name of the stream error and the byte count are placeholders.
+- Not verified: any execution with real torch or real pytest; the text of a real serialization failure (a quota or full file system during `torch.save`), of a real
+  CPU-allocator failure and of a real `cublasCreate` failure (the strings of the libraries were read, no failing call was made); the heartbeat and the
+  silence rule on a compute node, across nodes of the shared file system, and the silent gap of a live evaluation; a PBS walltime kill; the `--max-attempts`
+  with `--decision`, pause and `--new-evaluation-code` jobs on a compute node. The first compute-node run of `tests/test_tsm_scripts.py` is part of the step-0 test
+  job of §6.
