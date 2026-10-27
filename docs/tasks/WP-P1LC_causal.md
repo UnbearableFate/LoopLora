@@ -23,6 +23,25 @@ closed codex session), `docs/prereg/P1L.md` (all amendments, especially B5–B7)
 3. Step-B and step-C commands (P1L-C: ≤ 1 node × 1 h per job, test [102000, 104000), seed 4242).
 Report: `docs/reports/P1L-C-state.md`. Done line in your final reply: `WP-P1LC step A done`.
 
+## Step A2 (now, no compute): fixes from the static review
+Review: `docs/review/static_2026-10-27/p1l.md` (no defect in the registered computations; two low findings, notes).
+1. Merge master into wp/p1l before the authorization commit, so the pinned `P1L_SOURCE`/`P1LC_SOURCE` carries the
+   registered text (P1L-C Clarification C1, the P1L B7 wording note). Check with `git diff --stat` that master adds
+   no code on the confirmation path (at review time: only `scripts/summarize_p1l_training_logs.py`).
+2. `scripts/finalize_p1l_causal.py`: add `git_commit` and `source_hash` to the `shared` keys, so the nine P1L-C runs
+   must come from one source; add a differing-`source_hash` case to the audit test in `tests/test_p1lc_stats.py`.
+3. `scripts/launch_p1l_main.py`: remove the hard-coded 2026-10-28 00:00 UTC deadline in `walltime()`. After the
+   maintenance it refuses every launch, including a needed resubmission of a P1-L training. PBS holds a job that
+   would cross a scheduled stop, and `submit.py` enforces the per-job cap.
+4. `docs/reports/P1L-C-state.md`:
+   - An interrupted P1L-C run directory is moved aside unread (`<name>.interrupted-<k>`), never deleted. Only that
+     run is resubmitted, at the same `P1LC_SOURCE`, and the event is recorded in the state doc
+     (`evaluate_p1l_causal.py` refuses an existing directory).
+   - Reword "task spec equal to the confirmation spec, asserted" (review note N1): that equality cannot fail.
+     The guard is that the config is built as `evaluate_p1l_main.py` builds it.
+5. `py_compile` and pyflakes; commit on wp/p1l. No merge to master, no push. The tests run in step B.
+Done line in your final reply: `WP-P1LC step A2 done`.
+
 ## Step B (only when the orchestrator says so, after 2026-10-28 22:00)
 Finish the three remaining P1-L trainings, then the confirmation evaluation and analysis exactly as
 `P1L-state.md` and the prereg say, including the B7 check; draft `reports/decisions/P1L.md`.
