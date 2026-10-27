@@ -175,7 +175,8 @@ def audit(root, manifest, paths):
             wrong = sorted(key for key, value in expected.items() if record.get(key) != value)
             if wrong:
                 raise ValueError(f"invalid P1L-C provenance for {name}: {wrong}")
-            shared = ["spec_hash", "episodes_hash", "read_position_memory_hashes"]
+            # The episode and memory hashes do not depend on the code: also require one source for all nine runs.
+            shared = ["spec_hash", "episodes_hash", "read_position_memory_hashes", "git_commit", "source_hash"]
             shared += ["worlds_hash", "bridge_memory_hashes"] if reader in PATCH_READERS else []
             for key in shared:
                 if reference.setdefault(key, record[key]) != record[key]:

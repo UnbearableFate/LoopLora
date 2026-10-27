@@ -269,6 +269,18 @@ def test_audit_loads_every_run_and_rejects_changed_inputs_or_mixed_episodes(tmp_
         fin.audit(tree.root, tree.manifest, tree.paths)
 
 
+@pytest.mark.parametrize("key,other", [("source_hash", "another tree"), ("git_commit", "d" * 40)])
+def test_audit_requires_one_source_for_all_nine_runs(tmp_path, monkeypatch, key, other):
+    tree = Tree(tmp_path, monkeypatch)
+    for name in (name for name in tree.names if name.endswith("-s29")):    # one per-seed job rerun from another source
+        tree.write(name, dict(tree.record(name), **{key: other}))
+    with pytest.raises(ValueError, match=f"{key} differs across"):
+        fin.audit(tree.root, tree.manifest, tree.paths)
+    for name in tree.names:                                                # one (different) source for all nine is fine
+        tree.write(name, dict(tree.record(name), **{key: other}))
+    assert len(fin.audit(tree.root, tree.manifest, tree.paths)[2]) == 9
+
+
 def test_finalize_writes_results_tables_and_manifest_only_after_the_gate_and_audit(tmp_path, monkeypatch):
     tree = Tree(tmp_path, monkeypatch)
     monkeypatch.setattr(fin, "check_training", lambda manifest, authorization, check_all: None)
