@@ -11,7 +11,8 @@ import socket
 import torch
 
 from looplora.infra.seeds import stable_hash
-from .lsq import ARMS,SPECS,LSQExperiment,check_arms,configuration,lsq_eta
+from .lsq import LSQExperiment,configuration
+from .lsq_release import ARMS,SPECS,check_arms,eligible_e8,release_eta,scheduled_steps
 from .read_fix_run import fit
 from .run import _write_json,source_metadata
 
@@ -32,43 +33,6 @@ def load_inference(path,*,model=None,tokenizer=None):
     return experiment
 
 
-def release_arms(schedule):
-    """The candidate arms a release covers: RFX's `lsq_arms`, in candidate order (per rank U alone, or K4 with RG)."""
-    return check_arms(schedule['arms'])
-
-
-def release_eta(schedule,arm):
-    """The registered ridge strength of an RG arm: lsq_eta of RFX's fitting-set selection for its rank (U and K4 have none)."""
-    rank,store=SPECS[arm]
-    if store!='ridge':
-        return None
-    eta=lsq_eta(schedule['rfx_eta_by_rank'][str(rank)])
-    if schedule['eta_by_rank'][str(rank)]!=eta:
-        raise ValueError('the release eta differs from the clipped RFX selection')
-    return eta
-
-
-def scheduled_steps(arm,steps,schedule,*,smoke=False,E=16):
-    """Smoke: the explicit step count. Science: the frozen release's count for this arm."""
-    if smoke:
-        if schedule is not None or steps is None or steps<5:
-            raise ValueError('smoke requires its explicit step count')
-        return steps
-    if steps is not None or schedule is None:
-        raise ValueError('scientific arms require an immutable schedule release')
-    if schedule['study']!='LSQ' or schedule['E']!=E:
-        raise ValueError('schedule study/capacity mismatch')
-    arms=release_arms(schedule)
-    by_arm=schedule['steps_by_arm']
-    if arm not in arms or set(by_arm)!=(set(arms) if E==16 else {arm}):
-        raise ValueError('the E16 release fixes the step counts of every triggered arm at once, the E8 release only the '
-                         'retrained arm')
-    result=by_arm[arm]
-    if isinstance(result,bool) or not isinstance(result,int) or result<5 or result%5:
-        raise ValueError('scientific schedules require five equal integer intervals')
-    return result
-
-
 def choose(records,arms):
     """The registered rule of docs/prereg/LSQ.md over the triggered arms (the release's); ties keep the candidate order."""
     arms=tuple(check_arms(arms))
@@ -85,13 +49,6 @@ def choose(records,arms):
     if correct[best]>=500:
         return dict(action='retry_e8',arm=best,E=8,correct=correct)
     return dict(action='stop',arm=None,E=None,correct=correct)
-
-
-def eligible_e8(lock,arm):
-    choice=lock['choice']
-    if choice['action']!='retry_e8' or choice['arm']!=arm or choice['arm'] not in ARMS:
-        raise ValueError('E8 requires the one registered best arm')
-    return 8
 
 
 def run_one(arm,out,steps,E=16,smoke=False,eta=None):

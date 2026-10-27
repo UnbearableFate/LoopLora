@@ -508,7 +508,8 @@ def test_load_checkpoint_refuses_exports_it_cannot_read_and_leaves_no_adapter_be
     assert not hasattr(model, 'looplora_adapters')
 
 
-def test_run_evaluates_both_export_formats_and_writes_the_registered_files(model, tokenizer, tmp_path, monkeypatch):
+def registered_runs(model, tokenizer, tmp_path, monkeypatch):
+    """Two tiny exports standing in for the registered R-r32 and W5-r32 folders, with rfx_run pointed at them."""
     runs = tmp_path / 'runs'
     export_read_fix(model, tokenizer, runs / 'r32')
     export_writer_fix(model, tokenizer, runs / 'w5')
@@ -523,6 +524,11 @@ def test_run_evaluates_both_export_formats_and_writes_the_registered_files(model
     monkeypatch.setattr(rfx_run, 'DIGESTS', digests)
     monkeypatch.setattr(rfx_run, 'SMOKE', dict(fit_episodes=8, eval_episodes=8))
     monkeypatch.setattr(rfx_run, '_load_backbone', lambda device: (model, tokenizer, 0.))
+    return runs, folders, digests
+
+
+def test_run_evaluates_both_export_formats_and_writes_the_registered_files(model, tokenizer, tmp_path, monkeypatch):
+    runs, folders, digests = registered_runs(model, tokenizer, tmp_path, monkeypatch)
     out = tmp_path / 'out'
     summary = rfx_run.run(runs, out, ('R-r32', 'W5-r32'), smoke=True)
     assert summary['smoke'] is True and summary['labels'] == ['R-r32', 'W5-r32']
@@ -535,6 +541,7 @@ def test_run_evaluates_both_export_formats_and_writes_the_registered_files(model
     assert set(summary['rescue']) == set(summary['verdicts']) and all(
         set(flags) == set(rfx.VARIANTS) | {'decoder_refit'} for flags in summary['rescue'].values())
     on_disk = json.loads((out / 'summary.json').read_text())
+    assert summary['entity_em_guard'] == on_disk['entity_em_guard'] == dict(slack=rfx.ENTITY_EM_SLACK, passed=True)
     assert on_disk['verdicts'] == summary['verdicts'] and on_disk['lsq_arms'] == summary['lsq_arms']
     assert on_disk['rescue'] == summary['rescue'] and on_disk['eta_by_rank'] == summary['eta_by_rank']
     for label, arm in (('R-r32', 'R'), ('W5-r32', 'W5')):
@@ -555,3 +562,63 @@ def test_run_evaluates_both_export_formats_and_writes_the_registered_files(model
     with pytest.raises(ValueError, match='R-r32'):  # a checkpoint that is not the registered one voids the run
         rfx_run.run(runs, tmp_path / 'void', ('R-r32',), smoke=True)
     assert not (tmp_path / 'void').exists()
+
+
+def test_a_failed_entity_em_guard_writes_the_label_records_but_no_summary(model, tokenizer, tmp_path, monkeypatch):
+    runs, _, _ = registered_runs(model, tokenizer, tmp_path, monkeypatch)
+    seen = []
+    failure = dict(label='R-r32', variant='delta/raw/asis', rows=8, lm_em=.5, lm_em_entity=0., full_hit_entity_miss=4)
+    monkeypatch.setattr(rfx_run, 'entity_em_failures', lambda records: seen.append(set(records)) or [failure])
+    out = tmp_path / 'closed'
+    with pytest.raises(RuntimeError, match='entity-restricted EM guard'):
+        rfx_run.run(runs, out, ('R-r32', 'W5-r32'), smoke=True)
+    assert seen == [{'R-r32', 'W5-r32'}]  # the guard sees every checkpoint's record
+    assert sorted(path.name for path in out.iterdir()) == [
+        'R-r32-samples.npz', 'R-r32.json', 'W5-r32-samples.npz', 'W5-r32.json']  # and no summary.json is published
+    for label in ('R-r32', 'W5-r32'):
+        cells = json.loads((out / f'{label}.json').read_text())['cells']
+        assert all('full_hit_entity_miss' in cell and 'lm_em_entity' in cell for cell in cells.values())
+    assert not hasattr(model, 'looplora_adapters')
+
+
+def scripted_top_tokens():
+    """What a scripted model puts at logit 10 (the answer token is always at 5): -> (token rule, full EM, restricted EM)."""
+    names = lambda answer: torch.as_tensor(load_name_pool().token_ids, device=answer.device)
+    outsider = lambda answer: torch.full_like(answer, next(t for t in range(151936) if t not in set(load_name_pool().token_ids)))
+    return {
+        'the answer': (lambda answer, entity: answer, 1., 1.),
+        'a token that is no entity name': (lambda answer, entity: outsider(answer), 0., 1.),  # the answer is second among entities
+        'another entity': (lambda answer, entity: names(answer)[(entity + 1) % 1024], 0., 0.),
+    }
+
+
+@pytest.mark.parametrize('scenario', ['the answer', 'a token that is no entity name', 'another entity'])
+def test_entity_restricted_em_reads_the_logits_over_the_name_tokens_not_the_model(experiment, monkeypatch, scenario):
+    # The tiny random model answers at chance, which would leave the entity glue of `evaluate` untested: script the logits.
+    top, em, entity_em = scripted_top_tokens()[scenario]
+    real_observe, vocabulary = rfx.observe, {}
+
+    def scripted(answer, entity):
+        logits = torch.zeros(*answer.shape, vocabulary['size'], device=answer.device)
+        logits.scatter_(-1, answer[..., None], 5.)
+        logits.scatter_(-1, top(answer, entity)[..., None], 10.)
+        return logits
+
+    def observe(experiment_, batch):
+        obs = real_observe(experiment_, batch)
+        vocabulary['size'] = obs['logits'].shape[-1]
+        obs['logits'] = scripted(obs['answer'], obs['answer_entity'])
+        return obs
+
+    def replaced_logits(experiment_, batch, replacement):
+        entity = torch.as_tensor(batch.arrays.answer, device=batch.answer_ids.device, dtype=torch.long)
+        return scripted(batch.answer_ids, entity)
+
+    monkeypatch.setattr(rfx, 'observe', observe)
+    monkeypatch.setattr(rfx, 'replaced_logits', replaced_logits)
+    record, samples = rfx.run_checkpoint('scripted', experiment, experiment.value_head, smoke=True, fit_episodes=8,
+                                         eval_episodes=8)
+    for name, cell in record['cells'].items():
+        assert (cell['lm_em'], cell['lm_em_entity'], cell['full_hit_entity_miss']) == (em, entity_em, 0), name
+    assert samples['delta/raw/asis/entity_correct'].all() == bool(entity_em) and len(samples['clean/entity_correct']) == 8
+    assert rfx.entity_em_failures({'scripted': record}) == []

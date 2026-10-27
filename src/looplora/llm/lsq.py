@@ -2,41 +2,14 @@
 least-squares store (K4, RG)."""
 from __future__ import annotations
 
-import math
-
 import numpy as np
 import torch
 
 from looplora.core.memory import gram_conditions
+from .lsq_release import ETA_BOUNDS,SPECS
 from .read_fix import ReadFixExperiment,configuration as read_fix_configuration
 
-# Candidate order of docs/prereg/LSQ.md: rank 32 first, then 128. U (the deployed delta store with the unit query; it
-# runs under RFX's normalization verdict) and K4 and RG (the least-squares stores; they run under the storage verdict) are
-# mutually exclusive per rank; K4 (no new operator, no regularizer) comes before RG.
-ARMS=('L32-U','L32-K4','L32-RG','L128-U','L128-K4','L128-RG')
-SPECS={'L32-U':(32,'delta'),'L32-K4':(32,'sweep'),'L32-RG':(32,'ridge'),
-       'L128-U':(128,'delta'),'L128-K4':(128,'sweep'),'L128-RG':(128,'ridge')}
 SWEEPS=4
-ETA_BOUNDS=(1e-4,1e-1)
-
-
-def lsq_eta(rfx_eta):
-    """Ridge strength of an LSQ arm: the RFX fitting-set selection for the arm's rank, clipped to [1e-4, 1e-1]."""
-    if isinstance(rfx_eta,bool) or not math.isfinite(rfx_eta) or rfx_eta<=0:
-        raise ValueError('the RFX-selected eta must be positive and finite')
-    return min(max(float(rfx_eta),ETA_BOUNDS[0]),ETA_BOUNDS[1])
-
-
-def check_arms(arms):
-    """A set of triggered arms: each arm once, in candidate order, and per rank U alone or K4 together with RG."""
-    arms=list(arms)
-    if not arms or any(arm not in SPECS for arm in arms) or arms!=[a for a in ARMS if a in arms]:
-        raise ValueError('triggered arms must be registered LSQ arms, each once, in candidate order')
-    for rank in (32,128):
-        stores=[SPECS[arm][1] for arm in arms if SPECS[arm][0]==rank]
-        if stores not in ([],['delta'],['sweep','ridge']):
-            raise ValueError(f'rank {rank}: the arms are U alone (normalization verdict) or K4 with RG (storage verdict)')
-    return arms
 
 
 def configuration(arm,steps,*,E=16,smoke=False,eta=None):

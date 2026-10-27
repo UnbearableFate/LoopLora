@@ -19,8 +19,9 @@ from looplora.core.memory import delta_update, dpfp_features
 from looplora.data.relations import generate
 from looplora.infra.seeds import derive_seed
 from looplora.llm import read_fix, read_fix_run
-from looplora.llm.dpfp import ARMS, SPECS, DPFPExperiment, configuration
-from looplora.llm.dpfp_run import choose, eligible_e8, load_inference, scheduled_steps
+from looplora.llm.dpfp import DPFPExperiment, configuration
+from looplora.llm.dpfp_release import ARMS, SPECS, eligible_e8, scheduled_steps
+from looplora.llm.dpfp_run import choose, load_inference
 from looplora.llm.inject import load_tokenizer
 from looplora.llm.read_fix import ReadFixExperiment, controlled_score, diagnostics, extra_losses, question_terms
 from looplora.llm.read_fix_run import fit, validate

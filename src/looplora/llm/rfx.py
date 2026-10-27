@@ -43,6 +43,7 @@ RANK_LABELS=((32,'R-r32'),(128,'R-r128'))  # the R checkpoint whose verdict deci
 DECODER_DECAYS=(1e-4,1e-3,1e-2,1e-1)
 EPS=1e-6
 ERROR_RATIO,EM_GAIN,TOLERANCE=.5,.10,1e-9  # TOLERANCE: differences of two k/n rates may miss exactly 10 pp by rounding
+ENTITY_EM_SLACK=.005  # the entity-restricted EM may fall this far (one row, if more) below the full-vocabulary EM
 
 
 class FinalRead:
@@ -154,6 +155,27 @@ def entity_hits(logits,entity_ids,answer_entity):
     logits [..., vocabulary]; entity_ids [V] token ids of entities 0..V-1; answer_entity [...] entity indices.
     """
     return logits.index_select(-1,entity_ids).argmax(-1)==answer_entity
+
+
+def entity_em_failures(records):
+    """Variants whose entity-restricted EM falls short of the full-vocabulary EM by more than the guard allows.
+
+    records: label -> run_checkpoint record. The answer token is one of the 1,024 entity name tokens, so the restricted
+    argmax runs over a subset that contains the full-vocabulary argmax whenever that is the answer: it can miss a row
+    that the full argmax hits only through an exact bf16 tie. A larger deficit means the glue of `evaluate` (the entity
+    ids, the axis, the answer entity) is wrong. Allowed: ENTITY_EM_SLACK, or one row when that is more (the 64-row smoke).
+    A NaN deficit fails. Each failure carries the counts to diagnose it: ties cost a few rows, a wrong slice or pairing
+    costs about EM x rows (`full_hit_entity_miss` is the number of rows with a full-vocabulary hit and a restricted miss).
+    """
+    failures=[]
+    for label,record in records.items():
+        evaluation=record['data']['eval']
+        rows=evaluation['episodes']*evaluation['queries_per_episode']
+        allowed=max(ENTITY_EM_SLACK,1/rows)+TOLERANCE
+        failures+=[dict(label=label,variant=name,rows=rows,lm_em=cell['lm_em'],lm_em_entity=cell['lm_em_entity'],
+                        full_hit_entity_miss=cell['full_hit_entity_miss'])
+                   for name,cell in record['cells'].items() if not cell['lm_em']-cell['lm_em_entity']<=allowed]
+    return failures
 
 
 def ridge_reads(keys,values,q,eta):
@@ -493,7 +515,9 @@ def run_checkpoint(label,experiment,head,*,smoke=False,fit_episodes=FIT_EPISODES
         em,em_se=mean_se(piece['correct'].astype(np.float64))
         em_entity,em_entity_se=mean_se(piece['entity_correct'].astype(np.float64))
         cells[name]=dict(err=err,err_se=err_se,lm_em=em,lm_em_se=em_se,lm_em_entity=em_entity,
-                         lm_em_entity_se=em_entity_se,lm_nll=float(piece['nll'].mean()))
+                         lm_em_entity_se=em_entity_se,
+                         full_hit_entity_miss=int((piece['correct']&~piece['entity_correct']).sum()),
+                         lm_nll=float(piece['nll'].mean()))
         if 'head' in piece:
             cells[name]['head_acc']=float(piece['head'].mean())
     fit_reads=cell_reads(fit,params)

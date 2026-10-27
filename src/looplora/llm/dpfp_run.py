@@ -11,7 +11,8 @@ import socket
 import torch
 
 from looplora.infra.seeds import stable_hash
-from .dpfp import ARMS,DPFPExperiment,configuration
+from .dpfp import DPFPExperiment,configuration
+from .dpfp_release import ARMS,eligible_e8,scheduled_steps
 from .read_fix_run import fit
 from .run import _write_json,source_metadata
 
@@ -32,25 +33,6 @@ def load_inference(path,*,model=None,tokenizer=None):
     return experiment
 
 
-def scheduled_steps(arm,steps,schedule,*,smoke=False,E=16):
-    """Smoke: the explicit step count. Science: the frozen release's count for this arm."""
-    if smoke:
-        if schedule is not None or steps is None or steps<5:
-            raise ValueError('smoke requires its explicit step count')
-        return steps
-    if steps is not None or schedule is None:
-        raise ValueError('scientific arms require an immutable schedule release')
-    if schedule['study']!='DPFP' or schedule['E']!=E:
-        raise ValueError('schedule study/capacity mismatch')
-    by_arm=schedule['steps_by_arm']
-    if arm not in by_arm or (E==16 and set(by_arm)!=set(ARMS)):
-        raise ValueError('the E16 release fixes the step counts of all three arms at once (E8: the retrained arm)')
-    result=by_arm[arm]
-    if isinstance(result,bool) or not isinstance(result,int) or result<5 or result%5:
-        raise ValueError('scientific schedules require five equal integer intervals')
-    return result
-
-
 def choose(records):
     """The registered rule of docs/prereg/DPFP.md; ties keep the candidate order."""
     by_arm={r['arm']:r for r in records}
@@ -66,13 +48,6 @@ def choose(records):
     if correct[best]>=500:
         return dict(action='retry_e8',arm=best,E=8,correct=correct)
     return dict(action='stop',arm=None,E=None,correct=correct)
-
-
-def eligible_e8(lock,arm):
-    choice=lock['choice']
-    if choice['action']!='retry_e8' or choice['arm']!=arm or choice['arm'] not in ARMS:
-        raise ValueError('E8 requires the one registered best arm')
-    return 8
 
 
 def run_one(arm,out,steps,E=16,smoke=False):

@@ -21,8 +21,10 @@ from looplora.data.relations import generate
 from looplora.infra.seeds import derive_seed
 from looplora.llm import dpfp_run, read_fix, read_fix_run, rfx, rfx_run
 from looplora.llm.inject import load_tokenizer
-from looplora.llm.lsq import ARMS, ETA_BOUNDS, SPECS, SWEEPS, LSQExperiment, check_arms, configuration, lsq_eta
-from looplora.llm.lsq_run import choose, eligible_e8, load_inference, release_arms, release_eta, scheduled_steps
+from looplora.llm.lsq import SWEEPS, LSQExperiment, configuration
+from looplora.llm.lsq_release import (ARMS, ETA_BOUNDS, SPECS, check_arms, eligible_e8, lsq_eta, release_arms, release_eta,
+                                      scheduled_steps)
+from looplora.llm.lsq_run import choose, load_inference
 from looplora.llm.read_fix import ReadFixExperiment, diagnostics, extra_losses, gram_read, question_terms, store_read
 from looplora.llm.read_fix_run import fit, validate
 from looplora.llm.train import make_task_spec

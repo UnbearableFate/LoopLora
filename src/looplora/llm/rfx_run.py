@@ -12,8 +12,8 @@ import socket
 import numpy as np
 import torch
 
-from .lsq import lsq_eta
-from .rfx import LABELS,load_checkpoint,lsq_arms,run_checkpoint,storage_ranks
+from .lsq_release import lsq_eta
+from .rfx import ENTITY_EM_SLACK,LABELS,entity_em_failures,load_checkpoint,lsq_arms,run_checkpoint,storage_ranks
 from .run import _load_backbone,_write_json,source_metadata
 
 RUNS=Path('/work/xg24i002/x10041/LoopLora/runs/p1l')
@@ -92,7 +92,12 @@ def run(runs,out,labels=LABELS,*,smoke=False):
         np.savez_compressed(out/f'{label}-samples.npz',**{k.replace('/','__'):v for k,v in samples.items()})
         _write_json(out/f'{label}.json',record)
         failures[label]=instrumentation_failures(record['checks'])
+    entity_failed=entity_em_failures(records)
+    if entity_failed:  # fail closed: no verdict, arm or eta is published from a doubtful entity-restricted EM
+        raise RuntimeError(f'entity-restricted EM guard failed (the per-label records are written, summary.json is not): '
+                           f'{entity_failed}')
     summary=dict(**source_metadata(),smoke=smoke,labels=list(labels),**decisions(records),
+        entity_em_guard=dict(slack=ENTITY_EM_SLACK,passed=True),
         instrumentation_failures=failures,backbone_load_seconds=load_seconds,host=socket.gethostname(),
         job_id=os.environ.get('PBS_JOBID'),created_at=created,completed_at=datetime.now(timezone.utc).isoformat(),
         runtime=dict(torch=torch.__version__,gpu=torch.cuda.get_device_name(),

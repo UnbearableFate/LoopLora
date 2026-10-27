@@ -14,7 +14,7 @@ from torch.nn import functional as F
 from looplora.core import memory
 from looplora.data.relations import generate
 from looplora.infra.seeds import derive_seed
-from looplora.llm import lsq, read_fix, rfx
+from looplora.llm import lsq_release, read_fix, rfx
 from looplora.llm.train import make_task_spec
 
 DTYPE = torch.float64
@@ -373,9 +373,9 @@ def test_lsq_arms_follow_the_R_verdicts_in_candidate_order():
     # Candidate order is LSQ's, and per rank U never comes with K4 or RG (the arm sets check_arms accepts).
     for r128, r32 in itertools.product(LABEL_VERDICTS, repeat=2):
         arms = rfx.lsq_arms(verdicts(r128, r32))
-        assert arms == [a for a in lsq.ARMS if a in arms]
+        assert arms == [a for a in lsq_release.ARMS if a in arms]
         if arms:
-            assert lsq.check_arms(arms) == arms
+            assert lsq_release.check_arms(arms) == arms
     assert rfx.storage_ranks(verdicts('storage', 'none', 'storage')) == [128]
     assert rfx.storage_ranks(verdicts('storage', 'storage')) == [32, 128]
     assert rfx.storage_ranks(verdicts('normalization', 'query', 'storage')) == []
@@ -400,6 +400,46 @@ def test_entity_hits_restrict_the_argmax_to_the_entity_name_tokens():
     for answer_entity in (torch.randint(0, 25, (64, 3), generator=g), logits.index_select(-1, ids).argmax(-1)):
         full = logits.argmax(-1) == ids[answer_entity]
         assert (rfx.entity_hits(logits, ids, answer_entity) | ~full).all()
+
+
+def guard_record(rows, deficit=None, gain=0, queries=1):
+    """A run_checkpoint-like record: every variant's full argmax hits a third of the rows; its entity-restricted argmax
+    loses deficit[variant] of those rows and wins `gain` others."""
+    hits, deficit = rows // 3, deficit or {}
+    return dict(data=dict(eval=dict(episodes=rows // queries, queries_per_episode=queries)),
+                cells={v: dict(lm_em=hits / rows, lm_em_entity=(hits - deficit.get(v, 0) + gain) / rows,
+                               full_hit_entity_miss=deficit.get(v, 0)) for v in rfx.VARIANTS})
+
+
+def test_the_entity_em_guard_tolerates_ties_but_not_a_wrong_restricted_set():
+    one = lambda rows, deficit=None, gain=0: {'a': guard_record(rows, deficit, gain)}
+    assert rfx.ENTITY_EM_SLACK == .005 and rfx.entity_em_failures(one(4000)) == []
+    # Ties may cost a few rows: 0.005 of 4,000 rows is 20 rows (an exact 0.5 pp deficit passes), 21 rows do not.
+    assert rfx.entity_em_failures(one(4000, {'delta/raw/asis': 20})) == []
+    failed = rfx.entity_em_failures({**one(4000, {'delta/raw/asis': 21}), 'b': guard_record(4000)})
+    assert failed == [dict(label='a', variant='delta/raw/asis', rows=4000, lm_em=1333 / 4000, lm_em_entity=1312 / 4000,
+                           full_hit_entity_miss=21)]
+    # The restricted set is easier than the full vocabulary when the full argmax lands on a non-entity token.
+    assert rfx.entity_em_failures(one(4000, gain=400)) == []
+    # The 64-row smoke: one row is 1.6 pp, so one row of ties passes and two fail; from 200 rows on the slack is 0.005.
+    assert rfx.entity_em_failures(one(64, {'clean': 1})) == []
+    assert [f['variant'] for f in rfx.entity_em_failures(one(64, {'clean': 2, 'zero': 1}))] == ['clean']
+    assert rfx.entity_em_failures(one(200, {'zero': 1})) == []
+    assert [f['variant'] for f in rfx.entity_em_failures(one(200, {'zero': 2}))] == ['zero']
+    # Rows are episodes times queries per episode.
+    assert [f['variant'] for f in rfx.entity_em_failures({'a': guard_record(64, {'clean': 2}, queries=2)})] == ['clean']
+    assert rfx.entity_em_failures({'a': guard_record(64, {'clean': 1}, queries=2)}) == []
+    # A wrong slice, axis or pairing leaves chance-level restricted hits: every variant that has hits fails, with the count.
+    wrong = guard_record(4000)
+    for cell in wrong['cells'].values():
+        cell.update(lm_em_entity=0., full_hit_entity_miss=round(cell['lm_em'] * 4000))
+    failures = rfx.entity_em_failures({'R-r32': wrong})
+    assert [f['variant'] for f in failures] == list(rfx.VARIANTS) and all(
+        (f['label'], f['full_hit_entity_miss']) == ('R-r32', 1333) for f in failures)
+    # A NaN deficit fails closed.
+    broken = guard_record(4000)
+    broken['cells']['ridge/true/fit']['lm_em_entity'] = float('nan')
+    assert [f['variant'] for f in rfx.entity_em_failures({'a': broken})] == ['ridge/true/fit']
 
 
 def test_registered_data_ranges_and_seeds_are_new_and_disjoint_from_training():

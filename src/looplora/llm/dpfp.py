@@ -1,11 +1,8 @@
 """WP-L5 DPFP arms: WP-L4's R on a memory addressed by DPFP key and query features."""
 from __future__ import annotations
 
+from .dpfp_release import SPECS
 from .read_fix import ReadFixExperiment,configuration as read_fix_configuration
-
-# Candidate order of docs/prereg/DPFP.md: r = 32 first, then r = 128 with the smaller feature map first.
-ARMS=('D32-3','D128-1','D128-3')
-SPECS={'D32-3':(32,3),'D128-1':(128,1),'D128-3':(128,3)}
 
 
 def configuration(arm,steps,*,E=16,smoke=False):
