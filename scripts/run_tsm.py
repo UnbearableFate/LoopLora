@@ -12,17 +12,26 @@ Stages (each its own job; scripts/submit.py in a Miyabi-G allocation):
             a run that is already complete or a registered training failure is left as it is;
   evaluate  evaluate T0, T1, T2 and the B4 references on the new confirmation episodes (split test, seed 999007).
 
-Training failures (docs/prereg/TSM.md, "Decisions at registration"):
+Training failures (docs/prereg/TSM.md, "Decisions at registration" and Clarification C1); every run that ends with an
+exception is recorded as ``failed`` with a ``failure_kind`` (see ``classify_failure``):
 
-* a non-finite loss in a T1 or T2 run is a registered training failure: no retry, no re-tuning; that arm fails for
-  that writer, its completed runs are evaluated and reported descriptively, the other arms are evaluated as registered;
-* a non-finite loss in a T0 run stops the study before the confirmation set is opened: ``train`` refuses to start
-  anything else and ``evaluate`` refuses to run;
-* any other end before completion (walltime, a node or I/O fault) is an infrastructure failure: the run is trained
-  again with the identical configuration and code (``train --rerun-incomplete`` once its job has ended), at most twice;
-  every attempt is compared with the one before it (also when an earlier rerun stopped before its child started);
+* a non-finite loss or gradient norm in a T1 or T2 run (``numerical``) is a registered training failure: no retry, no
+  re-tuning; that arm fails for that writer, its completed runs are evaluated and reported descriptively, the other arms
+  are evaluated as registered;
+* the same in a T0 run stops the study before the confirmation set is opened: ``train`` refuses to start anything else
+  and ``evaluate`` refuses to run;
+* an end by walltime or a node fault, an I/O error (``OSError``) and CUDA out-of-memory (``infrastructure``) are
+  infrastructure failures: the run is trained again with the identical configuration and code (``train
+  --rerun-incomplete`` once its job has ended), at most twice; every attempt is compared with the one before it (also
+  when an earlier rerun stopped before its child started);
+* any other exception (``code_defect``) stops the study like a T0 failure, whatever the arm: the job ends with an
+  error, its running siblings are stopped, every later ``train`` and ``evaluate`` refuses, and the fixed code must
+  retrain every TSM run before the confirmation set is opened (the orchestrator decides);
 * ``evaluate`` needs every T0 run complete and every T1/T2 run complete or a registered training failure, all of them
-  trained with the same code (T0 is "retrained under the same code version") and with their checkpoints unchanged.
+  trained with the same code (T0 is "retrained under the same code version") and with their checkpoints unchanged;
+* an ``evaluate`` job that ended before it completed is restarted from scratch with identical inputs (same design lock,
+  code and checkpoints) at most twice, only with ``--restart-interrupted`` once its job has ended: the partial output is
+  moved aside to ``<root>/attempts/evaluation-attempt<k>`` without being read, and the new manifest records the restarts.
 """
 from __future__ import annotations
 
@@ -64,8 +73,9 @@ DECISION = dict(stay_tolerance=tsm.STAY_TOLERANCE, far_tolerance=tsm.FAR_TOLERAN
 SOURCE = Path(__file__).resolve().parents[1] / "src"
 WALLTIME_MARGIN = 1.5
 POLL_SECONDS = 1.0
-MAX_ATTEMPTS = 3  # a run and at most two identical reruns after an infrastructure failure (registered)
-QUIET_SECONDS = 300  # a run still marked "running" is rerun only after it was silent this long (it logs every ~10 steps)
+MAX_ATTEMPTS = 3  # a run (or the evaluation) and at most two identical reruns (restarts) after an infrastructure failure
+QUIET_SECONDS = 300  # a run or evaluation still marked "running" is started again only after it was silent this long
+NUMERICAL, INFRASTRUCTURE, CODE_DEFECT = "numerical", "infrastructure", "code_defect"  # a failed record's failure_kind
 
 
 def settings() -> dict:
@@ -160,14 +170,36 @@ def runtime_metadata(device: str) -> dict:
                 gpu=torch.cuda.get_device_name(device) if cuda else None, device=device, threads=1)
 
 
-def is_numerical_failure(failure: object) -> bool:
-    """True for the failure text of a run that stopped with a non-finite loss (or gradient norm).
+def is_cuda_out_of_memory(error: BaseException) -> bool:
+    """``torch.cuda.OutOfMemoryError``, or a ``RuntimeError`` that says so: older PyTorch, and the failures of the CUDA
+    runtime itself (creating the context on a full device) report "CUDA error: out of memory"."""
+    if isinstance(error, torch.cuda.OutOfMemoryError):
+        return True
+    text = str(error).lower()
+    return isinstance(error, RuntimeError) and "cuda" in text and "out of memory" in text
+
+
+def is_numerical_failure(error: BaseException) -> bool:
+    """A non-finite loss or gradient norm: an identical rerun would reproduce either.
 
     ``train`` and ``tsm.fit_tsm`` raise ``FloatingPointError`` for a non-finite loss, and clipping the gradient with
-    ``error_if_nonfinite`` raises a ``RuntimeError`` that says "non-finite". An identical rerun would reproduce either.
+    ``error_if_nonfinite`` raises a ``RuntimeError`` that says "non-finite".
     """
-    kind, _, message = str(failure).partition(": ")
-    return kind == "FloatingPointError" or "non-finite" in message
+    return isinstance(error, FloatingPointError) or (isinstance(error, RuntimeError) and "non-finite" in str(error))
+
+
+def classify_failure(error: BaseException) -> str:
+    """How the end of a run is read (docs/prereg/TSM.md, "Decisions at registration" and Clarification C1).
+
+    * ``infrastructure``: an I/O error (any ``OSError``), CUDA out-of-memory, or an interruption that is not an
+      exception of the code (``KeyboardInterrupt``, ``SystemExit``); the run may be trained again, identically;
+    * ``numerical``: a non-finite loss or gradient norm; never retried (a T1/T2 arm fails for that writer, T0 stops
+      the study);
+    * ``code_defect``: any other exception; the study stops.
+    """
+    if isinstance(error, OSError) or is_cuda_out_of_memory(error) or not isinstance(error, Exception):
+        return INFRASTRUCTURE
+    return NUMERICAL if is_numerical_failure(error) else CODE_DEFECT
 
 
 def read_json_record(path: Path) -> dict | None:
@@ -185,8 +217,10 @@ def read_record(root: Path, name: str) -> dict | None:
 
 
 def run_state(root: Path, name: str) -> str:
-    """``missing`` (no run directory), ``complete``, ``training_failure`` (stopped with a non-finite loss) or
-    ``incomplete`` (still running, ended before completion, or failed for any other reason)."""
+    """``missing`` (no run directory), ``complete``, ``training_failure`` (a non-finite loss or gradient norm),
+    ``code_defect`` (failed with an exception that is not a numerical failure, an I/O error or CUDA out-of-memory) or
+    ``incomplete`` (still running, ended before completion, failed with an I/O error or CUDA out-of-memory, or has an
+    unreadable record). The kind of a failure is the ``failure_kind`` that ``train_one`` recorded."""
     if not (root / "runs" / name).is_dir():
         return "missing"
     record = read_record(root, name)
@@ -194,8 +228,12 @@ def run_state(root: Path, name: str) -> str:
         return "incomplete"
     if record.get("status") == "complete":
         return "complete"
-    if record.get("status") == "failed" and is_numerical_failure(record.get("failure", "")):
-        return "training_failure"
+    if record.get("status") == "failed":
+        kind = record.get("failure_kind")
+        if kind == NUMERICAL:
+            return "training_failure"
+        if kind != INFRASTRUCTURE:  # also a failed record without a kind: nothing shows that it is not a defect
+            return "code_defect"
     return "incomplete"
 
 
@@ -206,15 +244,28 @@ def failure_row(root: Path, name: str) -> dict:
                 attempt=record.get("attempt"), failure=record["failure"])
 
 
-def t0_failures(root: Path) -> list[str]:
-    """T0 runs that stopped with a non-finite loss: with one of them 'far' has no reference and the study stops."""
-    return [row["name"] for row in planned_runs()
-            if row["arm"] == "T0" and run_state(root, row["name"]) == "training_failure"]
+def stops_study(root: Path, name: str) -> bool:
+    """True if run ``name`` stopped the study: a code defect (any arm), or a non-finite loss in a T0 run (with it 'far'
+    has no reference)."""
+    state = run_state(root, name)
+    arm = next(row["arm"] for row in planned_runs() if row["name"] == name)
+    return state == "code_defect" or (state == "training_failure" and arm == "T0")
 
 
-def study_stops(name: str) -> str:
-    return (f"T0 run {name} stopped with a non-finite loss: the study stops before the confirmation set is opened "
-            "(docs/prereg/TSM.md); report it to the orchestrator, any continuation needs an explicit amendment")
+def study_stop(root: Path) -> str | None:
+    """Why the study has stopped, or None. The message names the first run that stopped it, a code defect before a T0
+    failure: a code defect has the code fixed and every TSM run retrained, which supersedes any other result."""
+    stops = [row["name"] for row in planned_runs() if stops_study(root, row["name"])]
+    defects = [name for name in stops if run_state(root, name) == "code_defect"]
+    if defects:
+        return (f"run {defects[0]} ended with a code defect ({read_record(root, defects[0]).get('failure')}): the "
+                "study stops (docs/prereg/TSM.md, Clarification C1); the fixed code must retrain every TSM run before "
+                "the confirmation set is opened; report it to the orchestrator")
+    if stops:
+        return (f"T0 run {stops[0]} stopped with a non-finite loss or gradient norm: the study stops before the "
+                "confirmation set is opened (docs/prereg/TSM.md); report it to the orchestrator, any continuation "
+                "needs an explicit amendment")
+    return None
 
 
 def moved_attempts(root: Path, name: str) -> list[Path]:
@@ -254,16 +305,21 @@ def check_rerun(root: Path, name: str, *, config_hash: str, source: dict) -> int
     return used + 1
 
 
-def silent_seconds(root: Path, name: str) -> float:
-    """Seconds since anything in the run's directory or its child's log was last written."""
-    out = root / "runs" / name
+def seconds_since_written(paths: list[Path]) -> float:
+    """Seconds since the newest of ``paths`` was written (a path that does not exist counts as never written)."""
     newest = 0.0
-    for path in [out, root / "logs" / f"{name}.log", *out.rglob("*")]:
+    for path in paths:
         try:
             newest = max(newest, path.stat().st_mtime)
         except FileNotFoundError:
             pass
     return max(0.0, time.time() - newest)
+
+
+def silent_seconds(root: Path, name: str) -> float:
+    """Seconds since anything in the run's directory or its child's log was last written."""
+    out = root / "runs" / name
+    return seconds_since_written([out, root / "logs" / f"{name}.log", *out.rglob("*")])
 
 
 def require_ended(root: Path, name: str) -> None:
@@ -306,38 +362,45 @@ def retire_stale_log(root: Path, name: str) -> None:
 
 
 def train_one(design: dict, root: Path, name: str, *, device: str, steps: int | None = None) -> dict:
-    """Train one registered run into ``root/runs/<name>``; the record holds its status, attempt and seals."""
+    """Train one registered run into ``root/runs/<name>``; the record holds its status, attempt and seals.
+
+    Whatever ends the run after its directory exists, in the setup, in training or in the seals that follow, is
+    recorded before the error propagates: status ``failed``, the failure text and its ``failure_kind``
+    (``classify_failure``). Nothing is recorded for an error before the directory exists (the attempt guard, the
+    configuration): it has trained nothing.
+    """
     run = next(row for row in planned_runs() if row["name"] == name)
     config = make_config(design, run["writer"], run["seed"], run["arm"], device=device, steps=steps)
-    source = source_metadata()
-    attempt = check_rerun(root, name, config_hash=stable_hash(config), source=source)  # before anything is created
+    source, config_hash = source_metadata(), stable_hash(config)
+    attempt = check_rerun(root, name, config_hash=config_hash, source=source)  # before anything is created
     out = root / "runs" / name
     out.mkdir(parents=True, exist_ok=False)
-    write_json(out / "config.json", dict(config=config, config_hash=stable_hash(config)))
-    cuda = torch.device(device).type == "cuda"
-    torch.set_num_threads(1)
-    if cuda:
-        torch.cuda.set_device(torch.device(device))
-        torch.cuda.reset_peak_memory_stats()
-    record = dict(run, status="running", attempt=attempt, config_hash=stable_hash(config), started_at=now(),
-                  runtime=runtime_metadata(device), source=source, steps=config["train"]["steps"])
-    write_json(out / "record.json", record)
-    started = time.perf_counter()
+    record = dict(run, status="running", attempt=attempt, config_hash=config_hash, started_at=now(), source=source,
+                  steps=config["train"]["steps"])
     try:
+        write_json(out / "config.json", dict(config=config, config_hash=config_hash))
+        cuda = torch.device(device).type == "cuda"
+        torch.set_num_threads(1)
+        if cuda:
+            torch.cuda.set_device(torch.device(device))
+            torch.cuda.reset_peak_memory_stats()
+        record["runtime"] = runtime_metadata(device)
+        write_json(out / "record.json", record)
+        started = time.perf_counter()
         if run["arm"] == "T0":
             model, summary = train(config, out)
         else:
             model, _, summary = tsm.train_arm(config, out, run["arm"])
+        done = dict(record, status="complete", finished_at=now(), seconds=time.perf_counter() - started,
+                    summary=summary, checkpoint=str(out / "checkpoint.pt"),
+                    checkpoint_blake2b=digest_checkpoint(out / "checkpoint.pt"), state_hash=state_hash(model),
+                    peak_memory_bytes=int(torch.cuda.max_memory_allocated()) if cuda else None)
+        write_json(out / "record.json", done)
     except BaseException as error:
-        record.update(status="failed", failure=f"{type(error).__name__}: {error}", finished_at=now())
-        write_json(out / "record.json", record)
+        write_json(out / "record.json", dict(record, status="failed", failure=f"{type(error).__name__}: {error}",
+                                             failure_kind=classify_failure(error), finished_at=now()))
         raise
-    record.update(status="complete", finished_at=now(), seconds=time.perf_counter() - started, summary=summary,
-                  checkpoint=str(out / "checkpoint.pt"), checkpoint_blake2b=digest_checkpoint(out / "checkpoint.pt"),
-                  state_hash=state_hash(model),
-                  peak_memory_bytes=int(torch.cuda.max_memory_allocated()) if cuda else None)
-    write_json(out / "record.json", record)
-    return record
+    return done
 
 
 class Child:
@@ -482,15 +545,15 @@ def registered_record(design: dict, root: Path, row: dict) -> dict:
 def final_states(design: dict, root: Path) -> dict[str, str]:
     """State of every registered run for the evaluation: ``complete``, or ``training_failure`` (T1/T2 only).
 
-    Every T0 run must be complete (a T0 failure stops the study: ``far`` has no reference) and every T1/T2 run must
-    be complete or a registered training failure; every record must belong to the registered configuration, the
-    checkpoint of a complete run must be unchanged, and all 18 runs must have been trained with the same code (the
-    registered T0 is "retrained under the same code version"). Anything else is refused, and this runs before the
-    confirmation set is opened.
+    Every T0 run must be complete (a T0 failure stops the study: ``far`` has no reference), no run may have a code
+    defect (it stops the study), and every T1/T2 run must be complete or a registered training failure; every record
+    must belong to the registered configuration, the checkpoint of a complete run must be unchanged, and all 18 runs
+    must have been trained with the same code (the registered T0 is "retrained under the same code version").
+    Anything else is refused, and this runs before the confirmation set is opened.
     """
-    stopped = t0_failures(root)  # first: an unfinished run earlier in the plan must not hide a T0 failure
+    stopped = study_stop(root)  # first: an unfinished run earlier in the plan must not hide a stop
     if stopped:
-        raise ValueError(study_stops(stopped[0]))
+        raise ValueError(stopped)
     states, codes = {}, set()
     for row in planned_runs():
         name, state = row["name"], run_state(root, row["name"])
@@ -530,11 +593,12 @@ def select_names(args: argparse.Namespace) -> list[str]:
 def stage_train(args: argparse.Namespace) -> int:
     """Train the selected runs that have no final state; leave complete runs and registered failures as they are.
 
-    A run is final when it is complete or a registered training failure (a non-finite loss: no retry); a final record
-    must be the registered run. An unfinished run (killed by walltime, a node or I/O fault, or failed for another
-    reason) is trained again, identically, only with ``--rerun-incomplete`` (its job must have ended: a run still marked
-    "running" must have been silent for ``QUIET_SECONDS``) and at most twice; each attempt is compared with the one
-    before it. A T0 run with a non-finite loss stops the study: this stage refuses to start anything else. The stage
+    A run is final when it is complete or a registered training failure (a non-finite loss or gradient norm: no retry);
+    a final record must be the registered run. An unfinished run (killed by walltime or a node fault, or ended with an
+    I/O error or CUDA out-of-memory) is trained again, identically, only with ``--rerun-incomplete`` (its job must have
+    ended: a run still marked "running" must have been silent for ``QUIET_SECONDS``) and at most twice; each attempt is
+    compared with the one before it. A T0 run with a non-finite loss, and a run with a code defect (any other
+    exception), stops the study: the job ends with an error and this stage refuses to start anything else. The stage
     ends with an error unless every selected run is final.
     """
     root = absolute_path(args.root, "--root")
@@ -546,9 +610,9 @@ def stage_train(args: argparse.Namespace) -> int:
     root.mkdir(parents=True, exist_ok=True)
     manifest_path = root / f"train_manifest-{args.label}.json"
     require(not manifest_path.exists(), f"{manifest_path.name} exists: every training job needs its own --label")
-    stopped = t0_failures(root)
+    stopped = study_stop(root)
     if stopped:
-        raise ValueError(study_stops(stopped[0]))
+        raise ValueError(stopped)
     source = source_metadata()
     rows = {row["name"]: row for row in planned_runs()}
     states = {name: run_state(root, name) for name in names}
@@ -581,10 +645,10 @@ def stage_train(args: argparse.Namespace) -> int:
     write_json(manifest_path, manifest)
     try:
         schedule(todo, args.procs, design_path, root, device=args.device,
-                 fatal=lambda name: name in t0_failures(root))
+                 fatal=lambda name: stops_study(root, name))
     except ValueError as error:
-        stopped = t0_failures(root)
-        reason = study_stops(stopped[0]) if stopped else str(error)
+        stopped = study_stop(root)
+        reason = stopped or str(error)
         manifest.update(status="stopped" if stopped else "failed", reason=reason, finished_at=now())
         write_json(manifest_path, manifest)
         raise ValueError(reason) from error
@@ -662,34 +726,130 @@ def stage_smoke(args: argparse.Namespace) -> int:
     return 0
 
 
+def moved_evaluations(root: Path) -> list[Path]:
+    """Interrupted evaluations that were moved to ``root/attempts``; nothing in them is ever read."""
+    folder = root / "attempts"
+    return sorted(path for path in folder.glob("evaluation-attempt*") if path.is_dir()) if folder.is_dir() else []
+
+
+def evaluation_state(root: Path) -> str:
+    """``none`` (no evaluation directory in place), ``complete``, ``failed`` (the job recorded its own end) or ``running``
+    (still going, or ended before it completed; also a directory without a manifest, or with one that was cut off while
+    it was written). Only the manifest's ``status`` is read: nothing else of an evaluation in place."""
+    if not (root / "evaluation").exists():
+        return "none"
+    status = (read_json_record(root / "evaluation" / "manifest.json") or {}).get("status")
+    return status if status in ("complete", "failed") else "running"
+
+
+def earlier_evaluation(root: Path) -> dict | None:
+    """The manifest of the latest earlier evaluation attempt that has a readable one: in place, else the last moved
+    aside (a restart that stopped before its manifest was written leaves the earlier attempt only there). It holds the
+    inputs of the attempt, never a result: the samples are not read."""
+    for folder in [root / "evaluation", *reversed(moved_evaluations(root))]:
+        manifest = read_json_record(folder / "manifest.json")
+        if manifest is not None:
+            return manifest
+    return None
+
+
+def checkpoint_seals(root: Path, states: dict[str, str]) -> dict[str, str]:
+    """The blake2b seal of the checkpoint of every complete run, from its record (``final_states`` checked the file)."""
+    return {name: read_record(root, name)["checkpoint_blake2b"] for name in sorted(states) if states[name] == "complete"}
+
+
+def evaluation_inputs(manifest: dict) -> dict:
+    """What an evaluation is a function of: the design and its lock, the code and the trained checkpoints (the B4
+    references are sealed in the design)."""
+    return dict(design=manifest.get("design_hash"), design_lock_commit=manifest.get("design_lock_commit"),
+                code=manifest.get("source", {}).get("source_hash"), checkpoints=manifest.get("checkpoints"))
+
+
+def evaluation_attempt(root: Path, manifest: dict, state: str) -> int:
+    """The number of the evaluation attempt that may start now: 1, or 2 and 3 after an attempt that did not complete.
+
+    An evaluation that ended before it completed is started again from scratch with identical inputs, at most twice
+    (docs/prereg/TSM.md, Clarification C1): ``MAX_ATTEMPTS`` attempts in all. Identical means the design and its lock, the
+    code (``source_hash``) and the checkpoints of the latest earlier attempt (``manifest`` is this attempt's). An attempt
+    still marked "running" must have been silent for ``QUIET_SECONDS``: its job may be alive and would write into the
+    new directory; one marked "failed" has recorded its own end.
+    """
+    used = len(moved_evaluations(root)) + int(state != "none")
+    require(used < MAX_ATTEMPTS, f"the confirmation evaluation has used {used} of {MAX_ATTEMPTS} attempts: the "
+            "registered rule allows two restarts; report it to the orchestrator")
+    if state == "running":
+        out = root / "evaluation"
+        silent = seconds_since_written([out, *out.rglob("*")])
+        require(silent >= QUIET_SECONDS, f"the evaluation was written to {silent:.0f} s ago: its job may still be "
+                f"running; check qstat and restart it only after the job has ended (and {QUIET_SECONDS} s of silence)")
+    earlier = earlier_evaluation(root)
+    if earlier is not None:
+        old, new = evaluation_inputs(earlier), evaluation_inputs(manifest)
+        differing = [key for key in new if old[key] != new[key]]
+        require(not differing, f"the restart differs from the interrupted evaluation in {', '.join(differing)}: a "
+                "restart must have identical inputs (the same design lock, --commit and trained runs)")
+    return used + 1
+
+
+def move_evaluation_aside(root: Path) -> Path:
+    """Move the interrupted evaluation, unread, to ``root/attempts/evaluation-attempt<k>``."""
+    target = root / "attempts" / f"evaluation-attempt{len(moved_evaluations(root)) + 1}"
+    target.parent.mkdir(parents=True, exist_ok=True)
+    (root / "evaluation").rename(target)
+    return target
+
+
 def stage_evaluate(args: argparse.Namespace) -> int:
+    """Evaluate T0, T1, T2 and the B4 references on the confirmation episodes, once.
+
+    An evaluation that has started is not repeated (``complete``), and one that ended before it completed is started
+    again from scratch only with ``--restart-interrupted``, once its job has ended and with identical inputs, at most
+    twice (``evaluation_attempt``): the partial output is moved aside unread, and the manifest records the attempt and
+    the restarts. All of this is checked before the confirmation episodes are generated.
+    """
     root = absolute_path(args.root, "--root")
     design_path = Path(args.design).resolve()
     verify_git_lock(design_path, args.design_commit, "the design")
     design = json.loads(design_path.read_text())
     verify_design(design)
     out = root / "evaluation"
-    require(not (out / "manifest.json").exists(), "the confirmation evaluation has already started")
-    states = final_states(design, root)  # before anything touches the confirmation set; refuses a T0 failure
+    state = evaluation_state(root)
+    require(state != "complete", "the confirmation evaluation has already started and is complete: it is not repeated")
+    require(state == "none" or args.restart_interrupted,
+            "the confirmation evaluation has already started and did not complete: if its job has ended, restart it "
+            "from scratch with --restart-interrupted (at most twice; its partial output is moved aside unread)")
+    states = final_states(design, root)  # before anything touches the confirmation set; refuses a stop
     failures = [failure_row(root, name) for name in sorted(states) if states[name] == "training_failure"]
     started = time.perf_counter()
     manifest = dict(status="running", design=design, design_hash=stable_hash(design), design_path=str(design_path),
                     design_lock_commit=args.design_commit, evaluation=design["evaluation"],
-                    training_failures=failures, started_at=now(), source=source_metadata(),
-                    runtime=runtime_metadata(args.device))
+                    training_failures=failures, checkpoints=checkpoint_seals(root, states), started_at=now(),
+                    source=source_metadata(), runtime=runtime_metadata(args.device))
+    attempt = evaluation_attempt(root, manifest, state)
+    manifest.update(attempt=attempt, restarts=[dict(attempt=number, moved_to=f"attempts/evaluation-attempt{number}")
+                                               for number in range(1, attempt)])
+    if state != "none":
+        move_evaluation_aside(root)
     out.mkdir(parents=True, exist_ok=True)
     write_json(out / "manifest.json", manifest)
-    _, rows, profiles = evaluate_runs(design, root, writers=WRITERS, seeds=SEEDS, evaluation=design["evaluation"],
-                                      device=args.device, out=out / "samples", skip={row["name"] for row in failures})
-    for template in design["templates"]:
-        require(digest_checkpoint(Path(template["source"])) == template["source_blake2b"], "a released checkpoint changed")
-    verify_design(design)
+    try:
+        _, rows, profiles = evaluate_runs(design, root, writers=WRITERS, seeds=SEEDS, evaluation=design["evaluation"],
+                                          device=args.device, out=out / "samples",
+                                          skip={row["name"] for row in failures})
+        for template in design["templates"]:
+            require(digest_checkpoint(Path(template["source"])) == template["source_blake2b"],
+                    "a released checkpoint changed")
+        verify_design(design)
+        write_json(out / "gate_profiles.json", profiles)
+    except BaseException as error:  # the job has ended: say so, the manifest would otherwise stay "running"
+        manifest.update(status="failed", failure=f"{type(error).__name__}: {error}", finished_at=now())
+        write_json(out / "manifest.json", manifest)
+        raise
     seconds = time.perf_counter() - started
-    write_json(out / "gate_profiles.json", profiles)
     manifest.update(status="complete", evaluations=rows, finished_at=now(), total_seconds=seconds,
                     node_hours=seconds / 3600.0, checkpoints_unchanged=True)
     write_json(out / "manifest.json", manifest)
-    print(json.dumps(dict(stage="evaluate", status="complete", evaluated=len(rows),
+    print(json.dumps(dict(stage="evaluate", status="complete", attempt=attempt, evaluated=len(rows),
                           training_failures=[row["name"] for row in failures], seconds=seconds, out=str(out))),
           flush=True)
     return 0
@@ -713,9 +873,10 @@ def main(argv: list[str] | None = None) -> int:
     train_stage.add_argument("--procs", type=int, default=9)
     train_stage.add_argument("--label", default="main", help="name of this job's manifest (one label per job)")
     train_stage.add_argument("--rerun-incomplete", action="store_true",
-                             help="train unfinished runs again, identically (their job must have ended: a run still "
-                                  "marked running must have been silent for 300 s; at most twice per run); without it "
-                                  "an unfinished run is an error")
+                             help="train unfinished runs again (an I/O error, CUDA out-of-memory, walltime or a node "
+                                  "fault), identically (their job must have ended: a run still marked running must "
+                                  "have been silent for 300 s; at most twice per run); without it an unfinished run "
+                                  "is an error")
     train_stage.add_argument("--writers", nargs="+", default=list(WRITERS), choices=WRITERS)
     train_stage.add_argument("--arms", nargs="+", default=list(tsm.ARMS), choices=tsm.ARMS)
     train_stage.add_argument("--seeds", nargs="+", type=int, default=list(SEEDS), choices=SEEDS)
@@ -728,6 +889,10 @@ def main(argv: list[str] | None = None) -> int:
     evaluate.add_argument("--design", required=True)
     evaluate.add_argument("--design-commit", required=True)
     evaluate.add_argument("--root", required=True, help="the training run directory")
+    evaluate.add_argument("--restart-interrupted", action="store_true",
+                          help="start an evaluation that ended before it completed again from scratch, with identical "
+                               "inputs (its job must have ended: one still marked running must have been silent for "
+                               "300 s; at most twice); its partial output is moved aside unread")
     for stage in (smoke, train_stage, child, evaluate):
         stage.add_argument("--device", default="cuda:0")
     args = parser.parse_args(argv)
