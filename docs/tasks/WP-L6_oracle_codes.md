@@ -35,5 +35,28 @@ transition (and, for O-shared, the LM-side maps) learnable.
    smoke shows both fit ≤ 1 h with the 1.5 margin).
 Report: `docs/reports/WP-L6.md` (state + commands). Done line in your final reply: `WP-L6 step 1 done`.
 
+## Step 1b (now, no compute): fixes from the static review
+Review: `docs/review/static_2026-10-27/oracle.md` (no defect in the WP-L6 code; F1 runbook defect; F2 P1L-S traps).
+1. F1: `docs/reports/WP-L6.md` runs `scripts/run_wp_l6.py size|decide` directly on the login node, but the file is
+   mode 100644. Make it executable in git (`git update-index --chmod=+x`). Keep its module-level imports stdlib only.
+2. P1L-S plan: add a section "P1L-S implementation plan" to `docs/reports/WP-L6.md`. Give, per file and function,
+   the change for each F2 item and for the section "Pipeline work that precedes the smoke" of `docs/prereg/P1L-S.md`:
+   - writer hash and memory-snapshot checks per group (the reused B3-L4 runs are `oracle_random`; O-shared runs each
+     have their own C);
+   - one locked confirmation start (110,000), used by the evaluation and checked by finalize. Parameterizing only one
+     side would silently evaluate P1-L's range;
+   - writer labels in `endpoints.json` and `accuracy.csv`;
+   - the P1L-S memory-use check;
+   - `check_training` for 12 new plus 3 reused runs with k = 1 (95% CIs);
+   - launcher: the deadline guard (sn-p1l removes it on wp/p1l), `--scale-up docs/prereg/P1L-S.md`, lock paths and
+     condition names;
+   - C counted in `inference.json`;
+   - the evaluation templates.
+
+   Every change keeps the P1-L defaults bitwise unchanged, and a test shows it. Implement the plan only after the
+   orchestrator says wp/p1l is merged into master (after its compute tests), so the P1-L confirmation path stays as
+   tested. Then implement while the pilot runs; P1L-S itself runs only if `reports/wp-l6/decision.json` selects a code.
+3. Commit on wp/oracle. No merge to master, no push. Done line in your final reply: `WP-L6 step 1b done`.
+
 ## Step 2 / 3 (only when the orchestrator says so)
 Run tests, smoke and the pilot; apply the registered decision; report. Then P1L-S if it passes.
