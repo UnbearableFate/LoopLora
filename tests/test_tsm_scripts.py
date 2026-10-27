@@ -119,10 +119,11 @@ def _edited(path, change):
 def children():
     """How the next children end, by run name (``outcomes[name]`` is consumed one entry per start; the default is
     ``complete``): ``nonfinite`` (a non-finite loss), ``gradnorm`` (a non-finite gradient norm), ``fault`` (an I/O
-    error), ``oom`` (CUDA out of memory), ``defect`` (any other exception: a code defect), ``killed`` (ended by
-    walltime), ``crash`` (dies before it creates its run directory), ``hang`` (still running until it is stopped) or
-    ``overlap`` (another job has just created its log, so it cannot be started). ``started`` lists every child that was
-    started and ``stopped`` every child that was stopped while it was running."""
+    error), ``oom`` (CUDA out of memory), ``cublas`` and ``cudnn`` (an allocation failure of that library), ``memory``
+    (a host ``MemoryError``), ``defect`` (any other exception: a code defect), ``killed`` (ended by walltime),
+    ``crash`` (dies before it creates its run directory), ``hang`` (still running until it is stopped) or ``overlap``
+    (another job has just created its log, so it cannot be started). ``started`` lists every child that was started
+    and ``stopped`` every child that was stopped while it was running."""
     return types.SimpleNamespace(outcomes={}, started=[], stopped=[])
 
 
@@ -139,7 +140,7 @@ def tiny(tmp_path, monkeypatch, children):
     monkeypatch.setattr(run_tsm, "POLL_SECONDS", 0.0)
     monkeypatch.setattr(run_tsm, "QUIET_SECONDS", 0)  # the in-process children end at once; see the test of the guard
 
-    def start_child(name, design_path, root, *, device, steps):
+    def start_child(name, design_path, root, *, device, steps, max_attempts):
         plan = children.outcomes.get(name, [])
         outcome = plan.pop(0) if plan else "complete"
         (root / "logs").mkdir(parents=True, exist_ok=True)
@@ -159,11 +160,15 @@ def tiny(tmp_path, monkeypatch, children):
                                                   "non-finite, so it cannot be clipped."),
                          "fault": OSError("[Errno 5] Input/output error"),
                          "oom": torch.cuda.OutOfMemoryError("CUDA out of memory. Tried to allocate 2.00 GiB"),
+                         "cublas": RuntimeError("CUDA error: CUBLAS_STATUS_ALLOC_FAILED when calling "
+                                                "`cublasCreate(handle)`"),
+                         "cudnn": RuntimeError("cuDNN error: CUDNN_STATUS_INTERNAL_ERROR_DEVICE_ALLOCATION_FAILED"),
+                         "memory": MemoryError("Unable to allocate 1.00 TiB for an array"),
                          "defect": ValueError("training answer absent from episode candidate set")}.get(outcome)
                 if error is not None:
                     patch.setattr(tsm, "train_arm", _raise(error))
                     patch.setattr(run_tsm, "train", _raise(error))
-                run_tsm.train_one(design, root, name, device=device, steps=steps)
+                run_tsm.train_one(design, root, name, device=device, steps=steps, max_attempts=max_attempts)
         except Exception:  # train_one has recorded the failure; the child process would exit with an error
             return Exited(1)
         if outcome == "killed":
@@ -269,14 +274,20 @@ def test_schedule_limits_concurrency_and_stops_everything_on_the_first_failure(t
             active.discard(self.name)
             stopped.append(self.name)
 
-    def start(name, design_path, root, *, device, steps):
+    caps = []
+
+    def start(name, design_path, root, *, device, steps, max_attempts):
         active.add(name)
+        caps.append(max_attempts)
         peak[0] = max(peak[0], len(active))
         return Stub(name)
 
     monkeypatch.setattr(run_tsm, "start_child", start)
     assert run_tsm.schedule(["a", "b"], 2, tmp_path / "d.json", tmp_path, device="cpu") == {"a": 0, "b": 0}
     assert peak[0] == 2 and sorted(stopped) == ["a", "b"] and not active
+    assert caps == [3, 3]  # the registered number of attempts unless the job says otherwise
+    run_tsm.schedule(["a", "b"], 2, tmp_path / "d.json", tmp_path, device="cpu", max_attempts=5)
+    assert caps == [3, 3, 5, 5] and not active
     active.clear()
     peak[0] = 0
     with pytest.raises(ValueError, match="run c exited 1"):
@@ -291,16 +302,42 @@ def test_schedule_limits_concurrency_and_stops_everything_on_the_first_failure(t
                          fatal=lambda name: name == "c")
     assert not active
 
-    def broken(name, design_path, root, *, device, steps):
+    def broken(name, design_path, root, *, device, steps, max_attempts):
         if name == "c":
             raise FileExistsError("the log exists")  # another job runs it
-        return start(name, design_path, root, device=device, steps=steps)
+        return start(name, design_path, root, device=device, steps=steps, max_attempts=max_attempts)
 
     monkeypatch.setattr(run_tsm, "start_child", broken)
     stopped.clear()
     with pytest.raises(ValueError, match="run c could not be started: the log exists"):
         run_tsm.schedule(["a", "b", "c"], 3, tmp_path / "d.json", tmp_path, device="cpu")
     assert sorted(stopped) == ["a", "b"] and not active  # the children that were running are stopped
+
+
+def test_the_attempt_cap_reaches_the_training_child_on_its_command_line(tmp_path, monkeypatch):
+    commands = []
+
+    def popen(command, **kwargs):
+        commands.append(command)
+        return Exited(0)
+
+    monkeypatch.setattr(run_tsm, "subprocess", types.SimpleNamespace(Popen=popen, STDOUT=subprocess.STDOUT))
+    design = tmp_path / "design.json"
+    design.write_text("{}")
+    monkeypatch.setenv("S9_CHILD", "1")
+    for index, (arguments, expected) in enumerate(((dict(), 3), (dict(max_attempts=5), 5))):
+        run_tsm.start_child(NAME, design, tmp_path / f"root{index}", device="cpu", steps=None, **arguments).stop()
+        command = commands[-1]
+        assert command[command.index("--max-attempts") + 1] == str(expected)  # the registered number unless granted
+        seen = {}
+
+        def train_one(design, root, name, **kwargs):  # the child process: what its run is trained with
+            seen.update(kwargs)
+            return dict(status="complete", seconds=0.0)
+
+        monkeypatch.setattr(run_tsm, "train_one", train_one)
+        assert run_tsm.main(command[2:]) == 0  # the child parses its own command line
+        assert seen["max_attempts"] == expected and seen["device"] == "cpu"
 
 
 def test_pipeline_runs_end_to_end_and_the_analysis_audits_every_seal(tiny, children):
@@ -368,6 +405,8 @@ def test_pipeline_runs_end_to_end_and_the_analysis_audits_every_seal(tiny, child
     assert summary["failed_cells"] == []
     assert summary["training_source_hash"] == run_tsm.read_record(root, NAME)["source"]["source_hash"]
     assert summary["evaluation_attempt"] == 1 and summary["evaluation_restarts"] == []
+    assert summary["evaluation_source_hash"] == manifest["source"]["source_hash"]
+    assert manifest["training_source_hash"] == summary["training_source_hash"]  # the code the 18 runs were trained at
     for arm, passed in summary["arms_pass"].items():  # an arm passes only if it passes for both writers
         assert passed == all(summary["writer_passes"][f"{w}/{arm}"] for w in run_tsm.WRITERS)
         assert (summary["arm_outcome"][arm] == "both") == passed
@@ -446,17 +485,32 @@ def test_run_state_separates_registered_training_failures_from_unfinished_runs(t
     (lambda: OSError(5, "Input/output error"), "infrastructure"),
     (lambda: FileNotFoundError("checkpoint.pt"), "infrastructure"),
     (lambda: torch.cuda.OutOfMemoryError("CUDA out of memory. Tried to allocate 2.00 GiB"), "infrastructure"),
+    (lambda: torch.cuda.OutOfMemoryError("HIP out of memory. Tried to allocate 2.00 GiB"),
+     "infrastructure"),  # known by its class, whatever its text says
     (lambda: RuntimeError("CUDA error: out of memory"), "infrastructure"),
+    (lambda: RuntimeError("CUDA error: CUBLAS_STATUS_ALLOC_FAILED when calling `cublasCreate(handle)`"),
+     "infrastructure"),  # Clarification C2: allocation failures of cuBLAS and cuDNN
+    (lambda: RuntimeError("cuDNN error: CUDNN_STATUS_ALLOC_FAILED"), "infrastructure"),  # cuDNN 8; an alias in cuDNN 9
+    (lambda: RuntimeError("cuDNN error: CUDNN_STATUS_INTERNAL_ERROR_HOST_ALLOCATION_FAILED"), "infrastructure"),
+    (lambda: RuntimeError("cuDNN error: CUDNN_STATUS_INTERNAL_ERROR_DEVICE_ALLOCATION_FAILED"), "infrastructure"),
+    (lambda: MemoryError(), "infrastructure"),  # a host MemoryError
+    (lambda: type("ArrayMemoryError", (MemoryError,), {})("Unable to allocate 1.00 TiB for an array"),
+     "infrastructure"),  # as numpy raises it
     (lambda: KeyboardInterrupt(), "infrastructure"),  # an interruption is not an exception of the code
     (lambda: ValueError("training answer absent from episode candidate set"), "code_defect"),
     (lambda: KeyError("hop"), "code_defect"),
     (lambda: AssertionError(), "code_defect"),
     (lambda: RuntimeError("mat1 and mat2 shapes cannot be multiplied (4x8 and 16x8)"), "code_defect"),
     (lambda: RuntimeError("CUDA error: an illegal memory access was encountered"), "code_defect"),
+    (lambda: RuntimeError("CUDA error: CUBLAS_STATUS_EXECUTION_FAILED when calling `cublasSgemm`"), "code_defect"),
+    (lambda: RuntimeError("cuDNN error: CUDNN_STATUS_NOT_SUPPORTED"), "code_defect"),  # other CUDA runtime errors
+    (lambda: RuntimeError("cuDNN error: CUDNN_STATUS_INTERNAL_ERROR_COMPILATION_FAILED"), "code_defect"),
+    (lambda: RuntimeError("CUDA error: CUBLAS_STATUS_NOT_INITIALIZED when calling `cublasCreate(handle)`"),
+     "code_defect"),  # not a status that names an allocation
     (lambda: RuntimeError("DefaultCPUAllocator: can't allocate memory: you tried to allocate 1099511627776 bytes"),
-     "code_defect"),  # host memory is not CUDA out-of-memory
+     "code_defect"),  # a RuntimeError of PyTorch's CPU allocator is not a MemoryError
     (lambda: RuntimeError("out of memory while allocating the host buffer"), "code_defect"),  # not CUDA
-    (lambda: MemoryError(), "code_defect"),
+    (lambda: ValueError("CUDA error: out of memory"), "code_defect"),  # the libraries raise a RuntimeError
     (lambda: ValueError("non-finite values in the batch"), "code_defect"),  # not the error of the gradient clipping
 ])
 def test_a_failure_is_read_as_the_registration_reads_it(make_error, expected):
@@ -489,6 +543,12 @@ def test_an_attempt_must_be_identical_to_the_earlier_one_and_within_three_attemp
     (attempts / f"{NAME}-attempt3").mkdir()  # three attempts are used: there is no fourth
     with pytest.raises(ValueError, match="used 3 of 3 attempts"):
         run_tsm.check_rerun(tmp_path, NAME, config_hash="c1", source=source)
+    assert run_tsm.check_rerun(tmp_path, NAME, config_hash="c1", source=source, max_attempts=4) == 4  # Clarification C2
+    with pytest.raises(ValueError, match="configuration differs"):  # a granted attempt is as identical as any other
+        run_tsm.check_rerun(tmp_path, NAME, config_hash="c2", source=source, max_attempts=4)
+    (attempts / f"{NAME}-attempt4").mkdir()
+    with pytest.raises(ValueError, match="used 4 of 4 attempts"):
+        run_tsm.check_rerun(tmp_path, NAME, config_hash="c1", source=source, max_attempts=4)
 
 
 def test_an_infrastructure_failure_is_trained_again_identically_after_the_job_has_ended(tiny, children, monkeypatch):
@@ -631,6 +691,70 @@ def test_train_one_refuses_a_fourth_attempt_and_creates_nothing(tiny):
     with pytest.raises(ValueError, match="used 3 of 3 attempts"):
         run_tsm.train_one(design, root, NAME, device="cpu")
     assert not (root / "runs").exists()
+
+
+def test_train_one_takes_a_larger_number_of_attempts_and_refuses_the_next_one(tiny):
+    tmp_path, p1s, f2, _ = tiny
+    design = run_tsm.build_design(p1s, f2)
+    root = tmp_path / "root"
+    for number in (1, 2, 3):
+        (root / "attempts" / f"{NAME}-attempt{number}").mkdir(parents=True)
+    record = run_tsm.train_one(design, root, NAME, device="cpu", max_attempts=4)
+    assert record["status"] == "complete" and record["attempt"] == 4
+    with pytest.raises(FileExistsError):  # a run directory is never reused: the cap does not change that
+        run_tsm.train_one(design, root, NAME, device="cpu", max_attempts=9)
+    run_tsm.move_aside(root, NAME)
+    with pytest.raises(ValueError, match="used 4 of 4 attempts"):
+        run_tsm.train_one(design, root, NAME, device="cpu", max_attempts=4)
+    assert not (root / "runs" / NAME).exists()  # nothing was created
+
+
+def test_more_attempts_are_granted_only_by_the_flag_and_each_one_stays_identical(tiny, children, monkeypatch):
+    tmp_path, p1s, f2, repo = tiny
+    locked, commit = _locked_design(tmp_path, p1s, f2, repo)
+    root = tmp_path / "run"
+    # four allocation failures (infrastructure), then a run that completes
+    children.outcomes[NAME] = ["cublas", "memory", "oom", "cudnn", "complete"]
+    with pytest.raises(ValueError, match="did not finish"):
+        _one_run(locked, commit, root, "a")
+    for label in ("b", "c"):  # the registered number of attempts, with no flag
+        with pytest.raises(ValueError, match="did not finish"):
+            _one_run(locked, commit, root, label, "--rerun-incomplete")
+    assert children.started == [NAME] * 3 and run_tsm.run_state(root, NAME) == "incomplete"
+    with pytest.raises(ValueError, match=r"used 3 of 3 attempts.*--max-attempts"):
+        _one_run(locked, commit, root, "d", "--rerun-incomplete")
+    for lower in ("2", "0", "-1"):  # the registered number is a floor: a rerun is never refused by a smaller cap
+        with pytest.raises(ValueError, match="--max-attempts must be at least 3"):
+            _one_run(locked, commit, root, "d", "--rerun-incomplete", "--max-attempts", lower)
+    assert children.started == [NAME] * 3 and not (root / "train_manifest-d.json").exists()
+    real_source = run_tsm.source_metadata
+    monkeypatch.setattr(run_tsm, "source_metadata", lambda: dict(real_source(), source_hash="another-code-version"))
+    with pytest.raises(ValueError, match="code differs"):  # a granted attempt is as identical as any other
+        _one_run(locked, commit, root, "e", "--rerun-incomplete", "--max-attempts", "4")
+    monkeypatch.setattr(run_tsm, "source_metadata", real_source)
+    assert children.started == [NAME] * 3 and len(run_tsm.moved_attempts(root, NAME)) == 2  # nothing moved or started
+    with pytest.raises(ValueError, match="did not finish"):  # attempt 4 runs in the child, which is told the cap
+        _one_run(locked, commit, root, "f", "--rerun-incomplete", "--max-attempts", "4")
+    record = run_tsm.read_record(root, NAME)
+    assert record["attempt"] == 4 and record["failure_kind"] == "infrastructure"
+    assert record["failure"].startswith("RuntimeError: cuDNN error: CUDNN_STATUS_INTERNAL_ERROR_DEVICE_ALLOCATION")
+    with pytest.raises(ValueError, match="used 4 of 4 attempts"):  # the cap is the number granted, not one more
+        _one_run(locked, commit, root, "g", "--rerun-incomplete", "--max-attempts", "4")
+    assert not (root / "train_manifest-g.json").exists() and children.started == [NAME] * 4
+    assert _one_run(locked, commit, root, "h", "--rerun-incomplete", "--max-attempts", "5") == 0  # attempt 5
+    final = run_tsm.read_record(root, NAME)
+    assert final["status"] == "complete" and final["attempt"] == 5 and len(run_tsm.moved_attempts(root, NAME)) == 4
+    earlier = [json.loads((moved / "record.json").read_text()) for moved in run_tsm.moved_attempts(root, NAME)]
+    assert [row["attempt"] for row in earlier] == [1, 2, 3, 4]
+    assert {row["failure_kind"] for row in earlier} == {"infrastructure"}
+    assert [row["failure"].split(":")[0] for row in earlier] == ["RuntimeError", "MemoryError", "OutOfMemoryError",
+                                                                 "RuntimeError"]
+    assert {(row["config_hash"], row["source"]["source_hash"]) for row in earlier} == {
+        (final["config_hash"], final["source"]["source_hash"])}  # every attempt is the first one again
+    caps = {label: json.loads((root / f"train_manifest-{label}.json").read_text())["max_attempts"]
+            for label in ("a", "b", "c", "f", "h")}
+    assert caps == dict(a=3, b=3, c=3, f=4, h=5)  # the manifest records the cap that was in force
+    assert json.loads((root / "train_manifest-h.json").read_text())["reruns"] == [NAME]
 
 
 def test_an_error_anywhere_after_the_run_directory_exists_is_recorded_with_its_kind(tiny, monkeypatch):
@@ -780,14 +904,39 @@ def test_a_code_defect_in_any_run_stops_the_study_before_the_confirmation_set_is
     assert children.stopped == [sibling]  # the run that is still training is stopped
     order = [row["name"] for row in run_tsm.planned_runs()]
     assert children.started == order[:order.index(failed) + 3]  # nothing is started once the study has stopped
-    for extra in ([], ["--writers", "joint_fact", "--arms", "T0", "--seeds", "43"]):  # any selection, with or without
-        with pytest.raises(ValueError, match="the study stops"):  # the flag: the defect is the code's, not a run's
+    for extra in ([], ["--writers", "joint_fact", "--arms", "T0", "--seeds", "43"],  # any selection, with or without
+                  ["--max-attempts", "9"]):  # the flag, and a larger cap: the defect is the code's, not a run's
+        with pytest.raises(ValueError, match="the study stops"):
             run_tsm.main(_train_argv(locked, commit, root, f"b{len(extra)}", "--rerun-incomplete", *extra))
         assert not (root / f"train_manifest-b{len(extra)}.json").exists()
     with pytest.raises(ValueError, match="code defect.*the study stops"):
         run_tsm.main(_evaluate_argv(locked, commit, root))
     assert not (root / "evaluation").exists()  # the confirmation set was never touched
     assert children.started == order[:order.index(failed) + 3]
+
+
+def test_a_run_moved_aside_by_hand_after_a_recorded_hardware_fault_is_trained_again_identically(tiny, children):
+    tmp_path, p1s, f2, repo = tiny
+    locked, commit = _locked_design(tmp_path, p1s, f2, repo)
+    root = tmp_path / "run"
+    children.outcomes[NAME] = ["defect", "complete"]  # not an allocation failure: a code defect, whatever its cause
+    with pytest.raises(ValueError, match="the study stops"):
+        _one_run(locked, commit, root, "a")
+    with pytest.raises(ValueError, match="the study stops"):  # nothing in the scripts lifts the stop
+        _one_run(locked, commit, root, "b")
+    # Clarification C2: the orchestrator's diagnosis finds a hardware fault and records it. The scripts have no option
+    # for it: the run is moved to attempts/ by hand, as --rerun-incomplete moves an unfinished run, and the identical
+    # job is submitted again.
+    moved = run_tsm.move_aside(root, NAME)
+    assert moved.name == f"{NAME}-attempt1" and moved.with_name(moved.name + ".log").is_file()
+    assert run_tsm.study_stop(root) is None
+    assert _one_run(locked, commit, root, "c") == 0
+    final = run_tsm.read_record(root, NAME)
+    assert final["status"] == "complete" and final["attempt"] == 2
+    earlier = json.loads((moved / "record.json").read_text())
+    assert earlier["failure_kind"] == "code_defect" and earlier["attempt"] == 1  # the diagnosis stays on record
+    assert (earlier["config_hash"], earlier["source"]["source_hash"]) == (final["config_hash"],
+                                                                          final["source"]["source_hash"])
 
 
 def test_a_code_defect_is_reported_before_a_t0_failure_and_an_unfinished_run(tiny):
@@ -831,6 +980,30 @@ def test_cuda_out_of_memory_and_io_errors_are_infrastructure_failures_that_do_no
     assert run_tsm.run_state(root, fault) == "incomplete" and run_tsm.study_stop(root) is None
     assert run_tsm.main(_train_argv(locked, commit, root, "c", "--rerun-incomplete")) == 0  # attempt 3
     assert run_tsm.read_record(root, fault)["attempt"] == 3
+    assert run_tsm.main(_evaluate_argv(locked, commit, root)) == 0
+
+
+def test_cublas_cudnn_and_host_allocation_failures_are_infrastructure_failures_too(tiny, children):
+    tmp_path, p1s, f2, repo = tiny
+    locked, commit = _locked_design(tmp_path, p1s, f2, repo)
+    root = tmp_path / "run"
+    failing = {"tsm-oracle_random-T0-s17": ("cublas", "RuntimeError: CUDA error: CUBLAS_STATUS_ALLOC_FAILED"),
+               "tsm-oracle_random-T1-s29": ("cudnn", "RuntimeError: cuDNN error: CUDNN_STATUS_INTERNAL_ERROR_DEVICE"),
+               "tsm-joint_fact-T2-s43": ("memory", "MemoryError: Unable to allocate")}  # even a T0 run is only rerun
+    for name, (outcome, _) in failing.items():
+        children.outcomes[name] = [outcome, "complete"]
+    with pytest.raises(ValueError, match="did not finish"):
+        run_tsm.main(_train_argv(locked, commit, root, "a"))
+    first = json.loads((root / "train_manifest-a.json").read_text())
+    assert first["status"] == "incomplete" and sorted(first["unfinished"]) == sorted(failing)
+    assert first["training_failures"] == [] and len(list((root / "runs").glob("*/checkpoint.pt"))) == 15
+    for name, (_, text) in failing.items():
+        record = run_tsm.read_record(root, name)
+        assert record["failure_kind"] == "infrastructure" and record["failure"].startswith(text)
+        assert run_tsm.run_state(root, name) == "incomplete"
+    assert run_tsm.study_stop(root) is None  # neither a failure of the arm nor a defect of the code
+    assert run_tsm.main(_train_argv(locked, commit, root, "b", "--rerun-incomplete")) == 0
+    assert all(run_tsm.read_record(root, name)["attempt"] == 2 for name in failing)
     assert run_tsm.main(_evaluate_argv(locked, commit, root)) == 0
 
 
@@ -964,7 +1137,8 @@ def test_an_interrupted_evaluation_is_restarted_from_scratch_with_its_output_mov
     assert json.loads((moved / "manifest.json").read_text()) == first
     manifest = json.loads((out / "manifest.json").read_text())
     assert manifest["status"] == "complete" and manifest["attempt"] == 2
-    assert manifest["restarts"] == [dict(attempt=1, moved_to="attempts/evaluation-attempt1")]
+    assert manifest["restarts"] == [dict(attempt=1, moved_to="attempts/evaluation-attempt1",
+                                         source_hash=first["source"]["source_hash"])]
     assert len(manifest["evaluations"]) == 24 and len(list((out / "samples").glob("*.npz"))) == 24  # from scratch
     assert manifest["design_hash"] == first["design_hash"] and manifest["checkpoints"] == first["checkpoints"]
     assert manifest["source"]["source_hash"] == first["source"]["source_hash"]  # identical inputs
@@ -977,8 +1151,13 @@ def test_an_interrupted_evaluation_is_restarted_from_scratch_with_its_output_mov
     summary = json.loads((analysis / "summary.json").read_text())
     assert summary["evaluation_attempt"] == 2 and summary["evaluation_restarts"] == manifest["restarts"]
     assert "attempts/evaluation-attempt1" in (analysis / "summary.md").read_text()
+    assert "Clarification C2" not in (analysis / "summary.md").read_text()  # the code did not change at the restart
     with _edited(out / "manifest.json", lambda m: dict(m, attempt=1, restarts=[])):  # a restart that is not recorded
         with pytest.raises(ValueError, match="evaluation attempts differ"):
+            analyze_tsm.main(["--root", str(root), "--out", str(root.parent / "again")])
+    with _edited(out / "manifest.json", lambda m: dict(m, restarts=[{k: v for k, v in row.items() if k != "source_hash"}
+                                                                    for row in m["restarts"]])):  # the code is not
+        with pytest.raises(ValueError, match="does not record the code"):  # recorded
             analyze_tsm.main(["--root", str(root), "--out", str(root.parent / "again")])
     moved.rename(root / "attempts" / "elsewhere")  # a recorded restart whose output is not where it was moved
     with pytest.raises(ValueError, match="evaluation attempts differ"):
@@ -1069,7 +1248,8 @@ def test_a_restart_needs_identical_inputs_also_after_an_aborted_restart(tiny, mo
     assert run_tsm.main(_evaluate_argv(locked, commit, root)) == 0  # nothing is in place, so no flag is needed
     manifest = json.loads(manifest_path.read_text())
     assert manifest["status"] == "complete" and manifest["attempt"] == 2
-    assert manifest["restarts"] == [dict(attempt=1, moved_to="attempts/evaluation-attempt1")]
+    assert manifest["restarts"] == [dict(attempt=1, moved_to="attempts/evaluation-attempt1",
+                                         source_hash=json.loads(interrupted)["source"]["source_hash"])]
 
 
 @pytest.mark.parametrize("manifest_text", [None, '{"status": "runn'])
@@ -1093,7 +1273,161 @@ def test_an_evaluation_directory_without_a_readable_manifest_is_an_interrupted_e
     assert not (samples / "partial.npz").exists()
     manifest = json.loads((root / "evaluation" / "manifest.json").read_text())
     assert manifest["status"] == "complete" and manifest["attempt"] == 2
-    assert manifest["restarts"] == [dict(attempt=1, moved_to="attempts/evaluation-attempt1")]
+    assert manifest["restarts"] == [dict(attempt=1, moved_to="attempts/evaluation-attempt1", source_hash=None)]
+
+
+def _at_code(monkeypatch, code):
+    """Make the stages that follow run at another ``source_hash``: the code of the evaluation job."""
+    real = run_tsm.source_metadata
+    monkeypatch.setattr(run_tsm, "source_metadata", lambda: dict(real(), source_hash=code))
+    return real
+
+
+def test_a_fixed_evaluation_code_is_restarted_only_with_the_flag_and_both_hashes_are_recorded(tiny, monkeypatch):
+    locked, commit, root, _ = _trained(tiny)
+    trained_at = run_tsm.read_record(root, NAME)["source"]["source_hash"]
+    real = _interrupting(monkeypatch)
+    with pytest.raises(OSError, match="Input/output"):  # attempt 1 ends in the middle, at the code the runs trained at
+        run_tsm.main(_evaluate_argv(locked, commit, root))
+    out, manifest_path = root / "evaluation", root / "evaluation" / "manifest.json"
+    interrupted = manifest_path.read_text()
+    assert json.loads(interrupted)["source"]["source_hash"] == trained_at
+    monkeypatch.setattr(run_tsm, "evaluate_runs", real)
+    _at_code(monkeypatch, "the-fixed-evaluation-code")  # the evaluation code was fixed: another source_hash
+    with pytest.raises(ValueError, match=r"differs from the interrupted evaluation in code: .*--new-evaluation-code"):
+        run_tsm.main(_evaluate_argv(locked, commit, root, "--restart-interrupted"))
+    with pytest.raises(ValueError, match="--new-evaluation-code applies to a restart: it needs --restart-interrupted"):
+        run_tsm.main(_evaluate_argv(locked, commit, root, "--new-evaluation-code"))
+    assert manifest_path.read_text() == interrupted and not (root / "attempts").exists()  # nothing was moved
+    sealed = _seal(out / "samples")  # the partial samples are never opened
+    assert run_tsm.main(_evaluate_argv(locked, commit, root, "--restart-interrupted", "--new-evaluation-code")) == 0
+    moved = root / "attempts" / "evaluation-attempt1"
+    for path in (moved / "samples").glob("*.npz"):
+        path.chmod(0o600)
+    assert {path.name: path.read_bytes() for path in (moved / "samples").glob("*.npz")} == sealed  # as they were
+    assert (moved / "manifest.json").read_text() == interrupted
+    manifest = json.loads(manifest_path.read_text())
+    assert manifest["status"] == "complete" and manifest["attempt"] == 2
+    assert manifest["source"]["source_hash"] == "the-fixed-evaluation-code"  # the code of this attempt ...
+    assert manifest["training_source_hash"] == trained_at  # ... and the code the runs were trained at
+    assert manifest["restarts"] == [dict(attempt=1, moved_to="attempts/evaluation-attempt1",
+                                         source_hash=trained_at)]  # ... and the code of the interrupted one
+    first = json.loads(interrupted)
+    assert manifest["design_hash"] == first["design_hash"] and manifest["checkpoints"] == first["checkpoints"]
+    assert len(manifest["evaluations"]) == 24 and len(list((out / "samples").glob("*.npz"))) == 24
+    records = [json.loads(path.read_text()) for path in sorted((root / "runs").glob("*/record.json"))]
+    assert len(records) == 18 and {r["source"]["source_hash"] for r in records} == {trained_at}  # one training code
+
+    analysis = root.parent / "analysis"
+    assert analyze_tsm.main(["--root", str(root), "--out", str(analysis)]) == 0
+    summary = json.loads((analysis / "summary.json").read_text())
+    assert summary["training_source_hash"] == trained_at
+    assert summary["evaluation_source_hash"] == "the-fixed-evaluation-code"
+    assert summary["evaluation_attempt"] == 2 and summary["evaluation_restarts"] == manifest["restarts"]
+    report = (analysis / "summary.md").read_text()
+    assert "Clarification C2" in report
+    assert f"source_hash by attempt: 1: {trained_at[:12]}, 2: the-fixed-ev; the 18 runs were trained at " in report
+    with _edited(manifest_path, lambda m: dict(m, source={k: v for k, v in m["source"].items() if k != "source_hash"})):
+        with pytest.raises(ValueError, match="does not record the code"):  # the evaluation's own code is audited too
+            analyze_tsm.main(["--root", str(root), "--out", str(root.parent / "again")])
+    with _edited(manifest_path, lambda m: dict(m, training_source_hash="another-training-code")):
+        with pytest.raises(ValueError, match="training source_hash differs from the run records"):
+            analyze_tsm.main(["--root", str(root), "--out", str(root.parent / "again")])
+
+
+def test_the_new_evaluation_code_flag_relaxes_nothing_else(tiny, monkeypatch):
+    locked, commit, root, repo = _trained(tiny)
+    real = _interrupting(monkeypatch)
+    with pytest.raises(OSError):
+        run_tsm.main(_evaluate_argv(locked, commit, root))
+    monkeypatch.setattr(run_tsm, "evaluate_runs", real)
+    manifest_path = root / "evaluation" / "manifest.json"
+    interrupted = manifest_path.read_text()
+    first_code = json.loads(interrupted)["source"]["source_hash"]
+    real_source = _at_code(monkeypatch, "the-fixed-evaluation-code")
+    flags = ("--restart-interrupted", "--new-evaluation-code")
+
+    def refused(match, *, commit=commit):
+        with pytest.raises(ValueError, match=match):
+            run_tsm.main(_evaluate_argv(locked, commit, root, *flags))
+        assert manifest_path.read_text() == interrupted and not (root / "attempts").exists()  # nothing was moved
+
+    _git(repo, "commit", "-q", "--allow-empty", "-m", "later")  # the same design file under another commit
+    refused("in design_lock_commit: a restart must have identical inputs", commit=_git(repo, "rev-parse", "HEAD"))
+    checkpoint, record = root / "runs" / NAME / "checkpoint.pt", root / "runs" / NAME / "record.json"
+    original = checkpoint.read_bytes()
+    checkpoint.write_bytes(original + b"x")  # replaced and sealed again: only the earlier attempt shows the difference
+    with _edited(record, lambda r: dict(r, checkpoint_blake2b=run_tsm.digest_checkpoint(checkpoint))):
+        refused("in checkpoints: a restart must have identical inputs")
+    checkpoint.write_bytes(original)
+    with _edited(record, lambda r: dict(r, source=dict(r["source"], source_hash="another-training-code"))):
+        refused("not all trained with the same code")  # the training records still share one source_hash
+    # a restart that stopped after it had moved the interrupted evaluation aside and before it wrote a manifest
+    run_tsm.move_evaluation_aside(root)
+    monkeypatch.setattr(run_tsm, "source_metadata", real_source)
+    _at_code(monkeypatch, "another-fix")
+    with pytest.raises(ValueError, match="differs from the interrupted evaluation in code"):  # nothing is in place, but
+        run_tsm.main(_evaluate_argv(locked, commit, root))  # the code is compared with the interrupted attempt's
+    with pytest.raises(ValueError, match="--new-evaluation-code applies to a restart"):  # and the flag is for a restart
+        run_tsm.main(_evaluate_argv(locked, commit, root, "--new-evaluation-code"))
+    assert run_tsm.main(_evaluate_argv(locked, commit, root, *flags)) == 0
+    manifest = json.loads(manifest_path.read_text())
+    assert manifest["attempt"] == 2 and manifest["source"]["source_hash"] == "another-fix"
+    assert manifest["restarts"] == [dict(attempt=1, moved_to="attempts/evaluation-attempt1", source_hash=first_code)]
+
+
+@pytest.mark.parametrize("third", ["fix-one", "fix-two"])
+def test_the_evaluation_code_of_every_attempt_is_recorded_across_restarts(tiny, monkeypatch, third):
+    locked, commit, root, _ = _trained(tiny)
+    trained_at = run_tsm.read_record(root, NAME)["source"]["source_hash"]
+    real = _interrupting(monkeypatch)
+    flags = ("--restart-interrupted", "--new-evaluation-code")
+    with pytest.raises(OSError):  # attempt 1, at the training code
+        run_tsm.main(_evaluate_argv(locked, commit, root))
+    _at_code(monkeypatch, "fix-one")
+    with pytest.raises(OSError):  # attempt 2, at the first fix: interrupted again
+        run_tsm.main(_evaluate_argv(locked, commit, root, *flags))
+    second = json.loads((root / "evaluation" / "manifest.json").read_text())
+    assert second["attempt"] == 2 and [row["source_hash"] for row in second["restarts"]] == [trained_at]
+    monkeypatch.setattr(run_tsm, "evaluate_runs", real)
+    _at_code(monkeypatch, third)
+    if third != "fix-one":  # the flag permits a restart at another code than the latest attempt's, nothing more
+        with pytest.raises(ValueError, match="differs from the interrupted evaluation in code"):
+            run_tsm.main(_evaluate_argv(locked, commit, root, "--restart-interrupted"))
+    assert run_tsm.main(_evaluate_argv(locked, commit, root, *(flags if third != "fix-one" else flags[:1]))) == 0
+    manifest = json.loads((root / "evaluation" / "manifest.json").read_text())
+    assert manifest["attempt"] == 3 and manifest["source"]["source_hash"] == third
+    assert manifest["restarts"] == [dict(attempt=1, moved_to="attempts/evaluation-attempt1", source_hash=trained_at),
+                                    dict(attempt=2, moved_to="attempts/evaluation-attempt2", source_hash="fix-one")]
+    analysis = root.parent / "analysis"
+    assert analyze_tsm.main(["--root", str(root), "--out", str(analysis)]) == 0
+    report = (analysis / "summary.md").read_text()
+    by_attempt = f"source_hash by attempt: 1: {trained_at[:12]}, 2: fix-one, 3: {third}"
+    assert f"{by_attempt}; the 18 runs were trained at {trained_at[:12]}." in report
+
+
+def test_a_restart_records_no_code_for_an_attempt_whose_manifest_was_cut_off(tiny, monkeypatch):
+    locked, commit, root, _ = _trained(tiny)
+    trained_at = run_tsm.read_record(root, NAME)["source"]["source_hash"]
+    real = _interrupting(monkeypatch)
+    flags = ("--restart-interrupted", "--new-evaluation-code")
+    with pytest.raises(OSError):
+        run_tsm.main(_evaluate_argv(locked, commit, root))
+    _at_code(monkeypatch, "fix-one")
+    with pytest.raises(OSError):  # attempt 2 ends, and its manifest is cut off (a node fault while it was written)
+        run_tsm.main(_evaluate_argv(locked, commit, root, *flags))
+    (root / "evaluation" / "manifest.json").write_text('{"status": "runn')
+    monkeypatch.setattr(run_tsm, "evaluate_runs", real)
+    _at_code(monkeypatch, "fix-two")
+    # the restart is compared with attempt 1: the latest attempt that has a readable manifest
+    assert run_tsm.main(_evaluate_argv(locked, commit, root, *flags)) == 0
+    manifest = json.loads((root / "evaluation" / "manifest.json").read_text())
+    assert manifest["attempt"] == 3 and manifest["source"]["source_hash"] == "fix-two"
+    assert manifest["restarts"] == [dict(attempt=1, moved_to="attempts/evaluation-attempt1", source_hash=trained_at),
+                                    dict(attempt=2, moved_to="attempts/evaluation-attempt2", source_hash=None)]
+    analysis = root.parent / "analysis"
+    assert analyze_tsm.main(["--root", str(root), "--out", str(analysis)]) == 0  # the audit accepts an unknown code
+    assert f"1: {trained_at[:12]}, 2: unknown, 3: fix-two;" in (analysis / "summary.md").read_text()
 
 
 def _endpoint(writer, arm, *, passes, failed=False):

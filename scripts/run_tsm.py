@@ -12,18 +12,19 @@ Stages (each its own job; scripts/submit.py in a Miyabi-G allocation):
             a run that is already complete or a registered training failure is left as it is;
   evaluate  evaluate T0, T1, T2 and the B4 references on the new confirmation episodes (split test, seed 999007).
 
-Training failures (docs/prereg/TSM.md, "Decisions at registration" and Clarification C1); every run that ends with an
-exception is recorded as ``failed`` with a ``failure_kind`` (see ``classify_failure``):
+Training failures (docs/prereg/TSM.md, "Decisions at registration" and Clarifications C1 and C2); every run that ends
+with an exception is recorded as ``failed`` with a ``failure_kind`` (see ``classify_failure``):
 
 * a non-finite loss or gradient norm in a T1 or T2 run (``numerical``) is a registered training failure: no retry, no
   re-tuning; that arm fails for that writer, its completed runs are evaluated and reported descriptively, the other arms
   are evaluated as registered;
 * the same in a T0 run stops the study before the confirmation set is opened: ``train`` refuses to start anything else
   and ``evaluate`` refuses to run;
-* an end by walltime or a node fault, an I/O error (``OSError``) and CUDA out-of-memory (``infrastructure``) are
-  infrastructure failures: the run is trained again with the identical configuration and code (``train
-  --rerun-incomplete`` once its job has ended), at most twice; every attempt is compared with the one before it (also
-  when an earlier rerun stopped before its child started);
+* an end by walltime or a node fault, an I/O error (``OSError``) and an allocation failure (CUDA out-of-memory, a cuBLAS
+  or cuDNN allocation failure, a host ``MemoryError``) are infrastructure failures (``infrastructure``): the run is
+  trained again with the identical configuration and code (``train --rerun-incomplete`` once its job has ended), at
+  most twice, or more with ``--max-attempts N`` on the orchestrator's recorded decision; every attempt is compared with
+  the one before it (also when an earlier rerun stopped before its child started);
 * any other exception (``code_defect``) stops the study like a T0 failure, whatever the arm: the job ends with an
   error, its running siblings are stopped, every later ``train`` and ``evaluate`` refuses, and the fixed code must
   retrain every TSM run before the confirmation set is opened (the orchestrator decides);
@@ -31,7 +32,10 @@ exception is recorded as ``failed`` with a ``failure_kind`` (see ``classify_fail
   trained with the same code (T0 is "retrained under the same code version") and with their checkpoints unchanged;
 * an ``evaluate`` job that ended before it completed is restarted from scratch with identical inputs (same design lock,
   code and checkpoints) at most twice, only with ``--restart-interrupted`` once its job has ended: the partial output is
-  moved aside to ``<root>/attempts/evaluation-attempt<k>`` without being read, and the new manifest records the restarts.
+  moved aside to ``<root>/attempts/evaluation-attempt<k>`` without being read, and the new manifest records the restarts
+  and the code (``source_hash``) of every attempt. After a defect in the evaluation code, and on the orchestrator's
+  decision, ``--new-evaluation-code`` lets the restart run at another code; the training records must still share one
+  ``source_hash`` (Clarification C2).
 """
 from __future__ import annotations
 
@@ -73,9 +77,14 @@ DECISION = dict(stay_tolerance=tsm.STAY_TOLERANCE, far_tolerance=tsm.FAR_TOLERAN
 SOURCE = Path(__file__).resolve().parents[1] / "src"
 WALLTIME_MARGIN = 1.5
 POLL_SECONDS = 1.0
-MAX_ATTEMPTS = 3  # a run (or the evaluation) and at most two identical reruns (restarts) after an infrastructure failure
+MAX_ATTEMPTS = 3  # a run (or the evaluation) and two identical reruns (restarts); train --max-attempts raises it
 QUIET_SECONDS = 300  # a run or evaluation still marked "running" is started again only after it was silent this long
 NUMERICAL, INFRASTRUCTURE, CODE_DEFECT = "numerical", "infrastructure", "code_defect"  # a failed record's failure_kind
+ALLOCATION_STATUSES = (  # the library statuses that say an allocation failed, in lower case (docs/prereg/TSM.md, C2)
+    "cublas_status_alloc_failed",  # cuBLAS
+    "cudnn_status_alloc_failed",  # cuDNN 8, and a deprecated alias in cuDNN 9
+    "cudnn_status_internal_error_host_allocation_failed",  # cuDNN 9 (the pinned one): what its host allocations report
+    "cudnn_status_internal_error_device_allocation_failed")  # cuDNN 9: what its device allocations report
 
 
 def settings() -> dict:
@@ -170,13 +179,21 @@ def runtime_metadata(device: str) -> dict:
                 gpu=torch.cuda.get_device_name(device) if cuda else None, device=device, threads=1)
 
 
-def is_cuda_out_of_memory(error: BaseException) -> bool:
-    """``torch.cuda.OutOfMemoryError``, or a ``RuntimeError`` that says so: older PyTorch, and the failures of the CUDA
-    runtime itself (creating the context on a full device) report "CUDA error: out of memory"."""
-    if isinstance(error, torch.cuda.OutOfMemoryError):
+def is_allocation_failure(error: BaseException) -> bool:
+    """A failure to allocate memory (docs/prereg/TSM.md, Clarifications C1 and C2): CUDA out-of-memory, a cuBLAS or
+    cuDNN allocation failure, or a host ``MemoryError``; any other CUDA runtime error is not one.
+
+    CUDA out-of-memory is ``torch.cuda.OutOfMemoryError`` or a ``RuntimeError`` that says so (older PyTorch, and the
+    CUDA runtime itself, creating the context on a full device, report "CUDA error: out of memory"). The cuBLAS and
+    cuDNN libraries report a failed allocation as a ``RuntimeError`` that names one of ``ALLOCATION_STATUSES``: in
+    cuDNN 9 ``CUDNN_STATUS_ALLOC_FAILED`` is a deprecated alias, and its error text names the host or device
+    allocation status instead.
+    """
+    if isinstance(error, (torch.cuda.OutOfMemoryError, MemoryError)):
         return True
     text = str(error).lower()
-    return isinstance(error, RuntimeError) and "cuda" in text and "out of memory" in text
+    return isinstance(error, RuntimeError) and (("cuda" in text and "out of memory" in text)
+                                                or any(status in text for status in ALLOCATION_STATUSES))
 
 
 def is_numerical_failure(error: BaseException) -> bool:
@@ -189,15 +206,16 @@ def is_numerical_failure(error: BaseException) -> bool:
 
 
 def classify_failure(error: BaseException) -> str:
-    """How the end of a run is read (docs/prereg/TSM.md, "Decisions at registration" and Clarification C1).
+    """How the end of a run is read (docs/prereg/TSM.md, "Decisions at registration" and Clarifications C1 and C2).
 
-    * ``infrastructure``: an I/O error (any ``OSError``), CUDA out-of-memory, or an interruption that is not an
-      exception of the code (``KeyboardInterrupt``, ``SystemExit``); the run may be trained again, identically;
+    * ``infrastructure``: an I/O error (any ``OSError``), an allocation failure (``is_allocation_failure``), or an
+      interruption that is not an exception of the code (``KeyboardInterrupt``, ``SystemExit``); the run may be trained
+      again, identically;
     * ``numerical``: a non-finite loss or gradient norm; never retried (a T1/T2 arm fails for that writer, T0 stops
       the study);
     * ``code_defect``: any other exception; the study stops.
     """
-    if isinstance(error, OSError) or is_cuda_out_of_memory(error) or not isinstance(error, Exception):
+    if isinstance(error, OSError) or is_allocation_failure(error) or not isinstance(error, Exception):
         return INFRASTRUCTURE
     return NUMERICAL if is_numerical_failure(error) else CODE_DEFECT
 
@@ -283,18 +301,20 @@ def earlier_record(root: Path, name: str) -> dict | None:
     return None
 
 
-def check_rerun(root: Path, name: str, *, config_hash: str, source: dict) -> int:
+def check_rerun(root: Path, name: str, *, config_hash: str, source: dict, max_attempts: int = MAX_ATTEMPTS) -> int:
     """Refuse an attempt of ``name`` that exceeds the attempts allowed or is not identical to the one before it.
 
     Returns the number of the attempt that may start. The attempts used are those moved aside and the run in place, if
-    there is one; ``MAX_ATTEMPTS`` are allowed in all (the first run and two reruns). Identical means the configuration
+    there is one; ``max_attempts`` are allowed in all (by default ``MAX_ATTEMPTS``: the first run and two reruns; more
+    only on the orchestrator's recorded decision, ``train --max-attempts``). Identical means the configuration
     (hence the seeds and the data stream) and the code (``source_hash``) of the latest earlier attempt, wherever it is:
     in place, or moved aside by a rerun that stopped before its child had started. By induction every attempt equals
     the first.
     """
     used = len(moved_attempts(root, name)) + int((root / "runs" / name).is_dir())
-    require(used < MAX_ATTEMPTS, f"run {name} has used {used} of {MAX_ATTEMPTS} attempts: the registered rule "
-            "allows two identical reruns; report it to the orchestrator")
+    require(used < max_attempts, f"run {name} has used {used} of {max_attempts} attempts: report it to the "
+            "orchestrator; further identical attempts need its recorded decision (train --max-attempts N, "
+            "docs/prereg/TSM.md, Clarification C2)")
     record = earlier_record(root, name)
     if record is not None:  # a record exists once an attempt had started; the next one must not differ from it
         require(record.get("config_hash") == config_hash,
@@ -361,7 +381,8 @@ def retire_stale_log(root: Path, name: str) -> None:
         log.rename(folder / f"{name}-notstarted{len(list(folder.glob(f'{name}-notstarted*.log'))) + 1}.log")
 
 
-def train_one(design: dict, root: Path, name: str, *, device: str, steps: int | None = None) -> dict:
+def train_one(design: dict, root: Path, name: str, *, device: str, steps: int | None = None,
+              max_attempts: int = MAX_ATTEMPTS) -> dict:
     """Train one registered run into ``root/runs/<name>``; the record holds its status, attempt and seals.
 
     Whatever ends the run after its directory exists, in the setup, in training or in the seals that follow, is
@@ -372,7 +393,8 @@ def train_one(design: dict, root: Path, name: str, *, device: str, steps: int | 
     run = next(row for row in planned_runs() if row["name"] == name)
     config = make_config(design, run["writer"], run["seed"], run["arm"], device=device, steps=steps)
     source, config_hash = source_metadata(), stable_hash(config)
-    attempt = check_rerun(root, name, config_hash=config_hash, source=source)  # before anything is created
+    attempt = check_rerun(root, name, config_hash=config_hash, source=source,  # before anything is created
+                          max_attempts=max_attempts)
     out = root / "runs" / name
     out.mkdir(parents=True, exist_ok=False)
     record = dict(run, status="running", attempt=attempt, config_hash=config_hash, started_at=now(), source=source,
@@ -419,9 +441,11 @@ class Child:
         self.log.close()
 
 
-def start_child(name: str, design_path: Path, root: Path, *, device: str, steps: int | None) -> Child:
+def start_child(name: str, design_path: Path, root: Path, *, device: str, steps: int | None,
+                max_attempts: int = MAX_ATTEMPTS) -> Child:
     command = [sys.executable, str(Path(__file__).resolve()), "train-one", "--design", str(design_path),
-               "--root", str(root), "--name", name, "--device", device] + (["--steps", str(steps)] if steps else [])
+               "--root", str(root), "--name", name, "--device", device,
+               "--max-attempts", str(max_attempts)] + (["--steps", str(steps)] if steps else [])
     (root / "logs").mkdir(parents=True, exist_ok=True)
     log = (root / "logs" / f"{name}.log").open("x")
     env = dict(os.environ, S9_CHILD="1",
@@ -430,7 +454,7 @@ def start_child(name: str, design_path: Path, root: Path, *, device: str, steps:
 
 
 def schedule(names: list[str], procs: int, design_path: Path, root: Path, *, device: str,
-             steps: int | None = None, fatal=None) -> dict[str, int]:
+             steps: int | None = None, max_attempts: int = MAX_ATTEMPTS, fatal=None) -> dict[str, int]:
     """Run ``names`` with at most ``procs`` concurrent children; returns each child's exit code.
 
     By default the first child that exits non-zero stops everything (``ValueError``). With ``fatal``, a function
@@ -453,7 +477,8 @@ def schedule(names: list[str], procs: int, design_path: Path, root: Path, *, dev
             while pending and len(running) < procs:
                 name = pending.pop(0)
                 try:
-                    running[name] = start_child(name, design_path, root, device=device, steps=steps)
+                    running[name] = start_child(name, design_path, root, device=device, steps=steps,
+                                                max_attempts=max_attempts)
                 except OSError as error:  # for example the log of a run that another job has just started
                     raise ValueError(f"run {name} could not be started: {error}") from error
             if running:
@@ -559,7 +584,7 @@ def final_states(design: dict, root: Path) -> dict[str, str]:
         name, state = row["name"], run_state(root, row["name"])
         require(state in ("complete", "training_failure"),
                 f"run {name} is {state}: a run must be complete or a registered training failure (a T1/T2 run with a "
-                "non-finite loss); an unfinished run is trained again with `train --rerun-incomplete`, at most twice")
+                "non-finite loss); an unfinished run is trained again with `train --rerun-incomplete`")
         record = registered_record(design, root, row)
         if state == "complete":
             path = root / "runs" / name / "checkpoint.pt"
@@ -596,11 +621,15 @@ def stage_train(args: argparse.Namespace) -> int:
     A run is final when it is complete or a registered training failure (a non-finite loss or gradient norm: no retry);
     a final record must be the registered run. An unfinished run (killed by walltime or a node fault, or ended with an
     I/O error or CUDA out-of-memory) is trained again, identically, only with ``--rerun-incomplete`` (its job must have
-    ended: a run still marked "running" must have been silent for ``QUIET_SECONDS``) and at most twice; each attempt is
+    ended: a run still marked "running" must have been silent for ``QUIET_SECONDS``) and at most twice, or
+    ``--max-attempts`` attempts in all on the orchestrator's recorded decision (Clarification C2); each attempt is
     compared with the one before it. A T0 run with a non-finite loss, and a run with a code defect (any other
     exception), stops the study: the job ends with an error and this stage refuses to start anything else. The stage
     ends with an error unless every selected run is final.
     """
+    require(args.max_attempts >= MAX_ATTEMPTS, f"--max-attempts must be at least {MAX_ATTEMPTS}, the registered number "
+            "of attempts: more are granted by the orchestrator's recorded decision (docs/prereg/TSM.md, "
+            "Clarification C2)")
     root = absolute_path(args.root, "--root")
     design_path = Path(args.design).resolve()
     verify_git_lock(design_path, args.design_commit, "the design")
@@ -622,14 +651,14 @@ def stage_train(args: argparse.Namespace) -> int:
     unfinished_runs = [name for name in names if states[name] == "incomplete"]
     require(not unfinished_runs or args.rerun_incomplete,
             f"unfinished runs {unfinished_runs}: if their job has ended, train them again, identically, with "
-            "--rerun-incomplete (at most twice per run)")
+            f"--rerun-incomplete (at most {args.max_attempts - 1} reruns per run)")
     for name in unfinished_runs:
         require_ended(root, name)
     for name in names:  # every attempt after the first is compared with the one before it, also after an aborted rerun
         if states[name] in ("missing", "incomplete"):
             row = rows[name]
             config = make_config(design, row["writer"], row["seed"], row["arm"], device=args.device)
-            check_rerun(root, name, config_hash=stable_hash(config), source=source)
+            check_rerun(root, name, config_hash=stable_hash(config), source=source, max_attempts=args.max_attempts)
     started = time.perf_counter()
     for name in unfinished_runs:
         move_aside(root, name)
@@ -640,11 +669,12 @@ def stage_train(args: argparse.Namespace) -> int:
     reruns = [name for name in todo if moved_attempts(root, name)]  # attempt 2 or 3, whoever moved the earlier ones
     manifest = dict(status="running", design_hash=stable_hash(design), design_path=str(design_path),
                     design_lock_commit=args.design_commit, names=names, started=todo, reruns=reruns,
-                    final_before=[name for name in names if name not in todo], procs=args.procs, started_at=now(),
-                    source=source, runtime=runtime_metadata(args.device))
+                    final_before=[name for name in names if name not in todo], procs=args.procs,
+                    max_attempts=args.max_attempts, started_at=now(), source=source,
+                    runtime=runtime_metadata(args.device))
     write_json(manifest_path, manifest)
     try:
-        schedule(todo, args.procs, design_path, root, device=args.device,
+        schedule(todo, args.procs, design_path, root, device=args.device, max_attempts=args.max_attempts,
                  fatal=lambda name: stops_study(root, name))
     except ValueError as error:
         stopped = study_stop(root)
@@ -665,13 +695,14 @@ def stage_train(args: argparse.Namespace) -> int:
                           training_failures=[row["name"] for row in failures], unfinished=unfinished,
                           seconds=seconds)), flush=True)
     require(not unfinished, f"runs {unfinished} did not finish; see {root / 'logs'}; an infrastructure failure is "
-            "trained again with --rerun-incomplete once its job has ended, at most twice")
+            f"trained again with --rerun-incomplete once its job has ended, at most {args.max_attempts - 1} times")
     return 0
 
 
 def stage_train_one(args: argparse.Namespace) -> int:
     design = json.loads(Path(args.design).read_text())
-    record = train_one(design, Path(args.root), args.name, device=args.device, steps=args.steps)
+    record = train_one(design, Path(args.root), args.name, device=args.device, steps=args.steps,
+                       max_attempts=args.max_attempts)
     print(json.dumps(dict(stage="train-one", name=args.name, status=record["status"], seconds=record["seconds"])),
           flush=True)
     return 0
@@ -758,6 +789,11 @@ def checkpoint_seals(root: Path, states: dict[str, str]) -> dict[str, str]:
     return {name: read_record(root, name)["checkpoint_blake2b"] for name in sorted(states) if states[name] == "complete"}
 
 
+def training_source_hash(root: Path) -> str:
+    """The ``source_hash`` that the 18 runs were trained at (``final_states`` has checked that it is one)."""
+    return read_record(root, planned_runs()[0]["name"])["source"]["source_hash"]
+
+
 def evaluation_inputs(manifest: dict) -> dict:
     """What an evaluation is a function of: the design and its lock, the code and the trained checkpoints (the B4
     references are sealed in the design)."""
@@ -765,14 +801,15 @@ def evaluation_inputs(manifest: dict) -> dict:
                 code=manifest.get("source", {}).get("source_hash"), checkpoints=manifest.get("checkpoints"))
 
 
-def evaluation_attempt(root: Path, manifest: dict, state: str) -> int:
+def evaluation_attempt(root: Path, manifest: dict, state: str, *, new_code: bool = False) -> int:
     """The number of the evaluation attempt that may start now: 1, or 2 and 3 after an attempt that did not complete.
 
     An evaluation that ended before it completed is started again from scratch with identical inputs, at most twice
     (docs/prereg/TSM.md, Clarification C1): ``MAX_ATTEMPTS`` attempts in all. Identical means the design and its lock, the
-    code (``source_hash``) and the checkpoints of the latest earlier attempt (``manifest`` is this attempt's). An attempt
-    still marked "running" must have been silent for ``QUIET_SECONDS``: its job may be alive and would write into the
-    new directory; one marked "failed" has recorded its own end.
+    code (``source_hash``) and the checkpoints of the latest earlier attempt (``manifest`` is this attempt's); with
+    ``new_code`` (the orchestrator's decision after a defect in the evaluation code, Clarification C2) the code may
+    differ, nothing else. An attempt still marked "running" must have been silent for ``QUIET_SECONDS``: its job may be
+    alive and would write into the new directory; one marked "failed" has recorded its own end.
     """
     used = len(moved_evaluations(root)) + int(state != "none")
     require(used < MAX_ATTEMPTS, f"the confirmation evaluation has used {used} of {MAX_ATTEMPTS} attempts: the "
@@ -785,10 +822,26 @@ def evaluation_attempt(root: Path, manifest: dict, state: str) -> int:
     earlier = earlier_evaluation(root)
     if earlier is not None:
         old, new = evaluation_inputs(earlier), evaluation_inputs(manifest)
-        differing = [key for key in new if old[key] != new[key]]
+        differing = [key for key in new if old[key] != new[key] and not (key == "code" and new_code)]
+        hint = ("; a fix of the evaluation code is restarted with --new-evaluation-code, on the orchestrator's "
+                "decision (docs/prereg/TSM.md, Clarification C2)" if "code" in differing else "")
         require(not differing, f"the restart differs from the interrupted evaluation in {', '.join(differing)}: a "
-                "restart must have identical inputs (the same design lock, --commit and trained runs)")
+                f"restart must have identical inputs (the same design lock, --commit and trained runs){hint}")
     return used + 1
+
+
+def restart_rows(root: Path, attempt: int) -> list[dict]:
+    """One row per evaluation that was moved aside before attempt ``attempt``: where it is and the code it ran at.
+
+    The code of the interrupted attempt is in the manifest of the latest earlier attempt that has a readable one, which
+    carries the rows of its own predecessors; no other manifest is opened (``None``: not known).
+    """
+    earlier = earlier_evaluation(root)
+    codes = {row.get("attempt"): row.get("source_hash") for row in (earlier or {}).get("restarts", [])}
+    if earlier is not None:
+        codes[earlier.get("attempt")] = earlier.get("source", {}).get("source_hash")
+    return [dict(attempt=number, moved_to=f"attempts/evaluation-attempt{number}", source_hash=codes.get(number))
+            for number in range(1, attempt)]
 
 
 def move_evaluation_aside(root: Path) -> Path:
@@ -804,9 +857,13 @@ def stage_evaluate(args: argparse.Namespace) -> int:
 
     An evaluation that has started is not repeated (``complete``), and one that ended before it completed is started
     again from scratch only with ``--restart-interrupted``, once its job has ended and with identical inputs, at most
-    twice (``evaluation_attempt``): the partial output is moved aside unread, and the manifest records the attempt and
-    the restarts. All of this is checked before the confirmation episodes are generated.
+    twice (``evaluation_attempt``): the partial output is moved aside unread, and the manifest records the attempt, the
+    restarts, the code each attempt ran at and the code the runs were trained at. ``--new-evaluation-code`` lets the
+    restart run at another code (the orchestrator's decision, Clarification C2); the 18 training records must still
+    share one ``source_hash`` (``final_states``). All of this is checked before the confirmation episodes are generated.
     """
+    require(args.restart_interrupted or not args.new_evaluation_code,
+            "--new-evaluation-code applies to a restart: it needs --restart-interrupted")
     root = absolute_path(args.root, "--root")
     design_path = Path(args.design).resolve()
     verify_git_lock(design_path, args.design_commit, "the design")
@@ -823,11 +880,11 @@ def stage_evaluate(args: argparse.Namespace) -> int:
     started = time.perf_counter()
     manifest = dict(status="running", design=design, design_hash=stable_hash(design), design_path=str(design_path),
                     design_lock_commit=args.design_commit, evaluation=design["evaluation"],
-                    training_failures=failures, checkpoints=checkpoint_seals(root, states), started_at=now(),
+                    training_failures=failures, checkpoints=checkpoint_seals(root, states),
+                    training_source_hash=training_source_hash(root), started_at=now(),
                     source=source_metadata(), runtime=runtime_metadata(args.device))
-    attempt = evaluation_attempt(root, manifest, state)
-    manifest.update(attempt=attempt, restarts=[dict(attempt=number, moved_to=f"attempts/evaluation-attempt{number}")
-                                               for number in range(1, attempt)])
+    attempt = evaluation_attempt(root, manifest, state, new_code=args.new_evaluation_code)
+    manifest.update(attempt=attempt, restarts=restart_rows(root, attempt))
     if state != "none":
         move_evaluation_aside(root)
     out.mkdir(parents=True, exist_ok=True)
@@ -872,6 +929,10 @@ def main(argv: list[str] | None = None) -> int:
     train_stage.add_argument("--root", required=True, help="the run directory (shared by the training jobs)")
     train_stage.add_argument("--procs", type=int, default=9)
     train_stage.add_argument("--label", default="main", help="name of this job's manifest (one label per job)")
+    train_stage.add_argument("--max-attempts", type=int, default=MAX_ATTEMPTS,
+                             help="attempts allowed per run, the first one included (default 3, the registered "
+                                  "number); more only on the orchestrator's recorded decision (docs/prereg/TSM.md, "
+                                  "Clarification C2); every attempt stays identical to the one before it")
     train_stage.add_argument("--rerun-incomplete", action="store_true",
                              help="train unfinished runs again (an I/O error, CUDA out-of-memory, walltime or a node "
                                   "fault), identically (their job must have ended: a run still marked running must "
@@ -885,6 +946,7 @@ def main(argv: list[str] | None = None) -> int:
     child.add_argument("--root", required=True)
     child.add_argument("--name", required=True)
     child.add_argument("--steps", type=int)
+    child.add_argument("--max-attempts", type=int, default=MAX_ATTEMPTS)
     evaluate = sub.add_parser("evaluate", help="confirmation evaluation")
     evaluate.add_argument("--design", required=True)
     evaluate.add_argument("--design-commit", required=True)
@@ -893,6 +955,11 @@ def main(argv: list[str] | None = None) -> int:
                           help="start an evaluation that ended before it completed again from scratch, with identical "
                                "inputs (its job must have ended: one still marked running must have been silent for "
                                "300 s; at most twice); its partial output is moved aside unread")
+    evaluate.add_argument("--new-evaluation-code", action="store_true",
+                          help="with --restart-interrupted, on the orchestrator's decision after a defect in the "
+                               "evaluation code (docs/prereg/TSM.md, Clarification C2): the restart may run at another "
+                               "source_hash than the interrupted attempt; the 18 training records must still share "
+                               "one source_hash, and the manifest records the code of every attempt")
     for stage in (smoke, train_stage, child, evaluate):
         stage.add_argument("--device", default="cuda:0")
     args = parser.parse_args(argv)

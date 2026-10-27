@@ -11,8 +11,9 @@ A T1 or T2 run that stopped with a non-finite loss is a registered training fail
 that writer, its completed seeds are reported descriptively (they are not registered endpoints) and the
 other arms are evaluated as registered. Every T0 run must be complete (a T0 failure stops the study, and so does a
 code defect in any run). An evaluation that was restarted from scratch after an interruption is audited too: the
-manifest's attempts must match the interrupted evaluations moved aside, and its checkpoint seals must be those of
-the run records.
+manifest's attempts must match the interrupted evaluations moved aside, its checkpoint seals must be those of the run
+records, and it records the code (source_hash) of every attempt and the code the runs were trained at; a restart
+at another evaluation code (docs/prereg/TSM.md, Clarification C2) is reported with the code of each attempt.
 """
 from __future__ import annotations
 
@@ -77,11 +78,16 @@ def audit_run(root: Path) -> tuple[dict, dict[str, dict], dict]:
             "the manifest's training failures differ from the run records")
     require(manifest.get("checkpoints") == run_tsm.checkpoint_seals(root, states),
             "the manifest's checkpoint seals differ from the run records")
+    require(manifest.get("training_source_hash") == run_tsm.training_source_hash(root),
+            "the manifest's training source_hash differs from the run records")
     restarts = manifest.get("restarts")  # the interrupted evaluations are moved aside, never read
     require(isinstance(restarts, list) and manifest.get("attempt") == len(restarts) + 1 <= run_tsm.MAX_ATTEMPTS
             and [row.get("moved_to") for row in restarts]
             == [f"attempts/{path.name}" for path in run_tsm.moved_evaluations(root)],
             "the manifest's evaluation attempts differ from the interrupted evaluations moved aside under attempts/")
+    require(isinstance(manifest.get("source", {}).get("source_hash"), str)
+            and all("source_hash" in row for row in restarts),
+            "the manifest does not record the code (source_hash) of every evaluation attempt")
     evaluation = design["evaluation"]
     expected = set(complete) | {run_tsm.reference_name(w, s) for w in run_tsm.WRITERS for s in run_tsm.SEEDS}
     rows = {row["name"]: row for row in manifest["evaluations"]}
@@ -269,10 +275,16 @@ def render(result: dict, design: dict, manifest: dict) -> list[str]:
     lines += ["", f"Evaluation: {manifest['node_hours']:.3f} node-h (the completed attempt); design lock "
                   f"{manifest['design_lock_commit'][:12]}."]
     if manifest["restarts"]:
+        codes = [row["source_hash"] for row in manifest["restarts"]] + [manifest["source"]["source_hash"]]
         lines += ["", f"The evaluation ran as attempt {manifest['attempt']}: the earlier attempt(s) ended before they "
-                  "completed and were restarted from scratch with identical inputs (docs/prereg/TSM.md, Clarification "
-                  "C1); their partial output was moved aside unread: "
+                  "completed and were restarted from scratch with the same design, lock and checkpoints (docs/prereg/"
+                  "TSM.md, Clarification C1); their partial output was moved aside unread: "
                   + ", ".join(row["moved_to"] for row in manifest["restarts"]) + "."]
+        if len({code for code in codes if code}) > 1:
+            by_attempt = ", ".join(f"{number}: {(code or 'unknown')[:12]}" for number, code in enumerate(codes, 1))
+            lines += ["", "The evaluation code changed at a restart, on the orchestrator's decision (docs/prereg/"
+                      f"TSM.md, Clarification C2); source_hash by attempt: {by_attempt}; the 18 runs were trained at "
+                      f"{manifest['training_source_hash'][:12]}."]
     return lines
 
 
@@ -298,7 +310,8 @@ def main(argv: list[str] | None = None) -> int:
     write_json(out / "summary.json", dict(
         created=now(), seconds=time.perf_counter() - started, resamples=args.resamples,
         design_hash=manifest["design_hash"], design_lock_commit=manifest["design_lock_commit"],
-        training_source_hash=run_tsm.read_record(root, run_tsm.planned_runs()[0]["name"])["source"]["source_hash"],
+        training_source_hash=run_tsm.training_source_hash(root),
+        evaluation_source_hash=manifest["source"]["source_hash"],
         arms_pass=result["arms"], arm_outcome=result["outcome"], passing_writers=result["passing_writers"],
         writer_passes={f"{r['writer']}/{r['arm']}": r["passes"] for r in result["endpoints"]},
         training_failures=manifest["training_failures"], evaluation_attempt=manifest["attempt"],
