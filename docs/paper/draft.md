@@ -628,7 +628,7 @@ its accuracy–latency frontier still unmeasured. <!-- B5 --><!-- B8 -->
 Matching training depth narrows the sharing question. On the reused set C888, B8 minus
 shared M1-L4 has reachable-hop effects of +13.217 pp [11.983,14.450] for joint writing,
 +5.458 [4.242,6.750] for joint_fact, and +3.200 [1.958,4.517] for random oracle
-writing. <!-- B3 --> This comparison also changes parameter count and, for learned
+writing, each positive in every tested seed. <!-- B3 --> This comparison also changes parameter count and, for learned
 joint writing, writer parameters; it is not a parameter-neutral causal estimate
 of sharing. B8 is not parameter-matched to M1-L4: the joint model has 22,530 versus
 13,314 parameters (+9,216, +69.2%), and oracle_random has 16,386 versus 7,170 registered
