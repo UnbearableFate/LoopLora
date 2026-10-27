@@ -178,7 +178,8 @@ practical-gate outcome. The current policy does not retroactively turn a failed 
 
 P2-S primary endpoint models and all P2-S-F1 models use `15,000` steps and the same
 training seeds. The P2-S M1 reference is r32, trained at mixed depths and evaluated at L4;
-B6/B7 are trained/evaluated at L1, B8 at fixed L4. The follow-up adds shared M1 trained
+B6/B7 are trained/evaluated at L1, B8 at fixed L4; B8 is not parameter-matched to the shared
+readers (+9,216 parameters, about +69.2% in the joint model; FR1). The follow-up adds shared M1 trained
 only at L4 and factorized B8/B6/B7, with unchanged mixed-depth references re-evaluated on
 C888. Independently selected protocols are part of these comparisons. The selected numeric
 M1 learning rate is nevertheless **0.003 for both fixed and mixed training** for every
@@ -461,7 +462,8 @@ The fixed-checkpoint scan reuses E12-trained mixed-depth M1 at `L=1…8` for loa
 change together; this is not an isolated crosstalk manipulation. E6 has hops1–4 and no
 far-hop stratum. New E24/E36 training uses `15,000` steps, batch64, and the inherited
 learning rate `0.003` for every primary writer/reader, without a load-specific search.
-M1 samples training depths `{1,2,4}`; B8 is unshared fixed-L4; B4 is L1.
+M1 samples training depths `{1,2,4}`; B8 is unshared fixed-L4 (+9,216 parameters, so not
+parameter-matched to M1 or B4; FR1); B4 is L1.
 
 The design and update-task validity changes were locked before inference/training.
 C999 is opened after training. All IS intervals condition on seeds17/29/43 and use
