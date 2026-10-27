@@ -1,4 +1,7 @@
-# UNS (F11) — unseen-pool entities: audit of the committed unseen rows and one missing evaluation, pre-registration draft
+# UNS (F11) — unseen-pool entities: audit of the committed unseen rows and one missing evaluation, pre-registered
+
+Registered 2026-10-27 12:44 JST, when the orchestrator committed this file to master, before any lock, smoke or run of
+this study. The draft text is unchanged except where "Decisions at registration" (last section) says otherwise.
 
 Draft by sn-sym, 2026-10-27, on the login node: no run and no evaluation; the author read no result value (difference,
 interval, prediction or correctness) of any unseen-pool row or sample (what a review subagent read afterwards is stated
@@ -123,3 +126,10 @@ committed rows.
   Each job is one node and at most 1 h.
 - Code: `src/looplora/sym/uns.py`, `scripts/audit_uns.py`, `scripts/run_uns.py`; tests `tests/test_uns.py`,
   `tests/test_uns_scripts.py` (written, to be run on a compute node before any step-2 job).
+
+## Decisions at registration (orchestrator, 2026-10-27)
+- **Part B is run.** It is part of the registered study, not optional, because it is the only fresh-data look and covers
+  the M1-L4 reader the paper recommends. The two-checkpoint timing run stays optional.
+- Flagged items 1–5 are accepted as written.
+- **Locks.** The orchestrator commits each design lock (Part B) on wp/sym, the branch whose worktree holds the lock
+  files, after checking it against this text. sn-sym stops after each lock stage and reports the file path.

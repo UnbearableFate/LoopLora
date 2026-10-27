@@ -1,4 +1,7 @@
-# CVH (F9) — continuation-value halting heads on frozen symbolic readers, pre-registration draft
+# CVH (F9) — continuation-value halting heads on frozen symbolic readers, pre-registered
+
+Registered 2026-10-27 12:44 JST, when the orchestrator committed this file to master, before any lock, smoke or run of
+this study. The draft text is unchanged except where "Decisions at registration" (last section) says otherwise.
 
 Draft by sn-sym, 2026-10-27, on the login node: no run, no evaluation, no result read. Registered at the time the
 orchestrator commits this file to master, before any run below. Known then: P4-S-L (`docs/reports/P4S-L.md`,
@@ -108,3 +111,8 @@ the head is trained to predict whether any later read would still lower the answ
   351 s and the job for confirmation, timing and analysis 72 s). Each job is one node and at most 1 h.
 - Code: `src/looplora/sym/cvh.py`, `scripts/run_cvh.py`, `scripts/analyze_cvh.py`; tests `tests/test_cvh.py`,
   `tests/test_cvh_scripts.py` (written, to be run on a compute node before the lock).
+
+## Decisions at registration (orchestrator, 2026-10-27)
+- Flagged items 1–7 are accepted as written.
+- **Locks.** The orchestrator commits each design lock and `theta.json` on wp/sym, the branch whose worktree holds the
+  lock files, after checking it against this text. sn-sym stops after each lock stage and reports the file path.

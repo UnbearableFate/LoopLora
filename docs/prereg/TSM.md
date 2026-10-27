@@ -1,4 +1,7 @@
-# TSM (F10) — terminal-semantics training of the iterative reader, pre-registration draft
+# TSM (F10) — terminal-semantics training of the iterative reader, pre-registered
+
+Registered 2026-10-27 12:44 JST, when the orchestrator committed this file to master, before any lock, smoke or run of
+this study. The draft text is unchanged except where "Decisions at registration" (last section) says otherwise.
 
 Draft by sn-sym, 2026-10-27, on the login node: no run, no training, no evaluation, no result read. Registered at
 the time the orchestrator commits this file to master, before any run below. Known then:
@@ -99,3 +102,20 @@ over the same-rank B4 is ≥ 3 pp (CI > 0).
 - Code: `src/looplora/sym/tsm.py`, `scripts/run_tsm.py`, `scripts/analyze_tsm.py`; tests `tests/test_tsm.py`,
   `tests/test_tsm_scripts.py` (written, to be run on a compute node before the lock). The T0 path is the unchanged
   `train()`; a test shows that `fit_tsm` without stay loss and gate equals the existing `_fit` loop bitwise.
+
+## Decisions at registration (orchestrator, 2026-10-27)
+- Flagged items 1–6 are accepted as written.
+- **Both writers.** An arm passes only if it passes for both writers. If an arm passes for exactly one writer, the paper
+  reports it as a writer-specific result, not as a remedy, and the "no arm passes" statement is worded per writer.
+- **Training failures.** This replaces the draft's rule that the evaluation needs all 18 runs.
+  - An infrastructure failure is a job ended by walltime or by a node or I/O fault before it completes, with no
+    non-finite loss. The identical configuration (same code, seeds and data stream) is rerun, at most twice.
+  - A non-finite loss in a T1 or T2 run is a registered training failure. That arm fails for that writer, with no retry
+    and no re-tuning. Its completed runs are evaluated and reported descriptively, and the other arms are evaluated as
+    registered. `evaluate` is adapted to this before the lock.
+  - A non-finite loss in a T0 run stops the study before the confirmation set is opened, because "far" then has no
+    reference. Any continuation needs an explicit amendment.
+- The `--scale-up docs/prereg/TSM.md` allowance is accepted: at most 2 h, and only if the smoke shows that a seed's runs
+  cannot be split further.
+- **Locks.** The orchestrator commits each design lock on wp/sym, the branch whose worktree holds the lock files,
+  after checking it against this text. sn-sym stops after each lock stage and reports the file path.

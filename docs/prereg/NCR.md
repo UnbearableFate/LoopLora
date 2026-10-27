@@ -1,5 +1,8 @@
 # NCR (review C4) — neighbour-confusion rate of single-read errors, analysis specification
 
+Registered 2026-10-27 12:44 JST, when the orchestrator committed this file to master, before any lock, smoke or run of
+this study. The draft text is unchanged except where "Decisions at registration" (last section) says otherwise.
+
 Draft by sn-sym, 2026-10-27, on the login node: nothing computed; the author read no prediction or correctness value of
 any sample (only label arrays of 18 of the sample files, for the structural checks of the UNS audit). Afterwards a
 read-only review subagent loaded the `prediction` and `correct` arrays of those 18 files for range and consistency
@@ -78,3 +81,6 @@ The category sizes are computed per episode and sum to C − 1.
 - CPU only, a few minutes in a compute allocation (at most 0.1 node·h); one job, one node.
 - Code: `src/looplora/sym/ncr.py`, `scripts/analyze_neighbour_confusion.py`; tests `tests/test_neighbour_confusion.py`
   (written, to be run on a compute node before the analysis).
+
+## Decisions at registration (orchestrator, 2026-10-27)
+- Flagged items 1–4 are accepted as written.

@@ -1,4 +1,7 @@
-# IVD (F8) — key interference versus memory load on frozen symbolic checkpoints, pre-registration draft
+# IVD (F8) — key interference versus memory load on frozen symbolic checkpoints, pre-registered
+
+Registered 2026-10-27 12:44 JST, when the orchestrator committed this file to master, before any lock, smoke or run of
+this study. The draft text is unchanged except where "Decisions at registration" (last section) says otherwise.
 
 Draft by sn-sym, 2026-10-27, on the login node: no run, no evaluation, no result read. Registered at the time the
 orchestrator commits this file to master, before any run below. Known then: IS (`docs/reports/IS.md`): the depth
@@ -99,3 +102,10 @@ study follows (plan §6).
   requires it.
 - Code: `src/looplora/sym/ivd.py`, `scripts/run_ivd.py`, `scripts/analyze_ivd.py`; tests `tests/test_ivd.py`,
   `tests/test_ivd_scripts.py` (written, to be run on a compute node before the lock).
+
+## Decisions at registration (orchestrator, 2026-10-27)
+- Flagged items 1–5 are accepted as written.
+- The `--scale-up docs/prereg/IVD.md` allowance for the `run` job is accepted: at most 2 h, and only if the smoke-based
+  estimate exceeds 1 h.
+- **Locks.** The orchestrator commits each design lock on wp/sym, the branch whose worktree holds the lock files,
+  after checking it against this text. sn-sym stops after each lock stage and reports the file path.
