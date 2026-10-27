@@ -1,9 +1,11 @@
-# WP-L5 and WP-L7 state: DPFP option, least-squares stores and the read-failure factorial (step 1 done; nothing executed)
+# WP-L5 and WP-L7 state: DPFP option, least-squares stores and the read-failure factorial (steps 1 and 1b done; nothing executed)
 
 Branch `wp/llm`. WP-L5 step 1 (DPFP) is `34028dd`, `742d3bc`, `8eb24ab` on master `6da6330`; master was merged in as
-`77373ea` (P1-L pipeline from wp/p1l, follow-up plan) and `cbc8389` (follow-up tasks). **Every step-2 command must use a
-commit at or after `cbc8389`; the commits titled `WP-L7: ...` on top of it are the first that contain RFX and LSQ.**
-After the merge the DPFP files still compile (`py_compile`, `pyflakes`), and master's `src/` changes since `6da6330` touch
+`77373ea` (P1-L pipeline from wp/p1l, follow-up plan), `cbc8389` (follow-up tasks) and `1485bd9` (the registered RFX and
+LSQ, the step-1b task). **Every step-2 command must use the full hash of a commit that contains the registrations and the
+step-1b code: the last `WP-L7: step 1b ...` commit on wp/llm or its merge into master. The step-1 commits (up to
+`9588998`) implement the drafts' decision rules, not the registered ones.**
+After the merges the DPFP files still compile (`py_compile`, `pyflakes`), and master's `src/` changes since `6da6330` touch
 only the `oracle_random` rank-128 allowance (`llm/config.py`, `llm/oracle.py`, `llm/train.py`, oracle branches only), not
 the learned-writer path that the DPFP-off reproduction test covers.
 
@@ -13,11 +15,13 @@ code and of the tests by Sonnet subagents; their one likely test defect and two 
 commit). Step 1 of `docs/tasks/WP-L7_rfx_lsq.md` (RFX, LSQ, below) is statically checked the same way and was reviewed
 independently twice more (LSQ core and tests; RFX hook, runner and tests) by read-only Sonnet subagents; the findings
 that held (a wrong einsum in an LSQ test helper, two test tolerances, a missing digest guard, NaN-blind instrumentation
-maxima, an unbounded-evaluations L-BFGS default, wording of the Gram notation and of the E8 release) are fixed in the
-`WP-L7: review fixes` commit. **No torch code,
-test or run has been executed**: the login node forbids it and compute is unavailable until 2026-10-28 22:00 JST. Not
-merged, not pushed. Binding designs: `docs/prereg/DPFP.md`; drafts for the orchestrator to review and commit to master
-before any run: `docs/prereg/RFX.md`, `docs/prereg/LSQ.md`.
+maxima, a too small default evaluation budget of the L-BFGS decoder fit, wording of the Gram notation and of the E8
+release) are fixed in the `WP-L7: review fixes` commit. Step 1b (the code and tests rewritten to the registered rules, task
+section "Step 1b") is statically checked the same way, and its pure decision logic (verdict tree, arm sets, release checks,
+the hand-off from the RFX summary to the LSQ release) was also executed torch-free against the functions extracted from the
+source. **No torch code, test or run has been executed**: the login node forbids it and compute is unavailable until
+2026-10-28 22:00 JST. Not merged, not pushed. Binding designs: `docs/prereg/DPFP.md` and, registered 2026-10-27 11:05 JST
+before any RFX, LSQ or DPFP result, `docs/prereg/RFX.md` and `docs/prereg/LSQ.md`.
 
 ## What is implemented (WP-L5: DPFP)
 DPFP is `AdapterConfig.dpfp_nu` (default 0 = off). With nu >= 1 the write key and the read query are mapped to
@@ -139,15 +143,18 @@ already exists and the runner refuses to reuse it).
 - D128-3 stores 128 x 768 fp32 states (393 KB per episode, 128 query copies per batch); memory should be fine on a
   GH200 but is measured in the smoke record (`memory`).
 
-## WP-L7 step 1: RFX and LSQ (implemented and statically checked; nothing executed)
-Task `docs/tasks/WP-L7_rfx_lsq.md`; designs `docs/prereg/RFX.md` and `docs/prereg/LSQ.md` (drafts until the orchestrator
-commits them to master). **RFX** is evaluation only: on the three frozen WP-L4 checkpoints (R-r128, R-r32, W5-r32) it
-replaces the read at each question's final token by delta/ridge x raw/unit/true-key reads (each as is and with a
-fitted scalar gain), the clean value and zero, decodes through the LM path, the clean-value head and a refit linear
-decoder, and tabulates normalized read error, head accuracy, EM, NLL, write age, write order (four permutations),
-conditioning and the registered verdict (storage / query / decoder / none). **LSQ** is the conditional training study of two
-stores with unit queries (RG: recency-weighted ridge, K4: four beta = 1 sweeps), run only for the ranks whose R checkpoint
-RFX calls "storage".
+## WP-L7 steps 1 and 1b: RFX and LSQ (implemented to the registered rules and statically checked; nothing executed)
+Task `docs/tasks/WP-L7_rfx_lsq.md`; designs `docs/prereg/RFX.md` and `docs/prereg/LSQ.md` (registered; they differ from the
+step-1 drafts, which the step-1b commits supersede). **RFX** is evaluation only: on the three frozen WP-L4 checkpoints
+(R-r128, R-r32, W5-r32) it replaces the read at each question's final token by delta/ridge x raw/unit/true-key reads (each as
+is and with a fitted scalar gain), the clean value and zero, decodes through the LM path (full-vocabulary and entity-restricted
+EM), the clean-value head and a refit linear decoder, and tabulates normalized read error, head accuracy, EM, NLL, write age,
+write order (four permutations), conditioning, every rescue flag and the registered verdict, first that applies: **storage**
+(ridge/raw/fit rescues, or ridge/unit/fit rescues while delta/unit/fit does not), **normalization** (delta/unit/fit),
+**query** (delta/true/fit), **store+query** (ridge/true/fit), **decoder** (refit decoder against the entity-restricted baseline
+EM), **none**. **LSQ** is the conditional training study, per rank by the verdict on that rank's R checkpoint: storage runs
+K4 (four beta = 1 sweeps) and RG (recency-weighted ridge), normalization runs U (R's delta store with the unit query), any other
+verdict runs nothing; the arms RFX triggers are `lsq_arms` in `summary.json`.
 
 | File | Change |
 | --- | --- |
@@ -155,12 +162,12 @@ RFX calls "storage".
 | `src/looplora/core/memory.py` | `ridge_final` (recency-weighted ridge least squares, float64 Cholesky through the n x n system, differentiable), `sweep_final` (beta = 1 `scan_final` repeated), exact read coefficients `ridge_coefficients`, `sweep_coefficients`, `gram_conditions` (finite condition numbers; smallest eigenvalue floored at 1e-30) |
 | `src/looplora/core/adapters.py` | `query_code` returns the unit query when `unit_query` (the same object when off); `scan_final` dispatches on `store` (the delta branch is the old call); `write` raises for a non-delta store unless nothing is written and `scan_prewrite` always raises (final-only support writes) |
 | `src/looplora/llm/train.py` | `store`, `store_eta`, `store_sweeps`, `unit_query` read from `config['model']` with `get`; the writer signature gains them only when non-default |
-| `src/looplora/llm/read_fix.py` | `store_read` (exact-coefficient dispatch; delta is the old `gram_read`), `diagnostics` uses it and adds `key_gram_log10_cond` (and `ridge_log10_cond`) for non-delta stores |
+| `src/looplora/llm/read_fix.py` | `store_read` (exact-coefficient dispatch; delta is the old `gram_read`), `diagnostics` uses it and adds `key_gram_log10_cond` (and `ridge_log10_cond` for RG) for every LSQ arm: a non-delta store or `unit_query` (arm U) |
 | `src/looplora/llm/read_fix_run.py` | `fit` adds the optional `experiment.log_extras()` columns to each log row (none for every existing arm) |
-| `src/looplora/llm/lsq.py`, `lsq_run.py` (new) | arms L32-K4, L32-RG, L128-K4, L128-RG; `configuration`, `LSQExperiment` (log extras: condition numbers); runner `python -m looplora.llm.lsq_run --arm ARM --out ROOT (--steps N --smoke [--eta X] \| --schedule release.json) [--e8-decision lock.json]`; `choose` (prereg rule over the triggered arms), `release_arms`, `release_eta` (enforces the clipped RFX eta), `scheduled_steps`, `eligible_e8`, `load_inference` (the WP-L4 and DPFP loaders refuse an LSQ export and vice versa) |
-| `src/looplora/llm/rfx.py`, `rfx_run.py` (new) | `FinalRead` (instance-level hook: records, and optionally replaces, the final-token read; no change to shared code), `observe`, ridge/gain/eta fits on the fitting set, refit decoder, write age and order, conditioning, `classify`, `lsq_ranks`, `load_checkpoint`; runner `python -m looplora.llm.rfx_run --out DIR [--smoke] [--labels L ...]` (one job, three checkpoints, refuses a checkpoint whose blake2b-128 digests differ from `rfx_run.DIGESTS` before creating anything, `summary.json` with verdicts, `lsq_ranks`, `rfx_eta_by_rank`, `eta_by_rank`) |
+| `src/looplora/llm/lsq.py`, `lsq_run.py` (new) | arms in candidate order L32-U, L32-K4, L32-RG, L128-U, L128-K4, L128-RG (U: R's delta store and learned lambda, beta with `unit_query` on and no store field; K4, RG: R plus the store fields); `check_arms` (per rank nothing, U alone, or K4 with RG), `configuration`, `LSQExperiment` (log extras: key-Gram and ridge condition numbers); runner `python -m looplora.llm.lsq_run --arm ARM --out ROOT (--steps N --smoke [--eta X] \| --schedule release.json) [--e8-decision lock.json]`; `choose(records, arms)` (prereg rule over the release's arms), `release_arms` (the release's `arms` are RFX's `lsq_arms`), `release_eta` (RG arms only; enforces the clipped RFX eta), `scheduled_steps`, `eligible_e8`, `load_inference` (the WP-L4 and DPFP loaders refuse an LSQ export and vice versa) |
+| `src/looplora/llm/rfx.py`, `rfx_run.py` (new) | `FinalRead` (instance-level hook: records, and optionally replaces, the final-token read; no change to shared code), `observe`, ridge/gain/eta fits on the fitting set, refit decoder, entity-restricted EM (`entity_hits`: argmax over `load_name_pool().token_ids[:V]`, per variant), write age and order, conditioning, `classify` (the registered verdict tree and every rescue flag), `lsq_arms`, `storage_ranks`, `load_checkpoint`; runner `python -m looplora.llm.rfx_run --out DIR [--smoke] [--labels L ...]` (one job, three checkpoints, refuses a checkpoint whose blake2b-128 digests differ from `rfx_run.DIGESTS` before creating anything; `summary.json` has `verdicts`, `rescue`, `lsq_arms`, and `rfx_eta_by_rank` and `eta_by_rank` for the ranks with a storage verdict only; `decisions` builds them) |
 | `tests/test_lsq.py`, `tests/test_llm_lsq.py`, `tests/test_rfx.py`, `tests/test_llm_rfx.py` (new) | see below |
-| `docs/prereg/RFX.md`, `docs/prereg/LSQ.md` (new drafts), `docs/notation.md` (section 10), `configs/p1l/README.md` | decision rules, node-hour estimates, options documented; this file |
+| `docs/prereg/RFX.md`, `docs/prereg/LSQ.md` (registered by the orchestrator, not edited here), `docs/notation.md` (section 10), `configs/p1l/README.md` | decision rules and node-hour estimates; options documented; this file |
 
 **Off path.** Every new flag defaults off and the old tensor ops run in the same order: the adapter's delta branch is the
 unchanged `memory.scan_final` call, `query_code` returns its input, the training builder reads the new keys with `get`,
@@ -175,40 +182,52 @@ ranks 32 and 128) runs through the same flags-off path, so one pass covers DPFP-
   the key dimension, error cases, finite-difference gradients; K4 equals the repeated `scan_final(beta = 1)` (1-3 sweeps, one
   reset, interior reset rejected), sweeps approach the interpolant monotonically while four are far from it; gradients
   flow and stay finite with padding; coefficient reconstruction of both stores; `gram_conditions`; adapter dispatch,
-  final-only guards, unit-query behavior; **default adapter bitwise equals the pre-LSQ write and read**; config
+  final-only guards, unit-query behavior; arm U's adapter (delta store with the unit query: same parameters, bitwise the
+  same write, only the read normalizes); **default adapter bitwise equals the pre-LSQ write and read**; config
   validation matrix; parameter counts equal the delta rule's.
-- `tests/test_llm_lsq.py` (tiny Qwen3 on cuda): config equals WP-L4 R plus only the store fields (4 arms x E16/E8);
-  rejected arms, etas and arm/config mismatches; clipped eta rule; off-path experiment signature; per arm (K4, RG) store
-  and unit-query reads against explicit references, `M q_hat` read, gradients (`a_beta` unused), Gram reconstruction and
-  conditioning logs; 5-step `fit`, `validate`, export and exact reload (WP-L4's and DPFP's loaders refuse an LSQ export);
-  `store_read`; `choose`, `release_arms`, `release_eta`, `scheduled_steps`, `eligible_e8` against the prereg rule.
+- `tests/test_llm_lsq.py` (tiny Qwen3 on cuda): config equals WP-L4 R plus only the registered fields (6 arms x E16/E8; U adds
+  `unit_query` alone); rejected arms, etas and arm/config mismatches; clipped eta rule; off-path experiment signature; per arm
+  (U, K4, RG) store and unit-query reads against explicit references (U: the delta rule with the learned lambda and beta),
+  `M q_hat` read, gradients (`a_beta` unused by K4 and RG, trained for U), Gram reconstruction and conditioning logs; 5-step
+  `fit`, `validate`, export and exact reload for all three kinds (WP-L4's and DPFP's loaders refuse an LSQ export);
+  `store_read`; `choose`, `release_arms` (every arm set RFX can trigger is a release, nothing else), `release_eta` (RG only),
+  `scheduled_steps` (E16 names every release arm, E8 only the retrained one), `eligible_e8` against the prereg rule; the
+  hand-off from `rfx_run.decisions` to a release for every pair of R verdicts.
 - `tests/test_rfx.py` (synthetic tensors): ridge reads vs the formula, interpolation and order invariance, equality with
   `ridge_final` at lambda = 1; normalized error; fitted gain; eta/gain fitted on the fitting set only; the 14 variants;
   refit decoder (scale free, chance level); per-episode permutations; delta-state rebuild; table helpers; **the
-  verdict truth table** (precedence, both halves of the rescue test, exact 10 pp and 0.5 boundaries, baseline = better of
-  as-is and gain-fitted); LSQ rank triggering; registered data ranges and seeds.
+  registered verdict tree** (hand-written cases from the registration, all 64 combinations of the five decisive rescue
+  flags and the decoder flag against a transcription of the rule, every rescue flag recorded, both halves of the rescue
+  test, exact 10 pp and 0.5 boundaries, baselines = better of as-is and gain-fitted, the decoder against the
+  entity-restricted EM); `lsq_arms` (all verdict pairs, candidate order, W5-r32 inert) and `storage_ranks`;
+  `entity_hits`; registered data ranges and seeds.
 - `tests/test_llm_rfx.py` (bare adapters and the tiny model): the hook records and replaces exactly each row's last real
   token (ragged lengths, one-token question, padding untouched, token counter restart, unread rows flagged, loop depth
   guard), construction guards, cleanup and double interception; observation vs the deployed read, cached store, true key and
   answer; re-inserting the recorded read is bitwise the identity; only the replaced rows' last position of the adapted
-  projection changes; ragged question masks; `run_checkpoint` smoke (finite JSON, instrumentation checks, deployed EM and
-  NLL equal the model's own forward, evaluation only: parameters unchanged, no gradients); `load_checkpoint` for both
-  export formats (and its refusals); `checkpoint_identity`, the registered digests and the refusal of a mismatch;
+  projection changes; ragged question masks; `run_checkpoint` smoke (finite JSON, instrumentation checks, deployed EM, NLL
+  and entity-restricted EM equal the model's own forward, rescue flags, evaluation only: parameters unchanged, no
+  gradients); `load_checkpoint` for both export formats (and its refusals, including an arm-U export); `checkpoint_identity`,
+  the registered digests and the refusal of a mismatch; `rfx_run.decisions` (arms, and etas only for storage ranks);
   `rfx_run.run` end to end on two tiny exports.
 
-### Choices where the prereg drafts are silent (also listed there)
-1. RFX applies the fitted scalar gain to every cell and takes the better of the as-is and gain-fitted deployed reads as
-   the baseline; the plan only names a fitted scalar for the unit query. The refit decoder (1,024 entity classes)
-   is compared with the full-vocabulary EM.
-2. RFX's rule names "ridge + raw q". Ridge + unit q (what the LSQ arms read) is reported (`normalization_effect`) but
-   does not trigger LSQ. Say if it should.
-3. LSQ eta = clip(RFX fitting-set eta of the (ridge, unit q) cell of R-r_rank, 1e-4, 1e-1), copied into the release.
-   RFX's ridge is unweighted; LSQ's has recency weights lambda^(E-1-j) with the learned decay.
-4. Candidate order: rank 32 before 128 (DPFP's order), K4 before RG inside a rank.
+### Choices the registrations left to the code (the rest was decided at registration)
+1. RFX applies the fitted scalar gain to every cell; the baseline is the better of the as-is and gain-fitted deployed
+   reads (registered). `rescue` records a flag for all 14 variants plus `decoder_refit` (a superset of the five decisive
+   cells), so the report can show every rescue.
+2. The entity-restricted EM takes the argmax of the logits over the 1,024 name tokens; ties go to the lower entity index,
+   the full-vocabulary EM to the lower token id, so with exact bf16 ties a row can count for the latter and not the former.
+3. LSQ eta = clip(RFX fitting-set eta of the (ridge, unit q) cell of R-r_rank, 1e-4, 1e-1), copied into the release;
+   RFX reports it for the ranks with a storage verdict only. RFX's ridge is unweighted; LSQ's has recency weights
+   lambda^(E-1-j) with the learned decay.
+4. `lsq_run.choose(records, arms)` takes the release's arms (required) and rejects any set RFX cannot trigger. The
+   candidate order is the one of `lsq.ARMS`: U, K4, RG at rank 32, then at rank 128.
 5. K4 = four sweeps of the learned-decay beta = 1 scan (64 writes); four sweeps are not the interpolant for correlated keys.
-   Neither store uses beta; ridge averages duplicate addresses (none occur in T1).
+   Neither least-squares store uses beta (arm U trains it); ridge averages duplicate addresses (none occur in T1).
 6. RFX's "zero" replaces only the final-position read, so it is not WP-L4's zero-memory control (all positions).
-7. If DPFP and LSQ both select a writer, which one enters P1L-D is not decided.
+7. If DPFP and LSQ both select a writer, P1L-D uses the one at the lower rank, then the higher E16 val EM, then DPFP
+   (registered in `docs/prereg/LSQ.md`; an E8 selection counts as its arm's rank and its E8 val EM). No code applies this
+   yet; the audit or release script of step 2 must.
 
 ## Step-2 order and worklist (after 2026-10-28 22:00 JST; WP-L5 and WP-L7)
 Order given by the orchestrator: (1) tests, (2) DPFP smokes, (3) RFX, (4) DPFP arms, (5) LSQ only if RFX triggers it.
@@ -217,9 +236,9 @@ Sketch with the reasons:
    WP-L4 R). If a test fails, find out whether the code or the test is wrong before changing either; the WP-L7
    tests were never run.
 2. **DPFP smokes**: command 3 above (timing and memory only; no scores read).
-3. **RFX**, one smoke then one science job (about 0.2 node-hours), after the orchestrator has committed `docs/prereg/RFX.md`:
+3. **RFX**, one smoke then one science job (about 0.2 node-hours); `docs/prereg/RFX.md` is registered:
 ```sh
-REF=<master merge of the WP-L7 step-1 commits, or later>; RUNS=/work/xg24i002/x10041/LoopLora/runs/p1l
+REF=<full hash of the last WP-L7 step-1b commit on wp/llm, or its master merge>; RUNS=/work/xg24i002/x10041/LoopLora/runs/p1l
 scripts/submit.py --name rfx-smoke --queue regular-g --nodes 1 --walltime 00:20:00 --commit "$REF" --wait -- \
   -m looplora.llm.rfx_run --smoke --out $RUNS/rfx/smoke
 scripts/submit.py --name rfx --queue regular-g --nodes 1 --walltime 00:30:00 --commit "$REF" --wait -- \
@@ -227,48 +246,52 @@ scripts/submit.py --name rfx --queue regular-g --nodes 1 --walltime 00:30:00 --c
 python3 -c "
 import json
 s=json.load(open('$RUNS/rfx/science/summary.json'))
-print(s['verdicts'], s['lsq_ranks'], s['rfx_eta_by_rank'], s['eta_by_rank'], s['instrumentation_failures'])"
+print(s['verdicts'], s['lsq_arms'], s['rfx_eta_by_rank'], s['eta_by_rank'], s['instrumentation_failures'])"
 ```
    The smoke evaluates fresh `train` episodes (never the val or test ranges), so its numbers may be read to test the
    code, not for results. The science run raises after writing its files if an instrumentation check fails; fix the
    code and rerun everything (the registered rule does not change). The job refuses checkpoints whose digests differ from
    the ones in `docs/prereg/RFX.md` (`rfx_run.DIGESTS`), before creating its output. Then `docs/reports/RFX.md` (a table script like `analyze_p1l_read_fix.py` is still to be written).
 4. **DPFP arms**: release file and three jobs as described above.
-5. **LSQ, only for the ranks in `summary.json['lsq_ranks']`** and after `docs/prereg/LSQ.md` is committed (before any DPFP
-   result): 10% smokes of the triggered arms (the ridge arms need an `--eta` inside 1e-4..1e-1; smokes are never
-   interpreted), then the release, then the arms:
+5. **LSQ, only the arms in `summary.json['lsq_arms']`** (`docs/prereg/LSQ.md` is registered): 10% smokes of those arms
+   (RG arms need an `--eta` inside 1e-4..1e-1; U and K4 take none; smokes are never interpreted), then the release, then
+   the arms:
 ```sh
 RUNS=/work/xg24i002/x10041/LoopLora/runs/p1l
+# one smoke per ARM in summary.json['lsq_arms'], e.g. L32-K4 and L32-RG (RG: add --eta 1e-3; U and K4: no --eta)
 scripts/submit.py --name s-lsq-L32-K4 --queue regular-g --nodes 1 --walltime 00:25:00 --commit "$REF" -- \
   -m looplora.llm.lsq_run --arm L32-K4 --steps 2400 --smoke --out $RUNS/lsq/smoke
 scripts/submit.py --name s-lsq-L32-RG --queue regular-g --nodes 1 --walltime 00:25:00 --commit "$REF" -- \
   -m looplora.llm.lsq_run --arm L32-RG --steps 2400 --smoke --eta 1e-3 --out $RUNS/lsq/smoke
-# release JSON (commit it): study "LSQ", E 16, ranks (= the RFX summary's `lsq_ranks`; the key is renamed) and arms
-# (every arm of those ranks, in candidate order), steps_by_arm (read_fix_run.largest_schedule on the smoke timings, five
-# intervals), rfx_eta_by_rank and eta_by_rank copied from the RFX summary, science_commit. Then, per arm:
+# release JSON (commit it): study "LSQ", E 16, arms (= the RFX summary's `lsq_arms`, verbatim: per rank U alone or K4 with RG,
+# in candidate order), steps_by_arm (read_fix_run.largest_schedule on the smoke timings, five intervals), rfx_eta_by_rank
+# and eta_by_rank copied from the RFX summary (they exist for the ranks with RG arms), science_commit. Then, per arm:
 scripts/submit.py --name r-lsq-L32-RG --queue regular-g --nodes 1 --walltime 02:00:00 --scale-up docs/prereg/LSQ.md \
   --commit <science_commit> -- -m looplora.llm.lsq_run --arm L32-RG --schedule RELEASE.json --out $RUNS/lsq/arms
 ```
    The conditional E = 8 retrain adds `--e8-decision LOCK.json`, its own release (`E` 8, every other field as above,
    `steps_by_arm` holding only the retrained arm) and its own `--out $RUNS/lsq/e8`: the E = 16 arm folder already exists in
-   `$RUNS/lsq/arms`, and the runner refuses to reuse it. Node-hours: about 2.7 used and at most 4 reserved per triggered
-   rank (`docs/prereg/LSQ.md`).
+   `$RUNS/lsq/arms`, and the runner refuses to reuse it. Node-hours (`docs/prereg/LSQ.md`): about 2.7 used and at most 4
+   reserved for a rank with a storage verdict (K4 and RG), about 1.4 and at most 2 for a normalization verdict (U).
 
 Still to write in step 2 (not needed before): `scripts/prepare_dpfp_release.py` and `scripts/prepare_lsq_release.py`
-(timing-only read of the smokes, frozen per-arm step counts, `science_commit`; after `prepare_p1l_read_fix_a2.py`),
+(timing-only read of the smokes, frozen per-arm step counts, `science_commit`; the LSQ release copies `lsq_arms`,
+`rfx_eta_by_rank` and `eta_by_rank` from the RFX summary; after `prepare_p1l_read_fix_a2.py`),
 `scripts/audit_dpfp.py` and an LSQ counterpart (final checkpoints: zero/shuffle memory, key overlap, read error, value
 SIR, clean/read value-head EM; `controlled_score` and `diagnostics` already support rectangular and LSQ states; load
 LSQ exports with `lsq_run.load_inference`), table scripts for `docs/reports/DPFP.md`, `RFX.md` and `LSQ.md` (every
-curve, node-hours, `dpfp_run.choose` / `lsq_run.choose` on the E16 records).
+curve, node-hours, `dpfp_run.choose` / `lsq_run.choose(records, release_arms(release))` on the E16 records, and the P1L-D
+writer pick between DPFP and LSQ: lower rank, then higher E16 val EM, then DPFP).
 
 ## Open questions and risks for the orchestrator (WP-L7)
-- The two drafts are not binding until committed to master; the three marked open points in `docs/prereg/RFX.md` and the
-  four in `docs/prereg/LSQ.md` are choices for you (ridge + unit q as a trigger; K4 before RG; which writer enters P1L-D
-  if both studies select one).
+- The registrations decided the drafts' open points; nothing in the step-1b code is pending a decision. Choices the code
+  made where the text was silent are listed above (every rescue flag for all variants, entity-EM tie order, `choose` takes
+  the release's arms).
 - The rescue rule needs the LM path to accept a substituted read. A "none" or "decoder" verdict on a checkpoint whose
   clean head decodes well can be a distribution-shift artifact of the downstream path (stated as a caveat in the prereg).
 - Budget: tests, smokes and RFX together are about 1 node-hour for WP-L5 and WP-L7 (tests 0.1-0.2, DPFP smokes 0.3-0.4,
-  RFX smoke and science 0.2-0.25); LSQ adds 3-4 node-hours per triggered rank.
+  RFX smoke and science 0.2-0.25); LSQ adds 2.7-4 node-hours per rank with a storage verdict and 1.4-2 per rank with a
+  normalization verdict.
 - All new code is untested on a GPU. The riskiest parts are the RFX hook (checked by the identity and ragged-mask tests),
   the float64 Cholesky solve in the training loop (finite-difference and gradient tests), and the tiny-model comparisons
   that depend on bf16 rounding (tolerances were set from the formulas, not from runs).

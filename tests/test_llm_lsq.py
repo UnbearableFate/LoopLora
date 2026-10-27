@@ -4,6 +4,7 @@ Tiny-model tests (compute only). The real-model LSQ-off reproduction of WP-L4 R 
 flags default off and share that path).
 """
 import copy
+import itertools
 import json
 import math
 
@@ -18,9 +19,9 @@ from looplora.core.config import AdapterConfig
 from looplora.core.memory import delta_update
 from looplora.data.relations import generate
 from looplora.infra.seeds import derive_seed
-from looplora.llm import dpfp_run, read_fix, read_fix_run
+from looplora.llm import dpfp_run, read_fix, read_fix_run, rfx, rfx_run
 from looplora.llm.inject import load_tokenizer
-from looplora.llm.lsq import ARMS, ETA_BOUNDS, SPECS, SWEEPS, LSQExperiment, configuration, lsq_eta
+from looplora.llm.lsq import ARMS, ETA_BOUNDS, SPECS, SWEEPS, LSQExperiment, check_arms, configuration, lsq_eta
 from looplora.llm.lsq_run import choose, eligible_e8, load_inference, release_arms, release_eta, scheduled_steps
 from looplora.llm.read_fix import ReadFixExperiment, diagnostics, extra_losses, gram_read, question_terms, store_read
 from looplora.llm.read_fix_run import fit, validate
@@ -65,6 +66,14 @@ def ridge_state(keys, values, lam, eta):
     return torch.einsum('n,bni,bnj->bij', weights, values, keys) @ torch.linalg.inv(system)
 
 
+def delta_rule_state(keys, values, lam, beta):
+    """The deployed decay-first delta rule over the written pairs in order (arm U's store), from a zero state."""
+    state = torch.zeros(keys.shape[0], values.shape[2], keys.shape[2], dtype=torch.float64, device=keys.device)
+    for j in range(keys.shape[1]):
+        state = delta_update(state, keys[:, j].double(), values[:, j].double(), None, lam, beta)
+    return state
+
+
 def sweep_state(keys, values, lam, sweeps):
     state = torch.zeros(keys.shape[0], values.shape[2], keys.shape[2], dtype=torch.float64, device=keys.device)
     for _ in range(sweeps):
@@ -88,7 +97,12 @@ def test_configuration_is_wp_l4_R_plus_only_the_registered_store_fields(arm, E):
     rest['name'] = base['name']
     assert rest == base
     assert cfg['name'] == f'lsq-{arm}-E{E}'
-    assert (cfg['model']['r'], cfg['model']['store'], cfg['model']['unit_query'], cfg['task']['E']) == (rank, store, True, E)
+    # U is R plus the unit query only; K4 and RG add their store fields to it.
+    assert set(cfg['model']) - set(base['model']) == {
+        'delta': {'unit_query'}, 'sweep': {'unit_query', 'store', 'store_sweeps'},
+        'ridge': {'unit_query', 'store', 'store_eta'}}[store]
+    assert (cfg['model']['r'], cfg['model'].get('store', 'delta'), cfg['model']['unit_query'], cfg['task']['E']) == (
+        rank, store, True, E)
     assert (cfg['seed'], cfg['model']['layer'], cfg['train']['prefetch_workers']) == (17, 14, 2)
     assert cfg['read_fix']['arm'] == 'R' and cfg['read_fix']['read_weight'] == 1
     assert cfg['model'].get('store_eta') == eta and cfg['model'].get('store_sweeps') == (SWEEPS if store == 'sweep' else None)
@@ -98,14 +112,17 @@ def test_configuration_is_wp_l4_R_plus_only_the_registered_store_fields(arm, E):
 
 
 def test_registered_arms_order_and_rejected_configurations():
-    assert ARMS == ('L32-K4', 'L32-RG', 'L128-K4', 'L128-RG') and SWEEPS == 4
-    assert [SPECS[a] for a in ARMS] == [(32, 'sweep'), (32, 'ridge'), (128, 'sweep'), (128, 'ridge')]
-    for arm, kwargs in (('R', {}), ('D32-3', {}), ('L32-K4', {'E': 4}), ('L32-RG', {}), ('L32-RG', {'eta': 1e-5}),
-                        ('L32-RG', {'eta': .5}), ('L128-RG', {'eta': math.nan}), ('L32-K4', {'eta': 1e-3})):
+    assert ARMS == ('L32-U', 'L32-K4', 'L32-RG', 'L128-U', 'L128-K4', 'L128-RG') and SWEEPS == 4
+    assert [SPECS[a] for a in ARMS] == [(32, 'delta'), (32, 'sweep'), (32, 'ridge'),
+                                        (128, 'delta'), (128, 'sweep'), (128, 'ridge')]
+    for arm, kwargs in (('R', {}), ('D32-3', {}), ('L32-K4', {'E': 4}), ('L32-U', {'E': 4}), ('L32-RG', {}),
+                        ('L32-RG', {'eta': 1e-5}), ('L32-RG', {'eta': .5}), ('L128-RG', {'eta': math.nan}),
+                        ('L32-K4', {'eta': 1e-3}), ('L32-U', {'eta': 1e-3}), ('L128-U', {'eta': 1e-3})):
         with pytest.raises(ValueError):
             configuration(arm, 10, **kwargs)
     assert configuration('L128-RG', 10, eta=ETA_BOUNDS[0])['model']['store_eta'] == ETA_BOUNDS[0]
     assert configuration('L128-RG', 10, eta=ETA_BOUNDS[1])['model']['store_eta'] == ETA_BOUNDS[1]
+    assert configuration('L128-U', 10)['model']['r'] == 128 and configuration('L32-U', 10)['model']['r'] == 32
 
 
 def test_ridge_strength_is_the_clipped_rfx_selection():
@@ -122,18 +139,27 @@ def test_experiment_rejects_inconsistent_arm_and_config(model, tokenizer):
 
     reject(tiny('L32-K4'), 'L32-RG')
     reject(tiny('L32-K4'), 'R')
+    reject(tiny('L32-U'), 'L32-K4')
+    reject(tiny('L32-K4'), 'L32-U')
+    reject(tiny('L32-U'), 'R')
     for arm, change in (('L32-K4', dict(store='ridge')), ('L32-K4', dict(unit_query=False)),
                         ('L32-K4', dict(store_sweeps=3)), ('L32-RG', dict(store_eta=.5)), ('L32-RG', dict(dpfp_nu=1)),
-                        ('L32-RG', dict(store='sweep'))):
+                        ('L32-RG', dict(store='sweep')), ('L32-K4', dict(store_eta=1e-3)), ('L32-RG', dict(store_sweeps=4)),
+                        ('L32-U', dict(store='ridge')), ('L32-U', dict(store='sweep')), ('L32-U', dict(unit_query=False)),
+                        ('L32-U', dict(store_sweeps=4)), ('L32-U', dict(store_eta=1e-3)), ('L32-U', dict(dpfp_nu=1))):
         cfg = tiny(arm)
         cfg['model'].update(change)
         reject(cfg, arm)
     cfg = tiny('L32-RG')
     cfg['lsq']['rank'] = 128
     reject(cfg, 'L32-RG')
-    cfg = tiny('L32-K4')
-    del cfg['lsq']
-    reject(cfg, 'L32-K4')
+    for arm in ('L32-K4', 'L32-U'):
+        cfg = tiny(arm)
+        del cfg['lsq']
+        reject(cfg, arm)
+    cfg = tiny('L32-U')
+    cfg['model']['store'] = 'delta'  # the explicit default is the same experiment
+    LSQExperiment(cfg, 'L32-U', model=model, tokenizer=tokenizer).close()
 
 
 def test_off_path_experiment_signature_and_adapter_defaults_are_the_wp_l4_ones(model, tokenizer):
@@ -149,7 +175,7 @@ def test_off_path_experiment_signature_and_adapter_defaults_are_the_wp_l4_ones(m
         experiment.close()
 
 
-@pytest.mark.parametrize('arm', ARMS[:2])
+@pytest.mark.parametrize('arm', ['L32-U', 'L32-K4', 'L32-RG'])
 def test_lsq_arm_writes_the_registered_store_and_reads_with_unit_queries(model, tokenizer, arm):
     cfg = tiny(arm)
     rank, store = SPECS[arm]
@@ -159,8 +185,10 @@ def test_lsq_arm_writes_the_registered_store_and_reads_with_unit_queries(model, 
         assert (adapter.cfg.store, adapter.cfg.unit_query, adapter.cfg.dpfp_nu) == (store, True, 0)
         assert experiment.read_arm == arm and experiment.log_extras() == {}
         signature = experiment.writer_signature()
-        assert signature['read_fix'] == arm and signature['unit_query'] is True and signature['store'] == store
-        assert (signature.get('store_eta'), signature.get('store_sweeps')) == ((ETA, None) if store == 'ridge' else (None, SWEEPS))
+        assert signature['read_fix'] == arm and signature['unit_query'] is True and signature.get('store', 'delta') == store
+        assert ('store' in signature) == (store != 'delta')  # U's signature differs from R's only by the unit query
+        assert (signature.get('store_eta'), signature.get('store_sweeps')) == {
+            'ridge': (ETA, None), 'sweep': (None, SWEEPS), 'delta': (None, None)}[store]
         assert experiment.standardize()['episodes'] == 256
         with torch.no_grad():
             adapter.B.fill_(.1)
@@ -168,8 +196,9 @@ def test_lsq_arm_writes_the_registered_store_and_reads_with_unit_queries(model, 
         state = batch.snapshot.states[1]
         assert state.shape == (2, RANK, RANK) and batch.keys.shape == (2, 16, RANK) and batch.base_keys is None
         lam = float(adapter.lam)
-        expected = ridge_state(batch.keys, batch.values, lam, ETA) if store == 'ridge' else \
-            sweep_state(batch.keys, batch.values, lam, SWEEPS)
+        expected = {'ridge': lambda: ridge_state(batch.keys, batch.values, lam, ETA),
+                    'sweep': lambda: sweep_state(batch.keys, batch.values, lam, SWEEPS),
+                    'delta': lambda: delta_rule_state(batch.keys, batch.values, lam, float(adapter.beta))}[store]()
         torch.testing.assert_close(state.detach().double(), expected, rtol=1e-4, atol=1e-5)
 
         logits, x = experiment.score(batch, 1, capture_inputs=True)
@@ -180,12 +209,17 @@ def test_lsq_arm_writes_the_registered_store_and_reads_with_unit_queries(model, 
         assert torch.equal(terms['stored'], torch.einsum('bij,bqj->bqi', state, q))
         assert torch.equal(terms['m'], terms['stored'])
 
-        # The raw-read loss reaches the writer parameters it should; the write-strength gate is unused by both stores.
+        # The raw-read loss reaches the writer parameters it should; the write-strength gate is unused by the least-squares
+        # stores and trained by U's delta rule.
         read, decor = extra_losses(experiment, batch, x)
         assert read > 0 and decor == 0
         gradients = torch.autograd.grad(read, [adapter.Q, adapter.V, adapter.K, adapter.a_lambda], retain_graph=True)
         assert all(torch.isfinite(g).all() and g.abs().sum() > 0 for g in gradients)
-        assert torch.autograd.grad(read, [adapter.a_beta], retain_graph=True, allow_unused=True)[0] is None
+        beta_gradient = torch.autograd.grad(read, [adapter.a_beta], retain_graph=True, allow_unused=True)[0]
+        if store == 'delta':
+            assert beta_gradient is not None and torch.isfinite(beta_gradient).all() and beta_gradient.abs().sum() > 0
+        else:
+            assert beta_gradient is None
 
         # Diagnostics: the exact coefficients reproduce the deployed read; conditioning is reported as log10.
         diag, exact = diagnostics(experiment, batch, x)
@@ -203,8 +237,8 @@ def test_lsq_arm_writes_the_registered_store_and_reads_with_unit_queries(model, 
         experiment.close()
 
 
-@pytest.mark.parametrize('arm', ['L32-K4', 'L32-RG'])
-def test_training_loop_validation_and_export_reload_with_a_least_squares_store(model, tokenizer, tmp_path, arm):
+@pytest.mark.parametrize('arm', ['L32-U', 'L32-K4', 'L32-RG'])
+def test_training_loop_validation_and_export_reload_for_every_lsq_store(model, tokenizer, tmp_path, arm):
     cfg = tiny(arm)
     store = SPECS[arm][1]
     experiment = LSQExperiment(cfg, arm, model=model, tokenizer=tokenizer)
@@ -220,7 +254,8 @@ def test_training_loop_validation_and_export_reload_with_a_least_squares_store(m
         assert all(('ridge_log10_cond_median' in row) == (store == 'ridge') for row in rows)
         exported = torch.load(tmp_path / 'writer.pt', weights_only=True)
         assert 'value_head' not in exported and 'optimizer' not in exported
-        assert exported['arm'] == arm and exported['signature']['store'] == store
+        assert exported['arm'] == arm and exported['signature'].get('store', 'delta') == store
+        assert exported['signature']['unit_query'] is True
         assert exported['config']['lsq']['arm'] == arm
         metrics = validate(experiment, tmp_path / 'val', 16)
         assert metrics['n'] == 16 and 0 <= metrics['em'] <= 1 and math.isfinite(metrics['loss'])
@@ -246,10 +281,11 @@ def test_training_loop_validation_and_export_reload_with_a_least_squares_store(m
     payload = torch.load(tmp_path / 'writer.pt', weights_only=True)
     with pytest.raises(ValueError):
         load_inference(tmp_path / 'checkpoint.pt', model=model, tokenizer=tokenizer)  # carries the head and optimizer
-    payload['signature'] = {**payload['signature'], 'store': 'delta'}
-    torch.save(payload, tmp_path / 'tampered.pt')
-    with pytest.raises(ValueError):
-        load_inference(tmp_path / 'tampered.pt', model=model, tokenizer=tokenizer)
+    for change in (dict(store='delta'), dict(unit_query=False)):
+        tampered = {**payload, 'signature': {**payload['signature'], **change}}
+        torch.save(tampered, tmp_path / 'tampered.pt')
+        with pytest.raises(ValueError):
+            load_inference(tmp_path / 'tampered.pt', model=model, tokenizer=tokenizer)
 
 
 @pytest.mark.parametrize('store', ['delta', 'ridge', 'sweep'])
@@ -273,76 +309,131 @@ def test_store_read_gives_the_exact_coefficients_of_each_store(store):
                                rtol=1e-9, atol=1e-9)
 
 
-def records(scores, arms=ARMS):
+STORAGE = ('L32-K4', 'L32-RG', 'L128-K4', 'L128-RG')  # a storage verdict at both ranks
+MIXED = ('L32-U', 'L128-K4', 'L128-RG')  # normalization at rank 32, storage at rank 128
+RANK128 = ('L128-K4', 'L128-RG')
+
+
+def records(scores, arms):
     return [dict(arm=arm, status='complete', smoke=False, config=dict(task=dict(E=16)),
                  training=dict(actual_steps=10, metrics={'10': dict(correct=scores.get(arm, 0))})) for arm in arms]
 
 
 def test_selection_follows_candidate_order_thresholds_and_single_E8_gate():
-    assert choose(records({'L32-K4': 800, 'L32-RG': 999, 'L128-RG': 1000}))['arm'] == 'L32-K4'
-    assert choose(records({'L32-K4': 799, 'L32-RG': 800, 'L128-K4': 999}))['arm'] == 'L32-RG'
-    assert choose(records({'L128-RG': 800}))['action'] == 'select'
-    choice = choose(records({'L32-K4': 799, 'L32-RG': 799}))  # ties keep the candidate order
+    def pick(scores, arms=STORAGE):
+        return choose(records(scores, arms), arms)
+
+    assert pick({'L32-K4': 800, 'L32-RG': 999, 'L128-RG': 1000})['arm'] == 'L32-K4'
+    assert pick({'L32-K4': 799, 'L32-RG': 800, 'L128-K4': 999})['arm'] == 'L32-RG'
+    assert pick({'L128-RG': 800})['action'] == 'select'
+    choice = pick({'L32-K4': 799, 'L32-RG': 799})  # ties keep the candidate order
     assert (choice['action'], choice['arm'], choice['E']) == ('retry_e8', 'L32-K4', 8)
-    choice = choose(records({'L32-K4': 600, 'L128-RG': 700}))
+    choice = pick({'L32-K4': 600, 'L128-RG': 700})
     assert (choice['action'], choice['arm'], choice['E']) == ('retry_e8', 'L128-RG', 8)
-    assert choose(records({'L128-K4': 500}))['action'] == 'retry_e8'
-    stopped = choose(records({'L32-K4': 499, 'L32-RG': 300, 'L128-RG': 10}))
+    assert pick({'L128-K4': 500})['action'] == 'retry_e8'
+    stopped = pick({'L32-K4': 499, 'L32-RG': 300, 'L128-RG': 10})
     assert (stopped['action'], stopped['arm'], stopped['E']) == ('stop', None, None)
     assert stopped['correct'] == {'L32-K4': 499, 'L32-RG': 300, 'L128-K4': 0, 'L128-RG': 10}
-    # Only the triggered rank's arms compete, in candidate order.
-    rank128 = ('L128-K4', 'L128-RG')
-    assert choose(records({'L32-K4': 999, 'L128-RG': 800}, rank128), rank128)['arm'] == 'L128-RG'
-    assert choose(records({'L128-K4': 800, 'L128-RG': 900}, rank128), rank128)['arm'] == 'L128-K4'
+    # Only the triggered arms compete, in candidate order (U comes first within its rank).
+    assert pick({'L32-K4': 999, 'L128-RG': 800}, RANK128)['arm'] == 'L128-RG'
+    assert pick({'L128-K4': 800, 'L128-RG': 900}, RANK128)['arm'] == 'L128-K4'
+    assert pick({'L32-U': 800, 'L128-K4': 999}, MIXED)['arm'] == 'L32-U'
+    assert pick({'L32-U': 799, 'L128-K4': 800, 'L128-RG': 900}, MIXED)['arm'] == 'L128-K4'
+    choice = pick({'L32-U': 600, 'L128-K4': 600, 'L128-RG': 600}, MIXED)
+    assert (choice['action'], choice['arm'], choice['E']) == ('retry_e8', 'L32-U', 8)
+    assert [pick({arm: score}, (arm,))['action'] for arm, score in (('L128-U', 800), ('L128-U', 500), ('L32-U', 499))] == [
+        'select', 'retry_e8', 'stop']
     with pytest.raises(ValueError):
-        choose(records({})[:-1])
+        choose(records({}, STORAGE)[:-1], STORAGE)
     with pytest.raises(ValueError):
-        choose(records({}) + [records({})[0]])
+        choose(records({}, STORAGE) + [records({}, STORAGE)[0]], STORAGE)
     with pytest.raises(ValueError):
-        choose(records({}, rank128))  # the decision needs exactly the triggered arms
+        choose(records({}, STORAGE), RANK128)  # the decision needs exactly the triggered arms
     with pytest.raises(ValueError):
-        choose(records({}, rank128[::-1]), rank128[::-1])  # candidate order is part of the rule
+        choose(records({}, RANK128), STORAGE)
+    with pytest.raises(ValueError):
+        choose(records({}, RANK128[::-1]), RANK128[::-1])  # candidate order is part of the rule
+    for arms in ((), ('L32-K4',), ('L32-RG',), ('L32-U', 'L32-K4'), ('L32-U', 'L32-K4', 'L32-RG'), ARMS,
+                 ('L32-U', 'L32-U')):  # RFX never triggers these sets
+        with pytest.raises(ValueError):
+            choose(records({}, arms), arms)
     with pytest.raises(ValueError):
         choose([], ())
     with pytest.raises(ValueError):
-        choose([{**r, 'smoke': True} for r in records({})])
+        choose([{**r, 'smoke': True} for r in records({}, STORAGE)], STORAGE)
     with pytest.raises(ValueError):
-        choose([{**r, 'status': 'failed'} for r in records({})])
-    short = records({})
+        choose([{**r, 'status': 'failed'} for r in records({}, STORAGE)], STORAGE)
+    short = records({}, STORAGE)
     short[1]['config']['task']['E'] = 8
     with pytest.raises(ValueError):
-        choose(short)
-    lock = dict(choice=choose(records({'L32-K4': 600, 'L128-RG': 700})))
+        choose(short, STORAGE)
+    lock = dict(choice=pick({'L32-K4': 600, 'L128-RG': 700}))
     assert eligible_e8(lock, 'L128-RG') == 8
-    for arm in ('L32-K4', 'L32-RG', 'L128-K4'):
+    for arm in ('L32-K4', 'L32-RG', 'L128-K4', 'L32-U', 'L128-U'):
         with pytest.raises(ValueError):
             eligible_e8(lock, arm)
+    assert eligible_e8(dict(choice=pick({'L32-U': 600, 'L128-K4': 599}, MIXED)), 'L32-U') == 8
     with pytest.raises(ValueError):
-        eligible_e8(dict(choice=choose(records({'L32-K4': 800}))), 'L32-K4')
+        eligible_e8(dict(choice=pick({'L32-K4': 800})), 'L32-K4')
 
 
-def release(ranks, steps, *, E=16, study='LSQ'):
-    arms = [a for a in ARMS if SPECS[a][0] in ranks]
-    return dict(study=study, E=E, ranks=ranks, arms=arms, steps_by_arm=steps)
+def release(arms, steps, *, E=16, study='LSQ'):
+    return dict(study=study, E=E, arms=list(arms), steps_by_arm=steps)
 
 
-def test_release_names_the_triggered_ranks_and_every_arm_of_them():
-    assert release_arms(release([32], {})) == ['L32-K4', 'L32-RG']
-    assert release_arms(release([128], {})) == ['L128-K4', 'L128-RG']
-    assert release_arms(release([32, 128], {})) == list(ARMS)
-    assert release_arms(dict(ranks=[128, 32], arms=list(ARMS))) == list(ARMS)  # arms always follow candidate order
-    for bad in (dict(ranks=[], arms=[]), dict(ranks=[32, 32], arms=['L32-K4', 'L32-RG']),
-                dict(ranks=[64], arms=[]), dict(ranks=[True], arms=[]),
-                dict(ranks=[32], arms=['L32-RG', 'L32-K4']), dict(ranks=[32], arms=['L32-K4']),
-                dict(ranks=[32], arms=list(ARMS)), dict(ranks=[128], arms=['L128-K4', 'L128-RG', 'L32-K4'])):
+RANK_OPTIONS = {32: ([], ['L32-U'], ['L32-K4', 'L32-RG']), 128: ([], ['L128-U'], ['L128-K4', 'L128-RG'])}
+
+
+def test_release_names_exactly_the_arms_rfx_can_trigger_in_candidate_order():
+    assert release_arms(release(['L32-K4', 'L32-RG'], {})) == ['L32-K4', 'L32-RG']
+    assert release_arms(release(['L32-U'], {})) == ['L32-U'] and release_arms(release(['L128-U'], {})) == ['L128-U']
+    assert release_arms(release(RANK128, {})) == list(RANK128)
+    assert release_arms(release(MIXED, {})) == list(MIXED)
+    assert release_arms(release(STORAGE, {})) == list(STORAGE)
+    assert release_arms(release(('L32-U', 'L128-U'), {})) == ['L32-U', 'L128-U']
+    # Per rank: nothing, U alone, or K4 with RG. Every nonempty combination is a release; nothing else is.
+    for low, high in itertools.product(RANK_OPTIONS[32], RANK_OPTIONS[128]):
+        arms = low + high
+        if arms:
+            assert release_arms(release(arms, {})) == arms == check_arms(arms)
+        else:
+            with pytest.raises(ValueError):
+                release_arms(release(arms, {}))
+    for bad in (['L32-K4'], ['L32-RG'], ['L32-RG', 'L32-K4'], ['L32-U', 'L32-K4'], ['L32-U', 'L32-RG'],
+                ['L32-U', 'L32-K4', 'L32-RG'], ['L128-K4'], ['L128-U', 'L128-RG'], list(ARMS), ['L32-U', 'L32-U'],
+                ['L128-U', 'L32-U'], ['L128-K4', 'L128-RG', 'L32-K4', 'L32-RG'], ['L64-K4', 'L64-RG'], ['R'], ['L32-K4', 'L32-RG', 'L32-K4']):
         with pytest.raises(ValueError):
-            release_arms(bad)
+            release_arms(release(bad, {}))
+
+
+def test_rfx_arms_and_etas_form_a_valid_release():
+    def record(verdict, eta):
+        return dict(verdict=dict(verdict=verdict, rescue={}), parameters=dict(eta=dict(raw=1., unit=eta, true=1e-6)))
+
+    for r128, r32 in itertools.product(rfx.VERDICTS, repeat=2):
+        decided = rfx_run.decisions({'R-r128': record(r128, 2e-6), 'R-r32': record(r32, 3e-3), 'W5-r32': record('storage', 1.)})
+        arms = decided['lsq_arms']
+        # U and K4/RG are exclusive per rank: a rank has a storage verdict, a normalization verdict or neither.
+        assert arms == rfx.lsq_arms(decided['verdicts'])
+        if not arms:
+            continue
+        schedule = dict(study='LSQ', E=16, arms=arms, steps_by_arm={arm: 15000 for arm in arms},
+                        rfx_eta_by_rank=decided['rfx_eta_by_rank'], eta_by_rank=decided['eta_by_rank'])
+        assert release_arms(schedule) == arms
+        for arm in arms:
+            assert scheduled_steps(arm, None, schedule) == 15000
+            expected = lsq_eta(decided['rfx_eta_by_rank'][str(SPECS[arm][0])]) if SPECS[arm][1] == 'ridge' else None
+            assert release_eta(schedule, arm) == expected
+        assert {a for a in arms if SPECS[a][1] == 'ridge'} == {f'L{rank}-RG' for rank in (32, 128)
+                                                                  if decided['verdicts'][f'R-r{rank}'] == 'storage'}
 
 
 def test_ridge_strength_comes_from_the_release_and_must_be_the_clipped_rfx_value():
     schedule = dict(rfx_eta_by_rank={'32': 3e-3, '128': 2e-6}, eta_by_rank={'32': 3e-3, '128': 1e-4})
     assert release_eta(schedule, 'L32-RG') == 3e-3 and release_eta(schedule, 'L128-RG') == 1e-4
-    assert release_eta(schedule, 'L32-K4') is None and release_eta(schedule, 'L128-K4') is None
+    for arm in ('L32-K4', 'L128-K4', 'L32-U', 'L128-U'):  # only the ridge arms have one
+        assert release_eta(schedule, arm) is None
+        assert release_eta(dict(arms=[arm]), arm) is None  # and a release without any eta field is fine for them
     for rank, eta in (('32', 4e-3), ('128', 2e-6), ('128', 1e-3)):
         with pytest.raises(ValueError):
             release_eta({**schedule, 'eta_by_rank': {**schedule['eta_by_rank'], rank: eta}}, f'L{rank}-RG')
@@ -350,12 +441,15 @@ def test_ridge_strength_comes_from_the_release_and_must_be_the_clipped_rfx_value
 
 def test_step_counts_come_from_the_release_or_the_explicit_smoke_count():
     counts = {'L32-K4': 20000, 'L32-RG': 19000}
-    both = release([32], counts)
+    both = release(('L32-K4', 'L32-RG'), counts)
     assert [scheduled_steps(arm, None, both) for arm in ('L32-K4', 'L32-RG')] == [20000, 19000]
-    assert scheduled_steps('L32-K4', 2400, None, smoke=True) == 2400
-    retrain = release([32], {'L32-RG': 15000}, E=8)  # the conditional E8 release names the retrained arm
+    assert scheduled_steps('L32-K4', 2400, None, smoke=True) == 2400 and scheduled_steps('L32-U', 2400, None, smoke=True) == 2400
+    retrain = release(('L32-K4', 'L32-RG'), {'L32-RG': 15000}, E=8)  # the conditional E8 release names the retrained arm
     assert scheduled_steps('L32-RG', None, retrain, E=8) == 15000
-    four = release([32, 128], {**counts, 'L128-K4': 18000, 'L128-RG': 17000})
+    mixed = release(MIXED, {'L32-U': 21000, 'L128-K4': 18000, 'L128-RG': 17000})
+    assert [scheduled_steps(arm, None, mixed) for arm in MIXED] == [21000, 18000, 17000]
+    assert scheduled_steps('L32-U', None, release(MIXED, {'L32-U': 14000}, E=8), E=8) == 14000
+    four = release(STORAGE, {**counts, 'L128-K4': 18000, 'L128-RG': 17000})
     assert scheduled_steps('L128-RG', None, four) == 17000
     for call in (lambda: scheduled_steps('L32-K4', 8225, both),
                  lambda: scheduled_steps('L32-K4', None, None),
@@ -364,9 +458,14 @@ def test_step_counts_come_from_the_release_or_the_explicit_smoke_count():
                  lambda: scheduled_steps('L32-K4', None, {**both, 'steps_by_arm': {**counts, 'L32-K4': 20001}}),
                  lambda: scheduled_steps('L32-K4', None, {**both, 'steps_by_arm': {**counts, 'L32-K4': True}}),
                  lambda: scheduled_steps('L32-K4', None, {**both, 'steps_by_arm': {'L32-K4': 20000}}),  # E16 names every arm
+                 lambda: scheduled_steps('L32-U', None, {**mixed, 'steps_by_arm': {'L32-U': 21000}}),
                  lambda: scheduled_steps('L128-K4', None, both),
+                 lambda: scheduled_steps('L32-U', None, both),
                  lambda: scheduled_steps('L32-K4', None, {**both, 'arms': ['L32-K4']}),
+                 lambda: scheduled_steps('L32-K4', None, release(('L32-U', 'L32-K4', 'L32-RG'), counts)),
                  lambda: scheduled_steps('L32-K4', None, retrain, E=8),
+                 lambda: scheduled_steps('L32-RG', None, release(('L32-K4', 'L32-RG'), counts, E=8), E=8),  # E8: one arm only
+                 lambda: scheduled_steps('L128-K4', None, release(('L32-U',), {'L128-K4': 15000}, E=8), E=8),  # not an arm
                  lambda: scheduled_steps('L32-K4', 4, None, smoke=True),
                  lambda: scheduled_steps('L32-K4', None, None, smoke=True),
                  lambda: scheduled_steps('L32-K4', 2400, both, smoke=True)):

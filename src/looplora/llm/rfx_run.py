@@ -13,7 +13,7 @@ import numpy as np
 import torch
 
 from .lsq import lsq_eta
-from .rfx import LABELS,load_checkpoint,lsq_ranks,run_checkpoint
+from .rfx import LABELS,load_checkpoint,lsq_arms,run_checkpoint,storage_ranks
 from .run import _load_backbone,_write_json,source_metadata
 
 RUNS=Path('/work/xg24i002/x10041/LoopLora/runs/p1l')
@@ -59,6 +59,17 @@ def instrumentation_failures(checks):
     return bad
 
 
+def decisions(records):
+    """What RFX decides from the checkpoints' records (label -> run_checkpoint record): the verdicts, every rescue flag,
+    the LSQ arms they trigger in candidate order and, for the ranks with a storage verdict (RG arms), the fitting-set
+    ridge strength of the (ridge, unit q) cell and its clipped LSQ value (string rank keys, as in the release)."""
+    verdicts={label:record['verdict']['verdict'] for label,record in records.items()}
+    rfx_eta={str(rank):records[f'R-r{rank}']['parameters']['eta']['unit'] for rank in storage_ranks(verdicts)}
+    return dict(verdicts=verdicts,rescue={label:record['verdict']['rescue'] for label,record in records.items()},
+                lsq_arms=lsq_arms(verdicts),rfx_eta_by_rank=rfx_eta,
+                eta_by_rank={rank:lsq_eta(eta) for rank,eta in rfx_eta.items()})
+
+
 def run(runs,out,labels=LABELS,*,smoke=False):
     if not smoke and tuple(labels)!=LABELS:
         raise ValueError('the registered study evaluates all three checkpoints')
@@ -81,11 +92,7 @@ def run(runs,out,labels=LABELS,*,smoke=False):
         np.savez_compressed(out/f'{label}-samples.npz',**{k.replace('/','__'):v for k,v in samples.items()})
         _write_json(out/f'{label}.json',record)
         failures[label]=instrumentation_failures(record['checks'])
-    verdicts={label:record['verdict']['verdict'] for label,record in records.items()}
-    ranks=lsq_ranks(verdicts)
-    rfx_eta={str(rank):records[f'R-r{rank}']['parameters']['eta']['unit'] for rank in ranks}
-    summary=dict(**source_metadata(),smoke=smoke,labels=list(labels),verdicts=verdicts,lsq_ranks=ranks,
-        rfx_eta_by_rank=rfx_eta,eta_by_rank={rank:lsq_eta(eta) for rank,eta in rfx_eta.items()},
+    summary=dict(**source_metadata(),smoke=smoke,labels=list(labels),**decisions(records),
         instrumentation_failures=failures,backbone_load_seconds=load_seconds,host=socket.gethostname(),
         job_id=os.environ.get('PBS_JOBID'),created_at=created,completed_at=datetime.now(timezone.utc).isoformat(),
         runtime=dict(torch=torch.__version__,gpu=torch.cuda.get_device_name(),

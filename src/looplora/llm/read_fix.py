@@ -150,8 +150,8 @@ def diagnostics(experiment,batch,x):
         base_pair=(base@base.transpose(-1,-2))[:,~eye]
         result.update(key_gram_rms_base=base_pair.square().mean(-1).sqrt()[:,None].expand_as(target),
                       key_gram_max_abs_base=base_pair.abs().amax(-1)[:,None].expand_as(target))
-    if adapter.cfg.store!='delta':
-        # Least-squares stores: conditioning of the key Gram (and of the weighted ridge system), as log10.
+    if adapter.cfg.store!='delta' or adapter.cfg.unit_query:
+        # LSQ arms (U, K4, RG): conditioning of the key Gram (and of the weighted ridge system for RG), as log10.
         ridge=adapter.cfg.store=='ridge'
         cond=gram_conditions(batch.keys.detach(),adapter.lam.detach() if ridge else None,
                              adapter.cfg.store_eta if ridge else None)

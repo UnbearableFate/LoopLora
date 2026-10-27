@@ -11,7 +11,7 @@ import socket
 import torch
 
 from looplora.infra.seeds import stable_hash
-from .lsq import ARMS,SPECS,LSQExperiment,configuration,lsq_eta
+from .lsq import ARMS,SPECS,LSQExperiment,check_arms,configuration,lsq_eta
 from .read_fix_run import fit
 from .run import _write_json,source_metadata
 
@@ -33,18 +33,12 @@ def load_inference(path,*,model=None,tokenizer=None):
 
 
 def release_arms(schedule):
-    """The candidate arms a release covers: every arm of each rank that RFX triggered, in candidate order."""
-    ranks=schedule['ranks']
-    if not ranks or any(isinstance(r,bool) or r not in (32,128) for r in ranks) or len(set(ranks))!=len(ranks):
-        raise ValueError('a release names its triggered ranks (32 and/or 128)')
-    arms=[arm for arm in ARMS if SPECS[arm][0] in ranks]
-    if list(schedule['arms'])!=arms:
-        raise ValueError('the release arms must be every arm of the triggered ranks, in candidate order')
-    return arms
+    """The candidate arms a release covers: RFX's `lsq_arms`, in candidate order (per rank U alone, or K4 with RG)."""
+    return check_arms(schedule['arms'])
 
 
 def release_eta(schedule,arm):
-    """The registered ridge strength of a ridge arm: lsq_eta of RFX's fitting-set selection for its rank."""
+    """The registered ridge strength of an RG arm: lsq_eta of RFX's fitting-set selection for its rank (U and K4 have none)."""
     rank,store=SPECS[arm]
     if store!='ridge':
         return None
@@ -66,19 +60,18 @@ def scheduled_steps(arm,steps,schedule,*,smoke=False,E=16):
         raise ValueError('schedule study/capacity mismatch')
     arms=release_arms(schedule)
     by_arm=schedule['steps_by_arm']
-    if arm not in by_arm or (E==16 and set(by_arm)!=set(arms)):
-        raise ValueError('the E16 release fixes the step counts of every triggered arm at once (E8: the retrained arm)')
+    if arm not in arms or set(by_arm)!=(set(arms) if E==16 else {arm}):
+        raise ValueError('the E16 release fixes the step counts of every triggered arm at once, the E8 release only the '
+                         'retrained arm')
     result=by_arm[arm]
     if isinstance(result,bool) or not isinstance(result,int) or result<5 or result%5:
         raise ValueError('scientific schedules require five equal integer intervals')
     return result
 
 
-def choose(records,arms=ARMS):
-    """The registered rule of docs/prereg/LSQ.md over the triggered arms; ties keep the candidate order."""
-    arms=tuple(arms)
-    if not arms or arms!=tuple(a for a in ARMS if a in arms):
-        raise ValueError('triggered arms must be a nonempty subset in candidate order')
+def choose(records,arms):
+    """The registered rule of docs/prereg/LSQ.md over the triggered arms (the release's); ties keep the candidate order."""
+    arms=tuple(check_arms(arms))
     by_arm={r['arm']:r for r in records}
     if len(records)!=len(arms) or set(by_arm)!=set(arms) or any(
             r['status']!='complete' or r['smoke'] or r['config']['task']['E']!=16 for r in records):

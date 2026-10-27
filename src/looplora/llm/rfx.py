@@ -4,8 +4,9 @@ The deployed read at the final question token, m = M q(z) in R^{r_mem}, is repla
 other token keeps its deployed read and the LM path after the read is the unmodified one. Cells: storage {the deployed
 delta store, the ridge store  M = V K^T (K K^T + eta I)^-1  over the same written unit keys and values} x query {the raw
 learned q, the unit q, the true source key of the queried fact}, each as is and with a scalar gain fitted on a fitting
-set, plus the clean value and a zero read. Decoders: the deployed LM path, the training-only clean-value head, and a
-linear decoder refit on fitting-set reads. Docs: docs/prereg/RFX.md.
+set, plus the clean value and a zero read. Decoders: the deployed LM path (full-vocabulary and entity-restricted EM), the
+training-only clean-value head, and a linear decoder refit on fitting-set reads. The registered verdict (storage,
+normalization, query, store+query, decoder, none) decides which LSQ arms run. Docs: docs/prereg/RFX.md.
 """
 from __future__ import annotations
 
@@ -19,6 +20,7 @@ from torch.nn import functional as F
 
 from looplora.core.memory import delta_update,gram_conditions
 from looplora.data.relations import generate
+from looplora.data.render import load_name_pool
 from looplora.infra.seeds import derive_seed
 from looplora.sym.evaluate import stratify_queries
 from .evaluate import _slice
@@ -36,6 +38,8 @@ FIT_EPISODES,EVAL_EPISODES,EVAL_START,EVAL_SEED=4096,4000,200000,4242
 FIT_SEED=derive_seed(17,'rfx','fit')
 SMOKE_START,SMOKE_SEED=10_000_000,derive_seed(17,'rfx','smoke-eval')
 PERMUTATIONS=4
+VERDICTS=('storage','normalization','query','store+query','decoder','none')
+RANK_LABELS=((32,'R-r32'),(128,'R-r128'))  # the R checkpoint whose verdict decides the LSQ arms of each rank
 DECODER_DECAYS=(1e-4,1e-3,1e-2,1e-1)
 EPS=1e-6
 ERROR_RATIO,EM_GAIN,TOLERANCE=.5,.10,1e-9  # TOLERANCE: differences of two k/n rates may miss exactly 10 pp by rounding
@@ -142,6 +146,14 @@ def replaced_logits(experiment,batch,replacement):
 def normalized_error(read,target):
     """|read - target|^2 / (|target|^2 + 1e-6), the WP-L4 relative read error."""
     return (read-target).square().sum(-1)/(target.square().sum(-1)+EPS)
+
+
+def entity_hits(logits,entity_ids,answer_entity):
+    """Entity-restricted D1 hits: the argmax of the logits over the task-entity name tokens is the answer entity.
+
+    logits [..., vocabulary]; entity_ids [V] token ids of entities 0..V-1; answer_entity [...] entity indices.
+    """
+    return logits.index_select(-1,entity_ids).argmax(-1)==answer_entity
 
 
 def ridge_reads(keys,values,q,eta):
@@ -328,25 +340,55 @@ def delta_state(adapter,keys,values):
 
 
 def classify(cells,refit):
-    """The registered verdict of docs/prereg/RFX.md for one checkpoint from its evaluation-set tables."""
+    """The registered verdict of docs/prereg/RFX.md for one checkpoint from its evaluation-set tables.
+
+    A cell rescues if its mean normalized error is at most half of the deployed gain-fitted read's and its full-vocabulary
+    EM is at least 10 pp above the better of the deployed as-is and gain-fitted reads. The first verdict that applies:
+    storage (ridge/raw/fit rescues, or ridge/unit/fit rescues while delta/unit/fit does not), normalization (delta/unit/fit),
+    query (delta/true/fit), store+query (ridge/true/fit), decoder (the refit decoder on the delta/raw reads beats the
+    entity-restricted baseline EM by 10 pp), none. Every rescue flag is recorded.
+    """
     base=cells['delta/raw/fit']
     base_em=max(cells['delta/raw/asis']['lm_em'],base['lm_em'])
-
-    def rescues(name):
-        cell=cells[name]
-        return bool(cell['err']<=ERROR_RATIO*base['err'] and cell['lm_em']-base_em>=EM_GAIN-TOLERANCE)
-
-    storage,query_delta,query_ridge=rescues('ridge/raw/fit'),rescues('delta/true/fit'),rescues('ridge/true/fit')
-    decoder=bool(refit['delta/raw']['acc']-base_em>=EM_GAIN-TOLERANCE)
-    verdict='storage' if storage else 'query' if (query_delta or query_ridge) else 'decoder' if decoder else 'none'
-    return dict(verdict=verdict,rescue=dict(storage_ridge_raw=storage,query_delta_true=query_delta,
-        query_ridge_true=query_ridge,decoder_refit=decoder),baseline=dict(lm_em=base_em,err_fit=base['err']),
+    base_entity=max(cells['delta/raw/asis']['lm_em_entity'],base['lm_em_entity'])
+    rescue={name:bool(cells[name]['err']<=ERROR_RATIO*base['err'] and cells[name]['lm_em']-base_em>=EM_GAIN-TOLERANCE)
+            for name in VARIANTS}
+    rescue['decoder_refit']=bool(refit['delta/raw']['acc']-base_entity>=EM_GAIN-TOLERANCE)
+    if rescue['ridge/raw/fit'] or (rescue['ridge/unit/fit'] and not rescue['delta/unit/fit']):
+        verdict='storage'
+    elif rescue['delta/unit/fit']:
+        verdict='normalization'
+    elif rescue['delta/true/fit']:
+        verdict='query'
+    elif rescue['ridge/true/fit']:
+        verdict='store+query'
+    elif rescue['decoder_refit']:
+        verdict='decoder'
+    else:
+        verdict='none'
+    return dict(verdict=verdict,rescue=rescue,
+        baseline=dict(err_fit=base['err'],lm_em=base_em,lm_em_entity=base_entity),
         thresholds=dict(error_ratio=ERROR_RATIO,em_gain=EM_GAIN))
 
 
-def lsq_ranks(verdicts):
-    """Ranks whose R checkpoint is classified 'storage' (they trigger the LSQ arms of that rank)."""
-    return [rank for rank,label in ((32,'R-r32'),(128,'R-r128')) if verdicts.get(label)=='storage']
+def storage_ranks(verdicts):
+    """Ranks whose R checkpoint has a storage verdict (their LSQ ridge arms take the RFX eta)."""
+    return [rank for rank,label in RANK_LABELS if verdicts.get(label)=='storage']
+
+
+def lsq_arms(verdicts):
+    """The LSQ arms the R checkpoints' verdicts trigger, in LSQ's candidate order (docs/prereg/RFX.md, LSQ.md).
+
+    Per rank: storage -> K4 and RG, normalization -> U, any other verdict (or none given) -> nothing.
+    """
+    arms=[]
+    for rank,label in RANK_LABELS:
+        verdict=verdicts.get(label)
+        if verdict=='normalization':
+            arms.append(f'L{rank}-U')
+        elif verdict=='storage':
+            arms+=[f'L{rank}-K4',f'L{rank}-RG']
+    return arms
 
 
 def eval_arrays(spec,episodes,smoke):
@@ -362,7 +404,8 @@ def eval_arrays(spec,episodes,smoke):
 def evaluate(experiment,head,arrays,params,*,batch_size=64,permutations=PERMUTATIONS):
     """Every variant through the deployed LM path on the evaluation set, plus write-order sensitivity and conditioning."""
     adapter,r=experiment.adapter,experiment.adapter.cfg.r_mem
-    pieces={v:dict(correct=[],nll=[],err=[],head=[]) for v in VARIANTS}
+    entity_ids=torch.as_tensor(load_name_pool().token_ids[:experiment.config['task']['V']],device=adapter.A.device)
+    pieces={v:dict(correct=[],entity_correct=[],nll=[],err=[],head=[]) for v in VARIANTS}
     kept={cell:[] for cell in REFIT_CELLS}
     perm=[dict(err=[],correct=[],discrepancy=[],agree=[],age=[]) for _ in range(permutations)]
     side=dict(age=[],entity=[],cond_gram=[],cond_ridge={q:[] for q in QUERIES})
@@ -385,6 +428,7 @@ def evaluate(experiment,head,arrays,params,*,batch_size=64,permutations=PERMUTAT
             logits=obs['logits'] if name=='delta/raw/asis' else replaced_logits(experiment,batch,read.reshape(-1,r).float())
             piece=pieces[name]
             piece['correct'].append((logits.argmax(-1)==obs['answer']).flatten().cpu())
+            piece['entity_correct'].append(entity_hits(logits,entity_ids,obs['answer_entity']).flatten().cpu())
             piece['nll'].append(F.cross_entropy(logits.float().flatten(0,1),obs['answer'].flatten(),reduction='none').cpu())
             piece['err'].append(normalized_error(read,obs['clean'].double()).flatten().cpu())
             if head is not None:
@@ -447,7 +491,9 @@ def run_checkpoint(label,experiment,head,*,smoke=False,fit_episodes=FIT_EPISODES
     for name,piece in pieces.items():
         err,err_se=mean_se(piece['err'])
         em,em_se=mean_se(piece['correct'].astype(np.float64))
-        cells[name]=dict(err=err,err_se=err_se,lm_em=em,lm_em_se=em_se,lm_nll=float(piece['nll'].mean()))
+        em_entity,em_entity_se=mean_se(piece['entity_correct'].astype(np.float64))
+        cells[name]=dict(err=err,err_se=err_se,lm_em=em,lm_em_se=em_se,lm_em_entity=em_entity,
+                         lm_em_entity_se=em_entity_se,lm_nll=float(piece['nll'].mean()))
         if 'head' in piece:
             cells[name]['head_acc']=float(piece['head'].mean())
     fit_reads=cell_reads(fit,params)

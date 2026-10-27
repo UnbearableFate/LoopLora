@@ -17,6 +17,7 @@ from transformers import Qwen3Config, Qwen3ForCausalLM
 from looplora.core.adapters import make_adapter
 from looplora.core.config import AdapterConfig
 from looplora.data.relations import generate
+from looplora.data.render import load_name_pool
 from looplora.infra.seeds import derive_seed
 from looplora.llm import read_fix, read_fix_run, rfx, rfx_run, writer_fix_run
 from looplora.llm.inject import load_tokenizer
@@ -310,11 +311,14 @@ def test_run_checkpoint_smoke_on_the_tiny_model_is_finite_complete_and_evaluatio
     assert (evaluation['split'], evaluation['start'], evaluation['episodes'], evaluation['queries_per_episode']) == (
         'train', rfx.SMOKE_START, 8, 1)
     assert set(record['cells']) == set(rfx.VARIANTS) and set(record['refit']) == set(rfx.REFIT_CELLS)
-    assert all(0 <= cell['lm_em'] <= 1 and 0 <= cell['head_acc'] <= 1 and np.isfinite(cell['err']) and cell['lm_nll'] > 0
-               for cell in record['cells'].values())
+    assert all(0 <= cell['lm_em'] <= 1 and 0 <= cell['lm_em_entity'] <= 1 and 0 <= cell['head_acc'] <= 1
+               and np.isfinite(cell['err']) and cell['lm_nll'] > 0 for cell in record['cells'].values())
     assert record['cells']['clean']['err'] == 0. and 0 < record['cells']['zero']['err'] <= 1
     assert all(0 <= row['acc'] <= 1 and row['nll'] > 0 for row in record['refit'].values())
-    assert record['verdict']['verdict'] in {'storage', 'query', 'decoder', 'none'}
+    assert record['verdict']['verdict'] in rfx.VERDICTS
+    assert set(record['verdict']['rescue']) == set(rfx.VARIANTS) | {'decoder_refit'}
+    assert record['verdict']['baseline']['lm_em_entity'] == max(
+        record['cells']['delta/raw/asis']['lm_em_entity'], record['cells']['delta/raw/fit']['lm_em_entity'])
     assert set(record['parameters']['eta']) == set(rfx.QUERIES) and all(
         eta in rfx.ETA_GRID for eta in record['parameters']['eta'].values())
     # The deployed read through the deployed LM path is the model's own forward on the same set.
@@ -328,7 +332,12 @@ def test_run_checkpoint_smoke_on_the_tiny_model_is_finite_complete_and_evaluatio
     assert base['lm_nll'] == pytest.approx(float(F.cross_entropy(logits.float().flatten(0, 1), batch.answer_ids.flatten())),
                                            rel=1e-5)
     assert np.array_equal(samples['delta/raw/asis/correct'], correct)
-    assert all(len(samples[f'{v}/{k}']) == 8 for v in rfx.VARIANTS for k in ('correct', 'nll', 'err', 'head'))
+    # The entity-restricted EM: the argmax of the same logits over the 1,024 entity name tokens is the answer entity.
+    names = torch.as_tensor(load_name_pool().token_ids[:experiment.config['task']['V']], device=logits.device)
+    entity_correct = (logits[..., names].argmax(-1) == torch.as_tensor(arrays.answer, device=logits.device)).flatten().cpu().numpy()
+    assert np.array_equal(samples['delta/raw/asis/entity_correct'], entity_correct)
+    assert base['lm_em_entity'] == pytest.approx(float(entity_correct.mean()), abs=1e-12)
+    assert all(len(samples[f'{v}/{k}']) == 8 for v in rfx.VARIANTS for k in ('correct', 'entity_correct', 'nll', 'err', 'head'))
     # Write order: four permutations of the same writes, tabulated by the permuted write age of the queried fact.
     order = record['write_order']
     assert order['permutations'] == rfx.PERMUTATIONS == len(order['err']) == len(order['lm_em'])
@@ -387,6 +396,28 @@ def test_checkpoint_identity_requires_the_registered_complete_final_run(tmp_path
         rfx_run.checkpoint_identity('R-r32', tmp_path)
     write(smoke=False)
     assert rfx_run.checkpoint_identity('R-r128', tmp_path)['steps'] == 24645
+
+
+def fake_record(verdict, eta):
+    return dict(verdict=dict(verdict=verdict, rescue={'ridge/unit/fit': verdict == 'storage'}),
+                parameters=dict(eta=dict(raw=1., unit=eta, true=1e-6)))
+
+
+def test_decisions_trigger_arms_and_carry_the_eta_only_for_ranks_with_a_storage_verdict():
+    records = {'R-r128': fake_record('storage', 2e-6), 'R-r32': fake_record('normalization', 3e-3),
+               'W5-r32': fake_record('storage', .5)}
+    decided = rfx_run.decisions(records)
+    assert decided['verdicts'] == {'R-r128': 'storage', 'R-r32': 'normalization', 'W5-r32': 'storage'}
+    assert decided['lsq_arms'] == ['L32-U', 'L128-K4', 'L128-RG']  # candidate order; W5-r32 triggers nothing
+    assert decided['rfx_eta_by_rank'] == {'128': 2e-6} and decided['eta_by_rank'] == {'128': 1e-4}  # clipped; none for U
+    assert decided['rescue'] == {label: r['verdict']['rescue'] for label, r in records.items()}
+    both = rfx_run.decisions({'R-r128': fake_record('storage', 5.), 'R-r32': fake_record('storage', 3e-3)})
+    assert both['lsq_arms'] == ['L32-K4', 'L32-RG', 'L128-K4', 'L128-RG']
+    assert both['rfx_eta_by_rank'] == {'32': 3e-3, '128': 5.} and both['eta_by_rank'] == {'32': 3e-3, '128': 1e-1}
+    for verdict in ('query', 'store+query', 'decoder', 'none'):
+        nothing = rfx_run.decisions({'R-r128': fake_record(verdict, 1e-3), 'R-r32': fake_record(verdict, 1e-3)})
+        assert nothing['lsq_arms'] == [] and nothing['rfx_eta_by_rank'] == {} and nothing['eta_by_rank'] == {}
+    json.dumps(both, allow_nan=False)
 
 
 def test_instrumentation_guards_flag_only_gross_failures():
@@ -497,10 +528,15 @@ def test_run_evaluates_both_export_formats_and_writes_the_registered_files(model
     assert summary['smoke'] is True and summary['labels'] == ['R-r32', 'W5-r32']
     assert summary['instrumentation_failures'] == {'R-r32': [], 'W5-r32': []}
     assert set(summary['verdicts']) == {'R-r32', 'W5-r32'}
-    assert set(summary['verdicts'].values()) <= {'storage', 'query', 'decoder', 'none'}
-    assert {str(rank) for rank in summary['lsq_ranks']} == set(summary['rfx_eta_by_rank']) == set(summary['eta_by_rank'])
+    assert set(summary['verdicts'].values()) <= set(rfx.VERDICTS)
+    assert 'lsq_ranks' not in summary and summary['lsq_arms'] == rfx.lsq_arms(summary['verdicts'])
+    assert set(summary['rfx_eta_by_rank']) == set(summary['eta_by_rank']) == {
+        str(rank) for rank in rfx.storage_ranks(summary['verdicts'])}
+    assert set(summary['rescue']) == set(summary['verdicts']) and all(
+        set(flags) == set(rfx.VARIANTS) | {'decoder_refit'} for flags in summary['rescue'].values())
     on_disk = json.loads((out / 'summary.json').read_text())
-    assert on_disk['verdicts'] == summary['verdicts'] and on_disk['lsq_ranks'] == summary['lsq_ranks']
+    assert on_disk['verdicts'] == summary['verdicts'] and on_disk['lsq_arms'] == summary['lsq_arms']
+    assert on_disk['rescue'] == summary['rescue'] and on_disk['eta_by_rank'] == summary['eta_by_rank']
     for label, arm in (('R-r32', 'R'), ('W5-r32', 'W5')):
         saved = json.loads((out / f'{label}.json').read_text())
         assert saved['label'] == label and saved['smoke'] is True and saved['checkpoint']['arm'] == arm

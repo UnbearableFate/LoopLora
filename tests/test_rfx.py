@@ -2,6 +2,7 @@
 
 Synthetic cached tensors only; the instrumented LLM forward is tested in test_llm_rfx.py. Compute-only like the rest.
 """
+import itertools
 import math
 from types import SimpleNamespace
 
@@ -13,7 +14,7 @@ from torch.nn import functional as F
 from looplora.core import memory
 from looplora.data.relations import generate
 from looplora.infra.seeds import derive_seed
-from looplora.llm import read_fix, rfx
+from looplora.llm import lsq, read_fix, rfx
 from looplora.llm.train import make_task_spec
 
 DTYPE = torch.float64
@@ -217,62 +218,188 @@ def test_the_running_maximum_of_the_instrumentation_checks_keeps_a_nan():
     assert math.isnan(rfx._worst(rfx._worst(0., nan), 5.))
 
 
-def table(**override):
-    """A tilted evaluation table: the deployed read is poor, no rescue unless an override says otherwise."""
-    cells = {name: dict(err=.8, lm_em=.30) for name in rfx.VARIANTS}
-    cells['delta/raw/fit'] = dict(err=.6, lm_em=.31)
-    refit = {cell: dict(acc=.30) for cell in rfx.REFIT_CELLS}
+def table(refit=None, **override):
+    """A tilted evaluation table: the deployed read is poor, no rescue unless an override says otherwise.
+
+    The deployed baselines are error .6 (gain-fitted read), full-vocabulary EM .31 and entity-restricted EM .40 (the
+    better of the as-is and the gain-fitted read in each case); a rescue needs error <= .3 and EM >= .41.
+    """
+    cells = {name: dict(err=.8, lm_em=.30, lm_em_entity=.38) for name in rfx.VARIANTS}
+    cells['delta/raw/fit'] = dict(err=.6, lm_em=.31, lm_em_entity=.40)
+    decoder = {cell: dict(acc=.30) for cell in rfx.REFIT_CELLS}
+    if refit is not None:
+        decoder['delta/raw'] = dict(acc=refit)
     for name, value in override.items():
-        if name == 'refit':
-            refit['delta/raw'] = dict(acc=value)
-        else:
-            cells[name.replace('__', '/')] = value
-    return cells, refit
+        cells[name.replace('__', '/')] = value
+    return cells, decoder
 
 
-def test_verdicts_follow_the_registered_rescue_rules_and_precedence():
-    # storage: ridge + raw q halves the (gain-fitted) deployed error and adds at least 10 pp EM.
-    cells, refit = table(ridge__raw__fit=dict(err=.3, lm_em=.45))
-    verdict = rfx.classify(cells, refit)
-    assert verdict['verdict'] == 'storage' and verdict['rescue']['storage_ridge_raw']
-    assert verdict['baseline'] == dict(lm_em=.31, err_fit=.6)
-    # ... and it wins over every other rescue.
-    cells, refit = table(ridge__raw__fit=dict(err=.3, lm_em=.45), delta__true__fit=dict(err=.1, lm_em=.8), refit=.9)
-    assert rfx.classify(cells, refit)['verdict'] == 'storage'
+RESCUED = dict(err=.1, lm_em=.5, lm_em_entity=.6)
+DECISIVE = dict(ridge_raw='ridge/raw/fit', ridge_unit='ridge/unit/fit', delta_unit='delta/unit/fit',
+                delta_true='delta/true/fit', ridge_true='ridge/true/fit')
+
+
+def with_rescues(*names, decoder=False):
+    """The tilted table in which exactly the named decisive cells rescue (and, optionally, the refit decoder does)."""
+    return table(refit=.51 if decoder else None, **{DECISIVE[n].replace('/', '__'): dict(RESCUED) for n in names})
+
+
+def verdict_of(*names, decoder=False):
+    return rfx.classify(*with_rescues(*names, decoder=decoder))['verdict']
+
+
+def test_verdicts_follow_the_registered_decision_tree():
+    # storage: the exact store rescues with the deployed query, or with the unit query when the unit query alone does not.
+    assert verdict_of('ridge_raw') == 'storage'
+    assert verdict_of('ridge_unit') == 'storage'
+    assert verdict_of('ridge_raw', 'ridge_unit') == 'storage'
+    # ... storage wins over normalization when ridge/raw rescues, but not when only ridge/unit does: delta/unit explains it.
+    assert verdict_of('ridge_raw', 'delta_unit') == 'storage'
+    assert verdict_of('ridge_raw', 'ridge_unit', 'delta_unit') == 'storage'
+    assert verdict_of('ridge_unit', 'delta_unit') == 'normalization'
+    # normalization: only the unit query on the deployed store.
+    assert verdict_of('delta_unit') == 'normalization'
+    assert verdict_of('delta_unit', 'delta_true') == 'normalization'
+    assert verdict_of('delta_unit', 'ridge_true', decoder=True) == 'normalization'
+    # query: only the true key on the deployed store; the ridge + true key read is store+query, not query.
+    assert verdict_of('delta_true') == 'query'
+    assert verdict_of('delta_true', 'ridge_true') == 'query'
+    assert verdict_of('delta_true', decoder=True) == 'query'
+    assert verdict_of('ridge_true') == 'store+query'
+    assert verdict_of('ridge_true', decoder=True) == 'store+query'
+    # decoder and none.
+    assert verdict_of(decoder=True) == 'decoder'
+    assert verdict_of() == 'none'
+    # Every verdict is registered, each one is reachable, and the strings are the ones the LSQ release logic reads.
+    assert set(rfx.VERDICTS) == {'storage', 'normalization', 'query', 'store+query', 'decoder', 'none'}
+    assert {verdict_of(*n, decoder=d) for n in ((), ('ridge_raw',), ('delta_unit',), ('delta_true',), ('ridge_true',))
+            for d in (False, True)} == set(rfx.VERDICTS)
+
+
+def registered_verdict(ridge_raw, ridge_unit, delta_unit, delta_true, ridge_true, decoder):
+    """docs/prereg/RFX.md, 'Decision rule', transcribed: the first verdict that applies."""
+    if ridge_raw or (ridge_unit and not delta_unit):
+        return 'storage'
+    if delta_unit:
+        return 'normalization'
+    if delta_true:
+        return 'query'
+    if ridge_true:
+        return 'store+query'
+    if decoder:
+        return 'decoder'
+    return 'none'
+
+
+@pytest.mark.parametrize('flags', list(itertools.product((False, True), repeat=6)))
+def test_every_combination_of_rescue_flags_gets_the_registered_verdict(flags):
+    names = [name for name, on in zip(DECISIVE, flags[:5]) if on]
+    verdict = rfx.classify(*with_rescues(*names, decoder=flags[5]))
+    assert verdict['verdict'] == registered_verdict(*flags)
+    # Every rescue flag is recorded, including ridge/unit/fit and delta/unit/fit, and it is exactly what was set.
+    assert set(verdict['rescue']) == set(rfx.VARIANTS) | {'decoder_refit'}
+    assert {name: verdict['rescue'][cell] for name, cell in DECISIVE.items()} == dict(zip(DECISIVE, flags[:5]))
+    assert verdict['rescue']['decoder_refit'] == flags[5]
+    assert sum(verdict['rescue'].values()) == sum(flags)  # no other cell (baseline, clean, zero, ...) rescues
+
+
+def test_a_cell_rescues_with_half_the_error_and_ten_points_of_em_over_the_better_deployed_read():
+    result = rfx.classify(*with_rescues('ridge_raw'))
+    assert result['baseline'] == dict(err_fit=.6, lm_em=.31, lm_em_entity=.40)
+    assert result['thresholds'] == dict(error_ratio=.5, em_gain=.10)
     # Each half of the rule is necessary.
-    assert rfx.classify(*table(ridge__raw__fit=dict(err=.31, lm_em=.45)))['verdict'] == 'none'  # error not halved
-    assert rfx.classify(*table(ridge__raw__fit=dict(err=.1, lm_em=.40)))['verdict'] == 'none'  # +9 pp only
-    assert rfx.classify(*table(ridge__raw__fit=dict(err=.3, lm_em=.41)))['verdict'] == 'storage'  # exactly +10 pp
-    assert rfx.classify(*table(ridge__raw__fit=dict(err=.30, lm_em=.4099)))['verdict'] == 'none'
-    # The baseline is the better of the deployed read as is and with its fitted gain, for both thresholds.
-    cells, refit = table(ridge__raw__fit=dict(err=.3, lm_em=.44))
-    cells['delta/raw/asis'] = dict(err=.9, lm_em=.35)
+    assert rfx.classify(*table(ridge__raw__fit=dict(err=.31, lm_em=.45, lm_em_entity=.6)))['verdict'] == 'none'  # error
+    assert rfx.classify(*table(ridge__raw__fit=dict(err=.1, lm_em=.40, lm_em_entity=.6)))['verdict'] == 'none'  # +9 pp
+    assert rfx.classify(*table(ridge__raw__fit=dict(err=.3, lm_em=.41, lm_em_entity=.4)))['verdict'] == 'storage'
+    assert rfx.classify(*table(ridge__raw__fit=dict(err=.30, lm_em=.4099, lm_em_entity=.4)))['verdict'] == 'none'
+    # The error threshold is a ratio to the gain-fitted deployed read only: exactly one half is enough.
+    cells, refit = table(ridge__raw__fit=dict(err=.25, lm_em=.45, lm_em_entity=.4))
+    cells['delta/raw/fit'] = dict(err=.5, lm_em=.31, lm_em_entity=.40)
+    assert rfx.classify(cells, refit)['verdict'] == 'storage'
+    cells['delta/raw/asis'] = dict(err=.2, lm_em=.30, lm_em_entity=.38)  # a lower as-is error does not move the baseline
+    assert rfx.classify(cells, refit)['verdict'] == 'storage'
+    # The EM baseline is the better of the as-is and the gain-fitted deployed read.
+    cells, refit = table(ridge__raw__fit=dict(err=.3, lm_em=.44, lm_em_entity=.6))
+    cells['delta/raw/asis'] = dict(err=.9, lm_em=.35, lm_em_entity=.38)
     assert rfx.classify(cells, refit)['verdict'] == 'none' and rfx.classify(cells, refit)['baseline']['lm_em'] == .35
     # Rounding of k/n rates: .50 - .40 is 0.0999... in floating point and still counts as 10 pp.
-    cells, refit = table(ridge__raw__fit=dict(err=.3, lm_em=.5))
-    cells['delta/raw/asis'] = dict(err=.8, lm_em=.4)
-    cells['delta/raw/fit'] = dict(err=.6, lm_em=.4)
+    cells, refit = table(ridge__raw__fit=dict(err=.3, lm_em=.5, lm_em_entity=.5))
+    cells['delta/raw/asis'] = dict(err=.8, lm_em=.4, lm_em_entity=.4)
+    cells['delta/raw/fit'] = dict(err=.6, lm_em=.4, lm_em_entity=.4)
     assert rfx.classify(cells, refit)['verdict'] == 'storage'
-    # The error threshold is a ratio to the deployed (gain-fitted) read: exactly one half is enough.
-    cells, refit = table(ridge__raw__fit=dict(err=.25, lm_em=.45))
-    cells['delta/raw/fit'] = dict(err=.5, lm_em=.31)
-    assert rfx.classify(cells, refit)['verdict'] == 'storage'
-    # query: only a true key rescues (either store); decoder: only the refit decoder rescues; otherwise none.
-    assert rfx.classify(*table(delta__true__fit=dict(err=.2, lm_em=.6)))['verdict'] == 'query'
-    assert rfx.classify(*table(ridge__true__fit=dict(err=.0, lm_em=.8)))['verdict'] == 'query'
-    assert rfx.classify(*table(delta__true__fit=dict(err=.2, lm_em=.6), refit=.9))['verdict'] == 'query'
-    assert rfx.classify(*table(refit=.45))['verdict'] == 'decoder'
-    assert rfx.classify(*table(refit=.41))['verdict'] == 'decoder'  # exactly +10 pp over the deployed baseline .31
-    assert rfx.classify(*table(refit=.40))['verdict'] == 'none'
-    assert rfx.classify(*table())['verdict'] == 'none'
-    assert rfx.classify(*table(delta__true__fit=dict(err=.2, lm_em=.4)))['verdict'] == 'none'  # error rescue without EM
+    # An error rescue without the EM gain does not rescue any cell, for any query.
+    for cell in DECISIVE.values():
+        assert rfx.classify(*table(**{cell.replace('/', '__'): dict(err=.2, lm_em=.4, lm_em_entity=.9)}))['verdict'] == 'none'
+    # The rescue test uses the full-vocabulary EM, never the entity-restricted one.
+    assert rfx.classify(*table(delta__unit__fit=dict(err=.1, lm_em=.30, lm_em_entity=.99)))['verdict'] == 'none'
 
 
-def test_only_storage_verdicts_of_the_R_checkpoints_trigger_lsq():
-    assert rfx.lsq_ranks({'R-r128': 'storage', 'R-r32': 'none', 'W5-r32': 'storage'}) == [128]
-    assert rfx.lsq_ranks({'R-r128': 'storage', 'R-r32': 'storage', 'W5-r32': 'none'}) == [32, 128]
-    assert rfx.lsq_ranks({'R-r128': 'query', 'R-r32': 'decoder', 'W5-r32': 'storage'}) == []
-    assert rfx.lsq_ranks({}) == [] and rfx.lsq_ranks({'R-r32': 'storage'}) == [32]
+def test_the_refit_decoder_is_compared_with_the_entity_restricted_baseline_em():
+    # Baseline: entity-restricted EM .40 (better of as-is .38 and fitted .40), full-vocabulary EM .31.
+    assert rfx.classify(*table(refit=.51))['verdict'] == 'decoder'
+    assert rfx.classify(*table(refit=.50))['verdict'] == 'decoder'  # exactly +10 pp (floating-point tolerance)
+    assert rfx.classify(*table(refit=.49))['verdict'] == 'none'
+    assert rfx.classify(*table(refit=.41))['verdict'] == 'none'  # +10 pp over the full-vocabulary .31 would have counted
+    cells, refit = table(refit=.52)
+    cells['delta/raw/asis'] = dict(err=.8, lm_em=.30, lm_em_entity=.45)  # the as-is entity EM is the better baseline
+    assert rfx.classify(cells, refit)['verdict'] == 'none' and rfx.classify(cells, refit)['baseline']['lm_em_entity'] == .45
+    refit['delta/raw'] = dict(acc=.55)
+    assert rfx.classify(cells, refit)['verdict'] == 'decoder'
+    # Only the decoder on the deployed raw read counts.
+    other = {cell: dict(acc=.99) for cell in rfx.REFIT_CELLS if cell != 'delta/raw'}
+    assert rfx.classify(table()[0], {**other, 'delta/raw': dict(acc=.30)})['verdict'] == 'none'
+
+
+LABEL_VERDICTS = ('storage', 'normalization', 'query', 'store+query', 'decoder', 'none')
+
+
+def test_lsq_arms_follow_the_R_verdicts_in_candidate_order():
+    def verdicts(r128, r32, w5='none'):
+        return {'R-r128': r128, 'R-r32': r32, 'W5-r32': w5}
+
+    assert rfx.lsq_arms(verdicts('storage', 'none')) == ['L128-K4', 'L128-RG']
+    assert rfx.lsq_arms(verdicts('none', 'storage')) == ['L32-K4', 'L32-RG']
+    assert rfx.lsq_arms(verdicts('storage', 'storage')) == ['L32-K4', 'L32-RG', 'L128-K4', 'L128-RG']
+    assert rfx.lsq_arms(verdicts('normalization', 'none')) == ['L128-U']
+    assert rfx.lsq_arms(verdicts('none', 'normalization')) == ['L32-U']
+    assert rfx.lsq_arms(verdicts('normalization', 'normalization')) == ['L32-U', 'L128-U']
+    assert rfx.lsq_arms(verdicts('normalization', 'storage')) == ['L32-K4', 'L32-RG', 'L128-U']
+    assert rfx.lsq_arms(verdicts('storage', 'normalization')) == ['L32-U', 'L128-K4', 'L128-RG']
+    for other in ('query', 'store+query', 'decoder', 'none'):
+        assert rfx.lsq_arms(verdicts(other, other)) == []
+    # W5-r32 triggers nothing, and a missing checkpoint triggers nothing.
+    assert rfx.lsq_arms(verdicts('none', 'none', 'storage')) == [] == rfx.lsq_arms(verdicts('none', 'none', 'normalization'))
+    assert rfx.lsq_arms({}) == [] and rfx.lsq_arms({'R-r32': 'storage'}) == ['L32-K4', 'L32-RG']
+    # Candidate order is LSQ's, and per rank U never comes with K4 or RG (the arm sets check_arms accepts).
+    for r128, r32 in itertools.product(LABEL_VERDICTS, repeat=2):
+        arms = rfx.lsq_arms(verdicts(r128, r32))
+        assert arms == [a for a in lsq.ARMS if a in arms]
+        if arms:
+            assert lsq.check_arms(arms) == arms
+    assert rfx.storage_ranks(verdicts('storage', 'none', 'storage')) == [128]
+    assert rfx.storage_ranks(verdicts('storage', 'storage')) == [32, 128]
+    assert rfx.storage_ranks(verdicts('normalization', 'query', 'storage')) == []
+    assert rfx.storage_ranks({}) == []
+
+
+def test_entity_hits_restrict_the_argmax_to_the_entity_name_tokens():
+    entity_ids = torch.tensor([7, 3, 11, 5])  # entity i has the name token entity_ids[i]
+    logits = torch.zeros(4, 1, 16)
+    logits[0, 0, 9], logits[0, 0, 11], logits[0, 0, 3] = 5., 2., 1.  # a non-entity token is largest; entity 2 leads the rest
+    logits[1, 0, 5], logits[1, 0, 7] = 3., 2.  # the largest logit is the answer's entity token (entity 3)
+    logits[2, 0, 7], logits[2, 0, 3] = 4., 3.9  # the wrong entity (0) wins; the answer is entity 1
+    logits[3, 0, 0], logits[3, 0, 3] = 9., 1.  # a non-entity token is largest; entity 1 is the only positive entity logit
+    answers = torch.tensor([[2], [3], [1], [1]])
+    hits = rfx.entity_hits(logits, entity_ids, answers)
+    assert hits.shape == (4, 1) and hits.tolist() == [[True], [True], [False], [True]]
+    assert (logits.argmax(-1) == entity_ids[answers]).tolist() == [[False], [True], [False], [False]]  # full vocabulary
+    # Without ties, a full-vocabulary hit is always an entity-restricted hit.
+    g = torch.Generator().manual_seed(derive_seed(17, 'rfx-test', 'entity-hits'))
+    logits = torch.randn(64, 3, 40, generator=g)
+    ids = torch.randperm(40, generator=g)[:25]
+    for answer_entity in (torch.randint(0, 25, (64, 3), generator=g), logits.index_select(-1, ids).argmax(-1)):
+        full = logits.argmax(-1) == ids[answer_entity]
+        assert (rfx.entity_hits(logits, ids, answer_entity) | ~full).all()
 
 
 def test_registered_data_ranges_and_seeds_are_new_and_disjoint_from_training():

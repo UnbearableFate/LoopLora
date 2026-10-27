@@ -363,6 +363,33 @@ def test_unit_query_normalizes_the_read_address_and_default_keeps_the_raw_tensor
     assert not torch.allclose(read(a['ridge']), read(a['delta']))
 
 
+def test_unit_query_alone_is_the_delta_store_with_a_normalized_read():
+    # Arm U of the LSQ study: the deployed delta store (learned lambda and beta, no new parameter) read with the unit query.
+    def build(**extra):
+        torch.manual_seed(derive_seed(17, 'lsq-arm-u'))
+        return make_adapter(AdapterConfig(d_in=7, d_out=5, r=4, variant='iterq', **extra))
+
+    plain, unit = build(), build(unit_query=True)
+    assert (unit.cfg.store, unit.cfg.unit_query) == ('delta', True)
+    assert [n for n, _ in plain.named_parameters()] == [n for n, _ in unit.named_parameters()]
+    assert all(torch.equal(a, b) for a, b in zip(plain.parameters(), unit.parameters()))
+    g = torch.Generator().manual_seed(derive_seed(17, 'lsq-arm-u-data'))
+    u, state0 = torch.randn(3, 9, 4, generator=g), torch.randn(3, 4, 4, generator=g) * .1
+    valid, write = torch.rand(3, 9, generator=g) > .2, torch.rand(3, 9, generator=g) > .3
+    assert torch.equal(unit.scan_final(state0, u, valid, write, None), plain.scan_final(state0, u, valid, write, None))
+    for a, b in zip(unit.scan_prewrite(state0, u, valid, write, None), plain.scan_prewrite(state0, u, valid, write, None)):
+        assert torch.equal(a, b)
+    assert torch.equal(unit.write(state0, u[:, 0], write[:, 0]), plain.write(state0, u[:, 0], write[:, 0]))
+    z = torch.randn(3, 4, generator=g)
+    state = torch.randn(3, 4, 4, generator=g)
+    assert torch.equal(unit._query(z, state, unit.Q, unit.U), F.linear(torch.matmul(
+        state, F.normalize(F.linear(z, unit.Q), dim=-1, eps=unit.cfg.eps).unsqueeze(-1)).squeeze(-1), unit.U))
+    assert not torch.allclose(unit._query(z, state, unit.Q, unit.U), plain._query(z, state, plain.Q, plain.U))
+    raw = torch.randn(3, 4, generator=g) * 3.
+    assert plain.query_code(raw) is raw
+    torch.testing.assert_close(unit.query_code(raw).norm(dim=-1), torch.ones(3), rtol=0, atol=1e-6)
+
+
 def frozen_memory():
     spec = importlib.util.spec_from_file_location(
         'memory_before_dpfp', Path(__file__).parent / 'assets' / 'memory_before_dpfp.py')
