@@ -119,3 +119,23 @@ over the same-rank B4 is ≥ 3 pp (CI > 0).
   cannot be split further.
 - **Locks.** The orchestrator commits each design lock on wp/sym, the branch whose worktree holds the lock files,
   after checking it against this text. sn-sym stops after each lock stage and reports the file path.
+
+## Clarification C1 (2026-10-27 14:24 JST, before any TSM lock, smoke or run; from sn-sym's step-1b questions)
+These rules fill gaps in the failure rules above. They change no endpoint, threshold or decision rule.
+- **Three failed attempts.** A run whose three attempts all end in infrastructure failures pauses the study; no further
+  TSM job is submitted. The orchestrator diagnoses the cause. A remedy that changes no registered quantity (walltime,
+  job split, concurrency, node, I/O path) permits further identical attempts, and each is reported. Anything else needs
+  an amendment before the confirmation set is opened.
+- **Non-finite gradient norm.** A non-finite gradient norm with a finite loss is a numerical failure, treated as a
+  non-finite loss. It is a property of the training dynamics, and an identical rerun reproduces it.
+- **Other early ends.**
+  - CUDA out-of-memory and I/O errors are infrastructure failures. The remedy may lower the number of concurrent runs
+    per job.
+  - Any other exception is a code defect. The study stops. Because every TSM run must use one code version, the fixed
+    code retrains every TSM run, before the confirmation set is opened.
+- **Interrupted evaluation.** An `evaluate` job that ends before it completes is restarted from scratch with identical
+  inputs, at most twice. Its partial outputs are moved aside unread.
+- **One code version.** "T0 retrained under the same code version" means one `source_hash` across all 18 runs, and
+  every TSM training and evaluation job runs at one CODE commit. Smoke runs are exempt and never analysed.
+- **After a T0 failure.** TSM jobs that are already running may finish, and their outputs are kept. No new TSM job is
+  submitted until the orchestrator decides.
