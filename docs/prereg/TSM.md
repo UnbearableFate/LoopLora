@@ -177,3 +177,14 @@ These rules refine C1 and C2. They change no endpoint, threshold or decision rul
     path is `train`, `train-one` and everything they call, including shared helpers.
   - The check cannot be file level because evaluation and training share files (`scripts/run_tsm.py`,
     `src/looplora/sym/tsm.py`); a file-level check could never pass.
+
+## Clarification C4 (2026-10-27 18:32 JST, before any TSM lock, smoke or run; from the second static review)
+These rules refine C2 and C3. They change no endpoint, threshold or decision rule.
+- **Checkpoint I/O (C3).** C3's I/O rule covers every error that torch's checkpoint writer or reader raises because a
+  file cannot be created, opened, written or read. The texts quoted in C3 are examples. Two more are
+  "File <path> cannot be opened." and "Parent directory <dir> does not exist.". The same condition hit through
+  Python's `open` is an `OSError`, so both routes now give one classification. C3's bounded exposure applies.
+- **Evaluation-code defect before the first evaluation manifest (C2).** A defect can end `evaluate` before its first
+  `manifest.json` exists. This is handled as C2's evaluation-code defect: the orchestrator records its decision,
+  including C3's code-level check, and the first evaluation attempt then runs at the fixed commit. Both code hashes are
+  recorded.
