@@ -153,6 +153,19 @@ depth routing, including a variant that reuses first-recursion KV for later quer
 Consequently fixed context alone is not a unique distinction. Our specified compact
 delta state, low-dimensional reader, and separate write schedule define the comparison.
 
+Degradation from extra iterations is a known failure of recurrent depth, separate from this
+adapter. [Bansal et al.](https://arxiv.org/abs/2202.05826) report that recurrent networks can
+lose accuracy when iterated beyond their training depth ("overthinking"), and reduce it with a
+recall path that reinjects the input together with progressive training. The reader's
+reinjected u is analogous to a recall path, and no progressive or stay objective is trained
+here. [Think-at-Hard](https://arxiv.org/abs/2511.08577) reports that extra loop iterations can
+turn correct tokens into errors in looped language models, and
+[Kohli et al.](https://arxiv.org/abs/2604.07822) report that recurrent-depth transformers can
+compose knowledge, need more recurrence for deeper compositions, and overthink under excessive
+recurrence. We therefore read the loss of short-hop accuracy at larger L (Sections 5.1 and 7)
+as an instance of a known failure in a new setting, not as a defect specific to this reader,
+and we do not test the remedies those works propose. <!-- S7 --><!-- JS1 -->
+
 [STARS](https://arxiv.org/html/2605.26733v1) already combines sampled depth with
 Jacobian-vector regularization of looped dynamics. Its practical sampled-state proxy
 is not a certified spectral radius or global contraction constant.
@@ -161,6 +174,79 @@ recursive full-sequence answer/scratchpad updates and ACT halting. These precede
 narrow any claim about reinjection, frozen-backbone latent recurrence, or stabilization.
 They motivate the [JS protocol](../prereg/JS.md); its separate adapter results are
 reported in Section 7.
+
+### Multi-hop composition, regression memories, and retrieval in weights
+
+The works in this subsection were added after two external literature reviews
+([rv-fable](../review/rv-fable_2026-10-27.md) and [rv-astra](../review/rv-astra_2026-10-27.md))
+opened their primary pages. We cite only what their abstracts and the review notes support,
+re-read no full text for this manuscript, and draw no priority claim from them.
+
+Latent multi-hop composition in language models has a substantial literature.
+[Yang et al. (2024)](https://arxiv.org/abs/2402.16837) look for and intervene on the bridge
+entity of two-hop queries, and [Yang et al. (2025)](https://arxiv.org/abs/2411.16679) remove
+shortcuts and find relation-dependent composition.
+[Balesni et al.](https://arxiv.org/abs/2411.16353) report both failures and successes of
+latent two-hop reasoning across synthetic and natural settings.
+[Biran et al.](https://arxiv.org/abs/2406.12775) report that the bridge is resolved early and
+the second hop starts too late in the layer stack,
+[Yu et al.](https://arxiv.org/abs/2502.10835) let early layers read later-layer states, and
+[Liu et al.](https://arxiv.org/abs/2601.03542) report that later-hop answers can be decodable
+before the bridge. [Guo et al.](https://arxiv.org/abs/2502.13913) find in-context two-hop
+reasoning with distractors near guessing before fine-tuning. For out-of-distribution
+composition, [Zhang et al.](https://arxiv.org/abs/2608.07261) report failure when upper layers
+map facts to outputs instead of reasoning, and that recurrent-style training that reuses
+circuitry helped there; [Lin et al.](https://arxiv.org/abs/2509.24653) report that identity
+supervision on bridges enables unseen compositions, and
+[Wang et al.](https://arxiv.org/abs/2405.15071) that composition does not generalize out of
+distribution without grokking. Our setting differs: facts reach the reader only through a
+fixed-size adapter memory, and hops are spent in a reader loop rather than in layer depth.
+These studies therefore bound what we may claim without predicting our results. In particular,
+Zhang et al. make it unsafe to read B8's in-distribution advantage over the shared reader
+(Section 6) as evidence for the unshared design, because that advantage is measured on trained
+hops and names; and the paper reports no test of composition over unseen names.
+<!-- B3 --><!-- B6 -->
+
+Associative memory can also be viewed as regression at test time.
+[Wang et al.](https://arxiv.org/abs/2501.12352) treat a delta-rule write as one gradient step
+on a recall loss, with least squares as the exact minimizer.
+[Yang et al.](https://arxiv.org/abs/2406.06484) parallelize delta-rule linear transformers over
+sequence length, and [Titans](https://arxiv.org/abs/2501.00663),
+[ATLAS](https://arxiv.org/abs/2505.23735), and [TTT layers](https://arxiv.org/abs/2407.04620)
+train the memory itself at test time, ATLAS over a window of past tokens rather than only the
+latest one. Our writer is the one-step delta update, which need not reach the regression
+solution when keys are correlated (cf. Proposition 11). Whether that gap contributes to the
+deployed-read distortion in Section 8.3 is untested, because the audit identifies no unique
+cause, and we study none of these alternative writers. <!-- LL7 --><!-- LL9 -->
+
+Slot and lookup memories give each stored item its own address.
+[End-to-end memory networks](https://arxiv.org/abs/1503.08895) learn several memory hops over
+stored items, and [key–value memory networks](https://aclanthology.org/D16-1147/) separate the
+addressing representation from the returned one, so multi-hop reading of a memory and
+key–value separation are long established and we claim neither.
+[Hopfield networks](https://arxiv.org/abs/2008.02217) retrieve stored patterns in a single
+softmax step, [memory layers](https://arxiv.org/abs/2412.09764) scale trainable key–value
+lookup inside language models, and [Memory Mosaics](https://arxiv.org/abs/2405.06394) compose
+networks of associative memories. Their state grows with the number of stored items, whereas
+the reader here uses a fixed-size delta-rule state in which facts superpose. No slot-memory
+baseline is run, and no result here bears on how a slot memory would behave.
+
+Facts can also live in, or be written into, parameters.
+[Geva et al.](https://arxiv.org/abs/2012.14913) interpret feed-forward layers as key–value
+memories; [ROME](https://arxiv.org/abs/2202.05262) edits a factual association with a
+rank-one update and [MEMIT](https://arxiv.org/abs/2210.07229) scales such edits to many facts,
+a linear associative write into persistent weights rather than into a resettable per-episode
+state. [Larimar](https://arxiv.org/abs/2403.11901) attaches an episodic memory with one-shot
+writes to a language model; [Cartridges](https://arxiv.org/abs/2506.06266) and
+[StreamAdapter](https://arxiv.org/abs/2411.09289) compress a context into a trained
+key–value cache and a parameter update, respectively, Cartridges by training on each context,
+whereas the writers studied here are single-pass delta updates. Three 2026 reports on
+memories for frozen language models locate the bottleneck in reading or extraction rather
+than in storage ([Frozen Memory Is Not Enough](https://arxiv.org/abs/2608.17050),
+[Prometheus Mind](https://arxiv.org/abs/2601.15324), and a workshop paper on
+[a hidden-state memory layer](https://neurips.cc/virtual/2026/170472)). That is compatible
+with, but does not confirm, the read-distortion measurements of Section 8.3, whose cause the
+audit leaves unidentified. <!-- LL7 --><!-- LL9 -->
 
 ### Verbalizable directions and the readout boundary
 
@@ -1206,6 +1292,42 @@ than populated from unmerged or provisional results.
 - Bae et al., [*Relaxed Recursive Transformers: Effective Parameter Sharing with Layer-wise LoRA*](https://arxiv.org/html/2410.20672v3).
 - Bae et al., [*Mixture-of-Recursions: Learning Dynamic Recursive Depths for Adaptive Token-Level Computation*](https://arxiv.org/html/2507.10524v3).
 - Hao et al., [*Training Large Language Models to Reason in a Continuous Latent Space*](https://arxiv.org/html/2412.06769v4).
+
+Added after the external reviews (primary pages opened by the reviewers; venues were not
+re-checked and are omitted):
+
+- Bansal et al., [*End-to-end Algorithm Synthesis with Recurrent Networks: Logical Extrapolation Without Overthinking*](https://arxiv.org/abs/2202.05826).
+- Fu et al., [*Think-at-Hard: Dynamic Looped Transformers for Improved Reasoning*](https://arxiv.org/abs/2511.08577).
+- Kohli et al., [*Loop, Think, & Generalize: Implicit Reasoning in Recurrent-Depth Transformers*](https://arxiv.org/abs/2604.07822).
+- Yang et al., [*Do Large Language Models Latently Perform Multi-Hop Reasoning?*](https://arxiv.org/abs/2402.16837).
+- Yang et al., [*Do Large Language Models Perform Latent Multi-Hop Reasoning without Exploiting Shortcuts?*](https://arxiv.org/abs/2411.16679).
+- Balesni, Korbak, and Evans, [*Lessons from Studying Two-Hop Latent Reasoning*](https://arxiv.org/abs/2411.16353).
+- Biran et al., [*Hopping Too Late: Exploring the Limitations of Large Language Models on Multi-Hop Queries*](https://arxiv.org/abs/2406.12775).
+- Yu, Belinkov, and Ananiadou, [*Back Attention: Understanding and Enhancing Multi-Hop Reasoning in Large Language Models*](https://arxiv.org/abs/2502.10835).
+- Liu et al., [*Layer-Order Inversion: Rethinking Latent Multi-Hop Reasoning in Large Language Models*](https://arxiv.org/abs/2601.03542).
+- Guo et al., [*How Do LLMs Perform Two-Hop Reasoning in Context?*](https://arxiv.org/abs/2502.13913).
+- Zhang et al., [*Why Knowing Both Hops Is Not Enough: Understanding Two-Hop Generalization in Language Models*](https://arxiv.org/abs/2608.07261).
+- Lin, Chen, and Xu, [*Unveiling the Mechanisms of Multi-Hop Reasoning in Transformers via Identity Bridge*](https://arxiv.org/abs/2509.24653).
+- Wang et al., [*Grokked Transformers are Implicit Reasoners: A Mechanistic Journey to the Edge of Generalization*](https://arxiv.org/abs/2405.15071).
+- Wang, Shi, and Fox, [*Test-time regression: a unifying framework for designing sequence models with associative memory*](https://arxiv.org/abs/2501.12352).
+- Yang et al., [*Parallelizing Linear Transformers with the Delta Rule over Sequence Length*](https://arxiv.org/abs/2406.06484).
+- Behrouz, Zhong, and Mirrokni, [*Titans: Learning to Memorize at Test Time*](https://arxiv.org/abs/2501.00663).
+- Behrouz et al., [*ATLAS: Learning to Optimally Memorize the Context at Test Time*](https://arxiv.org/abs/2505.23735).
+- Sun et al., [*Learning to (Learn at Test Time): RNNs with Expressive Hidden States*](https://arxiv.org/abs/2407.04620).
+- Sukhbaatar et al., [*End-To-End Memory Networks*](https://arxiv.org/abs/1503.08895).
+- Miller et al., [*Key-Value Memory Networks for Directly Reading Documents*](https://aclanthology.org/D16-1147/).
+- Ramsauer et al., [*Hopfield Networks is All You Need*](https://arxiv.org/abs/2008.02217).
+- Berges et al., [*Memory Layers at Scale*](https://arxiv.org/abs/2412.09764).
+- Zhang et al., [*Memory Mosaics*](https://arxiv.org/abs/2405.06394).
+- Geva et al., [*Transformer Feed-Forward Layers Are Key-Value Memories*](https://arxiv.org/abs/2012.14913).
+- Meng et al., [*Locating and Editing Factual Associations in GPT*](https://arxiv.org/abs/2202.05262).
+- Meng et al., [*Mass-Editing Memory in a Transformer*](https://arxiv.org/abs/2210.07229).
+- Das et al., [*Larimar: Large Language Models with Episodic Memory Control*](https://arxiv.org/abs/2403.11901).
+- Eyuboglu et al., [*Cartridges: Lightweight and general-purpose long context representations via self-study*](https://arxiv.org/abs/2506.06266).
+- Muhtar et al., [*StreamAdapter: Efficient Test Time Adaptation from Contextual Streams*](https://arxiv.org/abs/2411.09289).
+- Li et al., [*Frozen Memory Is Not Enough: Rethinking External Memory as Extraction*](https://arxiv.org/abs/2608.17050).
+- Wind, [*Prometheus Mind: Retrofitting Memory to Frozen Language Models*](https://arxiv.org/abs/2601.15324).
+- Zhouguoding, [*DHM: A Differentiable Hippocampal Memory Layer for Continual Knowledge Injection into Frozen Language Models*](https://neurips.cc/virtual/2026/170472) (workshop paper).
 - Project source records: [dated literature audit](../reports/lit_check.md),
   [symbolic evidence ledger](evidence_symbolic.md), [LLM evidence ledger](evidence_llm.md), [binding notation](../notation.md),
   and [full theory](../theory.md). The unresolved RecLoRA comparison remains a TODO.
