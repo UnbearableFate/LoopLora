@@ -1,6 +1,6 @@
 # Study RFX — read-failure factorial on the frozen WP-L4 checkpoints (WP-L7, F2 of the follow-up plan), pre-registered
 
-Registered 2026-10-27 11:10 JST by the orchestrator, before any RFX run (smoke included), any RFX or LSQ result and any
+Registered 2026-10-27 11:05 JST by the orchestrator, before any RFX run (smoke included), any RFX or LSQ result and any
 DPFP result. Drafted 09:56 JST by sn-llm (WP-L7 step 1, no compute). The orchestrator changed the decision rule at
 registration (section "Decisions at registration"): the plan's rule (`plan/followup_2026-10-27.md` §3 F2) did not
 cover a rescue by query normalization alone, and its "query" verdict would also have fired on the near-exact
