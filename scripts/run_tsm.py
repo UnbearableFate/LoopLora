@@ -9,9 +9,18 @@ Stages (each its own job; scripts/submit.py in a Miyabi-G allocation):
             then evaluate on validation episodes (seed 4242): timings, memory, gate profile; no confirmation data;
   train     train registered runs (T0 with the unchanged ``train()``, T1/T2 with ``tsm.train_arm``) in ``--procs``
             concurrent child processes; needs the committed design; several jobs may share one root;
+            a run that is already complete or a registered training failure is left as it is;
   evaluate  evaluate T0, T1, T2 and the B4 references on the new confirmation episodes (split test, seed 999007).
 
-A run that stops with a non-finite loss is recorded as failed and reported; nothing is retried or re-tuned.
+Training failures (docs/prereg/TSM.md, "Decisions at registration"):
+
+* a non-finite loss in a T1 or T2 run is a registered training failure: no retry, no re-tuning; that arm fails for
+  that writer, its completed runs are evaluated and reported descriptively, the other arms are evaluated as registered;
+* a non-finite loss in a T0 run stops the study before the confirmation set is opened: ``train`` refuses to start
+  anything else and ``evaluate`` refuses to run;
+* any other end before completion (walltime, a node or I/O fault) is an infrastructure failure: the run is trained
+  again with the identical configuration and code (``train --rerun-incomplete`` once its job has ended), at most twice;
+* ``evaluate`` needs every T0 run complete and every T1/T2 run complete or a registered training failure.
 """
 from __future__ import annotations
 
@@ -53,6 +62,7 @@ DECISION = dict(stay_tolerance=tsm.STAY_TOLERANCE, far_tolerance=tsm.FAR_TOLERAN
 SOURCE = Path(__file__).resolve().parents[1] / "src"
 WALLTIME_MARGIN = 1.5
 POLL_SECONDS = 1.0
+MAX_ATTEMPTS = 3  # a run and at most two identical reruns after an infrastructure failure (registered)
 
 
 def settings() -> dict:
@@ -147,10 +157,112 @@ def runtime_metadata(device: str) -> dict:
                 gpu=torch.cuda.get_device_name(device) if cuda else None, device=device, threads=1)
 
 
+def is_numerical_failure(failure: object) -> bool:
+    """True for the failure text of a run that stopped with a non-finite loss (or gradient norm).
+
+    ``train`` and ``tsm.fit_tsm`` raise ``FloatingPointError`` for a non-finite loss, and clipping the gradient with
+    ``error_if_nonfinite`` raises a ``RuntimeError`` that says "non-finite". An identical rerun would reproduce either.
+    """
+    kind, _, message = str(failure).partition(": ")
+    return kind == "FloatingPointError" or "non-finite" in message
+
+
+def read_record(root: Path, name: str) -> dict | None:
+    """The run's ``record.json``; None when it is absent or was cut off while it was being written."""
+    try:
+        record = json.loads((root / "runs" / name / "record.json").read_text())
+    except (FileNotFoundError, ValueError):
+        return None
+    return record if isinstance(record, dict) else None
+
+
+def run_state(root: Path, name: str) -> str:
+    """``missing`` (no run directory), ``complete``, ``training_failure`` (stopped with a non-finite loss) or
+    ``incomplete`` (still running, ended before completion, or failed for any other reason)."""
+    if not (root / "runs" / name).is_dir():
+        return "missing"
+    record = read_record(root, name)
+    if record is None:
+        return "incomplete"
+    if record.get("status") == "complete":
+        return "complete"
+    if record.get("status") == "failed" and is_numerical_failure(record.get("failure", "")):
+        return "training_failure"
+    return "incomplete"
+
+
+def failure_row(root: Path, name: str) -> dict:
+    """The entry of a registered training failure in the manifests and the analysis."""
+    record = read_record(root, name)
+    return dict(name=name, writer=record["writer"], arm=record["arm"], seed=record["seed"],
+                attempt=record.get("attempt"), failure=record["failure"])
+
+
+def t0_failures(root: Path) -> list[str]:
+    """T0 runs that stopped with a non-finite loss: with one of them 'far' has no reference and the study stops."""
+    return [row["name"] for row in planned_runs()
+            if row["arm"] == "T0" and run_state(root, row["name"]) == "training_failure"]
+
+
+def study_stops(name: str) -> str:
+    return (f"T0 run {name} stopped with a non-finite loss: the study stops before the confirmation set is opened "
+            "(docs/prereg/TSM.md); report it to the orchestrator, any continuation needs an explicit amendment")
+
+
+def moved_attempts(root: Path, name: str) -> list[Path]:
+    """Earlier, unfinished attempts of ``name`` that were moved to ``root/attempts``."""
+    folder = root / "attempts"
+    return sorted(path for path in folder.glob(f"{name}-attempt*") if path.is_dir()) if folder.is_dir() else []
+
+
+def check_rerun(root: Path, name: str, *, config_hash: str, source: dict) -> None:
+    """Refuse a rerun of an unfinished run that is not identical to it, or that exceeds the attempts allowed.
+
+    Identical means the configuration (hence the seeds and the data stream) and the code (``source_hash``) of the
+    unfinished attempt; ``MAX_ATTEMPTS`` attempts are allowed in all (the first run and two reruns).
+    """
+    number = len(moved_attempts(root, name)) + 1  # the attempt that is unfinished
+    require(number < MAX_ATTEMPTS, f"run {name} has used {number} of {MAX_ATTEMPTS} attempts: the registered rule "
+            "allows two identical reruns; report it to the orchestrator")
+    record = read_record(root, name)
+    if record is not None:  # a record exists once the run had started; the rerun must not differ from it
+        require(record.get("config_hash") == config_hash,
+                f"run {name}: the configuration differs from the unfinished attempt; a rerun must be identical")
+        require(record.get("source", {}).get("source_hash") == source["source_hash"],
+                f"run {name}: the code differs from the unfinished attempt; a rerun must use identical code "
+                "(submit it at the same --commit)")
+
+
+def move_aside(root: Path, name: str) -> Path:
+    """Move an unfinished run (its directory and log) to ``root/attempts``; the run can then be trained again."""
+    target = root / "attempts" / f"{name}-attempt{len(moved_attempts(root, name)) + 1}"
+    target.parent.mkdir(parents=True, exist_ok=True)
+    (root / "runs" / name).rename(target)
+    log = root / "logs" / f"{name}.log"
+    if log.is_file():
+        log.rename(target.with_name(target.name + ".log"))
+    return target
+
+
+def retire_stale_log(root: Path, name: str) -> None:
+    """A child that died before it created its run directory leaves only its log: keep it, out of the way.
+
+    Nothing was trained, so this is not an attempt (``moved_attempts`` does not count it).
+    """
+    log = root / "logs" / f"{name}.log"
+    if log.is_file():
+        folder = root / "attempts"
+        folder.mkdir(parents=True, exist_ok=True)
+        log.rename(folder / f"{name}-notstarted{len(list(folder.glob(f'{name}-notstarted*.log'))) + 1}.log")
+
+
 def train_one(design: dict, root: Path, name: str, *, device: str, steps: int | None = None) -> dict:
-    """Train one registered run into ``root/runs/<name>``; the record holds its status and seals."""
+    """Train one registered run into ``root/runs/<name>``; the record holds its status, attempt and seals."""
     run = next(row for row in planned_runs() if row["name"] == name)
     config = make_config(design, run["writer"], run["seed"], run["arm"], device=device, steps=steps)
+    attempt = len(moved_attempts(root, name)) + 1
+    require(attempt <= MAX_ATTEMPTS, f"run {name} has used its {MAX_ATTEMPTS} attempts")
+    source = source_metadata()
     out = root / "runs" / name
     out.mkdir(parents=True, exist_ok=False)
     write_json(out / "config.json", dict(config=config, config_hash=stable_hash(config)))
@@ -159,8 +271,8 @@ def train_one(design: dict, root: Path, name: str, *, device: str, steps: int | 
     if cuda:
         torch.cuda.set_device(torch.device(device))
         torch.cuda.reset_peak_memory_stats()
-    record = dict(run, status="running", config_hash=stable_hash(config), started_at=now(),
-                  runtime=runtime_metadata(device), steps=config["train"]["steps"])
+    record = dict(run, status="running", attempt=attempt, config_hash=stable_hash(config), started_at=now(),
+                  runtime=runtime_metadata(device), source=source, steps=config["train"]["steps"])
     write_json(out / "record.json", record)
     started = time.perf_counter()
     try:
@@ -207,10 +319,15 @@ def start_child(name: str, design_path: Path, root: Path, *, device: str, steps:
 
 
 def schedule(names: list[str], procs: int, design_path: Path, root: Path, *, device: str,
-             steps: int | None = None) -> None:
-    """Run ``names`` with at most ``procs`` concurrent children; the first failure stops everything."""
+             steps: int | None = None, fatal=None) -> dict[str, int]:
+    """Run ``names`` with at most ``procs`` concurrent children; returns each child's exit code.
+
+    By default the first child that exits non-zero stops everything (``ValueError``). With ``fatal``, a function
+    of the run name that is called after a non-zero exit, only a failure for which it returns true stops everything;
+    the other children go on and the caller reads their records.
+    """
     require(procs >= 1, "procs must be positive")
-    pending, running = list(names), {}
+    pending, running, codes = list(names), {}, {}
     try:
         while pending or running:
             for name, child in list(running.items()):
@@ -218,7 +335,9 @@ def schedule(names: list[str], procs: int, design_path: Path, root: Path, *, dev
                 if code is not None:
                     child.stop()
                     del running[name]
-                    require(code == 0, f"run {name} exited {code}; see {root / 'logs' / (name + '.log')}")
+                    codes[name] = code
+                    require(code == 0 or (fatal is not None and not fatal(name)),
+                            f"run {name} exited {code}; see {root / 'logs' / (name + '.log')}")
             while pending and len(running) < procs:
                 name = pending.pop(0)
                 running[name] = start_child(name, design_path, root, device=device, steps=steps)
@@ -227,6 +346,7 @@ def schedule(names: list[str], procs: int, design_path: Path, root: Path, *, dev
     finally:
         for child in running.values():
             child.stop()
+    return codes
 
 
 def evaluation_arrays(design: dict, writer: str, evaluation: dict, device: str):
@@ -238,18 +358,20 @@ def evaluation_arrays(design: dict, writer: str, evaluation: dict, device: str):
 
 
 def evaluate_runs(design: dict, root: Path, *, writers, seeds, evaluation: dict, device: str,
-                  out: Path | None) -> tuple[dict, list[dict], dict]:
+                  out: Path | None, skip=()) -> tuple[dict, list[dict], dict]:
     """Samples of T0/T1/T2 and the B4 references for the given writers and seeds.
 
     Returns (samples by name, evaluation rows, gate profiles by run name). With ``out`` set, the samples
-    are also saved to ``out/<name>.npz`` and their blake2b seals added to the rows.
+    are also saved to ``out/<name>.npz`` and their blake2b seals added to the rows. ``skip`` names the registered
+    training failures: they have no checkpoint and are not evaluated.
     """
     samples, rows, profiles = {}, [], {}
     depths = list(design["evaluation"]["depths"])
     for writer in writers:
         arrays = evaluation_arrays(design, writer, evaluation, device)
         for seed in seeds:
-            jobs = [(run_name(writer, arm, seed), arm, None) for arm in tsm.ARMS]
+            jobs = [(run_name(writer, arm, seed), arm, None) for arm in tsm.ARMS
+                    if run_name(writer, arm, seed) not in skip]
             jobs.append((reference_name(writer, seed), "B4",
                          next(r for r in design["references"] if r["writer"] == writer and r["seed"] == seed)))
             for name, arm, reference in jobs:
@@ -285,11 +407,36 @@ def evaluate_runs(design: dict, root: Path, *, writers, seeds, evaluation: dict,
     return samples, rows, profiles
 
 
-def group_samples(samples: dict, writer: str, arm: str) -> dict:
-    """The mapping ``tsm.arm_endpoints`` expects: T0, the arm and B4 by training seed."""
-    return {"T0": {s: samples[run_name(writer, "T0", s)] for s in SEEDS},
-            arm: {s: samples[run_name(writer, arm, s)] for s in SEEDS},
-            "B4": {s: samples[reference_name(writer, s)] for s in SEEDS}}
+def group_samples(samples: dict, writer: str, arm: str, seeds=SEEDS) -> dict:
+    """The mapping ``tsm.arm_endpoints`` expects: T0, the arm and B4 by training seed.
+
+    ``seeds`` are the training seeds the arm completed; T0 and B4 are restricted to the same seeds.
+    """
+    return {"T0": {s: samples[run_name(writer, "T0", s)] for s in seeds},
+            arm: {s: samples[run_name(writer, arm, s)] for s in seeds},
+            "B4": {s: samples[reference_name(writer, s)] for s in seeds}}
+
+
+def final_states(design: dict, root: Path) -> dict[str, str]:
+    """State of every registered run for the evaluation: ``complete``, or ``training_failure`` (T1/T2 only).
+
+    Every T0 run must be complete (a T0 failure stops the study: ``far`` has no reference) and every T1/T2 run must
+    be complete or a registered training failure; every record must belong to the registered configuration.
+    Anything else is refused, and this runs before the confirmation set is opened.
+    """
+    states = {}
+    for row in planned_runs():
+        name, state = row["name"], run_state(root, row["name"])
+        require(not (row["arm"] == "T0" and state == "training_failure"), study_stops(name))
+        require(state in ("complete", "training_failure"),
+                f"run {name} is {state}: a run must be complete or a registered training failure (a T1/T2 run with a "
+                "non-finite loss); an unfinished run is trained again with `train --rerun-incomplete`, at most twice")
+        record = read_record(root, name)
+        config = make_config(design, row["writer"], row["seed"], row["arm"], device=record["runtime"]["device"])
+        require(record["config_hash"] == stable_hash(config) and record["steps"] == design["training"]["steps"],
+                f"run {name} is not a registered run")
+        states[name] = state
+    return states
 
 
 def stage_lock(args: argparse.Namespace) -> int:
@@ -310,6 +457,13 @@ def select_names(args: argparse.Namespace) -> list[str]:
 
 
 def stage_train(args: argparse.Namespace) -> int:
+    """Train the selected runs that have no final state; leave complete runs and registered failures as they are.
+
+    A run is final when it is complete or a registered training failure (a non-finite loss: no retry). An unfinished
+    run (killed by walltime, a node or I/O fault, or failed for another reason) is trained again, identically, only
+    with ``--rerun-incomplete`` (its job must have ended) and at most twice. A T0 run with a non-finite loss stops the
+    study: this stage refuses to start anything else. The stage ends with an error unless every selected run is final.
+    """
     root = absolute_path(args.root, "--root")
     design_path = Path(args.design).resolve()
     verify_git_lock(design_path, args.design_commit, "the design")
@@ -317,19 +471,56 @@ def stage_train(args: argparse.Namespace) -> int:
     verify_design(design)
     names = select_names(args)
     root.mkdir(parents=True, exist_ok=True)
+    manifest_path = root / f"train_manifest-{args.label}.json"
+    require(not manifest_path.exists(), f"{manifest_path.name} exists: every training job needs its own --label")
+    stopped = t0_failures(root)
+    if stopped:
+        raise ValueError(study_stops(stopped[0]))
+    source = source_metadata()
+    states = {name: run_state(root, name) for name in names}
+    reruns = [name for name in names if states[name] == "incomplete"]
+    require(not reruns or args.rerun_incomplete,
+            f"unfinished runs {reruns}: if their job has ended, train them again, identically, with "
+            "--rerun-incomplete (at most twice per run)")
+    for name in reruns:
+        run = next(row for row in planned_runs() if row["name"] == name)
+        config = make_config(design, run["writer"], run["seed"], run["arm"], device=args.device)
+        check_rerun(root, name, config_hash=stable_hash(config), source=source)
     started = time.perf_counter()
+    for name in reruns:
+        move_aside(root, name)
+    for name in names:
+        if states[name] == "missing":
+            retire_stale_log(root, name)
+    todo = [name for name in names if states[name] in ("missing", "incomplete")]
     manifest = dict(status="running", design_hash=stable_hash(design), design_path=str(design_path),
-                    design_lock_commit=args.design_commit, names=names, procs=args.procs, started_at=now(),
-                    source=source_metadata(), runtime=runtime_metadata(args.device))
-    write_json(root / f"train_manifest-{args.label}.json", manifest)
-    schedule(names, args.procs, design_path, root, device=args.device)
-    records = [json.loads((root / "runs" / name / "record.json").read_text()) for name in names]
-    require(all(r["status"] == "complete" for r in records), "a run did not complete")
+                    design_lock_commit=args.design_commit, names=names, started=todo, reruns=reruns,
+                    final_before=[name for name in names if name not in todo], procs=args.procs, started_at=now(),
+                    source=source, runtime=runtime_metadata(args.device))
+    write_json(manifest_path, manifest)
+    try:
+        schedule(todo, args.procs, design_path, root, device=args.device,
+                 fatal=lambda name: name in t0_failures(root))
+    except ValueError as error:
+        stopped = t0_failures(root)
+        reason = study_stops(stopped[0]) if stopped else str(error)
+        manifest.update(status="stopped" if stopped else "failed", reason=reason, finished_at=now())
+        write_json(manifest_path, manifest)
+        raise ValueError(reason) from error
+    states = {name: run_state(root, name) for name in names}
+    failures = [failure_row(root, name) for name in names if states[name] == "training_failure"]
+    unfinished = [name for name in names if states[name] not in ("complete", "training_failure")]
     seconds = time.perf_counter() - started
-    manifest.update(status="complete", finished_at=now(), total_seconds=seconds, node_hours=seconds / 3600.0,
-                    run_seconds={r["name"]: r["seconds"] for r in records})
-    write_json(root / f"train_manifest-{args.label}.json", manifest)
-    print(json.dumps(dict(stage="train", status="complete", runs=len(names), seconds=seconds)), flush=True)
+    status = "incomplete" if unfinished else "complete"
+    manifest.update(status=status, finished_at=now(), total_seconds=seconds, node_hours=seconds / 3600.0,
+                    run_seconds={name: read_record(root, name)["seconds"] for name in todo if states[name] == "complete"},
+                    training_failures=failures, unfinished=unfinished)
+    write_json(manifest_path, manifest)
+    print(json.dumps(dict(stage="train", status=status, runs=len(names), started=len(todo),
+                          training_failures=[row["name"] for row in failures], unfinished=unfinished,
+                          seconds=seconds)), flush=True)
+    require(not unfinished, f"runs {unfinished} did not finish; see {root / 'logs'}; an infrastructure failure is "
+            "trained again with --rerun-incomplete once its job has ended, at most twice")
     return 0
 
 
@@ -398,19 +589,17 @@ def stage_evaluate(args: argparse.Namespace) -> int:
     verify_design(design)
     out = root / "evaluation"
     require(not (out / "manifest.json").exists(), "the confirmation evaluation has already started")
-    for row in planned_runs():  # every registered run must be complete and trained under the registered configuration
-        record = json.loads((root / "runs" / row["name"] / "record.json").read_text())
-        config = make_config(design, row["writer"], row["seed"], row["arm"], device=record["runtime"]["device"])
-        require(record["status"] == "complete" and record["config_hash"] == stable_hash(config)
-                and record["steps"] == design["training"]["steps"], f"run {row['name']} is not a registered run")
+    states = final_states(design, root)  # before anything touches the confirmation set; refuses a T0 failure
+    failures = [failure_row(root, name) for name in sorted(states) if states[name] == "training_failure"]
     started = time.perf_counter()
     manifest = dict(status="running", design=design, design_hash=stable_hash(design), design_path=str(design_path),
-                    design_lock_commit=args.design_commit, evaluation=design["evaluation"], started_at=now(),
-                    source=source_metadata(), runtime=runtime_metadata(args.device))
+                    design_lock_commit=args.design_commit, evaluation=design["evaluation"],
+                    training_failures=failures, started_at=now(), source=source_metadata(),
+                    runtime=runtime_metadata(args.device))
     out.mkdir(parents=True, exist_ok=True)
     write_json(out / "manifest.json", manifest)
     _, rows, profiles = evaluate_runs(design, root, writers=WRITERS, seeds=SEEDS, evaluation=design["evaluation"],
-                                      device=args.device, out=out / "samples")
+                                      device=args.device, out=out / "samples", skip={row["name"] for row in failures})
     for template in design["templates"]:
         require(digest_checkpoint(Path(template["source"])) == template["source_blake2b"], "a released checkpoint changed")
     verify_design(design)
@@ -419,7 +608,9 @@ def stage_evaluate(args: argparse.Namespace) -> int:
     manifest.update(status="complete", evaluations=rows, finished_at=now(), total_seconds=seconds,
                     node_hours=seconds / 3600.0, checkpoints_unchanged=True)
     write_json(out / "manifest.json", manifest)
-    print(json.dumps(dict(stage="evaluate", status="complete", seconds=seconds, out=str(out))), flush=True)
+    print(json.dumps(dict(stage="evaluate", status="complete", evaluated=len(rows),
+                          training_failures=[row["name"] for row in failures], seconds=seconds, out=str(out))),
+          flush=True)
     return 0
 
 
@@ -439,7 +630,10 @@ def main(argv: list[str] | None = None) -> int:
     train_stage.add_argument("--design-commit", required=True, help="full commit hash that locked the design")
     train_stage.add_argument("--root", required=True, help="the run directory (shared by the training jobs)")
     train_stage.add_argument("--procs", type=int, default=9)
-    train_stage.add_argument("--label", default="main", help="name of this job's manifest")
+    train_stage.add_argument("--label", default="main", help="name of this job's manifest (one label per job)")
+    train_stage.add_argument("--rerun-incomplete", action="store_true",
+                             help="train unfinished runs again, identically (their job must have ended; at most "
+                                  "twice per run); without it an unfinished run is an error")
     train_stage.add_argument("--writers", nargs="+", default=list(WRITERS), choices=WRITERS)
     train_stage.add_argument("--arms", nargs="+", default=list(tsm.ARMS), choices=tsm.ARMS)
     train_stage.add_argument("--seeds", nargs="+", type=int, default=list(SEEDS), choices=SEEDS)

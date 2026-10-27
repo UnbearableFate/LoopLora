@@ -4,7 +4,12 @@
 Every lock, seal and structure check runs before any statistic is computed. For each writer and
 each of the arms T1 and T2 the registered conditions are: hops 1-3 at L16 within 1 pp of L4; hops
 4-8 at L8 no more than 1 pp below T0 at L8; hops 2-3 at L4 at least 3 pp above the B4 single read
-with the interval above zero. An arm passes only if it passes for both writers.
+with the interval above zero. An arm passes only if it passes for both writers; an arm that passes
+for exactly one writer is a writer-specific result, not a remedy.
+
+A T1 or T2 run that stopped with a non-finite loss is a registered training failure: that arm fails for
+that writer, its completed seeds are reported descriptively (they are not registered endpoints) and the
+other arms are evaluated as registered. Every T0 run must be complete (a T0 failure stops the study).
 """
 from __future__ import annotations
 
@@ -13,6 +18,7 @@ import json
 from pathlib import Path
 import sys
 import time
+from typing import Sequence
 
 import numpy as np
 
@@ -26,6 +32,24 @@ from looplora.sym import tsm
 from looplora.sym.stats import load_samples
 
 ENDPOINTS = ("stay", "far", "gain")
+FIELDS = ("difference", "ci_low", "ci_high")
+ARMS = ("T1", "T2")
+OUTCOME_TEXT = dict(both="passes for both writers", writer_specific="writer-specific result, not a remedy",
+                    none="passes for neither writer")
+
+
+def arm_outcome(passing: Sequence[str]) -> str:
+    """The registered reading of an arm from the writers it passes for: both, exactly some (writer-specific), none."""
+    if len(passing) == len(run_tsm.WRITERS):
+        return "both"
+    return "writer_specific" if passing else "none"
+
+
+def reading(endpoints: list[dict]) -> dict:
+    """Per arm: whether it passes for both writers, the writers it passes for, and the registered outcome."""
+    passing = {arm: [r["writer"] for r in endpoints if r["arm"] == arm and r["passes"]] for arm in ARMS}
+    return dict(arms={arm: all(r["passes"] for r in endpoints if r["arm"] == arm) for arm in ARMS},
+                passing_writers=passing, outcome={arm: arm_outcome(writers) for arm, writers in passing.items()})
 
 
 def audit_run(root: Path) -> tuple[dict, dict[str, dict], dict]:
@@ -41,16 +65,17 @@ def audit_run(root: Path) -> tuple[dict, dict[str, dict], dict]:
     require(json.loads(git_locked_file(design_path, manifest["design_lock_commit"])) == design,
             "the manifest design differs from its Git lock")
     run_tsm.verify_design(design)
-    for row in run_tsm.planned_runs():
-        record = json.loads((root / "runs" / row["name"] / "record.json").read_text())
-        config = run_tsm.make_config(design, row["writer"], row["seed"], row["arm"], device=record["runtime"]["device"])
-        require(record["status"] == "complete" and record["config_hash"] == stable_hash(config)
-                and record["steps"] == design["training"]["steps"], f"run {row['name']} is not a registered run")
+    states = run_tsm.final_states(design, root)  # T0 complete; T1/T2 complete or a registered training failure
+    complete = sorted(name for name, state in states.items() if state == "complete")
+    failed = sorted(name for name, state in states.items() if state == "training_failure")
+    for name in complete:
+        record = run_tsm.read_record(root, name)
         require(digest_checkpoint(Path(record["checkpoint"])) == record["checkpoint_blake2b"],
-                f"checkpoint changed: {row['name']}")
+                f"checkpoint changed: {name}")
+    require(manifest["training_failures"] == [run_tsm.failure_row(root, name) for name in failed],
+            "the manifest's training failures differ from the run records")
     evaluation = design["evaluation"]
-    expected = {run["name"] for run in run_tsm.planned_runs()} | {
-        run_tsm.reference_name(w, s) for w in run_tsm.WRITERS for s in run_tsm.SEEDS}
+    expected = set(complete) | {run_tsm.reference_name(w, s) for w in run_tsm.WRITERS for s in run_tsm.SEEDS}
     rows = {row["name"]: row for row in manifest["evaluations"]}
     require(set(rows) == expected, "the evaluation does not cover the registered runs and references")
     samples, reference = {}, None
@@ -74,6 +99,9 @@ def audit_run(root: Path) -> tuple[dict, dict[str, dict], dict]:
                 f"{name}: episodes differ from the other evaluations")
         samples[name] = arrays
     profiles = json.loads((out / "gate_profiles.json").read_text())
+    arm_of = {row["name"]: row["arm"] for row in run_tsm.planned_runs()}
+    require(set(profiles) == {name for name in complete if arm_of[name] == "T2"},
+            "the gate profiles do not match the completed T2 runs")
     return manifest, samples, profiles
 
 
@@ -85,7 +113,10 @@ def accuracy_rows(samples: dict, design: dict, resamples: int) -> list[dict]:
                    for arm in tsm.ARMS]
         methods.append(("B4", lambda s: run_tsm.reference_name(writer, s), [1]))
         for method, namer, depths in methods:
-            by_seed = {s: samples[namer(s)] for s in run_tsm.SEEDS}
+            seeds = [s for s in run_tsm.SEEDS if namer(s) in samples]  # a failed T1/T2 run has no samples
+            if not seeds:
+                continue
+            by_seed = {s: samples[namer(s)] for s in seeds}
             for depth in depths:
                 aligned = fs.aligned_terms(by_seed, [(design["evaluation"]["split"], "original", depth)])
                 for group, hops in {**fs.HOP_GROUPS, "all": tuple(design["evaluation"]["hops"])}.items():
@@ -97,42 +128,53 @@ def accuracy_rows(samples: dict, design: dict, resamples: int) -> list[dict]:
                                                      confidence=0.95, label=("tsm", "accuracy", writer, method, depth,
                                                                              group))
                     rows.append(dict(writer=writer, method=method, L=depth, hop_group=group,
-                                     accuracy=result["difference"], ci_low=result["ci_low"], ci_high=result["ci_high"],
+                                     seeds=";".join(str(s) for s in seeds), accuracy=result["difference"], ci_low=result["ci_low"], ci_high=result["ci_high"],
                                      confidence=0.95))
     return rows
 
 
 def analyse(samples: dict, design: dict, resamples: int) -> dict:
+    """Endpoints per writer and arm; an arm with a training failure has no registered endpoint and fails for the writer."""
     spec = design["decision"]
     endpoints, descriptive = [], []
     for writer in run_tsm.WRITERS:
-        for arm in ("T1", "T2"):
-            result = tsm.arm_endpoints(run_tsm.group_samples(samples, writer, arm), arm, writer=writer,
-                                       confidence=spec["confidence"], resamples=resamples,
-                                       split=design["evaluation"]["split"])
-            row = dict(writer=writer, arm=arm, confidence=spec["confidence"], passes=result["passes"])
+        for arm in ARMS:
+            done = [s for s in run_tsm.SEEDS if run_tsm.run_name(writer, arm, s) in samples]
+            failed = [s for s in run_tsm.SEEDS if s not in done]
+            result = None
+            if done:  # T0 and B4 are restricted to the completed seeds of the arm
+                result = tsm.arm_endpoints(run_tsm.group_samples(samples, writer, arm, done), arm, writer=writer,
+                                           confidence=spec["confidence"], resamples=resamples,
+                                           split=design["evaluation"]["split"])
+            registered = result is not None and not failed
+            row = dict(writer=writer, arm=arm, confidence=spec["confidence"], training_failed=bool(failed),
+                       completed_seeds=";".join(str(s) for s in done), failed_seeds=";".join(str(s) for s in failed))
             for name in ENDPOINTS:
-                row.update({f"{name}_{field}": result[name][field] for field in ("difference", "ci_low", "ci_high")},
-                           **{f"{name}_passes": result["checks"][name]})
+                row.update({f"{name}_{field}": result[name][field] if registered else None for field in FIELDS},
+                           **{f"{name}_passes": result["checks"][name] if registered else None})
+            row["passes"] = bool(registered and result["passes"])
             endpoints.append(row)
-            descriptive.extend(dict(writer=writer, arm=arm, contrast=name,
-                                    **{field: value[field] for field in ("difference", "ci_low", "ci_high")})
-                               for name, value in result["descriptive"].items())
-    arms = {arm: all(r["passes"] for r in endpoints if r["arm"] == arm) for arm in ("T1", "T2")}
-    return dict(endpoints=endpoints, descriptive=descriptive, arms=arms,
+            if result is not None:  # the gating contrasts of a failed arm are descriptive only
+                contrasts = dict(result["descriptive"]) if registered else {
+                    **{name: result[name] for name in ENDPOINTS}, **result["descriptive"]}
+                descriptive.extend(dict(writer=writer, arm=arm, contrast=name, seeds=row["completed_seeds"],
+                                        training_failed=bool(failed), **{field: value[field] for field in FIELDS})
+                                   for name, value in contrasts.items())
+    return dict(endpoints=endpoints, descriptive=descriptive, **reading(endpoints),
                 accuracy=accuracy_rows(samples, design, resamples))
 
 
 def training_rows(root: Path) -> list[dict]:
     rows = []
     for row in run_tsm.planned_runs():
-        record = json.loads((root / "runs" / row["name"] / "record.json").read_text())
-        summary = record["summary"]
+        record = run_tsm.read_record(root, row["name"])
+        summary = record.get("summary", {})  # a registered training failure has no summary
         rows.append(dict(name=row["name"], writer=row["writer"], arm=row["arm"], seed=row["seed"],
-                         steps=summary["steps"], final_loss=summary["final_loss"], mean_L=summary["mean_L"],
-                         train_seconds=record["seconds"], step_seconds=summary["train_step_seconds"],
-                         trainable_parameters=summary["trainable_parameters"],
-                         peak_memory_bytes=record["peak_memory_bytes"]))
+                         status=record["status"], attempt=record.get("attempt"), failure=record.get("failure"),
+                         steps=record["steps"], final_loss=summary.get("final_loss"), mean_L=summary.get("mean_L"),
+                         train_seconds=record.get("seconds"), step_seconds=summary.get("train_step_seconds"),
+                         trainable_parameters=summary.get("trainable_parameters"),
+                         peak_memory_bytes=record.get("peak_memory_bytes")))
     return rows
 
 
@@ -154,6 +196,8 @@ def render(result: dict, design: dict, manifest: dict) -> list[str]:
              "## Registered conditions", ""]
     rows = []
     for r in result["endpoints"]:
+        if r["training_failed"]:
+            continue
         rows.append([r["writer"], r["arm"],
                      interval(dict(difference=r["stay_difference"], ci_low=r["stay_ci_low"], ci_high=r["stay_ci_high"])),
                      "yes" if r["stay_passes"] else "no",
@@ -161,18 +205,52 @@ def render(result: dict, design: dict, manifest: dict) -> list[str]:
                      "yes" if r["far_passes"] else "no",
                      interval(dict(difference=r["gain_difference"], ci_low=r["gain_ci_low"], ci_high=r["gain_ci_high"])),
                      "yes" if r["gain_passes"] else "no", "yes" if r["passes"] else "no"])
-    lines += table_lines(["writer", "arm", "hops 1-3: L16 - L4", "<= 1 pp", "hops 4-8: arm@8 - T0@8", ">= -1 pp",
-                          "hops 2-3: arm@4 - B4@1", ">= 3 pp, interval > 0", "passes"], rows)
+    if rows:
+        lines += table_lines(["writer", "arm", "hops 1-3: L16 - L4", "<= 1 pp", "hops 4-8: arm@8 - T0@8", ">= -1 pp",
+                              "hops 2-3: arm@4 - B4@1", ">= 3 pp, interval > 0", "passes"], rows)
+    else:
+        lines += ["No arm was trained completely for any writer: there is no registered endpoint."]
     lines += ["", "An arm passes only if it passes for both writers: "
-              + ", ".join(f"{arm}: {'yes' if ok else 'no'}" for arm, ok in result["arms"].items()), ""]
+              + ", ".join(f"{arm}: {'yes' if ok else 'no'}" for arm, ok in result["arms"].items()), "",
+              "## Registered reading", ""]
+    cells = {(r["writer"], r["arm"]): r for r in result["endpoints"]}
+
+    def status(writer, arm):
+        row = cells[writer, arm]
+        return "training failure" if row["training_failed"] else "passes" if row["passes"] else "fails"
+
+    lines += table_lines(["arm"] + list(run_tsm.WRITERS) + ["outcome"],
+                         [[arm] + [status(w, arm) for w in run_tsm.WRITERS] + [OUTCOME_TEXT[result["outcome"][arm]]]
+                          for arm in ARMS])
+    lines += ["", "An arm that passes for exactly one writer is a writer-specific result, not a remedy; the statement "
+              "that no arm passes is worded per writer (the columns above).", ""]
+    if manifest["training_failures"]:
+        lines += ["## Training failures", "",
+                  "A non-finite loss in a T1 or T2 run is a registered training failure: no retry, no re-tuning. The "
+                  "arm fails for that writer; its completed seeds are reported descriptively below (T0 and B4 "
+                  "restricted to the same seeds) and are not registered endpoints; the other arms are evaluated as "
+                  "registered.", ""]
+        lines += table_lines(["run", "writer", "arm", "seed", "attempt", "failure"],
+                             [[f["name"], f["writer"], f["arm"], f["seed"], f["attempt"],
+                               str(f["failure"]).replace("|", "/")] for f in manifest["training_failures"]])
+        descriptive = {(r["writer"], r["arm"], r["contrast"]): r for r in result["descriptive"]}
+        rows = [[r["writer"], r["arm"], r["completed_seeds"]]
+                + [interval(descriptive[r["writer"], r["arm"], name]) for name in ENDPOINTS]
+                for r in result["endpoints"] if r["training_failed"] and r["completed_seeds"]]
+        if rows:
+            lines += ["", "Completed seeds of those arms (descriptive):", ""]
+            lines += table_lines(["writer", "arm", "completed seeds", "hops 1-3: L16 - L4", "hops 4-8: arm@8 - T0@8",
+                                  "hops 2-3: arm@4 - B4@1"], rows)
+        lines += [""]
     lines += ["## Accuracy by depth (percent, hops 2-3)", ""]
     table = {(r["writer"], r["method"], r["L"], r["hop_group"]): r for r in result["accuracy"]}
+
     def cell(w, m, d, group):
         return f"{100 * table[w, m, d, group]['accuracy']:.1f}" if (w, m, d, group) in table else ""
 
-    rows = [[w, m, d, cell(w, m, d, "reach"), cell(w, m, d, "far"), cell(w, m, d, "hop1")]
+    rows = [[w, m, d, table[w, m, d, g]["seeds"], cell(w, m, d, "reach"), cell(w, m, d, "far"), cell(w, m, d, "hop1")]
             for (w, m, d, g) in sorted(table) if g == "reach"]
-    lines += table_lines(["writer", "method", "L", "hops 2-3", "hops 6-8", "hop 1"], rows)
+    lines += table_lines(["writer", "method", "L", "seeds pooled", "hops 2-3", "hops 6-8", "hop 1"], rows)
     lines += ["", f"Evaluation: {manifest['node_hours']:.3f} node-h; design lock {manifest['design_lock_commit'][:12]}."]
     return lines
 
@@ -199,9 +277,14 @@ def main(argv: list[str] | None = None) -> int:
     write_json(out / "summary.json", dict(
         created=now(), seconds=time.perf_counter() - started, resamples=args.resamples,
         design_hash=manifest["design_hash"], design_lock_commit=manifest["design_lock_commit"],
-        arms_pass=result["arms"], writer_passes={f"{r['writer']}/{r['arm']}": r["passes"] for r in result["endpoints"]},
+        arms_pass=result["arms"], arm_outcome=result["outcome"], passing_writers=result["passing_writers"],
+        writer_passes={f"{r['writer']}/{r['arm']}": r["passes"] for r in result["endpoints"]},
+        training_failures=manifest["training_failures"],
+        failed_cells=[f"{r['writer']}/{r['arm']}" for r in result["endpoints"] if r["training_failed"]],
         bootstrap=dict(design["decision"]), evaluation_node_hours=manifest["node_hours"]))
-    print(json.dumps(dict(stage="analysis", arms_pass=result["arms"], out=str(out))), flush=True)
+    print(json.dumps(dict(stage="analysis", arms_pass=result["arms"], arm_outcome=result["outcome"],
+                          training_failures=[f["name"] for f in manifest["training_failures"]], out=str(out))),
+          flush=True)
     return 0
 
 
