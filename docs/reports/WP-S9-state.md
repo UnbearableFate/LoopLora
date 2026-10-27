@@ -13,6 +13,13 @@ reports the file path (the orchestrator commits it on `wp/sym`) and runs UNS Par
 version found gaps in the rerun rules; they are fixed (§10). Still nothing was executed on a compute node: the new tests have
 never run with torch or pytest, and §10 states exactly what was checked and how.
 
+Step 1c (2026-10-27, §10.4): the orchestrator's Clarification C1 of `docs/prereg/TSM.md` (master 3477526, identical on `wp/sym`
+at 68c19da) answered the questions that were open after step 1b (§9). Two answers changed the TSM scripts: only CUDA
+out-of-memory and `OSError` are infrastructure failures, any other exception is a code defect that stops the study like a T0
+failure, and an interrupted `evaluate` is restarted from scratch with identical inputs, at most twice, with its partial output
+moved aside unread. The §6 sheet states the same operational rule for the evaluation jobs of IVD, CVH, UNS and NCR. As before,
+nothing was run with torch, pytest or on a compute node; §10.5 says what was checked and how.
+
 ```bash
 SYM=/work/xg24i002/x10041/LoopLora-wt/sym     # worktree; step-2 outputs go to $SYM/runs/<study> (git-ignored)
                                               # and compact results to $SYM/reports/<study> (committed)
@@ -203,7 +210,7 @@ $SUB --name uns-b --queue regular-g --walltime <measured x 1.5> --commit $CODE -
   --design-commit $UNS_LOCK --root $SYM/runs/uns/main
 $SUB --name uns-b-audit --queue debug-g --walltime 00:20:00 --commit $CODE --wait -- scripts/audit_uns.py --extension-root $SYM/runs/uns/main --out $SYM/reports/uns/part-b
 
-# 4. TSM   (after the others; failure rules: docs/prereg/TSM.md, "Decisions at registration")
+# 4. TSM   (after the others; failure rules: docs/prereg/TSM.md, "Decisions at registration" and Clarification C1)
 $SUB --name tsm-lock  --queue debug-g --walltime 00:05:00 --commit $CODE --wait -- scripts/run_tsm.py lock --out $SYM/reports/tsm/design.json
 #    STOP: report $SYM/reports/tsm/design.json; the orchestrator commits it on wp/sym. TSM_LOCK = that commit's full SHA
 $SUB --name tsm-smoke --queue regular-g --walltime 00:20:00 --commit $CODE --wait -- scripts/run_tsm.py smoke --design $SYM/reports/tsm/design.json --root $SYM/runs/tsm/smoke --procs 6
@@ -212,15 +219,28 @@ for S in 17 29 43; do   # one job per seed (6 runs each); walltime from smoke.js
     --design-commit $TSM_LOCK --root $SYM/runs/tsm/main --procs 6 --seeds $S --label s$S
 done
 #    After every job read $SYM/runs/tsm/main/train_manifest-<label>.json (exit status 0 = every selected run is final):
-#      "training_failures" lists registered failures (a non-finite loss in a T1/T2 run): no retry, no re-tuning; report them, the evaluation goes on;
-#      status "stopped": a T0 run had a non-finite loss, the study stops: report to the orchestrator and do not evaluate;
-#      status "incomplete" (the job ended before its runs did: walltime, node or I/O fault): once qstat shows the job has ended, submit the
+#      "training_failures" lists registered failures (a non-finite loss or gradient norm in a T1/T2 run): no retry, no re-tuning; report them, the evaluation goes on;
+#      status "stopped": the study stops. Report it to the orchestrator; do not evaluate and submit no further TSM job (jobs that are already running
+#        may finish). Two causes, named in the manifest's "reason": a non-finite loss or gradient norm in a T0 run, or a code defect, that is a run that
+#        ended with any exception other than those, an OSError or CUDA out-of-memory (its record.json says failure_kind code_defect; the traceback is in
+#        logs/<run>.log). After a code defect the fixed code must retrain every TSM run before the confirmation set is opened: the orchestrator decides,
+#        nothing continues by itself (TSM.md, Clarification C1);
+#      status "incomplete" (the job ended before its runs did: walltime or node fault, an I/O error = OSError, or CUDA out-of-memory; failure_kind
+#        infrastructure, and for out-of-memory the remedy may be a lower --procs): once qstat shows the job has ended, submit the
 #        identical command again at the same --commit with a new --label (s17-r2) and --rerun-incomplete, restricted to the runs of that job
-#        (--seeds ...); at most twice per run (3 attempts). `train` refuses a run marked "running" that was written to in the last 5 minutes
+#        (--seeds ...); at most twice per run (3 attempts; `train` refuses a fourth: report it, the orchestrator diagnoses, see §9). `train` refuses a
+#        run marked "running" that was written to in the last 5 minutes
 #        (its job may be alive): wait and submit again. A rerun job that itself ends before its runs started is submitted again the same way.
+#        A run reported as unfinished that has no record.json (its child died before it created its run directory) is not rerun blindly: read
+#        logs/<run>.log; a traceback that is not an I/O error or CUDA out-of-memory is a code defect: report it instead (§9, open point 6).
 #      All 18 runs must come from the same $CODE and every attempt must equal the one before it (configuration and source_hash); `train`,
-#      `evaluate` and the analysis refuse otherwise (a different code version is a decision for the orchestrator, §9 (e)).
+#      `evaluate` and the analysis refuse otherwise (a different code version is a decision for the orchestrator, §9).
 $SUB --name tsm-eval  --queue regular-g --walltime <about 00:20:00> --commit $CODE -- scripts/run_tsm.py evaluate --design $SYM/reports/tsm/design.json --design-commit $TSM_LOCK --root $SYM/runs/tsm/main
+#    tsm-eval ends before it completes (walltime or node fault; evaluation/manifest.json says "running", or "failed" if the job could write its own end):
+#      once qstat shows the job has ended, submit the identical command again (same --commit, same $TSM_LOCK) with --restart-interrupted, at most twice
+#      (3 attempts in all). `evaluate` moves the partial evaluation/ to attempts/evaluation-attempt<k> without opening anything in it, requires identical
+#      inputs (design lock, source_hash, the 18 run checkpoints) and records `attempt` and `restarts` in the new manifest; a "running" manifest must have
+#      been silent for 5 minutes. Never open the moved files; report each restart. The analysis audits the record and prints it in summary.md and summary.json.
 $SUB --name tsm-analyze --queue debug-g --walltime 00:15:00 --commit $CODE --wait -- scripts/analyze_tsm.py --root $SYM/runs/tsm/main --out $SYM/reports/tsm/results
 ```
 
@@ -228,8 +248,32 @@ Jobs longer than the Bash tool's limit are submitted without `--wait` and follow
 `miyabi-pbs-goal-wakeup` workflow). The lock files are written into the worktree because the `run` stages verify them with
 `git show <commit>:<path>` in the file's own repository; a commit of the same file on master at the same relative path
 is equally valid. TSM's rerun rules are in the comments of block 4: the `train` stage itself moves an unfinished run to `<root>/attempts/`
-(with `--rerun-incomplete`), never touches a complete run or a registered failure, and `evaluate` refuses anything else.
-An `evaluate` job that is killed leaves `evaluation/manifest.json` at "running" and the stage refuses to start again (§9 (d)).
+(with `--rerun-incomplete`), never touches a complete run or a registered failure, and `evaluate` refuses anything else; an `evaluate` job that
+was interrupted is started again with `--restart-interrupted` as described there (without the flag it refuses: "already started").
+
+**Interrupted evaluation jobs of IVD, CVH, UNS and NCR.** The same operational rule as for TSM (Clarification C1) applies: a job that ends before
+it completes (walltime, node or I/O fault) is restarted from scratch with identical inputs (same `--commit $CODE`, same lock commits and
+arguments), at most twice (3 attempts in all); its partial output is moved aside without being opened, and each restart is reported to the
+orchestrator. These scripts refuse an existing output directory (IVD `run`, UNS `run`: `mkdir(exist_ok=False)`; CVH `confirm`: "the confirmation
+has already started") or overwrite files in it (NCR, UNS Part A), and they have no restart option, so after `qstat` shows that the job has ended the
+operator moves the partial output by hand and submits the same job again unchanged. Nothing in the moved output is opened (not even `cat`
+or `head`; `ls -l` is enough), it is never analysed, and it is not committed (`runs/` is git-ignored, `reports/` is not: the output of
+NCR and UNS Part A is moved out of `reports/`). Their manifests record nothing about it: the `*-attempt<k>` directories and the
+report to the orchestrator are the record.
+
+```bash
+K=1                                  # 1 for the first restart, 2 for the second; a third restart is not allowed (report it instead)
+AT=$SYM/runs/attempts; mkdir -p $AT
+# IVD run:      mv $SYM/runs/ivd/main $AT/ivd-main-attempt$K          then submit ivd-run again
+# UNS Part B:   mv $SYM/runs/uns/main $AT/uns-main-attempt$K          then submit uns-b again (the optional timing run is no confirmation evaluation)
+# NCR:          mv $SYM/reports/ncr $AT/ncr-attempt$K                 then submit ncr again
+# UNS Part A:   mv $SYM/reports/uns/part-a $AT/uns-part-a-attempt$K   then submit uns-a again
+# CVH confirm:  its outputs share the training root, which must stay: move only the confirmation outputs
+R=$SYM/runs/cvh/main; C=$AT/cvh-confirm-attempt$K; mkdir -p $C/traces
+for f in manifest.json latency.json confirmation_timing.json; do [ -e $R/$f ] && mv $R/$f $C/; done
+for f in $R/traces/*/test.npz; do [ -e "$f" ] && mkdir -p $C/traces/$(basename $(dirname $f)) && mv $f $C/traces/$(basename $(dirname $f))/; done
+#               (train_manifest.json, theta.json, heads/ and traces/*/val.npz stay), then submit cvh-confirm again
+```
 
 ## 7. Verification done in step 1 (all static or file-level)
 
@@ -315,11 +359,12 @@ as to its thresholds; each fills something the plan leaves open.
 | --- | --- |
 | IVD | decision load L24 (L6 reported); per-writer decision with a 97.5% interval; `nat` arm and second load level added (reported only); manipulation check (overlap gap ≥ 0.2, label `inconclusive`) added, same action as `not_supported`; frozen readers see 18 or 36 stored facts, outside their training distribution |
 | CVH | the plan's three heads: A0 is a reference, the rule applies to A1 and A2 (six comparisons); margin 0.25 nats fixed before any data; the hop-1 constraint is applied to the threshold choice of both A1 and A2; "mean executed depth" read as mean executed updates (fallback = 16), stricter than the mean selected step; a family whose A1 and A2 are both infeasible is not traced on the confirmation set; wall time is the primary latency clock; the A0 recomputation must reproduce the P4-S-L validation accuracy within 1e-3 |
-| TSM | T0 = released recipe at the fixed depth 4 (P2-S-F1 recipe), retrained; stay uses L4 and L16, far uses L8 for arm and T0 (L16 reported), gain uses L4 against B4 at L1; an arm passes only if both writers pass (rv-astra), intervals corrected for four comparisons; stay-loss weighting (mean over steps s ≥ hop, equal over queries); T2 without PonderNet step cost, with explicit init (a, b) = (0, 4); same released lr (0.003) for every arm, no retry; training failures as registered at 40ddf08 and implemented in step 1b (§10): a non-finite loss in T1/T2 fails that arm for that writer (completed seeds reported descriptively, other arms evaluated), in T0 it stops the study, an infrastructure failure is rerun identically at most twice, a single-writer pass is a writer-specific result, not a remedy |
+| TSM | T0 = released recipe at the fixed depth 4 (P2-S-F1 recipe), retrained; stay uses L4 and L16, far uses L8 for arm and T0 (L16 reported), gain uses L4 against B4 at L1; an arm passes only if both writers pass (rv-astra), intervals corrected for four comparisons; stay-loss weighting (mean over steps s ≥ hop, equal over queries); T2 without PonderNet step cost, with explicit init (a, b) = (0, 4); same released lr (0.003) for every arm, no retry; training failures as registered at 40ddf08 and in Clarification C1, implemented in steps 1b and 1c (§10): a non-finite loss or gradient norm in T1/T2 fails that arm for that writer (completed seeds reported descriptively, other arms evaluated), in T0 it stops the study, an infrastructure failure (walltime, node fault, `OSError`, CUDA out-of-memory) is rerun identically at most twice, any other exception is a code defect that stops the study, an interrupted `evaluate` is restarted from scratch with identical inputs at most twice, a single-writer pass is a writer-specific result, not a remedy |
 | UNS | split into Part A (zero-evaluation audit of the committed rows) and Part B (what is missing; registered as run, not optional); "M1-L4 and B4" covered by Part A (released M1 at L4/L1, B4) and Part B (M1 trained at L = 4); `oracle_random` added as a control; a 3 pp wording rule for the scope row (changes no gate); disclosure that the unseen rows were seen before registration |
 | NCR | single read = L = 1 of M1 and B4; both rate and share reported; category priority and the h = 2 case fixed before any neighbour-confusion quantity is computed; the already analysed C777 confirmation samples are re-read, not re-evaluated |
 
-Answered at registration (orchestrator; 40ddf08 and the step-1b message), no longer open:
+Answered (orchestrator; 40ddf08, the step-1b message and, for item 6, Clarification C1 of `docs/prereg/TSM.md`, master 3477526, identical on
+`wp/sym` at 68c19da), no longer open:
 1. UNS Part B runs; it is not optional (only its two-checkpoint timing run stays optional).
 2. TSM: both writers must pass; a single-writer pass is reported as writer-specific, not as a remedy. Failures: infrastructure
    failure, identical rerun, at most twice; non-finite loss in T1/T2, that arm fails for that writer and the other arms are still
@@ -328,26 +373,46 @@ Answered at registration (orchestrator; 40ddf08 and the step-1b message), no lon
    reports the path.
 4. The `--scale-up` allowances for IVD and TSM are accepted.
 5. Master was merged into `wp/sym` (a928ea0).
+6. The five questions left open after step 1b, answered by Clarification C1 (the step-1c message; the code follows it, §10.4):
+   (a) three failed attempts of a run pause the study; the orchestrator diagnoses, and a remedy that changes no registered quantity
+   permits further identical attempts, each reported (the scripts stop at three: open point 1 below);
+   (b) a non-finite gradient norm is a numerical failure like a non-finite loss (as implemented in step 1b);
+   (c) only CUDA out-of-memory and I/O errors (`OSError`) are infrastructure failures (the remedy may lower the concurrent runs per
+   job); any other exception is a code defect: the study stops, as after a T0 failure, and the fixed code retrains every TSM run before
+   the confirmation set is opened (step 1c, change 1);
+   (d) an interrupted `evaluate` is restarted from scratch with identical inputs, at most twice, the partial output moved aside unread
+   (step 1c, change 2); the same operational rule applies to an interrupted evaluation job of IVD, CVH, UNS and NCR (the §6 sheet);
+   (e) one `source_hash` across all 18 runs, and every TSM training and evaluation job at one `CODE` commit (smoke exempt), as
+   implemented in step 1b.
 
-Open after step 1b (for the orchestrator; none blocks the lock stages):
-a. A TSM run whose three attempts all end without completing (infrastructure failures): `train` refuses a fourth and `evaluate`
-   refuses (such a run is neither complete nor a registered training failure). The registration has no rule for it, so it needs
-   a decision (an amendment) before the confirmation set is opened.
-b. A non-finite gradient norm with a finite loss (the `RuntimeError` of `clip_grad_norm_(..., error_if_nonfinite=True)`) is
-   classified as a numerical failure like a non-finite loss, because an identical rerun reproduces it. Confirm, or say that only
-   `FloatingPointError` counts.
-c. Any other end of a run before completion (for example a CUDA out-of-memory error or an I/O error) is treated as an
-   infrastructure failure and may be rerun twice. The registration defines infrastructure failure as walltime, node or I/O faults.
-   Confirm this reading.
-d. An `evaluate` job that ends before it completes (walltime, node fault) leaves `evaluation/manifest.json` at "running"; the
-   stage then refuses to start ("already started") and the registration has no rule for an interrupted evaluation. The runs and
-   episodes are fixed, so an identical re-evaluation (the old `evaluation/` moved aside by hand) would be the natural rule, but it
-   is a decision about the confirmation set and is left to the orchestrator.
-e. "T0 is retrained under the same code version" is implemented as one `source_hash` (blake2b of `src`, `scripts`, `tests`, `configs`,
-   `pyproject.toml`, `uv.lock`; not `docs/` or `reports/`) for all 18 records, complete or failed, checked before `evaluate` opens the
-   confirmation set and again by the analysis; the sheet submits every TSM job at one `CODE`. A change to any of those files between
-   two jobs, even one unrelated to TSM, makes `evaluate` refuse until the orchestrator decides. Confirm this reading, or name a
-   weaker one (for example, the TSM files only).
+Open after step 1c (for the orchestrator; none blocks the lock stages, and none was decided here):
+1. A fourth attempt. C1 lets the orchestrator permit further identical attempts after a remedy that changes no registered quantity.
+   The scripts cannot grant it: a run (or the evaluation) that has used three attempts is refused by `train` (`evaluate`), because
+   the cap is the constant `MAX_ATTEMPTS`, and changing the constant changes the `source_hash`, which then differs from the runs
+   already trained. An explicit option (for example `--max-attempts N`, default 3, recorded in the manifest) would give the orchestrator a way to
+   grant it without touching the code; it is cheap before a `CODE` commit is chosen and costly after the first TSM job. Not added: it was not asked for.
+2. The restart reads the interrupted evaluation's `manifest.json` (its status, and its inputs for the identical-inputs check), although
+   C1 says the partial output is moved aside unread. That manifest is written before any confirmation episode is generated and holds
+   no sample or statistic (the design, its lock, the code, the checkpoint seals, the training failures, the start); the samples and
+   gate profiles are never opened (the test makes the partial samples unreadable). Say if even the manifest must stay closed; the
+   alternative is no identical-inputs comparison against the interrupted attempt, only the operator's discipline.
+3. A code defect inside `evaluate`. C1's remedy (retrain every TSM run before the confirmation set is opened) presumes an unopened
+   set; in `evaluate` it is open once the first episode is generated. `evaluate` records any exception as the evaluation manifest's
+   failure (`status: failed`, the exception text) and permits identical restarts only (a fixed code has another `source_hash` and is
+   refused as not identical); it does not classify the exception by kind. What a code defect in `evaluate` means for the study is for the
+   orchestrator.
+4. The `source_hash` of the evaluation job itself is recorded in its manifest (`source`) but compared with the training records by
+   nothing: C1 asks for one `CODE` commit for every TSM training and evaluation job, and the sheet does it. Say if `evaluate` (or the
+   analysis) should refuse an evaluation whose hash differs from the 18 runs.
+5. By the registered text a CUDA error that is not out-of-memory (for example an illegal memory access, or a failed cuBLAS or cuDNN
+   workspace allocation such as `CUBLAS_STATUS_ALLOC_FAILED`) and a host `MemoryError` are code defects and stop the study. If an
+   allocation failure of the CUDA libraries should count as out-of-memory, the rule needs a text and the classification a case.
+6. An error before the run directory exists (reading the design, `make_config`, `source_metadata`, the attempt guard) leaves no record: the
+   run stays `missing`, the job reports it as unfinished with the traceback in `logs/<run>.log`, no attempt is counted, and nothing marks the
+   study as stopped even if the error is a code defect (the sheet tells the operator to read such a log and to report a traceback that is not an
+   I/O error or CUDA out-of-memory). No result is affected, since nothing was trained. Say if the child should record such failures too. The
+   same holds, as for training in step 1b, for an `evaluate` that ends after it moved the interrupted evaluation aside and before it wrote
+   its manifest: no attempt is counted.
 
 ## 10. Step 1b (2026-10-27): aligned with the registrations
 
@@ -368,7 +433,9 @@ Interpretations made in step 1b (none changes a registered threshold or statisti
 - A run's state is read from its `record.json`: `complete`; `training_failure` when the status is `failed` and the failure text
   is a `FloatingPointError` (the non-finite loss that `train` and `tsm.fit_tsm` raise) or says "non-finite" (the `RuntimeError`
   of `clip_grad_norm_(..., error_if_nonfinite=True)`); `incomplete` for anything else (still `running` after its job ended,
-  failed with another error, or an unreadable record); `missing` without a run directory. Open questions (b) and (c).
+  failed with another error, or an unreadable record); `missing` without a run directory. Open questions (b) and (c) of step 1b;
+  superseded in step 1c (§10.4): the kind of a failure is recorded when it happens, and an exception that is neither numerical, an
+  I/O error nor CUDA out-of-memory is a code defect, not `incomplete`.
 - `--rerun-incomplete` is deliberate, not automatic: several jobs share one root and the code cannot see whether the job that
   started a run is still alive, so the operator confirms with `qstat` that it has ended. As a second guard (10.2, F1) `train`
   refuses a run that is still marked "running" when anything in its directory or log was written in the last 300 s: a live
@@ -378,7 +445,7 @@ Interpretations made in step 1b (none changes a registered threshold or statisti
 - "Same code" is the `source_hash` of `looplora.sym.run.source_metadata` (blake2b over `src`, `scripts`, `tests`, `configs`,
   `pyproject.toml`, `uv.lock`; `docs/` and `reports/` are outside it, so committing a lock does not change it): submit a rerun at
   the same `--commit`. A different hash is refused as "not identical code". For the registered T0 ("retrained under the same
-  code version") the same hash is required across all 18 records: open question (e).
+  code version") the same hash is required across all 18 records (open question (e) of step 1b; confirmed by C1).
 - A child that died before it created its run directory has trained nothing: its log is set aside as
   `attempts/<run>-notstarted<k>.log` and no attempt is counted.
 - A registered failure does not fail the job, because the registered study goes on; the stdout line and the manifest name it, and
@@ -403,8 +470,8 @@ statistic. Its findings and what was done (2b36cde):
 | F1 | `--rerun-incomplete` treated every "running" record as dead: a rerun job whose selection overlapped a live job moved the live run aside and started a second child, whose files the first child then overwrote in the new directory (reproduced with processes) | fixed: the 300 s silence rule above; test `test_a_run_that_may_still_be_running_is_not_moved_aside` (a fresh file in an old directory, in the run or in its log, is refused); the process scenario refuses the overlapping job while the first job completes untouched, and accepts the rerun after a kill once the (shortened) silence has passed. The command sheet restricts a rerun job to the runs of the failed job |
 | F3 | an `OSError` from `start_child` (for example its log existing because another job runs the same run) escaped `schedule`; the train manifest stayed "running" with no reason | fixed: `schedule` raises a `ValueError`, the existing handler writes a `failed` manifest; tests in `test_schedule_...` and `test_a_child_that_cannot_be_started_...` |
 | F4 | `stage_train` skipped a complete or failed record of another configuration or steps; `evaluate` refused it later, after the job slots were spent | fixed: `registered_record` is checked for every final run of the selection at the start of `train`, and by `final_states` |
-| F5 | `evaluation/manifest.json` ("running") was written before the checkpoint seals were checked; a missing or corrupt checkpoint, or a kill during `evaluate`, blocked every rerun | partly fixed: the digests of all complete runs are verified in `final_states`, before the manifest is written (a missing file is a refusal, not a crash); a killed `evaluate` still blocks a rerun: open question (d) |
-| F6 | the audit did not require one code version for the 18 runs although T0 is "retrained under the same code version" | fixed as an interpretation: one `source_hash` across all 18 records, checked by `evaluate` before the confirmation set is opened and by the analysis, recorded as `training_source_hash` in `summary.json`; open question (e) |
+| F5 | `evaluation/manifest.json` ("running") was written before the checkpoint seals were checked; a missing or corrupt checkpoint, or a kill during `evaluate`, blocked every rerun | partly fixed: the digests of all complete runs are verified in `final_states`, before the manifest is written (a missing file is a refusal, not a crash); a killed `evaluate` still blocked a rerun (open question (d) of step 1b; answered by C1 and implemented in step 1c, §10.4) |
+| F6 | the audit did not require one code version for the 18 runs although T0 is "retrained under the same code version" | fixed as an interpretation: one `source_hash` across all 18 records, checked by `evaluate` before the confirmation set is opened and by the analysis, recorded as `training_source_hash` in `summary.json`; open question (e) of step 1b, confirmed by C1 |
 | F7 | `final_states` stopped at the first unfinished run in plan order, hiding a later T0 failure's "the study stops" message | fixed: T0 failures are checked first; test `test_an_unfinished_run_earlier_in_the_plan_does_not_hide_a_t0_failure` |
 | F8 | the outcome "passes for neither writer" was also printed for arms with a training failure, and the per-writer "no arm passes" wording existed only as a pointer to the table | fixed: the outcome says a training failure counts as not passing, and one line per writer is printed |
 | T1 | the gate-profile audit check was never exercised (deleting it left every test green) | new assertion in the end-to-end test: a missing T2 profile is refused |
@@ -451,3 +518,84 @@ statistic. Its findings and what was done (2b36cde):
   node, filesystem timestamps across nodes on the shared filesystem (the 300 s rule assumes clock differences of seconds), and
   the actual `log_every` cadence of a T1/T2 run on a GPU. The first compute-node run of `tests/test_tsm_scripts.py` is part of the
   step-0 test job of §6.
+
+### 10.4 Step 1c (2026-10-27): Clarification C1 in the code
+
+Task: `docs/tasks/WP-S9_symbolic_followups.md`, section "Step 1c" (master f94cf52). Rules: Clarification C1 of `docs/prereg/TSM.md`
+(master 3477526, byte-identical on `wp/sym` at 68c19da; not edited). Commits: 55f0499 (`scripts/run_tsm.py`, `scripts/analyze_tsm.py`,
+`tests/test_tsm_scripts.py`) and the commit of this report. Nothing else changed: the IVD, CVH, UNS and NCR code, the five preregs,
+`pyproject.toml` and `uv.lock` are as they were; for those four studies the change is a rule in the §6 sheet.
+
+| rule (Clarification C1) | implementation |
+| --- | --- |
+| only CUDA out-of-memory and I/O errors are infrastructure failures | `train_one` records every exception that ends a run after its directory exists (the setup, the training, and the seals that follow it) as `status: failed` with `failure_kind` from `classify_failure(error)`: `infrastructure` for an `OSError` (any subclass), `torch.cuda.OutOfMemoryError`, a `RuntimeError` whose text says "cuda" and "out of memory" (the CUDA runtime's own "CUDA error: out of memory"), or an interruption that is not an `Exception` (`KeyboardInterrupt`, `SystemExit`); `numerical` for a `FloatingPointError` and for the `RuntimeError` of the gradient clipping that says "non-finite"; `code_defect` for everything else. `run_state` reads the kind, not the text: `training_failure` (numerical), `code_defect`, `incomplete` (still running, infrastructure, unreadable record) |
+| any other exception is a code defect: the study stops, as after a T0 failure; every later `train` or `evaluate` refuses | `stops_study(root, run)` is true for a code defect in any run and for a numerical failure in a T0 run; `study_stop(root)` words the reason (a code defect first: "the fixed code must retrain every TSM run before the confirmation set is opened; report it to the orchestrator"). `schedule` ends the job at the first such run (running siblings are terminated; the manifest is `stopped` with the reason; exit status 1), `train` refuses before it writes a manifest, and `final_states`, hence `evaluate`, refuses before the confirmation episodes are generated and before the evaluation manifest exists |
+| an interrupted `evaluate` is restarted from scratch with identical inputs, at most twice; the partial output is moved aside unread; the restart is recorded | `evaluate --restart-interrupted`, see the next paragraph. The evaluation manifest has `attempt`, `restarts` (one `{attempt, moved_to}` per moved evaluation) and `checkpoints` (the blake2b seal of every complete run's checkpoint); the analysis audits both and prints the restart in `summary.md` and `summary.json` (`evaluation_attempt`, `evaluation_restarts`) |
+| the same operational rule for IVD, CVH, UNS and NCR | the §6 sheet: restart from scratch with identical inputs, at most twice, the partial output moved by hand into `$SYM/runs/attempts/` without being opened, each restart reported (the commands were run on a dummy tree) |
+
+The evaluation restart. An evaluation directory in place is `complete`, `failed` (its manifest says so: the job caught the exception
+that ended it, wrote it as `failure` and `finished_at`, and let it propagate), or `running` (the manifest a killed job leaves; also a
+directory without a manifest, or with a cut-off one). A complete evaluation is never repeated. Anything else is refused unless the job
+is started with `--restart-interrupted`; then, after `final_states` has accepted the 18 runs (a stopped study refuses also a restart) and
+before any confirmation episode is generated, `evaluation_attempt` requires (i) fewer than three attempts used, the interrupted one in
+place and those moved aside counting (a fourth is refused and goes to the orchestrator), (ii) for `running`, 300 s without a write
+anywhere in the evaluation directory (its job may be alive; `failed` has recorded its own end), and (iii) identical inputs: the design
+hash and its lock commit, the `source_hash` and the checkpoint seals, compared with the manifest of the latest earlier attempt, in place
+or moved aside (an earlier restart that stopped before it wrote its manifest is still compared). `move_evaluation_aside` then renames
+`evaluation/` to `attempts/evaluation-attempt<k>`; nothing in it is opened, and the new manifest carries `attempt = k + 1`.
+
+Interpretations made in step 1c (none changes a registered threshold, statistic or sample):
+- The kind of a failure is decided when the exception happens, from its type, and written into the record; the failure text is never
+  parsed afterwards. A `failed` record without a `failure_kind` (this code writes none) counts as a code defect: nothing shows it was not one.
+- CUDA out-of-memory is `torch.cuda.OutOfMemoryError` (in the pinned torch 2.14 `torch._C.OutOfMemoryError`, a `RuntimeError`; read in the
+  installed source, not instantiated) or a `RuntimeError` that says both "cuda" and "out of memory". A host `MemoryError`, a host allocation failure and
+  every other CUDA error are code defects, as the registered text has it (open point 5 of §9).
+- An interruption that is not an exception of the code (`KeyboardInterrupt`, `SystemExit`) is infrastructure: the run was ended from outside. A
+  walltime kill or a node fault leaves the record at "running", as before; the silence rule then decides when a rerun may start.
+- Only the manifest of an interrupted evaluation is read, for its status and its inputs; it is written before any confirmation episode is
+  generated and holds no sample or statistic. The samples and gate profiles are not opened (open point 2 of §9).
+- `evaluate` marks its manifest `failed` for any exception, whatever its kind, and allows identical restarts only; it does not apply the
+  code-defect rule inside the evaluation (open point 3 of §9).
+- `MAX_ATTEMPTS` = 3 now also caps the evaluation (the first attempt and two restarts), and is not liftable without a code change (open point 1).
+
+### 10.5 Verification of step 1c (all static or torch-free; nothing was run with torch, pytest or on a compute node)
+
+- `python3 -m pyflakes` (2.4.0, Python 3.9.25) on the three changed Python files: clean. `py_compile` with the bytecode written outside the
+  worktree under Python 3.9.25 and 3.13.13 (`-I -B`): ok; no `__pycache__` in the worktree. The `ast` checks of step 1 on the final tree:
+  730 module-attribute references, none unresolved; 1075 calls with 5 hits, the 4 re-exports of §7 and `run_tsm.digest_checkpoint` in a new
+  test (`from s9_common import digest_checkpoint`, `run_tsm.py:51`; it resolves at run time). 118 test functions in the ten files (108 after
+  step 1b); `test_tsm_scripts.py` went from 20 to 30: ten new functions (classification; a code defect in a T0, T1 and T2 run;
+  a code defect reported before a T0 failure and an unfinished run; out-of-memory and I/O errors rerun, even for T0; every error after the run
+  directory exists is recorded with its kind; the restart with the partial output unreadable, audited and tampered with; at most two
+  restarts; the restart waits for the silence; identical inputs, also after an aborted restart; a directory without a readable manifest)
+  and `test_run_state_...` extended with the failure kinds.
+- The repository's own test bodies of `tests/test_tsm_scripts.py` through the stand-in for pytest's fixture machinery of 10.3 (venv python,
+  stub `torch` package whose `torch.cuda.OutOfMemoryError` derives from `RuntimeError` as in the pinned torch, file and numpy stand-ins for
+  the model, `train`, `train_arm`, `evaluate_arm` and the loaders): 56 of 56 cases passed (29 functions; 16, 10, 3 and 2 cases for the four
+  parametrized ones; `test_t0_is_the_unchanged_training_function` is skipped as before). In the first run one new test failed because it needed
+  the silence threshold that the `tiny` fixture sets to 0 (fixed in the test, not in the code).
+- Mutation check of the logic by the same stand-in: 72 one-line mutants of `run_tsm.py` and `analyze_tsm.py`, the 27 of 10.3 adapted to the step-1c
+  text and 45 new ones (OSError, out-of-memory, interruption, "any other exception" read as numerical or infrastructure, the message and
+  gradient-norm cases of the numerical rule, the run state of a failed record with and without a kind, which runs stop the study, the order of the
+  reasons, the manifest status of a stop, no kind recorded, a setup or seal error not recorded, a complete evaluation restartable, no flag
+  needed, a third restart, moved attempts not counted, no silence rule, `failed` held to the silence rule, the silence rule on the directory
+  only, no identity check, each of the four inputs not compared, only the evaluation in place read, nothing moved, the restarts or the seals
+  not recorded, a failed end not recorded, the partial output read or deleted, a directory without a manifest or with a cut-off one not an
+  evaluation, the attempt not advanced, the three audit checks and the summary field, the restart not named in `summary.md`): all 72 were killed by
+  at least one test, none by a crash of the run. Writing the mutants showed one gap in the first classification test (a loose text rule for
+  out-of-memory would have passed it); it led to the host out-of-memory case.
+- Real subprocess scenarios (real `Popen` children and parents, logs, SIGTERM to the process group, stub torch, fake training and evaluation
+  with sleeps; scripts in the session scratchpad): (A) a `ValueError` in a T1 run while two siblings train: the job exits 1 with the code-defect
+  reason, the siblings are terminated (no process left), the manifest is `stopped`, two later jobs (another selection; `--rerun-incomplete`) and `evaluate`
+  refuse, and no `evaluation/` exists; (B) an `OSError` in a T0 run and a CUDA out-of-memory in a T2 run: the other seven runs complete, the job is
+  `incomplete`, and `--rerun-incomplete` trains both as attempt 2 with attempt 1 moved to `attempts/`; (C) an `evaluate` killed by SIGTERM
+  (manifest `running`, 5 partial samples): a restart without the flag is refused, with the flag inside the silence period refused ("written to 1 s
+  ago"), after it accepted: attempt 2, 24 samples, the 5 partial ones in `attempts/evaluation-attempt1`, and the analysis audits it and reports
+  `evaluation_attempt` 2; (D) three evaluate attempts killed in turn: the fourth start is refused ("used 3 of 3 attempts"), the third attempt and the
+  two moved directories untouched. The four process scenarios of 10.2 and 10.3 were run again on the final code with the same outcomes (the first one ends
+  in an error of its own last line, which reads a manifest that a refused job never writes; the same on 68c19da).
+- Not verified: any execution with real torch or real pytest (including the fixtures and `monkeypatch` of the new tests and the real
+  `torch.cuda.OutOfMemoryError` and `clip_grad_norm_` errors, only read in the source), a PBS walltime kill or an I/O fault on a compute node,
+  the clock and file timestamps across nodes of the shared filesystem (the 300 s rule), and the manual `mv` rules of the sheet beyond the dummy
+  tree (the file lists come from reading the IVD, CVH, UNS and NCR scripts, not from running them). The first compute-node run of
+  `tests/test_tsm_scripts.py` is part of the step-0 test job of §6.
