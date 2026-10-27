@@ -159,3 +159,21 @@ These rules refine C1. They change no endpoint, threshold or decision rule.
   its samples or statistics.
 - **Errors before a run directory exists.** Such an error leaves no record. The operator reports its traceback, and the
   orchestrator classifies it under C1 and C2.
+
+## Clarification C3 (2026-10-27 16:58 JST, before any TSM lock, smoke or run; from the static review of the failure rules)
+These rules refine C1 and C2. They change no endpoint, threshold or decision rule.
+- **Allocation failures (C2).** These are infrastructure failures:
+  - torch's CPU-allocator failure (a `RuntimeError` containing "DefaultCPUAllocator: not enough memory"), which
+    counts as a host allocation failure;
+  - `CUBLAS_STATUS_NOT_INITIALIZED` reported by `cublasCreate` (cuBLAS could not create its handle, usually on a full
+    GPU), which counts as a cuBLAS allocation failure.
+- **I/O errors (C1).** torch's checkpoint serialization raises errors when a file cannot be written or read
+  ("PytorchStreamWriter failed", "PytorchStreamReader failed"). These are I/O errors, hence infrastructure failures.
+- **Bounded exposure.** A code defect misread as one of the failures above repeats identically and reaches C1's
+  three-attempt pause. If the diagnosis then finds a code defect, C1's code-defect rule applies.
+- **Evaluation-code defects (C2).** The orchestrator checks the fix at code level, not file level, and records the
+  check with its decision:
+  - The fix must change no function, class or module-level statement that the training path executes. The training
+    path is `train`, `train-one` and everything they call, including shared helpers.
+  - The check cannot be file level because evaluation and training share files (`scripts/run_tsm.py`,
+    `src/looplora/sym/tsm.py`); a file-level check could never pass.
