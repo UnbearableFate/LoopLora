@@ -12,8 +12,10 @@ that writer, its completed seeds are reported descriptively (they are not regist
 other arms are evaluated as registered. Every T0 run must be complete (a T0 failure stops the study, and so does a
 code defect in any run). An evaluation that was restarted from scratch after an interruption is audited too: the
 manifest's attempts must match the interrupted evaluations moved aside, its checkpoint seals must be those of the run
-records, and it records the code (source_hash) of every attempt and the code the runs were trained at; a restart
-at another evaluation code (docs/prereg/TSM.md, Clarification C2) is reported with the code of each attempt.
+records, and it records the code (source_hash) of every attempt and the code the runs were trained at. The summary
+always states both codes and flags a difference: the first evaluation attempt runs at the training code, so a first
+attempt at another code is reported as outside the rule (docs/prereg/TSM.md, Clarifications C1 and C2), and a restart
+at another evaluation code (Clarification C2) is reported with the code of each attempt.
 """
 from __future__ import annotations
 
@@ -274,17 +276,26 @@ def render(result: dict, design: dict, manifest: dict) -> list[str]:
     lines += table_lines(["writer", "method", "L", "seeds pooled", "hops 2-3", "hops 6-8", "hop 1"], rows)
     lines += ["", f"Evaluation: {manifest['node_hours']:.3f} node-h (the completed attempt); design lock "
                   f"{manifest['design_lock_commit'][:12]}."]
+    trained, final = manifest["training_source_hash"], manifest["source"]["source_hash"]
+    lines += ["", f"Code (source_hash): the 18 runs were trained at {trained[:12]}; the evaluation ran at "
+                  f"{final[:12]} ({'the same code' if final == trained else 'a DIFFERENT code'})."]
     if manifest["restarts"]:
-        codes = [row["source_hash"] for row in manifest["restarts"]] + [manifest["source"]["source_hash"]]
         lines += ["", f"The evaluation ran as attempt {manifest['attempt']}: the earlier attempt(s) ended before they "
                   "completed and were restarted from scratch with the same design, lock and checkpoints (docs/prereg/"
                   "TSM.md, Clarification C1); their partial output was moved aside unread: "
                   + ", ".join(row["moved_to"] for row in manifest["restarts"]) + "."]
-        if len({code for code in codes if code}) > 1:
-            by_attempt = ", ".join(f"{number}: {(code or 'unknown')[:12]}" for number, code in enumerate(codes, 1))
-            lines += ["", "The evaluation code changed at a restart, on the orchestrator's decision (docs/prereg/"
-                      f"TSM.md, Clarification C2); source_hash by attempt: {by_attempt}; the 18 runs were trained at "
-                      f"{manifest['training_source_hash'][:12]}."]
+    codes = [row["source_hash"] for row in manifest["restarts"]] + [final]  # by attempt; None: not known
+    differing = [number for number, code in enumerate(codes, 1) if code and code != trained]
+    by_attempt = ", ".join(f"{number}: {(code or 'unknown')[:12]}" for number, code in enumerate(codes, 1))
+    if 1 in differing:
+        lines += ["", "The first evaluation attempt ran at a code other than the training code: this is outside the "
+                  "rule that the first attempt runs at the training code (docs/prereg/TSM.md, Clarifications C1 and "
+                  f"C2); source_hash by attempt: {by_attempt}; report it to the orchestrator before the result is "
+                  "used."]
+    elif differing:
+        lines += ["", "The evaluation code changed at a restart, on the orchestrator's decision (docs/prereg/"
+                  f"TSM.md, Clarification C2); source_hash by attempt: {by_attempt}; the 18 runs were trained at "
+                  f"{trained[:12]}."]
     return lines
 
 
