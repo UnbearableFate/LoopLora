@@ -60,3 +60,18 @@ Review: `docs/review/static_2026-10-27/oracle.md` (no defect in the WP-L6 code; 
 
 ## Step 2 / 3 (only when the orchestrator says so)
 Run tests, smoke and the pilot; apply the registered decision; report. Then P1L-S if it passes.
+
+## Step 1c (now, no compute): implement the P1L-S plan early
+Supersedes the timing in step 1b item 2: compute is down until 2026-10-28 22:00, and the P1L-S pipeline would otherwise
+sit on the critical path after the WP-L6 decision.
+1. Merge wp/p1l at 02fc561 into wp/oracle. It is the P1-L code that the confirmation will pin: B7 check, P1L-C, and the
+   step-A2 fixes.
+2. Implement "P1L-S implementation plan" of `docs/reports/WP-L6.md` with its tests.
+   - Every P1-L default stays bitwise unchanged. For now the differential baseline is wp/p1l 02fc561.
+   - When wp/p1l is merged into master after its compute tests, merge master and re-point the baseline to that merge.
+   - Do not touch `docs/prereg`.
+3. The WP-L6 step-2 tests, smoke and pilot run at 7175e09, the commit before this step, so the pilot does not depend on
+   the new pipeline code. The P1L-S tests run separately, at the new head.
+4. Update `docs/reports/WP-L6.md` with the commits, the tests and the step-2/3 commands. Run `py_compile` and pyflakes,
+   with no bytecode in the worktree. Commit on wp/oracle; no merge to master, no push.
+Done line: `WP-L6 step 1c done`.
