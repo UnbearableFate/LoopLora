@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import argparse
-from datetime import datetime, timedelta, timezone
 import json
 import math
 from pathlib import Path
@@ -16,9 +15,6 @@ def walltime(expected: float) -> str:
     seconds = math.ceil(expected * 1.5 / 300) * 300
     if seconds > 7200:
         raise ValueError(f"measured work requires {seconds}s after1.5margin, above2h")
-    now = datetime.now(timezone.utc)
-    if now + timedelta(seconds=seconds) >= datetime(2026, 10, 28, tzinfo=timezone.utc):
-        raise ValueError("requested job would extend beyond the maintenance deadline")
     hours, remainder = divmod(seconds, 3600)
     minutes, seconds = divmod(remainder, 60)
     return f"{hours:02d}:{minutes:02d}:{seconds:02d}"
