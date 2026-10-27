@@ -1,7 +1,7 @@
-# Study WP-L6 — LLM oracle code designs at r = 32 (pilot), pre-registered (draft)
+# Study WP-L6 — LLM oracle code designs at r = 32 (pilot), pre-registered
 
-Drafted 2026-10-27 by sn-oracle (Claude Sonnet-5.5) for the orchestrator's review; the registration time is the
-orchestrator's commit time. Source: `plan/followup_2026-10-27.md` §3 F5 and §6. Written before any WP-L6 run
+Drafted 2026-10-27 by sn-oracle (Claude Sonnet-5.5); reviewed and registered by the orchestrator at its master
+commit time (2026-10-27, before any WP-L6 run). Source: `plan/followup_2026-10-27.md` §3 F5 and §6. Written before any WP-L6 run
 (none is possible before the Miyabi maintenance ends, 2026-10-28 22:00 JST). Validation episodes only: no test or
 confirmation episode is read. A pass licenses `docs/prereg/P1L-S.md`; it is not a claim about multiple reads.
 
@@ -68,8 +68,10 @@ are never written.
   initialization by pool), parameter counts, step times, peak memory, writer and checkpoint hashes.
 
 ## Interpretation
-- O-rot passes: the unrelated value→key transitions were what the r = 32 reader could not learn. Hop 1 passing says
-  the reader uses the memory at all; it says nothing yet about composition.
+- O-rot passes: with keys tied to the value codes by a fixed rotation, the r = 32 reader learns to use the memory.
+  The pilot does not separate why (hops 2–3 becoming learnable training signal, or the shared code geometry helping
+  the question-side and output-side maps). Hop 1 passing says the reader uses the memory at all; it says nothing yet
+  about composition.
 - O-rot fails, O-shared passes: the random maps at the LM's two ends (question state → key, value code → name) are
   the r = 32 bottleneck; codes the reader can shape remove it.
 - Neither passes: stop as above.

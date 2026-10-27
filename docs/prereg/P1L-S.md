@@ -1,7 +1,7 @@
-# Study P1L-S — P1-L comparison at r = 32 with the WP-L6 oracle code, pre-registered (draft)
+# Study P1L-S — P1-L comparison at r = 32 with the WP-L6 oracle code, pre-registered
 
-Drafted 2026-10-27 by sn-oracle (Claude Sonnet-5.5) for the orchestrator's review; the registration time is the
-orchestrator's commit time. Source: `plan/followup_2026-10-27.md` §3 F6 and §6. Written before any WP-L6 run, so the
+Drafted 2026-10-27 by sn-oracle (Claude Sonnet-5.5); reviewed and registered by the orchestrator at its master
+commit time (2026-10-27, before any WP-L6 or P1L-S run). Source: `plan/followup_2026-10-27.md` §3 F6 and §6. Written before any WP-L6 run, so the
 code design is not chosen here: **W is whatever WP-L6's registered rule selects** (`docs/prereg/WP-L6.md`:
 `oracle_rot` if it passes, else `oracle_shared`). The study **runs iff** `reports/wp-l6/decision.json` (committed
 before the smoke) has status `selected`; it does not depend on P1-L's r = 128 results. P1-L, P1L-C and their episode
@@ -21,17 +21,19 @@ multi-read reader beat a single read at the same rank, as the symbolic stage fou
   differs: backbone `Qwen/Qwen3-0.6B-Base` @ `da87bfb608c14b7cf20ba1ce41287e8de496c0cd`, layer-14 `o_proj`, fp32
   adapter and state, ρ = 0.25, α = 1, r = r_mem = 32, fast path, `train.prefetch_workers: 2`; task `t2_chain_end`,
   E = 12, chains (8, 4), n_rel 4, head sharing 0.3, train hops {1, 2, 3}, evaluation hops 1–8; memory-only protocol.
-- Readers, seeds 17 / 29 / 43 (15 runs): **B8** (L = 4), **M1-L4**, **B4** (L = 1), **B5-L4** (fixed query, L = 4),
-  **B3-L4** (no memory, L = 4). B0, B1 and B2 are not rerun (they do not use the oracle and are not gated).
+- Readers, seeds 17 / 29 / 43 (12 new runs): **B8** (L = 4), **M1-L4**, **B4** (L = 1), **B5-L4** (fixed query,
+  L = 4). **B3-L4** (no memory, L = 4) is not retrained: it never reads the memory, so its training does not depend
+  on the writer; P1-L's r = 32 B3-L4 runs (seeds 17/29/43, lr 1e-3, S = 17,000) are evaluated on this study's
+  confirmation range. B0, B1 and B2 are not rerun (they do not use the oracle and are not gated).
 - Optimization: AdamW, batch 64, warmup 20, weight decay 0.01, clip 1.0, constant lr, **S = 17,000 steps for every
   reader** (the P1-L value; the per-job time rule holds, see Cost).
-- Smoke and **own Pilot-2**: a 10% time-only smoke (1,700 steps per reader; no score read), then lr ∈ {1e-3, 3e-3}
-  per reader at ⌊S/3⌋ = 5,666 steps, seed 17, validation (split `val`, eval seed 4242, 1,000 episodes), selected by
+- Smoke and **own Pilot-2** (for the four retrained readers): a 10% time-only smoke (1,700 steps per reader; no
+  score read), then lr ∈ {1e-3, 3e-3} per reader at ⌊S/3⌋ = 5,666 steps, seed 17, validation (split `val`, eval seed 4242, 1,000 episodes), selected by
   full-vocabulary EM pooled over hops 1–3 at the reader's trained L (B4: L = 1), ties → the lower lr. The WP-L6 pilot
   run is not reused as a candidate. lrs and S are locked in a commit before any main run.
 - **Confirmation: split `test`, indices [110000, 112000), eval base seed 4242, 2,000 episodes**, a range no earlier
   evaluation used (P1-L: [100000, 102000); P1L-C: [102000, 104000)); the typed replication uses `t2_typed` on the same
-  range. Evaluated once, only after all 15 trainings have finished and the lr/S lock is committed.
+  range. Evaluated once, only after all 12 trainings have finished and the lr/S lock is committed.
 
 ## Endpoints (memory-only, confirmation set, hops {2, 3} unless stated; pooled paired episode bootstrap, 2,000
 ## draws, **95% CIs** because exactly one condition is gated; per-seed values reported)
@@ -48,9 +50,7 @@ multi-read reader beat a single read at the same rank, as the symbolic stage fou
 - Secondary, not gating (as P1-L): M1-L4 against the same comparators; M1-L4 depth scan L = 1…8 (Δ_reach and walk
   specificity where hops 6–8 exist); B8 − M1-L4; `swap_successors` follow rates; per-hop tables; the per-step
   readout (logit lens and J-lens directions) for M1-L4 and B8; adapter parameter counts and inference time per
-  question for every reader; for O-shared the drift of C from its initialization. Descriptive pipeline check: B3-L4
-  never reads the memory, so at the same lr it should reproduce P1-L's r = 32 B3-L4 (same seed, data, init); a
-  difference is reported, not gated.
+  question for every reader; for O-shared the drift of C from its initialization. 
 
 ## Decision use
 - B7 passes, G1-L and G2-L pass: with oracle W, the multi-read reader composes inside the LM at r = 32 and beats the
@@ -67,17 +67,16 @@ multi-read reader beat a single read at the same rank, as the symbolic stage fou
 ## Cost (node·h from P1-L's measured r = 32 step times; B8 0.193, M1-L4 0.197, B4 0.133, B5-L4 0.152, B3-L4 0.135 s/step)
 | stage | runs | estimate |
 | --- | --- | --- |
-| smoke | 5 readers × 1,700 steps | 0.40 node·h |
-| Pilot-2 | 5 readers × 2 lr × 5,666 steps (one job per reader, 0.43–0.63 h each, ≤ 1 h with the 1.5 margin) | 2.58 node·h |
-| main | 15 runs × 17,000 steps (3.84 node·h per seed) | 11.51 node·h |
-| confirmation, typed, swap, readouts | 15 checkpoints × 2,000 episodes (P1-L timing scaled) | ≈ 2 node·h |
+| smoke | 4 readers × 1,700 steps | 0.33 node·h |
+| Pilot-2 | 4 readers × 2 lr × 5,666 steps (one job per reader, 0.42–0.62 h each, ≤ 1 h with the 1.5 margin) | 2.12 node·h |
+| main | 12 runs × 17,000 steps (3.19 node·h per seed) | 9.56 node·h |
+| confirmation, typed, swap, readouts | 15 checkpoints (12 new, 3 reused B3-L4) × 2,000 episodes (P1-L timing scaled) | ≈ 2 node·h |
 | startup and reserve | per-job model load, export, hashing | ≈ 0.5 node·h |
-| **total** | | **≈ 17 node·h** (plan: ≈ 20) |
+| **total** | | **≈ 14.5 node·h** (plan: ≈ 20) |
 
 Main jobs use `scripts/submit.py --scale-up docs/prereg/P1L-S.md` (justification: S = 17,000 is P1-L's value, and
 B8 at 0.193 s/step needs 3,294 s per run, so 1.5 × (3,294 + reserve) = 1.4 h). Walltimes are 1.5 × the P1L-S smoke
-measurement, at most 2 h: B8 ≈ 1.4 h, M1-L4 ≈ 1.4 h, B5-L4 ≈ 1.1 h as single-run jobs; B4 and B3-L4 as P1-L did
-(together 1.9 h, or one job each). Each job ≤ 1 node × 2 h; node·h recorded per job.
+measurement, at most 2 h: B8 ≈ 1.4 h, M1-L4 ≈ 1.4 h, B5-L4 ≈ 1.1 h and B4 ≈ 1.0 h as single-run jobs. Each job ≤ 1 node × 2 h; node·h recorded per job.
 
 ## Pipeline work that precedes the smoke (step 3; not part of the science above)
 The P1-L scripts hard-code `oracle_random`, `configs/p1l/`, `reports/p1l/`, `docs/prereg/P1L.md` and a confirmation
