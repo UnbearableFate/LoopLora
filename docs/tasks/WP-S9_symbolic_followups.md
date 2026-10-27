@@ -69,3 +69,38 @@ points 1–6. Code changes:
 Points 2, 4 and 6 need no code beyond what C2 states. `py_compile` and pyflakes; commit on wp/sym; no merge, no push.
 After this the TSM failure protocol is closed: any further edge case is decided by the orchestrator when it occurs and
 recorded in the report. Done line: `WP-S9 step 1d done`.
+
+## Step 1e (now, no compute): static review of the failure rules, TSM Clarification C3
+Review: `docs/review/static_2026-10-27/tsm.md`. It found no break of a registered quantity or decision rule. Findings:
+F1 Medium, F3 Low–Medium, F2 and F4–F8 Low. `docs/prereg/TSM.md` gained Clarification C3 (master d335fe7; identical
+on wp/sym 3ca4d89). This step reopens the failure protocol once, for these findings only.
+1. F1. The first evaluation attempt runs at the training code:
+   - With no earlier attempt (in place or moved), require the evaluation `source_hash` to equal `training_source_hash`,
+     and refuse `--new-evaluation-code`.
+   - `summary.md` always prints both hashes and flags a difference.
+   - Add a test of the refusal.
+2. F2. `train` refuses a `source_hash` that differs from any record under `runs/` or `attempts/`. Check this in
+   `stage_train`, and in `train-one` before `mkdir`. Add a test.
+3. F3, F4 (C3). Classify these as infrastructure failures:
+   - torch serialization I/O errors;
+   - the CPU-allocator failure;
+   - `CUBLAS_STATUS_NOT_INITIALIZED` from `cublasCreate`.
+
+   Add test cases with the real torch 2.14 texts, and replace the test's "can't allocate memory" text.
+4. F5. On a stopping failure (a T0 numerical failure or a code defect):
+   - start no pending run;
+   - let the running runs of the same job finish (C1: running jobs may finish, and their outputs are kept);
+   - then stop.
+
+   Add a test.
+5. F6. Enforce the pause in code:
+   - `train` refuses to start while a run that is not final has used its attempts.
+   - `--max-attempts N` above 3 needs `--decision FILE`, the orchestrator's recorded decision. The manifest records the
+     file's path and its blake2b digest.
+   - Add tests.
+6. F7. Add an evaluation heartbeat: while `evaluate` runs, touch a file in the evaluation directory at least every
+   60 s, so the 300 s rule cannot mistake a live evaluation for an ended one. Add a test that pins `QUIET_SECONDS == 300`.
+7. F8 (C3). In the sheet, the evaluation-fix check works at code level.
+8. Correct the `--rerun-incomplete` help text (allocation failures, `--max-attempts`).
+9. Update the state report and the sheet. Run `py_compile` and pyflakes. Commit on wp/sym; no merge, no push.
+Done line: `WP-S9 step 1e done`.
