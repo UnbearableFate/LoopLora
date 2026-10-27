@@ -9,11 +9,11 @@ wake-ups cancelled).
 
 | subagent | role | worktree, branch | state |
 | --- | --- | --- | --- |
-| sn-llm | wk-llm: LLM module experiments (learned writer line) | LoopLora-wt/llm, wp/llm | WP-L5 step 1 done (8eb24ab; master merged in as 77373ea); active: WP-L7 step 1 (RFX, LSQ code and prereg drafts); WP-L5/L7 step 2 after 2026-10-28 22:00 |
-| sn-p1l | wk-p1l: P1-L main study | LoopLora-wt/p1l, wp/p1l (wp/p1l merged into master as ca85a40) | active: WP-P1LC step A (B7 memory-use check, P1L-C code); step B (remaining training, confirmation) after 2026-10-28 22:00 |
-| sn-oracle | new (2026-10-27): LLM oracle code designs, WP-L6 and P1L-S | LoopLora-wt/oracle, wp/oracle | active: WP-L6 step 1 |
+| sn-llm | wk-llm: LLM module experiments (learned writer line) | LoopLora-wt/llm, wp/llm | WP-L5 step 1 done (8eb24ab); WP-L7 step 1 done (9588998); RFX and LSQ registered on master (077bb81, 64f3e54); active: WP-L7 step 1b (code to the registered rules); WP-L5/L7 step 2 after 2026-10-28 22:00 |
+| sn-p1l | wk-p1l: P1-L main study | LoopLora-wt/p1l, wp/p1l (wp/p1l merged into master as ca85a40) | WP-P1LC step A done (wp/p1l c5de5c2: B7 check in finalize, P1L-C code and tests, unrun); step B (remaining training, confirmation) after 2026-10-28 22:00 |
+| sn-oracle | new (2026-10-27): LLM oracle code designs, WP-L6 and P1L-S | LoopLora-wt/oracle, wp/oracle | WP-L6 step 1 done (wp/oracle 3a788b1; preregs WP-L6 and P1L-S registered 4ac2410); step 2 after 2026-10-28 22:00 |
 | sn-sym | wk-sym/wk-symf: symbolic studies | LoopLora-wt/sym, wp/sym | active: WP-S9 step 1 (IVD, CVH, TSM, UNS) |
-| sn-paper | wk-theory/T-tasks: paper and claim contract | LoopLora-wt/paper, wp/paper | active: WP-T9 |
+| sn-paper | wk-theory/T-tasks: paper and claim contract | LoopLora-wt/paper, wp/paper | WP-T9 done, merged 1cc0e16 |
 | (on demand) | wk-core, wk-data, wk-theory | — | no pending work |
 | rv-fable | external reviewer, Claude Fable 5.1 (max), herdr tab w1:t17 (user request 2026-10-27) | — | done (c370e22); tab closed after the report |
 | rv-astra | external reviewer, Codex GPT-6-Astra (max, web search), herdr tab w1:t18 (user request 2026-10-27) | — | done 08:18 (6179f3a); codex closed, tab closed |

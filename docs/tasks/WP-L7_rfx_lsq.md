@@ -26,6 +26,30 @@ commit at or after it, and the DPFP tests must pass on it.
    RFX, DPFP arms, LSQ if triggered.
 Done line in your final reply: `WP-L7 step 1 done`.
 
+## Step 1b (now, no compute): implement the registered rules
+The orchestrator registered `docs/prereg/RFX.md` and `docs/prereg/LSQ.md` on master (077bb81, time fix 64f3e54; the
+same text is on wp/llm as c3b01bf and its fix commit). The registered rules differ from the drafts. Read both files'
+"Decision rule" and "Decisions at registration" sections first.
+1. Merge master into wp/llm.
+2. `rfx.py` / `rfx_run.py`:
+   - Per variant, also compute the entity-restricted D1 EM (argmax over the 1,024 entity name tokens).
+   - Rewrite `classify` to the registered verdict order: storage, normalization, query, store+query, decoder, none.
+     Record every rescue flag, including ridge/unit/fit and delta/unit/fit. The decoder rule uses the
+     entity-restricted baseline EMe_b.
+   - Replace `lsq_ranks` with `lsq_arms` (arms in LSQ candidate order). `rfx_eta_by_rank` and `eta_by_rank` cover only
+     ranks with a storage verdict.
+3. `lsq.py` / `lsq_run.py`:
+   - Add arms L32-U and L128-U: the delta store with its learned λ and β as R, `unit_query` on. Use the registered
+     candidate order.
+   - A release's `arms` equals RFX's `lsq_arms`; U and K4/RG are exclusive per rank. `release_eta` applies to RG arms
+     only.
+4. Tests for the new rules: verdict cases of `classify` from synthetic cell tables, `lsq_arms`, U configuration and
+   validation, release checks. They stay unrun until compute is back.
+5. Update `docs/reports/WP-L5-state.md` and any other doc that names `lsq_ranks` or calls the preregs drafts.
+   `py_compile` and pyflakes; commit on wp/llm; no merge to master, no push.
+
+Done line in your final reply: `WP-L7 step 1b done`.
+
 ## Step 2 (only when the orchestrator says so)
-WP-L5 step 2 (DPFP) and RFX; LSQ only if RFX says "storage". Reports: `docs/reports/DPFP.md`,
+WP-L5 step 2 (DPFP) and RFX; LSQ only for the arms RFX triggers (`lsq_arms`). Reports: `docs/reports/DPFP.md`,
 `docs/reports/RFX.md`, `docs/reports/LSQ.md`.

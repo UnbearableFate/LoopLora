@@ -1,6 +1,6 @@
 # Study P1L-C — causal and read-position analysis of the P1-L r = 128 readers, pre-registered
 
-Registered 2026-10-27 09:40 JST, before any P1-L confirmation score is read (P1-L Amendment B7). Proposed by the
+Registered 2026-10-27 08:51 JST, before any P1-L confirmation score is read (P1-L Amendment B7). Proposed by the
 external review `docs/review/rv-astra_2026-10-27.md` §5. Evaluation only: no training, no change to P1-L.
 
 ## Question
@@ -48,3 +48,12 @@ the reader state after the first read, z_1, with z_1 from the same position in w
 ## Limits
 Evaluation only; each job ≤ 1 node × 1 h; expected ≤ 0.6 node·h in total; node·h recorded per job. Implemented
 and run by a Claude Sonnet-5.5 subagent after the P1-L confirmation evaluation. Report: `docs/reports/P1L-C.md`.
+
+## Clarification C1 (2026-10-27, before any P1L-C run; from the implementation review)
+- World B for the chain-end task: b_B is the head of the other chain's **final** edge, so world B's answer t_B is
+  that chain's end and is reached in two hops from s, as t_A is in world A. Only c is drawn with the episode-index
+  seed: a seen-pool entity that is not in the episode (so it has no outgoing fact).
+- The patch replaces z_1 only; the recipient's u and world A's memory are kept for steps 2–L. The random control
+  draws one direction per episode and position from the episode-index seed.
+- P1L-C runs under the P1-L confirmation authorization (the same locked checkpoints); its range is recorded in its
+  own outputs. A validation-only smoke (val [0, 64), timing only) may run before the confirmation.
