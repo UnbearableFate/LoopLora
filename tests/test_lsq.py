@@ -96,7 +96,7 @@ def test_ridge_final_interpolates_independent_keys_as_eta_vanishes(device, lam):
     # Any recency weighting gives the same interpolant: it is the minimum-norm solution of M k_j = v_j.
     gram = keys @ keys.transpose(1, 2)
     minimum_norm = torch.einsum('bni,bnm,bmj->bij', values, torch.linalg.inv(gram), keys)
-    torch.testing.assert_close(state, minimum_norm, rtol=0, atol=1e-6)
+    torch.testing.assert_close(state, minimum_norm, rtol=1e-4, atol=1e-6)
 
 
 @pytest.mark.parametrize('device', DEVICES)

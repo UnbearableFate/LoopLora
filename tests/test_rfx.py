@@ -209,6 +209,14 @@ def test_small_table_helpers():
     assert summary['unit'] == 'log10 condition number'
 
 
+def test_the_running_maximum_of_the_instrumentation_checks_keeps_a_nan():
+    nan = float('nan')
+    assert rfx._worst(0., 2.) == 2. and rfx._worst(3., 2.) == 3. and rfx._worst(0., 0.) == 0.
+    assert max(0., nan) == 0.  # why max() is not used: a NaN would vanish from the guards
+    assert math.isnan(rfx._worst(0., nan)) and math.isnan(rfx._worst(nan, 1.))
+    assert math.isnan(rfx._worst(rfx._worst(0., nan), 5.))
+
+
 def table(**override):
     """A tilted evaluation table: the deployed read is poor, no rescue unless an override says otherwise."""
     cells = {name: dict(err=.8, lm_em=.30) for name in rfx.VARIANTS}

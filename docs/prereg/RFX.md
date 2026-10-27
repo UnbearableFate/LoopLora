@@ -22,7 +22,8 @@ contains the value)? A "storage" verdict triggers the LSQ study (`docs/prereg/LS
 ## Objects (frozen, never trained or modified)
 All three are final checkpoints of complete WP-L4/WP-L3 runs under `/work/xg24i002/x10041/LoopLora/runs/p1l`. The job
 refuses a folder whose `record.json` is not `complete`, is a smoke, or has another rank or step count, and records the
-blake2b-128 digests of `writer.pt` and `checkpoint.pt`; they must equal the values below (a mismatch voids the run).
+blake2b-128 digests of `writer.pt` and `checkpoint.pt`; before creating any output it requires them to equal the values
+below (`rfx_run.DIGESTS`; a mismatch voids the run).
 
 | label | folder | rank = r_mem | steps | job | source commit | config hash |
 | --- | --- | ---: | ---: | --- | --- | --- |
@@ -69,7 +70,7 @@ Storage x query, plus two controls, each evaluated by replacing the final-positi
 
 | factor | levels |
 | --- | --- |
-| storage | **delta**: the deployed state M. **ridge**: M = V Kᵀ (K Kᵀ + η I)⁻¹ over the same E = 16 cached unit keys and values (unweighted; float64; η below). |
+| storage | **delta**: the deployed state M. **ridge**: M = V Kᵀ (K Kᵀ + η I)⁻¹ over the same E = 16 cached unit keys and values, K, V ∈ R^{r×E} (unweighted; float64, solved through the E x E system KᵀK + η I; η below). |
 | query | **raw**: the deployed q. **unit**: q / ‖q‖₂ (eps 1e-6). **true**: the unit written key of the queried fact (uses the label; a diagnostic, never a deployable read; rv-fable's oracle-query control E3 is delta x true). |
 | controls | **clean**: the written value of the queried fact. **zero**: a zero read. |
 
@@ -82,7 +83,8 @@ Storage x query, plus two controls, each evaluated by replacing the final-positi
 - **Decoders**: (D1) the deployed LM path: full-vocabulary EM (argmax over all 151,936 tokens) and NLL of the answer
   token. (D2) the checkpoint's training-only clean-value head applied to the replaced read: accuracy over the 1,024 task
   entities. (D3) a linear decoder refit on fitting-set reads of the same cell (affine multinomial logistic regression on
-  standardized reads, 1,024 classes, 100 L-BFGS iterations, L2 weight chosen from {1e-4, 1e-3, 1e-2, 0.1} on the last
+  standardized reads, 1,024 classes, 100 L-BFGS iterations (strong-Wolfe line search, at most 1,000 function
+  evaluations), L2 weight chosen from {1e-4, 1e-3, 1e-2, 0.1} on the last
   20% of the fitting rows), applied to the evaluation-set reads of that cell: accuracy and NLL. D3 is fitted for the
   six unscaled cells, clean and zero.
 - **Metrics per cell**: normalized read error ‖m − v‖² / (‖v‖² + 1e-6) against the clean value (the WP-L4 metric; mean and
@@ -95,7 +97,7 @@ Storage x query, plus two controls, each evaluated by replacing the final-positi
   EM, agreement of the predictions with the natural order, the normalized squared difference to the natural-order read,
   and error/EM by the permuted write age. The ridge store is order free; the job checks that its reads agree across a
   permutation to 1e-4. Descriptive only.
-- **Conditioning**: log10 of the condition number of the key Gram K Kᵀ (E x E per episode) and of K Kᵀ + η I for each
+- **Conditioning**: log10 of the condition number of the key Gram KᵀK (E x E per episode) and of KᵀK + η I for each
   query's selected η (median, 90th and 99th percentile, maximum over the evaluation episodes; the smallest eigenvalue is
   floored at 1e-30, so a singular Gram reports about 30 + log10 of its largest eigenvalue). Descriptive.
 - **Normalization and gain effects**: EM and error differences unit − raw (per storage, with the fitted gain) and
@@ -135,7 +137,8 @@ Evaluation only: no training, no gradient step, no checkpoint is written, one se
 One job of one node: estimated 2-3 minutes per checkpoint (about 130 fitting batches and 20 question forwards per
 evaluation batch, from WP-L4's 6-9 s per 1,000-episode validation), about 8-12 minutes in all, **0.15-0.2 node·h**
 (plan: 0.15-0.3). A 64 + 64 episode smoke first (at most 0.05 node·h). No `--scale-up`. Node·h is recorded per job.
-Commands (from `/work/xg24i002/x10041/LoopLora`, `REF` a committed ref at or after `cbc8389`):
+Commands (from `/work/xg24i002/x10041/LoopLora`, `REF` a committed ref that contains the RFX code as merged from
+`wp/llm`, i.e. the master merge of WP-L7 step 1 or later; `cbc8389` predates `rfx_run.py`):
 `scripts/submit.py --name rfx --queue regular-g --nodes 1 --walltime 00:30:00 --commit REF -- -m looplora.llm.rfx_run
 --out RUNS/rfx` (smoke: add `--smoke`, separate `--out`). Report: `docs/reports/RFX.md` with every table above,
 the rescue flags, the verdicts and node·h. Executed by a Claude Sonnet-5.5 subagent.

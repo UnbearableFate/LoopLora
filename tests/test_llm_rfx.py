@@ -217,8 +217,8 @@ def test_observation_matches_the_deployed_read_and_the_cached_store(experiment):
     torch.testing.assert_close(rebuilt, state, rtol=1e-4, atol=1e-5)
     # ... and a different write order gives a different store (the delta rule is order dependent).
     order = torch.arange(15, -1, -1, device=obs['keys'].device)
-    assert not torch.allclose(rfx.delta_state(experiment.adapter, obs['keys'][:, order], obs['values'][:, order]),
-                              state, rtol=1e-3, atol=1e-4)
+    reordered = rfx.delta_state(experiment.adapter, obs['keys'][:, order], obs['values'][:, order])
+    assert (reordered - state).norm() > 1e-3 * state.norm()  # relative: the tiny model's value scale is not assumed
 
 
 def test_collect_keeps_episode_order_and_content_across_batches(experiment):
@@ -354,6 +354,17 @@ def test_registered_checkpoints_are_the_three_wp_l4_final_runs():
                                    'W5-r32': ('writer-fix-20261027/rerun/W5', 32, 32900)}
 
 
+def test_registered_digests_cover_the_three_checkpoints_and_a_mismatch_voids_the_run():
+    assert set(rfx_run.DIGESTS) == set(rfx.LABELS)
+    assert all(len(x) == 32 and set(x) <= set('0123456789abcdef') for pair in rfx_run.DIGESTS.values() for x in pair)
+    for label, (writer, checkpoint) in rfx_run.DIGESTS.items():
+        rfx_run.verify_digests(label, dict(writer_blake2b=writer, checkpoint_blake2b=checkpoint))
+        for bad in (dict(writer_blake2b='0' * 32, checkpoint_blake2b=checkpoint),
+                    dict(writer_blake2b=writer, checkpoint_blake2b='0' * 32)):
+            with pytest.raises(ValueError, match=label):
+                rfx_run.verify_digests(label, bad)
+
+
 def test_checkpoint_identity_requires_the_registered_complete_final_run(tmp_path):
     (tmp_path / 'writer.pt').write_bytes(b'writer')
     (tmp_path / 'checkpoint.pt').write_bytes(b'checkpoint')
@@ -476,6 +487,9 @@ def test_run_evaluates_both_export_formats_and_writes_the_registered_files(model
             arm=arm, rank=RANK, training=dict(actual_steps=10))))
     monkeypatch.setattr(rfx_run, 'CHECKPOINTS', {'R-r128': ('r128', 128, 10), 'R-r32': ('r32', RANK, 10),
                                                  'W5-r32': ('w5', RANK, 10)})
+    digests = {label: tuple(hashlib.blake2b((runs / folders[label] / name).read_bytes(), digest_size=16).hexdigest()
+                            for name in ('writer.pt', 'checkpoint.pt')) for label in folders}
+    monkeypatch.setattr(rfx_run, 'DIGESTS', digests)
     monkeypatch.setattr(rfx_run, 'SMOKE', dict(fit_episodes=8, eval_episodes=8))
     monkeypatch.setattr(rfx_run, '_load_backbone', lambda device: (model, tokenizer, 0.))
     out = tmp_path / 'out'
@@ -501,3 +515,7 @@ def test_run_evaluates_both_export_formats_and_writes_the_registered_files(model
     with pytest.raises(ValueError):  # the registered study evaluates all three checkpoints
         rfx_run.run(runs, tmp_path / 'partial', ('R-r32',), smoke=False)
     assert not (tmp_path / 'partial').exists()
+    monkeypatch.setattr(rfx_run, 'DIGESTS', {**digests, 'R-r32': ('0' * 32, digests['R-r32'][1])})
+    with pytest.raises(ValueError, match='R-r32'):  # a checkpoint that is not the registered one voids the run
+        rfx_run.run(runs, tmp_path / 'void', ('R-r32',), smoke=True)
+    assert not (tmp_path / 'void').exists()

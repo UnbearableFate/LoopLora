@@ -240,7 +240,7 @@ def cell_reads(obs,params,chunk=256):
 def _logistic(x,y,classes,decay,iterations):
     weight=torch.zeros(x.shape[1],classes,dtype=x.dtype,device=x.device,requires_grad=True)
     bias=torch.zeros(classes,dtype=x.dtype,device=x.device,requires_grad=True)
-    optimizer=torch.optim.LBFGS([weight,bias],lr=1.,max_iter=iterations,history_size=20,
+    optimizer=torch.optim.LBFGS([weight,bias],lr=1.,max_iter=iterations,max_eval=10*iterations,history_size=20,
                                 line_search_fn='strong_wolfe',tolerance_grad=1e-9,tolerance_change=1e-12)
 
     def closure():
@@ -283,7 +283,9 @@ def collect(experiment,arrays,batch_size):
     parts=[]
     for begin in range(0,len(arrays.answer),batch_size):
         batch=experiment.prepare(_slice(arrays,slice(begin,min(begin+batch_size,len(arrays.answer)))))
-        parts.append(observe(experiment,batch))
+        obs=observe(experiment,batch)
+        del obs['logits']  # [rows, vocabulary] per batch; the fitting set never needs them
+        parts.append(obs)
     cat=lambda name:torch.cat([p[name] for p in parts])
     return dict(keys=cat('keys'),values=cat('values'),q=cat('q'),true_key=cat('true_key'),clean=cat('clean'),
                 target=cat('target'),answer_entity=cat('answer_entity'),
@@ -309,6 +311,11 @@ def episode_permutations(episode_seeds,E,index):
     """[B,E] write orders: every episode's own permutation, a pure function of its episode seed and the index."""
     return np.stack([np.random.default_rng(derive_seed(17,'rfx','permutation',index,int(seed))).permutation(E)
                      for seed in episode_seeds])
+
+
+def _worst(a,b):
+    """max(a, b) that keeps a NaN: Python's max(0., nan) is 0., which would hide it from the instrumentation guards."""
+    return b if (b!=b or b>a) else a
 
 
 def delta_state(adapter,keys,values):
@@ -373,7 +380,7 @@ def evaluate(experiment,head,arrays,params,*,batch_size=64,permutations=PERMUTAT
         if begin==0:
             again=replaced_logits(experiment,batch,deployed.reshape(-1,r))
             checks['identity_max_abs_logit_diff']=float((again.float()-obs['logits'].float()).abs().max())
-        checks['raw_recompute_max_rel']=max(checks['raw_recompute_max_rel'],relative(obs['recomputed_raw'],deployed))
+        checks['raw_recompute_max_rel']=_worst(checks['raw_recompute_max_rel'],relative(obs['recomputed_raw'],deployed))
         for name,read in reads.items():
             logits=obs['logits'] if name=='delta/raw/asis' else replaced_logits(experiment,batch,read.reshape(-1,r).float())
             piece=pieces[name]
@@ -387,7 +394,7 @@ def evaluate(experiment,head,arrays,params,*,batch_size=64,permutations=PERMUTAT
                 kept[key].append(read.flatten(0,1).float().cpu())
         # Write order: the same cached writes, re-ordered, through the deployed decay-first delta rule.
         natural=delta_state(adapter,obs['keys'],obs['values'])
-        checks['delta_reconstruction_max_rel']=max(checks['delta_reconstruction_max_rel'],
+        checks['delta_reconstruction_max_rel']=_worst(checks['delta_reconstruction_max_rel'],
             relative(torch.einsum('bij,bqj->bqi',natural,obs['q']),deployed))
         for p in range(permutations):
             order=torch.as_tensor(episode_permutations(part.episode_seed,E,p),device=obs['keys'].device)
@@ -404,7 +411,7 @@ def evaluate(experiment,head,arrays,params,*,batch_size=64,permutations=PERMUTAT
             if p==0:
                 one=ridge_reads(obs['keys'],obs['values'],obs['q'],params['eta']['raw'])
                 two=ridge_reads(keys,values,obs['q'],params['eta']['raw'])
-                checks['ridge_permutation_max_abs']=max(checks['ridge_permutation_max_abs'],float((one-two).abs().max()))
+                checks['ridge_permutation_max_abs']=_worst(checks['ridge_permutation_max_abs'],float((one-two).abs().max()))
         side['age'].append((E-1-obs['target']).flatten().cpu())
         side['entity'].append(obs['answer_entity'].flatten().cpu())
         side['cond_gram'].append(gram_conditions(obs['keys'])['gram'].cpu())

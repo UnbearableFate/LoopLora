@@ -35,8 +35,8 @@ unit-normalized queries, remove the read distortion and give a learned writer th
   - **RG (ridge)**: M = V W Kᵀ (K W Kᵀ + η I)⁻¹ with recency weights w_j = λ^(E−1−j), W = diag(w), λ the learned scalar
     decay gate (the last write has weight one; this is the weighted least-squares minimizer, and for η → 0 with
     independent keys it interpolates every pair exactly whatever λ). Solved in float64 through the E x E system by a
-    Cholesky factorization, differentiable; η is a constant, frozen below. The log10 condition numbers of K Kᵀ and of the
-    weighted ridge system are logged at every logged step and reported at validation.
+    Cholesky factorization, differentiable; η is a constant, frozen below. The log10 condition numbers of the E x E key Gram
+    KᵀK and of the weighted ridge system W^½ KᵀK W^½ + η I are logged at every logged step and reported at validation.
   - **K4**: the existing β = 1 delta `scan_final` repeated four times over the same ordered writes (Kaczmarz sweeps; every
     write overwrites exactly along its unit key; the learned λ decays the state before every one of the 64 writes). No
     new mathematics, no η. Four sweeps do not reach the interpolant for correlated keys (at λ = 1 the distance to it is
@@ -104,11 +104,14 @@ episode, K4 four times the 16 sequential writes: both a few percent of the step)
 | conditional E = 8 retrain of one arm | <= 2 |
 
 Plan estimate for F4: 2-4 node·h. Smokes and tests together stay within 0.5 node·h per rank. Node·h is recorded per job.
-Commands (after the release file `study: LSQ`, `E`, `ranks`, `arms`, `steps_by_arm`, `rfx_eta_by_rank`, `eta_by_rank`,
-`science_commit` is committed): `scripts/submit.py --name r-lsq-ARM --queue regular-g --nodes 1 --walltime 02:00:00
+Commands (after the release file is committed: `study: LSQ`, `E`, `ranks` (RFX's `lsq_ranks`), `arms` (every arm of the
+triggered ranks, in candidate order), `steps_by_arm`, `rfx_eta_by_rank` and `eta_by_rank` (both copied from RFX's
+`summary.json`), `science_commit`): `scripts/submit.py --name r-lsq-ARM --queue regular-g --nodes 1 --walltime 02:00:00
 --scale-up docs/prereg/LSQ.md --commit <science_commit> -- -m looplora.llm.lsq_run --arm ARM --schedule RELEASE.json
---out RUNS/lsq/arms`; the conditional retrain adds `--e8-decision LOCK.json`. Report: `docs/reports/LSQ.md` with every
-curve, node·h and `lsq_run.choose` over the E16 records. Executed by a Claude Sonnet-5.5 subagent.
+--out RUNS/lsq/arms`. The conditional retrain adds `--e8-decision LOCK.json`, takes its own release (`E: 8`, every other
+field as above, `steps_by_arm` holding only the retrained arm) and its own `--out RUNS/lsq/e8` (the E = 16 arm folder
+already exists under `RUNS/lsq/arms`). Report: `docs/reports/LSQ.md` with every curve, node·h and `lsq_run.choose` over
+the E16 records. Executed by a Claude Sonnet-5.5 subagent.
 
 ## Open points for the orchestrator (flagged, not decided here)
 1. K4 is listed before RG within a rank; the plan only names the two arms.

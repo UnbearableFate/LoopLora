@@ -61,8 +61,8 @@ def ridge_state(keys, values, lam, eta):
     keys, values = keys.double(), values.double()
     weights = lam ** torch.arange(keys.shape[1] - 1, -1, -1, dtype=torch.float64, device=keys.device)
     system = eta * torch.eye(keys.shape[2], dtype=torch.float64, device=keys.device) \
-        + torch.einsum('bn,bnj,bnk->bjk', weights, keys, keys)
-    return torch.einsum('bn,bni,bnj->bij', weights, values, keys) @ torch.linalg.inv(system)
+        + torch.einsum('n,bnj,bnk->bjk', weights, keys, keys)
+    return torch.einsum('n,bni,bnj->bij', weights, values, keys) @ torch.linalg.inv(system)
 
 
 def sweep_state(keys, values, lam, sweeps):

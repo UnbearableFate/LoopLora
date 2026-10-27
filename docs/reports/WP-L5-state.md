@@ -10,7 +10,11 @@ the learned-writer path that the DPFP-off reproduction test covers.
 Step 1 of `docs/tasks/WP-L5_dpfp_writer.md` is implemented and statically checked (`py_compile` and `pyflakes` on every
 changed Python file, a torch-free dry run of the repro test's CSV parsing, and two independent read-only reviews of the
 code and of the tests by Sonnet subagents; their one likely test defect and two hardening items are fixed in the second
-commit). Step 1 of `docs/tasks/WP-L7_rfx_lsq.md` (RFX, LSQ, below) is statically checked the same way. **No torch code,
+commit). Step 1 of `docs/tasks/WP-L7_rfx_lsq.md` (RFX, LSQ, below) is statically checked the same way and was reviewed
+independently twice more (LSQ core and tests; RFX hook, runner and tests) by read-only Sonnet subagents; the findings
+that held (a wrong einsum in an LSQ test helper, two test tolerances, a missing digest guard, NaN-blind instrumentation
+maxima, an unbounded-evaluations L-BFGS default, wording of the Gram notation and of the E8 release) are fixed in the
+`WP-L7: review fixes` commit. **No torch code,
 test or run has been executed**: the login node forbids it and compute is unavailable until 2026-10-28 22:00 JST. Not
 merged, not pushed. Binding designs: `docs/prereg/DPFP.md`; drafts for the orchestrator to review and commit to master
 before any run: `docs/prereg/RFX.md`, `docs/prereg/LSQ.md`.
@@ -102,7 +106,9 @@ for a in ('D32-3','D128-1','D128-3'):
 Science (later, per arm, after the three step counts are committed in a release JSON with `study: DPFP`, `E: 16`,
 `steps_by_arm`, `science_commit`): `scripts/submit.py --name r-dpfp-ARM --queue regular-g --nodes 1 --walltime 02:00:00
 --scale-up docs/prereg/DPFP.md --commit <science_commit> -- -m looplora.llm.dpfp_run --arm ARM --schedule RELEASE.json --out $RUNS/arms`.
-The conditional E8 retrain adds `--e8-decision LOCK.json` (the audited lock whose `choice` is `retry_e8` for that arm).
+The conditional E8 retrain adds `--e8-decision LOCK.json` (the audited lock whose `choice` is `retry_e8` for that arm),
+its own release (`E: 8`, `steps_by_arm` naming that arm) and its own `--out` root (the E16 arm folder `$RUNS/arms/ARM`
+already exists and the runner refuses to reuse it).
 
 ## Choices where the prereg was silent
 1. Normalization is `x / max(||x||_2, eps)` with the existing eps = 1e-6, at write and read. phi_nu is quadratic, so a
@@ -152,7 +158,7 @@ RFX calls "storage".
 | `src/looplora/llm/read_fix.py` | `store_read` (exact-coefficient dispatch; delta is the old `gram_read`), `diagnostics` uses it and adds `key_gram_log10_cond` (and `ridge_log10_cond`) for non-delta stores |
 | `src/looplora/llm/read_fix_run.py` | `fit` adds the optional `experiment.log_extras()` columns to each log row (none for every existing arm) |
 | `src/looplora/llm/lsq.py`, `lsq_run.py` (new) | arms L32-K4, L32-RG, L128-K4, L128-RG; `configuration`, `LSQExperiment` (log extras: condition numbers); runner `python -m looplora.llm.lsq_run --arm ARM --out ROOT (--steps N --smoke [--eta X] \| --schedule release.json) [--e8-decision lock.json]`; `choose` (prereg rule over the triggered arms), `release_arms`, `release_eta` (enforces the clipped RFX eta), `scheduled_steps`, `eligible_e8`, `load_inference` (the WP-L4 and DPFP loaders refuse an LSQ export and vice versa) |
-| `src/looplora/llm/rfx.py`, `rfx_run.py` (new) | `FinalRead` (instance-level hook: records, and optionally replaces, the final-token read; no change to shared code), `observe`, ridge/gain/eta fits on the fitting set, refit decoder, write age and order, conditioning, `classify`, `lsq_ranks`, `load_checkpoint`; runner `python -m looplora.llm.rfx_run --out DIR [--smoke] [--labels L ...]` (one job, three checkpoints, `summary.json` with verdicts, `lsq_ranks`, `rfx_eta_by_rank`, `eta_by_rank`) |
+| `src/looplora/llm/rfx.py`, `rfx_run.py` (new) | `FinalRead` (instance-level hook: records, and optionally replaces, the final-token read; no change to shared code), `observe`, ridge/gain/eta fits on the fitting set, refit decoder, write age and order, conditioning, `classify`, `lsq_ranks`, `load_checkpoint`; runner `python -m looplora.llm.rfx_run --out DIR [--smoke] [--labels L ...]` (one job, three checkpoints, refuses a checkpoint whose blake2b-128 digests differ from `rfx_run.DIGESTS` before creating anything, `summary.json` with verdicts, `lsq_ranks`, `rfx_eta_by_rank`, `eta_by_rank`) |
 | `tests/test_lsq.py`, `tests/test_llm_lsq.py`, `tests/test_rfx.py`, `tests/test_llm_rfx.py` (new) | see below |
 | `docs/prereg/RFX.md`, `docs/prereg/LSQ.md` (new drafts), `docs/notation.md` (section 10), `configs/p1l/README.md` | decision rules, node-hour estimates, options documented; this file |
 
@@ -187,7 +193,8 @@ ranks 32 and 128) runs through the same flags-off path, so one pass covers DPFP-
   answer; re-inserting the recorded read is bitwise the identity; only the replaced rows' last position of the adapted
   projection changes; ragged question masks; `run_checkpoint` smoke (finite JSON, instrumentation checks, deployed EM and
   NLL equal the model's own forward, evaluation only: parameters unchanged, no gradients); `load_checkpoint` for both
-  export formats (and its refusals); `checkpoint_identity`; `rfx_run.run` end to end on two tiny exports.
+  export formats (and its refusals); `checkpoint_identity`, the registered digests and the refusal of a mismatch;
+  `rfx_run.run` end to end on two tiny exports.
 
 ### Choices where the prereg drafts are silent (also listed there)
 1. RFX applies the fitted scalar gain to every cell and takes the better of the as-is and gain-fitted deployed reads as
@@ -212,7 +219,7 @@ Sketch with the reasons:
 2. **DPFP smokes**: command 3 above (timing and memory only; no scores read).
 3. **RFX**, one smoke then one science job (about 0.2 node-hours), after the orchestrator has committed `docs/prereg/RFX.md`:
 ```sh
-REF=<commit at or after the WP-L7 step-1 commit>; RUNS=/work/xg24i002/x10041/LoopLora/runs/p1l
+REF=<master merge of the WP-L7 step-1 commits, or later>; RUNS=/work/xg24i002/x10041/LoopLora/runs/p1l
 scripts/submit.py --name rfx-smoke --queue regular-g --nodes 1 --walltime 00:20:00 --commit "$REF" --wait -- \
   -m looplora.llm.rfx_run --smoke --out $RUNS/rfx/smoke
 scripts/submit.py --name rfx --queue regular-g --nodes 1 --walltime 00:30:00 --commit "$REF" --wait -- \
@@ -224,8 +231,8 @@ print(s['verdicts'], s['lsq_ranks'], s['rfx_eta_by_rank'], s['eta_by_rank'], s['
 ```
    The smoke evaluates fresh `train` episodes (never the val or test ranges), so its numbers may be read to test the
    code, not for results. The science run raises after writing its files if an instrumentation check fails; fix the
-   code and rerun everything (the registered rule does not change). The checkpoint digests in `docs/prereg/RFX.md` must
-   equal the recorded ones. Then `docs/reports/RFX.md` (a table script like `analyze_p1l_read_fix.py` is still to be written).
+   code and rerun everything (the registered rule does not change). The job refuses checkpoints whose digests differ from
+   the ones in `docs/prereg/RFX.md` (`rfx_run.DIGESTS`), before creating its output. Then `docs/reports/RFX.md` (a table script like `analyze_p1l_read_fix.py` is still to be written).
 4. **DPFP arms**: release file and three jobs as described above.
 5. **LSQ, only for the ranks in `summary.json['lsq_ranks']`** and after `docs/prereg/LSQ.md` is committed (before any DPFP
    result): 10% smokes of the triggered arms (the ridge arms need an `--eta` inside 1e-4..1e-1; smokes are never
@@ -236,14 +243,16 @@ scripts/submit.py --name s-lsq-L32-K4 --queue regular-g --nodes 1 --walltime 00:
   -m looplora.llm.lsq_run --arm L32-K4 --steps 2400 --smoke --out $RUNS/lsq/smoke
 scripts/submit.py --name s-lsq-L32-RG --queue regular-g --nodes 1 --walltime 00:25:00 --commit "$REF" -- \
   -m looplora.llm.lsq_run --arm L32-RG --steps 2400 --smoke --eta 1e-3 --out $RUNS/lsq/smoke
-# release JSON (commit it): study "LSQ", E 16, ranks and arms from the RFX summary (arms in candidate order),
-# steps_by_arm (read_fix_run.largest_schedule on the smoke timings, five intervals), rfx_eta_by_rank and eta_by_rank
-# copied from the RFX summary, science_commit. Then, per arm:
+# release JSON (commit it): study "LSQ", E 16, ranks (= the RFX summary's `lsq_ranks`; the key is renamed) and arms
+# (every arm of those ranks, in candidate order), steps_by_arm (read_fix_run.largest_schedule on the smoke timings, five
+# intervals), rfx_eta_by_rank and eta_by_rank copied from the RFX summary, science_commit. Then, per arm:
 scripts/submit.py --name r-lsq-L32-RG --queue regular-g --nodes 1 --walltime 02:00:00 --scale-up docs/prereg/LSQ.md \
   --commit <science_commit> -- -m looplora.llm.lsq_run --arm L32-RG --schedule RELEASE.json --out $RUNS/lsq/arms
 ```
-   The conditional E = 8 retrain adds `--e8-decision LOCK.json` and a release that names that arm. Node-hours: about 2.7
-   used and at most 4 reserved per triggered rank (`docs/prereg/LSQ.md`).
+   The conditional E = 8 retrain adds `--e8-decision LOCK.json`, its own release (`E` 8, every other field as above,
+   `steps_by_arm` holding only the retrained arm) and its own `--out $RUNS/lsq/e8`: the E = 16 arm folder already exists in
+   `$RUNS/lsq/arms`, and the runner refuses to reuse it. Node-hours: about 2.7 used and at most 4 reserved per triggered
+   rank (`docs/prereg/LSQ.md`).
 
 Still to write in step 2 (not needed before): `scripts/prepare_dpfp_release.py` and `scripts/prepare_lsq_release.py`
 (timing-only read of the smokes, frozen per-arm step counts, `science_commit`; after `prepare_p1l_read_fix_a2.py`),

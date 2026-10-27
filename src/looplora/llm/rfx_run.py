@@ -20,6 +20,10 @@ RUNS=Path('/work/xg24i002/x10041/LoopLora/runs/p1l')
 # label -> (folder under RUNS, rank, steps of the final checkpoint), as registered in docs/prereg/RFX.md
 CHECKPOINTS={'R-r128':('read-fix-20261027/arms-r128/R',128,24645),'R-r32':('read-fix-20261027/arms/R',32,23590),
              'W5-r32':('writer-fix-20261027/rerun/W5',32,32900)}
+# label -> (writer.pt, checkpoint.pt) blake2b-128, as registered in docs/prereg/RFX.md; a mismatch voids the run
+DIGESTS={'R-r128':('61911b21bbfdbe48604ad3d5961ef9d3','0f51677aea1db4cbb5f7e9349fceffd1'),
+         'R-r32':('dce6e6040122f3956444a81b9bec3bf4','a2e79690fafd64d540f8aef8b081efab'),
+         'W5-r32':('979b387f8b04165132b91b4d174f1c80','687b5b46f81f845f0b6d33f2723bfe34')}
 SMOKE=dict(fit_episodes=64,eval_episodes=64)
 TOLERANCE=dict(raw_recompute_max_rel=1e-4,delta_reconstruction_max_rel=1e-4,ridge_permutation_max_abs=1e-4)
 
@@ -37,6 +41,13 @@ def checkpoint_identity(label,folder):
                 writer_blake2b=digest('writer.pt'),checkpoint_blake2b=digest('checkpoint.pt'))
 
 
+def verify_digests(label,identity):
+    """The folder's files must be the registered ones (docs/prereg/RFX.md): a mismatch voids the run."""
+    found=(identity['writer_blake2b'],identity['checkpoint_blake2b'])
+    if found!=DIGESTS[label]:
+        raise ValueError(f'{label}: (writer.pt, checkpoint.pt) blake2b-128 {found} differ from the registered {DIGESTS[label]}')
+
+
 def instrumentation_failures(checks):
     """Gross-bug guards, not scientific outcomes: the replacement hook and the cached stores must reproduce the model."""
     bad=[]
@@ -51,12 +62,15 @@ def instrumentation_failures(checks):
 def run(runs,out,labels=LABELS,*,smoke=False):
     if not smoke and tuple(labels)!=LABELS:
         raise ValueError('the registered study evaluates all three checkpoints')
+    identities={label:checkpoint_identity(label,Path(runs)/CHECKPOINTS[label][0]) for label in labels}
+    for label,identity in identities.items():
+        verify_digests(label,identity)  # before anything is created or loaded
     out=Path(out); out.mkdir(parents=True,exist_ok=False)
     created=datetime.now(timezone.utc).isoformat()
     model,tokenizer,load_seconds=_load_backbone('cuda')
     records,failures={},{}
     for label in labels:
-        identity=checkpoint_identity(label,Path(runs)/CHECKPOINTS[label][0])
+        identity=identities[label]
         experiment,head=load_checkpoint(identity['folder'],model=model,tokenizer=tokenizer)
         try:
             record,samples=run_checkpoint(label,experiment,head,smoke=smoke,**(SMOKE if smoke else {}))

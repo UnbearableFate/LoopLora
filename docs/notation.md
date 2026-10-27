@@ -113,4 +113,4 @@ sweep  (store_sweeps = S): the β = 1 delta scan of §3 over the same n writes, 
 Both read as §2 (`q̂` when `unit_query`), neither uses β, both need `gate = "scalar"` and no DPFP. `write` and
 `scan_prewrite` (online per-token writes) raise for a non-delta store. The exact read `m = Σ_j d_j v_j` is available as
 `memory.ridge_coefficients` / `memory.sweep_coefficients`; `memory.gram_conditions` gives the (finite) condition numbers
-of `K Kᵀ` and of the weighted ridge system. With the defaults §2–§7 hold exactly.
+of the `n × n` key Gram `KᵀK` and of the weighted ridge system `W^½ KᵀK W^½ + η I`. With the defaults §2–§7 hold exactly.
