@@ -9,7 +9,7 @@ wake-ups cancelled).
 
 | subagent | role | worktree, branch | state |
 | --- | --- | --- | --- |
-| sn-llm | wk-llm: LLM module experiments (learned writer line) | LoopLora-wt/llm, wp/llm | WP-L5 step 1 done (8eb24ab; master merged in as 77373ea); active: WP-L7 step 1 (RFX, LSQ code and prereg drafts); WP-L5/L7 step 2 after 2026-10-28 22:00 |
+| sn-llm | wk-llm: LLM module experiments (learned writer line) | LoopLora-wt/llm, wp/llm | WP-L5 step 1 done (8eb24ab); WP-L7 step 1 done (9588998); RFX and LSQ registered on master (077bb81, 64f3e54); active: WP-L7 step 1b (code to the registered rules); WP-L5/L7 step 2 after 2026-10-28 22:00 |
 | sn-p1l | wk-p1l: P1-L main study | LoopLora-wt/p1l, wp/p1l (wp/p1l merged into master as ca85a40) | WP-P1LC step A done (wp/p1l c5de5c2: B7 check in finalize, P1L-C code and tests, unrun); step B (remaining training, confirmation) after 2026-10-28 22:00 |
 | sn-oracle | new (2026-10-27): LLM oracle code designs, WP-L6 and P1L-S | LoopLora-wt/oracle, wp/oracle | WP-L6 step 1 done (wp/oracle 3a788b1; preregs WP-L6 and P1L-S registered 4ac2410); step 2 after 2026-10-28 22:00 |
 | sn-sym | wk-sym/wk-symf: symbolic studies | LoopLora-wt/sym, wp/sym | active: WP-S9 step 1 (IVD, CVH, TSM, UNS) |
