@@ -6,7 +6,8 @@ pushed). Nothing has run on a GPU.** The orchestrator reviewed the preregs (0b1c
 Miyabi is in maintenance until 2026-10-28 22:00 JST. Checked so far: `py_compile` and `pyflakes` on all 9 changed or
 new Python files (login Python 3.9; the project targets 3.13), both pilot configs resolve, and the runner's `decide`
 and `size` rules ran on synthetic records (stdlib only). All other code, every test included, is desk-checked and
-first runs in step 2.
+first runs in step 2. Step 1b (F1 fix, the P1L-S plan) and step 1c (the P1L-S pipeline, implemented early on top of
+wp/p1l 02fc561) have their own sections below; **the WP-L6 tests, smoke and pilot stay pinned to 7175e09**.
 
 | Piece | Where |
 | --- | --- |
@@ -24,8 +25,9 @@ fixed Π_0 for rot and not linear for random; float64 delta-rule reference; exac
 addressed or written; gradient reaches C only for shared; config rules; tiny-model train, export and reload for both;
 optimizer group and joint clipping; parameter counts; run records; `compare_suite`; checkpoint rejection; the
 registered decision rule, divergence versus infrastructure failure, and the packing rule. **`oracle_random` bitwise
-unchanged:** the recorded CPU code hash `55179f86…` is reproduced, and the four changed files, put back to dc659e0 in a
-copy of `src`, must give identical code tables, memory, resolved hashes of all committed P1-L configs, tiny-model
+unchanged:** the recorded CPU code hash `55179f86…` is reproduced, and the four changed files (five since step 1c, which
+adds `evaluate.py`), put back to dc659e0 in a copy of `src`, must give identical code tables, memory, resolved
+hashes of all committed P1-L configs, tiny-model
 training of M1/B8/B4/B5/B3, `run_one` records and `compare_suite` (needs dc659e0 reachable; `LOOPLORA_REPO`
 overrides).
 
@@ -34,23 +36,33 @@ clipped jointly. A non-finite loss, evaluation value or gradient norm fails that
 infrastructure failures rerun the unchanged config. The 567-step smoke uses a derived seed and validation seed and
 times a full 1,000-episode evaluation; its scores are never read. The WP-L6 run is not a P1L-S Pilot-2 candidate.
 
-**Step-2 commands.** `W=/work/xg24i002/x10041/LoopLora-wt/oracle`, `R=/work/xg24i002/x10041/LoopLora/runs/wp-l6`,
-`S=$W/scripts/submit.py`, `H` = full hash of a commit that contains this branch (the preregs are already registered).
+**Step-2 commands (pinned to 7175e09 since step 1c).** `W=/work/xg24i002/x10041/LoopLora-wt/oracle`,
+`C=/work/xg24i002/x10041/LoopLora`, `R=$C/runs/wp-l6`, `S=$W/scripts/submit.py`,
+`H0=7175e09471fc548c5f376af38cd6a2d2f8661ec3` (the step-1b commit, the last one before the P1L-S pipeline). The tests,
+the smoke and the pilot run from H0 as `--commit` snapshots, so the pilot does not depend on the P1L-S pipeline code
+that later commits add: `llm/config.py`, `llm/evaluate.py` and the P1-L scripts differ after H0, while
+`scripts/run_wp_l6.py`, `llm/oracle.py`, `llm/run.py`, `llm/train.py`, `configs/wp_l6/` and the WP-L6 tests are
+byte-identical in every later commit. The test jobs therefore use `--commit $H0` instead of `--worktree $W` (which would
+test whatever the worktree holds), and the two login-node steps run from a plain export of H0 (`P0`). The preregs are
+already registered.
 ```
+P0=$(mktemp -d) && git -C $C archive $H0 | tar -x -C $P0
 # 1-2 tests, then regression of the existing LLM/oracle tests (debug-g, blocking)
-$S --name wp-l6-tests --walltime 00:30:00 --worktree $W --wait -- -m pytest -q tests/test_llm_oracle_codes.py tests/test_llm_oracle_offpath.py tests/test_wp_l6_runner.py
-$S --name wp-l6-regr --walltime 00:30:00 --worktree $W --wait -- -m pytest -q tests/test_llm_oracle.py tests/test_llm_run.py tests/test_llm_train.py tests/test_llm_evaluate.py tests/test_llm_determinism.py tests/test_sym_writer_compatibility.py tests/test_p1l_main_gates.py tests/test_p1l_main_readout.py
+$S --name wp-l6-tests --walltime 00:30:00 --commit $H0 --wait -- -m pytest -q tests/test_llm_oracle_codes.py tests/test_llm_oracle_offpath.py tests/test_wp_l6_runner.py
+$S --name wp-l6-regr --walltime 00:30:00 --commit $H0 --wait -- -m pytest -q tests/test_llm_oracle.py tests/test_llm_run.py tests/test_llm_train.py tests/test_llm_evaluate.py tests/test_llm_determinism.py tests/test_sym_writer_compatibility.py tests/test_p1l_main_gates.py tests/test_p1l_main_readout.py
 # 3 time-only smoke, both arms
-$S --name wp-l6-smoke --walltime 00:20:00 --commit $H --wait -- scripts/run_wp_l6.py smoke --out $R/smoke
+$S --name wp-l6-smoke --walltime 00:20:00 --commit $H0 --wait -- scripts/run_wp_l6.py smoke --out $R/smoke
 # 4 login node: packed or separate (packed only if 1.5 x (summed expected seconds + 90 s) <= 1 h)
-$W/scripts/run_wp_l6.py size --smoke $R/smoke --out $W/reports/wp-l6/sizing.json
+$P0/scripts/run_wp_l6.py size --smoke $R/smoke --out $W/reports/wp-l6/sizing.json
 # 5a packed: walltime = packed.walltime from sizing.json (regular-g above 30 min; no --wait)
-$S --name wp-l6-pilot --queue regular-g --walltime <packed.walltime> --commit $H -- scripts/run_wp_l6.py pilot --out $R/pilot
+$S --name wp-l6-pilot --queue regular-g --walltime <packed.walltime> --commit $H0 -- scripts/run_wp_l6.py pilot --out $R/pilot
 # 5b separate: one job per arm, walltime = arms.<arm>.walltime
-$S --name wp-l6-rot --queue regular-g --walltime <w> --commit $H -- scripts/run_wp_l6.py pilot --arms oracle_rot --out $R/pilot-rot
-$S --name wp-l6-shared --queue regular-g --walltime <w> --commit $H -- scripts/run_wp_l6.py pilot --arms oracle_shared --out $R/pilot-shared
+$S --name wp-l6-rot --queue regular-g --walltime <w> --commit $H0 -- scripts/run_wp_l6.py pilot --arms oracle_rot --out $R/pilot-rot
+$S --name wp-l6-shared --queue regular-g --walltime <w> --commit $H0 -- scripts/run_wp_l6.py pilot --arms oracle_shared --out $R/pilot-shared
 # 6 login node: the registered decision (packed: $R/pilot/<arm>; separate: $R/pilot-rot/oracle_rot, $R/pilot-shared/oracle_shared)
-$W/scripts/run_wp_l6.py decide --oracle_rot <dir> --oracle_shared <dir> --out $W/reports/wp-l6/decision.json
+$P0/scripts/run_wp_l6.py decide --oracle_rot <dir> --oracle_shared <dir> --out $W/reports/wp-l6/decision.json
+# 7 commit the evidence: P1L-S reads the decision from the commit (git show) and its authorization hashes it
+cd $W && git add reports/wp-l6/sizing.json reports/wp-l6/decision.json && git commit -m 'WP-L6: smoke sizing and the registered decision'
 ```
 Cost from P1-L's measured step times: ≈ 1.3 node·h in all (tests ≈ 0.5, smoke ≈ 0.1, pilot ≈ 0.65); every job ≤ 1 node × 1 h.
 
@@ -76,14 +88,17 @@ Step 2 starts when the maintenance ends (2026-10-28 22:00 JST).
 Review `docs/review/static_2026-10-27/oracle.md` (head 3a788b1): no defect in the WP-L6 code, runner, configs or tests.
 **F1 fixed:** `scripts/run_wp_l6.py` is git mode 100755 (`git ls-files -s`), shebang kept, module-level imports still
 stdlib only; `tests/test_wp_l6_runner.py::test_runbook_runs_the_file_directly_on_the_login_node` runs it as a command
-(step 2). The `size` and `decide` commands above stand as written. **F2 is the plan below; no P1L-S code is written.**
+(step 2). The `size` and `decide` commands stand as written (step 1c runs them from an export of 7175e09).
+**F2 is the plan below; step 1b wrote no P1L-S code (step 1c implements it).**
 
-## P1L-S implementation plan (step 3a; not started)
+## P1L-S implementation plan (step 3a; implemented in step 1c, see the last section)
 
-Starts when the orchestrator says wp/p1l is merged into master (its compute tests passed) and runs while the WP-L6
-pilot runs. Base and baseline of every default-equality test: master at that merge (it then holds sn-p1l's
-`memory_use_check` and the removed launcher deadline). P1L-S itself runs only if `reports/wp-l6/decision.json`
-selects a code. Sources: review F2.1–F2.8 and "Pipeline work that precedes the smoke" in `docs/prereg/P1L-S.md`.
+*Status: the orchestrator moved this up (step 1c): it is implemented on wp/p1l 02fc561 (merged into wp/oracle, 0fd1550),
+which already holds sn-p1l's `memory_use_check` and the removed launcher deadline; the baseline of the default-equality
+tests is that commit until wp/p1l is in master. The text below is the plan as registered in 7175e09; where the code
+differs, "Where the implementation differs from the plan text" in the last section lists it.* P1L-S itself runs only if
+`reports/wp-l6/decision.json` selects a code.
+Sources: review F2.1–F2.8 and "Pipeline work that precedes the smoke" in `docs/prereg/P1L-S.md`.
 Functions, not line numbers, because wp/p1l moves lines.
 
 **Rule.** New behaviour is selected by `--study p1l-s` (`run_p1l_main.py`, `launch_p1l_main.py`,
@@ -192,3 +207,218 @@ P1L-state §4 covers all 15 names, B3-L4 into P1L-S's own root), finalize, `docs
 P1L-C code: `p1lc.py` has its own [102000, 104000) window, so the prereg's "the same mechanism P1L-C needs" holds only
 as a need, not as shared code. Review observation, no action: the pilot exercises Π_0 only (`t2_chain_end` writes
 relation 0); Π_1–Π_3 first act on the LM path in P1L-S's typed replication, so a pilot pass says nothing about them.
+
+## Step 1c — the P1L-S pipeline, implemented (2026-10-27)
+
+**Commits on `wp/oracle`.** `0fd1550` merges wp/p1l 02fc561 (parents 7175e09 and 02fc561; no conflict). `47949f0` is the
+pipeline and its tests (15 files, +2,194 −91). `0c00af6` holds the fixes from an independent review (see below; 3 files,
++112 −13). The commit that carries this section is the head, **H1** below (`git rev-parse wp/oracle`). No merge into
+master, no push, no GPU run, no job submitted. WP-L6's pinned files (`scripts/run_wp_l6.py`, `llm/oracle.py`,
+`llm/run.py`, `llm/train.py`, `configs/wp_l6/`, `tests/test_llm_oracle_codes.py`, `tests/test_wp_l6_runner.py`) are
+byte-identical to 7175e09 (`git diff 7175e09 HEAD -- <paths>` is empty), and `docs/prereg` is untouched (`git diff
+0fd1550 HEAD -- docs/prereg` is empty). The code is dormant unless `reports/wp-l6/decision.json` selects an oracle code.
+
+**Rule (as planned).** `--study p1l-s` (`run_p1l_main.py`, `launch_p1l_main.py`, `analyze_p1l_main.py`,
+`p1l_job_ledger.py`) or `study: "p1l-s"` in the manifest (`evaluate_p1l_main.py`, `finalize_p1l_main.py`, with the
+authorization naming the same study) selects the new behaviour; absent means P1-L, whose statements run unchanged.
+Signatures: an AST comparison with 02fc561 of the eight changed modules (47 surviving functions) shows no positional
+parameter changed or removed, and every added parameter has a default. The only top-level names that disappeared are
+`labels_for_rank` in `launch_p1l_main` and `analyze_p1l_main` (each now imports `trained_labels`; nothing imports the
+old name from there; `run_p1l_main.labels_for_rank` stays, with a defaulted `study`).
+
+| Plan item | Implemented in |
+| --- | --- |
+| 1 Study profile | `run_p1l_main.py`: `STUDIES` (`p1l`, `p1l-s`), `labels_for_rank(rank, study)`, `trained_labels`, `lock_file`, `config(label, seed, rank, study)`; `--study`, with an error for r ≠ 32 or a label the study does not train. `fit()` adds `writer_trainable_parameters` and `parameters` for `oracle_rot`/`oracle_shared` and `code_drift` for `oracle_shared` only (P1-L records keep their fields). New `scripts/make_p1ls_configs.py` (mode 755, stdlib): the 12 configs, P1-L's files with only `name` (`p1l-s-<reader>-s<seed>`) and `writer` replaced, from `reports/wp-l6/decision.json` (status `selected`), never overwriting a differing file, all-or-nothing |
+| 2 One locked window | `llm/config.py`: `CONFIRMATION_WINDOWS = {"p1l": 100000, "p1l-s": 110000}`, `split_window(eval, split)`, optional allow-listed `eval.confirmation` (only with a `confirm` split; absent keeps every resolved P1-L config and hash; `eval.start`/`episode_start` still rejected). `llm/evaluate.py` and `evaluate_p1l_main.py` (`swap_successors`, `readout`) read the window through `split_window`; `main()` merges the authorization's `confirmation_window` into the confirmation template (typed replication inherits it); `finalize` compares `metrics["episode_ranges"]` and `cfg["eval"]["confirmation"]` with the authorization's window |
+| 3 Per-group code audit | `finalize_p1l_main.py`: `audit_writer_groups` (the retrained runs under W and the reused runs under `oracle_random` must be exactly the manifest's split; write counts equal across all runs), `audit_fixed_code` (one `writer_hash` and identical snapshots per fixed-code group), `audit_shared_code` (`global_codes` and `rotations` of every run's checkpoint equal to a writer rebuilt from `oracle_seed`; the recorded trained-parameter count equals the size of C (32,800 at r = 32); each run's C hashed and recorded, not compared; drift recorded); all of it in `run-manifest.json` |
+| 4 Writer labels | `endpoints(..., writer)`; `accuracy.csv` `writer` from each run's recorded config; `endpoints.json` adds `study`, `confirmation_window`, `writer_by_reader`; headline and plot titles name the study |
+| 5 B7 and B6 | `memory_use_check` unchanged (95% at k = 1); `memory_use_lines(rank, memory, study, gates)` prints, after a B7 pass, the line of `docs/prereg/P1L-S.md` that matches the (G1-L, G2-L) outcomes, and the B7-fail text otherwise; `meets_g1_criterion` and `B6_equal_parameter` in `endpoints.json` and `results.md` |
+| 6 `check_training` | `evaluate_p1l_main.py`: `check_study_training` (12 + 3 runs, k = 1, window, committed `decision.json` by path and hash with `selected == manifest["writer"]`, reused entries re-verified against P1-L's `training-manifest.json`), `check_run` shared with the P1-L path; signature unchanged |
+| 7 Launcher, analysis, ledger | `launch_p1l_main.py`: `submit(..., scale_up)`, `selected_writer` (the decision and the 12 configs are read with `git show` at the commit the jobs run from), `reused_runs`, pilot = four readers at seed 17, main = 12 single-run jobs, names `ps-<p\|m>-<tag>`, `--scale-up docs/prereg/P1L-S.md`, manifest with `study`, `writer`, `condition`, `reused`; `analyze_p1l_main.py` takes the labels from the study and reads `<root>/smoke/<label>-s17`; `p1l_job_ledger.py --study p1l-s` (prefix `ps-`, which no existing job name has) |
+| 8 C in `inference.json` | `inference_timing` adds `writer_parameters` only when nonzero; `inference.csv` gets the column for P1L-S |
+| 9 Evaluation templates | unchanged files in `configs/p1l/main`, used by both studies; the window comes only from the authorization |
+
+**Where the implementation differs from the plan text.**
+1. `fit()` imports `code_drift` from `run_wp_l6.py` (lazily, `oracle_shared` only) instead of a shared tensor-level core:
+   extracting it would edit a WP-L6-pinned file.
+2. `writer_parameters` is `sum(experiment.writer_trainable_parameters())`, not `_parameter_counts(...)["external_writer"]`
+   (same value: 32,800 for `oracle_shared`, absent otherwise).
+3. `launch_p1l_main.py` has `--reuse <P1-L r = 32 training-manifest.json>` (required by, and only valid for, the P1L-S
+   main stage, and it must be an absolute path because every later job re-reads it from its own working directory);
+   its entries (`source`, `manifest`, `manifest_hash`, `checkpoint_hash`) are what `check_study_training` re-verifies.
+4. The WP-L6 decision lives at `reports/wp-l6/decision.json` (profile key `decision`); the authorization names it as
+   `decision: {path, hash}`.
+5. `check_training` on the P1-L path now also refuses an authorization that carries `confirmation_window` or names
+   another study. P1-L's authorization has neither (`reports/p1l/confirmation-lock.json` keys; the other callers,
+   `compare_p1l_ranks.py` and sn-p1l's `evaluate_p1l_causal.py`/`finalize_p1l_causal.py`, pass P1-L's own); this is the
+   plan's "rejects any window in a P1-L authorization".
+6. In `launch()` the P1-L group-building block is indented one level deeper (diff noise; the differential test compares
+   its command lines, receipts and manifests).
+7. `memory_use_lines` takes `gates = (G1-L, G2-L)` as well as `study`: after a B7 pass, `results.md` states what the
+   outcomes allow (the prereg's decision table: both pass, G1-L fails, G1-L passes and G2-L fails) instead of one
+   sentence for every pass.
+8. The default-equality test takes `src`, `scripts` and `configs` of the baseline whole from `git archive` (a consistent
+   tree) instead of single `git show` files.
+
+**Independent review.** A fresh read-only subagent was given the diff of 47949f0 and the specifications, not my
+conclusions. It found no wrong run accepted, no valid run rejected, no change on the P1-L path and no pytest or torch
+pitfall, and reported three items, all fixed in `0c00af6`: the launcher checked the working-tree configs although jobs
+run from the commit (now `git show`, test added); the B7-pass sentence read as "composition shown" even when G1-L
+failed (item 7 above; cohorts with G1-L failing and with G2-L failing added); no test loaded a real reused checkpoint
+(added, see below). It ran no GPU test, `evaluate_part` or real pytest, as the login-node rules forbid.
+
+**Tests (compute node; their first run is the H1 jobs below).**
+- `tests/test_p1ls_defaults.py`: P1-L defaults unchanged. `src`, `scripts` and `configs` of the baseline commit
+  `BASELINE` (wp/p1l 02fc561 for now) come from `git archive`; `tests/assets/p1ls_defaults_probe.py` runs in a fresh
+  process on that tree and on this checkout over the same synthetic inputs, and every part of its record must be equal:
+  resolved hashes of the 40 committed P1-L configs and both confirmation templates, `run_p1l_main` labels and configs,
+  the launcher's command lines, receipts and manifests (pilot and main at r = 32 and 128; 7/7/19/5/15 commands),
+  `analyze` size and select, `check_training` on 23 inputs (2 accepted, 21 rejected; the same outcome and exception
+  text on both trees, at least 10 distinct texts), `endpoints` and the memory-use text, `finalize`'s output files on a synthetic r = 32 matrix, and
+  `evaluate()`'s confirmation window and `episode_ranges` (generator stubbed, no test episode generated).
+- `tests/test_p1ls_pipeline.py` (60 test functions, 236 cases; `tests/assets/p1l_matrix.py` builds the synthetic P1-L
+  and P1L-S matrices from files only): windows (registered, disjoint from P1-L's and P1L-C's, templates carry none,
+  one-key config difference, rejections); `check_training` (16 authorization, 15 manifest, 14 record and 6 reuse
+  cases, lock-check semantics, decision rule, cross-study refusal); `evaluate_p1l_main.main` with stubs (window in both
+  confirmation configs for P1L-S, absent for P1-L); `finalize` (writers, B6 and B7 text for all three outcomes,
+  `writer_parameters`, range and study checks before any evaluation is opened, missing evaluation, group and
+  fixed-code damage, `meets_g1_criterion` boundaries, `audit_writer_groups`, `audit_shared_code`); the control plane on a
+  stand-in repository (launcher main and pilot, receipts, idempotence, job names, argument rules, decision, committed
+  configs, reuse, sizing and lock errors, existing output; run profile; `make_p1ls_configs` write, atomicity and
+  refusal; analyze; ledger per study; import without torch). Eleven cases need the GPU model or real artifacts:
+  tiny-model `fit` code fields for the three writers (3), `inference_timing` (3), `evaluate()` with a recording
+  `generate` that returns validation episodes only (4), and the reuse test (1): P1-L's real r = 32 B3-L4 seed-17
+  checkpoint (the run P1L-S reuses) loads under this code, the `oracle_random` code this tree builds from its config
+  has the `writer_hash` P1-L recorded, and 16 validation episodes score (no value is asserted; it skips if
+  `runs/p1l/main/training-manifest.json` is absent).
+- `tests/test_llm_oracle_offpath.py` and `tests/assets/oracle_offpath_probe.py`: `evaluate.py` joins `CHANGED` (five
+  files; it imports `split_window` from the changed `config.py`, so a dc659e0 `config.py` cannot serve it).
+
+**Checked here and not.** Static: pyflakes on the 21 Python files changed since 02fc561 shows only the 7 unused-import
+warnings that 02fc561's copies of the six P1-L scripts have too (same messages); `py_compile` passes on Python 3.9 and
+3.13 (bytecode redirected out of the worktree; `__pycache__` count 0); the five stdlib control-plane scripts
+(`launch_p1l_main`, `p1l_job_ledger`, `make_p1ls_configs`, `run_p1l_main`, `analyze_p1l_main`) import and print `--help`
+under the login node's Python 3.9. Executed on the login node with stand-ins, **not pytest, not torch**:
+`tests/test_p1ls_pipeline.py` under a stdlib mini-pytest and a numpy-only fake torch, on the final code: 225 passed,
+11 skipped (the GPU or real-artifact cases above), 0 failed; the existing `tests/test_p1l_main_gates.py` (5) and
+`tests/test_p1l_memory_use.py` (8) pass under the same shim; the probe's CPU parts, run on a `git archive` of 02fc561 and
+on this tree after the review fixes, give equal records. Against the real artifacts (hashes and JSON only):
+`make_p1ls_configs.make` gives 12 configs for both codes that differ from P1-L's files in `name` and `writer` only
+and serialize identically; `launch_p1l_main.reused_runs` and the per-run reuse checks hold for P1-L's three real
+r = 32 B3-L4 runs (complete, checkpoint hash matches, r = 32, no smoke or confirmation access, `oracle_random`, oracle
+seed 17, S = 17,000, lr as locked, manifest map and condition as `check_study_training` expects). **Not run:** any real
+pytest; the 11 GPU or real-artifact cases of the pipeline module and the probe's evaluate part; the existing torch
+tests (`test_llm_*`, `test_p1lc*`, the off-path overlay with `evaluate.py` added); `audit_shared_code` on checkpoints
+written by the real `train()` (its tests rebuild the real writer class's state under torch on compute, but no trained
+run has been audited); every compute job.
+
+**Commands.** `W=/work/xg24i002/x10041/LoopLora-wt/oracle`, `C=/work/xg24i002/x10041/LoopLora`, `S=$W/scripts/submit.py`.
+*WP-L6 step 2 (tests, smoke, pilot, decision): pinned to 7175e09, see "Step-2 commands" above (H0).* *P1L-S tests, at
+the new head H1 (separate from step 2; they may run while the WP-L6 pilot runs; job names start with `ps-`, so the
+P1L-S ledger counts them):*
+```
+H1=$(git -C $W rev-parse HEAD)     # full hash: submit.py resolves refs in the central checkout
+$S --name ps-t-pipeline --queue regular-g --walltime 01:00:00 --commit $H1 -- -m pytest -q tests/test_p1ls_pipeline.py
+$S --name ps-t-defaults --queue regular-g --walltime 01:00:00 --commit $H1 -- -m pytest -q tests/test_p1ls_defaults.py
+$S --name ps-t-oracle --walltime 00:30:00 --commit $H1 -- -m pytest -q tests/test_llm_oracle_codes.py tests/test_llm_oracle_offpath.py tests/test_wp_l6_runner.py
+$S --name ps-t-regr --walltime 00:30:00 --commit $H1 -- -m pytest -q tests/test_llm_oracle.py tests/test_llm_run.py tests/test_llm_train.py tests/test_llm_evaluate.py tests/test_llm_determinism.py tests/test_llm_b8.py tests/test_llm_prefetch.py tests/test_sym_writer_compatibility.py
+$S --name ps-t-p1l --walltime 00:30:00 --commit $H1 -- -m pytest -q tests/test_p1l_main_gates.py tests/test_p1l_main_readout.py tests/test_p1l_memory_use.py tests/test_p1lc.py tests/test_p1lc_stats.py
+```
+Five single-node jobs, at most 3.5 node·h if every request were used. The wall times are guesses (nothing here has run
+on a GPU), and the defaults test needs `git` and the central repository on the compute node, as the off-path test does.
+The last three jobs re-run the existing tests that call `resolve_config`, `llm.evaluate` or the P1-L scripts directly
+(the step-2 regression list, `test_llm_b8`, `test_llm_prefetch`, and the P1-L tests that came with the merge). The other
+`test_llm_*` suites reach `config.py` only through `llm/run.py` and `llm/train.py` and are not re-run; add
+`tests/test_llm_*.py` to `ps-t-regr` for a full sweep. Once wp/p1l is in master after its compute tests: merge master into wp/oracle, set
+`BASELINE` in `tests/test_p1ls_defaults.py` to that merge commit (reachable from this checkout or the central one, or
+`LOOPLORA_REPO`), and rerun `ps-t-defaults`.
+
+*P1L-S step 3, only if `reports/wp-l6/decision.json` is committed with status `selected` (step 2 above commits it) and
+P1-L's r = 32 runs have finished; `P1LM` is P1-L's raw `training-manifest.json`, identical today to the committed
+`reports/p1l/training-manifest.json`. All paths absolute; compute jobs run from a commit snapshot, so every file they
+read must be committed first.*
+```
+R=$C/runs/p1l-s; P1LM=$C/runs/p1l/main/training-manifest.json; A=$W/reports/p1l-s/confirmation-authorization.json
+cd $W && python3 -B scripts/make_p1ls_configs.py && git add configs/p1l-s && git commit -m 'P1L-S: configs under the WP-L6 code'
+H2=$(git rev-parse HEAD)
+# smoke: 4 readers x 1,700 steps, time only (about 0.35 node.h); never read its scores
+$S --name ps-s-smoke --queue regular-g --walltime 00:45:00 --commit $H2 --wait -- scripts/run_p1l_main.py smoke --out $R/smoke --steps 1700 --study p1l-s
+$S --name ps-size --walltime 00:05:00 --commit $H2 --wait -- scripts/analyze_p1l_main.py size --root $R --out $W/reports/p1l-s/sizing.json --study p1l-s
+# Pilot-2: one job per reader, lr 1e-3 and 3e-3 at 5,666 steps (login node; the launcher submits the jobs and records receipts)
+python3 -B scripts/launch_p1l_main.py pilot --root $R --sizing $W/reports/p1l-s/sizing.json --study p1l-s
+# when all four pilot jobs have finished:
+$S --name ps-select --walltime 00:05:00 --commit $H2 --wait -- scripts/analyze_p1l_main.py select --root $R/pilot --sizing $W/reports/p1l-s/sizing.json --out $W/reports/p1l-s/lr-S-lock.json --study p1l-s
+git add reports/p1l-s && git commit -m 'P1L-S: sizing and lr/S lock'     # main needs the lock committed at HEAD
+python3 -B scripts/launch_p1l_main.py main --root $R --sizing $W/reports/p1l-s/sizing.json --study p1l-s --reuse $P1LM
+```
+After all 12 trainings have finished, the orchestrator writes the authorization once (never rewritten), commits it, and
+takes `P1LS`:
+```
+python3 -B - <<'PY'
+import json, sys
+from pathlib import Path
+sys.path.insert(0, "scripts")
+from run_p1l_main import STUDIES, digest
+decision = STUDIES["p1l-s"]["decision"]
+auth = dict(study="p1l-s", status="allowed", orchestrator_decision="<who, when, why>", gated_conditions=1,
+            confirmation_window="p1l-s", decision=dict(path=decision, hash=digest(Path(decision))),
+            condition_manifests={"p1l-s-r32": "/work/xg24i002/x10041/LoopLora/runs/p1l-s/training-manifest.json"})
+out = Path("reports/p1l-s/confirmation-authorization.json"); assert not out.exists()
+out.write_text(json.dumps(auth, indent=2) + "\n")
+PY
+git add reports/p1l-s/confirmation-authorization.json && git commit -m 'P1L-S: release the confirmation after the 12 trainings'
+P1LS=$(git rev-parse HEAD)
+$S --name ps-t-preconfirm --walltime 00:10:00 --commit $P1LS --wait -- -c '
+import json, sys
+from pathlib import Path
+sys.path.insert(0, "scripts")
+from evaluate_p1l_main import check_training
+a = json.loads(Path("'$A'").read_text())
+check_training(json.loads(Path(a["condition_manifests"]["p1l-s-r32"]).read_text()), a)
+print("P1L-S training matrix verified")'
+for label in B8 M1-L4 B4 B5-L4 B3-L4; do     # one job per reader, three seeds; test ! -e before each
+  case $label in M1-L4|B8) wall=01:00:00; queue=regular-g;; *) wall=00:15:00; queue=debug-g;; esac
+  test ! -e $R/confirmation/$label
+  $S --name ps-ev-$label --queue $queue --walltime $wall --commit $P1LS -- scripts/evaluate_p1l_main.py \
+    --manifest $R/training-manifest.json --authorization $A --out $R/confirmation/$label \
+    --runs $label-s17 $label-s29 $label-s43 --directions $C/runs/p1l/main/jlens/directions.pt | tee -a $R/confirmation-submissions.jsonl
+done
+```
+Then the evaluation map and the finalizer, as in P1L-state §4 (15 names; B3-L4 is evaluated from P1-L's checkpoints into
+this study's own root), the ledger, and the reports:
+```
+python3 -I - <<'PY'
+import json
+from pathlib import Path
+root = Path("/work/xg24i002/x10041/LoopLora/runs/p1l-s")
+runs = {name: str(root / "confirmation" / name.rsplit("-s", 1)[0] / name) for name in json.loads((root / "training-manifest.json").read_text())["runs"]}
+for name, path in runs.items():
+    assert json.loads((Path(path) / "record.json").read_text())["status"] == "complete", name
+(root / "evaluation-manifest.json").write_text(json.dumps({"runs": runs}, indent=2) + "\n")
+PY
+$S --name ps-fin --walltime 00:10:00 --commit $P1LS --wait -- scripts/finalize_p1l_main.py --manifest $R/training-manifest.json --evaluations $R/evaluation-manifest.json --authorization $A --out $W/reports/p1l-s
+python3 -B scripts/p1l_job_ledger.py --study p1l-s --out reports/p1l-s/jobs.json --require-final
+```
+Then `docs/reports/P1L-S.md` and, for a negative result, `reports/decisions/P1L-S.md` (the prereg's decision rules).
+The Pilot-2 and main walltimes come from the launcher (1.5 × the measured time, at most 2 h) and the main jobs use
+`--scale-up docs/prereg/P1L-S.md`. Margin: `analyze size` refuses S = 17,000 if the slowest reader needs more than
+about 0.278 s per step (2 h / 1.5 less the load reserve); P1-L's M1-L4 measured 0.197 s at r = 32.
+
+**Open questions (conservative choice made where the plan was silent).**
+1. **Baseline.** The differential baseline is wp/p1l 02fc561; re-point it as above once wp/p1l is in master.
+2. **Reuse source.** P1L-S records the blake2b of the P1-L manifest it is given and every later job re-checks it, so a
+   rewrite of that file after the P1L-S main launch stops evaluation until the launch is repeated. The committed copy
+   `reports/p1l/training-manifest.json` is the stable choice if the raw manifest may still change (identical today).
+3. **`code_drift` import** from `run_wp_l6.py` (difference 1): move it into `src/` after the pilot if you want it shared.
+4. **`audit_shared_code` compares tensors bitwise** with a CPU rebuild of the seeded writer. The training and the
+   finalizer both run with `OPENBLAS_NUM_THREADS=1`, so the QR-built rotations should reproduce exactly; if the first
+   real finalize rejects them, the check is cheap to relax and finalize cheap to rerun. Unverified until a compute run.
+5. **Off-path overlay test kept.** Decision 3 above allowed retiring part 2 of `tests/test_llm_oracle_offpath.py` once a
+   later change edits the four files. Step 1c edits `config.py` and adds `evaluate.py`, but the test still holds for
+   `oracle_random` and the P1-L paths by design, so it is kept with five files; retire part 2 (the docstring says how)
+   if you prefer: `ps-t-defaults` already covers the same ground against 02fc561.
+6. **Test wall times** are guesses; the pipeline module is finalize-heavy and the defaults test runs two probes (each
+   limited to 3,000 s inside the test).
+7. **Smoke and sizing commands** above are this section's design (the plan did not spell them out): analyze reads
+   `<root>/smoke/<reader>-s17` for P1L-S, so the smoke is run with `--out $R/smoke`; `analyze size` and `select` call
+   `require_compute()`, hence they are jobs.
