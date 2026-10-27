@@ -68,7 +68,7 @@ The category sizes are computed per episode and sum to C − 1.
 2. The rate is computed over all queries of the hop (as accuracy), and the share over the errors; both are given
    because the rate depends on accuracy and the share does not.
 3. The priority order of the categories (neighbour first) and the treatment of h = 2 (`one_short` empty) are fixed here
-   before any sample is read.
+   before any neighbour-confusion quantity is computed from a sample.
 4. The confirmation samples are already analysed by the earlier studies; NCR re-reads them only through the saved
    predictions, adds no new evaluation, and does not alter any earlier statistic.
 
