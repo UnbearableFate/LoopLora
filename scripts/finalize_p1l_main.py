@@ -95,7 +95,7 @@ def memory_use_rows(rank, memory):
     return rows
 
 
-def memory_use_lines(rank, memory, study="p1l"):
+def memory_use_lines(rank, memory, study="p1l", gates=None):
     passed = memory["passed"]
     lines = ["", "## Amendment B7: memory-use check", "",
              f"Hop-1 full-vocabulary EM on the confirmation set; each reader minus B3-L4@4 (no memory); "
@@ -111,10 +111,22 @@ def memory_use_lines(rank, memory, study="p1l"):
     lines.append("")
     if study != "p1l":
         # P1L-S supersedes P1-L's rule 2 at r = 32: its decision text (docs/prereg/P1L-S.md), for the selected code only.
+        # `gates` is (G1-L, G2-L): a B7 pass supports a multi-read claim only through them.
         if passed:
-            lines.append("B7 passes: the G1-L, G2-L and Amendment-B6 outcomes above are read as docs/prereg/P1L-S.md "
-                         "states, for this oracle code only. A pass shows composition for this code, not "
-                         "equivalence with the symbolic oracle, and says nothing about unseen names.")
+            if gates is None:
+                raise ValueError("the P1L-S memory-use text needs the (G1-L, G2-L) outcomes")
+            g1, g2 = gates
+            if g1 and g2:
+                reading = ("G1-L and G2-L pass: with this oracle code the multi-read reader composes inside the LM at "
+                           "r = 32 and beats the single read of the same rank; the equal-parameter statement follows "
+                           "the Amendment-B6 line above.")
+            elif not g1:
+                reading = "G1-L fails: a negative LLM result at r = 32 for this oracle code."
+            else:
+                reading = ("G1-L passes and G2-L fails: report which comparator matches B8; no evolving-query claim.")
+            lines.append(f"B7 passes, so the outcomes above are read as docs/prereg/P1L-S.md states. {reading} This "
+                         "holds for this oracle code only: it is not equivalence with the symbolic oracle and says "
+                         "nothing about unseen names.")
         else:
             lines.append("The readers did not learn to use the oracle memory at r = 32 with this code (rule 1): the "
                          "G1-L, G2-L and Amendment-B6 outcomes above are reported but not interpreted as evidence "
@@ -340,7 +352,7 @@ def finalize(args):
     if study != "p1l":
         lines.extend(["", "Amendment B6 (equal reader parameters): M1-L4@4 - B4@1 meets the G1-L criterion: "
                       f"**{'yes' if result['B6_equal_parameter'] else 'no'}**."])
-    lines.extend(memory_use_lines(rank, result["memory_use"], study))
+    lines.extend(memory_use_lines(rank, result["memory_use"], study, (result["G1_L"], result["G2_L"])))
     (args.out / "results.md").write_text("\n".join(lines) + "\n")
     print(json.dumps(dict(status="complete", G1=result["G1_L"], G2=result["G2_L"],
                           memory_use=result["memory_use_passed"])), flush=True)

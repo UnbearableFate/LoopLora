@@ -8,7 +8,7 @@ import math
 from pathlib import Path
 import subprocess
 
-from run_p1l_main import LABELS, ROOT, SEEDS, STUDIES, config, digest, lock_file, save, trained_labels
+from run_p1l_main import LABELS, ROOT, SEEDS, STUDIES, digest, lock_file, save, trained_labels
 
 
 def walltime(expected: float) -> str:
@@ -34,7 +34,12 @@ def submit(name: str, source: str, expected: float, argv: list[str], scale_up: s
 
 
 def selected_writer(source: str) -> str:
-    """The oracle code WP-L6 selected, read from the decision committed at `source` (P1L-S runs iff it selected one)."""
+    """The oracle code WP-L6 selected, read from the decision committed at `source` (P1L-S runs iff it selected one).
+
+    Jobs run from the snapshot of `source`, so the configs they will use are read from that commit as well: a config
+    that is edited, regenerated or committed under another code after the decision would otherwise train, and only
+    check_training would notice, after the training.
+    """
     decision = STUDIES["p1l-s"]["decision"]
     committed = json.loads(subprocess.check_output(["git", "-C", str(ROOT), "show", f"{source}:{decision}"], text=True))
     if committed != json.loads((ROOT / decision).read_text()):
@@ -43,8 +48,10 @@ def selected_writer(source: str) -> str:
         raise ValueError("P1L-S runs only if WP-L6 selected an oracle code")
     for label in trained_labels(32, "p1l-s"):
         for seed in SEEDS:
-            if config(label, seed, 32, "p1l-s")["writer"] != committed["selected"]:
-                raise ValueError(f"configs/p1l-s/{label}-s{seed} does not use the selected code; "
+            relative = f"{STUDIES['p1l-s']['configs']}/main/{label}-s{seed}.json"
+            config = json.loads(subprocess.check_output(["git", "-C", str(ROOT), "show", f"{source}:{relative}"], text=True))
+            if config["writer"] != committed["selected"]:
+                raise ValueError(f"{relative} at {source[:10]} does not use the selected code; "
                                  "run scripts/make_p1ls_configs.py and commit")
     return committed["selected"]
 
@@ -150,6 +157,8 @@ def main():
         parser.error(f"{args.study} runs at r = 32 only")
     if (args.study != "p1l" and args.stage == "main") != (args.reuse is not None):
         parser.error("--reuse is required by, and only valid for, the main stage of a study that reuses P1-L runs")
+    if args.reuse is not None and not args.reuse.is_absolute():
+        parser.error("--reuse must be an absolute path: every later job re-reads it from its own working directory")
     launch(args)
 
 

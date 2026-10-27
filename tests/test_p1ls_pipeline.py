@@ -35,11 +35,13 @@ import make_p1ls_configs as maker
 import p1l_job_ledger as ledger
 import p1l_matrix as matrix
 import run_p1l_main as run
-from looplora.infra.seeds import derive_seed
+from looplora.infra.seeds import derive_seed, stable_hash
 from looplora.llm.config import CONFIRMATION_WINDOWS, DEFAULTS, recursive_merge, resolve_config, split_window
-from looplora.llm.inject import load_tokenizer
+from looplora.llm.inject import load_model, load_tokenizer
+from looplora.llm.oracle import OracleRandomWriter
 from looplora.llm.p1lc import REGISTERED_RANGE
-from looplora.llm.train import LLMExperiment
+from looplora.llm.train import LLMExperiment, load_checkpoint
+from looplora.sym.evaluate import tensor_hash
 from p1ls_defaults_probe import SOURCE, STEP, FakeSubprocess
 
 read, edited = matrix.read_json, matrix.edited
@@ -126,6 +128,23 @@ def unused_memory(p1l, tmp_path_factory):
     with pytest.MonkeyPatch.context() as patch:
         patch.setattr(evaluator, "ROOT", unused.repository)
         return finalize_study(unused, tmp_path_factory.mktemp("finalized-unused"))
+
+
+# What a B7 pass may say depends on G1-L and G2-L (docs/prereg/P1L-S.md, Decision use).
+READINGS = {
+    "flat_reach": ({"B8": .30}, "G1-L fails: a negative LLM result at r = 32 for this oracle code."),
+    "fixed_query_wins": ({"B5-L4": .70}, "G1-L passes and G2-L fails: report which comparator matches B8; "
+                                         "no evolving-query claim."),
+}
+
+
+@pytest.fixture(scope="module", params=READINGS)
+def b7_pass_cohort(request, p1l, tmp_path_factory):
+    """oracle_rot with B7 passing but not both gates: B8 no better than B4, or a fixed-query B5-L4 above B8."""
+    cohort = build(tmp_path_factory, request.param, p1l, "oracle_rot", overrides=READINGS[request.param][0])
+    with pytest.MonkeyPatch.context() as patch:
+        patch.setattr(evaluator, "ROOT", cohort.repository)
+        return request.param, finalize_study(cohort, tmp_path_factory.mktemp(f"finalized-{request.param}"))
 
 
 # ---- confirmation windows -----------------------------------------------------------------------------------------
@@ -440,6 +459,10 @@ def test_results_report_the_window_the_b6_flag_and_the_p1ls_b7_text(built, final
     assert "test [110000, 112000)" in text and "B3-L4 is reused from P1-L (oracle_random)" in text
     assert "meets the G1-L criterion: **yes**" in text and "Memory-use check: **pass**" in text
     assert "docs/prereg/P1L-S.md" in text and "Rule 2" not in text and "Rule 3" not in text
+    assert ("B7 passes, so the outcomes above are read as docs/prereg/P1L-S.md states. G1-L and G2-L pass: with this "
+            "oracle code the multi-read reader composes inside the LM at r = 32 and beats the single read of the same "
+            "rank; the equal-parameter statement follows the Amendment-B6 line above. This holds for this oracle code "
+            "only: it is not equivalence with the symbolic oracle and says nothing about unseen names.") in text
     for name in ("accuracy.png", "accuracy.pdf", "M1-depth.png", "M1-depth.pdf", "memory-use.csv"):
         assert (finalized / name).exists()
     assert {row["confidence"] for row in table(finalized / "memory-use.csv") if row["seed"] == "pooled"} == {"0.95"}
@@ -452,6 +475,16 @@ def test_a_reader_that_does_not_use_the_memory_fails_b7_whatever_b6_says(unused_
     text = (unused_memory / "results.md").read_text()
     assert "Memory-use check: **fail**" in text and "did not learn to use the oracle memory at r = 32 with this code" in text
     assert "no multi-read claim at r = 32 follows from this study" in text and "B7 passes" not in text
+
+
+def test_a_memory_use_pass_is_read_through_the_gate_outcomes(b7_pass_cohort):
+    name, out = b7_pass_cohort
+    endpoints = read(out / "endpoints.json")
+    assert endpoints["memory_use_passed"] is True and endpoints["passes"] is False
+    assert (endpoints["G1_L"], endpoints["G2_L"]) == {"flat_reach": (False, False), "fixed_query_wins": (True, False)}[name]
+    text = (out / "results.md").read_text()
+    assert f"B7 passes, so the outcomes above are read as docs/prereg/P1L-S.md states. {READINGS[name][1]} This holds" in text
+    assert "composes inside the LM" not in text and "Memory-use check: **pass**" in text
 
 
 def evaluation_dir(study, name):
@@ -753,6 +786,7 @@ def test_study_job_names_never_enter_the_other_studys_ledger(control, p1l, monke
     ("main", ("--reuse", "x")),                       # P1-L reuses nothing
     ("main", (*STUDY, "--rank", "128", "--reuse", "x")),
     ("pilot", (*STUDY, "--rank", "128")),
+    ("main", (*STUDY, "--reuse", "runs/p1l/main/training-manifest.json")),  # later jobs re-read it from elsewhere
 ])
 def test_launcher_argument_rules(control, monkeypatch, stage, flags):
     with pytest.raises(SystemExit) as error:
@@ -767,8 +801,21 @@ def test_launch_needs_a_selected_decision_that_the_configs_follow(control, p1l, 
     matrix.write_json(control.decision, dict(status="selected", selected="oracle_rot"))
     path = control.root / "configs/p1l-s/main/B4-s29.json"
     path.write_text(json.dumps({**read(path), "writer": "oracle_shared"}, indent=2) + "\n")
-    with pytest.raises(ValueError, match="B4-s29 does not use the selected code"):
+    with pytest.raises(ValueError, match=r"B4-s29\.json at \w+ does not use the selected code"):
         launch(control, monkeypatch, "main", *STUDY, *reuse(p1l))
+
+
+def test_launch_checks_the_configs_the_jobs_will_run_not_the_working_tree(control, monkeypatch):
+    relative = "configs/p1l-s/main/B4-s29.json"
+    fake = FakeSubprocess(control.root)
+    committed = fake.check_output
+    # the working tree is right, the commit the jobs are snapshotted from holds B4-s29 under another code
+    fake.check_output = lambda command, text=True: (
+        json.dumps({**read(control.root / relative), "writer": "oracle_shared"})
+        if command[3] == "show" and command[4].endswith(relative) else committed(command, text=text))
+    with pytest.raises(ValueError, match=r"B4-s29\.json at \w+ does not use the selected code"):
+        launch(control, monkeypatch, "pilot", *STUDY, fake=fake)
+    assert fake.commands == []
 
 
 def test_launch_refuses_a_decision_that_is_not_the_committed_one(control, monkeypatch):
@@ -1042,3 +1089,34 @@ def test_evaluate_reads_the_named_window_of_the_test_split(model, tokenizer, tmp
     finally:
         experiment.close()
     assert asked == calls and metrics["episode_ranges"] == ranges
+
+
+P1L_R32 = Path("/work/xg24i002/x10041/LoopLora/runs/p1l/main/training-manifest.json")
+
+
+def test_a_reused_p1l_checkpoint_loads_under_this_code_and_scores_validation_episodes(tmp_path):
+    """The run P1L-S reuses (P1-L's r = 32 B3-L4, seed 17): its checkpoint, its oracle_random code, the validation path.
+
+    Needs P1-L's real artifacts (the file the launcher's --reuse reads); validation episodes only, no score is asserted.
+    """
+    if not P1L_R32.is_file():
+        pytest.skip(f"{P1L_R32} not found: this check needs P1-L's real r = 32 artifacts")
+    source = Path(read(P1L_R32)["runs"]["B3-L4-s17"])
+    record = read(source / "record.json")
+    assert record["status"] == "complete" and run.digest(source / "checkpoint.pt") == record["checkpoint_hash"]
+    cfg = record["config"]
+    assert (cfg["writer"], cfg["oracle_seed"], cfg["model"]["r"]) == ("oracle_random", 17, 32)
+    # The code this source tree builds from the recorded config is the code P1-L trained with.
+    writer = OracleRandomWriter(cfg["task"]["V"], cfg["task"]["n_rel"], cfg["oracle_seed"], r_mem=cfg["model"]["r"])
+    assert stable_hash({name: tensor_hash(value) for name, value in writer.state_dict().items()}) == record["writer_hash"]
+    experiment = load_checkpoint(source / "checkpoint.pt", model=load_model(), tokenizer=load_tokenizer())
+    try:
+        assert stable_hash({name: tensor_hash(value)
+                            for name, value in experiment.writer_state().items()}) == record["writer_hash"]
+        evaluation = copy.deepcopy(experiment.config)
+        evaluation["eval"].update(splits=["val"], allow_confirmation=False, episodes=16, batch_size=16)
+        metrics, _ = llm_evaluate.evaluate(experiment, resolve_config(evaluation), tmp_path / "validation")
+    finally:
+        experiment.close()
+    assert metrics["gate0_passed"]
+    assert metrics["episode_ranges"] == {"val": dict(split="val", start=0, count=16)}
