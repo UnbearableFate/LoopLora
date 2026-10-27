@@ -1,8 +1,8 @@
-# P1L-C state — step A (B7 check and P1L-C implementation) done; nothing has run
+# P1L-C state — steps A and A2 (B7 check, P1L-C implementation, static-review fixes) done; nothing has run
 
-As of 2026-10-27 09:46 JST. Author: sn-p1l (Claude Sonnet 5.5). Branch `wp/p1l`, worktree
-`/work/xg24i002/x10041/LoopLora-wt/p1l`. Task: `docs/tasks/WP-P1LC_causal.md`; registration:
-`docs/prereg/P1L.md` Amendment B7 and `docs/prereg/P1L-C.md`.
+As of 2026-10-27 16:52 JST (step A written 09:46, step A2 added). Author: sn-p1l (Claude Sonnet 5.5). Branch
+`wp/p1l`, worktree `/work/xg24i002/x10041/LoopLora-wt/p1l`. Task: `docs/tasks/WP-P1LC_causal.md`; registration:
+`docs/prereg/P1L.md` Amendment B7 and `docs/prereg/P1L-C.md` (with Clarification C1).
 
 This is an implementation hand-off, not a result. No test or confirmation episode was generated or scored, no
 job was submitted (Miyabi is in dedicated time and maintenance until 2026-10-28 22:00 JST), and nothing was
@@ -15,9 +15,40 @@ executed on the login node except static checks. All tests below are written but
 | `a5144d9` | B7 memory-use check in `scripts/finalize_p1l_main.py` + `tests/test_p1l_memory_use.py` |
 | `30f4db1` | P1L-C library `src/looplora/llm/p1lc.py`, `scripts/evaluate_p1l_causal.py`, `scripts/finalize_p1l_causal.py` |
 | `cdde6af` | `tests/test_p1lc.py` (CPU and tiny-Qwen GPU), `tests/test_p1lc_stats.py` (CPU, synthetic samples) |
+| `c5de5c2` | this report, first version |
+| `2f22f84` | step A2: merge of master (`712b284`) into wp/p1l |
+| `c9b202f` | step A2: the finalizer requires one source tree for all nine runs (+ test) |
+| `3a7f111` | step A2: hard-coded 2026-10-28 deadline removed from `launch_p1l_main.walltime` |
+| (this file) | step A2: report update |
 
 Pending, in order: step B tests (below), the P1-L confirmation and analysis (with the B7 flag), then, only if
 r = 128 passes B7, the P1L-C smoke, the three registered jobs and the finalizer (step C commands below).
+
+## Step A2: fixes from the static review (`docs/review/static_2026-10-27/p1l.md`)
+
+The review found no defect in the registered computations (B7, P1L-C including Clarification C1); two low findings
+and notes. Done, still without compute:
+
+1. **Merge (L2, `2f22f84`).** master at `712b284` is merged into wp/p1l, so the tree that `P1L_SOURCE` and
+   `P1LC_SOURCE` pin carries P1L-C Clarification C1 and the P1-L B7 wording note. `git diff --stat dc659e0 712b284
+   -- src scripts configs tests pyproject.toml uv.lock` lists only the new `scripts/summarize_p1l_training_logs.py`
+   (69 lines, not on the confirmation path); no file had changed on both sides, so the merge had no conflicts.
+2. **One source for all nine runs (L1, `c9b202f`).** `finalize_p1l_causal.audit` now also compares `git_commit` and
+   `source_hash` across the nine records (the episode, world and memory hashes do not depend on the code). New test
+   `test_audit_requires_one_source_for_all_nine_runs`: a per-seed job rerun from another commit or source tree is
+   rejected, one different source for all nine is accepted.
+3. **Launcher (`3a7f111`).** The hard-coded 2026-10-28 00:00 UTC deadline is removed from
+   `launch_p1l_main.walltime`: after the maintenance it refused every launch, including a needed resubmission of a
+   P1-L training, and `test_job_margin_is_enforced_before_submission` would have failed from 2026-10-28 07:30 JST on
+   (now + 1.5 h past the deadline). PBS holds a job that would cross a scheduled stop and `submit.py` enforces the
+   per-job cap; the 2 h check in `walltime()` stays. The ban on rerunning the launcher also stays: its packing would
+   recreate the cancelled groups (`P1L-state.md`).
+4. **This report.** The wording of the Analysis A spec check (N1) and the interrupted-run protocol (N2) are below;
+   the open questions are cut down to what Clarification C1 does not settle. Notes N3–N5 need no change; N4 (the B4
+   path at L = 1 is not run end to end in the GPU tests) is covered by the smoke, which runs B4-s17 on a real
+   checkpoint.
+5. `py_compile` (system and venv Python) and `pyflakes` are clean on the edited files (the unused `LABELS` import in
+   `launch_p1l_main.py` was already there). The tests run in step B.
 
 ## What was built
 
@@ -38,7 +69,11 @@ r = 128 passes B7, the P1L-C smoke, the three registered jobs and the finalizer 
   tiny Qwen, and the run itself raises if the idle wrapper, the captured-state replay of each world or an identity
   patch (final and all positions) does not reproduce the plain logits exactly.
 - **Analysis A** (`read_position_samples`). Every query of the 2000 episodes in the confirmation batch shape
-  (`eval.batch_size` 16, 8 queries per episode, task spec equal to the confirmation spec, asserted), conditions
+  (`eval.batch_size` 16, 8 queries per episode). The config is built as `evaluate_p1l_main.py` builds the
+  confirmation config (the checkpoint config merged with `configs/p1l/main/eval-confirmation.json`), and that is
+  what fixes the task spec and every episode seed; the spec-equality check in `evaluation_config` cannot fail,
+  because the two configs differ only in the eval splits and `allow_confirmation`, so it guards nothing by itself.
+  Conditions
   `memory_only/deployed` (the plain path) and `memory_only/final_only` (M = 0 at every real question token except
   each row's last, whose state predicts the answer; the module still runs its memory-free branch there), at the
   reader's trained L (B4: 1, M1-L4 and B8: 4). Analysis reads hops 1, 2, 3 and pooled 1–3: final-only minus
@@ -64,7 +99,8 @@ r = 128 passes B7, the P1L-C smoke, the three registered jobs and the finalizer 
   carries the same authorization record, then runs `check_training(manifest, authorization, check_all=False)`, all
   before the first test episode is generated. Each run writes `record.json` (checkpoint, manifest, authorization and
   endpoints hashes, window, spec/episode/world/memory-snapshot hashes, timings, git commit and source hash, host,
-  job id). The finalizer re-checks all nine records, that the hashes shared by readers and seeds agree, the window
+  job id). The finalizer re-checks all nine records, that the hashes shared by readers and seeds agree (episodes,
+  worlds, oracle memory snapshots, and the `git_commit` and `source_hash` of the code), the window
   `test [102000, 104000) seed 4242`, and that the nine run directories exist; it then writes `results.json`,
   `results.md`, `read-position.csv`, `replication.csv`, `bridge-rates.csv`, `bridge-shift.csv`, `run-manifest.json`.
 
@@ -84,40 +120,38 @@ kernels; if one fails by a last-bit difference, investigate before relaxing it.
 
 ## Open questions
 
-Conservative choices were made and implemented; the orchestrator can confirm or redirect.
+Clarification C1 (`docs/prereg/P1L-C.md`, in this tree through the master merge) registers what the first version of
+this section left open; the code was written to that reading and matches it. Settled:
 
-1. **b_B.** The registration says b_B is "the head of an edge b_B → t_B on the other chain" drawn with a seed
-   derived from the episode index. I use the other chain's FINAL edge (its only such candidate that keeps t_B the
-   chain-end answer, which the reader is trained to output); only c is actually drawn. A random mid-chain edge would
-   make "answer = t_B" ambiguous with the chain-end answer in world B.
-2. **c.** A seen-pool entity outside the episode (appears in no fact except the patched edge in world C), not an
-   in-episode chain terminal. Uniform draw from the seen pool minus the episode's entities.
-3. **Which hop-2 query.** The stratified hop-2 query of each episode (the one the confirmation scores at hop 2);
+- b_B is the head of the other chain's final edge (no draw; t_B is that chain's end, reached in two hops from s as t_A
+  is in world A); only c is drawn with the episode-index seed, a seen-pool entity outside the episode with no
+  outgoing fact.
+- The patch replaces z_1 only (the recipient's `u` and world A's memory are kept for steps 2–L; the code continues B8
+  with its per-step R/U/Q); the random control is one direction per episode and position from the episode-index
+  seed.
+- P1L-C runs under the P1-L confirmation authorization (it has no record of its own; `evaluate_p1l_causal.py` and
+  the finalizer require the r = 128 `endpoints.json` to carry the same record), and a validation-only smoke
+  (val [0, 64), timing only) may run before the confirmation.
+
+Still open (conservative choices are implemented; the orchestrator can confirm or redirect):
+
+1. **Which hop-2 query.** The stratified hop-2 query of each episode (the one the confirmation scores at hop 2);
    selection depends on the episode only, so all readers and seeds see the same 256 episodes and worlds.
-4. **Patch semantics.** Only the reader state z_1 is replaced; steps 2–L use the recipient token's own `u` and world
-   A's memory. For B8 the per-step R/U/Q are used for steps 2–4. Patching u as well would change the question the
-   reader answers and is not what the registration describes.
-5. **Random control.** One isotropic random direction per episode and position (fixed 128-position table seeded by
-   the absolute episode index, so it does not depend on batching), scaled to the position's ‖z_1^B − z_1^A‖. The
-   C-patch is the registered unrelated-entity control and is not norm-matched; state norms are reported.
-6. **Analysis A scope.** All 8 hops are scored in the confirmation batch shape and the file check requires 2000
+2. **Control details.** The random direction is isotropic, drawn from a fixed 128-position table per episode (so it
+   does not depend on batching) and scaled to the position's ‖z_1^B − z_1^A‖. The C-patch is the registered
+   unrelated-entity control and is not norm-matched; state norms are reported.
+3. **Analysis A scope.** All 8 hops are scored in the confirmation batch shape and the file check requires 2000
    queries per condition and hop; the analysis reads hops 1–3 as registered. B4 (L = 1) is included because A is
    stated "for each reader at its trained L".
-7. **Pooling and CI.** Unweighted seed mean (as the P1-L pooled contrasts), bootstrap over episodes shared by seeds.
+4. **Pooling and CI.** Unweighted seed mean (as the P1-L pooled contrasts), bootstrap over episodes shared by seeds.
    The bridge bootstrap seed is `derive_seed(2718, "p1lc", "bridge-shift", reader, seeds)`, independent of the
    confidence level. The 95% level follows P1L-C.md, not the 97.5% of the P1-L gates.
-8. **Replication.** Reported at both 95% and 97.5% (descriptive; P1-L's G1-L and B6 are unchanged by it).
-9. **Authorization.** P1L-C has no authorization record of its own; it reuses the P1-L confirmation authorization
-   and the r = 128 `endpoints.json`, so it cannot run before that confirmation was authorized and analyzed. Add a
-   separate record if you want an independent release.
-10. **Smoke.** `--smoke` uses val [0, 64) (16 patch episodes), needs no authorization, prints only run names and
-    seconds, and may therefore run before the confirmation; its predictions must not be read as results. If you
-    prefer to run it only after the confirmation, nothing changes.
-11. **Ledger.** Job names below start with `t-p1l`, `sm-p1l`, `ev-p1l` and `fin-p1l`, which `scripts/p1l_job_ledger.py`
-    already lists, so P1L-C node·h land in `reports/p1l/jobs.json` (separable by the `-c` marker). I left the ledger
-    script unchanged.
-12. **Runtime is not measured.** My inference (no measurement; unverified) is a few minutes per job, far below the
-    0.6 node·h registered. Walltime must come from the smoke.
+5. **Replication.** Reported at both 95% and 97.5% (descriptive; P1-L's G1-L and B6 are unchanged by it).
+6. **Ledger.** Job names below start with `t-p1l`, `sm-p1l`, `ev-p1l` and `fin-p1l`, which `scripts/p1l_job_ledger.py`
+   already lists, so P1L-C node·h land in `reports/p1l/jobs.json` (separable by the `-c` marker). I left the ledger
+   script unchanged.
+7. **Runtime is not measured.** My inference (no measurement; unverified) is a few minutes per job, far below the
+   0.6 node·h registered. Walltime must come from the smoke.
 
 ## Step B additions (before the authorization commit)
 
@@ -149,7 +183,9 @@ cd "$P1L_W" && git status --short                            # clean
   || echo "B7 not passed at r = 128: do not run P1L-C; the report says so"
 P1LC_SOURCE="$(git rev-parse HEAD)"                          # explicit full hash; submit.py resolves HEAD in the central checkout
 
-# 1. Smoke: validation only, no authorization. Needs the three seed-17 r128 checkpoints complete.
+# 1. Smoke: validation only, no authorization. Needs the three seed-17 r128 checkpoints complete. It also runs B4
+#    (L = 1) end to end, which the tiny-Qwen tests do not. Run directories are never overwritten: for a rerun use a
+#    new --out (e.g. causal-smoke-2) and keep the old one.
 /usr/bin/python3 scripts/submit.py --name sm-p1l-c-smoke --walltime 00:20:00 --commit "$P1LC_SOURCE" --wait -- \
   scripts/evaluate_p1l_causal.py --smoke --manifest "$P1L_R/r128/training-manifest.json" \
   --out "$P1L_R/r128/causal-smoke" --runs M1-L4-s17 B8-s17 B4-s17
@@ -178,11 +214,29 @@ done
 ```
 
 Notes: the registered run directories are created without `exist_ok`, so a repeated submission cannot overwrite
-an earlier output; keep the `--out` root and source fixed across the three jobs, as the finalizer compares hashes
-across all nine runs. This is a recipe, not an idempotent controller: after an interruption, inspect the receipts
-and existing run directories and submit only the missing seeds. Do not read any P1L-C score before the finalizer
-has audited the nine runs. If B7 fails at r = 128, P1L-C is not run and `docs/reports/P1L-C.md` says so in one
-paragraph.
+an earlier output. Keep the `--out` root and `P1LC_SOURCE` fixed across the three jobs: the finalizer compares the
+episode, world and oracle-memory hashes and the `git_commit` and `source_hash` of all nine runs and rejects a
+mixture. This is a recipe, not an idempotent controller. Do not read any P1L-C score before the finalizer has audited
+the nine runs. If B7 fails at r = 128, P1L-C is not run and `docs/reports/P1L-C.md` says so in one paragraph.
+
+**Interrupted run (killed at walltime, node failure).** A run is complete only if its directory holds `record.json`
+(written last, atomically); a directory without it is interrupted. Move it aside unread and never delete it:
+
+```bash
+cd "$P1L_R/r128/causal" && mv "M1-L4-s29" "M1-L4-s29.interrupted-1"    # k = 1, 2, ... ; open nothing inside
+```
+
+The job log may be read for the cause (it carries no scores), the run directory not. Then resubmit only the runs of
+that job that lack a complete directory (the interrupted one and any that never started; `evaluate_p1l_causal.py`
+refuses an existing directory, so a complete run is never rerun), at the same `P1LC_SOURCE` and with the same
+arguments, e.g. `--name ev-p1l-c-s29-r1 --runs M1-L4-s29 B8-s29 B4-s29`. The finalizer ignores the moved-aside
+directories. Record the event under "Interrupted-run log" below. A job that failed with an exception (for example a
+run-time audit) is not an interruption: diagnose it first, and a code change means a new `P1LC_SOURCE` for all nine
+runs (the finalizer rejects mixtures), so report to the orchestrator before moving anything.
+
+## Interrupted-run log
+
+None so far. One line per event: run, job id, cause, moved-aside path, resubmission job id, `P1LC_SOURCE` unchanged.
 
 ## Constraints that stayed binding
 
