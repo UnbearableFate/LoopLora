@@ -99,3 +99,18 @@ M ∈ R^{r_m × 2 r_m ν} ;  write: §3 with k̂ in place of k ;  read: m = M_pr
 (`M_new k̂ = v`), which is why L2 replaces Schlag et al.'s sum normalization. Address similarities (InfoNCE, key Gram,
 the exact Gram read) use `q̂·k̂_j` and `k̂_i·k̂_j` in φ space. Accounting (§7) uses `key_dim = 2 r_m ν` in place of
 `r_m` for `M q̂`, `M̄ k̂` and the outer product, and for the state bytes; φ_ν adds no parameters. With `ν = 0`, §2–§7 hold exactly.
+
+## 10. Optional least-squares stores and unit queries (WP-L7; off by default, `store = "delta"`, `unit_query = False`)
+`unit_query`: the read uses `q̂ = Q z / max(‖Q z‖₂, ε)` (read: `m = M_prev q̂`). `store` replaces the §3 write of one row's
+`n` final-only support writes (unit keys `k_j = K u_j / max(‖K u_j‖₂, ε)`, values `v_j = V u_j`; scalar gates;
+`Mb = λⁿ M₀`, `M₀ = 0` for a fresh support); `K = [k_1 … k_n] ∈ R^{r_m × n}`, `V = [v_1 … v_n]`, `W = diag(λ^{n−1−j})`:
+```
+ridge  (store_eta = η):    M = Mb + (V − Mb K) W Kᵀ (K W Kᵀ + η I)⁻¹      (weighted ridge least squares; solved in float64
+                           through the n×n system by Cholesky, differentiable; M k_j = v_j as η → 0 for independent keys)
+sweep  (store_sweeps = S): the β = 1 delta scan of §3 over the same n writes, repeated S times (Kaczmarz; at λ = 1 and
+                           independent keys the iterates converge to the interpolant as S grows)
+```
+Both read as §2 (`q̂` when `unit_query`), neither uses β, both need `gate = "scalar"` and no DPFP. `write` and
+`scan_prewrite` (online per-token writes) raise for a non-delta store. The exact read `m = Σ_j d_j v_j` is available as
+`memory.ridge_coefficients` / `memory.sweep_coefficients`; `memory.gram_conditions` gives the (finite) condition numbers
+of `K Kᵀ` and of the weighted ridge system. With the defaults §2–§7 hold exactly.

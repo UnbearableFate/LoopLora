@@ -104,6 +104,19 @@ The option applies to the `fact_final` writers (W1-W3, W5, R), not to the paired
 `python -m looplora.llm.dpfp_run --arm D32-3 --out ROOT (--steps N --smoke | --schedule release.json)`.
 `docs/reports/WP-L5-state.md` has the tests and smoke commands. This support alone authorizes no scientific run.
 
+# Least-squares stores and the read-failure factorial (WP-L7)
+
+`AdapterConfig.store` (`delta` default, `ridge`, `sweep`), `store_eta`, `store_sweeps` and `unit_query` (all off by
+default; `docs/notation.md` section 10) add the two LSQ stores and unit-normalized queries. Like `dpfp_nu` they are read
+from `config['model']` after `resolve_config`, so existing configs, hashes, signatures and checkpoints are unchanged and the
+writer signature gains the fields only when non-default. `looplora.llm.lsq.configuration(arm, steps, E=16, smoke=False,
+eta=None)` builds the four conditional arms L32-K4, L32-RG, L128-K4 and L128-RG of `docs/prereg/LSQ.md` (WP-L4's R at rank
+32 or 128 plus the store fields and an `lsq` block; the RG arms need their registered `eta`), one arm per job:
+`python -m looplora.llm.lsq_run --arm L32-K4 --out ROOT (--steps N --smoke [--eta X] | --schedule release.json)`.
+`python -m looplora.llm.rfx_run --out DIR [--smoke]` is the evaluation-only read-failure factorial of
+`docs/prereg/RFX.md` on the three frozen WP-L4 checkpoints (its `summary.json` names the ranks that trigger LSQ).
+`docs/reports/WP-L5-state.md` has the step-2 order and commands. This support alone authorizes no scientific run.
+
 # Fact-only oracle writer (WP-C7)
 
 Set `writer: oracle_random`, `stage: reader`, `model.r: 32` (or `128`, P1-L B3) and
