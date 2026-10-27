@@ -17,10 +17,32 @@ import time
 ROOT = Path(__file__).resolve().parents[1]
 LABELS = ("B8", "M1-L4", "B4", "B5-L4", "B3-L4", "B1", "B2")
 SEEDS = (17, 29, 43)
+# Study profiles. "p1l" is every script's default and holds P1-L's literals. "p1l-s" (docs/prereg/P1L-S.md) runs at
+# r = 32 only: B8, M1-L4, B4 and B5-L4 are retrained under the WP-L6 oracle code W; B3-L4 is P1-L's r = 32 run, reused.
+STUDIES = {
+    "p1l": dict(configs="configs/p1l", reports="reports/p1l", prereg="docs/prereg/P1L.md", prefix="p1l", reused=()),
+    "p1l-s": dict(configs="configs/p1l-s", reports="reports/p1l-s", prereg="docs/prereg/P1L-S.md", prefix="ps",
+                  labels=("B8", "M1-L4", "B4", "B5-L4", "B3-L4"), reused=("B3-L4",),
+                  condition="p1l-s-r32", window="p1l-s", decision="reports/wp-l6/decision.json"),
+}
 
 
-def labels_for_rank(rank: int):
+def labels_for_rank(rank: int, study: str = "p1l"):
+    """The reader labels of a study's training matrix, reused runs included (B0 is separate)."""
+    if study != "p1l":
+        return STUDIES[study]["labels"]
     return LABELS if rank == 32 else LABELS[:5]
+
+
+def trained_labels(rank: int, study: str = "p1l"):
+    """The labels a study trains itself: its matrix without the runs it reuses."""
+    return tuple(label for label in labels_for_rank(rank, study) if label not in STUDIES[study]["reused"])
+
+
+def lock_file(rank: int = 32, study: str = "p1l") -> str:
+    """Repository-relative path of a study's committed S/lr lock."""
+    reports = STUDIES[study]["reports"]
+    return f"{reports}/lr-S-lock.json" if rank == 32 else f"{reports}/r128/lr-S-lock.json"
 
 
 def save(path: Path, value) -> None:
@@ -38,9 +60,9 @@ def digest(path: Path) -> str:
     return h.hexdigest()
 
 
-def config(label: str, seed: int = 17, rank: int = 32) -> dict:
+def config(label: str, seed: int = 17, rank: int = 32, study: str = "p1l") -> dict:
     directory = "main" if rank == 32 else "main-r128"
-    return json.loads((ROOT / "configs/p1l" / directory / f"{label}-s{seed}.json").read_text())
+    return json.loads((ROOT / STUDIES[study]["configs"] / directory / f"{label}-s{seed}.json").read_text())
 
 
 def runtime() -> dict:
@@ -84,6 +106,17 @@ def fit(cfg: dict, out: Path, model, tokenizer, *, expose_scores: bool) -> dict:
                       writer_signature=experiment.writer_signature(),
                       writer_frozen=summary["writer_frozen"],
                       trainable_parameters=summary["trainable_parameters"])
+        if cfg["writer"] in ("oracle_rot", "oracle_shared"):
+            # WP-L6 codes only (P1-L records keep their fields): oracle_shared's table C counts as a writer
+            # parameter, and its drift from the initialization is recorded.
+            from looplora.llm.run import _parameter_counts
+
+            record.update(writer_trainable_parameters=summary.get("writer_trainable_parameters", 0),
+                          parameters=_parameter_counts(experiment))
+            if cfg["writer"] == "oracle_shared":
+                from run_wp_l6 import code_drift
+
+                record["code_drift"] = code_drift(experiment.writer, tuple(cfg["task"]["seen"]))
         # Timing smokes retain raw training logs, but expose no quality fields.
         if expose_scores:
             from looplora.llm.evaluate import evaluate
@@ -113,9 +146,9 @@ def train_stage(args) -> None:
     args.out.mkdir(parents=True, exist_ok=False)
     model, tokenizer = load_model(), load_tokenizer()
     records = []
-    selected = args.labels or labels_for_rank(args.rank)
+    selected = args.labels or trained_labels(args.rank, args.study)
     for label in selected:
-        base = config(label, args.seed, args.rank)
+        base = config(label, args.seed, args.rank, args.study)
         if args.stage in {"preflight", "smoke"}:
             base["seed"] = derive_seed(20261027, "p1l-main", "timing-smoke")
             base["smoke"] = True
@@ -128,8 +161,7 @@ def train_stage(args) -> None:
             base["train"]["steps"] = args.steps
             base["eval"].update(episodes=1000, hops=[1, 2, 3], counterfactuals=False)
         elif args.stage == "main":
-            lock_path = (ROOT / "reports/p1l" / ("r128/lr-S-lock.json" if args.rank == 128 else "lr-S-lock.json"))
-            lock = json.loads(lock_path.read_text())
+            lock = json.loads((ROOT / lock_file(args.rank, args.study)).read_text())
             if lock["status"] != "locked":
                 raise ValueError("main requires a committed lr/S lock")
             base["train"]["steps"] = lock["S"]
@@ -155,9 +187,12 @@ def main() -> None:
     parser.add_argument("--seed", type=int, choices=(17, 29, 43), default=17)
     parser.add_argument("--rank", type=int, choices=(32, 128), default=32)
     parser.add_argument("--labels", nargs="+", choices=(*LABELS, "B0"))
+    parser.add_argument("--study", choices=tuple(STUDIES), default="p1l")
     args = parser.parse_args()
     if args.stage in {"preflight", "smoke"} and (args.steps is None or args.steps < 10):
         parser.error("timing stages require --steps >= 10")
+    if args.study != "p1l" and (args.rank != 32 or not set(args.labels or ()) <= set(trained_labels(32, args.study))):
+        parser.error(f"{args.study} trains {', '.join(trained_labels(32, args.study))} at r = 32 only")
     train_stage(args)
 
 

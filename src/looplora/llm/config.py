@@ -15,6 +15,10 @@ STAGES = ("writer", "reader", "joint", "lora_ctx", "baseline")
 PROTOCOLS = ("memory_only", "context_retained")
 # Fact-only oracle writers (P1-L oracle_random; WP-L6 rotated-key variants). All are memory-only, r = r_mem in {32, 128}.
 ORACLE_WRITERS = ("oracle_random", "oracle_rot", "oracle_shared")
+# Registered start of the confirmation window in the `test` split, by study. A window is named, never a free integer:
+# `eval.confirmation` (optional, absent = "p1l") selects it, so resolved configs without it keep their hashes.
+CONFIRMATION_WINDOWS = {"p1l": 100000, "p1l-s": 110000}
+OPTIONAL_EVAL = ("confirmation",)
 DEFAULTS: dict[str, Any] = {
     "name": "llm", "seed": 17, "device": "cuda", "stage": "joint", "variant": "M1",
     "protocol": "memory_only", "write_policy": "fact_final", "activation": "relu",
@@ -31,6 +35,13 @@ DEFAULTS: dict[str, Any] = {
              "allow_confirmation": False},
     "stats": {"resamples": 2000, "seed": 2718},
 }
+
+
+def split_window(evaluation: Mapping[str, Any], split: str) -> tuple[str, int]:
+    """Generator split and first episode index of an evaluation split: `confirm` is the registered test window."""
+    if split == "confirm":
+        return "test", CONFIRMATION_WINDOWS[evaluation.get("confirmation", "p1l")]
+    return split, 0
 
 
 def recursive_merge(base: Mapping[str, Any], updates: Mapping[str, Any]) -> dict[str, Any]:
@@ -76,7 +87,7 @@ def resolve_config(mapping: Mapping[str, Any]) -> dict[str, Any]:
         if group in mapping and not isinstance(mapping[group], Mapping):
             raise ValueError(f"{group} must be a mapping")
         if group != "task" and group in mapping:
-            unknown = set(mapping[group]) - set(DEFAULTS[group])
+            unknown = set(mapping[group]) - set(DEFAULTS[group]) - (set(OPTIONAL_EVAL) if group == "eval" else set())
             if unknown:
                 raise ValueError(f"unknown {group} fields: {sorted(unknown)}")
     config = recursive_merge(DEFAULTS, mapping)
@@ -148,7 +159,7 @@ def resolve_config(mapping: Mapping[str, Any]) -> dict[str, Any]:
     evaluation = config["eval"]
     for key in ("episodes", "batch_size"):
         _integer(evaluation[key], f"eval.{key}")
-    # All ordinary sets are [0, episodes); confirm alone maps to [100000,100000+episodes).
+    # All ordinary sets are [0, episodes); confirm alone maps to its registered window (CONFIRMATION_WINDOWS).
     if evaluation["episodes"] > 2000:
         raise ValueError("eval.episodes exceeds the preregistered 2000-episode set")
     _integer(evaluation["seed"], "eval.seed", 0)
@@ -166,6 +177,12 @@ def resolve_config(mapping: Mapping[str, Any]) -> dict[str, Any]:
         raise ValueError("invalid eval.splits")
     if "confirm" in splits and not evaluation["allow_confirmation"]:
         raise ValueError("confirmation requires eval.allow_confirmation=true")
+    if "confirmation" in evaluation:
+        window = evaluation["confirmation"]
+        if not isinstance(window, str) or window not in CONFIRMATION_WINDOWS:
+            raise ValueError(f"eval.confirmation must be one of {sorted(CONFIRMATION_WINDOWS)}")
+        if "confirm" not in splits:
+            raise ValueError("eval.confirmation requires the confirm split")
     if config["smoke"] and (splits != ["val"] or evaluation["allow_confirmation"]):
         raise ValueError("smoke is validation-only and cannot authorize confirmation")
     if config["smoke"] and "seed" not in mapping.get("eval", {}):

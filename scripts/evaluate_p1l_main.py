@@ -15,17 +15,46 @@ import torch
 from audit_p4s_stopping import require_compute
 from looplora.data.relations import counterfactual, generate
 from looplora.infra.seeds import derive_seed
-from looplora.llm.config import recursive_merge, resolve_config
+from looplora.llm.config import recursive_merge, resolve_config, split_window
 from looplora.llm.evaluate import _slice, evaluate
 from looplora.llm.inject import load_model, load_tokenizer
 from looplora.llm.train import load_checkpoint, make_task_spec
 from looplora.sym.evaluate import stratify_queries
 
 from readout_p1l import path_entities, read_batch
-from run_p1l_main import LABELS, ROOT, SEEDS, digest, labels_for_rank, runtime, save
+from run_p1l_main import LABELS, ROOT, SEEDS, STUDIES, digest, labels_for_rank, runtime, save
+
+
+def check_run(name: str, path: str, rank: int) -> dict:
+    """Per-run checks shared by every study: complete record, unchanged checkpoint, rank, no smoke or confirmation use."""
+    directory = Path(path)
+    record = json.loads((directory / "record.json").read_text())
+    checkpoint = directory / "checkpoint.pt"
+    if record["status"] != "complete" or record["checkpoint_hash"] != digest(checkpoint):
+        raise ValueError(f"incomplete or changed main checkpoint: {name}")
+    cfg = record["config"]
+    if cfg["model"]["r"] != rank:
+        raise ValueError("main run rank differs from its condition manifest")
+    if cfg["smoke"] or cfg["eval"]["allow_confirmation"] or cfg["eval"]["splits"] != ["val"]:
+        raise ValueError("main training accessed confirmation data or used smoke settings")
+    return cfg
 
 
 def check_training(manifest: dict, authorization: dict, *, check_all: bool = True) -> None:
+    """Before any test episode is generated: the training matrix, its lock and the authorization agree.
+
+    A manifest without `study` is P1-L's; `study: "p1l-s"` selects check_study_training and the authorization must
+    name the same study. P1-L's rules below run unchanged.
+    """
+    study = manifest.get("study", "p1l")
+    if study not in STUDIES:
+        raise ValueError(f"unknown study: {study!r}")
+    if authorization.get("study", "p1l") != study:
+        raise ValueError("the authorization names another study than the training manifest")
+    if study != "p1l":
+        return check_study_training(manifest, authorization, study, check_all=check_all)
+    if "confirmation_window" in authorization:
+        raise ValueError("a P1-L authorization names no confirmation window: its range is the registered one")
     rank = manifest.get("rank", 32)
     expected = {f"{label}-s{seed}" for label in labels_for_rank(rank) for seed in SEEDS}
     if rank == 32:
@@ -51,18 +80,59 @@ def check_training(manifest: dict, authorization: dict, *, check_all: bool = Tru
         for other in all_manifests.values():
             check_training(other, authorization, check_all=False)
     for name, path in manifest["runs"].items():
-        directory = Path(path)
-        record = json.loads((directory / "record.json").read_text())
-        checkpoint = directory / "checkpoint.pt"
-        if record["status"] != "complete" or record["checkpoint_hash"] != digest(checkpoint):
-            raise ValueError(f"incomplete or changed main checkpoint: {name}")
-        cfg = record["config"]
-        if cfg["model"]["r"] != rank:
-            raise ValueError("main run rank differs from its condition manifest")
-        if cfg["smoke"] or cfg["eval"]["allow_confirmation"] or cfg["eval"]["splits"] != ["val"]:
-            raise ValueError("main training accessed confirmation data or used smoke settings")
+        cfg = check_run(name, path, rank)
         if name != "B0-s17" and (cfg["train"]["steps"] != manifest["S"]
                 or cfg["train"]["lr"] != manifest["lrs"][name.rsplit("-s", 1)[0]]):
+            raise ValueError("main training differs from its committed S/lr lock")
+
+
+def check_study_training(manifest: dict, authorization: dict, study: str, *, check_all: bool = True) -> None:
+    """P1L-S (docs/prereg/P1L-S.md): runs retrained under the oracle code WP-L6 selected plus P1-L's reused B3-L4 runs.
+
+    One gated condition (k = 1, 95% CIs) and one registered confirmation window. The authorization names the committed
+    WP-L6 decision by path and hash; every reused run must be the one P1-L's own training manifest lists.
+    """
+    profile = STUDIES[study]
+    condition = profile["condition"]
+    names = [f"{label}-s{seed}" for label in labels_for_rank(32, study) for seed in SEEDS]
+    if manifest.get("rank") != 32 or manifest.get("condition") != condition or set(manifest["runs"]) != set(names):
+        raise ValueError("P1L-S requires its retrained runs and the reused B3-L4 runs at r = 32, and no other run")
+    if authorization.get("status") != "allowed" or not authorization.get("orchestrator_decision"):
+        raise ValueError("confirmation is held until the orchestrator releases P1L-S")
+    conditions, k = authorization.get("condition_manifests", {}), authorization.get("gated_conditions")
+    if not isinstance(k, int) or isinstance(k, bool) or k != 1 or set(conditions) != {condition}:
+        raise ValueError("P1L-S gates exactly one condition")
+    if authorization.get("confirmation_window") != profile["window"]:
+        raise ValueError(f"the authorization must name the {profile['window']} confirmation window")
+    if check_all and json.loads(Path(conditions[condition]).read_text()) != manifest:
+        raise ValueError("the training manifest is not the one the authorization locked")
+    committed = ROOT / profile["decision"]
+    if authorization.get("decision") != dict(path=profile["decision"], hash=digest(committed)):
+        raise ValueError("the authorization does not name the committed WP-L6 decision")
+    decision = json.loads(committed.read_text())
+    if decision["status"] != "selected" or decision["selected"] != manifest.get("writer"):
+        raise ValueError("the manifest's oracle code is not the one WP-L6 selected")
+    reused = {name for name in names if name.rsplit("-s", 1)[0] in profile["reused"]}
+    if set(manifest.get("reused", {})) != reused:
+        raise ValueError("the reused runs are not exactly the registered ones")
+    for name, path in manifest["runs"].items():
+        label = name.rsplit("-s", 1)[0]
+        cfg = check_run(name, path, 32)
+        if name in reused:
+            entry = manifest["reused"][name]
+            source = json.loads(Path(entry["manifest"]).read_text())
+            if (digest(Path(entry["manifest"])) != entry["manifest_hash"] or source.get("condition") != "oracle-r32"
+                    or source.get("rank", 32) != 32 or "study" in source or source["runs"].get(name) != path
+                    or entry["source"] != path or entry["checkpoint_hash"] != digest(Path(path) / "checkpoint.pt")):
+                raise ValueError(f"reused run does not match P1-L's training manifest: {name}")
+            if source["S"] != manifest["S"]:
+                raise ValueError("P1L-S trains every reader with the S of P1-L's reused runs")
+            steps, lr, writer = source["S"], source["lrs"][label], "oracle_random"
+        else:
+            steps, lr, writer = manifest["S"], manifest["lrs"][label], manifest["writer"]
+        if cfg["writer"] != writer or cfg["oracle_seed"] != 17:
+            raise ValueError(f"{name} was not trained with its registered oracle code")
+        if cfg["train"]["steps"] != steps or cfg["train"]["lr"] != lr:
             raise ValueError("main training differs from its committed S/lr lock")
 
 
@@ -70,7 +140,7 @@ def check_training(manifest: dict, authorization: dict, *, check_all: bool = Tru
 def swap_successors(experiment, cfg: dict, out: Path) -> dict:
     spec = make_task_spec(cfg, evaluation=True)
     split, = cfg["eval"]["splits"]
-    generator_split, start = ("test", 100000) if split == "confirm" else (split, 0)
+    generator_split, start = split_window(cfg["eval"], split)
     count, seed = cfg["eval"]["episodes"], cfg["eval"]["seed"]
     arrays = stratify_queries(generate(spec, generator_split, start, count, seed),
                              spec, cfg["eval"]["hops"], seed)
@@ -128,7 +198,7 @@ def swap_successors(experiment, cfg: dict, out: Path) -> dict:
 def readout(experiment, cfg: dict, directions: dict, out: Path):
     spec = make_task_spec(cfg, evaluation=True)
     split, = cfg["eval"]["splits"]
-    generator_split, start = ("test", 100000) if split == "confirm" else (split, 0)
+    generator_split, start = split_window(cfg["eval"], split)
     episode_count, seed = cfg["eval"]["episodes"], cfg["eval"]["seed"]
     arrays = stratify_queries(generate(spec, generator_split, start, episode_count, seed),
                              spec, cfg["eval"]["hops"], seed)
@@ -197,9 +267,12 @@ def inference_timing(experiment, cfg: dict, out: Path):
             median_seconds_per_question=float(np.median(durations)) / questions,
             batch_seconds=durations))
     adapter = experiment.adapter
+    # oracle_shared's table C is a trained writer parameter outside the adapter: counted apart, and only when present.
+    writer_parameters = sum(p.numel() for p in experiment.writer_trainable_parameters())
     save(out / "inference.json", dict(rank=cfg["model"]["r"],
         adapter_parameters=0 if adapter is None else sum(p.numel() for p in adapter.parameters()),
         trainable_adapter_parameters=0 if adapter is None else sum(p.numel() for p in adapter.parameters() if p.requires_grad),
+        **({"writer_parameters": writer_parameters} if writer_parameters else {}),
         measurement="Amortized batched question score+full-vocabulary argmax, CUDA synchronized, "
             "single GPU process; includes frozen backbone, adapter and score-path CE; excludes "
             "support preparation/writing, tokenization and audit capture/hashing; fixed val[0,16), "
@@ -233,6 +306,8 @@ def main():
         try:
             base = copy.deepcopy(experiment.config)
             template = json.loads((ROOT / "configs/p1l/main/eval-confirmation.json").read_text())
+            if "confirmation_window" in authorization:  # P1L-S only; check_training rejects it for P1-L
+                template = recursive_merge(template, {"eval": {"confirmation": authorization["confirmation_window"]}})
             cfg = resolve_config(recursive_merge(base, template))
             if cfg["variant"] == "M1":
                 cfg["eval"]["depths"] = list(range(1, 9))

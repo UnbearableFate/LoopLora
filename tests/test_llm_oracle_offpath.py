@@ -3,14 +3,16 @@
 Run only through the compute test workflow (docs/reports/WP-L6.md).
 
 1. The writer state hash recorded before the change (reports/llm-oracle/benchmark.json, WP-C7) is reproduced on CPU.
-2. The four files WP-L6 changed (llm/config.py, oracle.py, run.py, train.py) are taken back to the baseline in a copy
-   of the source tree. tests/assets/oracle_offpath_probe.py runs in a fresh process on that copy and on the current
-   tree: code tables and written memory at r = 32 and 128, the resolved hash of every committed P1-L config, five
-   tiny-model training runs (M1, B8, B4, B5, B3: losses, summaries, adapter and checkpoint hashes, writer signature,
-   memory and logits, parameter counts), run_one records and compare_suite. Every recorded value must be identical.
+2. The five files WP-L6 changed (llm/config.py, evaluate.py, oracle.py, run.py, train.py) are taken back to the
+   baseline in a copy of the source tree. tests/assets/oracle_offpath_probe.py runs in a fresh process on that copy and
+   on the current tree: code tables and written memory at r = 32 and 128, the resolved hash of every committed P1-L
+   config, five tiny-model training runs (M1, B8, B4, B5, B3: losses, summaries, adapter and checkpoint hashes, writer
+   signature, memory and logits, parameter counts), run_one records and compare_suite. Every recorded value must be
+   identical. evaluate.py is in the set because it imports split_window from the changed config.py (a baseline
+   config.py cannot serve the current evaluate.py).
 
 The baseline commit must be reachable: set LOOPLORA_REPO to a repository that has it if neither this checkout nor the
-central one does. If a later change legitimately edits one of the four files, retire part 2 and keep part 1.
+central one does. If a later change legitimately edits one of the five files, retire part 2 and keep part 1.
 """
 from __future__ import annotations
 
@@ -29,7 +31,7 @@ from looplora.sym.evaluate import tensor_hash
 
 ROOT = Path(__file__).resolve().parents[1]
 BASELINE = "dc659e0"
-CHANGED = ("config.py", "oracle.py", "run.py", "train.py")
+CHANGED = ("config.py", "evaluate.py", "oracle.py", "run.py", "train.py")
 PROBE = ROOT / "tests" / "assets" / "oracle_offpath_probe.py"
 RECORDED_CODE_HASH = "55179f8658c8c3a00a8aa58ed68deacd"
 

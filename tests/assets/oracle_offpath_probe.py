@@ -4,8 +4,8 @@
     PYTHONPATH=<tree>/src python tests/assets/oracle_offpath_probe.py --configs configs/p1l --out probe.json
 
 Compute node only (tiny models train on the GPU). tests/test_llm_oracle_offpath.py runs it on the current tree and on
-a copy whose four WP-L6 files (llm/config.py, oracle.py, run.py, train.py) are taken back to the baseline commit,
-then compares the two JSON files exactly. Timing, host and path fields are never recorded.
+a copy whose five WP-L6 files (llm/config.py, evaluate.py, oracle.py, run.py, train.py) are taken back to the baseline
+commit, then compares the two JSON files exactly. Timing, host and path fields are never recorded.
 """
 from __future__ import annotations
 

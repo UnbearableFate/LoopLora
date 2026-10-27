@@ -13,6 +13,7 @@ import torch
 from looplora.data.relations import EpisodeArrays, counterfactual, generate
 from looplora.data.render import load_name_pool
 from looplora.infra.seeds import derive_seed, stable_hash
+from looplora.llm.config import split_window
 from looplora.sym.evaluate import stratify_queries, tensor_hash
 from looplora.sym.stats import depth_comparisons, load_samples
 
@@ -126,6 +127,7 @@ def evaluate(experiment: Any, config: dict[str, Any], out: Path) -> tuple[dict[s
 
     depths, splits, protocols, count, batch_size = _settings(config)
     settings = config["eval"]
+    windows = {split: split_window(settings, split) for split in splits}
     spec = make_task_spec(config, evaluation=True)
     seed = int(settings["seed"])
     out = Path(out)
@@ -141,7 +143,7 @@ def evaluate(experiment: Any, config: dict[str, Any], out: Path) -> tuple[dict[s
     started = time.perf_counter()
     try:
         for split in splits:
-            generator_split, start = ("test", 100000) if split == "confirm" else (split, 0)
+            generator_split, start = windows[split]
             arrays = stratify_queries(generate(spec, generator_split, start, count, seed),
                                      spec, settings["hops"], seed)
             n, q = arrays.answer.shape
@@ -255,9 +257,8 @@ def evaluate(experiment: Any, config: dict[str, Any], out: Path) -> tuple[dict[s
                        secondary_metric="episode_candidate_token_accuracy",
                        chance_metric="mean_inverse_episode_candidate_count_for_secondary_accuracy",
                        query_protocol="one_query_per_hop_from_support_v1", evaluation_seed=seed,
-                       episode_ranges={split: dict(split="test" if split == "confirm" else split,
-                                                   start=100000 if split == "confirm" else 0, count=count)
-                                       for split in splits},
+                       episode_ranges={split: dict(split=generator_split, start=start, count=count)
+                                       for split, (generator_split, start) in windows.items()},
                        counterfactual_hop="original_query_hop",
                        swap_candidate_set="original_episode", swap_labels="original_answer",
                        swap_context_retained_kv="original_episode")
