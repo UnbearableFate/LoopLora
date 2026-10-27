@@ -139,3 +139,23 @@ These rules fill gaps in the failure rules above. They change no endpoint, thres
   every TSM training and evaluation job runs at one CODE commit. Smoke runs are exempt and never analysed.
 - **After a T0 failure.** TSM jobs that are already running may finish, and their outputs are kept. No new TSM job is
   submitted until the orchestrator decides.
+
+## Clarification C2 (2026-10-27 15:12 JST, before any TSM lock, smoke or run; from sn-sym's step-1c points)
+These rules refine C1. They change no endpoint, threshold or decision rule.
+- **More than three attempts.** After the orchestrator's recorded decision under C1 ("Three failed attempts"),
+  `train --max-attempts N` grants further identical attempts. The default is 3.
+- **Allocation failures are infrastructure failures.** These are CUDA out-of-memory, cuBLAS or cuDNN allocation
+  failures, and host `MemoryError`. Other CUDA runtime errors count as code defects. If the orchestrator's diagnosis
+  finds a hardware fault, that is recorded, and the run is retried as an infrastructure failure.
+- **Defects in the evaluation code.** If the evaluation code (not the training code) has a defect:
+  - The 18 trained runs are kept.
+  - The orchestrator checks that the fix changes no file that the training path uses.
+  - The evaluation restarts from scratch at the fixed commit (`evaluate --restart-interrupted --new-evaluation-code`).
+  - The partial output is moved aside unread, and both code hashes are recorded.
+
+  This refines C1's "one code version": the training jobs share one CODE commit, and the evaluation job may use a
+  later commit only under this rule.
+- **What a restart reads.** A restart reads only the interrupted attempt's `manifest.json` (status and inputs), never
+  its samples or statistics.
+- **Errors before a run directory exists.** Such an error leaves no record. The operator reports its traceback, and the
+  orchestrator classifies it under C1 and C2.
