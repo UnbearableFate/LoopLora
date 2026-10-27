@@ -1,10 +1,12 @@
 # WP-L6 step 1 — oracle code designs in the LLM pipeline (2026-10-27)
 
-**Implemented and committed on `wp/oracle` (from master dc659e0; not merged, not pushed). Nothing has run on a GPU.**
-The login node allows no torch, pytest or run, and Miyabi is in maintenance until 2026-10-28 22:00 JST. Checked so
-far: `py_compile` and `pyflakes` on all 9 changed or new Python files (login Python 3.9; the project targets 3.13),
-both pilot configs resolve, and the runner's `decide` and `size` rules ran on synthetic records (stdlib only). All
-other code, every test included, is desk-checked and first runs in step 2.
+**Implemented and committed on `wp/oracle` (step 1: e4a13cd, from master dc659e0; not merged into master, not
+pushed). Nothing has run on a GPU.** The orchestrator reviewed the preregs (0b1c109) and registered them on master
+(4ac2410); master is merged into this branch (e5c618d, no conflict). The login node allows no torch, pytest or run, and
+Miyabi is in maintenance until 2026-10-28 22:00 JST. Checked so far: `py_compile` and `pyflakes` on all 9 changed or
+new Python files (login Python 3.9; the project targets 3.13), both pilot configs resolve, and the runner's `decide`
+and `size` rules ran on synthetic records (stdlib only). All other code, every test included, is desk-checked and
+first runs in step 2.
 
 | Piece | Where |
 | --- | --- |
@@ -14,7 +16,7 @@ other code, every test included, is desk-checked and first runs in step 2.
 | Records; C counted as `external_writer` (reader counts unchanged: M1 at r = 32 has 101,376 trainable, 103,426 stored; C adds 32,800); `compare_suite` skips the per-reader shared table | `llm/run.py` |
 | Runner `smoke`, `pilot`, `size`, `decide` (stdlib at import) | `scripts/run_wp_l6.py` |
 | Pilot configs: `configs/p1l/main/M1-L4-s17.json` except name, writer, steps 5,666, eval depths 1–4 | `configs/wp_l6/` |
-| Preregistration drafts (the orchestrator commits them before any run) | `docs/prereg/WP-L6.md`, `P1L-S.md` |
+| Preregistrations (orchestrator-reviewed 0b1c109, registered on master 4ac2410) | `docs/prereg/WP-L6.md`, `P1L-S.md` |
 | Tests | `tests/test_llm_oracle_codes.py`, `test_llm_oracle_offpath.py`, `test_wp_l6_runner.py`, `tests/assets/oracle_offpath_probe.py` |
 
 **What the tests cover (step 2 runs them).** Rotation orthogonality, seed and QR sign; unit keys; value→key map is the
@@ -33,7 +35,7 @@ infrastructure failures rerun the unchanged config. The 567-step smoke uses a de
 times a full 1,000-episode evaluation; its scores are never read. The WP-L6 run is not a P1L-S Pilot-2 candidate.
 
 **Step-2 commands.** `W=/work/xg24i002/x10041/LoopLora-wt/oracle`, `R=/work/xg24i002/x10041/LoopLora/runs/wp-l6`,
-`S=$W/scripts/submit.py`, `H` = full hash of a commit that contains this branch and the committed preregs.
+`S=$W/scripts/submit.py`, `H` = full hash of a commit that contains this branch (the preregs are already registered).
 ```
 # 1-2 tests, then regression of the existing LLM/oracle tests (debug-g, blocking)
 $S --name wp-l6-tests --walltime 00:30:00 --worktree $W --wait -- -m pytest -q tests/test_llm_oracle_codes.py tests/test_llm_oracle_offpath.py tests/test_wp_l6_runner.py
@@ -52,12 +54,19 @@ $W/scripts/run_wp_l6.py decide --oracle_rot <dir> --oracle_shared <dir> --out $W
 ```
 Cost from P1-L's measured step times: ≈ 1.3 node·h in all (tests ≈ 0.5, smoke ≈ 0.1, pilot ≈ 0.65); every job ≤ 1 node × 1 h.
 
-**Open questions.**
-1. P1L-S needs the P1-L scripts parameterized (they hard-code `oracle_random`, `configs/p1l/`, `reports/p1l/` and the
-   confirmation start 100000 in `llm/evaluate.py`); sn-p1l's P1L-C needs the same mechanism for [102000, 104000). One
-   shared change, owner to be named. Under O-shared the finalize check must record a per-run C hash and compare write
-   counts, not memory snapshots.
-2. B3-L4 under O-shared never reads memory, so C stays at its initialization but is counted. Say so before P1L-S if B3
-   should use a fixed code instead.
-3. The dc659e0 overlay test is a one-time proof; retire it if a later change edits the four files, keep the hash test.
-4. `configs/p1l/README.md` is not edited (append conflict with sn-p1l); usage of the new writers is in the prereg.
+**Decisions (orchestrator, 2026-10-27).**
+1. Preregs: the O-rot interpretation is softer (the pilot does not separate why O-rot would work). P1L-S does not
+   retrain B3-L4: it never reads the memory, so P1-L's r = 32 B3-L4 runs (seeds 17/29/43, lr 1e-3, S = 17,000) are
+   evaluated on [110000, 112000); 12 new runs, about 14.5 node·h. No registered run trains B3 under the new writers;
+   the B3 case of the tiny-model test stays as a code-path check.
+2. I own the P1L-S pipeline parameterization (writer, config and report roots, lock paths, confirmation range, CI
+   level, O-shared finalize checks): step 3 only if WP-L6 selects a code, and only after sn-p1l's step-A changes are
+   merged into master. Defaults must reproduce P1-L exactly; P1-L's confirmation runs from its pinned source commit
+   either way. For step 3: `finalize_p1l_main.py` requires one `writer_hash` across all primary runs and equal
+   snapshots/write counts across readers. P1L-S mixes writers (new runs under W, reused B3-L4 under oracle_random) and
+   O-shared trains a table per run, so the check becomes per group, with a per-run C hash and write counts and fact
+   lists compared instead of memory snapshots.
+3. Agreed: the dc659e0 overlay test is a one-time proof (retire it if a later change edits the four files, keep the
+   hash test); `configs/p1l/README.md` stays unedited (append conflict with sn-p1l; usage is in the prereg and here).
+
+Step 2 starts when the maintenance ends (2026-10-28 22:00 JST).
