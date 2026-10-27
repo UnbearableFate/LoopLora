@@ -39,6 +39,10 @@ SERIALIZATION_ERROR = "PytorchStreamWriter failed writing file data/12: file wri
 CPU_ALLOCATOR_ERROR = ("[enforce fail at alloc_cpu.cpp:121] data. DefaultCPUAllocator: not enough memory: you tried "
                        "to allocate 1099511627776 bytes.")
 CUBLAS_HANDLE_ERROR = "CUDA error: CUBLAS_STATUS_NOT_INITIALIZED when calling `cublasCreate(handle)`"
+# What torch.save raises when its writer cannot create the file (Clarification C4): the texts of the checks in
+# PyTorchStreamWriter::setup; the file and the directory are placeholders.
+OPEN_FILE_ERROR = "File /scratch/run/runs/tsm-joint_fact-T1-s17/checkpoint.pt cannot be opened."
+OPEN_DIRECTORY_ERROR = "Parent directory /scratch/run/runs/tsm-joint_fact-T1-s17 does not exist."
 
 
 def _config(writer, variant, seed):
@@ -134,8 +138,9 @@ def children():
     """How the next children end, by run name (``outcomes[name]`` is consumed one entry per start; the default is
     ``complete``): ``nonfinite`` (a non-finite loss), ``gradnorm`` (a non-finite gradient norm), ``fault`` (an I/O
     error), ``oom`` (CUDA out of memory), ``cublas`` and ``cudnn`` (an allocation failure of that library), ``memory``
-    (a host ``MemoryError``), ``serialize`` (torch cannot write the checkpoint), ``cpualloc`` (torch's CPU allocator
-    fails), ``cublasinit`` (cuBLAS cannot create its handle), ``defect`` (any other exception: a code defect),
+    (a host ``MemoryError``), ``serialize`` (torch cannot write the checkpoint), ``cannotopen`` and ``nodirectory``
+    (torch's writer cannot create the checkpoint file, or its directory is missing), ``cpualloc`` (torch's CPU
+    allocator fails), ``cublasinit`` (cuBLAS cannot create its handle), ``defect`` (any other exception: a code defect),
     ``killed`` (ended by walltime), ``crash`` (dies before it creates its run directory), ``slow`` (still running for a
     few polls, then completes) or ``overlap`` (another job has just created its log, so it cannot be started).
     ``started`` lists every child that was started and ``stopped`` every child that was terminated while it was
@@ -181,6 +186,8 @@ def tiny(tmp_path, monkeypatch, children):
                              "cudnn": RuntimeError("cuDNN error: CUDNN_STATUS_INTERNAL_ERROR_DEVICE_ALLOCATION_FAILED"),
                              "memory": MemoryError("Unable to allocate 1.00 TiB for an array"),
                              "serialize": RuntimeError(SERIALIZATION_ERROR),
+                             "cannotopen": RuntimeError(OPEN_FILE_ERROR),
+                             "nodirectory": RuntimeError(OPEN_DIRECTORY_ERROR),
                              "cpualloc": RuntimeError(CPU_ALLOCATOR_ERROR),
                              "cublasinit": RuntimeError(CUBLAS_HANDLE_ERROR),
                              "defect": ValueError("training answer absent from episode candidate set")}.get(outcome)
@@ -311,14 +318,16 @@ def test_schedule_limits_concurrency_and_stops_everything_on_the_first_failure(t
     assert caps == [3, 3, 5, 5] and not active
     active.clear()
     peak[0] = 0
-    with pytest.raises(ValueError, match="run c exited 1"):
+    with pytest.raises(ValueError, match="run c exited 1") as caught:
         run_tsm.schedule(["a", "b", "c", "d"], 2, tmp_path / "d.json", tmp_path, device="cpu")
     assert peak[0] <= 2 and not active  # every started child was stopped
+    assert isinstance(caught.value, run_tsm.ChildFailed)  # which names the child, its exit code and its log
+    assert (caught.value.run, caught.value.exit_code, caught.value.log) == ("c", 1, tmp_path / "logs" / "c.log")
     # with a fatal predicate only the failures it names stop the others; the rest are returned
     codes = run_tsm.schedule(["a", "b", "c", "d"], 2, tmp_path / "d.json", tmp_path, device="cpu",
                              fatal=lambda name: name == "d")
     assert codes == {"a": 0, "b": 0, "c": 1, "d": 0} and not active
-    with pytest.raises(ValueError, match="run c exited 1"):
+    with pytest.raises(run_tsm.ChildFailed, match="run c exited 1"):
         run_tsm.schedule(["a", "b", "c", "d"], 2, tmp_path / "d.json", tmp_path, device="cpu",
                          fatal=lambda name: name == "c")
     assert not active
@@ -330,9 +339,10 @@ def test_schedule_limits_concurrency_and_stops_everything_on_the_first_failure(t
 
     monkeypatch.setattr(run_tsm, "start_child", broken)
     stopped.clear()
-    with pytest.raises(ValueError, match="run c could not be started: the log exists"):
+    with pytest.raises(ValueError, match="run c could not be started: the log exists") as caught:
         run_tsm.schedule(["a", "b", "c"], 3, tmp_path / "d.json", tmp_path, device="cpu")
     assert sorted(stopped) == ["a", "b"] and not active  # the children that were running are stopped
+    assert not isinstance(caught.value, run_tsm.ChildFailed)  # no child ended: there is no exit code or log to name
 
 
 def test_a_stopping_failure_starts_nothing_more_and_lets_the_running_children_finish(tmp_path, monkeypatch):
@@ -371,8 +381,9 @@ def test_a_stopping_failure_starts_nothing_more_and_lets_the_running_children_fi
     started.clear(), ended.clear(), stopped.clear()
     # with a predicate, a failure that stops the study (Clarification C1: running jobs may finish, and their outputs
     # are kept) starts no pending run and lets the running children finish; the error names the first such failure
-    with pytest.raises(ValueError, match="run a exited 1"):
+    with pytest.raises(run_tsm.ChildFailed, match="run a exited 1") as caught:
         run_tsm.schedule(names, 3, tmp_path / "d.json", tmp_path, device="cpu", fatal=lambda name: name in ("a", "b"))
+    assert (caught.value.run, caught.value.exit_code) == ("a", 1)  # not b, which also stopped the study, later
     assert started == ["a", "b", "c"]  # d and e were never started
     assert ended == ["a", "c", "b"] and stopped == []  # c and b ran to their ends, b with a failure of its own
     started.clear(), ended.clear()
@@ -572,6 +583,10 @@ def test_run_state_separates_registered_training_failures_from_unfinished_runs(t
     (lambda: RuntimeError(SERIALIZATION_ERROR), "infrastructure"),  # Clarification C3: torch.save cannot write
     (lambda: RuntimeError("PytorchStreamReader failed reading zip archive: failed finding central directory"),
      "infrastructure"),  # ... and torch.load cannot read
+    (lambda: RuntimeError(OPEN_FILE_ERROR), "infrastructure"),  # Clarification C4: the writer cannot create the file
+    (lambda: RuntimeError(OPEN_DIRECTORY_ERROR), "infrastructure"),  # ... or its parent directory is missing
+    (lambda: RuntimeError(f"[enforce fail at inline_container.cc:600] . {OPEN_FILE_ERROR}\nException raised from setup"
+                          ), "infrastructure"),  # the text is read wherever it stands in the message
     (lambda: KeyboardInterrupt(), "infrastructure"),  # an interruption is not an exception of the code
     (lambda: ValueError("training answer absent from episode candidate set"), "code_defect"),
     (lambda: KeyError("hop"), "code_defect"),
@@ -591,6 +606,11 @@ def test_run_state_separates_registered_training_failures_from_unfinished_runs(t
     (lambda: RuntimeError("out of memory while allocating the host buffer"), "code_defect"),  # not CUDA
     (lambda: ValueError(CPU_ALLOCATOR_ERROR), "code_defect"),  # the libraries raise a RuntimeError
     (lambda: ValueError(SERIALIZATION_ERROR), "code_defect"),
+    (lambda: ValueError(OPEN_FILE_ERROR), "code_defect"),  # the writer raises a RuntimeError; Python's open an OSError
+    (lambda: ValueError(OPEN_DIRECTORY_ERROR), "code_defect"),
+    (lambda: RuntimeError("Directory /scratch/run/runs does not exist."),
+     "code_defect"),  # the writer's text starts "Parent directory"
+    (lambda: RuntimeError("Archive /scratch/run/checkpoint.pt cannot be opened."), "code_defect"),  # and "File ..."
     (lambda: RuntimeError("PytorchStream failed reading the model"), "code_defect"),  # neither marker
     (lambda: ValueError("CUDA error: out of memory"), "code_defect"),  # the libraries raise a RuntimeError
     (lambda: ValueError("non-finite values in the batch"), "code_defect"),  # not the error of the gradient clipping
@@ -765,6 +785,7 @@ def test_a_child_that_cannot_be_started_fails_the_job_cleanly(tiny, children):
         _one_run(locked, commit, root, "a")
     manifest = json.loads((root / "train_manifest-a.json").read_text())
     assert manifest["status"] == "failed" and f"run {NAME} could not be started" in manifest["reason"]
+    assert manifest["stopping_child"] is None  # no child ended
     assert children.started == [] and run_tsm.run_state(root, NAME) == "missing"
 
 
@@ -1115,6 +1136,8 @@ def test_nonfinite_loss_in_t0_stops_the_study_before_the_confirmation_set_is_ope
         run_tsm.main(_train_argv(locked, commit, root, "a"))
     stopped = json.loads((root / "train_manifest-a.json").read_text())
     assert stopped["status"] == "stopped" and failed in stopped["reason"]
+    assert stopped["stopping_child"] == dict(run=failed, exit_code=1, log=str(root / "logs" / f"{failed}.log"))
+    assert (root / "logs" / f"{failed}.log").is_file()  # the log that the manifest names
     assert children.stopped == []  # Clarification C1: a run that is still training when the study stops finishes ...
     assert run_tsm.run_state(root, sibling) == "complete" and (root / "runs" / sibling / "checkpoint.pt").is_file()
     assert stopped["run_states"][failed] == "training_failure" and stopped["run_states"][sibling] == "complete"
@@ -1142,6 +1165,7 @@ def test_a_code_defect_in_any_run_stops_the_study_before_the_confirmation_set_is
     assert run_tsm.run_state(root, failed) == "code_defect"
     stopped = json.loads((root / "train_manifest-a.json").read_text())
     assert stopped["status"] == "stopped" and failed in stopped["reason"] and "code defect" in stopped["reason"]
+    assert stopped["stopping_child"] == dict(run=failed, exit_code=1, log=str(root / "logs" / f"{failed}.log"))
     assert children.stopped == []  # the run that is still training finishes, and its record is kept (Clarification C1)
     assert run_tsm.run_state(root, sibling) == "complete" and stopped["run_states"][sibling] == "complete"
     order = [row["name"] for row in run_tsm.planned_runs()]
@@ -1228,7 +1252,7 @@ def test_cuda_out_of_memory_and_io_errors_are_infrastructure_failures_that_do_no
     assert run_tsm.main(_evaluate_argv(locked, commit, root)) == 0
 
 
-def test_library_allocation_and_serialization_failures_are_infrastructure_failures_too(tiny, children):
+def test_library_allocation_serialization_and_open_failures_are_infrastructure_failures_too(tiny, children):
     tmp_path, p1s, f2, repo = tiny
     locked, commit = _locked_design(tmp_path, p1s, f2, repo)
     root = tmp_path / "run"
@@ -1237,6 +1261,8 @@ def test_library_allocation_and_serialization_failures_are_infrastructure_failur
         "tsm-oracle_random-T1-s29": ("cudnn", "RuntimeError: cuDNN error: CUDNN_STATUS_INTERNAL_ERROR_DEVICE"),
         "tsm-joint_fact-T2-s43": ("memory", "MemoryError: Unable to allocate"),
         "tsm-oracle_random-T2-s17": ("serialize", "RuntimeError: PytorchStreamWriter failed writing file"),
+        "tsm-oracle_random-T1-s43": ("cannotopen", "RuntimeError: File /scratch/run/runs/tsm-joint_fact-T1-s17/check"),
+        "tsm-joint_fact-T2-s17": ("nodirectory", "RuntimeError: Parent directory /scratch/run/runs/tsm-joint_fact"),
         "tsm-joint_fact-T0-s29": ("cpualloc", "RuntimeError: [enforce fail at alloc_cpu.cpp:121] data. DefaultCPU"),
         "tsm-joint_fact-T1-s43": ("cublasinit", "RuntimeError: CUDA error: CUBLAS_STATUS_NOT_INITIALIZED when")}
     for name, (outcome, _) in failing.items():
@@ -1245,7 +1271,7 @@ def test_library_allocation_and_serialization_failures_are_infrastructure_failur
         run_tsm.main(_train_argv(locked, commit, root, "a"))
     first = json.loads((root / "train_manifest-a.json").read_text())
     assert first["status"] == "incomplete" and sorted(first["unfinished"]) == sorted(failing)
-    assert first["training_failures"] == [] and len(list((root / "runs").glob("*/checkpoint.pt"))) == 12
+    assert first["training_failures"] == [] and len(list((root / "runs").glob("*/checkpoint.pt"))) == 10
     for name, (_, text) in failing.items():
         record = run_tsm.read_record(root, name)
         assert record["failure_kind"] == "infrastructure" and record["failure"].startswith(text)
@@ -1387,7 +1413,7 @@ def test_an_interrupted_evaluation_is_restarted_from_scratch_with_its_output_mov
     manifest = json.loads((out / "manifest.json").read_text())
     assert manifest["status"] == "complete" and manifest["attempt"] == 2
     assert manifest["restarts"] == [dict(attempt=1, moved_to="attempts/evaluation-attempt1",
-                                         source_hash=first["source"]["source_hash"])]
+                                         source_hash=first["source"]["source_hash"], decision=None)]
     assert len(manifest["evaluations"]) == 24 and len(list((out / "samples").glob("*.npz"))) == 24  # from scratch
     assert manifest["design_hash"] == first["design_hash"] and manifest["checkpoints"] == first["checkpoints"]
     assert manifest["source"]["source_hash"] == first["source"]["source_hash"]  # identical inputs
@@ -1506,7 +1532,7 @@ def test_a_restart_needs_identical_inputs_also_after_an_aborted_restart(tiny, mo
     manifest = json.loads(manifest_path.read_text())
     assert manifest["status"] == "complete" and manifest["attempt"] == 2
     assert manifest["restarts"] == [dict(attempt=1, moved_to="attempts/evaluation-attempt1",
-                                         source_hash=json.loads(interrupted)["source"]["source_hash"])]
+                                         source_hash=json.loads(interrupted)["source"]["source_hash"], decision=None)]
 
 
 @pytest.mark.parametrize("manifest_text", [None, '{"status": "runn'])
@@ -1530,7 +1556,8 @@ def test_an_evaluation_directory_without_a_readable_manifest_is_an_interrupted_e
     assert not (samples / "partial.npz").exists()
     manifest = json.loads((root / "evaluation" / "manifest.json").read_text())
     assert manifest["status"] == "complete" and manifest["attempt"] == 2
-    assert manifest["restarts"] == [dict(attempt=1, moved_to="attempts/evaluation-attempt1", source_hash=None)]
+    assert manifest["restarts"] == [dict(attempt=1, moved_to="attempts/evaluation-attempt1", source_hash=None,
+                                         decision=None)]
 
 
 def test_a_fixed_evaluation_code_is_restarted_only_with_the_flag_and_both_hashes_are_recorded(tiny, monkeypatch):
@@ -1560,8 +1587,8 @@ def test_a_fixed_evaluation_code_is_restarted_only_with_the_flag_and_both_hashes
     assert manifest["status"] == "complete" and manifest["attempt"] == 2
     assert manifest["source"]["source_hash"] == "the-fixed-evaluation-code"  # the code of this attempt ...
     assert manifest["training_source_hash"] == trained_at  # ... and the code the runs were trained at
-    assert manifest["restarts"] == [dict(attempt=1, moved_to="attempts/evaluation-attempt1",
-                                         source_hash=trained_at)]  # ... and the code of the interrupted one
+    assert manifest["restarts"] == [dict(attempt=1, moved_to="attempts/evaluation-attempt1", source_hash=trained_at,
+                                         decision=None)]  # ... and the code of the interrupted one
     first = json.loads(interrupted)
     assert manifest["design_hash"] == first["design_hash"] and manifest["checkpoints"] == first["checkpoints"]
     assert len(manifest["evaluations"]) == 24 and len(list((out / "samples").glob("*.npz"))) == 24
@@ -1618,12 +1645,16 @@ def test_the_new_evaluation_code_flag_relaxes_nothing_else(tiny, monkeypatch):
     _at_code(monkeypatch, "another-fix")
     with pytest.raises(ValueError, match="differs from the interrupted evaluation in code"):  # nothing is in place, but
         run_tsm.main(_evaluate_argv(locked, commit, root))  # the code is compared with the interrupted attempt's
-    with pytest.raises(ValueError, match="--new-evaluation-code applies to a restart"):  # and the flag is for a restart
-        run_tsm.main(_evaluate_argv(locked, commit, root, "--new-evaluation-code"))
+    decision = tiny[0] / "decision.md"  # an attempt moved aside is an attempt: this is not a first attempt either
+    decision.write_text("the orchestrator's decision\n")
+    for extra in (["--new-evaluation-code"], ["--new-evaluation-code", "--decision", str(decision)]):
+        with pytest.raises(ValueError, match="--new-evaluation-code applies to a restart"):  # and the flag is for a
+            run_tsm.main(_evaluate_argv(locked, commit, root, *extra))  # restart
     assert run_tsm.main(_evaluate_argv(locked, commit, root, *flags)) == 0
     manifest = json.loads(manifest_path.read_text())
     assert manifest["attempt"] == 2 and manifest["source"]["source_hash"] == "another-fix"
-    assert manifest["restarts"] == [dict(attempt=1, moved_to="attempts/evaluation-attempt1", source_hash=first_code)]
+    assert manifest["restarts"] == [dict(attempt=1, moved_to="attempts/evaluation-attempt1", source_hash=first_code,
+                                         decision=None)]
 
 
 @pytest.mark.parametrize("third", ["fix-one", "fix-two"])
@@ -1647,8 +1678,9 @@ def test_the_evaluation_code_of_every_attempt_is_recorded_across_restarts(tiny, 
     assert run_tsm.main(_evaluate_argv(locked, commit, root, *(flags if third != "fix-one" else flags[:1]))) == 0
     manifest = json.loads((root / "evaluation" / "manifest.json").read_text())
     assert manifest["attempt"] == 3 and manifest["source"]["source_hash"] == third
-    assert manifest["restarts"] == [dict(attempt=1, moved_to="attempts/evaluation-attempt1", source_hash=trained_at),
-                                    dict(attempt=2, moved_to="attempts/evaluation-attempt2", source_hash="fix-one")]
+    assert manifest["restarts"] == [
+        dict(attempt=1, moved_to="attempts/evaluation-attempt1", source_hash=trained_at, decision=None),
+        dict(attempt=2, moved_to="attempts/evaluation-attempt2", source_hash="fix-one", decision=None)]
     analysis = root.parent / "analysis"
     assert analyze_tsm.main(["--root", str(root), "--out", str(analysis)]) == 0
     report = (analysis / "summary.md").read_text()
@@ -1673,8 +1705,9 @@ def test_a_restart_records_no_code_for_an_attempt_whose_manifest_was_cut_off(tin
     assert run_tsm.main(_evaluate_argv(locked, commit, root, *flags)) == 0
     manifest = json.loads((root / "evaluation" / "manifest.json").read_text())
     assert manifest["attempt"] == 3 and manifest["source"]["source_hash"] == "fix-two"
-    assert manifest["restarts"] == [dict(attempt=1, moved_to="attempts/evaluation-attempt1", source_hash=trained_at),
-                                    dict(attempt=2, moved_to="attempts/evaluation-attempt2", source_hash=None)]
+    assert manifest["restarts"] == [
+        dict(attempt=1, moved_to="attempts/evaluation-attempt1", source_hash=trained_at, decision=None),
+        dict(attempt=2, moved_to="attempts/evaluation-attempt2", source_hash=None, decision=None)]
     analysis = root.parent / "analysis"
     assert analyze_tsm.main(["--root", str(root), "--out", str(analysis)]) == 0  # the audit accepts an unknown code
     assert f"1: {trained_at[:12]}, 2: unknown, 3: fix-two;" in (analysis / "summary.md").read_text()
@@ -1703,7 +1736,7 @@ def test_a_single_writer_pass_is_worded_as_a_writer_specific_result():
     failure = dict(name="tsm-joint_fact-T2-s17", writer="joint_fact", arm="T2", seed=17, attempt=1,
                    failure="FloatingPointError: non-finite train loss | at step 3")
     manifest = dict(training_failures=[failure], node_hours=0.1, design_lock_commit="a" * 40, attempt=1, restarts=[],
-                    source=dict(source_hash="c" * 40), training_source_hash="c" * 40)
+                    source=dict(source_hash="c" * 40), training_source_hash="c" * 40, decision=None)
     text = "\n".join(analyze_tsm.render(result, design, manifest))
     assert "| T1 | fails | passes | writer-specific result, not a remedy |" in text
     assert "| T2 | passes | training failure | writer-specific result, not a remedy |" in text
@@ -1729,10 +1762,10 @@ def test_the_summary_states_the_training_and_evaluation_code_and_flags_a_differe
     endpoints = [_endpoint(w, a, passes=True) for w in run_tsm.WRITERS for a in analyze_tsm.ARMS]
     result = dict(endpoints=endpoints, descriptive=[], accuracy=[], **analyze_tsm.reading(endpoints))
     design = dict(decision=dict(confidence=0.9875), evaluation=dict(split="test", seed=999007, episodes=10))
-    restarts = [dict(attempt=number, moved_to=f"attempts/evaluation-attempt{number}", source_hash=code)
+    restarts = [dict(attempt=number, moved_to=f"attempts/evaluation-attempt{number}", source_hash=code, decision=None)
                 for number, code in enumerate(codes[:-1], 1)]
     manifest = dict(training_failures=[], node_hours=0.1, design_lock_commit="a" * 40, attempt=len(codes),
-                    restarts=restarts, source=dict(source_hash=codes[-1]), training_source_hash=trained)
+                    restarts=restarts, source=dict(source_hash=codes[-1]), training_source_hash=trained, decision=None)
     text = "\n".join(analyze_tsm.render(result, design, manifest))
     assert (f"Code (source_hash): the 18 runs were trained at {trained[:12]}; the evaluation ran at {codes[-1][:12]} "
             f"({'the same code' if same else 'a DIFFERENT code'}).") in text
@@ -1742,9 +1775,10 @@ def test_the_summary_states_the_training_and_evaluation_code_and_flags_a_differe
     assert len(flagged) == (sentence is not None)
     if sentence:
         assert flagged[0].startswith(sentence) and f"source_hash by attempt: {by_attempt}" in flagged[0]
-        if sentence.startswith("The first"):  # a first attempt at another code is outside the rule
-            assert "outside the rule" in flagged[0] and "Clarifications C1 and C2" in flagged[0]
-            assert "orchestrator's decision" not in flagged[0]
+        if sentence.startswith("The first"):  # a first attempt at another code, with no decision, is outside the rule
+            assert "outside the rule" in flagged[0] and "Clarifications C1, C2 and C4" in flagged[0]
+            assert "no decision of the orchestrator is recorded for it" in flagged[0]
+            assert "orchestrator's decision" not in flagged[0] and "recorded decision" not in flagged[0]
         else:  # a restart at another code is under the orchestrator's decision (Clarification C2)
             assert "on the orchestrator's decision" in flagged[0] and "Clarification C2" in flagged[0]
             assert "outside the rule" not in flagged[0]
@@ -1757,16 +1791,12 @@ def test_the_first_evaluation_attempt_runs_at_the_training_code(tiny, monkeypatc
     monkeypatch.setattr(run_tsm, "evaluate_runs", _raise(AssertionError("the confirmation set must stay closed")))
     real_source = _at_code(monkeypatch, "the-evaluation-code")  # not the code that the 18 runs were trained at
     refusal = f"the evaluation runs at source_hash the-evaluati but the 18 runs were trained at {trained_at[:12]}"
-    for flags in ([], ["--restart-interrupted"]):  # the restart flag has nothing to restart
+    for flags in ([], ["--restart-interrupted"],  # the restart flag has nothing to restart; and the new-code flag is
+                  ["--restart-interrupted", "--new-evaluation-code"]):  # no way round it without a decision (below)
         with pytest.raises(ValueError, match=refusal):
             run_tsm.main(_evaluate_argv(locked, commit, root, *flags))
-    with pytest.raises(ValueError, match="applies to the restart of an evaluation that has an earlier attempt"):
-        run_tsm.main(_evaluate_argv(locked, commit, root, "--restart-interrupted", "--new-evaluation-code"))
     assert not (root / "evaluation").exists() and not (root / "attempts").exists()  # nothing was created
-    monkeypatch.setattr(run_tsm, "source_metadata", real_source)  # at the training code the flag is no way round either
-    with pytest.raises(ValueError, match="applies to the restart of an evaluation that has an earlier attempt"):
-        run_tsm.main(_evaluate_argv(locked, commit, root, "--restart-interrupted", "--new-evaluation-code"))
-    assert not (root / "evaluation").exists()
+    monkeypatch.setattr(run_tsm, "source_metadata", real_source)  # at the training code the first attempt needs no flag
     monkeypatch.setattr(run_tsm, "evaluate_runs", real)
     assert run_tsm.main(_evaluate_argv(locked, commit, root)) == 0  # at the training code the first attempt runs
     manifest_path = root / "evaluation" / "manifest.json"
@@ -1783,8 +1813,158 @@ def test_the_first_evaluation_attempt_runs_at_the_training_code(tiny, monkeypatc
     flagged = (analysis / "flagged" / "summary.md").read_text()
     assert "(a DIFFERENT code)" in flagged
     assert "outside the rule that the first attempt runs at the training code" in flagged
+    assert "no decision of the orchestrator is recorded for it" in flagged  # nothing in the manifest allows it
     summary = json.loads((analysis / "flagged" / "summary.json").read_text())
     assert summary["training_source_hash"] == trained_at and summary["evaluation_source_hash"] == "the-evaluation-code"
+    assert summary["evaluation_decision"] is None
+
+
+@pytest.mark.parametrize("codes, decided, reading", [
+    (["f"], [1], "decided"),  # the first attempt at another code, on a recorded decision (Clarification C4)
+    (["f", "f"], [1], "decided"),  # interrupted, and restarted at that code: the decision stays with attempt 1
+    (["f", "t"], [1], "decided"),  # ... and restarted at the training code
+    (["f", "f"], [2], "outside"),  # a decision of a later attempt is not the first attempt's
+    (["t", "f"], [2], "changed"),  # a restart at another code is Clarification C2's, with or without a decision
+    (["t", "f"], [], "changed"),
+    (["t"], [1], None),  # a decision where the code is the training code flags nothing
+])
+def test_the_summary_names_the_decision_that_allowed_a_first_attempt_at_another_code(codes, decided, reading):
+    codes = [code * 40 for code in codes]
+    trained = "t" * 40
+    decisions = [dict(path=f"/decisions/{n}.md", blake2b=str(n) * 32) if n in decided else None
+                 for n in range(1, len(codes) + 1)]  # by attempt
+    endpoints = [_endpoint(w, a, passes=True) for w in run_tsm.WRITERS for a in analyze_tsm.ARMS]
+    result = dict(endpoints=endpoints, descriptive=[], accuracy=[], **analyze_tsm.reading(endpoints))
+    design = dict(decision=dict(confidence=0.9875), evaluation=dict(split="test", seed=999007, episodes=10))
+    restarts = [dict(attempt=n, moved_to=f"attempts/evaluation-attempt{n}", source_hash=code, decision=decisions[n - 1])
+                for n, code in enumerate(codes[:-1], 1)]
+    manifest = dict(training_failures=[], node_hours=0.1, design_lock_commit="a" * 40, attempt=len(codes),
+                    restarts=restarts, source=dict(source_hash=codes[-1]), training_source_hash=trained,
+                    decision=decisions[-1])
+    text = "\n".join(analyze_tsm.render(result, design, manifest))
+    flagged = [line for line in text.splitlines()
+               if line.startswith(("The first evaluation attempt", "The evaluation code changed"))]
+    assert len(flagged) == (reading is not None)
+    if reading == "decided":
+        assert flagged[0].startswith("The first evaluation attempt ran at a code other than the training code, on the "
+                                     "orchestrator's recorded decision (docs/prereg/TSM.md, Clarification C4; decision "
+                                     "file /decisions/1.md, blake2b 111111111111); source_hash by attempt: 1: ffff")
+        assert "outside the rule" not in flagged[0]
+    elif reading == "outside":
+        assert "no decision of the orchestrator is recorded for it" in flagged[0] and "/decisions/" not in flagged[0]
+    elif reading == "changed":
+        assert flagged[0].startswith("The evaluation code changed at a restart, on the orchestrator's decision")
+        assert "Clarification C2" in flagged[0] and "outside the rule" not in flagged[0]
+
+
+def test_a_first_evaluation_attempt_at_another_code_needs_the_new_code_flag_and_a_recorded_decision(tiny, monkeypatch):
+    tmp_path = tiny[0]
+    locked, commit, root, _ = _trained(tiny)
+    trained_at = run_tsm.read_record(root, NAME)["source"]["source_hash"]
+    real = run_tsm.evaluate_runs
+    monkeypatch.setattr(run_tsm, "evaluate_runs", _raise(AssertionError("the confirmation set must stay closed")))
+    _at_code(monkeypatch, "the-fixed-evaluation-code")  # a defect before the first manifest existed was fixed
+    decision, empty = tmp_path / "decision.md", tmp_path / "empty.md"
+    decision.write_text("evaluate ended with a KeyError before its first manifest; code-level check: nothing else\n")
+    empty.write_text("")
+    refusal = (f"the evaluation runs at source_hash the-fixed-ev but the 18 runs were trained at {trained_at[:12]}"
+               ".*--new-evaluation-code --decision FILE")
+    for extra in ([], ["--restart-interrupted"], ["--new-evaluation-code"],  # without --decision the refusal stays,
+                  ["--restart-interrupted", "--new-evaluation-code"],  # and --decision does not take the place of
+                  ["--decision", str(decision)], ["--restart-interrupted", "--decision", str(decision)]):  # the flag
+        with pytest.raises(ValueError, match=refusal):
+            run_tsm.main(_evaluate_argv(locked, commit, root, *extra))
+    for given, match in ((tmp_path / "absent.md", "non-empty file"), (empty, "non-empty file"),
+                         (tmp_path, "non-empty file"), ("decision.md", "--decision must be an absolute path")):
+        with pytest.raises(ValueError, match=match):  # the decision is a file that exists
+            run_tsm.main(_evaluate_argv(locked, commit, root, "--new-evaluation-code", "--decision", str(given)))
+    assert not (root / "evaluation").exists() and not (root / "attempts").exists()  # nothing was created
+    monkeypatch.setattr(run_tsm, "evaluate_runs", real)
+    assert run_tsm.main(_evaluate_argv(locked, commit, root, "--new-evaluation-code", "--decision", str(decision))) == 0
+    manifest_path = root / "evaluation" / "manifest.json"
+    manifest = json.loads(manifest_path.read_text())
+    sealed = dict(path=str(decision), blake2b=hashlib.blake2b(decision.read_bytes(), digest_size=16).hexdigest())
+    assert manifest["status"] == "complete" and manifest["attempt"] == 1 and manifest["restarts"] == []
+    assert manifest["source"]["source_hash"] == "the-fixed-evaluation-code"  # both codes are recorded ...
+    assert manifest["training_source_hash"] == trained_at
+    assert manifest["decision"] == sealed  # ... and the decision, by its path and its digest
+    records = [json.loads(path.read_text()) for path in sorted((root / "runs").glob("*/record.json"))]
+    assert len(records) == 18 and {r["source"]["source_hash"] for r in records} == {trained_at}  # one training code
+
+    analysis = root.parent / "analysis"
+    assert analyze_tsm.main(["--root", str(root), "--out", str(analysis)]) == 0
+    report = (analysis / "summary.md").read_text()
+    assert "(a DIFFERENT code)" in report and "outside the rule" not in report
+    assert ("The first evaluation attempt ran at a code other than the training code, on the orchestrator's recorded "
+            f"decision (docs/prereg/TSM.md, Clarification C4; decision file {decision}, blake2b "
+            f"{sealed['blake2b'][:12]}); source_hash by attempt: 1: the-fixed-ev; the 18 runs were trained at "
+            f"{trained_at[:12]}.") in report
+    summary = json.loads((analysis / "summary.json").read_text())
+    assert summary["evaluation_decision"] == sealed and summary["evaluation_source_hash"] == "the-fixed-evaluation-code"
+    assert summary["training_source_hash"] == trained_at
+    with _edited(manifest_path, lambda m: dict(m, decision=None)):  # without its decision the same run is flagged
+        assert analyze_tsm.main(["--root", str(root), "--out", str(analysis / "flagged")]) == 0
+    flagged = (analysis / "flagged" / "summary.md").read_text()
+    assert "no decision of the orchestrator is recorded for it" in flagged and "outside the rule" in flagged
+    assert "on the orchestrator's recorded decision" not in flagged
+    for bad in ("decision.md", dict(path=str(decision)), dict(sealed, sha="x")):  # a path and a digest, or none
+        with _edited(manifest_path, lambda m: dict(m, decision=bad)):
+            with pytest.raises(ValueError, match="does not record the orchestrator's decision"):
+                analyze_tsm.main(["--root", str(root), "--out", str(root.parent / "again")])
+    with _edited(manifest_path, lambda m: {k: v for k, v in m.items() if k != "decision"}):
+        with pytest.raises(ValueError, match="does not record the orchestrator's decision"):
+            analyze_tsm.main(["--root", str(root), "--out", str(root.parent / "again")])
+
+
+def test_an_interrupted_first_attempt_under_a_decision_is_restarted_at_its_own_code_and_keeps_its_decision(
+        tiny, monkeypatch):
+    tmp_path = tiny[0]
+    locked, commit, root, _ = _trained(tiny)
+    trained_at = run_tsm.read_record(root, NAME)["source"]["source_hash"]
+    real = _interrupting(monkeypatch)
+    _at_code(monkeypatch, "the-fixed-evaluation-code")
+    decision = tmp_path / "decision.md"
+    decision.write_text("the orchestrator's decision\n")
+    sealed = dict(path=str(decision), blake2b=hashlib.blake2b(decision.read_bytes(), digest_size=16).hexdigest())
+    first_flags = ("--new-evaluation-code", "--decision", str(decision))
+    with pytest.raises(OSError, match="Input/output"):  # the first attempt, at the fixed code, ends in the middle
+        run_tsm.main(_evaluate_argv(locked, commit, root, *first_flags))
+    manifest_path = root / "evaluation" / "manifest.json"
+    interrupted = json.loads(manifest_path.read_text())
+    assert interrupted["status"] == "failed" and interrupted["attempt"] == 1 and interrupted["decision"] == sealed
+    # an evaluation is in place now: it is an attempt, so the flags no longer make a first attempt
+    with pytest.raises(ValueError, match="--new-evaluation-code applies to a restart: it needs --restart-interrupted"):
+        run_tsm.main(_evaluate_argv(locked, commit, root, *first_flags))
+    # the restarts are compared with the interrupted attempt and run at its code: no flag and no new decision
+    with pytest.raises(OSError, match="Input/output"):  # attempt 2 ends in the middle too
+        run_tsm.main(_evaluate_argv(locked, commit, root, "--restart-interrupted"))
+    assert json.loads(manifest_path.read_text())["decision"] is None
+    monkeypatch.setattr(run_tsm, "evaluate_runs", real)
+    assert run_tsm.main(_evaluate_argv(locked, commit, root, "--restart-interrupted")) == 0  # attempt 3
+    manifest = json.loads(manifest_path.read_text())
+    assert manifest["status"] == "complete" and manifest["attempt"] == 3
+    assert manifest["source"]["source_hash"] == "the-fixed-evaluation-code" and manifest["decision"] is None
+    assert manifest["restarts"] == [  # the decision of attempt 1 is carried through the chain, and attempt 2 had none
+        dict(attempt=1, moved_to="attempts/evaluation-attempt1", source_hash="the-fixed-evaluation-code",
+             decision=sealed),
+        dict(attempt=2, moved_to="attempts/evaluation-attempt2", source_hash="the-fixed-evaluation-code",
+             decision=None)]
+    analysis = root.parent / "analysis"  # the decision of attempt 1 is in the final manifest: not "outside the rule"
+    assert analyze_tsm.main(["--root", str(root), "--out", str(analysis)]) == 0
+    report = (analysis / "summary.md").read_text()
+    assert ("The first evaluation attempt ran at a code other than the training code, on the orchestrator's recorded "
+            f"decision (docs/prereg/TSM.md, Clarification C4; decision file {decision}, blake2b "
+            f"{sealed['blake2b'][:12]}); source_hash by attempt: 1: the-fixed-ev, 2: the-fixed-ev, 3: the-fixed-ev; "
+            ) in report
+    assert "outside the rule" not in report
+    summary = json.loads((analysis / "summary.json").read_text())
+    assert summary["evaluation_restarts"] == manifest["restarts"] and summary["evaluation_decision"] is None
+    assert summary["training_source_hash"] == trained_at
+    for change in (lambda row: {k: v for k, v in row.items() if k != "decision"}, lambda row: dict(row, decision=1),
+                   lambda row: dict(row, decision=dict(sealed, extra="x"))):  # a path and a digest, or none
+        with _edited(manifest_path, lambda m: dict(m, restarts=[change(row) for row in m["restarts"]])):
+            with pytest.raises(ValueError, match="does not record the orchestrator's decision"):
+                analyze_tsm.main(["--root", str(root), "--out", str(root.parent / "again")])
 
 
 def test_a_restart_with_no_readable_earlier_manifest_runs_at_the_training_code_unless_the_flag_says_otherwise(
@@ -1802,17 +1982,32 @@ def test_a_restart_with_no_readable_earlier_manifest_runs_at_the_training_code_u
     with pytest.raises(ValueError, match=refusal):  # nothing to compare with: the training code is the reference
         run_tsm.main(_evaluate_argv(locked, commit, root, "--restart-interrupted"))
     assert not (root / "attempts").exists() and (samples / "partial.npz").read_bytes() == b"cut off"  # nothing moved
+    decision = tiny[0] / "decision.md"  # an evaluation directory is an attempt, so this is not a first attempt: the
+    decision.write_text("the orchestrator's decision\n")  # decision does not take the place of --restart-interrupted
+    with pytest.raises(ValueError, match="--new-evaluation-code applies to a restart: it needs --restart-interrupted"):
+        run_tsm.main(_evaluate_argv(locked, commit, root, "--new-evaluation-code", "--decision", str(decision)))
+    assert not (root / "attempts").exists() and (samples / "partial.npz").read_bytes() == b"cut off"
+    # a restart needs no decision (Clarification C2): the flag alone permits it
     assert run_tsm.main(_evaluate_argv(locked, commit, root, "--restart-interrupted", "--new-evaluation-code")) == 0
     manifest = json.loads((root / "evaluation" / "manifest.json").read_text())
     assert manifest["attempt"] == 2 and manifest["source"]["source_hash"] == "the-fixed-evaluation-code"
     assert manifest["training_source_hash"] == trained_at
-    assert manifest["restarts"] == [dict(attempt=1, moved_to="attempts/evaluation-attempt1", source_hash=None)]
+    assert manifest["restarts"] == [dict(attempt=1, moved_to="attempts/evaluation-attempt1", source_hash=None,
+                                         decision=None)]
     assert (root / "attempts" / "evaluation-attempt1" / "samples" / "partial.npz").read_bytes() == b"cut off"
 
 
 def test_the_silence_rule_is_the_one_the_heartbeat_serves():
     assert run_tsm.QUIET_SECONDS == 300  # an evaluation (or run) that nothing wrote to for 300 s has ended ...
     assert 0 < run_tsm.HEARTBEAT_SECONDS <= 60  # ... and a live evaluation writes its heartbeat at least every minute
+
+
+def _heartbeat_gone(seconds=5.0):
+    """True once no heartbeat thread is alive: ``heartbeat`` waits for its thread for 2 x ``HEARTBEAT_SECONDS`` only."""
+    deadline = time.time() + seconds
+    while "evaluation-heartbeat" in [thread.name for thread in threading.enumerate()] and time.time() < deadline:
+        time.sleep(0.005)
+    return "evaluation-heartbeat" not in [thread.name for thread in threading.enumerate()]
 
 
 def test_a_live_evaluation_writes_a_heartbeat_while_it_computes(tiny, monkeypatch):
@@ -1834,7 +2029,7 @@ def test_a_live_evaluation_writes_a_heartbeat_while_it_computes(tiny, monkeypatc
     monkeypatch.setattr(run_tsm, "evaluate_runs", busy)
     assert run_tsm.main(_evaluate_argv(locked, commit, root)) == 0
     assert len(set(seen)) >= 4  # the beat went on while the evaluation computed
-    assert "evaluation-heartbeat" not in [thread.name for thread in threading.enumerate()]
+    assert _heartbeat_gone()
     beat = root / "evaluation" / "heartbeat"
     last = beat.read_text()
     time.sleep(0.1)
@@ -1849,7 +2044,7 @@ def test_the_heartbeat_stops_when_the_evaluation_fails_and_a_beat_that_cannot_be
     _interrupting(monkeypatch)
     with pytest.raises(OSError, match="Input/output"):
         run_tsm.main(_evaluate_argv(locked, commit, root))
-    assert "evaluation-heartbeat" not in [thread.name for thread in threading.enumerate()]
+    assert _heartbeat_gone()
     beat = root / "evaluation" / "heartbeat"
     last = beat.read_text()
     time.sleep(0.1)
@@ -1861,4 +2056,24 @@ def test_the_heartbeat_stops_when_the_evaluation_fails_and_a_beat_that_cannot_be
         with run_tsm.heartbeat(tmp_path / "heartbeat"):
             assert (tmp_path / "heartbeat").is_file()
             raise KeyError("model")
-    assert "evaluation-heartbeat" not in [thread.name for thread in threading.enumerate()]
+    assert _heartbeat_gone()
+
+
+def test_a_heartbeat_that_hangs_in_its_write_does_not_hold_the_end_of_the_evaluation(tmp_path, monkeypatch):
+    monkeypatch.setattr(run_tsm, "HEARTBEAT_SECONDS", 0.05)
+    entered, release, real_now = threading.Event(), threading.Event(), run_tsm.now
+
+    def hung_now():  # the beat takes its text from now(): a file system that does not answer holds its thread here
+        if threading.current_thread().name == "evaluation-heartbeat":
+            entered.set()
+            release.wait(10)
+        return real_now()
+
+    monkeypatch.setattr(run_tsm, "now", hung_now)
+    with run_tsm.heartbeat(tmp_path / "heartbeat"):  # the first beat is the caller's own and returns
+        assert entered.wait(10)  # the thread is inside a beat that does not return
+        inside = time.perf_counter()
+    waited = time.perf_counter() - inside
+    assert 0.9 * 2 * 0.05 <= waited < 5  # it waited for the hung beat for 2 x HEARTBEAT_SECONDS: not 0, not for ever
+    release.set()
+    assert _heartbeat_gone()  # the daemon thread ends once its beat returns

@@ -12,10 +12,11 @@ that writer, its completed seeds are reported descriptively (they are not regist
 other arms are evaluated as registered. Every T0 run must be complete (a T0 failure stops the study, and so does a
 code defect in any run). An evaluation that was restarted from scratch after an interruption is audited too: the
 manifest's attempts must match the interrupted evaluations moved aside, its checkpoint seals must be those of the run
-records, and it records the code (source_hash) of every attempt and the code the runs were trained at. The summary
-always states both codes and flags a difference: the first evaluation attempt runs at the training code, so a first
-attempt at another code is reported as outside the rule (docs/prereg/TSM.md, Clarifications C1 and C2), and a restart
-at another evaluation code (Clarification C2) is reported with the code of each attempt.
+records, and it records the code (source_hash) and the orchestrator's decision (the path and blake2b digest of its file,
+or none) of every attempt, and the code the runs were trained at. The summary always states both codes and flags a
+difference: the first evaluation attempt runs at the training code, so a first attempt at another code is reported as
+outside the rule (docs/prereg/TSM.md, Clarifications C1 and C2) unless a decision is recorded for it (Clarification
+C4), and a restart at another evaluation code (Clarification C2) is reported with the code of each attempt.
 """
 from __future__ import annotations
 
@@ -90,6 +91,11 @@ def audit_run(root: Path) -> tuple[dict, dict[str, dict], dict]:
     require(isinstance(manifest.get("source", {}).get("source_hash"), str)
             and all("source_hash" in row for row in restarts),
             "the manifest does not record the code (source_hash) of every evaluation attempt")
+    decisions = [row.get("decision", "missing") for row in restarts]  # by attempt: the moved ones, then this one
+    decisions.append(manifest.get("decision", "missing"))
+    require(all(d is None or (isinstance(d, dict) and set(d) == {"path", "blake2b"}) for d in decisions),
+            "the manifest does not record the orchestrator's decision (the path and blake2b digest of its file, or "
+            "none) of every evaluation attempt")
     evaluation = design["evaluation"]
     expected = set(complete) | {run_tsm.reference_name(w, s) for w in run_tsm.WRITERS for s in run_tsm.SEEDS}
     rows = {row["name"]: row for row in manifest["evaluations"]}
@@ -285,12 +291,19 @@ def render(result: dict, design: dict, manifest: dict) -> list[str]:
                   "TSM.md, Clarification C1); their partial output was moved aside unread: "
                   + ", ".join(row["moved_to"] for row in manifest["restarts"]) + "."]
     codes = [row["source_hash"] for row in manifest["restarts"]] + [final]  # by attempt; None: not known
+    decisions = [row["decision"] for row in manifest["restarts"]] + [manifest["decision"]]  # None: none recorded
     differing = [number for number, code in enumerate(codes, 1) if code and code != trained]
     by_attempt = ", ".join(f"{number}: {(code or 'unknown')[:12]}" for number, code in enumerate(codes, 1))
-    if 1 in differing:
-        lines += ["", "The first evaluation attempt ran at a code other than the training code: this is outside the "
-                  "rule that the first attempt runs at the training code (docs/prereg/TSM.md, Clarifications C1 and "
-                  f"C2); source_hash by attempt: {by_attempt}; report it to the orchestrator before the result is "
+    if 1 in differing and decisions[0]:
+        lines += ["", "The first evaluation attempt ran at a code other than the training code, on the orchestrator's "
+                  "recorded decision (docs/prereg/TSM.md, Clarification C4; decision file "
+                  f"{decisions[0]['path']}, blake2b {decisions[0]['blake2b'][:12]}); source_hash by attempt: "
+                  f"{by_attempt}; the 18 runs were trained at {trained[:12]}."]
+    elif 1 in differing:
+        lines += ["", "The first evaluation attempt ran at a code other than the training code and no decision of the "
+                  "orchestrator is recorded for it: this is outside the rule that the first attempt runs at the "
+                  "training code unless the orchestrator decides otherwise (docs/prereg/TSM.md, Clarifications C1, C2 "
+                  f"and C4); source_hash by attempt: {by_attempt}; report it to the orchestrator before the result is "
                   "used."]
     elif differing:
         lines += ["", "The evaluation code changed at a restart, on the orchestrator's decision (docs/prereg/"
@@ -322,7 +335,7 @@ def main(argv: list[str] | None = None) -> int:
         created=now(), seconds=time.perf_counter() - started, resamples=args.resamples,
         design_hash=manifest["design_hash"], design_lock_commit=manifest["design_lock_commit"],
         training_source_hash=run_tsm.training_source_hash(root),
-        evaluation_source_hash=manifest["source"]["source_hash"],
+        evaluation_source_hash=manifest["source"]["source_hash"], evaluation_decision=manifest["decision"],
         arms_pass=result["arms"], arm_outcome=result["outcome"], passing_writers=result["passing_writers"],
         writer_passes={f"{r['writer']}/{r['arm']}": r["passes"] for r in result["endpoints"]},
         training_failures=manifest["training_failures"], evaluation_attempt=manifest["attempt"],

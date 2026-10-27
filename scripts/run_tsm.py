@@ -12,7 +12,7 @@ Stages (each its own job; scripts/submit.py in a Miyabi-G allocation):
             a run that is already complete or a registered training failure is left as it is;
   evaluate  evaluate T0, T1, T2 and the B4 references on the new confirmation episodes (split test, seed 999007).
 
-Training failures (docs/prereg/TSM.md, "Decisions at registration" and Clarifications C1 and C2); every run that ends
+Training failures (docs/prereg/TSM.md, "Decisions at registration" and Clarifications C1 to C4); every run that ends
 with an exception is recorded as ``failed`` with a ``failure_kind`` (see ``classify_failure``):
 
 * a non-finite loss or gradient norm in a T1 or T2 run (``numerical``) is a registered training failure: no retry, no
@@ -20,10 +20,11 @@ with an exception is recorded as ``failed`` with a ``failure_kind`` (see ``class
   are evaluated as registered;
 * the same in a T0 run stops the study before the confirmation set is opened: ``train`` refuses to start anything else
   and ``evaluate`` refuses to run;
-* an end by walltime or a node fault, an I/O error (an ``OSError``, or a failure of torch's checkpoint serialization)
-  and an allocation failure (CUDA out-of-memory, a cuBLAS or cuDNN allocation failure, a failure of torch's CPU
-  allocator, a host ``MemoryError``) are infrastructure failures (``infrastructure``): the run is trained again with the
-  identical configuration and code (``train --rerun-incomplete`` once its job has ended), at most twice, or more with
+* an end by walltime or a node fault, an I/O error (an ``OSError``, or a failure of torch's checkpoint writer or reader
+  to create, open, write or read a file) and an allocation failure (CUDA out-of-memory, a cuBLAS or cuDNN allocation
+  failure, a failure of torch's CPU allocator, a host ``MemoryError``) are infrastructure failures
+  (``infrastructure``): the run is trained again with the identical configuration and code
+  (``train --rerun-incomplete`` once its job has ended), at most twice, or more with
   ``--max-attempts N --decision FILE`` on the orchestrator's recorded decision; every attempt is compared with the one
   before it (also when an earlier rerun stopped before its child started). A run that is not final and has used its
   attempts pauses the study: ``train`` starts nothing until a decision grants more;
@@ -35,14 +36,19 @@ with an exception is recorded as ``failed`` with a ``failure_kind`` (see ``class
   under ``runs/`` or ``attempts/``;
 * ``evaluate`` needs every T0 run complete and every T1/T2 run complete or a registered training failure, all of them
   trained with the same code (T0 is "retrained under the same code version") and with their checkpoints unchanged;
-  its first attempt runs at that code too;
+  its first attempt runs at that code too, unless the orchestrator has decided otherwise after a defect in the
+  evaluation code that ended ``evaluate`` before its first manifest existed: ``--new-evaluation-code --decision FILE``
+  (Clarification C4);
 * an ``evaluate`` job that ended before it completed is restarted from scratch with identical inputs (same design lock,
   code and checkpoints) at most twice, only with ``--restart-interrupted`` once its job has ended: the partial output is
   moved aside to ``<root>/attempts/evaluation-attempt<k>`` without being read, and the new manifest records the restarts
   and the code (``source_hash``) of every attempt. After a defect in the evaluation code, and on the orchestrator's
-  decision, ``--new-evaluation-code`` lets the restart run at another code; the training records must still share one
-  ``source_hash`` (Clarification C2). A live evaluation touches ``evaluation/heartbeat`` every ``HEARTBEAT_SECONDS``,
-  so that the silence rule (``QUIET_SECONDS``) does not mistake it for an ended one.
+  decision, ``--new-evaluation-code`` lets the restart run at another code (Clarification C2), and lets the first
+  attempt, when neither ``evaluation/`` nor ``attempts/evaluation-attempt*`` exists, run at another code than the
+  training code when ``--decision FILE`` records the decision (Clarification C4; the manifest records the file's path
+  and blake2b digest and both codes); the training records must still share one ``source_hash``. A live evaluation
+  touches ``evaluation/heartbeat`` every ``HEARTBEAT_SECONDS``, so that the silence rule (``QUIET_SECONDS``) does not
+  mistake it for an ended one.
 """
 from __future__ import annotations
 
@@ -52,6 +58,7 @@ import copy
 import json
 import os
 from pathlib import Path
+import re
 import subprocess
 import sys
 import threading
@@ -98,6 +105,9 @@ ALLOCATION_STATUSES = (  # the library statuses that say an allocation failed, i
 CPU_ALLOCATOR_FAILURE = "defaultcpuallocator: not enough memory"  # torch's CPU allocator (c10, C3), in lower case
 SERIALIZATION_FAILURES = (  # torch.save and torch.load cannot write or read a file (docs/prereg/TSM.md, C3), lower case
     "pytorchstreamwriter failed", "pytorchstreamreader failed")
+# torch's checkpoint writer cannot create the file (docs/prereg/TSM.md, C4): "File <path> cannot be opened." and
+# "Parent directory <dir> does not exist."; matched in the lower-case text, wherever it stands in the message
+OPEN_FAILURE = re.compile(r"\bfile .* cannot be opened\.|\bparent directory .* does not exist\.")
 
 
 def settings() -> dict:
@@ -215,10 +225,16 @@ def is_allocation_failure(error: BaseException) -> bool:
 
 
 def is_serialization_failure(error: BaseException) -> bool:
-    """torch's checkpoint serialization could not write or read a file (docs/prereg/TSM.md, Clarification C3): a
-    ``RuntimeError`` of the zip stream behind ``torch.save`` and ``torch.load``, "PytorchStreamWriter failed ..." or
-    "PytorchStreamReader failed ...", the I/O error of a full disk, a quota or a file system fault."""
-    return isinstance(error, RuntimeError) and any(marker in str(error).lower() for marker in SERIALIZATION_FAILURES)
+    """torch's checkpoint writer or reader could not create, open, write or read a file (docs/prereg/TSM.md,
+    Clarifications C3 and C4): the I/O error of a full disk, a quota or a file system fault. It is a ``RuntimeError``
+    of the zip stream behind ``torch.save`` and ``torch.load``, "PytorchStreamWriter failed ..." or "PytorchStreamReader
+    failed ...", or of the writer's setup, "File <path> cannot be opened." or "Parent directory <dir> does not exist."
+    (the texts of C3 and C4 are examples of the rule; the same condition hit through Python's ``open`` is an
+    ``OSError``). The same text in any other exception is not one."""
+    if not isinstance(error, RuntimeError):
+        return False
+    text = str(error).lower()
+    return any(marker in text for marker in SERIALIZATION_FAILURES) or OPEN_FAILURE.search(text) is not None
 
 
 def is_numerical_failure(error: BaseException) -> bool:
@@ -231,11 +247,12 @@ def is_numerical_failure(error: BaseException) -> bool:
 
 
 def classify_failure(error: BaseException) -> str:
-    """How the end of a run is read (docs/prereg/TSM.md, "Decisions at registration" and Clarifications C1 to C3).
+    """How the end of a run is read (docs/prereg/TSM.md, "Decisions at registration" and Clarifications C1 to C4).
 
-    * ``infrastructure``: an I/O error (any ``OSError``, or a failure of torch's checkpoint serialization:
-      ``is_serialization_failure``), an allocation failure (``is_allocation_failure``), or an interruption that is not
-      an exception of the code (``KeyboardInterrupt``, ``SystemExit``); the run may be trained again, identically;
+    * ``infrastructure``: an I/O error (any ``OSError``, or a failure of torch's checkpoint writer or reader to create,
+      open, write or read a file: ``is_serialization_failure``), an allocation failure (``is_allocation_failure``), or
+      an interruption that is not an exception of the code (``KeyboardInterrupt``, ``SystemExit``); the run may be
+      trained again, identically;
     * ``numerical``: a non-finite loss or gradient norm; never retried (a T1/T2 arm fails for that writer, T0 stops
       the study);
     * ``code_defect``: any other exception; the study stops. A code defect that is misread as an infrastructure failure
@@ -513,6 +530,14 @@ class Child:
         self.log.close()
 
 
+class ChildFailed(ValueError):
+    """A child exited non-zero and stopped the job (``schedule``): the run, the exit code and the child's log."""
+
+    def __init__(self, run: str, exit_code: int, log: Path) -> None:
+        super().__init__(f"run {run} exited {exit_code}; see {log}")
+        self.run, self.exit_code, self.log = run, exit_code, log
+
+
 def start_child(name: str, design_path: Path, root: Path, *, device: str, steps: int | None,
                 max_attempts: int = MAX_ATTEMPTS) -> Child:
     command = [sys.executable, str(Path(__file__).resolve()), "train-one", "--design", str(design_path),
@@ -529,17 +554,17 @@ def schedule(names: list[str], procs: int, design_path: Path, root: Path, *, dev
              steps: int | None = None, max_attempts: int = MAX_ATTEMPTS, fatal=None) -> dict[str, int]:
     """Run ``names`` with at most ``procs`` concurrent children; returns each child's exit code.
 
-    By default the first child that exits non-zero stops everything at once (``ValueError``; the running children are
+    By default the first child that exits non-zero stops everything at once (``ChildFailed``; the running children are
     terminated). With ``fatal``, a function of the run name that is called after a non-zero exit, only a failure for
     which it returns true stops the job, and it stops it as a study stops (docs/prereg/TSM.md, Clarification C1:
     running jobs may finish, and their outputs are kept): no pending run is started, the children that are running
-    finish, and then ``ValueError`` names the first such failure. The other failures are only recorded: the other
-    children go on and the caller reads their records. A child that cannot be started (``OSError``) stops everything
-    at once.
+    finish, and then ``ChildFailed`` (a ``ValueError``) names the first such failure, with its run, exit code and log.
+    The other failures are only recorded: the other children go on and the caller reads their records. A child that
+    cannot be started (``OSError``) stops everything at once, with a plain ``ValueError``.
     """
     require(procs >= 1, "procs must be positive")
     pending, running, codes = list(names), {}, {}
-    stopped = None  # the first failure that stops the job
+    stopped = None  # the first failure that stops the job (a ChildFailed)
     try:
         while pending or running:
             for name, child in list(running.items()):
@@ -549,9 +574,10 @@ def schedule(names: list[str], procs: int, design_path: Path, root: Path, *, dev
                     del running[name]
                     codes[name] = code
                     if code != 0 and (fatal is None or fatal(name)):
-                        stopped = stopped or f"run {name} exited {code}; see {root / 'logs' / (name + '.log')}"
+                        if stopped is None:
+                            stopped = ChildFailed(name, code, root / "logs" / f"{name}.log")
                         if fatal is None:
-                            raise ValueError(stopped)  # everything stops now: the running children are terminated
+                            raise stopped  # everything stops now: the running children are terminated
                         pending.clear()  # the study stops: nothing more is started, the running children finish
             while pending and len(running) < procs:
                 name = pending.pop(0)
@@ -562,8 +588,8 @@ def schedule(names: list[str], procs: int, design_path: Path, root: Path, *, dev
                     raise ValueError(f"run {name} could not be started: {error}") from error
             if running:
                 time.sleep(POLL_SECONDS)
-        if stopped:
-            raise ValueError(stopped)
+        if stopped is not None:
+            raise stopped
     finally:
         for child in running.values():
             child.stop()
@@ -697,7 +723,8 @@ def select_names(args: argparse.Namespace) -> list[str]:
 
 
 def decision_record(value: str | None) -> dict | None:
-    """The orchestrator's recorded decision behind ``train --decision FILE``: its absolute path and blake2b digest.
+    """The orchestrator's recorded decision behind ``train --decision FILE`` and ``evaluate --decision FILE``: its
+    absolute path and blake2b digest.
 
     The file must exist and not be empty (what it says is the orchestrator's; nothing here reads it). None without
     ``--decision``.
@@ -726,8 +753,10 @@ def stage_train(args: argparse.Namespace) -> int:
     refuses too, when the study has stopped, and when a record of the root was written at another code: one root
     holds one ``source_hash`` (a retraining after a code defect starts in a new ``--root``). A T0 run with a non-finite
     loss, and a run with a code defect (any other exception), stops the study: no pending run is started, the runs
-    that are already running finish (their records are kept), and the job ends with an error. The stage ends with an
-    error unless every selected run is final.
+    that are already running finish (their records are kept), and the job ends with an error; its manifest says
+    "stopped" and records the reason, the state of every selected run and the stopping child (the first child whose
+    non-zero exit stopped the job: its run, exit code and log). The manifest of a job that was killed stays at
+    "running". The stage ends with an error unless every selected run is final.
     """
     require(args.max_attempts >= MAX_ATTEMPTS, f"--max-attempts must be at least {MAX_ATTEMPTS}, the registered number "
             "of attempts: more are granted by the orchestrator's recorded decision (docs/prereg/TSM.md, "
@@ -793,7 +822,10 @@ def stage_train(args: argparse.Namespace) -> int:
     except ValueError as error:
         stopped = study_stop(root)
         reason = stopped or str(error)
-        manifest.update(status="stopped" if stopped else "failed", reason=reason, finished_at=now(),
+        stopping = (dict(run=error.run, exit_code=error.exit_code, log=str(error.log))
+                    if isinstance(error, ChildFailed) else None)  # the first child whose exit stopped the job
+        manifest.update(status="stopped" if stopped else "failed", reason=reason, stopping_child=stopping,
+                        finished_at=now(),
                         run_states={name: run_state(root, name) for name in names})  # what the running children left
         write_json(manifest_path, manifest)
         raise ValueError(reason) from error
@@ -919,22 +951,22 @@ def evaluation_inputs(manifest: dict) -> dict:
 def evaluation_attempt(root: Path, manifest: dict, state: str, *, new_code: bool = False) -> int:
     """The number of the evaluation attempt that may start now: 1, or 2 and 3 after an attempt that did not complete.
 
-    The first attempt runs at the code that the 18 runs were trained at (``training_source_hash``; docs/prereg/TSM.md,
-    Clarifications C1 and C2). An evaluation that ended before it completed is started again from scratch with
-    identical inputs, at most twice (Clarification C1): ``MAX_ATTEMPTS`` attempts in all. Identical means the design and
-    its lock, the code (``source_hash``) and the checkpoints of the latest earlier attempt (``manifest`` is this
-    attempt's); with ``new_code`` (the orchestrator's decision after a defect in the evaluation code, Clarification C2)
-    the code may differ, nothing else. ``new_code`` needs an earlier attempt, and without one that has a readable
-    manifest to compare with, the attempt runs at the training code. An attempt still marked "running" must have been
-    silent for ``QUIET_SECONDS`` (a live evaluation writes ``heartbeat``): its job may be alive and would write into the
-    new directory; one marked "failed" has recorded its own end.
+    The first attempt (neither ``evaluation/`` nor ``attempts/evaluation-attempt*`` exists) runs at the code that the 18
+    runs were trained at (``training_source_hash``; docs/prereg/TSM.md, Clarifications C1 and C2), or at another code
+    only with ``new_code`` and the orchestrator's recorded decision (``manifest["decision"]``, ``--decision FILE``): a
+    defect in the evaluation code can end ``evaluate`` before its first manifest exists, and the first attempt then
+    runs at the fixed commit (Clarification C4). An evaluation that ended before it completed is started again from
+    scratch with identical inputs, at most twice (Clarification C1): ``MAX_ATTEMPTS`` attempts in all. Identical means
+    the design and its lock, the code (``source_hash``) and the checkpoints of the latest earlier attempt (``manifest``
+    is this attempt's); with ``new_code`` (the orchestrator's decision after a defect in the evaluation code,
+    Clarification C2) the code may differ, nothing else. Without an earlier attempt that has a readable manifest to
+    compare with, a restart runs at the training code unless ``new_code`` says otherwise. An attempt still marked
+    "running" must have been silent for ``QUIET_SECONDS`` (a live evaluation writes ``heartbeat``): its job may be alive
+    and would write into the new directory; one marked "failed" has recorded its own end.
     """
     used = len(moved_evaluations(root)) + int(state != "none")
     require(used < MAX_ATTEMPTS, f"the confirmation evaluation has used {used} of {MAX_ATTEMPTS} attempts: the "
             "registered rule allows two restarts; report it to the orchestrator")
-    require(used > 0 or not new_code, "--new-evaluation-code applies to the restart of an evaluation that has an "
-            "earlier attempt: the first attempt runs at the training code (docs/prereg/TSM.md, Clarifications C1 and "
-            "C2)")
     if state == "running":
         out = root / "evaluation"
         silent = seconds_since_written([out, *out.rglob("*")])
@@ -950,25 +982,37 @@ def evaluation_attempt(root: Path, manifest: dict, state: str, *, new_code: bool
                 f"restart must have identical inputs (the same design lock, --commit and trained runs){hint}")
     else:  # the first attempt, or a restart with no manifest to compare with: the code the runs were trained at
         code, trained = manifest["source"]["source_hash"], manifest["training_source_hash"]
-        require(code == trained or new_code, f"the evaluation runs at source_hash {code[:12]} but the 18 runs were "
-                f"trained at {trained[:12]}: an evaluation attempt with no earlier manifest to compare with runs at "
-                "the training code (docs/prereg/TSM.md, Clarifications C1 and C2; submit it at the training --commit)"
-                + ("; a fix of the evaluation code is restarted with --new-evaluation-code, on the orchestrator's "
-                   "decision" if used else ""))
+        if used == 0:  # another code needs the orchestrator's recorded decision (Clarification C4)
+            require(code == trained or (new_code and manifest.get("decision")), f"the evaluation runs at source_hash "
+                    f"{code[:12]} but the 18 runs were trained at {trained[:12]}: the first evaluation attempt runs at "
+                    "the training code (docs/prereg/TSM.md, Clarifications C1 and C2; submit it at the training "
+                    "--commit); after a defect in the evaluation code that ended evaluate before its first manifest "
+                    "existed, the first attempt at the fixed commit needs --new-evaluation-code --decision FILE, the "
+                    "orchestrator's recorded decision (Clarification C4)")
+        else:
+            require(code == trained or new_code, f"the evaluation runs at source_hash {code[:12]} but the 18 runs "
+                    f"were trained at {trained[:12]}: an evaluation attempt with no earlier manifest to compare with "
+                    "runs at the training code (docs/prereg/TSM.md, Clarifications C1 and C2; submit it at the "
+                    "training --commit); a fix of the evaluation code is restarted with --new-evaluation-code, on "
+                    "the orchestrator's decision")
     return used + 1
 
 
 def restart_rows(root: Path, attempt: int) -> list[dict]:
-    """One row per evaluation that was moved aside before attempt ``attempt``: where it is and the code it ran at.
+    """One row per evaluation that was moved aside before attempt ``attempt``: where it is, the code it ran at and the
+    decision it ran under (the orchestrator's recorded decision, ``--decision``: the path and blake2b digest of its
+    file, or ``None``: none recorded).
 
-    The code of the interrupted attempt is in the manifest of the latest earlier attempt that has a readable one, which
-    carries the rows of its own predecessors; no other manifest is opened (``None``: not known).
+    The code and the decision of the interrupted attempt are in the manifest of the latest earlier attempt that has a
+    readable one, which carries the rows of its own predecessors; no other manifest is opened (``None``: not known).
     """
     earlier = earlier_evaluation(root)
-    codes = {row.get("attempt"): row.get("source_hash") for row in (earlier or {}).get("restarts", [])}
+    known = {row.get("attempt"): row for row in (earlier or {}).get("restarts", [])}
     if earlier is not None:
-        codes[earlier.get("attempt")] = earlier.get("source", {}).get("source_hash")
-    return [dict(attempt=number, moved_to=f"attempts/evaluation-attempt{number}", source_hash=codes.get(number))
+        known[earlier.get("attempt")] = dict(source_hash=earlier.get("source", {}).get("source_hash"),
+                                             decision=earlier.get("decision"))
+    return [dict(attempt=number, moved_to=f"attempts/evaluation-attempt{number}",
+                 source_hash=known.get(number, {}).get("source_hash"), decision=known.get(number, {}).get("decision"))
             for number in range(1, attempt)]
 
 
@@ -986,7 +1030,9 @@ def heartbeat(path: Path):
 
     An evaluation writes nothing for as long as a run takes to evaluate, and ``evaluation_attempt`` reads "nothing
     written for ``QUIET_SECONDS``" as "its job has ended": the beat is the sign of life. A beat that cannot be written
-    (a full disk) is skipped: it is not a result and must not end the evaluation.
+    (a full disk) is skipped: it is not a result and must not end the evaluation. A beat that hangs inside its write (a
+    hung file system) delays the end of the block by at most ``2 * HEARTBEAT_SECONDS``: the thread is a daemon and is
+    left behind.
     """
     stop = threading.Event()
 
@@ -1007,7 +1053,7 @@ def heartbeat(path: Path):
         yield
     finally:
         stop.set()
-        thread.join()
+        thread.join(2 * HEARTBEAT_SECONDS)
 
 
 def stage_evaluate(args: argparse.Namespace) -> int:
@@ -1017,20 +1063,26 @@ def stage_evaluate(args: argparse.Namespace) -> int:
     again from scratch only with ``--restart-interrupted``, once its job has ended and with identical inputs, at most
     twice (``evaluation_attempt``): the partial output is moved aside unread, and the manifest records the attempt, the
     restarts, the code each attempt ran at and the code the runs were trained at. The first attempt runs at the training
-    code. ``--new-evaluation-code`` lets a restart (not the first attempt) run at another code (the orchestrator's
-    decision, Clarification C2); the 18 training records must still share one ``source_hash`` (``final_states``). All
-    of this is checked before the confirmation episodes are generated. While it runs, the evaluation writes
-    ``evaluation/heartbeat`` every ``HEARTBEAT_SECONDS`` (``heartbeat``).
+    code. ``--new-evaluation-code`` lets a restart run at another code (the orchestrator's decision, Clarification C2),
+    and lets the first attempt (neither ``evaluation/`` nor ``attempts/evaluation-attempt*`` exists) run at another code
+    when ``--decision FILE`` records the orchestrator's decision (Clarification C4: a defect can end ``evaluate`` before
+    its first manifest exists); the manifest records the file's path and blake2b digest. The 18 training records must
+    still share one ``source_hash`` (``final_states``). All of this is checked before the confirmation episodes are
+    generated. While it runs, the evaluation writes ``evaluation/heartbeat`` every ``HEARTBEAT_SECONDS``
+    (``heartbeat``).
     """
-    require(args.restart_interrupted or not args.new_evaluation_code,
-            "--new-evaluation-code applies to a restart: it needs --restart-interrupted")
     root = absolute_path(args.root, "--root")
+    state = evaluation_state(root)
+    first = state == "none" and not moved_evaluations(root)  # no attempt yet, neither in place nor moved aside
+    require(args.restart_interrupted or first or not args.new_evaluation_code,
+            "--new-evaluation-code applies to a restart: it needs --restart-interrupted (or, before any attempt, the "
+            "orchestrator's decision: --decision FILE, docs/prereg/TSM.md, Clarification C4)")
+    decision = decision_record(args.decision)
     design_path = Path(args.design).resolve()
     verify_git_lock(design_path, args.design_commit, "the design")
     design = json.loads(design_path.read_text())
     verify_design(design)
     out = root / "evaluation"
-    state = evaluation_state(root)
     require(state != "complete", "the confirmation evaluation has already started and is complete: it is not repeated")
     require(state == "none" or args.restart_interrupted,
             "the confirmation evaluation has already started and did not complete: if its job has ended, restart it "
@@ -1041,7 +1093,7 @@ def stage_evaluate(args: argparse.Namespace) -> int:
     manifest = dict(status="running", design=design, design_hash=stable_hash(design), design_path=str(design_path),
                     design_lock_commit=args.design_commit, evaluation=design["evaluation"],
                     training_failures=failures, checkpoints=checkpoint_seals(root, states),
-                    training_source_hash=training_source_hash(root), started_at=now(),
+                    training_source_hash=training_source_hash(root), decision=decision, started_at=now(),
                     source=source_metadata(), runtime=runtime_metadata(args.device))
     attempt = evaluation_attempt(root, manifest, state, new_code=args.new_evaluation_code)
     manifest.update(attempt=attempt, restarts=restart_rows(root, attempt))
@@ -1100,8 +1152,9 @@ def main(argv: list[str] | None = None) -> int:
                                                 "records its path and blake2b digest")
     train_stage.add_argument("--rerun-incomplete", action="store_true",
                              help="train unfinished runs again (walltime or a node fault, an I/O or serialization "
-                                  "error, an allocation failure), identically (their job must have ended: a run still "
-                                  "marked running must have been silent for 300 s; at most twice per run, or "
+                                  "error such as a checkpoint file that cannot be created or opened, an allocation "
+                                  "failure), identically (their job must have ended: a run still marked "
+                                  "running must have been silent for 300 s; at most twice per run, or "
                                   "--max-attempts attempts in all); without it an unfinished run is an error")
     train_stage.add_argument("--writers", nargs="+", default=list(WRITERS), choices=WRITERS)
     train_stage.add_argument("--arms", nargs="+", default=list(tsm.ARMS), choices=tsm.ARMS)
@@ -1121,11 +1174,17 @@ def main(argv: list[str] | None = None) -> int:
                                "inputs (its job must have ended: one still marked running must have been silent for "
                                "300 s; at most twice); its partial output is moved aside unread")
     evaluate.add_argument("--new-evaluation-code", action="store_true",
-                          help="with --restart-interrupted, on the orchestrator's decision after a defect in the "
-                               "evaluation code (docs/prereg/TSM.md, Clarification C2): the restart may run at another "
-                               "source_hash than the interrupted attempt; refused without an earlier attempt (the "
-                               "first attempt runs at the training code); the 18 training records must still share "
-                               "one source_hash, and the manifest records the code of every attempt")
+                          help="on the orchestrator's decision after a defect in the evaluation code (docs/prereg/"
+                               "TSM.md, Clarifications C2 and C4): with --restart-interrupted, the restart may run at "
+                               "another source_hash than the interrupted attempt; before any attempt (neither "
+                               "evaluation/ nor attempts/evaluation-attempt* exists), the first attempt may run at "
+                               "another source_hash than the training code, and needs --decision; the 18 training "
+                               "records must still share one source_hash, and the manifest records the code of every "
+                               "attempt and the training code")
+    evaluate.add_argument("--decision", help="the orchestrator's recorded decision (an absolute path to a non-empty "
+                                             "file); required for a first attempt at another source_hash than the "
+                                             "training code (with --new-evaluation-code); the manifest records its "
+                                             "path and blake2b digest")
     for stage in (smoke, train_stage, child, evaluate):
         stage.add_argument("--device", default="cuda:0")
     args = parser.parse_args(argv)
