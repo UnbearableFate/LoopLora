@@ -1,9 +1,11 @@
-# Study RFX — read-failure factorial on the frozen WP-L4 checkpoints (WP-L7, F2 of the follow-up plan), pre-registration DRAFT
+# Study RFX — read-failure factorial on the frozen WP-L4 checkpoints (WP-L7, F2 of the follow-up plan), pre-registered
 
-Status: draft written 2026-10-27 09:56 JST by sn-llm (WP-L7 step 1; no compute, no result). It becomes the
-registration when the orchestrator commits it to master; no RFX run, smoke included, starts before that commit. The
-decision rule is the one of `plan/followup_2026-10-27.md` §3 F2; every place where the plan left a choice is marked
-"(operationalization)" and listed under "Open points". Runs start after the Miyabi maintenance (2026-10-28 22:00 JST).
+Registered 2026-10-27 11:10 JST by the orchestrator, before any RFX run (smoke included), any RFX or LSQ result and any
+DPFP result. Drafted 09:56 JST by sn-llm (WP-L7 step 1, no compute). The orchestrator changed the decision rule at
+registration (section "Decisions at registration"): the plan's rule (`plan/followup_2026-10-27.md` §3 F2) did not
+cover a rescue by query normalization alone, and its "query" verdict would also have fired on the near-exact
+ridge + true-key read. Every other place where the plan left a choice is marked "(operationalization)". Runs start
+after the Miyabi maintenance (2026-10-28 22:00 JST), with code that implements this text (WP-L7 step 1b).
 
 Known then: WP-L4 (`docs/reports/P1L-read-fix.md`) selected no writer. R at r = 128 ended at val EM 33.5% with
 normalized read error 0.631, key top-1 88.5% and clean/read value-head accuracy 93.3% / 19.7%; R at r = 32 ended at
@@ -17,7 +19,8 @@ ask where the deployed read goes wrong before more writers are screened.
 For each frozen checkpoint, is the failure of the deployed read at the final question position a failure of the
 **store** (the delta rule leaves cross-talk that an exact store would not), of the **query** (the learned q does not
 address the queried key, or its scale is off), or of the **decoder** (the path after the read cannot use a read that
-contains the value)? A "storage" verdict triggers the LSQ study (`docs/prereg/LSQ.md`); the other verdicts do not.
+contains the value)? A "storage" verdict triggers the least-squares arms of the LSQ study (`docs/prereg/LSQ.md`) and a
+"normalization" verdict its unit-query arm; the other verdicts trigger nothing.
 
 ## Objects (frozen, never trained or modified)
 All three are final checkpoints of complete WP-L4/WP-L3 runs under `/work/xg24i002/x10041/LoopLora/runs/p1l`. The job
@@ -88,7 +91,8 @@ Storage x query, plus two controls, each evaluated by replacing the final-positi
   20% of the fitting rows), applied to the evaluation-set reads of that cell: accuracy and NLL. D3 is fitted for the
   six unscaled cells, clean and zero.
 - **Metrics per cell**: normalized read error ‖m − v‖² / (‖v‖² + 1e-6) against the clean value (the WP-L4 metric; mean and
-  standard error), D1 EM and NLL, D2 accuracy, D3 accuracy and NLL.
+  standard error), D1 EM and NLL, the entity-restricted D1 EM (argmax of the same logits over the 1,024 task-entity
+  name tokens, `load_name_pool().token_ids[:V]`; the class set of D2 and D3), D2 accuracy, D3 accuracy and NLL.
 - **Write age**: error and EM of five cells (delta/raw/asis, delta/raw/fit, ridge/raw/fit, delta/true/fit,
   ridge/true/fit) by the write age of the queried fact (0 = the most recent of the 16 writes).
 - **Write order**: the cached writes of every evaluation episode are re-applied through the deployed decay-first delta
@@ -111,24 +115,31 @@ are permutation invariant to 1e-4. A failing check makes the job raise after it 
 a bug report, not a result: the code is fixed and the whole job rerun under the same rule; no verdict is read from a
 run whose checks failed.
 
-## Decision rule (stated before results; it is the plan's)
-Per checkpoint, on the evaluation set. Let e(c) and EM(c) be the mean normalized error and the D1 EM of cell c, and let
-the deployed baseline be e_b = e(delta/raw/fit) and EM_b = max(EM(delta/raw/asis), EM(delta/raw/fit)). A cell
+## Decision rule (stated before results)
+Per checkpoint, on the evaluation set. Let e(c), EM(c) and EMe(c) be the mean normalized error, the D1 EM and the
+entity-restricted D1 EM of cell c. The deployed baseline is e_b = e(delta/raw/fit),
+EM_b = max(EM(delta/raw/asis), EM(delta/raw/fit)) and EMe_b = max(EMe(delta/raw/asis), EMe(delta/raw/fit)). A cell
 **rescues** if e(c) <= 0.5 e_b and EM(c) − EM_b >= 0.10 (rates computed from counts; a 1e-9 tolerance covers
-floating-point rounding of exact 10 pp differences).
+floating-point rounding of exact 10 pp differences). The verdict is the first that applies:
 
-1. **storage** (triggers LSQ): ridge/raw/fit rescues, i.e. ridge + the raw q halves the normalized read error and adds
-   at least 10 pp EM.
-2. else **query** (no LSQ; addressing is recorded as a follow-up candidate): delta/true/fit or ridge/true/fit rescues,
-   i.e. only the true key rescues.
-3. else **decoder** (no LSQ): the D3 accuracy on delta/raw reads exceeds EM_b by at least 0.10, i.e. only the refit
-   decoder rescues.
-4. else **none** (no LSQ; the three factors are not separated by this design).
+1. **storage** (triggers the LSQ arms K4 and RG at the checkpoint's rank): ridge/raw/fit rescues; or ridge/unit/fit
+   rescues while delta/unit/fit does not. That is, the exact store rescues with the deployed query, or with the unit
+   query that the LSQ arms deploy when that query alone does not rescue.
+2. **normalization** (triggers the LSQ arm U at that rank): delta/unit/fit rescues, i.e. normalizing the query rescues
+   the deployed store.
+3. **query** (no LSQ; addressing is recorded as a follow-up candidate): delta/true/fit rescues, i.e. the true key
+   rescues the deployed store.
+4. **store+query** (no LSQ; reported): ridge/true/fit rescues, i.e. only the exact store and the true key together
+   rescue.
+5. **decoder** (no LSQ): the D3 accuracy on the delta/raw reads exceeds EMe_b by at least 0.10, i.e. only the refit
+   decoder rescues (both over the same 1,024 entities).
+6. **none** (no LSQ; the factors are not separated by this design).
 
-The three checkpoints are classified separately. LSQ is triggered for rank r by the verdict of **R-r32** (r = 32) and
-of **R-r128** (r = 128); W5-r32 is reported with the same table and verdict but triggers nothing. If both R
-checkpoints are "storage", both ranks run. The summary file lists the verdicts, the triggered ranks and the selected
-η of the (ridge, unit q) cell of each triggered rank, which the LSQ release copies.
+The three checkpoints are classified separately. The LSQ arms of rank r follow the verdict of **R-r32** (r = 32) or
+**R-r128** (r = 128): storage → L*r*-K4 and L*r*-RG, normalization → L*r*-U, any other verdict → none. W5-r32 is
+reported with the same table and verdict but triggers nothing. The summary file lists the verdicts, every rescue flag,
+the triggered arms in LSQ's candidate order (`lsq_arms`) and, for each rank with a storage verdict, the selected η of
+the (ridge, unit q) cell, which the LSQ release copies.
 Reading guide, descriptive and not a rule (rv-fable E3): delta/true/fit at or near the OA level (84% at r = 128) means
 the query path is the bottleneck; near the checkpoint's own EM means write interference dominates.
 
@@ -137,8 +148,9 @@ Evaluation only: no training, no gradient step, no checkpoint is written, one se
 One job of one node: estimated 2-3 minutes per checkpoint (about 130 fitting batches and 20 question forwards per
 evaluation batch, from WP-L4's 6-9 s per 1,000-episode validation), about 8-12 minutes in all, **0.15-0.2 node·h**
 (plan: 0.15-0.3). A 64 + 64 episode smoke first (at most 0.05 node·h). No `--scale-up`. Node·h is recorded per job.
-Commands (from `/work/xg24i002/x10041/LoopLora`, `REF` a committed ref that contains the RFX code as merged from
-`wp/llm`, i.e. the master merge of WP-L7 step 1 or later; `cbc8389` predates `rfx_run.py`):
+Commands (from `/work/xg24i002/x10041/LoopLora`; `REF` is the full hash of a commit that contains this registration
+and the step-1b code implementing its rule, on `wp/llm` or on master after the merge; `cbc8389` predates `rfx_run.py`,
+and step-1 commits up to `9588998` implement the draft's rule, not this one):
 `scripts/submit.py --name rfx --queue regular-g --nodes 1 --walltime 00:30:00 --commit REF -- -m looplora.llm.rfx_run
 --out RUNS/rfx` (smoke: add `--smoke`, separate `--out`). Report: `docs/reports/RFX.md` with every table above,
 the rescue flags, the verdicts and node·h. Executed by a Claude Sonnet-5.5 subagent.
@@ -147,18 +159,24 @@ the rescue flags, the verdicts and node·h. Executed by a Claude Sonnet-5.5 suba
 - A substituted read is a distribution shift for the LM path after the read (U, B and the later layers were trained on
   deployed-delta reads). A cell that fails in D1 but succeeds in D2 or D3 is reported as such; the rule uses D1 for the
   storage and query verdicts, as the plan states.
-- D3 predicts one of the 1,024 task entities; D1 EM is over the full vocabulary. The decoder rule therefore compares an
-  entity accuracy with a full-vocabulary EM, which favors the decoder verdict; this only matters when neither the
-  storage nor the query rule fired.
+- D3 predicts one of the 1,024 task entities. The decoder rule therefore compares it with the entity-restricted D1 EM
+  of the baseline, not with the full-vocabulary EM, which would favor the decoder verdict.
 - True-key cells use the label and are not deployable. The ridge store here is unweighted and uses a fitting-set η; the
   LSQ arms use recency weights (the learned decay) and are trained, not substituted.
 - The checkpoints are single-seed; one evaluation set of 4,000 queries gives EM standard errors of 0.7-0.8 pp, small
   against the 10 pp threshold; error ratios are on means over the same queries.
 
-## Open points for the orchestrator (flagged, not decided here)
-1. The rule names "ridge + raw q"; ridge + **unit** q is the read the LSQ arms use. If ridge/unit/fit rescues while
-   ridge/raw/fit does not, the verdict under this draft is query/decoder/none and LSQ is not triggered. Keeping the
-   plan's wording; say if unit q should also trigger.
-2. The baseline is the better of the deployed read as is and with its fitted gain (operationalization); using only
-   the as-is read would make rescues easier.
-3. The refit decoder is compared with the full-vocabulary EM (caveat above).
+## Decisions at registration (orchestrator, on the draft's open points)
+1. **Unit query in the storage verdict.** The plan names ridge + raw q, but the LSQ arms deploy ridge + unit q. A
+   ridge/unit/fit rescue therefore also counts as storage, provided delta/unit/fit does not rescue; otherwise the
+   normalization alone would explain it.
+2. **Normalization verdict.** A rescue by delta/unit/fit is its own verdict. It triggers LSQ's arm U (the deployed delta
+   store read with the unit query), registered in `docs/prereg/LSQ.md` before any result. Without it the decision tree
+   would have no outcome for this case. DPFP's report must also separate normalization from decorrelation (DPFP
+   Amendment A1).
+3. **Query verdict.** Only the true key on the deployed store counts. With an exact store and the true key, the read is
+   the written value up to η. That is close to the clean control, so a ridge/true rescue does not isolate the query; it
+   is reported as store+query.
+4. **Baseline.** The better of the as-is read and the read with its fitted gain is kept (operationalization). Using
+   only the as-is read would make rescues easier.
+5. **Decoder comparison.** D3 is compared with the entity-restricted EM (above), not the full-vocabulary EM.
