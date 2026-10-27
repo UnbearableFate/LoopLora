@@ -7,6 +7,12 @@ tests below are written but have never been executed**; the only checks are stat
 §7. Expect the first compute-node test run to find defects; fix them before any lock. Step 2 (running) waits for the
 orchestrator's go after 2026-10-28 22:00 JST.
 
+Step 1b (2026-10-27, §10): the five preregs were registered on master at 40ddf08 and master was merged into `wp/sym`; the TSM
+scripts now implement the registered training-failure rules, and the §6 command sheet stops after each lock stage and
+reports the file path (the orchestrator commits it on `wp/sym`) and runs UNS Part B. An independent review of the first
+version found gaps in the rerun rules; they are fixed (§10). Still nothing was executed on a compute node: the new tests have
+never run with torch or pytest, and §10 states exactly what was checked and how.
+
 ```bash
 SYM=/work/xg24i002/x10041/LoopLora-wt/sym     # worktree; step-2 outputs go to $SYM/runs/<study> (git-ignored)
                                               # and compact results to $SYM/reports/<study> (committed)
@@ -15,7 +21,7 @@ CENTRAL=/work/xg24i002/x10041/LoopLora        # central repo: submit.py's REPO, 
 
 ## 1. What exists
 
-| study | prereg draft | library | scripts | tests |
+| study | prereg (registered 40ddf08) | library | scripts | tests |
 | --- | --- | --- | --- | --- |
 | shared | — | `src/looplora/sym/followup_stats.py` | `scripts/s9_common.py`, `s9_torch.py` | `tests/test_followup_stats.py` |
 | IVD (F8) | `docs/prereg/IVD.md` | `ivd.py` | `run_ivd.py` (lock, smoke, run), `analyze_ivd.py` | `test_ivd.py`, `test_ivd_scripts.py` |
@@ -64,7 +70,7 @@ their weights.
 | 999003 | JS confirmation | JS |
 | **999004** | **IVD** (split `test`, 2000 episodes) | new |
 | **999005** | **CVH** (split `test`, 2000 episodes) | new |
-| **999006** | **UNS Part B** (splits `test`, `test_unseen`, 2000 episodes; optional) | new |
+| **999006** | **UNS Part B** (splits `test`, `test_unseen`, 2000 episodes; registered, run) | new |
 | **999007** | **TSM** (split `test`, 2000 episodes) | new |
 | none | UNS Part A (re-analysis of the existing seed-4242 screening samples) and NCR (existing samples) | no new seed |
 
@@ -97,7 +103,7 @@ Coverage of the F11 question: the committed rows cover the released mixed-depth 
 B4; they do not cover the P2-S-F1 M1 trained at L = 4 (no unseen evaluation exists) or absolute unseen accuracies of B4.
 Consequently UNS is **Part A, a zero-evaluation audit** of the 18 existing screening evaluations (protocol audit, exact
 recomputation of the 18 committed M1 depth rows, seen-versus-unseen tables, context transcription), plus **Part B**,
-registered only for what is missing (M1-L4 and B4 on new episodes, seed 999006, optional). `docs/prereg/UNS.md` states
+registered only for what is missing (M1-L4 and B4 on new episodes, seed 999006; registered as run, not optional). `docs/prereg/UNS.md` states
 that these rows were seen before registration (committed values and the qualitative sentences of the F1 and F2 reports),
 that the author read their metadata only, that the paper makes no unseen claim and that no gate depends on UNS.
 
@@ -126,7 +132,7 @@ Measured costs (PBS elapsed, one node per job; ledgers `reports/{is,js,p4s-l,p2s
 | tests of all new code (one debug job) | P4-S-L 159 tests 60 s, JS 16 tests 15 s, IS 23 tests 18 s | 0.02 | 0.05 |
 | NCR | CPU, 72 sample sets, row-by-row verification plus bootstraps: minutes | 0.03 | 0.1 |
 | UNS Part A | CPU bootstraps (about 200 intervals) and 18 file reads | 0.05 | 0.1 |
-| UNS Part B (optional) | 18 evaluations without counterfactuals; screening cost per checkpoint above | 0.3 | 0.75 |
+| UNS Part B (registered) | 18 evaluations without counterfactuals; screening cost per checkpoint above | 0.3 | 0.75 |
 | IVD | lock, smoke (4 checkpoints × 128 episodes), 12 checkpoints × 7–9 cells at loads up to 36 facts: about one to one-and-a-half screening evaluations per checkpoint (plan: 0.2–0.4) | 0.3 | 0.8 |
 | CVH | 9 readers: P4-S-L cost scaled from 24 to 9 heads, plus continuation labels, confirmation with latency timing | 0.1 | 0.3 |
 | TSM | 6 T0 runs at about one M1-L4 run each (0.033 node·h in P2-S-F1) + 12 T1/T2 runs at about twice that (depth 8, per-step decode) = 0.2 + 0.8–1.2; evaluation 24 × 4 depths; smoke; tests | 1.2–1.5 | 1.8 |
@@ -136,16 +142,19 @@ The IVD and TSM figures are the least certain; their smoke jobs fix the walltime
 reports' `suggested_walltime_seconds`; TSM's `smoke.json` also lists `extrapolated_run_seconds` per run so any subset of
 runs can be costed). Per job: one node, at most 1 h; `--scale-up docs/prereg/<NAME>.md` (at most 2 h) only where the prereg's
 Limits allows it: IVD `run` (no subset option exists), TSM (only if one seed's six runs cannot be split further). The
-`--scale-up` document must exist in the central repo, so the orchestrator commits the preregs to master first.
+`--scale-up` document must exist in the central repo: the preregs are registered on master (40ddf08), where the IVD and TSM
+allowances were accepted.
 
 ## 6. Step 2: gates and commands
 
-Order (plan): IVD, CVH, UNS (A, then optionally B) and NCR first; TSM after. They are independent and may run in parallel
-nodes. Before any lock: (1) the orchestrator reviews and commits the five preregs to master (that commit is the registration);
-(2) the compute-node test job below passes (fix defects, commit, repeat; defects found at this stage are not scientific
-changes unless they alter a registered quantity, which must then be flagged); (3) the code commit to snapshot is chosen
-(`CODE` below, a full 40-character SHA; `--commit` snapshots it with `git archive`, so the run uses exactly that code).
-Output roots are absolute, new, and contain no path component with the word "confirmation".
+Order (plan): IVD, CVH, UNS (Part A, then Part B, which is registered) and NCR first; TSM after. They are independent and may
+run in parallel nodes. Before any lock: (1) done: the five preregs are registered on master at 40ddf08; (2) the compute-node
+test job below passes (fix defects, commit, repeat; defects found at this stage are not scientific changes unless they alter a
+registered quantity, which must then be flagged); (3) the code commit to snapshot is chosen (`CODE` below, a full 40-character
+SHA; `--commit` snapshots it with `git archive`, so the run uses exactly that code). Locks: the sheet **stops** after each
+lock stage and after the CVH `theta.json` stage and reports the file path; the orchestrator checks the file against the
+registered text and commits it on `wp/sym`, and the sheet continues with that commit's full SHA (`IVD_LOCK`, `CVH_LOCK`,
+`CVH_THETA`, `UNS_LOCK`, `TSM_LOCK`). Output roots are absolute, new, and contain no path component with the word "confirmation".
 
 ```bash
 cd $SYM
@@ -158,9 +167,9 @@ $SUB --name s9-tests --queue debug-g --walltime 00:15:00 --worktree $SYM --wait 
   tests/test_cvh.py tests/test_cvh_scripts.py tests/test_tsm.py tests/test_tsm_scripts.py \
   tests/test_uns.py tests/test_uns_scripts.py tests/test_neighbour_confusion.py
 
-# 1. IVD   (lock file inside the worktree; commit it: its full SHA is IVD_LOCK)
+# 1. IVD   (the lock file is written inside the worktree; the orchestrator commits it: its full SHA is IVD_LOCK)
 $SUB --name ivd-lock  --queue debug-g   --walltime 00:05:00 --commit $CODE --wait -- scripts/run_ivd.py lock --out $SYM/reports/ivd/design.json
-git add reports/ivd/design.json && git commit -m "IVD: design lock (blake2b seals of the 12 checkpoints)"; IVD_LOCK=$(git rev-parse HEAD)
+#    STOP: report $SYM/reports/ivd/design.json; the orchestrator commits it on wp/sym. IVD_LOCK = that commit's full SHA
 $SUB --name ivd-smoke --queue regular-g --walltime 00:10:00 --commit $CODE --wait -- scripts/run_ivd.py smoke --design $SYM/reports/ivd/design.json --out $SYM/runs/ivd/smoke
 #    read suggested_walltime_seconds in runs/ivd/smoke/smoke.json; status must be "passed" (mean overlap ordered low < nat < high)
 $SUB --name ivd-run   --queue regular-g --walltime <smoke suggestion> [--scale-up docs/prereg/IVD.md if > 01:00:00] --commit $CODE -- \
@@ -169,11 +178,12 @@ $SUB --name ivd-analyze --queue debug-g --walltime 00:15:00 --commit $CODE --wai
 
 # 2. CVH   (the lock reads the committed P4-S-L files of the central repo; the confirm stage needs the Git lock of theta.json)
 $SUB --name cvh-lock  --queue debug-g   --walltime 00:05:00 --commit $CODE --wait -- scripts/run_cvh.py lock --repo $CENTRAL --out $SYM/reports/cvh/design.json
-git add reports/cvh/design.json && git commit -m "CVH: design lock"; CVH_LOCK=$(git rev-parse HEAD)
+#    STOP: report $SYM/reports/cvh/design.json; the orchestrator commits it on wp/sym. CVH_LOCK = that commit's full SHA
 $SUB --name cvh-smoke --queue regular-g --walltime 00:10:00 --commit $CODE --wait -- scripts/run_cvh.py smoke --design $SYM/reports/cvh/design.json --root $SYM/runs/cvh/smoke
 $SUB --name cvh-train --queue regular-g --walltime <suggested_train_walltime_seconds> --commit $CODE -- \
   scripts/run_cvh.py train --design $SYM/reports/cvh/design.json --design-commit $CVH_LOCK --root $SYM/runs/cvh/main
-#    theta.json (validation only) -> $SYM/reports/cvh/theta.json, committed (CVH_THETA) before confirmation; a registered failure stops here
+#    STOP: report $SYM/runs/cvh/main/theta.json (validation only; a registered failure stops the study here); the orchestrator copies it
+#    byte for byte to $SYM/reports/cvh/theta.json and commits it on wp/sym before confirmation. CVH_THETA = that commit's full SHA
 $SUB --name cvh-confirm --queue regular-g --walltime <suggested_confirm_walltime_seconds> --commit $CODE -- \
   scripts/run_cvh.py confirm --design $SYM/reports/cvh/design.json --design-commit $CVH_LOCK \
   --theta $SYM/reports/cvh/theta.json --theta-commit $CVH_THETA --root $SYM/runs/cvh/main
@@ -183,24 +193,33 @@ $SUB --name cvh-analyze --queue debug-g --walltime 00:15:00 --commit $CODE --wai
 $SUB --name uns-a --queue debug-g --walltime 00:20:00 --commit $CODE --wait -- scripts/audit_uns.py --out $SYM/reports/uns/part-a
 $SUB --name ncr   --queue debug-g --walltime 00:20:00 --commit $CODE --wait -- scripts/analyze_neighbour_confusion.py --out $SYM/reports/ncr
 
-# 3b. UNS Part B (optional; orchestrator decision)
+# 3b. UNS Part B (registered, not optional; after Part A)
 $SUB --name uns-lock --queue debug-g --walltime 00:05:00 --commit $CODE --wait -- scripts/run_uns.py lock --repo $CENTRAL --out $SYM/reports/uns/design.json
-git add reports/uns/design.json && git commit -m "UNS Part B: design lock"; UNS_LOCK=$(git rev-parse HEAD)
-#    timing run (partial, never analysed, delete afterwards):
+#    STOP: report $SYM/reports/uns/design.json; the orchestrator commits it on wp/sym. UNS_LOCK = that commit's full SHA
+#    the two-checkpoint timing run is optional (partial, never analysed, delete afterwards):
 $SUB --name uns-time --queue regular-g --walltime 00:10:00 --commit $CODE --wait -- scripts/run_uns.py run --design $SYM/reports/uns/design.json \
   --design-commit $UNS_LOCK --root $SYM/runs/uns/timing --names joint-M1L4-r32-s17,joint-B4-r32-s17
 $SUB --name uns-b --queue regular-g --walltime <measured x 1.5> --commit $CODE -- scripts/run_uns.py run --design $SYM/reports/uns/design.json \
   --design-commit $UNS_LOCK --root $SYM/runs/uns/main
 $SUB --name uns-b-audit --queue debug-g --walltime 00:20:00 --commit $CODE --wait -- scripts/audit_uns.py --extension-root $SYM/runs/uns/main --out $SYM/reports/uns/part-b
 
-# 4. TSM   (after the others)
+# 4. TSM   (after the others; failure rules: docs/prereg/TSM.md, "Decisions at registration")
 $SUB --name tsm-lock  --queue debug-g --walltime 00:05:00 --commit $CODE --wait -- scripts/run_tsm.py lock --out $SYM/reports/tsm/design.json
-git add reports/tsm/design.json && git commit -m "TSM: design lock"; TSM_LOCK=$(git rev-parse HEAD)
+#    STOP: report $SYM/reports/tsm/design.json; the orchestrator commits it on wp/sym. TSM_LOCK = that commit's full SHA
 $SUB --name tsm-smoke --queue regular-g --walltime 00:20:00 --commit $CODE --wait -- scripts/run_tsm.py smoke --design $SYM/reports/tsm/design.json --root $SYM/runs/tsm/smoke --procs 6
 for S in 17 29 43; do   # one job per seed (6 runs each); walltime from smoke.json extrapolated_run_seconds x 1.5 / procs
   $SUB --name tsm-train-$S --queue regular-g --walltime <from smoke> --commit $CODE -- scripts/run_tsm.py train --design $SYM/reports/tsm/design.json \
     --design-commit $TSM_LOCK --root $SYM/runs/tsm/main --procs 6 --seeds $S --label s$S
 done
+#    After every job read $SYM/runs/tsm/main/train_manifest-<label>.json (exit status 0 = every selected run is final):
+#      "training_failures" lists registered failures (a non-finite loss in a T1/T2 run): no retry, no re-tuning; report them, the evaluation goes on;
+#      status "stopped": a T0 run had a non-finite loss, the study stops: report to the orchestrator and do not evaluate;
+#      status "incomplete" (the job ended before its runs did: walltime, node or I/O fault): once qstat shows the job has ended, submit the
+#        identical command again at the same --commit with a new --label (s17-r2) and --rerun-incomplete, restricted to the runs of that job
+#        (--seeds ...); at most twice per run (3 attempts). `train` refuses a run marked "running" that was written to in the last 5 minutes
+#        (its job may be alive): wait and submit again. A rerun job that itself ends before its runs started is submitted again the same way.
+#      All 18 runs must come from the same $CODE and every attempt must equal the one before it (configuration and source_hash); `train`,
+#      `evaluate` and the analysis refuse otherwise (a different code version is a decision for the orchestrator, §9 (e)).
 $SUB --name tsm-eval  --queue regular-g --walltime <about 00:20:00> --commit $CODE -- scripts/run_tsm.py evaluate --design $SYM/reports/tsm/design.json --design-commit $TSM_LOCK --root $SYM/runs/tsm/main
 $SUB --name tsm-analyze --queue debug-g --walltime 00:15:00 --commit $CODE --wait -- scripts/analyze_tsm.py --root $SYM/runs/tsm/main --out $SYM/reports/tsm/results
 ```
@@ -208,8 +227,9 @@ $SUB --name tsm-analyze --queue debug-g --walltime 00:15:00 --commit $CODE --wai
 Jobs longer than the Bash tool's limit are submitted without `--wait` and followed with `qstat` (or the
 `miyabi-pbs-goal-wakeup` workflow). The lock files are written into the worktree because the `run` stages verify them with
 `git show <commit>:<path>` in the file's own repository; a commit of the same file on master at the same relative path
-is equally valid. A failed training job leaves its siblings' partial `runs/<name>` directories: TSM's `train-one` refuses to
-overwrite them, so move the incomplete directories aside (their `record.json` status is not `complete`) before resubmitting.
+is equally valid. TSM's rerun rules are in the comments of block 4: the `train` stage itself moves an unfinished run to `<root>/attempts/`
+(with `--rerun-incomplete`), never touches a complete run or a registered failure, and `evaluate` refuses anything else.
+An `evaluate` job that is killed leaves `evaluation/manifest.json` at "running" and the stage refuses to start again (§9 (d)).
 
 ## 7. Verification done in step 1 (all static or file-level)
 
@@ -295,13 +315,139 @@ as to its thresholds; each fills something the plan leaves open.
 | --- | --- |
 | IVD | decision load L24 (L6 reported); per-writer decision with a 97.5% interval; `nat` arm and second load level added (reported only); manipulation check (overlap gap ≥ 0.2, label `inconclusive`) added, same action as `not_supported`; frozen readers see 18 or 36 stored facts, outside their training distribution |
 | CVH | the plan's three heads: A0 is a reference, the rule applies to A1 and A2 (six comparisons); margin 0.25 nats fixed before any data; the hop-1 constraint is applied to the threshold choice of both A1 and A2; "mean executed depth" read as mean executed updates (fallback = 16), stricter than the mean selected step; a family whose A1 and A2 are both infeasible is not traced on the confirmation set; wall time is the primary latency clock; the A0 recomputation must reproduce the P4-S-L validation accuracy within 1e-3 |
-| TSM | T0 = released recipe at the fixed depth 4 (P2-S-F1 recipe), retrained; stay uses L4 and L16, far uses L8 for arm and T0 (L16 reported), gain uses L4 against B4 at L1; an arm passes only if both writers pass (rv-astra), intervals corrected for four comparisons; stay-loss weighting (mean over steps s ≥ hop, equal over queries); T2 without PonderNet step cost, with explicit init (a, b) = (0, 4); same released lr (0.003) for every arm, no retry; a run that fails to train blocks the evaluation and is reported, with no protocol change before an explicit amendment |
-| UNS | split into Part A (zero-evaluation audit of the committed rows) and optional Part B (what is missing); "M1-L4 and B4" covered by Part A (released M1 at L4/L1, B4) and Part B (M1 trained at L = 4); `oracle_random` added as a control; a 3 pp wording rule for the scope row (changes no gate); disclosure that the unseen rows were seen before registration |
+| TSM | T0 = released recipe at the fixed depth 4 (P2-S-F1 recipe), retrained; stay uses L4 and L16, far uses L8 for arm and T0 (L16 reported), gain uses L4 against B4 at L1; an arm passes only if both writers pass (rv-astra), intervals corrected for four comparisons; stay-loss weighting (mean over steps s ≥ hop, equal over queries); T2 without PonderNet step cost, with explicit init (a, b) = (0, 4); same released lr (0.003) for every arm, no retry; training failures as registered at 40ddf08 and implemented in step 1b (§10): a non-finite loss in T1/T2 fails that arm for that writer (completed seeds reported descriptively, other arms evaluated), in T0 it stops the study, an infrastructure failure is rerun identically at most twice, a single-writer pass is a writer-specific result, not a remedy |
+| UNS | split into Part A (zero-evaluation audit of the committed rows) and Part B (what is missing; registered as run, not optional); "M1-L4 and B4" covered by Part A (released M1 at L4/L1, B4) and Part B (M1 trained at L = 4); `oracle_random` added as a control; a 3 pp wording rule for the scope row (changes no gate); disclosure that the unseen rows were seen before registration |
 | NCR | single read = L = 1 of M1 and B4; both rate and share reported; category priority and the h = 2 case fixed before any neighbour-confusion quantity is computed; the already analysed C777 confirmation samples are re-read, not re-evaluated |
 
-Open questions for the orchestrator:
-1. UNS Part B: go or no-go (0.3 node·h expected, 0.75 upper bound). Part A alone is the zero-evaluation reading of the binding instruction.
-2. TSM: is "both writers must pass" (rv-astra) the intended arm-level rule, and should a registered failure to train (non-finite loss) stay a stop-and-amend event, as drafted?
-3. Where the lock commits go: the commands commit the design and `theta.json` locks on `wp/sym`; the orchestrator may instead commit identical files on master at the same paths.
-4. The `--scale-up` allowances written into the IVD and TSM preregs (up to 2 h, only if the smoke requires it) need the orchestrator's acceptance when committing them.
-5. Master has advanced since the base (`f7be34a` versus `dc659e0`) without touching F8–F11 (the hunks of `plan/followup_2026-10-27.md` on master lie in its header, §2, §3 and the F2–F4 sections, none in F8–F11 or §6); the new files do not overlap any file changed on master (`git diff --name-only dc659e0 master`), so a plain merge should be clean.
+Answered at registration (orchestrator; 40ddf08 and the step-1b message), no longer open:
+1. UNS Part B runs; it is not optional (only its two-checkpoint timing run stays optional).
+2. TSM: both writers must pass; a single-writer pass is reported as writer-specific, not as a remedy. Failures: infrastructure
+   failure, identical rerun, at most twice; non-finite loss in T1/T2, that arm fails for that writer and the other arms are still
+   evaluated; non-finite loss in T0, the study stops.
+3. The orchestrator commits each design lock and `theta.json` on `wp/sym`; the command sheet stops after each lock stage and
+   reports the path.
+4. The `--scale-up` allowances for IVD and TSM are accepted.
+5. Master was merged into `wp/sym` (a928ea0).
+
+Open after step 1b (for the orchestrator; none blocks the lock stages):
+a. A TSM run whose three attempts all end without completing (infrastructure failures): `train` refuses a fourth and `evaluate`
+   refuses (such a run is neither complete nor a registered training failure). The registration has no rule for it, so it needs
+   a decision (an amendment) before the confirmation set is opened.
+b. A non-finite gradient norm with a finite loss (the `RuntimeError` of `clip_grad_norm_(..., error_if_nonfinite=True)`) is
+   classified as a numerical failure like a non-finite loss, because an identical rerun reproduces it. Confirm, or say that only
+   `FloatingPointError` counts.
+c. Any other end of a run before completion (for example a CUDA out-of-memory error or an I/O error) is treated as an
+   infrastructure failure and may be rerun twice. The registration defines infrastructure failure as walltime, node or I/O faults.
+   Confirm this reading.
+d. An `evaluate` job that ends before it completes (walltime, node fault) leaves `evaluation/manifest.json` at "running"; the
+   stage then refuses to start ("already started") and the registration has no rule for an interrupted evaluation. The runs and
+   episodes are fixed, so an identical re-evaluation (the old `evaluation/` moved aside by hand) would be the natural rule, but it
+   is a decision about the confirmation set and is left to the orchestrator.
+e. "T0 is retrained under the same code version" is implemented as one `source_hash` (blake2b of `src`, `scripts`, `tests`, `configs`,
+   `pyproject.toml`, `uv.lock`; not `docs/` or `reports/`) for all 18 records, complete or failed, checked before `evaluate` opens the
+   confirmation set and again by the analysis; the sheet submits every TSM job at one `CODE`. A change to any of those files between
+   two jobs, even one unrelated to TSM, makes `evaluate` refuse until the orchestrator decides. Confirm this reading, or name a
+   weaker one (for example, the TSM files only).
+
+## 10. Step 1b (2026-10-27): aligned with the registrations
+
+Master (6dcf271: the preregs registered at 40ddf08 and the step-1b task of b3ba3b4) was merged into `wp/sym` (merge commit
+a928ea0, no conflict). The five prereg files on `wp/sym` are byte-identical to master's 40ddf08 and were not edited. Commits:
+a928ea0 (merge), b291c55 (TSM scripts and tests), 2b36cde (fixes after the independent review, 10.2) and the commit of this
+report. Only the TSM scripts and their tests changed (plus this report); the IVD, CVH, UNS and NCR code did not.
+
+| registered rule (`docs/prereg/TSM.md`, "Decisions at registration") | implementation |
+| --- | --- |
+| infrastructure failure: identical rerun, at most twice | `train --rerun-incomplete` (the job that started the run must have ended; a run still marked "running" must also have been silent for 300 s): the unfinished run's directory and log move to `<root>/attempts/<run>-attempt<k>`, the run is trained again with the same configuration hash (so the same seeds and data stream) and the same `source_hash` as the latest earlier attempt, at most three attempts per run (then `train` refuses and the case goes to the orchestrator); every attempt is compared with the one before it, also when a rerun job stopped before its child started; each record carries `attempt` and `source` |
+| non-finite loss in T1/T2: registered failure | the record is `failed`, the siblings go on, the job exits 0 when every selected run is final, the manifest `train_manifest-<label>.json` lists the failure under `training_failures`; never retried, not even with `--rerun-incomplete`; `evaluate` evaluates the completed runs and the six B4 references and lists the failures in its manifest; `analyze_tsm.py` marks the (writer, arm) cell `training_failed`, `passes` false, no registered endpoint, reports the stay, far, gain and four other contrasts of its completed seeds as descriptive (`descriptive_contrasts.csv`, with `seeds`; T0 and B4 restricted to the same seeds) and lists the failure in `summary.md` and `summary.json` |
+| non-finite loss in T0: the study stops | the job ends with an error (manifest `status: stopped`, siblings terminated); every later `train` and `evaluate` refuses, and `evaluate` does so before the confirmation episodes are generated |
+| `evaluate` no longer needs all 18 runs | it needs every T0 run complete and every T1/T2 run complete or a registered failure, each on the registered configuration and steps, with the checkpoint seal intact, and one `source_hash` for all 18 records; an unfinished run is refused with the rerun hint; all of this is checked before `evaluation/manifest.json` is written |
+| an arm passes only for both writers; a single-writer pass is writer-specific | `summary.md` has a "Registered reading" table (per arm, one column per writer: passes / fails / training failure, and the outcome `both`, `writer_specific` = "writer-specific result, not a remedy", or `none`) and one line per writer ("no arm passes", or the arms that pass; a training failure counts as not passing), so the "no arm passes" statement can be worded per writer; `summary.json` has `arm_outcome`, `passing_writers`, `failed_cells`, `training_source_hash` |
+
+Interpretations made in step 1b (none changes a registered threshold or statistic):
+- A run's state is read from its `record.json`: `complete`; `training_failure` when the status is `failed` and the failure text
+  is a `FloatingPointError` (the non-finite loss that `train` and `tsm.fit_tsm` raise) or says "non-finite" (the `RuntimeError`
+  of `clip_grad_norm_(..., error_if_nonfinite=True)`); `incomplete` for anything else (still `running` after its job ended,
+  failed with another error, or an unreadable record); `missing` without a run directory. Open questions (b) and (c).
+- `--rerun-incomplete` is deliberate, not automatic: several jobs share one root and the code cannot see whether the job that
+  started a run is still alive, so the operator confirms with `qstat` that it has ended. As a second guard (10.2, F1) `train`
+  refuses a run that is still marked "running" when anything in its directory or log was written in the last 300 s: a live
+  run appends to `train_log.jsonl` every `log_every` = 10 steps (the released configuration), seconds apart, so 300 s of silence
+  means the run is dead; a record that says `failed` is exempt. Without the flag an unfinished run stops `train` before
+  anything starts. Every job needs its own `--label`; a manifest is never overwritten.
+- "Same code" is the `source_hash` of `looplora.sym.run.source_metadata` (blake2b over `src`, `scripts`, `tests`, `configs`,
+  `pyproject.toml`, `uv.lock`; `docs/` and `reports/` are outside it, so committing a lock does not change it): submit a rerun at
+  the same `--commit`. A different hash is refused as "not identical code". For the registered T0 ("retrained under the same
+  code version") the same hash is required across all 18 records: open question (e).
+- A child that died before it created its run directory has trained nothing: its log is set aside as
+  `attempts/<run>-notstarted<k>.log` and no attempt is counted.
+- A registered failure does not fail the job, because the registered study goes on; the stdout line and the manifest name it, and
+  the command sheet says to read them after every job.
+- A T0 failure stops the job in which it happens (its running siblings are terminated) and every job started later; jobs of other
+  seeds that are already running finish their own runs unless the orchestrator `qdel`s them. `evaluate` refuses either way.
+
+### 10.2 Independent review of b291c55 and the fixes
+
+A second read-only subagent (82 tool calls over about 49 minutes; it changed nothing in the worktree; scratch files in the session
+scratchpad) reviewed `a928ea0..b291c55` (`run_tsm.py`, `analyze_tsm.py`, `test_tsm_scripts.py`). Its method: the tests' own bodies
+against torch-free fakes (21 of 21 passed), 37 one-line mutants of the two scripts run against the tests (31 killed), a random
+walk over kill points of the train stage (30 seeds, no violation), and real subprocess scenarios with a stub torch and sleeping
+stand-ins for training (SIGTERM to the process group as the walltime kill). It found no defect that changes an endpoint, a verdict or a
+registered statement, and found that attempts never exceed three, registered failures are never restarted, `evaluate` succeeds iff
+every T0 run is complete and every T1/T2 run is complete or a registered failure, and the audit checks every seal before any
+statistic. Its findings and what was done (2b36cde):
+
+| # | finding on b291c55 | disposition |
+| --- | --- | --- |
+| F2 | the identity check ran only for a run still in place; after a `--rerun-incomplete` job moved attempt 1 aside and ended before its child wrote a record, the run was `missing` and the next job trained attempt 2 on different code unchecked (reproduced with processes) | fixed: `check_rerun` compares with the latest earlier record, in place or in `attempts/`, for every run that is not a first attempt, in `stage_train` (also `missing` runs) and in `train_one`; tests `test_an_aborted_rerun_does_not_loosen_the_identity_rule`, `test_an_attempt_must_be_identical_...`; the process scenario now refuses the changed code and trains the identical rerun as attempt 2 |
+| F1 | `--rerun-incomplete` treated every "running" record as dead: a rerun job whose selection overlapped a live job moved the live run aside and started a second child, whose files the first child then overwrote in the new directory (reproduced with processes) | fixed: the 300 s silence rule above; test `test_a_run_that_may_still_be_running_is_not_moved_aside` (a fresh file in an old directory, in the run or in its log, is refused); the process scenario refuses the overlapping job while the first job completes untouched, and accepts the rerun after a kill once the (shortened) silence has passed. The command sheet restricts a rerun job to the runs of the failed job |
+| F3 | an `OSError` from `start_child` (for example its log existing because another job runs the same run) escaped `schedule`; the train manifest stayed "running" with no reason | fixed: `schedule` raises a `ValueError`, the existing handler writes a `failed` manifest; tests in `test_schedule_...` and `test_a_child_that_cannot_be_started_...` |
+| F4 | `stage_train` skipped a complete or failed record of another configuration or steps; `evaluate` refused it later, after the job slots were spent | fixed: `registered_record` is checked for every final run of the selection at the start of `train`, and by `final_states` |
+| F5 | `evaluation/manifest.json` ("running") was written before the checkpoint seals were checked; a missing or corrupt checkpoint, or a kill during `evaluate`, blocked every rerun | partly fixed: the digests of all complete runs are verified in `final_states`, before the manifest is written (a missing file is a refusal, not a crash); a killed `evaluate` still blocks a rerun: open question (d) |
+| F6 | the audit did not require one code version for the 18 runs although T0 is "retrained under the same code version" | fixed as an interpretation: one `source_hash` across all 18 records, checked by `evaluate` before the confirmation set is opened and by the analysis, recorded as `training_source_hash` in `summary.json`; open question (e) |
+| F7 | `final_states` stopped at the first unfinished run in plan order, hiding a later T0 failure's "the study stops" message | fixed: T0 failures are checked first; test `test_an_unfinished_run_earlier_in_the_plan_does_not_hide_a_t0_failure` |
+| F8 | the outcome "passes for neither writer" was also printed for arms with a training failure, and the per-writer "no arm passes" wording existed only as a pointer to the table | fixed: the outcome says a training failure counts as not passing, and one line per writer is printed |
+| T1 | the gate-profile audit check was never exercised (deleting it left every test green) | new assertion in the end-to-end test: a missing T2 profile is refused |
+| T2 | the configuration/steps check of `final_states` was untested | `test_evaluate_needs_...` rewrites `steps` and `config_hash` of a record |
+| T3 | no stage-level identity test, no aborted-rerun test, no live-run test | the tests of F1 and F2 above, and a changed `source_hash` refused at the stage |
+| T4 | the stand-in children ran synchronously, so "running siblings are stopped" was never exercised | a `hang` outcome: a sibling still running when a T0 run fails is stopped |
+| T5 | the attempt guard of `train_one` and the pre-load digest check of `evaluate_runs` had no test | `test_train_one_refuses_a_fourth_attempt_and_creates_nothing`, `test_the_evaluation_itself_refuses_a_checkpoint_that_changed_after_training` |
+
+### 10.3 Verification (all static or torch-free; the tests have never been run with torch or pytest)
+
+- `python3 -m pyflakes` (2.4.0, Python 3.9.25) on the three changed Python files: clean. `compile()` of the three files under
+  Python 3.9.25 and 3.13.13 (`-I`, no bytecode written): ok. The `ast` checks of step 1 re-run on the final tree: 660
+  module-attribute references with none unresolved, 1002 calls with the same 4 re-export hits as in §7, no hit in the TSM files
+  (the checker lists 10 hits elsewhere in the repository, in files this work did not touch), 108 test functions in the ten files
+  (93 at step 1; `test_tsm_scripts.py` went from 5 to 20) whose fixtures are builtin or defined in the file.
+- The repository's own test bodies of `tests/test_tsm_scripts.py`, run through a stand-in for pytest's fixture machinery (module
+  fixtures, `tmp_path`, `monkeypatch`, `raises`, `parametrize`) on the login node with the venv python, a stub `torch` package, and
+  `SymbolicModel`, `train`, `train_arm`, `load_tsm`, `evaluate_arm`, `gate_profile`, `load_frozen` and `evaluation_arrays`
+  replaced by file and numpy stand-ins (the stage code, the state handling, the manifests, the audit, `tsm.arm_endpoints` and
+  the `followup_stats` bootstraps are the repository's): 27 of 27 cases passed (20 functions; the nine cases of
+  `test_run_state_...` count separately; `test_t0_is_the_unchanged_training_function` is skipped: it needs the real `train()`).
+  Run against b291c55's scripts (with the one constant the tests set added), 11 of the 27 cases fail there: the tests of F1, F2, F3
+  and F7, the new assertions for F4, F5, F6 and F8 in the end-to-end, partial-failure, evaluate and wording tests, and the
+  fourth-attempt guard (whose message differs); the other 16 pass there too, among them the stage-level identity test, the T0 stop
+  with a running sibling and the evaluation's own checkpoint guard, which only add coverage.
+- Mutation check of the new logic, by the same stand-in run: 27 one-line mutants of `run_tsm.py` and `analyze_tsm.py` (no identity
+  check for missing or incomplete runs, none in `train_one`, the earlier record read only in place, the silence rule off, failed
+  records not exempt from it, no registered-record check in `train` or `final_states`, no checkpoint digest, no single
+  `source_hash`, the T0 failure checked after the loop, no gate-profile check, `reruns` of the manifest counted by the job that
+  moved the run, `OSError` not converted, siblings not stopped, the T0 stop check removed or never fatal, the attempt count off
+  by one, the configuration or the code not compared, no per-writer line, no `training_source_hash`, no stale-log set aside,
+  a rerun without the flag, the silence rule looking at the directory only): all 27 were killed by at least one test. One
+  survived the first version of the live-run test (the directory-only rule) and led to its second half: a fresh file in an old
+  directory. The reviewer's mutants of b291c55 had left six survivors; they correspond to T1, T2, T3 and T5 above (T4 was a gap
+  that its process scenario showed).
+- Real subprocess scenarios (real `Popen` children, logs, SIGTERM to the process group, stub torch, sleeping stand-ins for training;
+  the reviewer's scripts adapted): an overlapping rerun job is refused while the first job completes untouched; after a kill the
+  rerun is refused within the silence period and accepted after it (period shortened to 3 s for the run); an aborted rerun
+  followed by changed code is refused, the same code trains attempt 2 without the flag and sets the stale log aside; a T0
+  non-finite loss ends the job as `stopped`, terminates the siblings (no process left), and later jobs refuse; a T1 non-finite
+  loss lets the other runs finish, exits 0, and `--rerun-incomplete` leaves the failed record alone.
+- Not verified: any execution with real torch or real pytest (including the fixtures and `monkeypatch` of the new tests, the one
+  real-torch test, `train_one` with a real `FloatingPointError` from `fit_tsm`), a PBS walltime kill or I/O fault on a compute
+  node, filesystem timestamps across nodes on the shared filesystem (the 300 s rule assumes clock differences of seconds), and
+  the actual `log_every` cadence of a T1/T2 run on a GPU. The first compute-node run of `tests/test_tsm_scripts.py` is part of the
+  step-0 test job of §6.
