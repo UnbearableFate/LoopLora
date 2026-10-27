@@ -35,7 +35,7 @@ ENDPOINTS = ("stay", "far", "gain")
 FIELDS = ("difference", "ci_low", "ci_high")
 ARMS = ("T1", "T2")
 OUTCOME_TEXT = dict(both="passes for both writers", writer_specific="writer-specific result, not a remedy",
-                    none="passes for neither writer")
+                    none="passes for neither writer (a training failure counts as not passing)")
 
 
 def arm_outcome(passing: Sequence[str]) -> str:
@@ -65,13 +65,11 @@ def audit_run(root: Path) -> tuple[dict, dict[str, dict], dict]:
     require(json.loads(git_locked_file(design_path, manifest["design_lock_commit"])) == design,
             "the manifest design differs from its Git lock")
     run_tsm.verify_design(design)
-    states = run_tsm.final_states(design, root)  # T0 complete; T1/T2 complete or a registered training failure
+    # T0 complete; T1/T2 complete or a registered training failure; registered configurations, unchanged checkpoints
+    # and one code version for all 18 runs
+    states = run_tsm.final_states(design, root)
     complete = sorted(name for name, state in states.items() if state == "complete")
     failed = sorted(name for name, state in states.items() if state == "training_failure")
-    for name in complete:
-        record = run_tsm.read_record(root, name)
-        require(digest_checkpoint(Path(record["checkpoint"])) == record["checkpoint_blake2b"],
-                f"checkpoint changed: {name}")
     require(manifest["training_failures"] == [run_tsm.failure_row(root, name) for name in failed],
             "the manifest's training failures differ from the run records")
     evaluation = design["evaluation"]
@@ -222,8 +220,15 @@ def render(result: dict, design: dict, manifest: dict) -> list[str]:
     lines += table_lines(["arm"] + list(run_tsm.WRITERS) + ["outcome"],
                          [[arm] + [status(w, arm) for w in run_tsm.WRITERS] + [OUTCOME_TEXT[result["outcome"][arm]]]
                           for arm in ARMS])
-    lines += ["", "An arm that passes for exactly one writer is a writer-specific result, not a remedy; the statement "
-              "that no arm passes is worded per writer (the columns above).", ""]
+    lines += ["", "An arm that passes for exactly one writer is a writer-specific result, not a remedy. The statement "
+              "that no arm passes is worded per writer; a training failure counts as not passing, and the table above "
+              "says which cells failed in training:", ""]
+    for writer in run_tsm.WRITERS:
+        passing = [arm for arm in ARMS if cells[writer, arm]["passes"]]
+        lost = [arm for arm in ARMS if cells[writer, arm]["training_failed"]]
+        lines.append(f"- {writer}: " + (f"{' and '.join(passing)} passes" if passing else "no arm passes")
+                     + (f"; training failure: {', '.join(lost)}" if lost else ""))
+    lines += [""]
     if manifest["training_failures"]:
         lines += ["## Training failures", "",
                   "A non-finite loss in a T1 or T2 run is a registered training failure: no retry, no re-tuning. The "
@@ -277,6 +282,7 @@ def main(argv: list[str] | None = None) -> int:
     write_json(out / "summary.json", dict(
         created=now(), seconds=time.perf_counter() - started, resamples=args.resamples,
         design_hash=manifest["design_hash"], design_lock_commit=manifest["design_lock_commit"],
+        training_source_hash=run_tsm.read_record(root, run_tsm.planned_runs()[0]["name"])["source"]["source_hash"],
         arms_pass=result["arms"], arm_outcome=result["outcome"], passing_writers=result["passing_writers"],
         writer_passes={f"{r['writer']}/{r['arm']}": r["passes"] for r in result["endpoints"]},
         training_failures=manifest["training_failures"],

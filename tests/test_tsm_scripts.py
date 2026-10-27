@@ -6,8 +6,10 @@ by the smoke job.
 """
 from __future__ import annotations
 
+import contextlib
 import csv
 import json
+import os
 from pathlib import Path
 import subprocess
 import sys
@@ -61,6 +63,21 @@ class Exited:
         pass
 
 
+class Hanging:
+    """A child that is still running until it is stopped."""
+
+    def __init__(self, name, stopped):
+        self.name, self.stopped, self.polls = name, stopped, 0
+
+    def poll(self):
+        self.polls += 1
+        assert self.polls < 10000, f"the running child {self.name} was never stopped"  # not an endless wait
+        return None
+
+    def stop(self):
+        self.stopped.append(self.name)
+
+
 def _raise(error):
     def fail(*args, **kwargs):
         raise error
@@ -79,12 +96,33 @@ def _kill(root, name):
     (out / "checkpoint.pt").unlink()
 
 
+def _age(root, name, seconds):
+    """Make everything the run wrote look ``seconds`` older, as if its job had ended that long ago."""
+    out = root / "runs" / name
+    for path in [out, root / "logs" / f"{name}.log", *out.rglob("*")]:
+        stat = path.stat()
+        os.utime(path, (stat.st_atime - seconds, stat.st_mtime - seconds))
+
+
+@contextlib.contextmanager
+def _edited(path, change):
+    """Rewrite a JSON file (``change`` maps its content to the new content) for the duration of the block."""
+    original = path.read_text()
+    path.write_text(json.dumps(change(json.loads(original))))
+    try:
+        yield
+    finally:
+        path.write_text(original)
+
+
 @pytest.fixture
 def children():
     """How the next children end, by run name (``outcomes[name]`` is consumed one entry per start; the default is
-    ``complete``): ``nonfinite`` (a non-finite loss), ``fault`` (an I/O error), ``killed`` (ended by walltime) or
-    ``crash`` (dies before it creates its run directory). ``started`` lists every child that was started."""
-    return types.SimpleNamespace(outcomes={}, started=[])
+    ``complete``): ``nonfinite`` (a non-finite loss), ``fault`` (an I/O error), ``killed`` (ended by walltime),
+    ``crash`` (dies before it creates its run directory), ``hang`` (still running until it is stopped) or ``overlap``
+    (another job has just created its log, so it cannot be started). ``started`` lists every child that was started
+    and ``stopped`` every child that was stopped while it was running."""
+    return types.SimpleNamespace(outcomes={}, started=[], stopped=[])
 
 
 @pytest.fixture
@@ -98,13 +136,18 @@ def tiny(tmp_path, monkeypatch, children):
                                                     depths=list(tsm.DEPTHS), batch_size=3))
     monkeypatch.setattr(run_tsm, "SMOKE", dict(steps=2, split="val", seed=4242, episodes=EPISODES, training_seed=17))
     monkeypatch.setattr(run_tsm, "POLL_SECONDS", 0.0)
+    monkeypatch.setattr(run_tsm, "QUIET_SECONDS", 0)  # the in-process children end at once; see the test of the guard
 
     def start_child(name, design_path, root, *, device, steps):
-        children.started.append(name)
-        (root / "logs").mkdir(parents=True, exist_ok=True)
-        (root / "logs" / f"{name}.log").open("x").close()  # as the real child: a log never overwrites another
         plan = children.outcomes.get(name, [])
         outcome = plan.pop(0) if plan else "complete"
+        (root / "logs").mkdir(parents=True, exist_ok=True)
+        if outcome == "overlap":  # another job has just started this run
+            (root / "logs" / f"{name}.log").write_text("")
+        (root / "logs" / f"{name}.log").open("x").close()  # as the real child: a log never overwrites another
+        children.started.append(name)
+        if outcome == "hang":
+            return Hanging(name, children.stopped)
         if outcome == "crash":
             return Exited(1)
         design = json.loads(Path(design_path).read_text())
@@ -243,6 +286,17 @@ def test_schedule_limits_concurrency_and_stops_everything_on_the_first_failure(t
                          fatal=lambda name: name == "c")
     assert not active
 
+    def broken(name, design_path, root, *, device, steps):
+        if name == "c":
+            raise FileExistsError("the log exists")  # another job runs it
+        return start(name, design_path, root, device=device, steps=steps)
+
+    monkeypatch.setattr(run_tsm, "start_child", broken)
+    stopped.clear()
+    with pytest.raises(ValueError, match="run c could not be started: the log exists"):
+        run_tsm.schedule(["a", "b", "c"], 3, tmp_path / "d.json", tmp_path, device="cpu")
+    assert sorted(stopped) == ["a", "b"] and not active  # the children that were running are stopped
+
 
 def test_pipeline_runs_end_to_end_and_the_analysis_audits_every_seal(tiny, children):
     tmp_path, p1s, f2, repo = tiny
@@ -304,11 +358,13 @@ def test_pipeline_runs_end_to_end_and_the_analysis_audits_every_seal(tiny, child
     summary = json.loads((out / "summary.json").read_text())
     assert set(summary["arms_pass"]) == {"T1", "T2"} and summary["training_failures"] == []
     assert summary["failed_cells"] == []
+    assert summary["training_source_hash"] == run_tsm.read_record(root, NAME)["source"]["source_hash"]
     for arm, passed in summary["arms_pass"].items():  # an arm passes only if it passes for both writers
         assert passed == all(summary["writer_passes"][f"{w}/{arm}"] for w in run_tsm.WRITERS)
         assert (summary["arm_outcome"][arm] == "both") == passed
     assert "Registered conditions" in (out / "summary.md").read_text()
     assert "## Training failures" not in (out / "summary.md").read_text()
+    assert all(f"- {writer}: " in (out / "summary.md").read_text() for writer in run_tsm.WRITERS)  # per-writer reading
     with (out / "training.csv").open(newline="") as stream:
         training = list(csv.DictReader(stream))
     assert len(training) == 18 and {r["status"] for r in training} == {"complete"}
@@ -320,9 +376,12 @@ def test_pipeline_runs_end_to_end_and_the_analysis_audits_every_seal(tiny, child
     with pytest.raises(ValueError, match="samples missing or changed"):
         analyze_tsm.main(["--root", str(root), "--out", str(tmp_path / "again")])
     victim.write_bytes(original)
+    with _edited(root / "evaluation" / "gate_profiles.json", lambda p: dict(list(p.items())[1:])):
+        with pytest.raises(ValueError, match="gate profiles do not match"):  # a completed T2 run has no profile
+            analyze_tsm.main(["--root", str(root), "--out", str(tmp_path / "again")])
     checkpoint = next((root / "runs").glob("*/checkpoint.pt"))
     checkpoint.write_bytes(checkpoint.read_bytes() + b"x")
-    with pytest.raises(ValueError, match="checkpoint changed"):
+    with pytest.raises(ValueError, match="checkpoint missing or changed"):
         analyze_tsm.main(["--root", str(root), "--out", str(tmp_path / "again")])
 
 
@@ -364,23 +423,35 @@ def test_run_state_separates_registered_training_failures_from_unfinished_runs(t
     assert run_tsm.run_state(tmp_path, NAME) == expected
 
 
-def test_a_rerun_must_be_identical_to_the_unfinished_attempt_and_within_three_attempts(tmp_path):
+def test_an_attempt_must_be_identical_to_the_earlier_one_and_within_three_attempts(tmp_path):
     source = dict(git_commit="a" * 40, source_dirty=False, source_hash="h1")
+    first_run = run_tsm.check_rerun(tmp_path, NAME, config_hash="c9", source=dict(source, source_hash="h9"))
+    assert first_run == 1  # there is nothing to match yet
     out = tmp_path / "runs" / NAME
     out.mkdir(parents=True)
     (out / "record.json").write_text(json.dumps(dict(status="running", config_hash="c1", source=source)))
-    run_tsm.check_rerun(tmp_path, NAME, config_hash="c1", source=source)
+    assert run_tsm.check_rerun(tmp_path, NAME, config_hash="c1", source=source) == 2  # the unfinished run is attempt 1
     with pytest.raises(ValueError, match="configuration differs"):
         run_tsm.check_rerun(tmp_path, NAME, config_hash="c2", source=source)
     with pytest.raises(ValueError, match="code differs"):
         run_tsm.check_rerun(tmp_path, NAME, config_hash="c1", source=dict(source, source_hash="h2"))
-    for number in (1, 2):  # two attempts were moved aside: the unfinished one is the third and last
-        (tmp_path / "attempts" / f"{NAME}-attempt{number}").mkdir(parents=True)
+    # a rerun moved it aside and stopped before its child started: it is still the reference for the next attempt
+    attempts = tmp_path / "attempts"
+    attempts.mkdir()
+    out.rename(attempts / f"{NAME}-attempt1")
+    assert run_tsm.check_rerun(tmp_path, NAME, config_hash="c1", source=source) == 2
+    with pytest.raises(ValueError, match="code differs"):
+        run_tsm.check_rerun(tmp_path, NAME, config_hash="c1", source=dict(source, source_hash="h2"))
+    (attempts / f"{NAME}-attempt2").mkdir()  # an attempt that left no record does not hide the first one
+    assert run_tsm.check_rerun(tmp_path, NAME, config_hash="c1", source=source) == 3
+    with pytest.raises(ValueError, match="configuration differs"):
+        run_tsm.check_rerun(tmp_path, NAME, config_hash="c2", source=source)
+    (attempts / f"{NAME}-attempt3").mkdir()  # three attempts are used: there is no fourth
     with pytest.raises(ValueError, match="used 3 of 3 attempts"):
         run_tsm.check_rerun(tmp_path, NAME, config_hash="c1", source=source)
 
 
-def test_an_infrastructure_failure_is_trained_again_identically_after_the_job_has_ended(tiny, children):
+def test_an_infrastructure_failure_is_trained_again_identically_after_the_job_has_ended(tiny, children, monkeypatch):
     tmp_path, p1s, f2, repo = tiny
     locked, commit = _locked_design(tmp_path, p1s, f2, repo)
     root = tmp_path / "run"
@@ -392,6 +463,13 @@ def test_an_infrastructure_failure_is_trained_again_identically_after_the_job_ha
     with pytest.raises(ValueError, match="--rerun-incomplete"):  # a rerun is deliberate: its job must have ended
         _one_run(locked, commit, root, "b")
     assert children.started == [NAME] and not (root / "train_manifest-b.json").exists()
+    real_source = run_tsm.source_metadata
+    monkeypatch.setattr(run_tsm, "source_metadata", lambda: dict(real_source(), source_hash="another-code-version"))
+    with pytest.raises(ValueError, match="code differs"):  # identical code is required, not only allowed
+        _one_run(locked, commit, root, "x", "--rerun-incomplete")
+    monkeypatch.setattr(run_tsm, "source_metadata", real_source)
+    assert children.started == [NAME] and not (root / "attempts").exists()  # nothing moved, nothing started
+    assert not (root / "train_manifest-x.json").exists()
     with pytest.raises(ValueError, match="did not finish"):  # attempt 2: an I/O fault is not a registered failure
         _one_run(locked, commit, root, "c", "--rerun-incomplete")
     attempts = root / "attempts"
@@ -436,6 +514,98 @@ def test_a_run_that_never_finishes_is_refused_after_three_attempts(tiny, childre
         _one_run(locked, commit, root, "d", "--rerun-incomplete")
     assert children.started == [NAME] * 3
     assert run_tsm.run_state(root, NAME) == "incomplete" and len(run_tsm.moved_attempts(root, NAME)) == 2
+
+
+def test_an_aborted_rerun_does_not_loosen_the_identity_rule(tiny, children, monkeypatch):
+    tmp_path, p1s, f2, repo = tiny
+    locked, commit = _locked_design(tmp_path, p1s, f2, repo)
+    root = tmp_path / "run"
+    children.outcomes[NAME] = ["killed", "crash", "complete"]
+    with pytest.raises(ValueError, match="did not finish"):
+        _one_run(locked, commit, root, "a")
+    with pytest.raises(ValueError, match="did not finish"):  # the rerun moves attempt 1 aside; its child dies at once
+        _one_run(locked, commit, root, "b", "--rerun-incomplete")
+    assert run_tsm.run_state(root, NAME) == "missing" and len(run_tsm.moved_attempts(root, NAME)) == 1
+    real_source = run_tsm.source_metadata
+    monkeypatch.setattr(run_tsm, "source_metadata", lambda: dict(real_source(), source_hash="another-code-version"))
+    with pytest.raises(ValueError, match="code differs"):  # the run is missing now, but attempt 2 is still a rerun
+        _one_run(locked, commit, root, "c")
+    assert children.started == [NAME, NAME] and not (root / "train_manifest-c.json").exists()
+    monkeypatch.setattr(run_tsm, "source_metadata", real_source)
+    assert _one_run(locked, commit, root, "d") == 0  # the identical rerun needs no flag: nothing is running
+    final = run_tsm.read_record(root, NAME)
+    assert final["status"] == "complete" and final["attempt"] == 2
+    assert json.loads((root / "train_manifest-d.json").read_text())["reruns"] == [NAME]
+
+
+def test_a_run_that_may_still_be_running_is_not_moved_aside(tiny, children, monkeypatch):
+    tmp_path, p1s, f2, repo = tiny
+    locked, commit = _locked_design(tmp_path, p1s, f2, repo)
+    root = tmp_path / "run"
+    killed, faulted = "tsm-joint_fact-T1-s17", "tsm-joint_fact-T1-s29"
+    children.outcomes[killed], children.outcomes[faulted] = ["killed", "complete"], ["fault", "complete"]
+
+    def both(label, *extra):
+        return run_tsm.main(_train_argv(locked, commit, root, label, "--writers", "joint_fact", "--arms", "T1",
+                                        "--seeds", "17", "29", *extra))
+
+    with pytest.raises(ValueError, match="did not finish"):
+        both("a")
+    monkeypatch.setattr(run_tsm, "QUIET_SECONDS", 3600)  # a live run writes to its directory every few seconds
+    with pytest.raises(ValueError, match=f"run {killed} was written to .* its job may still be running"):
+        both("b", "--rerun-incomplete")
+    assert children.started == [killed, faulted] and not (root / "attempts").exists()  # nothing moved or started
+    assert not (root / "train_manifest-b.json").exists()
+    _age(root, killed, 7200)  # its job ended two hours ago; the failed run recorded its failure and is gone at once
+    out = root / "runs" / killed
+    for fresh in (out / "train_log.jsonl", root / "logs" / f"{killed}.log"):  # a live run appends to a file, which
+        folder = out.stat().st_mtime  # leaves the directory old: any fresh file shows that the run is still alive
+        fresh.touch()
+        os.utime(out, (folder, folder))
+        with pytest.raises(ValueError, match=f"run {killed} was written to .* its job may still be running"):
+            both("c", "--rerun-incomplete")
+        _age(root, killed, 7200)
+    assert children.started == [killed, faulted] and not (root / "attempts").exists()
+    assert both("d", "--rerun-incomplete") == 0
+    assert [run_tsm.read_record(root, name)["attempt"] for name in (killed, faulted)] == [2, 2]
+
+
+def test_a_child_that_cannot_be_started_fails_the_job_cleanly(tiny, children):
+    tmp_path, p1s, f2, repo = tiny
+    locked, commit = _locked_design(tmp_path, p1s, f2, repo)
+    root = tmp_path / "run"
+    children.outcomes[NAME] = ["overlap"]
+    with pytest.raises(ValueError, match=f"run {NAME} could not be started"):  # its log appeared: another job runs it
+        _one_run(locked, commit, root, "a")
+    manifest = json.loads((root / "train_manifest-a.json").read_text())
+    assert manifest["status"] == "failed" and f"run {NAME} could not be started" in manifest["reason"]
+    assert children.started == [] and run_tsm.run_state(root, NAME) == "missing"
+
+
+def test_train_one_refuses_a_fourth_attempt_and_creates_nothing(tiny):
+    tmp_path, p1s, f2, _ = tiny
+    design = run_tsm.build_design(p1s, f2)
+    root = tmp_path / "root"
+    for number in (1, 2, 3):
+        (root / "attempts" / f"{NAME}-attempt{number}").mkdir(parents=True)
+    with pytest.raises(ValueError, match="used 3 of 3 attempts"):
+        run_tsm.train_one(design, root, NAME, device="cpu")
+    assert not (root / "runs").exists()
+
+
+def test_the_evaluation_itself_refuses_a_checkpoint_that_changed_after_training(tiny, children):
+    tmp_path, p1s, f2, repo = tiny
+    locked, commit = _locked_design(tmp_path, p1s, f2, repo)
+    root = tmp_path / "run"
+    assert run_tsm.main(_train_argv(locked, commit, root, "a", "--writers", "joint_fact", "--seeds", "17")) == 0
+    design = json.loads(locked.read_text())
+    arguments = dict(writers=["joint_fact"], seeds=[17], evaluation=design["evaluation"], device="cpu", out=None)
+    _, rows, profiles = run_tsm.evaluate_runs(design, root, **arguments)
+    assert len(rows) == 4 and list(profiles) == ["tsm-joint_fact-T2-s17"]  # T0, T1, T2 and the B4 reference
+    checkpoint = root / "runs" / NAME / "checkpoint.pt"
+    checkpoint.write_bytes(checkpoint.read_bytes() + b"x")
+    with pytest.raises(ValueError, match=f"checkpoint changed: {NAME}"):
+        run_tsm.evaluate_runs(design, root, **arguments)
 
 
 def test_nonfinite_loss_fails_that_arm_for_that_writer_and_the_other_arms_are_evaluated(tiny, children):
@@ -487,6 +657,9 @@ def test_nonfinite_loss_fails_that_arm_for_that_writer_and_the_other_arms_are_ev
     assert {row["name"] for row in summary["training_failures"]} == {partial, *whole}
     text = (out / "summary.md").read_text()
     assert "## Training failures" in text and partial in text and whole[0] in text
+    reading = {line.split(":")[0]: line for line in text.splitlines() if line.startswith("- ")}  # per-writer reading
+    assert reading["- oracle_random"].endswith("training failure: T2") and reading["- joint_fact"].endswith(
+        "training failure: T1")
     with (out / "training.csv").open(newline="") as stream:
         training = {r["name"]: r for r in csv.DictReader(stream)}
     assert len(training) == 18
@@ -511,12 +684,13 @@ def test_nonfinite_loss_in_t0_stops_the_study_before_the_confirmation_set_is_ope
     tmp_path, p1s, f2, repo = tiny
     locked, commit = _locked_design(tmp_path, p1s, f2, repo)
     root = tmp_path / "run"
-    failed = "tsm-oracle_random-T0-s17"
-    children.outcomes[failed] = ["nonfinite"]
+    failed, sibling = "tsm-oracle_random-T0-s17", "tsm-oracle_random-T0-s29"
+    children.outcomes[failed], children.outcomes[sibling] = ["nonfinite"], ["hang"]  # the sibling is still training
     with pytest.raises(ValueError, match="the study stops"):
         run_tsm.main(_train_argv(locked, commit, root, "a"))
     stopped = json.loads((root / "train_manifest-a.json").read_text())
     assert stopped["status"] == "stopped" and failed in stopped["reason"]
+    assert children.stopped == [sibling]  # a run that is still training when the study stops is stopped
     assert "tsm-joint_fact-T2-s43" not in children.started  # nothing more is started once the study has stopped
     with pytest.raises(ValueError, match="the study stops"):  # no later job starts anything either
         run_tsm.main(_train_argv(locked, commit, root, "b", "--rerun-incomplete"))
@@ -540,9 +714,47 @@ def test_evaluate_needs_every_run_complete_or_a_registered_failure(tiny, childre
     assert run_tsm.main(_train_argv(locked, commit, root, "b", "--rerun-incomplete")) == 0
     assert children.started.count(killed) == 2 and len(children.started) == 19  # only the unfinished run again
     assert run_tsm.read_record(root, killed)["attempt"] == 2
+    record = root / "runs" / killed / "record.json"
+    for change, message in (  # each is refused before the confirmation set is opened
+            (lambda r: dict(r, steps=99), "not a registered run"),
+            (lambda r: dict(r, config_hash="0" * 32), "not a registered run"),
+            (lambda r: dict(r, source=dict(r["source"], source_hash="another-code-version")), "same code")):
+        with _edited(record, change):
+            with pytest.raises(ValueError, match=message):
+                run_tsm.main(_evaluate_argv(locked, commit, root))
+        assert not (root / "evaluation").exists()
+    started = list(children.started)  # the training stage applies the same test to a final record, at its start
+    with _edited(record, lambda r: dict(r, steps=99)):
+        with pytest.raises(ValueError, match="not a registered run"):
+            run_tsm.main(_train_argv(locked, commit, root, "c", "--writers", "oracle_random", "--arms", "T2",
+                                     "--seeds", "43"))
+    assert children.started == started and not (root / "train_manifest-c.json").exists()
+    checkpoint = root / "runs" / killed / "checkpoint.pt"
+    sealed = checkpoint.read_bytes()
+    checkpoint.write_bytes(sealed + b"x")
+    with pytest.raises(ValueError, match="checkpoint missing or changed"):
+        run_tsm.main(_evaluate_argv(locked, commit, root))
+    checkpoint.unlink()
+    with pytest.raises(ValueError, match="checkpoint missing or changed"):
+        run_tsm.main(_evaluate_argv(locked, commit, root))
+    checkpoint.write_bytes(sealed)
+    assert not (root / "evaluation").exists()
     assert run_tsm.main(_evaluate_argv(locked, commit, root)) == 0
     evaluation = json.loads((root / "evaluation" / "manifest.json").read_text())
     assert len(evaluation["evaluations"]) == 24 and evaluation["training_failures"] == []
+
+
+def test_an_unfinished_run_earlier_in_the_plan_does_not_hide_a_t0_failure(tiny):
+    tmp_path, p1s, f2, _ = tiny
+    design = run_tsm.build_design(p1s, f2)
+    root = tmp_path / "run"
+    failure = "FloatingPointError: non-finite train loss at step 4"
+    for name, record in (("tsm-oracle_random-T0-s17", dict(status="running")),
+                         ("tsm-oracle_random-T0-s29", dict(status="failed", failure=failure))):
+        (root / "runs" / name).mkdir(parents=True)
+        (root / "runs" / name / "record.json").write_text(json.dumps(record))
+    with pytest.raises(ValueError, match="the study stops"):
+        run_tsm.final_states(design, root)
 
 
 def _endpoint(writer, arm, *, passes, failed=False):
@@ -571,4 +783,5 @@ def test_a_single_writer_pass_is_worded_as_a_writer_specific_result():
     text = "\n".join(analyze_tsm.render(result, design, manifest))
     assert "| T1 | fails | passes | writer-specific result, not a remedy |" in text
     assert "| T2 | passes | training failure | writer-specific result, not a remedy |" in text
+    assert {"- oracle_random: T2 passes", "- joint_fact: T1 passes; training failure: T2"} <= set(text.splitlines())
     assert "## Training failures" in text and "tsm-joint_fact-T2-s17" in text and "non-finite train loss / at step 3" in text

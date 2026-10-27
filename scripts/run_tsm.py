@@ -20,7 +20,9 @@ Training failures (docs/prereg/TSM.md, "Decisions at registration"):
   anything else and ``evaluate`` refuses to run;
 * any other end before completion (walltime, a node or I/O fault) is an infrastructure failure: the run is trained
   again with the identical configuration and code (``train --rerun-incomplete`` once its job has ended), at most twice;
-* ``evaluate`` needs every T0 run complete and every T1/T2 run complete or a registered training failure.
+  every attempt is compared with the one before it (also when an earlier rerun stopped before its child started);
+* ``evaluate`` needs every T0 run complete and every T1/T2 run complete or a registered training failure, all of them
+  trained with the same code (T0 is "retrained under the same code version") and with their checkpoints unchanged.
 """
 from __future__ import annotations
 
@@ -63,6 +65,7 @@ SOURCE = Path(__file__).resolve().parents[1] / "src"
 WALLTIME_MARGIN = 1.5
 POLL_SECONDS = 1.0
 MAX_ATTEMPTS = 3  # a run and at most two identical reruns after an infrastructure failure (registered)
+QUIET_SECONDS = 300  # a run still marked "running" is rerun only after it was silent this long (it logs every ~10 steps)
 
 
 def settings() -> dict:
@@ -167,13 +170,18 @@ def is_numerical_failure(failure: object) -> bool:
     return kind == "FloatingPointError" or "non-finite" in message
 
 
-def read_record(root: Path, name: str) -> dict | None:
-    """The run's ``record.json``; None when it is absent or was cut off while it was being written."""
+def read_json_record(path: Path) -> dict | None:
+    """A ``record.json``; None when it is absent or was cut off while it was being written."""
     try:
-        record = json.loads((root / "runs" / name / "record.json").read_text())
+        record = json.loads(path.read_text())
     except (FileNotFoundError, ValueError):
         return None
     return record if isinstance(record, dict) else None
+
+
+def read_record(root: Path, name: str) -> dict | None:
+    """The record of run ``name`` in place (see ``read_json_record``)."""
+    return read_json_record(root / "runs" / name / "record.json")
 
 
 def run_state(root: Path, name: str) -> str:
@@ -215,22 +223,63 @@ def moved_attempts(root: Path, name: str) -> list[Path]:
     return sorted(path for path in folder.glob(f"{name}-attempt*") if path.is_dir()) if folder.is_dir() else []
 
 
-def check_rerun(root: Path, name: str, *, config_hash: str, source: dict) -> None:
-    """Refuse a rerun of an unfinished run that is not identical to it, or that exceeds the attempts allowed.
+def earlier_record(root: Path, name: str) -> dict | None:
+    """The record of the latest earlier attempt of ``name`` that has one: the run in place, else the last moved aside."""
+    for folder in [root / "runs" / name, *reversed(moved_attempts(root, name))]:
+        record = read_json_record(folder / "record.json")
+        if record is not None:
+            return record
+    return None
 
-    Identical means the configuration (hence the seeds and the data stream) and the code (``source_hash``) of the
-    unfinished attempt; ``MAX_ATTEMPTS`` attempts are allowed in all (the first run and two reruns).
+
+def check_rerun(root: Path, name: str, *, config_hash: str, source: dict) -> int:
+    """Refuse an attempt of ``name`` that exceeds the attempts allowed or is not identical to the one before it.
+
+    Returns the number of the attempt that may start. The attempts used are those moved aside and the run in place, if
+    there is one; ``MAX_ATTEMPTS`` are allowed in all (the first run and two reruns). Identical means the configuration
+    (hence the seeds and the data stream) and the code (``source_hash``) of the latest earlier attempt, wherever it is:
+    in place, or moved aside by a rerun that stopped before its child had started. By induction every attempt equals
+    the first.
     """
-    number = len(moved_attempts(root, name)) + 1  # the attempt that is unfinished
-    require(number < MAX_ATTEMPTS, f"run {name} has used {number} of {MAX_ATTEMPTS} attempts: the registered rule "
+    used = len(moved_attempts(root, name)) + int((root / "runs" / name).is_dir())
+    require(used < MAX_ATTEMPTS, f"run {name} has used {used} of {MAX_ATTEMPTS} attempts: the registered rule "
             "allows two identical reruns; report it to the orchestrator")
-    record = read_record(root, name)
-    if record is not None:  # a record exists once the run had started; the rerun must not differ from it
+    record = earlier_record(root, name)
+    if record is not None:  # a record exists once an attempt had started; the next one must not differ from it
         require(record.get("config_hash") == config_hash,
-                f"run {name}: the configuration differs from the unfinished attempt; a rerun must be identical")
+                f"run {name}: the configuration differs from the earlier attempt; a rerun must be identical")
         require(record.get("source", {}).get("source_hash") == source["source_hash"],
-                f"run {name}: the code differs from the unfinished attempt; a rerun must use identical code "
+                f"run {name}: the code differs from the earlier attempt; a rerun must use identical code "
                 "(submit it at the same --commit)")
+    return used + 1
+
+
+def silent_seconds(root: Path, name: str) -> float:
+    """Seconds since anything in the run's directory or its child's log was last written."""
+    out = root / "runs" / name
+    newest = 0.0
+    for path in [out, root / "logs" / f"{name}.log", *out.rglob("*")]:
+        try:
+            newest = max(newest, path.stat().st_mtime)
+        except FileNotFoundError:
+            pass
+    return max(0.0, time.time() - newest)
+
+
+def require_ended(root: Path, name: str) -> None:
+    """Refuse to train an unfinished run again while its job may still be running.
+
+    A child that failed has recorded the failure and is gone. A run still marked "running" (or whose record is being
+    written) has ended only if nothing touched it for ``QUIET_SECONDS``: a live run appends to ``train_log.jsonl``
+    every few seconds. Moving a live run aside would start a second child while the first one goes on writing into the
+    new directory.
+    """
+    record = read_record(root, name)
+    if record is not None and record.get("status") == "failed":
+        return
+    silent = silent_seconds(root, name)
+    require(silent >= QUIET_SECONDS, f"run {name} was written to {silent:.0f} s ago: its job may still be running; "
+            f"check qstat and train it again only after the job has ended (and {QUIET_SECONDS} s of silence)")
 
 
 def move_aside(root: Path, name: str) -> Path:
@@ -260,9 +309,8 @@ def train_one(design: dict, root: Path, name: str, *, device: str, steps: int | 
     """Train one registered run into ``root/runs/<name>``; the record holds its status, attempt and seals."""
     run = next(row for row in planned_runs() if row["name"] == name)
     config = make_config(design, run["writer"], run["seed"], run["arm"], device=device, steps=steps)
-    attempt = len(moved_attempts(root, name)) + 1
-    require(attempt <= MAX_ATTEMPTS, f"run {name} has used its {MAX_ATTEMPTS} attempts")
     source = source_metadata()
+    attempt = check_rerun(root, name, config_hash=stable_hash(config), source=source)  # before anything is created
     out = root / "runs" / name
     out.mkdir(parents=True, exist_ok=False)
     write_json(out / "config.json", dict(config=config, config_hash=stable_hash(config)))
@@ -324,7 +372,8 @@ def schedule(names: list[str], procs: int, design_path: Path, root: Path, *, dev
 
     By default the first child that exits non-zero stops everything (``ValueError``). With ``fatal``, a function
     of the run name that is called after a non-zero exit, only a failure for which it returns true stops everything;
-    the other children go on and the caller reads their records.
+    the other children go on and the caller reads their records. A child that cannot be started (``OSError``) stops
+    everything as well.
     """
     require(procs >= 1, "procs must be positive")
     pending, running, codes = list(names), {}, {}
@@ -340,7 +389,10 @@ def schedule(names: list[str], procs: int, design_path: Path, root: Path, *, dev
                             f"run {name} exited {code}; see {root / 'logs' / (name + '.log')}")
             while pending and len(running) < procs:
                 name = pending.pop(0)
-                running[name] = start_child(name, design_path, root, device=device, steps=steps)
+                try:
+                    running[name] = start_child(name, design_path, root, device=device, steps=steps)
+                except OSError as error:  # for example the log of a run that another job has just started
+                    raise ValueError(f"run {name} could not be started: {error}") from error
             if running:
                 time.sleep(POLL_SECONDS)
     finally:
@@ -417,25 +469,44 @@ def group_samples(samples: dict, writer: str, arm: str, seeds=SEEDS) -> dict:
             "B4": {s: samples[reference_name(writer, s)] for s in seeds}}
 
 
+def registered_record(design: dict, root: Path, row: dict) -> dict:
+    """The record of a final run (complete, or a registered failure), after checking it is the registered run."""
+    record = read_record(root, row["name"])
+    config = make_config(design, row["writer"], row["seed"], row["arm"],
+                         device=record.get("runtime", {}).get("device", "cpu"))
+    require(record.get("config_hash") == stable_hash(config) and record.get("steps") == design["training"]["steps"],
+            f"run {row['name']} is not a registered run: its configuration or steps differ from the locked design")
+    return record
+
+
 def final_states(design: dict, root: Path) -> dict[str, str]:
     """State of every registered run for the evaluation: ``complete``, or ``training_failure`` (T1/T2 only).
 
     Every T0 run must be complete (a T0 failure stops the study: ``far`` has no reference) and every T1/T2 run must
-    be complete or a registered training failure; every record must belong to the registered configuration.
-    Anything else is refused, and this runs before the confirmation set is opened.
+    be complete or a registered training failure; every record must belong to the registered configuration, the
+    checkpoint of a complete run must be unchanged, and all 18 runs must have been trained with the same code (the
+    registered T0 is "retrained under the same code version"). Anything else is refused, and this runs before the
+    confirmation set is opened.
     """
-    states = {}
+    stopped = t0_failures(root)  # first: an unfinished run earlier in the plan must not hide a T0 failure
+    if stopped:
+        raise ValueError(study_stops(stopped[0]))
+    states, codes = {}, set()
     for row in planned_runs():
         name, state = row["name"], run_state(root, row["name"])
-        require(not (row["arm"] == "T0" and state == "training_failure"), study_stops(name))
         require(state in ("complete", "training_failure"),
                 f"run {name} is {state}: a run must be complete or a registered training failure (a T1/T2 run with a "
                 "non-finite loss); an unfinished run is trained again with `train --rerun-incomplete`, at most twice")
-        record = read_record(root, name)
-        config = make_config(design, row["writer"], row["seed"], row["arm"], device=record["runtime"]["device"])
-        require(record["config_hash"] == stable_hash(config) and record["steps"] == design["training"]["steps"],
-                f"run {name} is not a registered run")
+        record = registered_record(design, root, row)
+        if state == "complete":
+            path = root / "runs" / name / "checkpoint.pt"
+            require(path.is_file() and digest_checkpoint(path) == record.get("checkpoint_blake2b"),
+                    f"checkpoint missing or changed: {name}")
+        codes.add(record.get("source", {}).get("source_hash"))
         states[name] = state
+    require(len(codes) == 1 and None not in codes,
+            "the registered runs were not all trained with the same code (one source_hash is required): the "
+            "registered T0 is 'retrained under the same code version'; report it to the orchestrator")
     return states
 
 
@@ -459,10 +530,12 @@ def select_names(args: argparse.Namespace) -> list[str]:
 def stage_train(args: argparse.Namespace) -> int:
     """Train the selected runs that have no final state; leave complete runs and registered failures as they are.
 
-    A run is final when it is complete or a registered training failure (a non-finite loss: no retry). An unfinished
-    run (killed by walltime, a node or I/O fault, or failed for another reason) is trained again, identically, only
-    with ``--rerun-incomplete`` (its job must have ended) and at most twice. A T0 run with a non-finite loss stops the
-    study: this stage refuses to start anything else. The stage ends with an error unless every selected run is final.
+    A run is final when it is complete or a registered training failure (a non-finite loss: no retry); a final record
+    must be the registered run. An unfinished run (killed by walltime, a node or I/O fault, or failed for another
+    reason) is trained again, identically, only with ``--rerun-incomplete`` (its job must have ended: a run still marked
+    "running" must have been silent for ``QUIET_SECONDS``) and at most twice; each attempt is compared with the one
+    before it. A T0 run with a non-finite loss stops the study: this stage refuses to start anything else. The stage
+    ends with an error unless every selected run is final.
     """
     root = absolute_path(args.root, "--root")
     design_path = Path(args.design).resolve()
@@ -477,22 +550,30 @@ def stage_train(args: argparse.Namespace) -> int:
     if stopped:
         raise ValueError(study_stops(stopped[0]))
     source = source_metadata()
+    rows = {row["name"]: row for row in planned_runs()}
     states = {name: run_state(root, name) for name in names}
-    reruns = [name for name in names if states[name] == "incomplete"]
-    require(not reruns or args.rerun_incomplete,
-            f"unfinished runs {reruns}: if their job has ended, train them again, identically, with "
+    for name in names:
+        if states[name] in ("complete", "training_failure"):
+            registered_record(design, root, rows[name])  # a final record must be the registered run, as evaluate needs
+    unfinished_runs = [name for name in names if states[name] == "incomplete"]
+    require(not unfinished_runs or args.rerun_incomplete,
+            f"unfinished runs {unfinished_runs}: if their job has ended, train them again, identically, with "
             "--rerun-incomplete (at most twice per run)")
-    for name in reruns:
-        run = next(row for row in planned_runs() if row["name"] == name)
-        config = make_config(design, run["writer"], run["seed"], run["arm"], device=args.device)
-        check_rerun(root, name, config_hash=stable_hash(config), source=source)
+    for name in unfinished_runs:
+        require_ended(root, name)
+    for name in names:  # every attempt after the first is compared with the one before it, also after an aborted rerun
+        if states[name] in ("missing", "incomplete"):
+            row = rows[name]
+            config = make_config(design, row["writer"], row["seed"], row["arm"], device=args.device)
+            check_rerun(root, name, config_hash=stable_hash(config), source=source)
     started = time.perf_counter()
-    for name in reruns:
+    for name in unfinished_runs:
         move_aside(root, name)
     for name in names:
         if states[name] == "missing":
             retire_stale_log(root, name)
     todo = [name for name in names if states[name] in ("missing", "incomplete")]
+    reruns = [name for name in todo if moved_attempts(root, name)]  # attempt 2 or 3, whoever moved the earlier ones
     manifest = dict(status="running", design_hash=stable_hash(design), design_path=str(design_path),
                     design_lock_commit=args.design_commit, names=names, started=todo, reruns=reruns,
                     final_before=[name for name in names if name not in todo], procs=args.procs, started_at=now(),
@@ -632,8 +713,9 @@ def main(argv: list[str] | None = None) -> int:
     train_stage.add_argument("--procs", type=int, default=9)
     train_stage.add_argument("--label", default="main", help="name of this job's manifest (one label per job)")
     train_stage.add_argument("--rerun-incomplete", action="store_true",
-                             help="train unfinished runs again, identically (their job must have ended; at most "
-                                  "twice per run); without it an unfinished run is an error")
+                             help="train unfinished runs again, identically (their job must have ended: a run still "
+                                  "marked running must have been silent for 300 s; at most twice per run); without it "
+                                  "an unfinished run is an error")
     train_stage.add_argument("--writers", nargs="+", default=list(WRITERS), choices=WRITERS)
     train_stage.add_argument("--arms", nargs="+", default=list(tsm.ARMS), choices=tsm.ARMS)
     train_stage.add_argument("--seeds", nargs="+", type=int, default=list(SEEDS), choices=SEEDS)
