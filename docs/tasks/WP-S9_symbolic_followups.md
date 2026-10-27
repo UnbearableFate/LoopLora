@@ -54,3 +54,18 @@ questions a–e. Two answers differ from what the code does now:
 Add tests for both and update the command sheet. For IVD, CVH, UNS and NCR, the same operational rule applies to an
 interrupted evaluation job (restart from scratch, partial output moved aside unread); note it in the sheet.
 `py_compile` and pyflakes; commit on wp/sym; no merge, no push. Done line: `WP-S9 step 1c done`.
+
+## Step 1d (now, no compute): TSM Clarification C2
+`docs/prereg/TSM.md` gained Clarification C2 (master d488b78; identical on wp/sym a5c093a). It answers your step-1c
+points 1–6. Code changes:
+1. `train --max-attempts N`, default 3.
+2. Allocation failures count as infrastructure failures: CUDA out-of-memory, cuBLAS/cuDNN allocation failures, host
+   `MemoryError`. Other CUDA runtime errors stay code defects.
+3. `evaluate --restart-interrupted --new-evaluation-code` permits a restart whose evaluation `source_hash` differs from
+   the interrupted attempt's. The 18 training records must still share one `source_hash`, and the manifest records both
+   hashes.
+4. Add tests and sheet notes.
+
+Points 2, 4 and 6 need no code beyond what C2 states. `py_compile` and pyflakes; commit on wp/sym; no merge, no push.
+After this the TSM failure protocol is closed: any further edge case is decided by the orchestrator when it occurs and
+recorded in the report. Done line: `WP-S9 step 1d done`.
