@@ -402,6 +402,53 @@ def test_entity_hits_restrict_the_argmax_to_the_entity_name_tokens():
         assert (rfx.entity_hits(logits, ids, answer_entity) | ~full).all()
 
 
+def tied_logits(top, vocabulary=16):
+    """[1, 1, vocabulary] logits with an exact tie of 2. at the tokens `top` and zeros elsewhere."""
+    logits = torch.zeros(1, 1, vocabulary)
+    logits[0, 0, torch.tensor(list(top), dtype=torch.long)] = 2.
+    return logits
+
+
+def test_entity_hits_break_exact_ties_like_the_full_vocabulary_argmax_not_by_entity_index():
+    # Entity i has the name token entity_ids[i]; the entity order is not the token order (entity 0 = token 7 > entity 3 = 5).
+    entity_ids = torch.tensor([7, 3, 11, 5])
+
+    def hit_and_full_hit(top, answer):
+        logits, answers = tied_logits(top), torch.tensor([[answer]])
+        return bool(rfx.entity_hits(logits, entity_ids, answers)), bool(logits.argmax(-1) == entity_ids[answers])
+
+    # A tie between the answer (entity 3, token 5) and entity 0 (the lower entity index, the higher token id): the full
+    # argmax takes the lower token id, the answer, and so does the restricted one (by entity index it would take entity 0).
+    assert hit_and_full_hit((7, 5), 3) == (True, True)
+    # The same tie with the answer on the other side (entity 0, token 7): both argmaxes take token 5, entity 3.
+    assert hit_and_full_hit((7, 5), 0) == (False, False)
+    # A three-way tie goes to the lowest token id of the three (token 5, entity 3), whichever entity is the answer.
+    assert [hit_and_full_hit((7, 11, 5), answer) for answer in range(4)] == [(False, False)] * 3 + [(True, True)]
+    # A tie with a non-entity token: the full argmax may take it (token 2 is lower: a miss), the restricted one ignores it.
+    assert hit_and_full_hit((5, 2), 3) == (True, False)
+    assert hit_and_full_hit((5, 9), 3) == (True, True)  # the non-entity token is higher: the answer wins both
+    # All logits equal: the full argmax is token 0, no entity; the restricted one takes the lowest entity token (3, entity 1).
+    assert [hit_and_full_hit((), answer) for answer in range(4)] == [(False, False), (True, False), (False, False),
+                                                                      (False, False)]
+
+
+def test_a_full_vocabulary_hit_is_an_entity_restricted_hit_even_with_ties():
+    g = gen('entity-ties')
+    logits = torch.randint(0, 4, (64, 3, 40), generator=g).float()  # four levels: almost every row ties at its maximum
+    ids = torch.randperm(40, generator=g)[:25]  # 25 entities whose order is not the token order
+    entity_logits = logits.index_select(-1, ids)
+    at_max = entity_logits == entity_logits.max(-1, keepdim=True).values
+    lowest = torch.where(at_max, ids, torch.full_like(ids, 10 ** 6)).min(-1).values  # the lowest token id at the maximum
+    assert (at_max.sum(-1) > 1).float().mean() > .9
+    differs_from_entity_index_rule = False
+    for entity in range(25):
+        hits = rfx.entity_hits(logits, ids, torch.full((64, 3), entity, dtype=torch.long))
+        assert (hits == (lowest == ids[entity])).all()
+        assert (hits | ~(logits.argmax(-1) == ids[entity])).all()
+        differs_from_entity_index_rule |= bool((hits != (entity_logits.argmax(-1) == entity)).any())
+    assert differs_from_entity_index_rule  # the test can tell the two tie rules apart
+
+
 def guard_record(rows, deficit=None, gain=0, queries=1):
     """A run_checkpoint-like record: every variant's full argmax hits a third of the rows; its entity-restricted argmax
     loses deficit[variant] of those rows and wins `gain` others."""
@@ -411,17 +458,17 @@ def guard_record(rows, deficit=None, gain=0, queries=1):
                                full_hit_entity_miss=deficit.get(v, 0)) for v in rfx.VARIANTS})
 
 
-def test_the_entity_em_guard_tolerates_ties_but_not_a_wrong_restricted_set():
+def test_the_entity_em_guard_allows_half_a_point_or_one_row_and_catches_a_wrong_restricted_set():
     one = lambda rows, deficit=None, gain=0: {'a': guard_record(rows, deficit, gain)}
     assert rfx.ENTITY_EM_SLACK == .005 and rfx.entity_em_failures(one(4000)) == []
-    # Ties may cost a few rows: 0.005 of 4,000 rows is 20 rows (an exact 0.5 pp deficit passes), 21 rows do not.
+    # The allowance is 0.005 of the rows: 20 of 4,000 (an exact 0.5 pp deficit passes), 21 are not.
     assert rfx.entity_em_failures(one(4000, {'delta/raw/asis': 20})) == []
     failed = rfx.entity_em_failures({**one(4000, {'delta/raw/asis': 21}), 'b': guard_record(4000)})
     assert failed == [dict(label='a', variant='delta/raw/asis', rows=4000, lm_em=1333 / 4000, lm_em_entity=1312 / 4000,
                            full_hit_entity_miss=21)]
     # The restricted set is easier than the full vocabulary when the full argmax lands on a non-entity token.
     assert rfx.entity_em_failures(one(4000, gain=400)) == []
-    # The 64-row smoke: one row is 1.6 pp, so one row of ties passes and two fail; from 200 rows on the slack is 0.005.
+    # The 64-row smoke: one row is 1.6 pp, so one row passes and two fail; from 200 rows on the allowance is 0.005 of the rows.
     assert rfx.entity_em_failures(one(64, {'clean': 1})) == []
     assert [f['variant'] for f in rfx.entity_em_failures(one(64, {'clean': 2, 'zero': 1}))] == ['clean']
     assert rfx.entity_em_failures(one(200, {'zero': 1})) == []

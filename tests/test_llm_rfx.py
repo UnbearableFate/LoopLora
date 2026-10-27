@@ -332,11 +332,16 @@ def test_run_checkpoint_smoke_on_the_tiny_model_is_finite_complete_and_evaluatio
     assert base['lm_nll'] == pytest.approx(float(F.cross_entropy(logits.float().flatten(0, 1), batch.answer_ids.flatten())),
                                            rel=1e-5)
     assert np.array_equal(samples['delta/raw/asis/correct'], correct)
-    # The entity-restricted EM: the argmax of the same logits over the 1,024 entity name tokens is the answer entity.
+    # The entity-restricted EM: the argmax of the same logits over the 1,024 entity name tokens is the answer entity, an exact
+    # tie going to the lowest token id as in the full-vocabulary argmax (the names sorted by token id, mapped back).
     names = torch.as_tensor(load_name_pool().token_ids[:experiment.config['task']['V']], device=logits.device)
-    entity_correct = (logits[..., names].argmax(-1) == torch.as_tensor(arrays.answer, device=logits.device)).flatten().cpu().numpy()
+    by_token = names.argsort()
+    winner = by_token[logits[..., names[by_token]].argmax(-1)]
+    entity_correct = (winner == torch.as_tensor(arrays.answer, device=logits.device)).flatten().cpu().numpy()
     assert np.array_equal(samples['delta/raw/asis/entity_correct'], entity_correct)
     assert base['lm_em_entity'] == pytest.approx(float(entity_correct.mean()), abs=1e-12)
+    # With that tie rule a full-vocabulary hit is always an entity-restricted hit, so a correct glue loses no row.
+    assert all(cell['full_hit_entity_miss'] == 0 for cell in record['cells'].values())
     assert all(len(samples[f'{v}/{k}']) == 8 for v in rfx.VARIANTS for k in ('correct', 'entity_correct', 'nll', 'err', 'head'))
     # Write order: four permutations of the same writes, tabulated by the permuted write age of the queried fact.
     order = record['write_order']
@@ -586,13 +591,18 @@ def scripted_top_tokens():
     names = lambda answer: torch.as_tensor(load_name_pool().token_ids, device=answer.device)
     outsider = lambda answer: torch.full_like(answer, next(t for t in range(151936) if t not in set(load_name_pool().token_ids)))
     return {
-        'the answer': (lambda answer, entity: answer, 1., 1.),
-        'a token that is no entity name': (lambda answer, entity: outsider(answer), 0., 1.),  # the answer is second among entities
-        'another entity': (lambda answer, entity: names(answer)[(entity + 1) % 1024], 0., 0.),
+        'the answer': (lambda answer, entity: (answer,), 1., 1.),
+        'a token that is no entity name': (lambda answer, entity: (outsider(answer),), 0., 1.),  # the answer is second among entities
+        'another entity': (lambda answer, entity: (names(answer)[(entity + 1) % 1024],), 0., 0.),
+        # An exact tie between the answer and the entity of the highest token id among entities 0..answer entity (the answer
+        # itself when it is that entity): both argmaxes take the lower token id, the answer. Broken by entity index, the
+        # restricted argmax would take the other entity, which has the lower index, in 1,018 of the 1,024 answer entities.
+        'a tie with an entity of a lower index and a higher token id': (
+            lambda answer, entity: (answer, names(answer).cummax(0).values[entity]), 1., 1.),
     }
 
 
-@pytest.mark.parametrize('scenario', ['the answer', 'a token that is no entity name', 'another entity'])
+@pytest.mark.parametrize('scenario', list(scripted_top_tokens()))
 def test_entity_restricted_em_reads_the_logits_over_the_name_tokens_not_the_model(experiment, monkeypatch, scenario):
     # The tiny random model answers at chance, which would leave the entity glue of `evaluate` untested: script the logits.
     top, em, entity_em = scripted_top_tokens()[scenario]
@@ -601,7 +611,8 @@ def test_entity_restricted_em_reads_the_logits_over_the_name_tokens_not_the_mode
     def scripted(answer, entity):
         logits = torch.zeros(*answer.shape, vocabulary['size'], device=answer.device)
         logits.scatter_(-1, answer[..., None], 5.)
-        logits.scatter_(-1, top(answer, entity)[..., None], 10.)
+        for token in top(answer, entity):
+            logits.scatter_(-1, token[..., None], 10.)
         return logits
 
     def observe(experiment_, batch):

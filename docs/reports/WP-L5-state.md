@@ -1,13 +1,15 @@
-# WP-L5 and WP-L7 state: DPFP option, least-squares stores and the read-failure factorial (steps 1, 1b and 1c done; nothing executed)
+# WP-L5 and WP-L7 state: DPFP option, least-squares stores and the read-failure factorial (steps 1, 1b, 1c and 1d done; nothing executed)
 
 Branch `wp/llm`. WP-L5 step 1 (DPFP) is `34028dd`, `742d3bc`, `8eb24ab` on master `6da6330`; master was merged in as
 `77373ea` (P1-L pipeline from wp/p1l, follow-up plan), `cbc8389` (follow-up tasks) and `1485bd9` (the registered RFX and
 LSQ, the step-1b task); step 1b is `17b27c2`. Step 1c (task section "Step 1c" of `docs/tasks/WP-L7_rfx_lsq.md` on master
-`9c6364b`, from the static review `docs/review/static_2026-10-27/rfxlsq.md`, which found no defect in `17b27c2`) is the
-`WP-L7: step 1c ...` commit on top of `17b27c2`; master `9c6364b` is not merged into wp/llm. **Every step-2 command must
-use the full hash of a commit that contains the registrations and the step-1b and step-1c code: the last `WP-L7: step 1c
-...` commit on wp/llm or its merge into master (`17b27c2` lacks the RFX entity-EM guard and the two release scripts). The
-step-1 commits (up to `9588998`) implement the drafts' decision rules, not the registered ones.**
+`9c6364b`, from the static review `docs/review/static_2026-10-27/rfxlsq.md`, which found no defect in `17b27c2`) is
+`0a3048a`. Step 1d (section "Step 1d" on master `4f22c3c`, from the second review `docs/review/static_2026-10-27/release.md`,
+which found no defect in the release path) is the `WP-L7: step 1d ...` commit on top of `0a3048a`; neither master commit
+is merged into wp/llm. **Every step-2 command must use the full hash of a commit that contains the registrations and the
+step-1b, 1c and 1d code: the last `WP-L7: step 1d ...` commit on wp/llm or its merge into master (`0a3048a` breaks
+entity-restricted ties by entity index and has no reload check; `17b27c2` also lacks the entity-EM guard and the two
+release scripts). The step-1 commits (up to `9588998`) implement the drafts' decision rules, not the registered ones.**
 After the merges the DPFP files still compile (`py_compile`, `pyflakes`), and master's `src/` changes since `6da6330` touch
 only the `oracle_random` rank-128 allowance (`llm/config.py`, `llm/oracle.py`, `llm/train.py`, oracle branches only), not
 the learned-writer path that the DPFP-off reproduction test covers.
@@ -26,8 +28,13 @@ source. Step 1c (a fail-closed entity-restricted EM guard in the RFX run, O1; th
 O2; the registry and release checks they need moved into torch-free modules) is statically checked the same way and its
 pure tests (`tests/test_release_scripts.py`, the guard test of `tests/test_rfx.py`) were executed torch-free with a
 stand-in test runner on the login node (80 cases passed, the one test that needs torch was skipped), and killed all 27 and
-all 9 deliberate mutants of the release code and the guard. **No torch code, `pytest` or run has been executed**: the login
-node forbids it and compute is unavailable until 2026-10-28 22:00 JST. Not merged, not pushed. Binding designs:
+all 9 deliberate mutants of the release code and the guard. Step 1d (the restricted argmax breaks ties like the full-vocabulary
+one, F1; the reload check of the smoke exports, F2) is statically checked the same way; the new pure tie tests of
+`tests/test_rfx.py` and the control flow of `scripts/check_smoke_reload.py` were executed torch-free against stand-ins for
+torch and for the compute modules (the tie tests kill the step-1c rule and six other mutants of `entity_hits`; every check
+of the script is load-bearing), which tests the logic and not torch's or the loaders' behavior.
+**No torch code, `pytest` or run has been executed**: the login node forbids it and compute is unavailable until
+2026-10-28 22:00 JST. Not merged, not pushed. Binding designs:
 `docs/prereg/DPFP.md` and, registered 2026-10-27 11:05 JST before any RFX, LSQ or DPFP result, `docs/prereg/RFX.md` and
 `docs/prereg/LSQ.md`.
 
@@ -47,6 +54,7 @@ DPFP is `AdapterConfig.dpfp_nu` (default 0 = off). With nu >= 1 the write key an
 | `src/looplora/llm/dpfp.py` (new) | arms `D32-3`, `D128-1`, `D128-3` (`ARMS`, `SPECS` live in `dpfp_release.py` since step 1c); `configuration(arm, steps, E=16, smoke=False)` = `read_fix.configuration('R', ...)` at rank 32/128/128 plus `model.dpfp_nu` and a `dpfp` block; `DPFPExperiment(ReadFixExperiment)` |
 | `src/looplora/llm/dpfp_run.py` (new) | one arm per job: `python -m looplora.llm.dpfp_run --arm ARM --out ROOT (--steps N --smoke \| --schedule release.json) [--e8-decision lock.json]`; reuses `read_fix_run.fit` unchanged; record adds rank, nu, key_dim, state bytes, peak CUDA memory; `choose` (registered rule), `load_inference`; `scheduled_steps` (an E16 release must fix all three arms at once; an E8 release names the retrained arm) and `eligible_e8` are imported from `dpfp_release.py` |
 | `src/looplora/llm/dpfp_release.py`, `scripts/prepare_dpfp_release.py` (new, step 1c) | torch-free: the arm registry, `scheduled_steps` and `eligible_e8` (moved verbatim out of `dpfp.py` and `dpfp_run.py`, so the runner and the login-node script share them); the script writes the DPFP release from the three smokes (see the commands below) |
+| `scripts/check_smoke_reload.py` (new, step 1d; compute only, DPFP and LSQ) | the reload gate of one smoke arm, run before the release is committed (below): reloads `ARM/writer.pt` with the study's `load_inference`, compares configs, validates 100 episodes and compares the predictions with the smoke's last evaluation |
 | `tests/test_dpfp.py`, `tests/test_llm_dpfp.py`, `tests/test_llm_dpfp_repro.py`, `tests/assets/memory_before_dpfp.py` (new) | see below |
 | `docs/notation.md` (section 9), `configs/p1l/README.md` | option documented; this file |
 
@@ -118,9 +126,9 @@ for a in ('D32-3','D128-1','D128-3'):
     print(a,r['status'],t['steady_step_mean_seconds'],t['step_p95_seconds'],
           max(v['seconds'] for v in t['metrics'].values()),r['memory'])"
 ```
-Release (later; login node, no torch, no GPU: the script is standard library only, so the system `python3` with
-`PYTHONPATH=src` is enough). When the three smokes are complete, one command writes and checks the release, which is then
-committed:
+Release and reload check (later, after the three smokes have completed; nothing is committed before the check passed).
+**1. Release, on the login node** (no torch, no GPU: the script is standard library only, so the system `python3` with
+`PYTHONPATH=src` is enough). It writes the file; do not commit it yet:
 ```sh
 PYTHONPATH=src python3 scripts/prepare_dpfp_release.py --root $RUNS/smoke --out reports/p1l-dpfp/release.json
 ```
@@ -129,15 +137,35 @@ clean 10% smokes of the right arm at one common full 40-hex commit (the `science
 `E: 16`, `steps_by_arm` (WP-L4's rule: the largest multiple of 5 that fits the 2 h job, from the smoke's step time and the
 ten-fold 100-episode evaluation time), the five evaluation steps, the sizing and the smoke timings. Before writing, it
 checks the release with the runner's own `dpfp_release.scheduled_steps`, and it refuses to overwrite an existing file
-(`FileExistsError`; a frozen release is replaced by nobody). Science, per arm: `scripts/submit.py --name r-dpfp-ARM --queue
-regular-g --nodes 1 --walltime 02:00:00 --scale-up docs/prereg/DPFP.md --commit <science_commit> -- -m looplora.llm.dpfp_run
---arm ARM --schedule RELEASE.json --out $RUNS/arms`.
+(`FileExistsError`; a committed release is replaced by nobody).
+**2. Reload check, one short compute job per smoke arm** (step 1d; about 3 minutes and 0.05 node-hours each, not
+measured; `scripts/check_smoke_reload.py`, choice 10 below): the release script cannot load an export, and three 2 h jobs
+must not depend on one that cannot be reloaded.
+```sh
+REL=/work/xg24i002/x10041/LoopLora/reports/p1l-dpfp/release.json
+SC=$(python3 -c "import json;print(json.load(open('$REL'))['science_commit'])")
+for ARM in D32-3 D128-1 D128-3; do
+  scripts/submit.py --name c-dpfp-$ARM --queue regular-g --nodes 1 --walltime 00:10:00 --commit "$SC" -- \
+    scripts/check_smoke_reload.py --release $REL --root $RUNS/smoke --arm $ARM
+done
+# when the jobs have ended (no score is printed; a missing file is a failed check, the job log says why):
+python3 -c "
+import json
+for a in ('D32-3','D128-1','D128-3'):
+    print(json.load(open('$RUNS/smoke/export-check-%s/reload-check.json'%a)))"
+```
+**3. Commit the release only if all three passed.** If one failed, do not commit: delete the uncommitted release file (and
+`$RUNS/smoke/export-check-ARM` before a rerun), fix the cause (a smoke whose export does not reload is rerun in a new smoke
+root and the release is written again). Science, per arm: `scripts/submit.py --name r-dpfp-ARM --queue regular-g --nodes 1
+--walltime 02:00:00 --scale-up docs/prereg/DPFP.md --commit <science_commit> -- -m looplora.llm.dpfp_run --arm ARM
+--schedule RELEASE.json --out $RUNS/arms`.
 The conditional E8 retrain adds `--e8-decision LOCK.json` (the audited lock whose `choice` is `retry_e8` for that arm) to
-three things: the arm's own E8 smoke (`... dpfp_run --arm ARM --steps 2400 --smoke --e8-decision LOCK.json --out
+four things: the arm's own E8 smoke (`... dpfp_run --arm ARM --steps 2400 --smoke --e8-decision LOCK.json --out
 $RUNS/smoke-e8`; the release script requires the smoke's `task.E` to equal the release's `E`), its own release
 (`prepare_dpfp_release.py --root $RUNS/smoke-e8 --out reports/p1l-dpfp/release-e8.json --e8-decision LOCK.json`: `E: 8`,
-`steps_by_arm` naming that arm only) and its own `--out` root for the science run (the E16 arm folder `$RUNS/arms/ARM`
-already exists and the runner refuses to reuse it).
+`steps_by_arm` naming that arm only), its own reload check (`check_smoke_reload.py --release .../release-e8.json --root
+$RUNS/smoke-e8 --arm ARM`) and its own `--out` root for the science run (the E16 arm folder `$RUNS/arms/ARM` already exists
+and the runner refuses to reuse it).
 
 ## Choices where the prereg was silent
 1. Normalization is `x / max(||x||_2, eps)` with the existing eps = 1e-6, at write and read. phi_nu is quadratic, so a
@@ -172,7 +200,7 @@ already exists and the runner refuses to reuse it).
 - D128-3 stores 128 x 768 fp32 states (393 KB per episode, 128 query copies per batch); memory should be fine on a
   GH200 but is measured in the smoke record (`memory`).
 
-## WP-L7 steps 1, 1b and 1c: RFX and LSQ (implemented to the registered rules and statically checked; nothing executed)
+## WP-L7 steps 1, 1b, 1c and 1d: RFX and LSQ (implemented to the registered rules and statically checked; nothing executed)
 Task `docs/tasks/WP-L7_rfx_lsq.md`; designs `docs/prereg/RFX.md` and `docs/prereg/LSQ.md` (registered; they differ from the
 step-1 drafts, which the step-1b commits supersede). **RFX** is evaluation only: on the three frozen WP-L4 checkpoints
 (R-r128, R-r32, W5-r32) it replaces the read at each question's final token by delta/ridge x raw/unit/true-key reads (each as
@@ -197,7 +225,7 @@ verdict runs nothing; the arms RFX triggers are `lsq_arms` in `summary.json`.
 | `src/looplora/llm/lsq_release.py` (new, step 1c; the parts moved verbatim out of `lsq.py` and `lsq_run.py`) | torch-free: arms in candidate order L32-U, L32-K4, L32-RG, L128-U, L128-K4, L128-RG, `SPECS`, `ETA_BOUNDS`, `lsq_eta` (the clip), `check_arms` (per rank nothing, U alone, or K4 with RG), `release_arms` (the release's `arms` are RFX's `lsq_arms`), `release_eta` (RG arms only; enforces the clipped RFX eta), `scheduled_steps`, `eligible_e8`; the runner and `scripts/prepare_lsq_release.py` share them |
 | `src/looplora/llm/release.py` (new, step 1c) | torch-free helpers of both release scripts: `smoke_timing` (checks the identity of a 10% smoke record and reads its timings, never a score), `largest_schedule` (stdlib copy of WP-L4's rule), `schedule_fields` (step counts, five evaluation marks, sizing, `science_commit`, smoke block), `write_new` (refuses to overwrite) |
 | `scripts/prepare_lsq_release.py`, `scripts/prepare_dpfp_release.py` (new, step 1c) | the immutable schedule releases, standard library only (login node: `PYTHONPATH=src python3 scripts/...`); commands below |
-| `src/looplora/llm/rfx.py`, `rfx_run.py` (new) | `FinalRead` (instance-level hook: records, and optionally replaces, the final-token read; no change to shared code), `observe`, ridge/gain/eta fits on the fitting set, refit decoder, entity-restricted EM (`entity_hits`: argmax over `load_name_pool().token_ids[:V]`, per variant; each cell also records `full_hit_entity_miss`, the rows with a full-vocabulary hit and a restricted miss; `entity_em_failures` is the guard, step 1c), write age and order, conditioning, `classify` (the registered verdict tree and every rescue flag), `lsq_arms`, `storage_ranks`, `load_checkpoint`; runner `python -m looplora.llm.rfx_run --out DIR [--smoke] [--labels L ...]` (one job, three checkpoints, refuses a checkpoint whose blake2b-128 digests differ from `rfx_run.DIGESTS` before creating anything; `summary.json` has `verdicts`, `rescue`, `lsq_arms`, and `rfx_eta_by_rank` and `eta_by_rank` for the ranks with a storage verdict only, built by `decisions`, and `entity_em_guard` = `{slack, passed: true}`; if the guard fails the per-label JSON and samples are written and the job raises before `summary.json`, so a summary exists only for a run that passed it) |
+| `src/looplora/llm/rfx.py`, `rfx_run.py` (new) | `FinalRead` (instance-level hook: records, and optionally replaces, the final-token read; no change to shared code), `observe`, ridge/gain/eta fits on the fitting set, refit decoder, entity-restricted EM (`entity_hits`: argmax over the name tokens `load_name_pool().token_ids[:V]` with every other token masked to -inf, so an exact tie goes to the lowest token id as in the full-vocabulary argmax and the winner is mapped back to its entity index (step 1d), per variant; each cell also records `full_hit_entity_miss`, the rows with a full-vocabulary hit and a restricted miss; `entity_em_failures` is the guard, step 1c), write age and order, conditioning, `classify` (the registered verdict tree and every rescue flag), `lsq_arms`, `storage_ranks`, `load_checkpoint`; runner `python -m looplora.llm.rfx_run --out DIR [--smoke] [--labels L ...]` (one job, three checkpoints, refuses a checkpoint whose blake2b-128 digests differ from `rfx_run.DIGESTS` before creating anything; `summary.json` has `verdicts`, `rescue`, `lsq_arms`, and `rfx_eta_by_rank` and `eta_by_rank` for the ranks with a storage verdict only, built by `decisions`, and `entity_em_guard` = `{slack, passed: true}`; if the guard fails the per-label JSON and samples are written and the job raises before `summary.json`, so a summary exists only for a run that passed it) |
 | `tests/test_lsq.py`, `tests/test_llm_lsq.py`, `tests/test_rfx.py`, `tests/test_llm_rfx.py` (new) | see below |
 | `docs/prereg/RFX.md`, `docs/prereg/LSQ.md` (registered by the orchestrator, not edited here), `docs/notation.md` (section 10), `configs/p1l/README.md` | decision rules and node-hour estimates; options documented; this file |
 
@@ -232,7 +260,11 @@ ranks 32 and 128) runs through the same flags-off path, so one pass covers DPFP-
   flags and the decoder flag against a transcription of the rule, every rescue flag recorded, both halves of the rescue
   test, exact 10 pp and 0.5 boundaries, baselines = better of as-is and gain-fitted, the decoder against the
   entity-restricted EM); `lsq_arms` (all verdict pairs, candidate order, W5-r32 inert) and `storage_ranks`;
-  `entity_hits`; **the entity-EM guard** (`entity_em_failures`: a deficit of the restricted EM of 20 rows passes and of 21
+  `entity_hits` and **its tie rule** (exact ties between the answer and an entity with a lower entity index and a higher token
+  id, the mirror image, a three-way tie, a tie with a non-entity token, all-equal logits; a random four-level grid in which
+  almost every row ties: the winner is the lowest token id at the entity maximum, a full-vocabulary hit is always a
+  restricted hit, and the entity-index rule of step 1c would decide some rows differently); **the entity-EM guard**
+  (`entity_em_failures`: a deficit of the restricted EM of 20 rows passes and of 21
   fails at 4,000 rows, 1 row passes and 2 fail at the 64-row smoke, the 200-row boundary where 0.5 pp equals one row,
   queries per episode count as rows, a wrong restricted set and NaN fail, the failure carries the counts); registered
   data ranges and seeds.
@@ -241,14 +273,15 @@ ranks 32 and 128) runs through the same flags-off path, so one pass covers DPFP-
   guard), construction guards, cleanup and double interception; observation vs the deployed read, cached store, true key and
   answer; re-inserting the recorded read is bitwise the identity; only the replaced rows' last position of the adapted
   projection changes; ragged question masks; `run_checkpoint` smoke (finite JSON, instrumentation checks, deployed EM, NLL
-  and entity-restricted EM equal the model's own forward, rescue flags, evaluation only: parameters unchanged, no
-  gradients); `load_checkpoint` for both export formats (and its refusals, including an arm-U export); `checkpoint_identity`,
+  and entity-restricted EM (names sorted by token id, mapped back) equal the model's own forward, `full_hit_entity_miss` 0
+  in every cell, rescue flags, evaluation only: parameters unchanged, no gradients); `load_checkpoint` for both export formats (and its refusals, including an arm-U export); `checkpoint_identity`,
   the registered digests and the refusal of a mismatch; `rfx_run.decisions` (arms, and etas only for storage ranks);
   `rfx_run.run` end to end on two tiny exports (records `entity_em_guard`); the entity-restricted EM against scripted
   logits (the tiny model hits entities only at chance, so the glue that builds `entity_ids` and the answer entity is
-  checked with logits whose top token is the answer, a non-entity token with the answer second, or another entity: the
-  counts must be (1, 1), (0, 1) and (0, 0), `full_hit_entity_miss` 0); a failed guard writes every per-label record and
-  no `summary.json`.
+  checked with logits whose top token is the answer, a non-entity token with the answer second, another entity, or an exact
+  tie between the answer and an entity of a lower index and a higher token id, which the entity-index rule of step 1c would
+  take in 1,018 of the 1,024 answer entities: the counts must be (1, 1), (0, 1), (0, 0) and (1, 1), `full_hit_entity_miss`
+  0); a failed guard writes every per-label record and no `summary.json`.
 - `tests/test_release_scripts.py` (stdlib and pytest; only the parity test imports torch; step 1c): both scripts for every
   arm set RFX can trigger (six for LSQ) and for E16 and E8: the release holds the arms, both eta maps and the step
   counts the runner accepts, the step counts equal an independent transcription of WP-L4's sizing rule (largest
@@ -266,9 +299,15 @@ ranks 32 and 128) runs through the same flags-off path, so one pass covers DPFP-
 1. RFX applies the fitted scalar gain to every cell; the baseline is the better of the as-is and gain-fitted deployed
    reads (registered). `rescue` records a flag for all 14 variants plus `decoder_refit` (a superset of the five decisive
    cells), so the report can show every rescue.
-2. The entity-restricted EM takes the argmax of the logits over the 1,024 name tokens; ties go to the lower entity index,
-   the full-vocabulary EM to the lower token id, so with exact bf16 ties a row can count for the latter and not the former.
-   Step 1c turns this into a guard (item 8).
+2. The entity-restricted EM takes the argmax of the logits over the 1,024 name tokens with every non-entity token masked to
+   -inf and maps the winning token id back to its entity index, so an exact tie breaks as in the full-vocabulary argmax (the
+   lowest token id). **Step 1d (review F1).** Step 1c broke ties by entity index, which is a seeded shuffle of the token ids
+   (511 of 1,023 adjacent pairs of the name pool are inversions): with exact bf16 ties a row could count for the
+   full-vocabulary EM and not for the restricted one even with a correct glue, and the 64-row smoke, which is deterministic,
+   could trip the guard of item 8 with a probability of a few percent. The registered metric (`docs/prereg/RFX.md`: "argmax
+   of the same logits over the 1,024 task-entity name tokens") fixes no tie rule, so no registered quantity changes; no RFX
+   number existed before this change. A row that the full-vocabulary argmax hits is now always a restricted hit (the answer
+   is an entity token and the lowest-id maximum of the whole vocabulary), for any logits.
 3. LSQ eta = clip(RFX fitting-set eta of the (ridge, unit q) cell of R-r_rank, 1e-4, 1e-1), copied into the release;
    RFX reports it for the ranks with a storage verdict only. RFX's ridge is unweighted; LSQ's has recency weights
    lambda^(E-1-j) with the learned decay.
@@ -283,10 +322,12 @@ ranks 32 and 128) runs through the same flags-off path, so one pass covers DPFP-
 8. **Entity-EM guard (step 1c, O1).** `rfx_run.run` raises `RuntimeError` before writing `summary.json` (the per-label
    JSON and samples are already on disk) if any variant of any checkpoint has `lm_em - lm_em_entity` above the allowance
    `max(0.005, 1/rows) + 1e-9`, `rows` = episodes x queries per episode, NaN counted as a failure. The task text says
-   0.005; at the registered 4,000 rows the two are identical (20 rows), but the 64-row smoke would otherwise fail on a
-   single tied row (1.56 pp), so the allowance is at least one row; the difference matters under 200 rows only. The
-   restricted argmax is over a set that contains the answer token, so a full-vocabulary hit can become a restricted miss
-   only through an exact bf16 tie (a few rows at most); a wrong slice, axis or pairing in the glue costs about EM x rows.
+   0.005; at the registered 4,000 rows the two are identical (20 rows), the 64-row smoke tolerates one row (1.56 pp), and
+   the difference matters under 200 rows only. That one row was added in step 1c to absorb tie rows; with the tie rule of
+   item 2 nothing needs it any more and step 1d left the guard unchanged as instructed (`max(0.005, 1/rows)` can go back to
+   the flat registered 0.005 if the orchestrator prefers; the smoke would then tolerate no row at all). A correct glue now has
+   `full_hit_entity_miss` = 0 in every cell, so a nonzero count is a defect even where the guard tolerates it, and a wrong
+   slice, axis or pairing in the glue costs about EM x rows.
    Each cell records `full_hit_entity_miss` (rows with a full-vocabulary hit and a restricted miss), and the error
    message lists label, variant, rows, both EMs and that count. `summary.json` carries `entity_em_guard` = `{slack: 0.005,
    passed: true}`, and the LSQ release script refuses a summary without it. The decoder verdict compares the refit decoder
@@ -309,6 +350,19 @@ ranks 32 and 128) runs through the same flags-off path, so one pass covers DPFP-
    or dirty commit, and never overwrites an existing release. The E8 release needs an E8 smoke of the retrained arm
    (`task.E` must match) and, for LSQ, an arm that RFX triggered. The DPFP E8 check is the runner's `eligible_e8`, not
    tightened further.
+10. **Reload check (step 1d, review F2).** The release scripts check identity and timing only; WP-L4's A2 gate also reloaded
+   the export and compared a fresh validation, which needs torch. `scripts/check_smoke_reload.py` is that part, one short
+   compute job per smoke arm before the release is committed (commands below). It reads the uncommitted release (study,
+   `E`, smoke steps, the arm's smoke row) and the arm folder, and fails unless: the record is the one the release was sized from
+   (`job_id`, `git_commit`, `source_hash`); the record's config equals the code's `configuration(arm, smoke steps, E of the
+   release, smoke=True)` (LSQ RG: with the smoke's own `store_eta`, not the release's; JSON-normalized, since tuples become
+   lists); the study's `load_inference` reloads `ARM/writer.pt` (signature and strict state-dict checks inside it) to an
+   experiment with that same config, no value head and finite parameters; and a fresh 100-episode `validate` of the reloaded
+   writer has the smoke's episodes and exactly the predictions of the smoke's last evaluation (`ARM/val-STEPS`). It never
+   prints or compares a score, writes `ROOT/export-check-ARM/` (the folder must not exist: `validate` refuses an existing
+   one) and, only on success, `reload-check.json` there. It does not require the check to run at the smoke's commit (the
+   result records both), though the commands use `science_commit`. It has not been run and has no compute test: its first
+   run is the gate, and a failure blocks the commit of the release and changes nothing else.
 
 ## Step-2 order and worklist (after 2026-10-28 22:00 JST; WP-L5 and WP-L7)
 Order given by the orchestrator: (1) tests, (2) DPFP smokes, (3) RFX, (4) DPFP arms, (5) LSQ only if RFX triggers it.
@@ -319,14 +373,16 @@ Sketch with the reasons:
 2. **DPFP smokes**: command 3 above (timing and memory only; no scores read).
 3. **RFX**, one smoke then one science job (about 0.2 node-hours); `docs/prereg/RFX.md` is registered:
 ```sh
-REF=<full hash of the last WP-L7 step-1c commit on wp/llm, or its master merge>; RUNS=/work/xg24i002/x10041/LoopLora/runs/p1l
+REF=<full hash of the last WP-L7 step-1d commit on wp/llm, or its master merge>; RUNS=/work/xg24i002/x10041/LoopLora/runs/p1l
 scripts/submit.py --name rfx-smoke --queue regular-g --nodes 1 --walltime 00:20:00 --commit "$REF" --wait -- \
   -m looplora.llm.rfx_run --smoke --out $RUNS/rfx/smoke
-# the smoke runs the entity-EM guard (below): it has a summary.json only if the guard passed; check before the science job
+# the smoke runs the entity-EM guard (below): it has a summary.json only if the guard passed. Check it before the science
+# job, with the count that a correct glue never has (step 1d: the restricted argmax breaks ties like the full one): it must be 0
 python3 -c "
 import json
 s=json.load(open('$RUNS/rfx/smoke/summary.json'))
-print(s['entity_em_guard'], s['instrumentation_failures'])"
+miss=[c['full_hit_entity_miss'] for l in s['labels'] for c in json.load(open('$RUNS/rfx/smoke/%s.json'%l))['cells'].values()]
+print(s['entity_em_guard'], s['instrumentation_failures'], 'max full_hit_entity_miss', max(miss))"
 scripts/submit.py --name rfx --queue regular-g --nodes 1 --walltime 00:30:00 --commit "$REF" --wait -- \
   -m looplora.llm.rfx_run --out $RUNS/rfx/science
 python3 -c "
@@ -339,9 +395,12 @@ print(s['verdicts'], s['lsq_arms'], s['rfx_eta_by_rank'], s['eta_by_rank'], s['i
    `summary.json` (the per-label `LABEL.json` and samples stay) if any variant of any checkpoint has an entity-restricted
    EM below the full-vocabulary EM by more than 0.5 pp or one row, whichever is more (64 rows in the smoke, so one row is
    1.56 pp; 4,000 rows in the science run, so 20 rows). Run the smoke first so that a glue bug in `rfx.evaluate` (the
-   entity ids, the axis, the answer entity) costs a smoke and not the science job. If it raises, diagnose from the
-   per-label JSON before anything else: exact bf16 ties cost a few rows, a wrong slice or pairing costs about EM x rows
-   (`full_hit_entity_miss` is that count per variant):
+   entity ids, the axis, the answer entity) costs a smoke and not the science job. Since step 1d the restricted argmax
+   breaks ties as the full-vocabulary one does, so a correct glue has no row with a full-vocabulary hit and a restricted
+   miss: the per-variant count `full_hit_entity_miss` is 0 in every cell (the guard's slack of 1 row at 64 rows and 20 at
+   4,000 is not meant to be used), and a nonzero count after the smoke is a bug to find before the science job even when
+   the guard passed. If the guard raises, diagnose from the per-label JSON before anything else: a wrong slice or pairing
+   costs about EM x rows:
 ```sh
 python3 -c "
 import json
@@ -354,11 +413,11 @@ for label in ('R-r128','R-r32','W5-r32'):
    code and rerun everything (the registered rule does not change; the guard is not a threshold to tune). The job refuses
    checkpoints whose digests differ from the ones in `docs/prereg/RFX.md` (`rfx_run.DIGESTS`), before creating its output.
    Then `docs/reports/RFX.md` (a table script like `analyze_p1l_read_fix.py` is still to be written).
-4. **DPFP arms**: `scripts/prepare_dpfp_release.py` on the login node (above), commit the release, then three jobs as
-   described above.
+4. **DPFP arms**: `scripts/prepare_dpfp_release.py` on the login node, the three reload checks, then commit the release
+   and run three jobs, as described above.
 5. **LSQ, only the arms in `summary.json['lsq_arms']`** (`docs/prereg/LSQ.md` is registered): 10% smokes of those arms
-   (RG arms need an `--eta` inside 1e-4..1e-1; U and K4 take none; smokes are never interpreted), then the release, then
-   the arms:
+   (RG arms need an `--eta` inside 1e-4..1e-1; U and K4 take none; smokes are never interpreted), then the release, the
+   reload checks, the commit of the release and the arms:
 ```sh
 RUNS=/work/xg24i002/x10041/LoopLora/runs/p1l
 # one smoke per ARM in summary.json['lsq_arms'], e.g. L32-K4 and L32-RG (RG: add --eta 1e-3; U and K4: no --eta)
@@ -366,10 +425,18 @@ scripts/submit.py --name s-lsq-L32-K4 --queue regular-g --nodes 1 --walltime 00:
   -m looplora.llm.lsq_run --arm L32-K4 --steps 2400 --smoke --out $RUNS/lsq/smoke
 scripts/submit.py --name s-lsq-L32-RG --queue regular-g --nodes 1 --walltime 00:25:00 --commit "$REF" -- \
   -m looplora.llm.lsq_run --arm L32-RG --steps 2400 --smoke --eta 1e-3 --out $RUNS/lsq/smoke
-# release (login node, standard library only; commit the file), after every smoke has completed:
+# release (login node, standard library only), after every smoke has completed; written, not committed yet:
 PYTHONPATH=src python3 scripts/prepare_lsq_release.py --summary $RUNS/rfx/science/summary.json --root $RUNS/lsq/smoke \
   --out reports/p1l-lsq/release.json
-# then, per arm of the release:
+# reload check (step 1d), one short compute job per arm of the release, before the release is committed:
+REL=/work/xg24i002/x10041/LoopLora/reports/p1l-lsq/release.json
+SC=$(python3 -c "import json;print(json.load(open('$REL'))['science_commit'])")
+for ARM in $(python3 -c "import json;print(*json.load(open('$REL'))['steps_by_arm'])"); do
+  scripts/submit.py --name c-lsq-$ARM --queue regular-g --nodes 1 --walltime 00:10:00 --commit "$SC" -- \
+    scripts/check_smoke_reload.py --release $REL --root $RUNS/lsq/smoke --arm $ARM
+done
+# every arm must have left $RUNS/lsq/smoke/export-check-ARM/reload-check.json (print them as for DPFP); only then commit the
+# release and run, per arm of the release:
 scripts/submit.py --name r-lsq-L32-RG --queue regular-g --nodes 1 --walltime 02:00:00 --scale-up docs/prereg/LSQ.md \
   --commit <science_commit> -- -m looplora.llm.lsq_run --arm L32-RG --schedule RELEASE.json --out $RUNS/lsq/arms
 ```
@@ -387,8 +454,9 @@ scripts/submit.py --name r-lsq-L32-RG --queue regular-g --nodes 1 --walltime 02:
    --summary ... --root $RUNS/lsq/e8-smoke --out reports/p1l-lsq/release-e8.json --e8-decision LOCK.json`: `E` 8, every
    other field as above, `steps_by_arm` holding only the retrained arm, which must be one of the RFX arms) and its own
    science `--out $RUNS/lsq/e8`: the E = 16 arm folder already exists in `$RUNS/lsq/arms`, and the runner refuses to
-   reuse it. Node-hours (`docs/prereg/LSQ.md`): about 2.7 used and at most 4 reserved for a rank with a storage verdict (K4
-   and RG), about 1.4 and at most 2 for a normalization verdict (U).
+   reuse it; its reload check is `check_smoke_reload.py --release .../release-e8.json --root $RUNS/lsq/e8-smoke --arm ARM`.
+   Node-hours (`docs/prereg/LSQ.md`): about 2.7 used and at most 4 reserved for a rank with a storage verdict (K4 and RG),
+   about 1.4 and at most 2 for a normalization verdict (U); the reload checks add about 0.05 per smoke arm (an estimate).
 
 Still to write in step 2 (not needed before; the two release scripts are done): `scripts/audit_dpfp.py` and an LSQ
 counterpart (final checkpoints: zero/shuffle memory, key overlap, read error, value SIR, clean/read value-head EM;
@@ -398,15 +466,19 @@ counterpart (final checkpoints: zero/shuffle memory, key overlap, read error, va
 between DPFP and LSQ: lower rank, then higher E16 val EM, then DPFP).
 
 ## Open questions and risks for the orchestrator (WP-L7)
-- The registrations decided the drafts' open points; nothing in the step-1b and step-1c code is pending a decision.
-  Choices the code made where the text was silent are listed above (every rescue flag for all variants, entity-EM tie
-  order, `choose` takes the release's arms, the guard allowance, the release scripts' checks). One departs from the
-  task text and is worth a look: the guard allows `max(0.005, 1/rows)`, not 0.005, so that the 64-row smoke cannot fail on
-  one tied row (identical at the registered 4,000 rows; item 8).
+- The registrations decided the drafts' open points; nothing in the step-1b, 1c and 1d code is pending a decision.
+  Choices the code made where the text was silent are listed above (every rescue flag for all variants, the entity-EM tie
+  rule, `choose` takes the release's arms, the guard allowance, the release scripts' checks, the reload check). One departs
+  from the task text and is worth a look: the guard allows `max(0.005, 1/rows)`, not 0.005 (identical at the registered
+  4,000 rows); since the tie rule of step 1d nothing needs the extra row at the 64-row smoke any more (item 8).
 - Step 1c moved the LSQ and DPFP registries and release checks out of the torch-importing modules into new stdlib
   modules (item 9); it is a pure move, but it touches the two runners and four existing test files, so the first
   compute test run must include `tests/test_llm_lsq.py` and `tests/test_llm_dpfp.py`, which command 1 does. The scripts
   and their tests need Python 3.9-compatible syntax (the login node's Python) and `PYTHONPATH=src`.
+- Step 1d changed `rfx.entity_hits` (the only RFX code that decides a metric), which command 1 tests through
+  `tests/test_rfx.py` and `tests/test_llm_rfx.py` (the latter on the tiny model, where the reference now sorts the names by
+  token id). `scripts/check_smoke_reload.py` has no compute test; if the first check job fails, find out whether the check or
+  the smoke is wrong before touching either.
 - The rescue rule needs the LM path to accept a substituted read. A "none" or "decoder" verdict on a checkpoint whose
   clean head decodes well can be a distribution-shift artifact of the downstream path (stated as a caveat in the prereg).
 - Budget: tests, smokes and RFX together are about 1 node-hour for WP-L5 and WP-L7 (tests 0.1-0.2, DPFP smokes 0.3-0.4,

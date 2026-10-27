@@ -152,20 +152,27 @@ def normalized_error(read,target):
 def entity_hits(logits,entity_ids,answer_entity):
     """Entity-restricted D1 hits: the argmax of the logits over the task-entity name tokens is the answer entity.
 
-    logits [..., vocabulary]; entity_ids [V] token ids of entities 0..V-1; answer_entity [...] entity indices.
+    logits [..., vocabulary]; entity_ids [V] token ids of entities 0..V-1; answer_entity [...] entity indices. Every
+    non-entity token is masked to -inf and the argmax runs over the whole vocabulary, so an exact tie breaks as in the
+    full-vocabulary argmax (the first maximum: the lowest token id), not by entity index (the name pool is a shuffle); the
+    winning token id is then mapped back to its entity index. A row that the full-vocabulary argmax hits (the answer is an
+    entity token) is therefore always a restricted hit.
     """
-    return logits.index_select(-1,entity_ids).argmax(-1)==answer_entity
+    entity_of_token=torch.full((logits.shape[-1],),-1,dtype=torch.long,device=logits.device)
+    entity_of_token[entity_ids]=torch.arange(len(entity_ids),device=logits.device)
+    winner=logits.masked_fill(entity_of_token<0,-torch.inf).argmax(-1)
+    return entity_of_token[winner]==answer_entity
 
 
 def entity_em_failures(records):
     """Variants whose entity-restricted EM falls short of the full-vocabulary EM by more than the guard allows.
 
-    records: label -> run_checkpoint record. The answer token is one of the 1,024 entity name tokens, so the restricted
-    argmax runs over a subset that contains the full-vocabulary argmax whenever that is the answer: it can miss a row
-    that the full argmax hits only through an exact bf16 tie. A larger deficit means the glue of `evaluate` (the entity
-    ids, the axis, the answer entity) is wrong. Allowed: ENTITY_EM_SLACK, or one row when that is more (the 64-row smoke).
-    A NaN deficit fails. Each failure carries the counts to diagnose it: ties cost a few rows, a wrong slice or pairing
-    costs about EM x rows (`full_hit_entity_miss` is the number of rows with a full-vocabulary hit and a restricted miss).
+    records: label -> run_checkpoint record. The answer token is one of the 1,024 entity name tokens and `entity_hits`
+    breaks exact ties as the full-vocabulary argmax does, so a row that the full argmax hits is always a restricted hit:
+    with a correct glue `full_hit_entity_miss` (the number of rows with a full-vocabulary hit and a restricted miss) is 0
+    in every cell, and a wrong slice, axis or pairing in `evaluate` (the entity ids, the answer entity) costs about
+    EM x rows. Allowed: ENTITY_EM_SLACK, or one row when that is more (the 64-row smoke); a nonzero count below that
+    is still a defect. A NaN deficit fails. Each failure carries the counts to diagnose it.
     """
     failures=[]
     for label,record in records.items():
