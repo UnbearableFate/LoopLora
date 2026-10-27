@@ -1,5 +1,6 @@
 """WP-L6 pilot runner: the registered decision rule and the pack-or-separate sizing (stdlib only; no GPU needed)."""
 import json
+import os
 import subprocess
 import sys
 from pathlib import Path
@@ -184,3 +185,14 @@ def test_command_line_decide_and_size(tmp_path):
                          check=True, capture_output=True, text=True)
     assert json.loads(out.stdout)["recommendation"] == "packed"
     assert run_wp_l6.PACK_LIMIT == 3600
+
+
+def test_runbook_runs_the_file_directly_on_the_login_node(tmp_path):
+    # docs/reports/WP-L6.md calls `$W/scripts/run_wp_l6.py size|decide` as a command: the file must carry its
+    # shebang and the executable bit (git mode 100755), which the sys.executable calls above cannot show.
+    script = SCRIPTS / "run_wp_l6.py"
+    assert script.read_text().startswith("#!/usr/bin/env python3\n") and os.access(script, os.X_OK)
+    dirs = pilots(tmp_path, .45, .10)
+    out = subprocess.run([str(script), "decide", "--oracle_rot", str(dirs["oracle_rot"]),
+                          "--oracle_shared", str(dirs["oracle_shared"])], check=True, capture_output=True, text=True)
+    assert json.loads(out.stdout)["selected"] == "oracle_rot"
