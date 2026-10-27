@@ -57,7 +57,7 @@ Validation only; seed 17; no T2, reader or joint runs. Each job ≤ 1 node × 2 
 fixed budgets, and the user requested this study); tests and smoke ≤ 0.5 node·h; node·h recorded per job.
 Executed by a Claude Sonnet-5.5 subagent (codex workers closed 2026-10-27). Report: `docs/reports/DPFP.md`.
 
-## Amendment A1 — relation to the diagnostic and regression-writer studies (2026-10-27 10:05 JST; before any
+## Amendment A1 — relation to the diagnostic and regression-writer studies (2026-10-27 08:51 JST; before any
 ## DPFP run or result)
 Prompted by the external reviews (`docs/review/rv-fable_2026-10-27.md` C3, `docs/review/rv-astra_2026-10-27.md`
 §4, §8) and integrated in `plan/followup_2026-10-27.md`. Arms, schedule rule and decision rule are unchanged.

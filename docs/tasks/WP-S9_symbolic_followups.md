@@ -25,3 +25,19 @@ Report: `docs/reports/WP-S9-state.md`. Done line in your final reply: `WP-S9 ste
 
 ## Step 2 (only when the orchestrator says so)
 Run in the plan's order (IVD, CVH, UNS and the confusion rate first; TSM after). Reports per study.
+
+## Step 1b (now, no compute): align with the registrations
+The orchestrator registered `docs/prereg/{IVD,CVH,TSM,UNS,NCR}.md` on master at 40ddf08; identical text is on wp/sym.
+Read each file's "Decisions at registration" section.
+1. Merge master into wp/sym.
+2. TSM training failures, as registered:
+   - an infrastructure failure gets an identical rerun, at most twice;
+   - a non-finite loss in T1 or T2 fails that arm for that writer, and its completed runs are evaluated descriptively;
+   - a non-finite loss in T0 stops the study.
+   Adapt `run_tsm.py evaluate` and `analyze_tsm.py` to this, with tests. `evaluate` must no longer require all 18 runs.
+3. Locks are committed by the orchestrator, on wp/sym. In the step-2 command sheet (`docs/reports/WP-S9-state.md`),
+   replace each `git add … && git commit` after a lock or `theta.json` stage with "stop and report the file path".
+   UNS Part B is registered (not optional): put it in the step-2 order.
+4. `py_compile` and pyflakes; commit on wp/sym; no merge to master, no push.
+
+Done line in your final reply: `WP-S9 step 1b done`.
