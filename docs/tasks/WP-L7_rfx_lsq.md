@@ -72,6 +72,25 @@ Review: `docs/review/static_2026-10-27/rfxlsq.md` (no defect in 17b27c2; O1 and 
 3. Update `docs/reports/WP-L5-state.md`. Run `py_compile` and pyflakes. Commit on wp/llm; no merge to master, no push.
 Done line in your final reply: `WP-L7 step 1c done`.
 
+## Step 1d (now, no compute): second review of step 1c
+Review: `docs/review/static_2026-10-27/release.md`. It found no defect in the release path. Fed WP-L4's real smoke
+records, the new path reproduces the frozen A2 release exactly. Two findings:
+1. **F1 (ties).** The restricted argmax breaks exact bf16 ties by entity index (a seeded shuffle). The full-vocabulary
+   argmax breaks them by token id. So a correct glue can still give full-hit/restricted-miss rows. On the 64-row smoke,
+   a net 2-row deficit in one of the 42 cells trips the guard with a probability of a few percent, and the smoke is
+   deterministic.
+   - Fix: break ties as the full-vocabulary argmax does. That is, take the argmax over the logits with every non-entity
+     token masked to −inf, then map the winning token id back to its entity index. A correct glue then gives no such
+     rows at all, and the guard stays as it is.
+   - The registered metric ("argmax over the 1,024 entity name tokens") does not fix a tie rule, so this changes no
+     registered quantity. Record it in the state doc.
+   - Add a test: an exact tie between the answer and an entity whose entity index is lower but whose token id is higher.
+2. **F2 (reload check).** In step 2, before a DPFP or LSQ release is committed, one short compute job per smoke arm
+   reloads that arm's export (`load_inference`) and checks that its config equals the release's, as WP-L4's A2 gate did.
+   Put this in the `WP-L5-state.md` step-2 commands.
+3. Run `py_compile` and pyflakes. Commit on wp/llm; no merge, no push.
+Done line in your final reply: `WP-L7 step 1d done`.
+
 ## Step 2 (only when the orchestrator says so)
 WP-L5 step 2 (DPFP) and RFX; LSQ only for the arms RFX triggers (`lsq_arms`). Reports: `docs/reports/DPFP.md`,
 `docs/reports/RFX.md`, `docs/reports/LSQ.md`.
