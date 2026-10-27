@@ -176,3 +176,7 @@ Rules added:
    analysis of the r = 128 checkpoints on test [102000, 104000), registered before any confirmation score) and,
    per `plan/followup_2026-10-27.md`, an oracle-code redesign pilot (WP-L6) and, if it passes, a new r = 32 study
    (P1L-S) on test [110000, 112000).
+- Wording note (2026-10-27, before any confirmation score; raised in WP-T9): "at chance" above means at or near the
+  no-memory level. In the last five logged training batches (1,280 questions) some r = 32 memory-reader seeds exceed
+  B3-L4 by up to 1.25 pp (B5-L4 seed 29: 1.641% vs 0.391%). Per-run values: `reports/p1l-c1/training-logs.json`
+  (`scripts/summarize_p1l_training_logs.py`; the run directories are not tracked). Rules and predictions unchanged.
