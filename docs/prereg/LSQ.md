@@ -1,6 +1,6 @@
 # Study LSQ — least-squares and repeated-scan stores for the learned LLM writer (WP-L7, F4 of the follow-up plan), pre-registered
 
-Registered 2026-10-27 11:10 JST by the orchestrator, before any LSQ run (smoke included), any RFX or LSQ result and,
+Registered 2026-10-27 11:05 JST by the orchestrator, before any LSQ run (smoke included), any RFX or LSQ result and,
 as DPFP Amendment A1 requires, any DPFP result. Drafted 09:56 JST by sn-llm (WP-L7 step 1, no compute). The study is
 **conditional**: for each rank, RFX's verdict on that rank's R checkpoint (`docs/prereg/RFX.md`) decides which arms
 run. Storage runs K4 and RG. Normalization runs U, which the orchestrator added at registration. Any other verdict
