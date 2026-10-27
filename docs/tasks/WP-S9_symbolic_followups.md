@@ -41,3 +41,16 @@ Read each file's "Decisions at registration" section.
 4. `py_compile` and pyflakes; commit on wp/sym; no merge to master, no push.
 
 Done line in your final reply: `WP-S9 step 1b done`.
+
+## Step 1c (now, no compute): TSM Clarification C1
+`docs/prereg/TSM.md` gained Clarification C1 (master 3477526; identical on wp/sym 68c19da). It answers your step-1b
+questions a–e. Two answers differ from what the code does now:
+1. **Other early ends.** Only CUDA out-of-memory and I/O errors (`OSError`) are infrastructure failures. Any other
+   exception is a code defect: the run is recorded as such, and every later TSM `train` or `evaluate` refuses, as after
+   a T0 failure.
+2. **Interrupted evaluation.** An interrupted `evaluate` may be restarted from scratch with identical inputs, at most
+   twice. The partial output is moved aside unread, and the restart is recorded in the evaluation manifest.
+
+Add tests for both and update the command sheet. For IVD, CVH, UNS and NCR, the same operational rule applies to an
+interrupted evaluation job (restart from scratch, partial output moved aside unread); note it in the sheet.
+`py_compile` and pyflakes; commit on wp/sym; no merge, no push. Done line: `WP-S9 step 1c done`.
