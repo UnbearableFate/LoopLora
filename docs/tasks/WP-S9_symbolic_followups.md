@@ -104,3 +104,24 @@ on wp/sym 3ca4d89). This step reopens the failure protocol once, for these findi
 8. Correct the `--rerun-incomplete` help text (allocation failures, `--max-attempts`).
 9. Update the state report and the sheet. Run `py_compile` and pyflakes. Commit on wp/sym; no merge, no push.
 Done line: `WP-S9 step 1e done`.
+
+## Step 1f (now, no compute): second review of step 1e, TSM Clarification C4
+Review: `docs/review/static_2026-10-27/tsm2.md`. It found that the process management (F5), the pause (F6), the
+one-code rules and the heartbeat behave as specified, and it found one classification defect.
+`docs/prereg/TSM.md` gained Clarification C4 (master d6ceb6a; identical on wp/sym 76a00b3).
+1. **Finding 1 (C4).** Classify the torch checkpoint writer's `RuntimeError` texts "File <path> cannot be opened." and
+   "Parent directory <dir> does not exist." as I/O errors, hence infrastructure failures.
+   - Add table cases: the `RuntimeError` gives infrastructure, and the same text in a `ValueError` gives `code_defect`.
+   - Update the sheet sentence and the `--rerun-incomplete` help.
+2. **Finding 2 (C4).** A first evaluation attempt at a code other than the training code is accepted only with
+   `--new-evaluation-code --decision FILE`. A first attempt means that neither `evaluation/` nor
+   `attempts/evaluation-attempt*` exists.
+   - The manifest records the decision file's path and blake2b digest, and both code hashes.
+   - Without `--decision` the current refusal stays. Add a test.
+3. **Notes.**
+   - (a) The stopped train manifest records the stopping child's exit code and log path.
+   - (b) The sheet says that a train manifest left at "running" means that the job was killed, so read the run states.
+   - (f) The heartbeat thread's `join` gets a timeout of 2 × `HEARTBEAT_SECONDS`.
+4. Update the state report. Run `py_compile` and pyflakes, with bytecode kept out of the worktree. Commit on wp/sym; no
+   merge, no push.
+Done line: `WP-S9 step 1f done`.
