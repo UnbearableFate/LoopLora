@@ -1305,8 +1305,8 @@ establish causal path following. The [primary-source audit](../reports/lit_check
 states those limits; the separate output-alignment intervention is not pursued
 after the writer-screen decision. <!-- LP5 -->
 
-**TODO — plan §9.3 item6:** the symbolic/LLM correspondence figure awaits P1-L
-confirmation. The completed writer-screen negatives above supply no multihop
+**TODO — plan §9.3 item6:** the symbolic/LLM correspondence figure is not produced; the
+P1-L confirmation is reported above in tables. The completed writer-screen negatives supply no multihop
 oracle-reader outcome or general language-reasoning claim. <!-- LL9 --><!-- LP4 -->
 
 ## 9. Limitations, reproducibility, and conclusion
