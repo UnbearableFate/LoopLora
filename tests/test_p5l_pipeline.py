@@ -5,7 +5,6 @@ The matrix builders are those of the P1-L tests (tests/assets/p1l_matrix.py). Co
 import contextlib
 import copy
 import io
-import json
 from pathlib import Path
 import shutil
 from types import SimpleNamespace
