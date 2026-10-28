@@ -236,7 +236,13 @@ runs (the finalizer rejects mixtures), so report to the orchestrator before movi
 
 ## Interrupted-run log
 
-None so far. One line per event: run, job id, cause, moved-aside path, resubmission job id, `P1LC_SOURCE` unchanged.
+None (step C: nine runs complete, 2026-10-29). One line per event: run, job id, cause, moved-aside path, resubmission job id, `P1LC_SOURCE` unchanged.
+
+## Step C job record (2026-10-29, `P1LC_SOURCE` 395e30914149898006d63cd289b20dac15d732fe)
+
+`sm-p1l-c-smoke` 3721352 (0.008 node·h, exit 0); `ev-p1l-c-s17/s29/s43` 3721357/3721358/3721359 (debug-g, 15 min
+requested, 0.041/0.041/0.043 node·h, exit 0); `fin-p1l-c` 3721377 (0.007, exit 0, status complete). Receipts in
+`runs/p1l/main/r128/causal-submissions.jsonl`. Results and discussion: `docs/reports/P1L-C.md`.
 
 ## Constraints that stayed binding
 

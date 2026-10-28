@@ -1,0 +1,114 @@
+{
+  "runs": [
+    {
+      "bridge_patch_hash": "ebd8b7f5172927d558f6c1c7a708cc6a",
+      "checkpoint_hash": "c90d23ff1a27d509ed61ae43d5185832",
+      "evaluation": "/work/xg24i002/x10041/LoopLora/runs/p1l/main/r128/causal/M1-L4-s17",
+      "git_commit": "395e30914149898006d63cd289b20dac15d732fe",
+      "job_id": "3721357.opbs",
+      "name": "M1-L4-s17",
+      "read_position_hash": "eda1623419681c7146123d77f96853bf",
+      "record_hash": "ebbedfa271a9c786484ba95a91463481",
+      "seconds": 51.52159825399576,
+      "source_hash": "bcb8ab9ef031d1b7c5ffbdddad3db677"
+    },
+    {
+      "bridge_patch_hash": "5ef0de34c44a7e1fc5594a0c395c593e",
+      "checkpoint_hash": "59e293ee6f36f29d03413c3f580f7fa7",
+      "evaluation": "/work/xg24i002/x10041/LoopLora/runs/p1l/main/r128/causal/M1-L4-s29",
+      "git_commit": "395e30914149898006d63cd289b20dac15d732fe",
+      "job_id": "3721358.opbs",
+      "name": "M1-L4-s29",
+      "read_position_hash": "dd709246b2d0d830953ecd7ecd8dc2e4",
+      "record_hash": "b4027ca99d0191023370797207e122b4",
+      "seconds": 51.94053143799829,
+      "source_hash": "bcb8ab9ef031d1b7c5ffbdddad3db677"
+    },
+    {
+      "bridge_patch_hash": "e7e37f7fa79d2aae87cb91dbb0b6185d",
+      "checkpoint_hash": "37a7baf0e832e3cad35e10b7ef1d1c39",
+      "evaluation": "/work/xg24i002/x10041/LoopLora/runs/p1l/main/r128/causal/M1-L4-s43",
+      "git_commit": "395e30914149898006d63cd289b20dac15d732fe",
+      "job_id": "3721359.opbs",
+      "name": "M1-L4-s43",
+      "read_position_hash": "c6dcc85217063d673d7527a5cf65bb25",
+      "record_hash": "83e4d49a684291ec92af7a110b720f1c",
+      "seconds": 53.72239958700084,
+      "source_hash": "bcb8ab9ef031d1b7c5ffbdddad3db677"
+    },
+    {
+      "bridge_patch_hash": "fcae464487fce2bd3efc430a3a6481b6",
+      "checkpoint_hash": "243dfcee7710792d8452745e6bd06b35",
+      "evaluation": "/work/xg24i002/x10041/LoopLora/runs/p1l/main/r128/causal/B8-s17",
+      "git_commit": "395e30914149898006d63cd289b20dac15d732fe",
+      "job_id": "3721357.opbs",
+      "name": "B8-s17",
+      "read_position_hash": "606ada7e8911b4dfa94d4775acaefe27",
+      "record_hash": "baa25edabdab5efb04bfb6ec73a2ddbd",
+      "seconds": 50.01127180400363,
+      "source_hash": "bcb8ab9ef031d1b7c5ffbdddad3db677"
+    },
+    {
+      "bridge_patch_hash": "e7810e49d9d421bd964805b7a0ecbb52",
+      "checkpoint_hash": "d599783f6fadab6beaf6a5a448777c2e",
+      "evaluation": "/work/xg24i002/x10041/LoopLora/runs/p1l/main/r128/causal/B8-s29",
+      "git_commit": "395e30914149898006d63cd289b20dac15d732fe",
+      "job_id": "3721358.opbs",
+      "name": "B8-s29",
+      "read_position_hash": "53f922dc7f32acd71bdb15831ac0e0a5",
+      "record_hash": "36e920104b38b8a0ca07337ada1e1b06",
+      "seconds": 50.22501366700453,
+      "source_hash": "bcb8ab9ef031d1b7c5ffbdddad3db677"
+    },
+    {
+      "bridge_patch_hash": "47a17543632a6c312642a8de48b9a0d6",
+      "checkpoint_hash": "743d5021d223466361a6ae5a9a794f0d",
+      "evaluation": "/work/xg24i002/x10041/LoopLora/runs/p1l/main/r128/causal/B8-s43",
+      "git_commit": "395e30914149898006d63cd289b20dac15d732fe",
+      "job_id": "3721359.opbs",
+      "name": "B8-s43",
+      "read_position_hash": "4686bdf294fe7411d894b28326c07136",
+      "record_hash": "941391b2c75406ac1d79a59484a0238a",
+      "seconds": 52.02067713900033,
+      "source_hash": "bcb8ab9ef031d1b7c5ffbdddad3db677"
+    },
+    {
+      "bridge_patch_hash": null,
+      "checkpoint_hash": "acfa784892a1dd2fd2e31a7d04ff86ae",
+      "evaluation": "/work/xg24i002/x10041/LoopLora/runs/p1l/main/r128/causal/B4-s17",
+      "git_commit": "395e30914149898006d63cd289b20dac15d732fe",
+      "job_id": "3721357.opbs",
+      "name": "B4-s17",
+      "read_position_hash": "9eadce374b1d7907d7ccdaf9b17e8b70",
+      "record_hash": "cc2733372bfad42cfad0c7d33f39d776",
+      "seconds": 25.088418850005837,
+      "source_hash": "bcb8ab9ef031d1b7c5ffbdddad3db677"
+    },
+    {
+      "bridge_patch_hash": null,
+      "checkpoint_hash": "558ceca24cb0fa24af967d8c3fc4e3b8",
+      "evaluation": "/work/xg24i002/x10041/LoopLora/runs/p1l/main/r128/causal/B4-s29",
+      "git_commit": "395e30914149898006d63cd289b20dac15d732fe",
+      "job_id": "3721358.opbs",
+      "name": "B4-s29",
+      "read_position_hash": "90a57240d530b747569959cc3b045820",
+      "record_hash": "de6700759204bce6f518feb79ab08d3d",
+      "seconds": 25.14623023299646,
+      "source_hash": "bcb8ab9ef031d1b7c5ffbdddad3db677"
+    },
+    {
+      "bridge_patch_hash": null,
+      "checkpoint_hash": "682626adf4ae6e14123ca5c1a6e77b2a",
+      "evaluation": "/work/xg24i002/x10041/LoopLora/runs/p1l/main/r128/causal/B4-s43",
+      "git_commit": "395e30914149898006d63cd289b20dac15d732fe",
+      "job_id": "3721359.opbs",
+      "name": "B4-s43",
+      "read_position_hash": "8dc6ff461a790ec25815a2f9fdda699e",
+      "record_hash": "de94e28b7026dab90846c9906237973c",
+      "seconds": 25.980399784995825,
+      "source_hash": "bcb8ab9ef031d1b7c5ffbdddad3db677"
+    }
+  ],
+  "seconds": 385.6565407570015,
+  "status": "audited"
+}

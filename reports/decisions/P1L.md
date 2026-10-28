@@ -89,3 +89,12 @@ One oracle seed (17) and one task layout. The oracle's random key and value tabl
 r = 32 cannot learn it (B7). Only hops up to about 3 compose in M1-L4 (hop 4 at 7.2%, hops 5–8 ≤ 5%; depth effect on
 hops 6–8 is +3.7 pp). B7 is a floor check at hop 1, not a proof that composition uses the memory (that is P1L-C,
 registered, not started). The causal and read-position study P1L-C runs only after the orchestrator's go.
+
+## 6. P1L-C follow-up (2026-10-29; `docs/reports/P1L-C.md`, `reports/p1lc/`)
+Run after the r = 128 B7 pass, test [102000, 104000), one source (`395e309`). Memory at the final question position only
+collapses every reader (M1-L4 hops 1–3 −29.9 pp [−30.8, −29.1], B8 −9.5, B4@1 −9.1), a distribution shift that shows the
+deployed readers use earlier question positions. The P1-L contrasts replicate (M1-L4 − B4 +20.81 pp [19.72, 21.85]; B8 − B4
++0.92 pp [0.28, 1.53]). Bridge patching gives **no causal bridge claim** for either reader (final-position shift M1-L4
++0.39 pp [−0.13, 0.78], B8 0.00; registered bar 10 pp): the M1-L4 answer follows world B when the memory changes (37.2%
+t_B) but not when z_1 alone is replaced. The Claims in §4 are unchanged; "composition inside the LM" is supported
+behaviourally, and the causal-bridge reading is not.
