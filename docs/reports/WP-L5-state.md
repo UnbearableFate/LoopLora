@@ -54,7 +54,10 @@ Source commit of every run: `efadc36436e4d29514a4ea570596925b779b8b2d` (= b79e0f
   (K4 and RG) or a normalization verdict (U), and neither checkpoint of R got one (store+query; W5-r32 triggers nothing). Per the
   orchestrator's decision there is no LSQ release and no LSQ run. The LSQ code, `scripts/prepare_lsq_release.py` and the LSQ tests stay in the
   tree unused; the LSQ commands and release text below are not to be executed.
-- DPFP arms 3721087-89 (2 h each) were running when this was written; see `docs/reports/DPFP.md` for their outcome.
+- **DPFP arms** (3721087-89, about 80 min each, complete at the released steps): final val EM D32-3 39.0 %, D128-1 58.0 %, D128-3 60.8 %.
+  Registered decision: none reaches 0.80; the best (D128-3, 608 of 1,000) is at least 0.50, so **one retrain of D128-3 at E = 8** is triggered
+  (accepted only at val EM >= 0.80, flagged). Not submitted: it waits for the orchestrator's lock. Report `docs/reports/DPFP.md`, records
+  `reports/p1l-dpfp/arms/`, tables by `scripts/analyze_dpfp.py`.
 
 ## What is implemented (WP-L5: DPFP)
 DPFP is `AdapterConfig.dpfp_nu` (default 0 = off). With nu >= 1 the write key and the read query are mapped to
