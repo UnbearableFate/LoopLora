@@ -1,0 +1,115 @@
+{
+  "git_commit": "99759482371c561bcc58db40df2ba36123457a63",
+  "runs": {
+    "D128-1-E16": {
+      "E": 16,
+      "arm": "D128-1",
+      "checkpoint_git_commit": "efadc36436e4d29514a4ea570596925b779b8b2d",
+      "checkpoint_job_id": "3721088.opbs",
+      "dpfp_nu": 1,
+      "episodes": 1000,
+      "eval_seed": 4242,
+      "git_commit": "99759482371c561bcc58db40df2ba36123457a63",
+      "max_repeated_logit_drift": 0.0,
+      "optimizer_steps": 0,
+      "original": {
+        "correct": 580,
+        "em": 0.58,
+        "nll": 2.2774674892425537
+      },
+      "original_matches_record": {
+        "correct": true,
+        "record_correct": 580,
+        "record_nll": 2.2774674892425537
+      },
+      "rank": 128,
+      "shuffle": {
+        "correct": 2,
+        "em": 0.002,
+        "nll": 13.634912490844727
+      },
+      "source_dirty": false,
+      "source_hash": "8110cbb3d4e63fde446126aa165d7501",
+      "steps": 23690,
+      "zero": {
+        "correct": 0,
+        "em": 0.0,
+        "nll": 12.736211776733398
+      }
+    },
+    "D128-3-E16": {
+      "E": 16,
+      "arm": "D128-3",
+      "checkpoint_git_commit": "efadc36436e4d29514a4ea570596925b779b8b2d",
+      "checkpoint_job_id": "3721089.opbs",
+      "dpfp_nu": 3,
+      "episodes": 1000,
+      "eval_seed": 4242,
+      "git_commit": "99759482371c561bcc58db40df2ba36123457a63",
+      "max_repeated_logit_drift": 0.0,
+      "optimizer_steps": 0,
+      "original": {
+        "correct": 608,
+        "em": 0.608,
+        "nll": 2.1291537284851074
+      },
+      "original_matches_record": {
+        "correct": true,
+        "record_correct": 608,
+        "record_nll": 2.1291537284851074
+      },
+      "rank": 128,
+      "shuffle": {
+        "correct": 2,
+        "em": 0.002,
+        "nll": 13.33556079864502
+      },
+      "source_dirty": false,
+      "source_hash": "8110cbb3d4e63fde446126aa165d7501",
+      "steps": 22370,
+      "zero": {
+        "correct": 0,
+        "em": 0.0,
+        "nll": 17.439849853515625
+      }
+    },
+    "D32-3-E16": {
+      "E": 16,
+      "arm": "D32-3",
+      "checkpoint_git_commit": "efadc36436e4d29514a4ea570596925b779b8b2d",
+      "checkpoint_job_id": "3721087.opbs",
+      "dpfp_nu": 3,
+      "episodes": 1000,
+      "eval_seed": 4242,
+      "git_commit": "99759482371c561bcc58db40df2ba36123457a63",
+      "max_repeated_logit_drift": 0.0,
+      "optimizer_steps": 0,
+      "original": {
+        "correct": 390,
+        "em": 0.39,
+        "nll": 3.5007691383361816
+      },
+      "original_matches_record": {
+        "correct": true,
+        "record_correct": 390,
+        "record_nll": 3.5007691383361816
+      },
+      "rank": 32,
+      "shuffle": {
+        "correct": 0,
+        "em": 0.0,
+        "nll": 12.746194839477539
+      },
+      "source_dirty": false,
+      "source_hash": "8110cbb3d4e63fde446126aa165d7501",
+      "steps": 23015,
+      "zero": {
+        "correct": 0,
+        "em": 0.0,
+        "nll": 15.087380409240723
+      }
+    }
+  },
+  "source_dirty": false,
+  "source_hash": "8110cbb3d4e63fde446126aa165d7501"
+}
