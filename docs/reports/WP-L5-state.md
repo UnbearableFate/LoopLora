@@ -38,8 +38,8 @@ of the script is load-bearing), which tests the logic and not torch's or the loa
 `docs/prereg/DPFP.md` and, registered 2026-10-27 11:05 JST before any RFX, LSQ or DPFP result, `docs/prereg/RFX.md` and
 `docs/prereg/LSQ.md`.
 
-## Step 2 status (compute from 2026-10-28 23:40 JST; commits on wp/llm, nothing merged)
-Source commit of every run: `efadc36436e4d29514a4ea570596925b779b8b2d` (= b79e0f8 plus one test-fixture commit).
+## Step 2 status (compute from 2026-10-28 23:40 JST; finished 2026-10-29; commits on wp/llm)
+Source commit of the runs: `efadc36436e4d29514a4ea570596925b779b8b2d` (= b79e0f8 plus one test-fixture commit); the E8 retrain ran at `72ed469` (adds the audited lock).
 - **Tests** (`t-dpfp`, job 3720636, 6m19s): everything passed except three tests of `tests/test_llm_dpfp.py` (the unit-phi-keys test for D32-3
   and D128-1; the zero/shuffle controls). Cause, measured in jobs 3720796 and 3720880: at the fixture's adapter rank 4 the nonzero entries
   of phi(query) and of the stored phi keys did not overlap (3 to 6 nonzeros of key_dim 8 to 24), so `M q_hat` was exactly zero: no gradient, and
@@ -55,9 +55,15 @@ Source commit of every run: `efadc36436e4d29514a4ea570596925b779b8b2d` (= b79e0f
   orchestrator's decision there is no LSQ release and no LSQ run. The LSQ code, `scripts/prepare_lsq_release.py` and the LSQ tests stay in the
   tree unused; the LSQ commands and release text below are not to be executed.
 - **DPFP arms** (3721087-89, about 80 min each, complete at the released steps): final val EM D32-3 39.0 %, D128-1 58.0 %, D128-3 60.8 %.
-  Registered decision: none reaches 0.80; the best (D128-3, 608 of 1,000) is at least 0.50, so **one retrain of D128-3 at E = 8** is triggered
-  (accepted only at val EM >= 0.80, flagged). Not submitted: it waits for the orchestrator's lock. Report `docs/reports/DPFP.md`, records
-  `reports/p1l-dpfp/arms/`, tables by `scripts/analyze_dpfp.py`.
+  None reaches 0.80; the best (D128-3, 608 of 1,000) is at least 0.50, so the registered rule triggered **one retrain of D128-3 at E = 8**
+  (audited lock `reports/p1l-dpfp/e8-lock.json`). E8 smoke 3721493, release `reports/p1l-dpfp/release-e8.json`, reload check 3721520, science
+  job 3721535 (78 min, 26065 steps): **730 of 1,000 (73.0 %), below 0.80, not accepted.**
+- **Final DPFP decision (orchestrator-confirmed 2026-10-29): stop. No writer selected, P1L-D not run, negative result.** With RFX triggering no LSQ arm,
+  the learned-writer line stops. Registered diagnostics: zero and shuffled memory at the final checkpoints (`scripts/audit_dpfp.py`, jobs 3721521
+  and 3721773): EM at most 0.2 % in both conditions for all four runs; the originals reproduce the records exactly.
+- Cost: DPFP about 6.14 node·h, RFX 0.10. Tests plus smokes used about 0.78 node·h against the registered 0.5 cap (recorded overrun, causes in
+  `docs/reports/DPFP.md`). Reports: `docs/reports/DPFP.md`, `docs/reports/RFX.md`; records in `reports/p1l-dpfp/` and `reports/p1l-rfx/`; tables by
+  `scripts/analyze_dpfp.py` and `scripts/analyze_rfx.py`. Nothing remains to run in this work package.
 
 ## What is implemented (WP-L5: DPFP)
 DPFP is `AdapterConfig.dpfp_nu` (default 0 = off). With nu >= 1 the write key and the read query are mapped to

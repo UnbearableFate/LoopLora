@@ -1,0 +1,43 @@
+{
+  "git_commit": "99759482371c561bcc58db40df2ba36123457a63",
+  "runs": {
+    "D128-3-E8": {
+      "E": 8,
+      "arm": "D128-3",
+      "checkpoint_git_commit": "72ed4691c90eb24fd5362d20845d3d887dba1121",
+      "checkpoint_job_id": "3721535.opbs",
+      "dpfp_nu": 3,
+      "episodes": 1000,
+      "eval_seed": 4242,
+      "git_commit": "99759482371c561bcc58db40df2ba36123457a63",
+      "max_repeated_logit_drift": 0.0,
+      "optimizer_steps": 0,
+      "original": {
+        "correct": 730,
+        "em": 0.73,
+        "nll": 1.3155832290649414
+      },
+      "original_matches_record": {
+        "correct": true,
+        "record_correct": 730,
+        "record_nll": 1.3155832290649414
+      },
+      "rank": 128,
+      "shuffle": {
+        "correct": 2,
+        "em": 0.002,
+        "nll": 14.50158405303955
+      },
+      "source_dirty": false,
+      "source_hash": "8110cbb3d4e63fde446126aa165d7501",
+      "steps": 26065,
+      "zero": {
+        "correct": 1,
+        "em": 0.001,
+        "nll": 11.611610412597656
+      }
+    }
+  },
+  "source_dirty": false,
+  "source_hash": "8110cbb3d4e63fde446126aa165d7501"
+}

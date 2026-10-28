@@ -7,19 +7,22 @@ nu = 3); T1 as WP-L4 (E = 16, seed 17, layer 14, L = 1, batch 32 / Q 4, lr 3e-3)
 1dd1869). Records are copied to `reports/p1l-dpfp/arms/` and, for the two WP-L4 R references, `reports/p1l-dpfp/refs/`; every table
 below is printed by `python3 scripts/analyze_dpfp.py reports/p1l-dpfp` from them.
 
-## Result and registered decision
-**No arm reaches val EM 0.80, so no writer is selected at E = 16. The best arm, D128-3, has 608 of 1,000 correct (60.8 %), which is
-at least 0.50, so the registered rule triggers one retrain of D128-3 at E = 8 with the same schedule rule, accepted only if its val EM
-is at least 0.80 (flagged).** The retrain is not submitted: it needs the audited lock (below) and is the orchestrator's decision.
+## Result and final registered decision
+**Final decision (orchestrator-confirmed 2026-10-29): stop. No DPFP writer is selected, P1L-D is not run, and the study is a negative result.**
+No E = 16 arm reaches val EM 0.80 (best D128-3: 608 of 1,000, 60.8 %). That is at least 0.50, so the registered rule triggered one retrain of
+D128-3 at E = 8 (flagged; audited lock `reports/p1l-dpfp/e8-lock.json`, 72ed469), accepted only at val EM 0.80. It reached **730 of 1,000
+(73.0 %)** at its released 26065 steps (job 3721535), so it is not accepted. Per `docs/prereg/DPFP.md` the paper reports the negative result
+and no further writer screen follows from this study; LSQ ran no arm (RFX triggered none), so the learned-writer line stops.
 
 | arm | final val EM | candidate order | 0.80 |
 | --- | ---: | --- | --- |
 | D32-3 | 39.0 % | 1 | no |
 | D128-1 | 58.0 % | 2 | no |
 | D128-3 | 60.8 % | 3 | no |
+| D128-3 at E = 8 (retrain, flagged) | 73.0 % | | no |
 
-Every arm completed its released steps (`status` complete, not a smoke, source clean, `actual_steps` = released steps, E = 16; the
-logs have no error and exit 0). The WP-L4 references (R at r = 32: 12.0 %, at r = 128: 33.5 %) are used as registered, not rerun,
+Every arm completed its released steps (`status` complete, not a smoke, source clean, `actual_steps` = released steps; E = 16, and E = 8
+for the retrain; the logs have no error and exit 0). The WP-L4 references (R at r = 32: 12.0 %, at r = 128: 33.5 %) are used as registered, not rerun,
 because the DPFP-off reproduction test (`tests/test_llm_dpfp_repro.py`, job 3720637 `t-dpfp-repro`, passed) matches WP-L4's first 200
 logged steps exactly at both ranks.
 
@@ -46,19 +49,20 @@ logged steps exactly at both ranks.
   store with the true key stays near the checkpoint's own EM (write interference). DPFP lowers that interference (parallel interference
   and read error above) but not far enough here.
 
-## What the E = 8 retrain needs (STOP: orchestrator)
-The runner and release scripts take the audited lock through `--e8-decision LOCK.json` and accept it only when
-`lock['choice']` is `retry_e8` for that arm (`dpfp_release.eligible_e8`). The registered choice computed from the three records is
-`{"action": "retry_e8", "arm": "D128-3", "E": 8, "correct": {"D32-3": 390, "D128-1": 580, "D128-3": 608}}`. Sequence once it
-is locked (state doc, "Commands for step 2"): (1) the arm's own E8 smoke, `dpfp_run --arm D128-3 --steps 2400 --smoke --e8-decision LOCK
---out RUNS/smoke-e8`; (2) `prepare_dpfp_release.py --root RUNS/smoke-e8 --out reports/p1l-dpfp/release-e8.json --e8-decision LOCK`
-(E 8, one arm); (3) `check_smoke_reload.py` for that arm; (4) the science job, 2 h with `--scale-up`, `--schedule release-e8.json --out RUNS/arms-e8`.
-Estimated 0.15 + 0.01 + at most 2.0 node·h (the E = 16 runs took 1.33 node·h each; the E8 step count comes from its smoke).
+## The E = 8 retrain (registered rule, flagged)
+The runner and release scripts took the audited lock through `--e8-decision reports/p1l-dpfp/e8-lock.json` (`dpfp_release.eligible_e8`
+accepts it only for `retry_e8` on that arm). Sequence run: E8 smoke 3721493 (2,400 steps; 0.180 s per step), release
+`reports/p1l-dpfp/release-e8.json` (E 8, D128-3, 26065 steps, evaluations at 5213, 10426, 15639, 20852, 26065), reload check 3721520 (config
+equal, reload identical, 0 mismatches), science job 3721535 (2 h cap with `--scale-up docs/prereg/DPFP.md`, 78 min used).
+D128-3 at E = 8: val EM 56.9, 64.1, 70.7, 72.4, 73.0 % at the five checkpoints (still +0.6 pp over the last interval), normalized read error
+0.269, read-value head 62.9 % (clean-value head 89.1 %), value SIR 28.5, against 60.8 %, 0.363, 51.0 % and 8.0 at E = 16 for the same arm.
+Halving the number of facts per episode therefore raises EM by 12.2 pp and lowers the read error further, but ends 7.0 pp below the gate;
+under the registration that retrain is the last attempt of this study.
 
-## Memory interventions at the final E = 16 checkpoints (registered descriptive diagnostic; job 3721521)
+## Memory interventions at the final checkpoints (registered descriptive diagnostic; jobs 3721521 and 3721773)
 `scripts/audit_dpfp.py` (no training; tiny-model test `tests/test_audit_dpfp.py` passed in job 3721495) reloads each final export and scores the same
 1,000 validation episodes (eval seed 4242) with the deployed memory, a zeroed memory and the memory of another episode (a one-step roll of a
-seeded permutation; no episode keeps its own). Source: `reports/p1l-dpfp/audit-e16.json`. The original condition reproduces the record's final
+seeded permutation; no episode keeps its own). Sources: `reports/p1l-dpfp/audit-e16.json` and `audit-e8.json`. The original condition reproduces the record's final
 validation exactly for every arm (same correct count and NLL), repeated forwards are bit-identical, and the question input is unchanged
 under both interventions (asserted).
 
@@ -67,29 +71,41 @@ under both interventions (asserted).
 | D32-3 | 39.0 (3.501) | 0.0 (15.087) | 0.0 (12.746) |
 | D128-1 | 58.0 (2.277) | 0.0 (12.736) | 0.2 (13.635) |
 | D128-3 | 60.8 (2.129) | 0.0 (17.440) | 0.2 (13.336) |
+| D128-3 at E = 8 | 73.0 (1.316) | 0.1 (11.612) | 0.2 (14.502) |
 
 Reading (descriptive): every DPFP arm's answers depend entirely on the episode's own memory: with zero or another episode's memory the EM is at
-most 0.2 % (2 of 1,000) and the NLL is 12 to 17 against 2.1 to 3.5 with the deployed memory, so the writer's memory is used and is
+most 0.2 % (2 of 1,000) and the NLL is 11.6 to 17.4 against 1.3 to 3.5 with the deployed memory, so the writer's memory is used and is
 episode specific. This says the gains in the table are carried by the memory; it does not say the
 read is accurate (read error 0.36 to 0.43).
 
 ## Not done
-No test or confirmation data was read. The audit of the E = 8 arm (below) runs after its science job.
+No test or confirmation data was read. No P1L-D registration (no writer selected). Nothing remains to run for this study.
 
 ## Jobs and cost (node·h = wall hours of a one-node job)
 | job | purpose | wall | node·h | outcome |
 | --- | --- | --- | ---: | --- |
 | 3720636 `t-dpfp` | tests (b79e0f8) | 6m19s | 0.105 | 3 failures in `tests/test_llm_dpfp.py`: fixture rank 4 gave a zero read (see state doc) |
 | 3720637 `t-dpfp-repro` | DPFP-off reproduction of WP-L4 R, ranks 32 and 128 | 2m13s | 0.037 | passed |
-| 3720796, 3720880 | debug of the fixture | about 25 s, 27 s | 0.01 | read at rank 4 exactly 0, nonzero at 8 and 16 |
+| 3720748, 3720796, 3720880 | debug of the fixture (3720748 could not see its script) | 7 s, 25 s, 27 s | 0.015 | read at rank 4 exactly 0, nonzero at 8 and 16 |
 | 3720890 `t-dpfp2` | `tests/test_llm_dpfp.py` at efadc36 | 40 s | 0.011 | 16 passed |
-| 3720940, 3720941, 3720942 | 10% smokes (2,400 steps) | 8m54s, 8m40s, 9m09s | 0.446 | complete; timings in the release |
-| 3721044, 3721045, 3721046 | reload checks (`scripts/check_smoke_reload.py`) | 23 s each | 0.02 | config equal, reload identical, 0 prediction mismatches |
-| 3721087, 3721088, 3721089 | the three arms | 80.0, 79.7 and 81.5 min | 4.02 | complete |
+| 3720940, 3720941, 3720942 | 10% smokes, E = 16 (2,400 steps) | 8m54s, 8m40s, 9m09s | 0.446 | complete; timings in the release |
+| 3721044, 3721045, 3721046 | reload checks, E = 16 | 23 s each | 0.019 | config equal, reload identical, 0 mismatches |
+| 3721087, 3721088, 3721089 | the three E = 16 arms | 80.0, 79.7 and 81.5 min | 4.02 | complete |
+| 3721495 `t-audit-dpfp` | test of `scripts/audit_dpfp.py` (tiny model) | 24 s | 0.007 | 2 passed |
+| 3721493 `s-dpfp-e8-D128-3` | 10% smoke, E = 8 | 7m56s | 0.132 | complete |
+| 3721520 `c-dpfp-e8-D128-3` | reload check, E = 8 | 24 s | 0.007 | passed |
+| 3721521 `audit-dpfp-e16` | zero/shuffled-memory audit of the three E = 16 arms | 78 s | 0.022 | original reproduces the records |
+| 3721535 `r-dpfp-e8-D128-3` | science run, E = 8 retrain | 78.5 min | 1.309 | complete, 730 of 1,000 |
+| 3721773 `audit-dpfp-e8` | audit of the E = 8 arm | 39 s | 0.011 | original reproduces the record |
 
-Total about 4.65 node·h. Tests, reproduction and debug cost 0.17, the smokes 0.45 and the reload checks 0.02, together about 0.63
-node·h against the registered cap of 0.5 for tests plus smokes (the failed test run and the debug jobs are 0.13 of it). Flag for the
-orchestrator.
+Total DPFP node·h about 6.14 (the RFX jobs, 0.10, are in `docs/reports/RFX.md`).
+
+**Recorded overrun (deviation from the registered cap).** `docs/prereg/DPFP.md` caps tests plus smokes at 0.5 node·h. They used about 0.78: tests,
+reproduction, failed run, rerun and debug 0.17 (the failed test run and the debug jobs are 0.13 of it), the E = 16 smokes 0.45, the E = 8 smoke
+0.13, the reload checks 0.03 and the audit test 0.01. Causes: the failed test run (a fixture defect, not a product defect) and its debug and
+rerun jobs, and the E = 8 smoke, which the registration's retrain rule requires but the cap did not budget. The three E = 16 arms (4.02) and
+the E = 8 science run (1.31) are science jobs under the 2 h `--scale-up` and are not part of that cap. No other registered rule or limit was
+exceeded.
 
 ## Tables
 ### Decision table (final checkpoint, 1,000 validation episodes, eval seed 4242)
@@ -104,6 +120,8 @@ orchestrator.
 
 Registered decision: **retry D128-3 at E = 8 (flagged)** (best D128-3 with 608 of 1,000; thresholds 800 and 500).
 
+E = 8 retrain of D128-3 (job 3721535.opbs, 26065 steps): 730 of 1,000 correct (73.0 %); final registered decision: **stop: no writer selected, negative result** (threshold 800).
+
 ### Validation EM % at the five evenly spaced checkpoints
 
 | arm | checkpoint 1 | 2 | 3 | 4 | 5 (final) |
@@ -111,28 +129,29 @@ Registered decision: **retry D128-3 at E = 8 (flagged)** (best D128-3 with 608 o
 | D32-3 | 4603: 18.2 | 9206: 30.1 | 13809: 36.5 | 18412: 37.6 | 23015: 39.0 |
 | D128-1 | 4738: 35.0 | 9476: 45.6 | 14214: 55.0 | 18952: 58.8 | 23690: 58.0 |
 | D128-3 | 4474: 36.0 | 8948: 50.2 | 13422: 52.3 | 17896: 60.2 | 22370: 60.8 |
+| D128-3 at E = 8 | 5213: 56.9 | 10426: 64.1 | 15639: 70.7 | 20852: 72.4 | 26065: 73.0 |
 | R-r32 (WP-L4) | 4718: 5.9 | 9436: 9.4 | 14154: 10.1 | 18872: 12.9 | 23590: 12.0 |
 | R-r128 (WP-L4) | 4929: 16.3 | 9858: 22.4 | 14787: 27.6 | 19716: 31.0 | 24645: 33.5 |
 
 ### Diagnostics at the final checkpoint (WP-L4 audit columns; one seed)
 
-| metric | D32-3 | D128-1 | D128-3 | R-r32 | R-r128 |
-| --- | ---: | ---: | ---: | ---: | ---: |
-| val EM % | 39.0 | 58.0 | 60.8 | 12.0 | 33.5 |
-| NLL | 3.501 | 2.277 | 2.129 | 5.045 | 3.531 |
-| normalized read error | 0.391 | 0.431 | 0.363 | 0.666 | 0.631 |
-| clean-value head acc % | 83.3 | 92.8 | 90.6 | 84.5 | 93.3 |
-| read-value head acc % | 30.2 | 46.0 | 51.0 | 8.8 | 19.7 |
-| value SIR | 5.47 | 6.88 | 8.00 | 0.48 | 0.55 |
-| key top-1 % | 75.8 | 81.1 | 84.9 | 83.2 | 88.5 |
-| key margin | 0.223 | 0.215 | 0.252 | 0.158 | 0.177 |
-| key Gram RMS (phi space for DPFP) | 0.202 | 0.178 | 0.190 | 0.332 | 0.288 |
-| key Gram RMS (original space) | 0.374 | 0.366 | 0.321 |  |  |
-| mean max |cos| (phi space for DPFP) | 0.834 | 0.733 | 0.692 | 0.871 | 0.767 |
-| mean max |cos| (original space) | 0.907 | 0.870 | 0.829 |  |  |
-| mean pairwise cosine (as logged) | 0.117 | 0.108 | 0.140 | 0.136 | 0.130 |
-| parallel interference | 0.573 | 0.413 | 0.270 | 0.322 | 0.283 |
-| query norm | 1.0 | 1.0 | 1.0 | 16.5 | 131.6 |
+| metric | D32-3 | D128-1 | D128-3 | D128-3 E8 | R-r32 | R-r128 |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| val EM % | 39.0 | 58.0 | 60.8 | 73.0 | 12.0 | 33.5 |
+| NLL | 3.501 | 2.277 | 2.129 | 1.316 | 5.045 | 3.531 |
+| normalized read error | 0.391 | 0.431 | 0.363 | 0.269 | 0.666 | 0.631 |
+| clean-value head acc % | 83.3 | 92.8 | 90.6 | 89.1 | 84.5 | 93.3 |
+| read-value head acc % | 30.2 | 46.0 | 51.0 | 62.9 | 8.8 | 19.7 |
+| value SIR | 5.47 | 6.88 | 8.00 | 28.53 | 0.48 | 0.55 |
+| key top-1 % | 75.8 | 81.1 | 84.9 | 89.8 | 83.2 | 88.5 |
+| key margin | 0.223 | 0.215 | 0.252 | 0.333 | 0.158 | 0.177 |
+| key Gram RMS (phi space for DPFP) | 0.202 | 0.178 | 0.190 | 0.180 | 0.332 | 0.288 |
+| key Gram RMS (original space) | 0.374 | 0.366 | 0.321 | 0.313 |  |  |
+| mean max |cos| (phi space for DPFP) | 0.834 | 0.733 | 0.692 | 0.541 | 0.871 | 0.767 |
+| mean max |cos| (original space) | 0.907 | 0.870 | 0.829 | 0.710 |  |  |
+| mean pairwise cosine (as logged) | 0.117 | 0.108 | 0.140 | 0.127 | 0.136 | 0.130 |
+| parallel interference | 0.573 | 0.413 | 0.270 | 0.159 | 0.322 | 0.283 |
+| query norm | 1.0 | 1.0 | 1.0 | 1.0 | 16.5 | 131.6 |
 
 ### Read error and clean/read head accuracy over training (normalized read error / read-value head %)
 
@@ -141,6 +160,7 @@ Registered decision: **retry D128-3 at E = 8 (flagged)** (best D128-3 with 608 o
 | D32-3 | 4603: 0.251 / 20.9 | 9206: 0.410 / 23.2 | 13809: 0.371 / 27.6 | 18412: 0.382 / 28.4 | 23015: 0.391 / 30.2 |
 | D128-1 | 4738: 0.443 / 28.0 | 9476: 0.416 / 35.4 | 14214: 0.428 / 41.6 | 18952: 0.433 / 44.2 | 23690: 0.431 / 46.0 |
 | D128-3 | 4474: 0.444 / 34.8 | 8948: 0.413 / 42.5 | 13422: 0.423 / 43.6 | 17896: 0.362 / 51.0 | 22370: 0.363 / 51.0 |
+| D128-3 at E = 8 | 5213: 0.316 / 50.9 | 10426: 0.290 / 55.2 | 15639: 0.274 / 60.6 | 20852: 0.273 / 65.2 | 26065: 0.269 / 62.9 |
 | R-r32 (WP-L4) | 4718: 0.677 / 4.8 | 9436: 0.675 / 5.9 | 14154: 0.687 / 5.6 | 18872: 0.695 / 6.9 | 23590: 0.666 / 8.8 |
 | R-r128 (WP-L4) | 4929: 0.677 / 10.9 | 9858: 0.674 / 12.6 | 14787: 0.630 / 16.5 | 19716: 0.623 / 18.8 | 24645: 0.631 / 19.7 |
 
@@ -151,3 +171,4 @@ Registered decision: **retry D128-3 at E = 8 (flagged)** (best D128-3 with 608 o
 | D32-3 | 3721087.opbs | efadc364 | 23015 | 79.6 | 0.205 | 7.6 | 2.92 | 24576 | 103426 |
 | D128-1 | 3721088.opbs | efadc364 | 23690 | 79.3 | 0.199 | 7.5 | 3.26 | 131072 | 475138 |
 | D128-3 | 3721089.opbs | efadc364 | 22370 | 81.1 | 0.215 | 7.5 | 4.08 | 393216 | 475138 |
+| D128-3 (E8) | 3721535.opbs | 72ed4691 | 26065 | 78.1 | 0.178 | 7.0 | 3.87 | 393216 | 475138 |
