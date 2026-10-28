@@ -26,10 +26,11 @@ context is low or stale (repeated compaction, or before a large unrelated task),
 (`/new` in the codex TUI; record the new session id here) and re-injects context with one message:
 "Read docs/README.md, your role row in docs/workers.md, the listed context docs, then docs/tasks/<task>.md".
 
-Monitoring (user rule, 2026-10-26 23:45): the orchestrator checks every worker every 20 minutes and sends
-"continue" to a worker that stopped unexpectedly (model/stream error, interrupted turn, idle mid-task without a
-done report, armed PBS wakeup or live job). Idle after "WP-… done", idle with a wakeup armed, and a pending
-question are expected states.
+Monitoring (user rule, 2026-10-26 23:45; narrowed by the user 2026-10-29): the 20-minute check applied to the herdr
+codex workers. In-session subagents get no timed check: each stop reaches the orchestrator as a notification, and the
+orchestrator arms a background watcher (`wait_jobs.sh`) for every `WAIT <job ids>` line and resumes the subagent when
+it exits. A subagent that stopped unexpectedly (model/stream error, interrupted turn, idle mid-task without a done,
+WAIT or STOP line) gets "continue".
 
 Model: sessions opened or resumed from 2026-10-26 19:36 use GPT-6.1-sol xhigh; wk-sym still runs its original
 GPT-6-Astra xhigh session until its next clear (switched by resume at 03:46 on 2026-10-27; all workers now GPT-6.1-sol).
