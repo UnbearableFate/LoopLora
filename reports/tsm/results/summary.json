@@ -1,0 +1,43 @@
+{
+  "arm_outcome": {
+    "T1": "none",
+    "T2": "none"
+  },
+  "arms_pass": {
+    "T1": false,
+    "T2": false
+  },
+  "bootstrap": {
+    "alpha": 0.05,
+    "comparisons": 4,
+    "confidence": 0.9875,
+    "far_tolerance": 0.01,
+    "gain_minimum": 0.03,
+    "resamples": 2000,
+    "seed": 2718,
+    "stay_tolerance": 0.01
+  },
+  "created": "2026-10-28T15:50:26.828408+00:00",
+  "design_hash": "b4e5975b4349e6f0caa7b92e67089295",
+  "design_lock_commit": "1bf689be3589c52da21dc309cff0f8d7668357a9",
+  "evaluation_attempt": 1,
+  "evaluation_decision": null,
+  "evaluation_node_hours": 0.0032779833469450954,
+  "evaluation_restarts": [],
+  "evaluation_source_hash": "9433cb32a72ccdc24d0b376a08b74626",
+  "failed_cells": [],
+  "passing_writers": {
+    "T1": [],
+    "T2": []
+  },
+  "resamples": 2000,
+  "seconds": 12.398300857996219,
+  "training_failures": [],
+  "training_source_hash": "9433cb32a72ccdc24d0b376a08b74626",
+  "writer_passes": {
+    "joint_fact/T1": false,
+    "joint_fact/T2": false,
+    "oracle_random/T1": false,
+    "oracle_random/T2": false
+  }
+}

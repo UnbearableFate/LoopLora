@@ -1,0 +1,29 @@
+{
+  "bootstrap": {
+    "alpha": 0.05,
+    "comparisons": 6,
+    "confidence": 0.9916666666666667,
+    "gain_minimum": 0.03,
+    "hop1_loss": 0.01,
+    "mean_depth_limit": 8.0,
+    "resamples": 2000,
+    "seed": 2718
+  },
+  "confirmation_node_hours": 0.005803658421945228,
+  "created": "2026-10-28T15:14:35.397269+00:00",
+  "design_hash": "1659eb4141d4638139c1d8ae074b8539",
+  "design_lock_commit": "8a13c45d2207f0c6d78091d18645c6e5cbdc9d77",
+  "failures": [],
+  "latency_claims": [
+    "joint_fact/r32/M1/A1",
+    "joint_fact/r32/M1/A2",
+    "t1_frozen_fact/r32/M1/A1",
+    "t1_frozen_fact/r32/M1/A2"
+  ],
+  "passing": [
+    "oracle_random/r32/M1/A1"
+  ],
+  "resamples": 2000,
+  "seconds": 9.36656201200094,
+  "theta_lock_commit": "19c56137c122d1277103070d390dfe1e16fa624e"
+}

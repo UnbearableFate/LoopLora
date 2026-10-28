@@ -1,0 +1,1231 @@
+{
+  "created": "2026-10-28T15:03:31.192001+00:00",
+  "failures": [],
+  "runs": [
+    {
+      "directory": "/work/xg24i002/x10041/LoopLora-wt/sym/runs/uns/main/evaluation/joint-M1L4-r32-s17",
+      "failures": [],
+      "pools": {
+        "seen": {
+          "candidate_sizes": [
+            14
+          ],
+          "depths": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            6,
+            8,
+            12,
+            16
+          ],
+          "episodes": 2000,
+          "hops": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8
+          ],
+          "rows": 144000,
+          "split": "test"
+        },
+        "unseen": {
+          "candidate_sizes": [
+            14
+          ],
+          "depths": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            6,
+            8,
+            12,
+            16
+          ],
+          "episodes": 2000,
+          "hops": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8
+          ],
+          "rows": 144000,
+          "split": "test_unseen"
+        }
+      },
+      "reader": "M1",
+      "samples_hash": "e503f71d9024871311464df27bf15cb3",
+      "seed": 17,
+      "writer": "joint"
+    },
+    {
+      "directory": "/work/xg24i002/x10041/LoopLora-wt/sym/runs/uns/main/evaluation/joint-M1L4-r32-s29",
+      "failures": [],
+      "pools": {
+        "seen": {
+          "candidate_sizes": [
+            14
+          ],
+          "depths": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            6,
+            8,
+            12,
+            16
+          ],
+          "episodes": 2000,
+          "hops": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8
+          ],
+          "rows": 144000,
+          "split": "test"
+        },
+        "unseen": {
+          "candidate_sizes": [
+            14
+          ],
+          "depths": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            6,
+            8,
+            12,
+            16
+          ],
+          "episodes": 2000,
+          "hops": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8
+          ],
+          "rows": 144000,
+          "split": "test_unseen"
+        }
+      },
+      "reader": "M1",
+      "samples_hash": "bb94f8fc8664a52f64d02bde08967ba0",
+      "seed": 29,
+      "writer": "joint"
+    },
+    {
+      "directory": "/work/xg24i002/x10041/LoopLora-wt/sym/runs/uns/main/evaluation/joint-M1L4-r32-s43",
+      "failures": [],
+      "pools": {
+        "seen": {
+          "candidate_sizes": [
+            14
+          ],
+          "depths": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            6,
+            8,
+            12,
+            16
+          ],
+          "episodes": 2000,
+          "hops": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8
+          ],
+          "rows": 144000,
+          "split": "test"
+        },
+        "unseen": {
+          "candidate_sizes": [
+            14
+          ],
+          "depths": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            6,
+            8,
+            12,
+            16
+          ],
+          "episodes": 2000,
+          "hops": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8
+          ],
+          "rows": 144000,
+          "split": "test_unseen"
+        }
+      },
+      "reader": "M1",
+      "samples_hash": "bcac58be7a87c80baad45ab706b9bb6b",
+      "seed": 43,
+      "writer": "joint"
+    },
+    {
+      "directory": "/work/xg24i002/x10041/LoopLora-wt/sym/runs/uns/main/evaluation/joint-B4-r32-s17",
+      "failures": [],
+      "pools": {
+        "seen": {
+          "candidate_sizes": [
+            14
+          ],
+          "depths": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            6,
+            8,
+            12,
+            16
+          ],
+          "episodes": 2000,
+          "hops": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8
+          ],
+          "rows": 144000,
+          "split": "test"
+        },
+        "unseen": {
+          "candidate_sizes": [
+            14
+          ],
+          "depths": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            6,
+            8,
+            12,
+            16
+          ],
+          "episodes": 2000,
+          "hops": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8
+          ],
+          "rows": 144000,
+          "split": "test_unseen"
+        }
+      },
+      "reader": "B4",
+      "samples_hash": "35383db448cffd85eb303f221c2942c1",
+      "seed": 17,
+      "writer": "joint"
+    },
+    {
+      "directory": "/work/xg24i002/x10041/LoopLora-wt/sym/runs/uns/main/evaluation/joint-B4-r32-s29",
+      "failures": [],
+      "pools": {
+        "seen": {
+          "candidate_sizes": [
+            14
+          ],
+          "depths": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            6,
+            8,
+            12,
+            16
+          ],
+          "episodes": 2000,
+          "hops": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8
+          ],
+          "rows": 144000,
+          "split": "test"
+        },
+        "unseen": {
+          "candidate_sizes": [
+            14
+          ],
+          "depths": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            6,
+            8,
+            12,
+            16
+          ],
+          "episodes": 2000,
+          "hops": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8
+          ],
+          "rows": 144000,
+          "split": "test_unseen"
+        }
+      },
+      "reader": "B4",
+      "samples_hash": "ff68f4f2693c813134d92513959e1440",
+      "seed": 29,
+      "writer": "joint"
+    },
+    {
+      "directory": "/work/xg24i002/x10041/LoopLora-wt/sym/runs/uns/main/evaluation/joint-B4-r32-s43",
+      "failures": [],
+      "pools": {
+        "seen": {
+          "candidate_sizes": [
+            14
+          ],
+          "depths": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            6,
+            8,
+            12,
+            16
+          ],
+          "episodes": 2000,
+          "hops": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8
+          ],
+          "rows": 144000,
+          "split": "test"
+        },
+        "unseen": {
+          "candidate_sizes": [
+            14
+          ],
+          "depths": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            6,
+            8,
+            12,
+            16
+          ],
+          "episodes": 2000,
+          "hops": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8
+          ],
+          "rows": 144000,
+          "split": "test_unseen"
+        }
+      },
+      "reader": "B4",
+      "samples_hash": "57ab0a4b843452187a9ea32c6c9bd7d5",
+      "seed": 43,
+      "writer": "joint"
+    },
+    {
+      "directory": "/work/xg24i002/x10041/LoopLora-wt/sym/runs/uns/main/evaluation/joint_fact-M1L4-r32-s17",
+      "failures": [],
+      "pools": {
+        "seen": {
+          "candidate_sizes": [
+            14
+          ],
+          "depths": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            6,
+            8,
+            12,
+            16
+          ],
+          "episodes": 2000,
+          "hops": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8
+          ],
+          "rows": 144000,
+          "split": "test"
+        },
+        "unseen": {
+          "candidate_sizes": [
+            14
+          ],
+          "depths": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            6,
+            8,
+            12,
+            16
+          ],
+          "episodes": 2000,
+          "hops": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8
+          ],
+          "rows": 144000,
+          "split": "test_unseen"
+        }
+      },
+      "reader": "M1",
+      "samples_hash": "9eae36540c03519c691b74219134fcb5",
+      "seed": 17,
+      "writer": "joint_fact"
+    },
+    {
+      "directory": "/work/xg24i002/x10041/LoopLora-wt/sym/runs/uns/main/evaluation/joint_fact-M1L4-r32-s29",
+      "failures": [],
+      "pools": {
+        "seen": {
+          "candidate_sizes": [
+            14
+          ],
+          "depths": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            6,
+            8,
+            12,
+            16
+          ],
+          "episodes": 2000,
+          "hops": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8
+          ],
+          "rows": 144000,
+          "split": "test"
+        },
+        "unseen": {
+          "candidate_sizes": [
+            14
+          ],
+          "depths": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            6,
+            8,
+            12,
+            16
+          ],
+          "episodes": 2000,
+          "hops": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8
+          ],
+          "rows": 144000,
+          "split": "test_unseen"
+        }
+      },
+      "reader": "M1",
+      "samples_hash": "5aa33b8d6efa48ff3317c81d761484de",
+      "seed": 29,
+      "writer": "joint_fact"
+    },
+    {
+      "directory": "/work/xg24i002/x10041/LoopLora-wt/sym/runs/uns/main/evaluation/joint_fact-M1L4-r32-s43",
+      "failures": [],
+      "pools": {
+        "seen": {
+          "candidate_sizes": [
+            14
+          ],
+          "depths": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            6,
+            8,
+            12,
+            16
+          ],
+          "episodes": 2000,
+          "hops": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8
+          ],
+          "rows": 144000,
+          "split": "test"
+        },
+        "unseen": {
+          "candidate_sizes": [
+            14
+          ],
+          "depths": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            6,
+            8,
+            12,
+            16
+          ],
+          "episodes": 2000,
+          "hops": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8
+          ],
+          "rows": 144000,
+          "split": "test_unseen"
+        }
+      },
+      "reader": "M1",
+      "samples_hash": "5ffc6aad1e645fc70fb3e51963038d62",
+      "seed": 43,
+      "writer": "joint_fact"
+    },
+    {
+      "directory": "/work/xg24i002/x10041/LoopLora-wt/sym/runs/uns/main/evaluation/joint_fact-B4-r32-s17",
+      "failures": [],
+      "pools": {
+        "seen": {
+          "candidate_sizes": [
+            14
+          ],
+          "depths": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            6,
+            8,
+            12,
+            16
+          ],
+          "episodes": 2000,
+          "hops": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8
+          ],
+          "rows": 144000,
+          "split": "test"
+        },
+        "unseen": {
+          "candidate_sizes": [
+            14
+          ],
+          "depths": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            6,
+            8,
+            12,
+            16
+          ],
+          "episodes": 2000,
+          "hops": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8
+          ],
+          "rows": 144000,
+          "split": "test_unseen"
+        }
+      },
+      "reader": "B4",
+      "samples_hash": "4f23ae716eb770cc573418567591a42b",
+      "seed": 17,
+      "writer": "joint_fact"
+    },
+    {
+      "directory": "/work/xg24i002/x10041/LoopLora-wt/sym/runs/uns/main/evaluation/joint_fact-B4-r32-s29",
+      "failures": [],
+      "pools": {
+        "seen": {
+          "candidate_sizes": [
+            14
+          ],
+          "depths": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            6,
+            8,
+            12,
+            16
+          ],
+          "episodes": 2000,
+          "hops": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8
+          ],
+          "rows": 144000,
+          "split": "test"
+        },
+        "unseen": {
+          "candidate_sizes": [
+            14
+          ],
+          "depths": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            6,
+            8,
+            12,
+            16
+          ],
+          "episodes": 2000,
+          "hops": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8
+          ],
+          "rows": 144000,
+          "split": "test_unseen"
+        }
+      },
+      "reader": "B4",
+      "samples_hash": "624b53c20108cb571a3e0920a74a253c",
+      "seed": 29,
+      "writer": "joint_fact"
+    },
+    {
+      "directory": "/work/xg24i002/x10041/LoopLora-wt/sym/runs/uns/main/evaluation/joint_fact-B4-r32-s43",
+      "failures": [],
+      "pools": {
+        "seen": {
+          "candidate_sizes": [
+            14
+          ],
+          "depths": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            6,
+            8,
+            12,
+            16
+          ],
+          "episodes": 2000,
+          "hops": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8
+          ],
+          "rows": 144000,
+          "split": "test"
+        },
+        "unseen": {
+          "candidate_sizes": [
+            14
+          ],
+          "depths": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            6,
+            8,
+            12,
+            16
+          ],
+          "episodes": 2000,
+          "hops": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8
+          ],
+          "rows": 144000,
+          "split": "test_unseen"
+        }
+      },
+      "reader": "B4",
+      "samples_hash": "d4b8f59d9b989dd48ed068d0d08d7eb1",
+      "seed": 43,
+      "writer": "joint_fact"
+    },
+    {
+      "directory": "/work/xg24i002/x10041/LoopLora-wt/sym/runs/uns/main/evaluation/oracle_random-M1L4-r32-s17",
+      "failures": [],
+      "pools": {
+        "seen": {
+          "candidate_sizes": [
+            14
+          ],
+          "depths": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            6,
+            8,
+            12,
+            16
+          ],
+          "episodes": 2000,
+          "hops": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8
+          ],
+          "rows": 144000,
+          "split": "test"
+        },
+        "unseen": {
+          "candidate_sizes": [
+            14
+          ],
+          "depths": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            6,
+            8,
+            12,
+            16
+          ],
+          "episodes": 2000,
+          "hops": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8
+          ],
+          "rows": 144000,
+          "split": "test_unseen"
+        }
+      },
+      "reader": "M1",
+      "samples_hash": "d0a100f5d225fb3ddc5dadb484ae2bf7",
+      "seed": 17,
+      "writer": "oracle_random"
+    },
+    {
+      "directory": "/work/xg24i002/x10041/LoopLora-wt/sym/runs/uns/main/evaluation/oracle_random-M1L4-r32-s29",
+      "failures": [],
+      "pools": {
+        "seen": {
+          "candidate_sizes": [
+            14
+          ],
+          "depths": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            6,
+            8,
+            12,
+            16
+          ],
+          "episodes": 2000,
+          "hops": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8
+          ],
+          "rows": 144000,
+          "split": "test"
+        },
+        "unseen": {
+          "candidate_sizes": [
+            14
+          ],
+          "depths": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            6,
+            8,
+            12,
+            16
+          ],
+          "episodes": 2000,
+          "hops": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8
+          ],
+          "rows": 144000,
+          "split": "test_unseen"
+        }
+      },
+      "reader": "M1",
+      "samples_hash": "f5e5c9be2567b60f3d8a459d0d9a89dd",
+      "seed": 29,
+      "writer": "oracle_random"
+    },
+    {
+      "directory": "/work/xg24i002/x10041/LoopLora-wt/sym/runs/uns/main/evaluation/oracle_random-M1L4-r32-s43",
+      "failures": [],
+      "pools": {
+        "seen": {
+          "candidate_sizes": [
+            14
+          ],
+          "depths": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            6,
+            8,
+            12,
+            16
+          ],
+          "episodes": 2000,
+          "hops": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8
+          ],
+          "rows": 144000,
+          "split": "test"
+        },
+        "unseen": {
+          "candidate_sizes": [
+            14
+          ],
+          "depths": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            6,
+            8,
+            12,
+            16
+          ],
+          "episodes": 2000,
+          "hops": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8
+          ],
+          "rows": 144000,
+          "split": "test_unseen"
+        }
+      },
+      "reader": "M1",
+      "samples_hash": "cd35f718278a494a3186e98ece9c8509",
+      "seed": 43,
+      "writer": "oracle_random"
+    },
+    {
+      "directory": "/work/xg24i002/x10041/LoopLora-wt/sym/runs/uns/main/evaluation/oracle_random-B4-r32-s17",
+      "failures": [],
+      "pools": {
+        "seen": {
+          "candidate_sizes": [
+            14
+          ],
+          "depths": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            6,
+            8,
+            12,
+            16
+          ],
+          "episodes": 2000,
+          "hops": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8
+          ],
+          "rows": 144000,
+          "split": "test"
+        },
+        "unseen": {
+          "candidate_sizes": [
+            14
+          ],
+          "depths": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            6,
+            8,
+            12,
+            16
+          ],
+          "episodes": 2000,
+          "hops": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8
+          ],
+          "rows": 144000,
+          "split": "test_unseen"
+        }
+      },
+      "reader": "B4",
+      "samples_hash": "3483b55d63475abe03a397c906226000",
+      "seed": 17,
+      "writer": "oracle_random"
+    },
+    {
+      "directory": "/work/xg24i002/x10041/LoopLora-wt/sym/runs/uns/main/evaluation/oracle_random-B4-r32-s29",
+      "failures": [],
+      "pools": {
+        "seen": {
+          "candidate_sizes": [
+            14
+          ],
+          "depths": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            6,
+            8,
+            12,
+            16
+          ],
+          "episodes": 2000,
+          "hops": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8
+          ],
+          "rows": 144000,
+          "split": "test"
+        },
+        "unseen": {
+          "candidate_sizes": [
+            14
+          ],
+          "depths": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            6,
+            8,
+            12,
+            16
+          ],
+          "episodes": 2000,
+          "hops": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8
+          ],
+          "rows": 144000,
+          "split": "test_unseen"
+        }
+      },
+      "reader": "B4",
+      "samples_hash": "1ec82e00dd633d184d5ab5ce86e05d0a",
+      "seed": 29,
+      "writer": "oracle_random"
+    },
+    {
+      "directory": "/work/xg24i002/x10041/LoopLora-wt/sym/runs/uns/main/evaluation/oracle_random-B4-r32-s43",
+      "failures": [],
+      "pools": {
+        "seen": {
+          "candidate_sizes": [
+            14
+          ],
+          "depths": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            6,
+            8,
+            12,
+            16
+          ],
+          "episodes": 2000,
+          "hops": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8
+          ],
+          "rows": 144000,
+          "split": "test"
+        },
+        "unseen": {
+          "candidate_sizes": [
+            14
+          ],
+          "depths": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            6,
+            8,
+            12,
+            16
+          ],
+          "episodes": 2000,
+          "hops": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8
+          ],
+          "rows": 144000,
+          "split": "test_unseen"
+        }
+      },
+      "reader": "B4",
+      "samples_hash": "8d7b140680724dff6622e3a0f31dd31a",
+      "seed": 43,
+      "writer": "oracle_random"
+    }
+  ],
+  "status": "passed"
+}

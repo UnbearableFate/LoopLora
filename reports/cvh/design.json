@@ -1,0 +1,230 @@
+{
+  "a0_theta": {
+    "joint_fact/r32/M1": {
+      "theta": 0.45,
+      "validation_accuracy": 0.17114583333333333
+    },
+    "oracle_random/r32/M1": {
+      "theta": 0.25,
+      "validation_accuracy": 0.21333333333333335
+    },
+    "t1_frozen_fact/r32/M1": {
+      "theta": 0.25,
+      "validation_accuracy": 0.13014583333333332
+    }
+  },
+  "arms": [
+    "A0",
+    "A1",
+    "A2"
+  ],
+  "confirmation": {
+    "episodes": 2000,
+    "seed": 999005,
+    "split": "test"
+  },
+  "decision": {
+    "alpha": 0.05,
+    "comparisons": 6,
+    "confidence": 0.9916666666666667,
+    "gain_minimum": 0.03,
+    "hop1_loss": 0.01,
+    "mean_depth_limit": 8.0,
+    "resamples": 2000,
+    "seed": 2718
+  },
+  "families": [
+    "oracle_random/r32/M1",
+    "joint_fact/r32/M1",
+    "t1_frozen_fact/r32/M1"
+  ],
+  "hop1_tolerance": 0.01,
+  "hops": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8
+  ],
+  "latency": {
+    "batch_size": 64,
+    "repeats": 20,
+    "warmup": 5
+  },
+  "prereg": "docs/prereg/CVH.md",
+  "readers": [
+    {
+      "blake2b": "1ca5fabe8741942ee947d643d24581f1",
+      "family": "joint_fact/r32/M1",
+      "head_blake2b": "51626416a5df36d827fcbba668f41d8c",
+      "head_path": "/work/xg24i002/x10041/LoopLora/reports/p4s-l/heads/f2-main-joint_fact-M1-s17.pt",
+      "name": "f2-main-joint_fact-M1-s17",
+      "path": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p1s/f2/main-readers/shard-02/f2-main-joint_fact-M1-s17/checkpoint.pt",
+      "r": 32,
+      "seed": 17,
+      "variant": "M1",
+      "writer": "joint_fact"
+    },
+    {
+      "blake2b": "020f263d1a74cb51aebf85b666984312",
+      "family": "joint_fact/r32/M1",
+      "head_blake2b": "0b3fe4a81588095cdaf5fa6496d32711",
+      "head_path": "/work/xg24i002/x10041/LoopLora/reports/p4s-l/heads/f2-main-joint_fact-M1-s29.pt",
+      "name": "f2-main-joint_fact-M1-s29",
+      "path": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p1s/f2/main-readers/shard-00/f2-main-joint_fact-M1-s29/checkpoint.pt",
+      "r": 32,
+      "seed": 29,
+      "variant": "M1",
+      "writer": "joint_fact"
+    },
+    {
+      "blake2b": "645cbdf31dd2853499361c3cd0f1923a",
+      "family": "joint_fact/r32/M1",
+      "head_blake2b": "b9b26c0b18207d53e80e2ffd4abba0be",
+      "head_path": "/work/xg24i002/x10041/LoopLora/reports/p4s-l/heads/f2-main-joint_fact-M1-s43.pt",
+      "name": "f2-main-joint_fact-M1-s43",
+      "path": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p1s/f2/main-readers/shard-02/f2-main-joint_fact-M1-s43/checkpoint.pt",
+      "r": 32,
+      "seed": 43,
+      "variant": "M1",
+      "writer": "joint_fact"
+    },
+    {
+      "blake2b": "ee3a2f31ae93b974609d2f70bdf9cde6",
+      "family": "t1_frozen_fact/r32/M1",
+      "head_blake2b": "205dbfc923b2aa170d2fd7bd692ac237",
+      "head_path": "/work/xg24i002/x10041/LoopLora/reports/p4s-l/heads/f2-main-t1_frozen_fact-M1-s17.pt",
+      "name": "f2-main-t1_frozen_fact-M1-s17",
+      "path": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p1s/f2/main-readers/shard-00/f2-main-t1_frozen_fact-M1-s17/checkpoint.pt",
+      "r": 32,
+      "seed": 17,
+      "variant": "M1",
+      "writer": "t1_frozen_fact"
+    },
+    {
+      "blake2b": "ce44f0d0d1e50abf704c30ef6c7a305c",
+      "family": "t1_frozen_fact/r32/M1",
+      "head_blake2b": "2e416743f30d38a0dce86bd6d6ede3d4",
+      "head_path": "/work/xg24i002/x10041/LoopLora/reports/p4s-l/heads/f2-main-t1_frozen_fact-M1-s29.pt",
+      "name": "f2-main-t1_frozen_fact-M1-s29",
+      "path": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p1s/f2/main-readers/shard-02/f2-main-t1_frozen_fact-M1-s29/checkpoint.pt",
+      "r": 32,
+      "seed": 29,
+      "variant": "M1",
+      "writer": "t1_frozen_fact"
+    },
+    {
+      "blake2b": "55d47d87777814bc0ac31dc9cb50bf1f",
+      "family": "t1_frozen_fact/r32/M1",
+      "head_blake2b": "1c17e45831c0f1187e97a65f48c01d93",
+      "head_path": "/work/xg24i002/x10041/LoopLora/reports/p4s-l/heads/f2-main-t1_frozen_fact-M1-s43.pt",
+      "name": "f2-main-t1_frozen_fact-M1-s43",
+      "path": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p1s/f2/main-readers/shard-00/f2-main-t1_frozen_fact-M1-s43/checkpoint.pt",
+      "r": 32,
+      "seed": 43,
+      "variant": "M1",
+      "writer": "t1_frozen_fact"
+    },
+    {
+      "blake2b": "5cfcfa0a8530ec2da3d01c84ba76754b",
+      "family": "oracle_random/r32/M1",
+      "head_blake2b": "43cbe24b8af1d987b25e007fcd5601e1",
+      "head_path": "/work/xg24i002/x10041/LoopLora/reports/p4s-l/heads/primary-oracle_random-M1-r32-s17.pt",
+      "name": "primary-oracle_random-M1-r32-s17",
+      "path": "/work/xg24i002/x10041/LoopLora/runs/p1s/main/20261026/runs/primary-oracle_random-M1-r32-s17/checkpoint.pt",
+      "r": 32,
+      "seed": 17,
+      "variant": "M1",
+      "writer": "oracle_random"
+    },
+    {
+      "blake2b": "f6b35c6f243797d3fd77548de37e374a",
+      "family": "oracle_random/r32/M1",
+      "head_blake2b": "03a62eab8b0e55e6c10161536b058402",
+      "head_path": "/work/xg24i002/x10041/LoopLora/reports/p4s-l/heads/primary-oracle_random-M1-r32-s29.pt",
+      "name": "primary-oracle_random-M1-r32-s29",
+      "path": "/work/xg24i002/x10041/LoopLora/runs/p1s/main/20261026/runs/primary-oracle_random-M1-r32-s29/checkpoint.pt",
+      "r": 32,
+      "seed": 29,
+      "variant": "M1",
+      "writer": "oracle_random"
+    },
+    {
+      "blake2b": "3f9b21f8658f2c86f3ae8c074589b7b2",
+      "family": "oracle_random/r32/M1",
+      "head_blake2b": "d92b34672ee10ab9d153dc27ee04d547",
+      "head_path": "/work/xg24i002/x10041/LoopLora/reports/p4s-l/heads/primary-oracle_random-M1-r32-s43.pt",
+      "name": "primary-oracle_random-M1-r32-s43",
+      "path": "/work/xg24i002/x10041/LoopLora/runs/p1s/main/20261026/runs/primary-oracle_random-M1-r32-s43/checkpoint.pt",
+      "r": 32,
+      "seed": 43,
+      "variant": "M1",
+      "writer": "oracle_random"
+    }
+  ],
+  "seeds": [
+    17,
+    29,
+    43
+  ],
+  "smoke": {
+    "steps": 200,
+    "training_episodes": 2000,
+    "training_seed": 17,
+    "validation_episodes": 200
+  },
+  "sources": {
+    "design": {
+      "blake2b": "644d55cb44e6d33787800b499559a1f7",
+      "path": "/work/xg24i002/x10041/LoopLora/reports/p4s-l/design.json"
+    },
+    "heads": {
+      "blake2b": "b7b9fb1aeaf0f008e7fbf943286e3c2d",
+      "path": "/work/xg24i002/x10041/LoopLora/reports/p4s-l/head_manifest.json"
+    },
+    "theta": {
+      "blake2b": "c784b6d2ce4856c85d467f40e2147fe8",
+      "path": "/work/xg24i002/x10041/LoopLora/reports/p4s-l/theta.json"
+    }
+  },
+  "study": "CVH",
+  "thetas": [
+    0.05,
+    0.1,
+    0.15,
+    0.2,
+    0.25,
+    0.3,
+    0.35,
+    0.4,
+    0.45,
+    0.5,
+    0.55,
+    0.6,
+    0.65,
+    0.7,
+    0.75,
+    0.8,
+    0.85,
+    0.9,
+    0.95
+  ],
+  "training": {
+    "batch_episodes": 256,
+    "episodes": 20000,
+    "label": "cvh",
+    "lr": 0.001,
+    "margin": 0.25,
+    "seed": 31337,
+    "split": "train",
+    "steps": 2000
+  },
+  "validation": {
+    "episodes": 2000,
+    "seed": 4242,
+    "split": "val"
+  }
+}
