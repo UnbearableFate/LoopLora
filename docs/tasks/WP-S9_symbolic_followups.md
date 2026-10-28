@@ -125,3 +125,22 @@ one-code rules and the heartbeat behave as specified, and it found one classific
 4. Update the state report. Run `py_compile` and pyflakes, with bytecode kept out of the worktree. Commit on wp/sym; no
    merge, no push.
 Done line: `WP-S9 step 1f done`.
+
+## Step 3 (now, login only): study reports
+Step 2 is done (wp/sym 70bfdfc). Write one report per study from the committed outputs only:
+`docs/reports/IVD.md`, `CVH.md`, `TSM.md`, `UNS.md`, `NCR.md`.
+1. For each report:
+   - the registered endpoints with their intervals at the registered level, and the decision as the prereg's rule
+     states it;
+   - the reported (non-gating) items the prereg lists;
+   - the manipulation and audit checks;
+   - jobs and node·h;
+   - the prereg's "Use of the results" wording that now applies.
+
+   Every number comes from a file under `reports/<study>/` or `runs/` that is named in the report. Do not add an
+   interpretation beyond the prereg's text. Put anything else under "Observations (not registered)".
+2. Make the tables with a small stdlib script, `scripts/report_s9_tables.py`, so they can be regenerated. Check every
+   number against its source file.
+3. Update `docs/reports/WP-S9-state.md` (step 3 done) and run `py_compile` and pyflakes. Commit on wp/sym; no merge, no
+   push.
+Done line: `WP-S9 step 3 done`.
