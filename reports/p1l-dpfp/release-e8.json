@@ -1,0 +1,57 @@
+{
+  "E": 8,
+  "max_job_seconds": 7200,
+  "primary_eval_steps_by_arm": {
+    "D128-3": [
+      5213,
+      10426,
+      15639,
+      20852,
+      26065
+    ]
+  },
+  "scale_up": "docs/prereg/DPFP.md",
+  "science_commit": "72ed4691c90eb24fd5362d20845d3d887dba1121",
+  "sizing_by_arm": {
+    "D128-3": {
+      "eval1000_seconds": 9.518943040020531,
+      "evaluations": 5,
+      "expected_seconds_with_margin": 7198.914651332721,
+      "margin": 1.5,
+      "setup_reserve_seconds": 90,
+      "smoke_fraction_of_fixed_steps": 0.09207749856128908,
+      "step_seconds": 0.1799992986388533
+    }
+  },
+  "smoke": {
+    "evaluation_episodes": 100,
+    "quality_scores_exposed": false,
+    "rows": [
+      {
+        "arm": "D128-3",
+        "eval100_seconds": [
+          0.9518943040020531,
+          0.7294348720024573,
+          0.7334773280017544,
+          0.6813902520007105,
+          0.7344624010002008
+        ],
+        "git_commit": "72ed4691c90eb24fd5362d20845d3d887dba1121",
+        "host": "mg0930",
+        "job_id": "3721493.opbs",
+        "source_hash": "45f204656988fd7c8b88e4302b87e44c",
+        "steady_step_mean_seconds": 0.1799992986388533,
+        "step_p95_seconds": 0.1836110781485331,
+        "steps": 2400,
+        "total_seconds": 452.2939429679973
+      }
+    ],
+    "steps": 2400
+  },
+  "status": "released_after_smoke_timing_gate",
+  "steps_by_arm": {
+    "D128-3": 26065
+  },
+  "study": "DPFP",
+  "walltime": "02:00:00"
+}
