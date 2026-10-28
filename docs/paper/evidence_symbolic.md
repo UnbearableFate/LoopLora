@@ -641,9 +641,9 @@ A pending row is a measurement the paper may need that does not yet exist. Its s
 and no value is imputed.
 
 No symbolic measurement is pending after WP-T10 part 1. PM1, which WP-T9 left open for the neighbour-confusion rate,
-is filled by the NCR analysis; its ID is kept in the follow-up section above. The pending items of the
-language-model line (P1-L confirmation and the memory-use check, P1L-C, DPFP, P1L-D) have placeholders in the
-[LLM ledger](evidence_llm.md#pending-follow-up-placeholders).
+is filled by the NCR analysis; its ID is kept in the follow-up section above. The P1-L confirmation, the memory-use check and P1L-C
+are reported in the [LLM ledger](evidence_llm.md#p1-l-confirmation-and-p1l-c-registered-results) (WP-T10 part 2); DPFP and P1L-D
+keep placeholders there (evidence_llm.md#pending-follow-up-placeholders).
 
 ## Statements the paper must not make
 

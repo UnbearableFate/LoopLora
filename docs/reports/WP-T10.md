@@ -57,3 +57,64 @@ P1-L confirmation and the B7 memory-use check (LP4, LP6), P1L-C (PC1), DPFP (DP1
    "not an identification of the cause".
 
 WP-T10 part 1 done
+
+# WP-T10 part 2 — P1-L confirmation with B7, and P1L-C
+
+Master `5d9c121` merged first (the branch already contained part 1). Text only, static checks only (tags resolve, no new duplicate
+ledger IDs, table columns, links, no SHA-256, `git diff --check`; every number in the new ledger rows and in Section 8.5 was
+compared with `reports/p1l/**` and `reports/p1lc/**`; derived values are the seed means and the latency means and ratios).
+
+Commits: `4bf8f44` (LLM ledger), `ac49905` (draft), `d914079` (symbolic-ledger pointer, figure TODO), plus this report.
+
+## What changed where
+
+**[evidence_llm.md](../paper/evidence_llm.md).**
+- New section "P1-L confirmation and P1L-C: registered results": LP7 (B7 check, supported: rank 32 fails, rank 128 passes, per-seed
+  values), LP8 (rank-32 gate outcomes, descriptive and not interpreted), LP9 (B8 G1-L at rank 128, not supported: +0.983333 pp
+  [0.266563, 1.716667], below 3 pp), LP10 (G2-L passes, supported, small against B5-L4), LP11 (M1-L4@4 against B4@1 at rank 128,
+  supported: +21.550000 pp [20.383229, 22.758333], per seed 24.450/15.100/25.100, 475,138 parameters each), LP12 and LP13
+  (descriptive: depth effect, walk specificity, accuracy by hop; parameters, latency, cost), PC1 (causal bridge, not supported: M1-L4
+  +0.390625 pp [-0.130208, 0.781250], B8 0.000000, bar 10 pp), PC2 (read position, descriptive), PC3 (patching rates, descriptive),
+  PC4 (replication on [102000, 104000), descriptive).
+- LP4 rewritten and narrowed; LP3, LP5 and LP6 cross-referenced; PC1 and the LP4/LP6 pointer row removed from the pending section
+  (DP1 and PD1 stay open); populations V-L8 and V-L9; source keys P1LE and P1LC; scope bullet; must-not-say list (B8, equal
+  parameters and symbolic-oracle equivalence, causal bridge, latency, rank 32); audit boundary.
+- RFXS and WL6D now cite the master paths (merged `d4de948` and `ddfcbc2`; `git diff` shows the files unchanged from `379fccd`,
+  `faacd37` and `98d048c`).
+
+**[draft.md](../paper/draft.md).** Header and abstract (the oracle-reader sentence replaces "confirmation remains pending"; only the
+confirmation outcomes changed); Section 1 scope sentence and the "separate questions" sentence; Section 8 title; Section 8.3 closing
+sentence; Section 8.4 (the LP6 prediction is now "reported in Section 8.5"); Section 8.5 rewritten (memory-use table per rank,
+rank-128 results, P1L-C; DPFP/P1L-D and readout TODOs kept); Section 9 (new bounding paragraph, intervals, conclusion); Appendix B
+rows (P1-L updated, P1L-C added); Appendix C (P1-L row rewritten, P1L-C row added, reading rules). Claim contract kept: same-rank
+comparisons only, "equal parameters" only for M1-L4 against B4 at rank 128, B8 +31.0% not parameter-matched, latency a cost
+(M1-L4 about 1.42 and B8 about 1.57 times B4 per question), no rank-32 multi-read claim, no symbolic-oracle equivalence, no
+unseen-name claim.
+
+**[evidence_symbolic.md](../paper/evidence_symbolic.md).** The pending-measurements pointer now names the reported P1-L and P1L-C rows.
+
+## Left pending (placeholders, no result)
+
+DPFP (DP1), P1L-D (PD1), and the per-step readouts (LP5; see below).
+
+## Discrepancies and wording not settleable from the sources (orchestrator decision wanted)
+
+1. **Decision record versus readout CSV.** `reports/decisions/P1L.md` says the per-step readouts put the hop-s entity at top-1 with
+   rate at most 0.3% at every step. The committed `reports/p1l/r128/per-step-readout.csv` has logit-lens top-1 rates for M1-L4 up to
+   0.643 (seed mean, hop 1, entity step 1, reader step 2), and 0.110 on the hop-2 diagonal. I did not enter or cite any readout
+   result and left LP5 open with a note; someone who owns the readout should reconcile the two before it is reported.
+2. **B0 in the decision record.** The record gives B0 (context-retained) as 0.1–0.3%; `reports/p1l/accuracy.csv` (primary) has
+   0.30–1.00% for hops 1–8. B0 is not cited.
+3. **Rank-32 wording.** The task asks for "the readers did not learn to use the oracle memory" with no interpretation, so the paper
+   gives only the B7 rule 1 sentence; the rule 2 attribution to the oracle design is kept out of the paper (ledger notes it as an
+   untested inference). The B4 lower bound at rank 32 is exactly 0.000000, which fails "interval above 0" together with B8.
+4. **B8 versus M1-L4 sentence.** "One fixed oracle memory, 17,000 steps, not a statement about unshared reads in general" paraphrases
+   the decision record's "Narrowed" bullet; the prereg has no wording for it.
+5. **P1L-C read-position inference.** The report's reading that the deployed readers also use earlier question positions is an
+   inference from the drop; the ledger marks it so and the paper does not state it.
+6. **Latency.** Timings are per-question means from one run per seed; the rank-32 and rank-128 timings come from different jobs and
+   are not compared. B4 at rank 32 (0.438 ms) is slower than at rank 128 (0.392 ms), which shows job-to-job variation.
+7. **Abstract.** Changed only for the confirmation outcomes (shared reader at rank 128, B8 fails, no causal bridge claim, rank 32
+   check). A reviewer may prefer to leave the bridge-patching clause out.
+
+WP-T10 part 2 done
