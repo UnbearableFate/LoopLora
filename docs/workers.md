@@ -97,4 +97,5 @@ Open or resume (new tab, worktree cwd):
 | WP-T10 part 3b (DPFP negative result; P1L-D not run) | sn-paper | 047fe8f |
 | WP-P5L second-scale confirmation (Qwen3-1.7B-Base; B6 met, holds at a second scale) | sn-p1l | c6b5275 |
 | WP-T10 part 4 (P5L into the LLM ledger LP14–LP20 and the draft §8.5) | sn-paper | f4cd105 |
+| Merged master full test suite after P5L (job 3722062, exit 0, 2676 passed, 1 expected skip) | orchestrator | c6b5275 |
 | Merged master full test suite (job 3721356, exit 0, 1 expected skip) | orchestrator | d4de948 |
