@@ -55,11 +55,26 @@ is locked (state doc, "Commands for step 2"): (1) the arm's own E8 smoke, `dpfp_
 (E 8, one arm); (3) `check_smoke_reload.py` for that arm; (4) the science job, 2 h with `--scale-up`, `--schedule release-e8.json --out RUNS/arms-e8`.
 Estimated 0.15 + 0.01 + at most 2.0 node·h (the E = 16 runs took 1.33 node·h each; the E8 step count comes from its smoke).
 
+## Memory interventions at the final E = 16 checkpoints (registered descriptive diagnostic; job 3721521)
+`scripts/audit_dpfp.py` (no training; tiny-model test `tests/test_audit_dpfp.py` passed in job 3721495) reloads each final export and scores the same
+1,000 validation episodes (eval seed 4242) with the deployed memory, a zeroed memory and the memory of another episode (a one-step roll of a
+seeded permutation; no episode keeps its own). Source: `reports/p1l-dpfp/audit-e16.json`. The original condition reproduces the record's final
+validation exactly for every arm (same correct count and NLL), repeated forwards are bit-identical, and the question input is unchanged
+under both interventions (asserted).
+
+| arm | original EM % (NLL) | zero memory EM % (NLL) | shuffled memory EM % (NLL) |
+| --- | ---: | ---: | ---: |
+| D32-3 | 39.0 (3.501) | 0.0 (15.087) | 0.0 (12.746) |
+| D128-1 | 58.0 (2.277) | 0.0 (12.736) | 0.2 (13.635) |
+| D128-3 | 60.8 (2.129) | 0.0 (17.440) | 0.2 (13.336) |
+
+Reading (descriptive): every DPFP arm's answers depend entirely on the episode's own memory: with zero or another episode's memory the EM is at
+most 0.2 % (2 of 1,000) and the NLL is 12 to 17 against 2.1 to 3.5 with the deployed memory, so the writer's memory is used and is
+episode specific. This says the gains in the table are carried by the memory; it does not say the
+read is accurate (read error 0.36 to 0.43).
+
 ## Not done
-The registered zero/shuffle-memory diagnostics (EM/NLL with zeroed and shuffled memory at the final checkpoints) need a no-training
-audit of the exported writers (`controlled_score` already supports the rectangular state; the audit script, a counterpart of
-`scripts/audit_p1l_read_fix.py`, is not written). The tables use the diagnostics the training run itself logged at each
-validation (WP-L4's audit columns). No test or confirmation data was read.
+No test or confirmation data was read. The audit of the E = 8 arm (below) runs after its science job.
 
 ## Jobs and cost (node·h = wall hours of a one-node job)
 | job | purpose | wall | node·h | outcome |
