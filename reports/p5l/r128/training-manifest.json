@@ -1,0 +1,170 @@
+{
+  "S": 17000,
+  "backbone": {
+    "id": "Qwen/Qwen3-1.7B-Base",
+    "revision": "ea980cb0a6c2ae4b936e82123acc929f1cec04c1"
+  },
+  "condition": "p5l-r128",
+  "jobs": {
+    "B0-s17": {
+      "checkpoint_hash": "b2d9319f68cfa867ea51e3a1caa6cddf",
+      "config_hash": "fd8e5b77c439d7e74e8c82617a0e9a89",
+      "job_id": "3721888.opbs",
+      "path": "/work/xg24i002/x10041/LoopLora/runs/p5l/main/B0-s17/B0-s17",
+      "source": "24fcc0708e4d576eaf990c23cf2b19570ef80868",
+      "train_seconds": 0.0006523199990624562
+    },
+    "B3-L4-s17": {
+      "checkpoint_hash": "e3f41f85869145cafcb02eacd5972248",
+      "config_hash": "e4c753eb1aab078410f64afc17850920",
+      "job_id": "3721881.opbs",
+      "path": "/work/xg24i002/x10041/LoopLora/runs/p5l/main/B3-L4-s17/B3-L4-s17",
+      "source": "e8ae1f91c506b03a7829c8afce2302203d42f972",
+      "train_seconds": 3059.728855577996
+    },
+    "B3-L4-s29": {
+      "checkpoint_hash": "7e10dd2af7178e05e85c81a79688de7e",
+      "config_hash": "1bc856c92818b825ac36a90f78683960",
+      "job_id": "3721884.opbs",
+      "path": "/work/xg24i002/x10041/LoopLora/runs/p5l/main/B3-L4-s29/B3-L4-s29",
+      "source": "e8ae1f91c506b03a7829c8afce2302203d42f972",
+      "train_seconds": 3081.155516191997
+    },
+    "B3-L4-s43": {
+      "checkpoint_hash": "fdb3802c893a03949734316468aa4d68",
+      "config_hash": "65db67f9eda1f19d164a1181b8b03e3a",
+      "job_id": "3721887.opbs",
+      "path": "/work/xg24i002/x10041/LoopLora/runs/p5l/main/B3-L4-s43/B3-L4-s43",
+      "source": "e8ae1f91c506b03a7829c8afce2302203d42f972",
+      "train_seconds": 3079.3220967140005
+    },
+    "B4-s17": {
+      "checkpoint_hash": "f94071de15a1b5de70acec87c932b451",
+      "config_hash": "f0e7e5ad77b8be8ffdc3cf04d8d60043",
+      "job_id": "3721880.opbs",
+      "path": "/work/xg24i002/x10041/LoopLora/runs/p5l/main/B4-s17/B4-s17",
+      "source": "e8ae1f91c506b03a7829c8afce2302203d42f972",
+      "train_seconds": 2998.8599751769943
+    },
+    "B4-s29": {
+      "checkpoint_hash": "9732bcbd81e7e1bc4c6e5e90bf2ecf9e",
+      "config_hash": "a68c1776b33337caa910e1ea9ebc7cb7",
+      "job_id": "3721883.opbs",
+      "path": "/work/xg24i002/x10041/LoopLora/runs/p5l/main/B4-s29/B4-s29",
+      "source": "e8ae1f91c506b03a7829c8afce2302203d42f972",
+      "train_seconds": 3014.300891820996
+    },
+    "B4-s43": {
+      "checkpoint_hash": "87a8235fa487a96b92da8c4e5ca530db",
+      "config_hash": "fae0a4968aa3c808d6034958b6fac4ee",
+      "job_id": "3721886.opbs",
+      "path": "/work/xg24i002/x10041/LoopLora/runs/p5l/main/B4-s43/B4-s43",
+      "source": "e8ae1f91c506b03a7829c8afce2302203d42f972",
+      "train_seconds": 3009.671084280002
+    },
+    "B5-L4-s17": {
+      "checkpoint_hash": "623a655210e97dee4e448b56e1a73554",
+      "config_hash": "f107c0a8f3be51dd0ae80567552a0505",
+      "job_id": "3721879.opbs",
+      "path": "/work/xg24i002/x10041/LoopLora/runs/p5l/main/B5-L4-s17/B5-L4-s17",
+      "source": "e8ae1f91c506b03a7829c8afce2302203d42f972",
+      "train_seconds": 3436.1145177329963
+    },
+    "B5-L4-s29": {
+      "checkpoint_hash": "ee2a0ddea8f85c5da0530e380fcca82f",
+      "config_hash": "f24f95bc62ab187b49371f6265f2c527",
+      "job_id": "3721882.opbs",
+      "path": "/work/xg24i002/x10041/LoopLora/runs/p5l/main/B5-L4-s29/B5-L4-s29",
+      "source": "e8ae1f91c506b03a7829c8afce2302203d42f972",
+      "train_seconds": 3383.9414988620047
+    },
+    "B5-L4-s43": {
+      "checkpoint_hash": "f8c26661bb74310190dc17c69f8bd5a3",
+      "config_hash": "7562636e14df3617a3a456bceb34e8fd",
+      "job_id": "3721885.opbs",
+      "path": "/work/xg24i002/x10041/LoopLora/runs/p5l/main/B5-L4-s43/B5-L4-s43",
+      "source": "e8ae1f91c506b03a7829c8afce2302203d42f972",
+      "train_seconds": 3400.5041434000013
+    },
+    "B8-s17": {
+      "checkpoint_hash": "61f471bd3d423d056d5ee3da58304375",
+      "config_hash": "8226ff32cd110fdd3c6142d5f6a60ab8",
+      "job_id": "3721865.opbs",
+      "path": "/work/xg24i002/x10041/LoopLora/runs/p5l/main/B8-s17/B8-s17",
+      "source": "e8ae1f91c506b03a7829c8afce2302203d42f972",
+      "train_seconds": 4113.804693627004
+    },
+    "B8-s29": {
+      "checkpoint_hash": "9d202f651926f8100cca2c93117965aa",
+      "config_hash": "0d1f284c8067f15fddc0d62c46966088",
+      "job_id": "3721867.opbs",
+      "path": "/work/xg24i002/x10041/LoopLora/runs/p5l/main/B8-s29/B8-s29",
+      "source": "e8ae1f91c506b03a7829c8afce2302203d42f972",
+      "train_seconds": 4066.3330378180035
+    },
+    "B8-s43": {
+      "checkpoint_hash": "2ea1fc4e7dc4208320e829af4c5fc4e4",
+      "config_hash": "d44ee54c2b4b554f91e75621c603bebe",
+      "job_id": "3721869.opbs",
+      "path": "/work/xg24i002/x10041/LoopLora/runs/p5l/main/B8-s43/B8-s43",
+      "source": "e8ae1f91c506b03a7829c8afce2302203d42f972",
+      "train_seconds": 3966.5009828389957
+    },
+    "M1-L4-s17": {
+      "checkpoint_hash": "1a6a44811f5e344b0189368a794ac585",
+      "config_hash": "b92635037f80b832a436b69e2f656dcd",
+      "job_id": "3721866.opbs",
+      "path": "/work/xg24i002/x10041/LoopLora/runs/p5l/main/M1-L4-s17/M1-L4-s17",
+      "source": "e8ae1f91c506b03a7829c8afce2302203d42f972",
+      "train_seconds": 4069.3105703960027
+    },
+    "M1-L4-s29": {
+      "checkpoint_hash": "02f3a83db6af516e8501b2e85616b753",
+      "config_hash": "7330a40cb6c7dcf02e55b5affbcd9809",
+      "job_id": "3721868.opbs",
+      "path": "/work/xg24i002/x10041/LoopLora/runs/p5l/main/M1-L4-s29/M1-L4-s29",
+      "source": "e8ae1f91c506b03a7829c8afce2302203d42f972",
+      "train_seconds": 4014.0654738919984
+    },
+    "M1-L4-s43": {
+      "checkpoint_hash": "4f90ab5689810fecbdfb17e2268a8701",
+      "config_hash": "fd10c3f0bdaadf4be2d5a3346274c7b6",
+      "job_id": "3721870.opbs",
+      "path": "/work/xg24i002/x10041/LoopLora/runs/p5l/main/M1-L4-s43/M1-L4-s43",
+      "source": "e8ae1f91c506b03a7829c8afce2302203d42f972",
+      "train_seconds": 4010.689125776
+    }
+  },
+  "lock": {
+    "hash": "7543882188846f08a0b1e3e3699b5bcb",
+    "path": "reports/p5l/r128/lr-S-lock.json"
+  },
+  "lrs": {
+    "B3-L4": 0.001,
+    "B4": 0.003,
+    "B5-L4": 0.003,
+    "B8": 0.003,
+    "M1-L4": 0.003
+  },
+  "rank": 128,
+  "runs": {
+    "B0-s17": "/work/xg24i002/x10041/LoopLora/runs/p5l/main/B0-s17/B0-s17",
+    "B3-L4-s17": "/work/xg24i002/x10041/LoopLora/runs/p5l/main/B3-L4-s17/B3-L4-s17",
+    "B3-L4-s29": "/work/xg24i002/x10041/LoopLora/runs/p5l/main/B3-L4-s29/B3-L4-s29",
+    "B3-L4-s43": "/work/xg24i002/x10041/LoopLora/runs/p5l/main/B3-L4-s43/B3-L4-s43",
+    "B4-s17": "/work/xg24i002/x10041/LoopLora/runs/p5l/main/B4-s17/B4-s17",
+    "B4-s29": "/work/xg24i002/x10041/LoopLora/runs/p5l/main/B4-s29/B4-s29",
+    "B4-s43": "/work/xg24i002/x10041/LoopLora/runs/p5l/main/B4-s43/B4-s43",
+    "B5-L4-s17": "/work/xg24i002/x10041/LoopLora/runs/p5l/main/B5-L4-s17/B5-L4-s17",
+    "B5-L4-s29": "/work/xg24i002/x10041/LoopLora/runs/p5l/main/B5-L4-s29/B5-L4-s29",
+    "B5-L4-s43": "/work/xg24i002/x10041/LoopLora/runs/p5l/main/B5-L4-s43/B5-L4-s43",
+    "B8-s17": "/work/xg24i002/x10041/LoopLora/runs/p5l/main/B8-s17/B8-s17",
+    "B8-s29": "/work/xg24i002/x10041/LoopLora/runs/p5l/main/B8-s29/B8-s29",
+    "B8-s43": "/work/xg24i002/x10041/LoopLora/runs/p5l/main/B8-s43/B8-s43",
+    "M1-L4-s17": "/work/xg24i002/x10041/LoopLora/runs/p5l/main/M1-L4-s17/M1-L4-s17",
+    "M1-L4-s29": "/work/xg24i002/x10041/LoopLora/runs/p5l/main/M1-L4-s29/M1-L4-s29",
+    "M1-L4-s43": "/work/xg24i002/x10041/LoopLora/runs/p5l/main/M1-L4-s43/M1-L4-s43"
+  },
+  "study": "p5l",
+  "training_source": "e8ae1f91c506b03a7829c8afce2302203d42f972"
+}

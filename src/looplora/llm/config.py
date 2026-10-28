@@ -17,8 +17,12 @@ PROTOCOLS = ("memory_only", "context_retained")
 ORACLE_WRITERS = ("oracle_random", "oracle_rot", "oracle_shared")
 # Registered start of the confirmation window in the `test` split, by study. A window is named, never a free integer:
 # `eval.confirmation` (optional, absent = "p1l") selects it, so resolved configs without it keep their hashes.
-CONFIRMATION_WINDOWS = {"p1l": 100000, "p1l-s": 110000}
+CONFIRMATION_WINDOWS = {"p1l": 100000, "p1l-s": 110000, "p5l": 104000}
 OPTIONAL_EVAL = ("confirmation",)
+# Optional top-level `backbone` ({"id", "revision"}): another cached backbone of the Qwen3 family (docs/prereg/P5L.md).
+# Absent = the pinned Qwen3-0.6B-Base of `llm.inject`; like `eval.confirmation` it is not in DEFAULTS, so resolved
+# configs without it keep their hashes.
+OPTIONAL_TOP = ("backbone",)
 DEFAULTS: dict[str, Any] = {
     "name": "llm", "seed": 17, "device": "cuda", "stage": "joint", "variant": "M1",
     "protocol": "memory_only", "write_policy": "fact_final", "activation": "relu",
@@ -80,7 +84,7 @@ def resolve_config(mapping: Mapping[str, Any]) -> dict[str, Any]:
     """Resolve stage contracts; smoke never permits screening or confirmation data."""
     if not isinstance(mapping, Mapping):
         raise ValueError("configuration must be a mapping")
-    unknown = set(mapping) - set(DEFAULTS)
+    unknown = set(mapping) - set(DEFAULTS) - set(OPTIONAL_TOP)
     if unknown:
         raise ValueError(f"unknown configuration fields: {sorted(unknown)}")
     for group in ("model", "task", "train", "eval", "stats"):
@@ -91,6 +95,11 @@ def resolve_config(mapping: Mapping[str, Any]) -> dict[str, Any]:
             if unknown:
                 raise ValueError(f"unknown {group} fields: {sorted(unknown)}")
     config = recursive_merge(DEFAULTS, mapping)
+    if "backbone" in config:
+        backbone = config["backbone"]
+        if (not isinstance(backbone, Mapping) or set(backbone) != {"id", "revision"}
+                or not all(isinstance(value, str) and value for value in backbone.values())):
+            raise ValueError("backbone must be a mapping with nonempty string fields id and revision")
     stage, variant = config["stage"], config["variant"]
     if stage not in STAGES or variant not in VARIANTS:
         raise ValueError("unknown stage or variant")

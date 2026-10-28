@@ -1,0 +1,20 @@
+{
+ "runs": {
+  "B0-s17": "/work/xg24i002/x10041/LoopLora/runs/p5l/confirmation/B0/B0-s17",
+  "B3-L4-s17": "/work/xg24i002/x10041/LoopLora/runs/p5l/confirmation/B3-L4/B3-L4-s17",
+  "B3-L4-s29": "/work/xg24i002/x10041/LoopLora/runs/p5l/confirmation/B3-L4/B3-L4-s29",
+  "B3-L4-s43": "/work/xg24i002/x10041/LoopLora/runs/p5l/confirmation/B3-L4/B3-L4-s43",
+  "B4-s17": "/work/xg24i002/x10041/LoopLora/runs/p5l/confirmation/B4/B4-s17",
+  "B4-s29": "/work/xg24i002/x10041/LoopLora/runs/p5l/confirmation/B4/B4-s29",
+  "B4-s43": "/work/xg24i002/x10041/LoopLora/runs/p5l/confirmation/B4/B4-s43",
+  "B5-L4-s17": "/work/xg24i002/x10041/LoopLora/runs/p5l/confirmation/B5-L4/B5-L4-s17",
+  "B5-L4-s29": "/work/xg24i002/x10041/LoopLora/runs/p5l/confirmation/B5-L4/B5-L4-s29",
+  "B5-L4-s43": "/work/xg24i002/x10041/LoopLora/runs/p5l/confirmation/B5-L4/B5-L4-s43",
+  "B8-s17": "/work/xg24i002/x10041/LoopLora/runs/p5l/confirmation/B8-s17/B8-s17",
+  "B8-s29": "/work/xg24i002/x10041/LoopLora/runs/p5l/confirmation/B8-s29/B8-s29",
+  "B8-s43": "/work/xg24i002/x10041/LoopLora/runs/p5l/confirmation/B8-s43/B8-s43",
+  "M1-L4-s17": "/work/xg24i002/x10041/LoopLora/runs/p5l/confirmation/M1-L4-s17/M1-L4-s17",
+  "M1-L4-s29": "/work/xg24i002/x10041/LoopLora/runs/p5l/confirmation/M1-L4-s29/M1-L4-s29",
+  "M1-L4-s43": "/work/xg24i002/x10041/LoopLora/runs/p5l/confirmation/M1-L4-s43/M1-L4-s43"
+ }
+}

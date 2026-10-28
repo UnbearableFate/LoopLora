@@ -4,7 +4,7 @@ from __future__ import annotations
 from contextlib import contextmanager
 from dataclasses import replace
 import os
-from typing import TYPE_CHECKING, Iterator
+from typing import TYPE_CHECKING, Iterator, Mapping
 
 import torch
 from torch import Tensor, nn
@@ -35,16 +35,27 @@ def configure_numerics() -> None:
     torch.backends.cudnn.benchmark = False
 
 
-def load_tokenizer():
+def backbone_pin(backbone: Mapping[str, str] | None = None) -> tuple[str, str]:
+    """(model id, revision) of the backbone. ``None`` is the pinned 0.6B default; a configuration may name another
+    cached backbone of the same family with ``{"id": ..., "revision": ...}`` (`config.backbone`)."""
+    if backbone is None:
+        return MODEL_ID, MODEL_REVISION
+    return backbone["id"], backbone["revision"]
+
+
+def load_tokenizer(backbone: Mapping[str, str] | None = None):
+    model_id, revision = backbone_pin(backbone)
     return AutoTokenizer.from_pretrained(
-        MODEL_ID, revision=MODEL_REVISION, cache_dir=CACHE_DIR, local_files_only=True,
+        model_id, revision=revision, cache_dir=CACHE_DIR, local_files_only=True,
     )
 
 
-def load_model(*, dtype: torch.dtype = torch.bfloat16, device: str = "cuda"):
+def load_model(*, dtype: torch.dtype = torch.bfloat16, device: str = "cuda",
+               backbone: Mapping[str, str] | None = None):
     configure_numerics()
+    model_id, revision = backbone_pin(backbone)
     model = AutoModelForCausalLM.from_pretrained(
-        MODEL_ID, revision=MODEL_REVISION, cache_dir=CACHE_DIR, local_files_only=True,
+        model_id, revision=revision, cache_dir=CACHE_DIR, local_files_only=True,
         torch_dtype=dtype, attn_implementation="sdpa",
     ).to(device)
     model.requires_grad_(False)
