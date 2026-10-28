@@ -1,4 +1,4 @@
-# WP-P5L state — step 1 done (backbone option, tests, 1.7B smoke, prereg draft); no main training
+# WP-P5L state — step 1 done; step 2: 15 trainings and B0 done and verified, authorization committed, no confirmation episode generated
 
 As of 2026-10-29 05:20 JST. Author: sn-p1l (Claude Sonnet 5.5), branch `wp/p1l`. Task: `docs/tasks/WP-P5L_second_scale.md`
 (master `1fcf56a`, merged into wp/p1l first). Prereg draft: `docs/prereg/P5L.md`. Nothing was trained beyond the smokes;
@@ -67,3 +67,38 @@ Main training 15 runs: 14.6 node·h of training + about 0.2 start-up = **14.8 no
 2. After registration, step 2 needs the evaluator/finalizer extension named above; say if it should be me.
 3. Confirmation-evaluation cost at 1.7B is a projection; a short validation-only evaluation timing on the smoke
    checkpoints (`runs/p5l/smoke-100`) can replace it before the main runs if wanted.
+
+## Step 2 (2026-10-29; prereg registered on master 99f0dae, window changed to test [104000, 106000))
+- Lock `reports/p5l/r128/lr-S-lock.json` committed at e8ae1f9 (audited by the orchestrator). The 15 trainings ran pinned to
+  e8ae1f9 (`git_commit` and `source_hash` identical in all 15 records, `source_dirty` false); B0 ran at 24fcc07 (it needs
+  `run_p5l.py` B0 support, optimizes nothing).
+- Extension built and tested: `CONFIRMATION_WINDOWS["p5l"] = 104000`, `scripts/evaluate_p5l.py` (with `--check-only`),
+  `scripts/finalize_p5l.py`, `scripts/make_p5l_manifest.py`, `configs/p5l/main-r128/B0-s17.json`, `tests/test_p5l_pipeline.py`.
+  Not done: the optional validation-only evaluation timing on the smoke checkpoints (confirmation cost stays a projection).
+
+### Verification of the trainings (before the manifest; no confirmation episode, no score)
+All 16 jobs exit 0, and each record was read: `status` complete; `config.train.steps` 17,000 and the train log's last step
+17,000 (170 logged steps plus the final line) for all 15; lr 0.003 (B8, M1-L4, B4, B5-L4) or 0.001 (B3-L4) as locked; backbone
+revision ea980cb in every config; the 15 committed config files still hash to the lock's `config_hashes`; each record's config
+equals its committed config; `checkpoint.pt` present and equal to the recorded hash; exit file 0 and receipt source e8ae1f9
+for every job. B0 (21 s wall, 0.0007 s "training"): `trainable_parameters` 0, empty `train_log.jsonl`, the same `writer_hash`
+as P1-L's B0, so the same record shape as P1-L's B0 job (0.006 node·h); its wall time is the 1.7B model load, peak memory 3.44 GB
+is the bf16 weights. Then `make_p5l_manifest.py` re-verified every run (records, checkpoints, committed configs, receipts,
+source) and wrote `reports/p5l/r128/training-manifest.json` (16 runs). `evaluate_p5l.py --check-only` (job 3722004) accepted
+the manifest and `reports/p5l/confirmation-authorization.json` (hashes of prereg, lock and manifest, k = 2, 97.5%, window
+`p5l`) with the full `check_training`, without loading a model or generating an episode.
+
+### Jobs (`reports/p5l/jobs.json`, `--study p5l`, all 26 jobs, 15.17 node·h)
+| Jobs | Name | node·h | Walltime used |
+| --- | --- | ---: | --- |
+| 3721865 / 3721867 / 3721869 | `tr-p5l-B8-s17/29/43` | 1.149 / 1.136 / 1.108 | 1:08:56 / 1:08:08 / 1:06:28 |
+| 3721866 / 3721868 / 3721870 | `tr-p5l-M1-L4-s17/29/43` | 1.136 / 1.121 / 1.120 | 1:08:11 / 1:07:16 / 1:07:12 |
+| 3721879 / 3721882 / 3721885 | `tr-p5l-B5-L4-s17/29/43` | 0.961 / 0.946 / 0.951 | 0:57:38 / 0:56:45 / 0:57:02 |
+| 3721880 / 3721883 / 3721886 | `tr-p5l-B4-s17/29/43` | 0.839 / 0.843 / 0.842 | 0:50:20 / 0:50:36 / 0:50:32 |
+| 3721881 / 3721884 / 3721887 | `tr-p5l-B3-L4-s17/29/43` | 0.856 / 0.862 / 0.861 | 0:51:21 / 0:51:43 / 0:51:41 |
+| 3721888 | `tr-p5l-B0-s17` | 0.006 | 0:00:21 |
+| 3721889 / 3721890 | `t-p5l-pipeline` / `t-p5l-pipeline2` | 0.043 / 0.014 | first run failed one test of mine (B0 evaluator test built a synthetic config); fixed, rerun passes (57 tests) |
+| 3722003 / 3722004 | `t-p5l-check`, `t-p5l-authcheck` | 0.014 / 0.006 | tests after adding `--check-only` (50 passed); real manifest/authorization check |
+Main training: 16 jobs, 14.74 node·h (projection 14.8). Step 1 (tests and smokes): 0.36 node·h. Total so far 15.17 node·h.
+Next, after the orchestrator's reply on the authorization: 16 evaluation jobs (one per reader group, `ev-p5l-*`), the manifest of
+evaluations, `finalize_p5l.py`, the decision record `reports/decisions/P5L.md` and the report `docs/reports/P5L.md`.
