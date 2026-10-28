@@ -1,0 +1,21 @@
+{
+  "audit_failures": 0,
+  "confidence": 0.95,
+  "created": "2026-10-28T15:03:31.198956+00:00",
+  "design_hash": "1782cf998e5c3ae9e34401173b43d1fd",
+  "design_lock_commit": "a8369284f11f8aea556437ebadf51e2f9076ef60",
+  "evaluation_node_hours": 0.021904669426112376,
+  "part": "B",
+  "reproduced": {
+    "joint": [],
+    "joint_fact": [],
+    "oracle_random": []
+  },
+  "resamples": 2000,
+  "seconds": 18.933417257001565,
+  "writers": [
+    "joint",
+    "joint_fact",
+    "oracle_random"
+  ]
+}
