@@ -20,6 +20,9 @@ LEDGERS = {
                 budget_rule="B2: per-job8nodes x2h; no total cap"),
     "p1l-s": dict(name="P1L-S", task="P1L-S", since="2026-10-27T00:00", prefixes=("ps-",),
                   budget_rule="P1L-S: per-job 1 node x 2h; node-hours recorded per job"),
+    "p5l": dict(name="P5L", task="WP-P5L", since="2026-10-29T04:00",
+                prefixes=("t-p5l", "sm-p5l", "tr-p5l", "ev-p5l", "fin-p5l"),
+                budget_rule="P5L: tests plus smoke <= 0.5 node-h; per-job 1 node x 2h with --scale-up docs/prereg/P5L.md"),
 }
 
 

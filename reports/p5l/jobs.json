@@ -1,0 +1,161 @@
+{
+  "accounting": "qstat observed elapsed_seconds times nodes; failed jobs included; live totals provisional",
+  "allocated_node_hours": 0.35805555555555557,
+  "allocated_node_seconds": 1289,
+  "budget_rule": "P5L: tests plus smoke <= 0.5 node-h; per-job 1 node x 2h with --scale-up docs/prereg/P5L.md",
+  "final": true,
+  "jobs": [
+    {
+      "allocated_seconds": 21,
+      "argv": [
+        "-m",
+        "pytest",
+        "-q",
+        "tests/test_p5l.py",
+        "tests/test_p1l_main_gates.py",
+        "tests/test_p1ls_pipeline.py",
+        "-x"
+      ],
+      "exit_code": 1,
+      "host": "mg0020",
+      "job_id": "3721808.opbs",
+      "log": "/work/xg24i002/x10041/LoopLora/logs/pbs/t-p5l-backbone-20261029-045516-588623.log",
+      "name": "t-p5l-backbone",
+      "node_hours": 0.005833333333333334,
+      "nodes": 1,
+      "requested_walltime": "00:20:00",
+      "source": {
+        "kind": "commit",
+        "ref": "1248990de788bf3b253a87e766754f9ded95e8f1"
+      },
+      "status": "FINISH"
+    },
+    {
+      "allocated_seconds": 120,
+      "argv": [
+        "-m",
+        "pytest",
+        "-q",
+        "tests/test_p5l.py",
+        "tests/test_p1l_main_gates.py",
+        "tests/test_p1ls_pipeline.py"
+      ],
+      "exit_code": 1,
+      "host": "mg0020",
+      "job_id": "3721815.opbs",
+      "log": "/work/xg24i002/x10041/LoopLora/logs/pbs/t-p5l-backbone2-20261029-045619-669328.log",
+      "name": "t-p5l-backbone2",
+      "node_hours": 0.03333333333333333,
+      "nodes": 1,
+      "requested_walltime": "00:20:00",
+      "source": {
+        "kind": "commit",
+        "ref": "db14e6ad899c3d22fbef32a30cecee18487a095b"
+      },
+      "status": "FINISH"
+    },
+    {
+      "allocated_seconds": 22,
+      "argv": [
+        "-m",
+        "pytest",
+        "-q",
+        "tests/test_p5l.py"
+      ],
+      "exit_code": 0,
+      "host": "mg0010",
+      "job_id": "3721817.opbs",
+      "log": "/work/xg24i002/x10041/LoopLora/logs/pbs/t-p5l-backbone3-20261029-045829-963198.log",
+      "name": "t-p5l-backbone3",
+      "node_hours": 0.006111111111111111,
+      "nodes": 1,
+      "requested_walltime": "00:10:00",
+      "source": {
+        "kind": "commit",
+        "ref": "9da789726560cdd5a7b067473e322daa16fdb639"
+      },
+      "status": "FINISH"
+    },
+    {
+      "allocated_seconds": 192,
+      "argv": [
+        "scripts/run_p5l.py",
+        "smoke",
+        "--steps",
+        "100",
+        "--out",
+        "/work/xg24i002/x10041/LoopLora/runs/p1l/main/../../p5l/smoke-100"
+      ],
+      "exit_code": 0,
+      "host": "mg0010",
+      "job_id": "3721818.opbs",
+      "log": "/work/xg24i002/x10041/LoopLora/logs/pbs/sm-p5l-quick-20261029-045912-1124719.log",
+      "name": "sm-p5l-quick",
+      "node_hours": 0.05333333333333334,
+      "nodes": 1,
+      "requested_walltime": "00:20:00",
+      "source": {
+        "kind": "commit",
+        "ref": "9da789726560cdd5a7b067473e322daa16fdb639"
+      },
+      "status": "FINISH"
+    },
+    {
+      "allocated_seconds": 87,
+      "argv": [
+        "-m",
+        "pytest",
+        "-q",
+        "tests/test_llm_train.py",
+        "tests/test_llm_oracle.py",
+        "tests/test_p1l_memory_use.py",
+        "tests/test_p1lc.py",
+        "tests/test_p1lc_stats.py",
+        "tests/test_llm_evaluate.py",
+        "tests/test_llm_determinism.py",
+        "tests/test_llm_protocols.py"
+      ],
+      "exit_code": 0,
+      "host": "mg0013",
+      "job_id": "3721819.opbs",
+      "log": "/work/xg24i002/x10041/LoopLora/logs/pbs/t-p5l-llm-20261029-045913-1125103.log",
+      "name": "t-p5l-llm",
+      "node_hours": 0.024166666666666666,
+      "nodes": 1,
+      "requested_walltime": "00:25:00",
+      "source": {
+        "kind": "commit",
+        "ref": "9da789726560cdd5a7b067473e322daa16fdb639"
+      },
+      "status": "FINISH"
+    },
+    {
+      "allocated_seconds": 847,
+      "argv": [
+        "scripts/run_p5l.py",
+        "smoke",
+        "--steps",
+        "1700",
+        "--labels",
+        "B8",
+        "M1-L4",
+        "--out",
+        "/work/xg24i002/x10041/LoopLora/runs/p5l/smoke-1700"
+      ],
+      "exit_code": 0,
+      "host": "mg0018",
+      "job_id": "3721827.opbs",
+      "log": "/work/xg24i002/x10041/LoopLora/logs/pbs/sm-p5l-10pct-20261029-050247-1742782.log",
+      "name": "sm-p5l-10pct",
+      "node_hours": 0.23527777777777778,
+      "nodes": 1,
+      "requested_walltime": "00:25:00",
+      "source": {
+        "kind": "commit",
+        "ref": "9da789726560cdd5a7b067473e322daa16fdb639"
+      },
+      "status": "FINISH"
+    }
+  ],
+  "task": "WP-P5L"
+}
