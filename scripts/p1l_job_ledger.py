@@ -13,14 +13,24 @@ from run_p1l_main import save
 
 REPO = Path("/work/xg24i002/x10041/LoopLora")
 HELPER = Path("/work/xg24i002/x10041/.codex/skills/miyabi-pbs-cmd/scripts/qstat_json.py")
+# Each study accounts only for its own job names: P1L-S's `ps-<stage>-<tag>` never matches a P1-L prefix.
+LEDGERS = {
+    "p1l": dict(name="P1-L", task="WP-P1L", since="2026-10-27T04:07",
+                prefixes=("pf-p1l", "size-p1l", "sm-p1l", "t-p1l", "p1l-", "ev-p1l", "fin-p1l"),
+                budget_rule="B2: per-job8nodes x2h; no total cap"),
+    "p1l-s": dict(name="P1L-S", task="P1L-S", since="2026-10-27T00:00", prefixes=("ps-",),
+                  budget_rule="P1L-S: per-job 1 node x 2h; node-hours recorded per job"),
+}
 
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--out", type=Path, required=True)
     parser.add_argument("--require-final", action="store_true")
+    parser.add_argument("--study", choices=tuple(LEDGERS), default="p1l")
     args = parser.parse_args()
-    prefixes = ("pf-p1l", "size-p1l", "sm-p1l", "t-p1l", "p1l-", "ev-p1l", "fin-p1l")
+    ledger = LEDGERS[args.study]
+    prefixes = ledger["prefixes"]
     submissions = REPO / "logs/pbs/submissions.jsonl"
     if submissions.stat().st_size > 8 * 1024 * 1024:
         raise ValueError("submission metadata exceeds the bounded control-plane scan")
@@ -28,7 +38,7 @@ def main():
     with submissions.open() as stream:
         for line in stream:
             row = json.loads(line)
-            if row["submitted"] >= "2026-10-27T04:07" and row["name"].startswith(prefixes):
+            if row["submitted"] >= ledger["since"] and row["name"].startswith(prefixes):
                 entries.append(row)
     history = subprocess.run(["/usr/bin/python3", "-I", str(HELPER), "-H", "--hday", "2", "--hnum", "200",
         "--fields", "job_id,job_name,status,elapsed_seconds,nodes"], capture_output=True, text=True, check=True)
@@ -69,8 +79,8 @@ def main():
             requested_walltime=entry["walltime"], exit_code=exit_code,
             source=entry["source"], argv=entry["argv"], log=str(log)))
     if args.require_final and not final:
-        raise ValueError("some P1-L jobs are still queued/running")
-    result = dict(task="WP-P1L", budget_rule="B2: per-job8nodes x2h; no total cap", final=final,
+        raise ValueError(f"some {ledger['name']} jobs are still queued/running")
+    result = dict(task=ledger["task"], budget_rule=ledger["budget_rule"], final=final,
         allocated_node_seconds=total, allocated_node_hours=total/3600,
         accounting="qstat observed elapsed_seconds times nodes; failed jobs included; live totals provisional",
         jobs=rows)

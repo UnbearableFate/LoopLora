@@ -19,13 +19,16 @@ from looplora.core.config import AdapterConfig, validate_steps
 from looplora.data.relations import TaskSpec
 from looplora.infra.seeds import derive_seed
 from .batching import PreparedBatch, repeat_snapshot, tokenize_batch
+from .config import ORACLE_WRITERS
 from .inject import (MODEL_ID, MODEL_REVISION, AdapterBank, attach_adapters,
                      configure_numerics, detach_adapters, load_model, load_tokenizer)
 from .protocols import SupportSnapshot, answer_scores, encode_support
 from .prefetch import BatchStream
-from .oracle import OracleRandomWriter
+from .oracle import OracleRandomWriter, OracleRotWriter, OracleSharedWriter
 
 WRITER_NAMES = ("A", "K", "V", "a_lambda", "a_beta", "w_lambda", "w_beta")
+ORACLE_CLASSES = {"oracle_random": OracleRandomWriter, "oracle_rot": OracleRotWriter,
+                  "oracle_shared": OracleSharedWriter}
 
 
 def make_task_spec(config: dict[str, Any], evaluation: bool = False) -> TaskSpec:
@@ -64,7 +67,8 @@ class LLMExperiment:
         self.model.requires_grad_(False)
         self._closed = False
         stage, variant = config["stage"], config["variant"]
-        self.oracle = config.get("writer", "learned") == "oracle_random"
+        self.writer_kind = config.get("writer", "learned")
+        self.oracle = self.writer_kind in ORACLE_WRITERS
         self.layer = config["model"]["layer"]
         self.input_site = config["model"].get("input_site", "o_proj")
         self.adapter = None
@@ -93,8 +97,8 @@ class LLMExperiment:
             if self.oracle:
                 if (stage not in {"reader", "joint"} or config["protocol"] != "memory_only"
                         or self.adapter.cfg.r_mem not in {32, 128}):
-                    raise ValueError("oracle_random requires a memory-only reader with r_mem in {32,128}")
-                self.writer = OracleRandomWriter(config["task"]["V"], config["task"]["n_rel"],
+                    raise ValueError(f"{self.writer_kind} requires a memory-only reader with r_mem in {{32,128}}")
+                self.writer = ORACLE_CLASSES[self.writer_kind](config["task"]["V"], config["task"]["n_rel"],
                     config.get("oracle_seed", 17), r_mem=self.adapter.cfg.r_mem).to(self.device)
                 # A encodes the question and remains trainable. Learned writer
                 # projections/gates have no role in this condition.
@@ -134,6 +138,17 @@ class LLMExperiment:
         if self.writer is None:
             return {}
         if self.oracle:
+            if self.writer_kind == "oracle_rot":
+                return dict(writer="oracle_rot", version=1, r_mem=self.writer.r_mem,
+                            V=self.writer.V, n_rel=self.writer.n_rel, seed=self.writer.seed,
+                            keys="relation_rotated_global_codes", values="OracleWriter.global_codes",
+                            rotation="qr_gaussian_positive_diagonal")
+            if self.writer_kind == "oracle_shared":
+                return dict(writer="oracle_shared", version=1, r_mem=self.writer.r_mem,
+                            V=self.writer.V, n_rel=self.writer.n_rel, seed=self.writer.seed,
+                            keys="relation_rotated_trainable_codes", values="normalized_trainable_codes",
+                            init="OracleWriter.global_codes", trainable="C",
+                            rotation="qr_gaussian_positive_diagonal")
             return dict(writer="oracle_random", version=1, r_mem=self.writer.r_mem,
                         V=self.writer.V, n_rel=self.writer.n_rel, seed=self.writer.seed,
                         keys="global_entity_relation_pairs", values="OracleWriter.global_codes")
@@ -193,7 +208,7 @@ class LLMExperiment:
         if protocol not in {"memory_only", "context_retained"}:
             raise ValueError(f"unknown protocol: {protocol}")
         if self.oracle and protocol != "memory_only":
-            raise ValueError("oracle_random supports memory_only only")
+            raise ValueError(f"{self.writer_kind} supports memory_only only")
         tokens = (tokenize_batch(arrays, self.tokenizer, device=self.device, include_support=not self.oracle)
                   if tokens is None else tokens.to(self.device))
         B = tokens.support_ids.shape[0]
@@ -254,6 +269,10 @@ class LLMExperiment:
     def trainable_parameters(self):
         return [] if self.adapter is None else [p for p in self.adapter.parameters() if p.requires_grad]
 
+    def writer_trainable_parameters(self):
+        """Parameters of an oracle writer that trains with the reader (oracle_shared's table C); else empty."""
+        return [p for p in self.writer.parameters() if p.requires_grad] if self.oracle else []
+
     def close(self) -> None:
         if not self._closed:
             detach_adapters(self.model)
@@ -270,9 +289,14 @@ def _fit(experiment: LLMExperiment, out: Path) -> dict[str, Any]:
     depth_rng = np.random.default_rng(derive_seed(config["seed"], "llm", config["stage"], "depths"))
     data_seed = derive_seed(config["seed"], "llm", "writer-data" if config["stage"] == "writer" else "train-data")
     params = experiment.trainable_parameters()
+    # oracle_shared: its code table C trains with the reader at the same lr and schedule, without weight decay,
+    # and is clipped together with the reader parameters. Other oracle writers have no parameters.
+    writer_params = experiment.writer_trainable_parameters()
+    clipped = params + writer_params
     steps = 0 if config["stage"] == "baseline" else options["steps"]
-    optimizer = torch.optim.AdamW(params, lr=options["lr"], weight_decay=options["weight_decay"]) if steps else None
-    before = experiment.writer_state() if config["stage"] == "reader" else None
+    groups = params if not writer_params else [{"params": params}, {"params": writer_params, "weight_decay": 0.}]
+    optimizer = torch.optim.AdamW(groups, lr=options["lr"], weight_decay=options["weight_decay"]) if steps else None
+    before = experiment.writer_state() if config["stage"] == "reader" and not writer_params else None
     durations, chosen = [], []
     final_loss, train_tokens = None, 0
     synchronize(experiment.device)
@@ -297,7 +321,7 @@ def _fit(experiment: LLMExperiment, out: Path) -> dict[str, Any]:
             if not torch.isfinite(loss):
                 raise FloatingPointError(f"non-finite loss at step {step + 1}")
             loss.backward()
-            grad_norm = torch.nn.utils.clip_grad_norm_(params, options["grad_clip"], error_if_nonfinite=True)
+            grad_norm = torch.nn.utils.clip_grad_norm_(clipped, options["grad_clip"], error_if_nonfinite=True)
             optimizer.step()
             synchronize(experiment.device)
             seconds = time.perf_counter() - begin
@@ -318,15 +342,18 @@ def _fit(experiment: LLMExperiment, out: Path) -> dict[str, Any]:
         after = experiment.writer_state()
         if any(not torch.equal(value, after[name]) for name, value in before.items()):
             raise RuntimeError("frozen writer changed during reader training")
-    return {"train_seconds": time.perf_counter() - started,
-            "train_step_seconds": float(np.mean(durations)) if durations else 0.,
-            "train_step_p95_seconds": float(np.quantile(durations, .95)) if durations else 0.,
-            "seconds_per_1000_steps": float(np.mean(durations)) * 1000 if durations else 0.,
-            "mean_L": float(np.mean(chosen)) if chosen else None, "steps": steps,
-            "final_loss": final_loss, "data_seed": data_seed, "train_tokens": train_tokens,
-            "train_queries": steps * options["batch_size"] * spec.Q,
-            "writer_frozen": config["stage"] == "reader" or experiment.oracle,
-            "trainable_parameters": sum(p.numel() for p in params)}
+    summary = {"train_seconds": time.perf_counter() - started,
+               "train_step_seconds": float(np.mean(durations)) if durations else 0.,
+               "train_step_p95_seconds": float(np.quantile(durations, .95)) if durations else 0.,
+               "seconds_per_1000_steps": float(np.mean(durations)) * 1000 if durations else 0.,
+               "mean_L": float(np.mean(chosen)) if chosen else None, "steps": steps,
+               "final_loss": final_loss, "data_seed": data_seed, "train_tokens": train_tokens,
+               "train_queries": steps * options["batch_size"] * spec.Q,
+               "writer_frozen": (config["stage"] == "reader" or experiment.oracle) and not writer_params,
+               "trainable_parameters": sum(p.numel() for p in params)}
+    if writer_params:
+        summary["writer_trainable_parameters"] = sum(p.numel() for p in writer_params)
+    return summary
 
 
 def train(config: dict[str, Any], out: Path, *, model=None, tokenizer=None):

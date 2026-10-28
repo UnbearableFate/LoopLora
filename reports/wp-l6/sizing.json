@@ -1,0 +1,33 @@
+{
+  "arms": {
+    "oracle_rot": {
+      "evaluation_seconds": 23.570802943999297,
+      "expected_seconds": 1091.1578948825754,
+      "node_hours": 0.3030994152451598,
+      "overhead_seconds": 15.381106139301465,
+      "peak_memory_bytes": 7175488000,
+      "step_seconds": 0.1857052569359821,
+      "walltime": "00:30:00"
+    },
+    "oracle_shared": {
+      "evaluation_seconds": 23.37036050500319,
+      "expected_seconds": 1318.21524824404,
+      "node_hours": 0.3661709022900111,
+      "overhead_seconds": 13.233656260598309,
+      "peak_memory_bytes": 7190422528,
+      "step_seconds": 0.22619329888429904,
+      "walltime": "00:40:00"
+    }
+  },
+  "expected_node_hours": 0.6692703175351709,
+  "packed": {
+    "expected_seconds": 2409.373143126615,
+    "fits_one_hour_with_margin": false,
+    "walltime": "01:05:00"
+  },
+  "pilot_steps": 5666,
+  "recommendation": "separate",
+  "reserve_seconds": 90.0,
+  "rule": "pack the two arms in one 1-node job only if 1.5 x (sum of expected seconds + reserve) <= 1 h",
+  "smoke_steps": 567
+}

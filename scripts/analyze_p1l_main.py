@@ -9,19 +9,21 @@ import math
 from pathlib import Path
 import statistics
 
-from run_p1l_main import LABELS, ROOT, digest, labels_for_rank, save
+from run_p1l_main import LABELS, ROOT, STUDIES, digest, save, trained_labels
 
 
 def read(path: Path):
     return json.loads(path.read_text())
 
 
-def timings(root: Path, rank: int = 32) -> list[dict]:
+def timings(root: Path, rank: int = 32, study: str = "p1l") -> list[dict]:
     rows = []
-    for label in labels_for_rank(rank):
+    for label in trained_labels(rank, study):
         directory = root / f"{label}-s17"
         if not directory.is_dir():
-            if rank == 128:
+            if study != "p1l":
+                parent = "smoke"
+            elif rank == 128:
                 parent = "smoke-a" if label in {"B8", "M1-L4"} else "smoke-b"
             else:
                 parent = "smoke-context" if label in {"B1", "B2"} else "smoke-oracle"
@@ -52,7 +54,7 @@ def timings(root: Path, rank: int = 32) -> list[dict]:
 
 
 def size(args) -> None:
-    rows = timings(args.root, args.rank)
+    rows = timings(args.root, args.rank, args.study)
     # Two-hour job /1.5 margin, including a bounded load/export reserve.
     longest = max(row["step_seconds"] for row in rows)
     reserve = 60. + max(row["overhead_seconds"] for row in rows)
@@ -78,14 +80,18 @@ def size(args) -> None:
                   excludes="smoke, validation, confirmation, name-gradient probe and failed jobs",
                   timing_rows=rows, source=str(args.root),
                   time=datetime.now(timezone.utc).isoformat())
+    if args.study != "p1l":
+        result["study"] = args.study
     save(args.out, result)
     print(json.dumps(result), flush=True)
 
 
 def select(args) -> None:
     sizing = read(args.sizing)
+    if sizing.get("study", "p1l") != args.study:
+        raise ValueError("the sizing file belongs to another study")
     selections, lrs = [], {}
-    for label in labels_for_rank(args.rank):
+    for label in trained_labels(args.rank, args.study):
         candidates = []
         for rate in (.001, .003):
             directory = args.root / label / f"{label}-lr{rate:g}"
@@ -115,6 +121,8 @@ def select(args) -> None:
                   sizing_hash=digest(args.sizing), time=datetime.now(timezone.utc).isoformat())
     result["packing"] = sizing["packing"]
     result["projected_main_plus_pilot_node_hours"] = sizing["main_plus_pilot_node_hours"]
+    if args.study != "p1l":
+        result["study"] = args.study
     save(args.out, result)
     print(json.dumps(result), flush=True)
 
@@ -126,7 +134,10 @@ def main() -> None:
     parser.add_argument("--out", type=Path, required=True)
     parser.add_argument("--sizing", type=Path)
     parser.add_argument("--rank", type=int, choices=(32, 128), default=32)
+    parser.add_argument("--study", choices=tuple(STUDIES), default="p1l")
     args = parser.parse_args()
+    if args.study != "p1l" and args.rank != 32:
+        parser.error(f"{args.study} runs at r = 32 only")
     from audit_p4s_stopping import require_compute
     require_compute()
     if args.stage == "size":

@@ -13,6 +13,12 @@ from looplora.infra.seeds import derive_seed
 VARIANTS = ("M1", "M1-lin", "B5", "B3", "B4", "B8", "B1", "B2", "B0")
 STAGES = ("writer", "reader", "joint", "lora_ctx", "baseline")
 PROTOCOLS = ("memory_only", "context_retained")
+# Fact-only oracle writers (P1-L oracle_random; WP-L6 rotated-key variants). All are memory-only, r = r_mem in {32, 128}.
+ORACLE_WRITERS = ("oracle_random", "oracle_rot", "oracle_shared")
+# Registered start of the confirmation window in the `test` split, by study. A window is named, never a free integer:
+# `eval.confirmation` (optional, absent = "p1l") selects it, so resolved configs without it keep their hashes.
+CONFIRMATION_WINDOWS = {"p1l": 100000, "p1l-s": 110000}
+OPTIONAL_EVAL = ("confirmation",)
 DEFAULTS: dict[str, Any] = {
     "name": "llm", "seed": 17, "device": "cuda", "stage": "joint", "variant": "M1",
     "protocol": "memory_only", "write_policy": "fact_final", "activation": "relu",
@@ -29,6 +35,13 @@ DEFAULTS: dict[str, Any] = {
              "allow_confirmation": False},
     "stats": {"resamples": 2000, "seed": 2718},
 }
+
+
+def split_window(evaluation: Mapping[str, Any], split: str) -> tuple[str, int]:
+    """Generator split and first episode index of an evaluation split: `confirm` is the registered test window."""
+    if split == "confirm":
+        return "test", CONFIRMATION_WINDOWS[evaluation.get("confirmation", "p1l")]
+    return split, 0
 
 
 def recursive_merge(base: Mapping[str, Any], updates: Mapping[str, Any]) -> dict[str, Any]:
@@ -74,7 +87,7 @@ def resolve_config(mapping: Mapping[str, Any]) -> dict[str, Any]:
         if group in mapping and not isinstance(mapping[group], Mapping):
             raise ValueError(f"{group} must be a mapping")
         if group != "task" and group in mapping:
-            unknown = set(mapping[group]) - set(DEFAULTS[group])
+            unknown = set(mapping[group]) - set(DEFAULTS[group]) - (set(OPTIONAL_EVAL) if group == "eval" else set())
             if unknown:
                 raise ValueError(f"unknown {group} fields: {sorted(unknown)}")
     config = recursive_merge(DEFAULTS, mapping)
@@ -94,11 +107,11 @@ def resolve_config(mapping: Mapping[str, Any]) -> dict[str, Any]:
         raise ValueError("unknown write_policy")
     if config["activation"] not in ("relu", "identity"):
         raise ValueError("activation must be relu or identity")
-    if config["writer"] not in ("learned", "oracle_random"):
-        raise ValueError("writer must be learned or oracle_random")
-    oracle = config["writer"] == "oracle_random"
+    if config["writer"] not in ("learned", *ORACLE_WRITERS):
+        raise ValueError(f"writer must be learned or one of {', '.join(ORACLE_WRITERS)}")
+    oracle = config["writer"] in ORACLE_WRITERS
     if oracle and (stage not in {"reader", "joint"} or variant in {"B0", "B1", "B2"}):
-        raise ValueError("oracle_random requires a memory-only reader/joint stage")
+        raise ValueError(f"{config['writer']} requires a memory-only reader/joint stage")
     if variant == "M1-lin":
         config["activation"] = "identity"
     for key in ("smoke",):
@@ -111,7 +124,7 @@ def resolve_config(mapping: Mapping[str, Any]) -> dict[str, Any]:
     _integer(config["oracle_seed"], "oracle_seed", 0)
     _integer(config["model"]["r"], "model.r")
     if oracle and config["model"]["r"] not in {32, 128}:
-        raise ValueError("oracle_random requires r = r_mem in {32,128}")
+        raise ValueError(f"{config['writer']} requires r = r_mem in {{32,128}}")
     _integer(config["model"]["layer"], "model.layer", 0)
     if config["model"]["input_site"] not in {"o_proj", "residual"}:
         raise ValueError("model.input_site must be o_proj or residual")
@@ -140,13 +153,13 @@ def resolve_config(mapping: Mapping[str, Any]) -> dict[str, Any]:
     if stage == "reader" and checkpoint is None and not oracle:
         raise ValueError("reader requires writer_checkpoint")
     if oracle and checkpoint is not None:
-        raise ValueError("oracle_random codes are self-contained; no writer_checkpoint")
+        raise ValueError(f"{config['writer']} codes are self-contained; no writer_checkpoint")
     if stage != "reader" and checkpoint is not None:
         raise ValueError("only the reader stage consumes writer_checkpoint")
     evaluation = config["eval"]
     for key in ("episodes", "batch_size"):
         _integer(evaluation[key], f"eval.{key}")
-    # All ordinary sets are [0, episodes); confirm alone maps to [100000,100000+episodes).
+    # All ordinary sets are [0, episodes); confirm alone maps to its registered window (CONFIRMATION_WINDOWS).
     if evaluation["episodes"] > 2000:
         raise ValueError("eval.episodes exceeds the preregistered 2000-episode set")
     _integer(evaluation["seed"], "eval.seed", 0)
@@ -164,6 +177,12 @@ def resolve_config(mapping: Mapping[str, Any]) -> dict[str, Any]:
         raise ValueError("invalid eval.splits")
     if "confirm" in splits and not evaluation["allow_confirmation"]:
         raise ValueError("confirmation requires eval.allow_confirmation=true")
+    if "confirmation" in evaluation:
+        window = evaluation["confirmation"]
+        if not isinstance(window, str) or window not in CONFIRMATION_WINDOWS:
+            raise ValueError(f"eval.confirmation must be one of {sorted(CONFIRMATION_WINDOWS)}")
+        if "confirm" not in splits:
+            raise ValueError("eval.confirmation requires the confirm split")
     if config["smoke"] and (splits != ["val"] or evaluation["allow_confirmation"]):
         raise ValueError("smoke is validation-only and cannot authorize confirmation")
     if config["smoke"] and "seed" not in mapping.get("eval", {}):
@@ -176,7 +195,7 @@ def resolve_config(mapping: Mapping[str, Any]) -> dict[str, Any]:
             or any(p not in PROTOCOLS for p in protocols) or len(set(protocols)) != len(protocols)):
         raise ValueError("invalid eval.protocols")
     if oracle and protocols != ["memory_only"]:
-        raise ValueError("oracle_random supports memory_only only")
+        raise ValueError(f"{config['writer']} supports memory_only only")
     if "context_retained" in protocols and variant not in ("M1", "B8", "B0", "B1", "B2"):
         raise ValueError("secondary context-retained evaluation is defined for M1/B8/B0/B1/B2")
     _integer(config["stats"]["resamples"], "stats.resamples", 2000)

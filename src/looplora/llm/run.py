@@ -17,7 +17,7 @@ from pathlib import Path
 from typing import Any
 
 from looplora.infra.seeds import derive_seed, stable_hash
-from looplora.llm.config import read_mapping, recursive_merge, resolve_config
+from looplora.llm.config import ORACLE_WRITERS, read_mapping, recursive_merge, resolve_config
 
 
 def _write_json(path: Path, value: Any) -> None:
@@ -54,7 +54,8 @@ def _parameter_counts(experiment) -> dict[str, int]:
                {id(p): p for p in experiment.adapter.parameters()})
     external = {}
     if experiment.writer is not None and experiment.writer is not experiment.adapter:
-        for name in WRITER_NAMES:
+        # "C" is oracle_shared's trainable code table: a writer parameter, counted apart from the reader's adapter.
+        for name in (*WRITER_NAMES, "C"):
             parameter = getattr(experiment.writer, name, None)
             if isinstance(parameter, Parameter) and id(parameter) not in model:
                 external[id(parameter)] = parameter
@@ -91,7 +92,7 @@ def run_one(config: dict[str, Any], out: str | Path, *, model=None, tokenizer=No
         "consumed_writer_checkpoint": consumed,
         "writer_source_record": str(Path(consumed).resolve().parent / "record.json") if consumed else None,
         "writer_checkpoint": None,
-        "writer": ("oracle_random" if config["writer"] == "oracle_random" else
+        "writer": (config["writer"] if config["writer"] in ORACLE_WRITERS else
                    "t1_frozen" if config["stage"] == "reader" else config["stage"]),
         "stage": config["stage"], "protocol": config["protocol"],
         "eval_protocols": config["eval"]["protocols"], "smoke": config["smoke"],
@@ -140,7 +141,7 @@ def run_one(config: dict[str, Any], out: str | Path, *, model=None, tokenizer=No
             "gpu": torch.cuda.get_device_name(device) if device.type == "cuda" else None,
         }
         experiment, summary = train(config, out, model=model, tokenizer=tokenizer)
-        if config["writer"] == "oracle_random":
+        if config["writer"] in ORACLE_WRITERS:
             from looplora.sym.evaluate import tensor_hash
 
             record["writer_signature"] = experiment.writer_signature()
@@ -259,7 +260,7 @@ def _comparison_groups(jobs: list[dict[str, Any]]) -> dict[str, dict[str, dict[s
             continue
         key = stable_hash({"stage": config["stage"], "writer": config["writer_checkpoint"],
                            "writer_kind": config.get("writer", "learned"),
-                           "oracle_seed": config.get("oracle_seed", 17) if config.get("writer") == "oracle_random" else None,
+                           "oracle_seed": config.get("oracle_seed", 17) if config.get("writer") in ORACLE_WRITERS else None,
                            "seed": config["seed"], "task": config["task"],
                            "model": config["model"], "write_policy": config["write_policy"],
                            "eval": {k: v for k, v in config["eval"].items() if k not in ("protocols", "depths")}})
@@ -279,12 +280,14 @@ def compare_suite(jobs: list[dict[str, Any]], out: Path) -> dict[str, Any]:
 
     result: dict[str, Any] = {"frozen_writer_hashes_verified": [], "comparisons": []}
     for variants in groups.values():
-        frozen = [job for job in variants.values() if job["config"]["stage"] == "reader"]
+        # oracle_shared trains its code table with each reader, so its memories differ by construction.
+        frozen = [job for job in variants.values()
+                  if job["config"]["stage"] == "reader" and job["config"].get("writer") != "oracle_shared"]
         reference = None
         for job in frozen:
             metrics = json.loads((out / job["name"] / "metrics.json").read_text())
             fields = ("split", "protocol", "condition", "episode_start", "M", "write_count")
-            if job["config"].get("writer", "learned") != "oracle_random":
+            if job["config"].get("writer", "learned") not in ORACLE_WRITERS:
                 fields += ("x", "u")
             hashes = [{k: entry[k] for k in fields}
                       for entry in metrics["invariant_hashes"] if entry["protocol"] == "memory_only"]
