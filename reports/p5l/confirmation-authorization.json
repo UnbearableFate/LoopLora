@@ -1,0 +1,23 @@
+{
+  "condition_manifests": {
+    "p5l-r128": "/work/xg24i002/x10041/LoopLora-wt/p1l/reports/p5l/r128/training-manifest.json"
+  },
+  "confidence": 0.975,
+  "confirmation_window": "p5l",
+  "gated_conditions": 2,
+  "lock": {
+    "hash": "7543882188846f08a0b1e3e3699b5bcb",
+    "path": "reports/p5l/r128/lr-S-lock.json"
+  },
+  "locked_at": "2026-10-28T21:39:51.383307+00:00",
+  "manifest_hash": "d5f20c919a7eefd31dae2e8ff34a6f8d",
+  "orchestrator_decision": "docs/prereg/P5L.md registered by the orchestrator (master 99f0dae, 2026-10-29): after all 15 trainings and B0 are verified, evaluate the oracle_random r = 128 condition on Qwen3-1.7B-Base on test [104000, 106000) without further permission. This file is committed for the orchestrator's check; no evaluation job is submitted before the orchestrator replies.",
+  "prereg": {
+    "hash": "ff69d3511e433065f3ca8ff17fe66a69",
+    "path": "docs/prereg/P5L.md"
+  },
+  "release_rule": "Verify all 15 trainings and B0 (records, checkpoints, exit-0 receipts, one source commit, committed configs), then create this authorization; no confirmation episode before the orchestrator's check.",
+  "status": "allowed",
+  "study": "p5l",
+  "training_source": "e8ae1f91c506b03a7829c8afce2302203d42f972"
+}

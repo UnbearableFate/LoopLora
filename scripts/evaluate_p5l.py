@@ -80,13 +80,19 @@ def main():
     parser.add_argument("--manifest", type=Path, required=True)
     parser.add_argument("--authorization", type=Path, required=True)
     parser.add_argument("--out", type=Path, required=True)
-    parser.add_argument("--runs", nargs="+", required=True)
+    parser.add_argument("--runs", nargs="+", default=[])
+    parser.add_argument("--check-only", action="store_true", help="run check_training and stop: no model, no episode")
     args = parser.parse_args()
+    if not args.check_only and not args.runs:
+        parser.error("--runs is required unless --check-only")
     require_compute()
     torch.set_num_threads(1)
     manifest = json.loads(args.manifest.read_text())
     authorization = json.loads(args.authorization.read_text())
     check_training(manifest, authorization)  # before any test episode is generated
+    if args.check_only:
+        print(json.dumps(dict(status="checked", runs=len(manifest["runs"]), window=authorization["confirmation_window"])))
+        return
     args.out.mkdir(parents=True, exist_ok=False)
     model, tokenizer = load_model(backbone=manifest["backbone"]), load_tokenizer(manifest["backbone"])
     for name in args.runs:

@@ -5,6 +5,7 @@ The matrix builders are those of the P1-L tests (tests/assets/p1l_matrix.py). Co
 import contextlib
 import copy
 import io
+import json
 from pathlib import Path
 import shutil
 from types import SimpleNamespace
@@ -206,6 +207,16 @@ def test_the_evaluator_loads_the_manifests_backbone_and_scores_the_p5l_window(re
         assert cfg["eval"]["allow_confirmation"] is True and (cfg["eval"]["episodes"], cfg["eval"]["seed"]) == (2000, 4242)
         assert split_window(cfg["eval"], "confirm") == ("test", 104000)
     assert read(out / "record.json")["authorization_hash"] == matrix.digest(repo.authorization)
+
+
+def test_check_only_checks_and_loads_nothing(repo, monkeypatch, tmp_path, capsys):
+    monkeypatch.setattr(evaluator, "require_compute", lambda: None)
+    monkeypatch.setattr(evaluator, "load_model", lambda backbone=None: pytest.fail("a model was loaded"))
+    monkeypatch.setattr(sys, "argv", ["evaluate_p5l.py", "--manifest", str(repo.manifest), "--authorization",
+                                      str(repo.authorization), "--out", str(tmp_path / "x"), "--check-only"])
+    evaluator.main()
+    assert json.loads(capsys.readouterr().out) == dict(status="checked", runs=16, window="p5l")
+    assert not (tmp_path / "x").exists()
 
 
 def test_the_evaluator_scores_nothing_when_the_checks_fail(repo, monkeypatch, tmp_path):
