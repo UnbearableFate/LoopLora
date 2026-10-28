@@ -1019,6 +1019,9 @@ Interpretations made in step 1f, stated as they are implemented (none changes a 
 | uns-lock | 3720659.opbs | 0.01 | exit 0; `reports/uns/design.json` (18 checkpoints, design_hash 1782cf998e5c3ae9e34401173b43d1fd); not committed |
 | uns-a (Part A) | 3720660.opbs | 0.02 | exit 0 (23:43 to 23:44); audit passed, 0 audit failures, all 18 reproductions true; `reports/uns/part-a` |
 | ncr | 3720661.opbs | 0.02 | exit 0 (23:43 to 23:44); 48 groups, 0 missing, 72 directories and 288000 rows verified; `reports/ncr` |
-| ivd-smoke | 3720673.opbs | | submitted at IVD_LOCK 2a8d063 (design checked by the orchestrator) |
-| cvh-smoke | 3720674.opbs | | submitted at CVH_LOCK 8a13c45 |
-| uns-time (optional timing run, two checkpoints; partial, never analysed, delete afterwards) | 3720675.opbs | | submitted at UNS_LOCK a836928 |
+| ivd-smoke | 3720673.opbs | 0.01 | exit 0 (14 s); status passed; registered smoke work: validation split, seed 4242, 128 episodes, seed-17 checkpoints, 4 checkpoints x 7 cells, 14336 rows and 1024 queries each; mean overlap ordered low < nat < high; main estimate 76 s, suggested walltime 120 s |
+| cvh-smoke | 3720674.opbs | 0.01 | exit 0 (25 s); status passed; registered smoke work: 3 readers, 200 head-training steps on 2000 training episodes (registered main: 2000 steps, 20000 episodes), validation on 200 episodes; suggested train walltime 420 s, confirm 60 s; the smoke thetas are never used |
+| uns-time (optional timing run, two checkpoints; partial, never analysed; its output was deleted) | 3720675.opbs | 0.003 | exit 0 (21 s); full registered size per checkpoint (2000 episodes, splits test and test_unseen, 288000 rows each), 5.0 s and 4.4 s; 18 checkpoints about 90 s |
+| ivd-run | 3720790.opbs | | submitted at CODE with IVD_LOCK 2a8d063, walltime 00:04:00 (suggestion 120 s) |
+| cvh-train | 3720791.opbs | | submitted with CVH_LOCK 8a13c45, walltime 00:08:00 (suggestion 420 s) |
+| uns-b | 3720792.opbs | | submitted with UNS_LOCK a836928, walltime 00:04:00 (18 x 5 s x 1.5 plus start-up) |
