@@ -3,7 +3,7 @@
 
 docs/prereg/P5L.md changes one thing relative to P1-L's r = 128 matrix: the backbone. Each file is P1-L's config with only
 `name` replaced and `backbone` added; lr (0.003; 0.001 for B3-L4), S = 17,000 and every other field are carried unchanged.
-Existing files are never rewritten.
+B0-s17 (no training) is P1-L's B0 config with r = 128. Existing files are never rewritten.
 """
 from __future__ import annotations
 
@@ -19,7 +19,7 @@ TARGET = "configs/p5l/main-r128"
 
 
 def make() -> dict[str, dict]:
-    """The fifteen configs, keyed by run name."""
+    """The fifteen trained configs plus B0-s17 (frozen base, evaluated only), keyed by run name."""
     configs = {}
     for label in LABELS:
         for seed in SEEDS:
@@ -28,6 +28,9 @@ def make() -> dict[str, dict]:
             if (base["writer"], base["oracle_seed"], base["model"]["r"], base["train"]["steps"]) != ("oracle_random", 17, 128, 17000):
                 raise ValueError(f"P1-L config {name} is not an r = 128 oracle_random run of 17,000 steps")
             configs[name] = {**base, "name": f"p5l-r128-{name}", "backbone": dict(BACKBONE)}
+    # B0 has no parameters: P1-L's B0 config (baseline stage, both protocols) with the rank field of this condition.
+    b0 = json.loads((ROOT / "configs/p1l/main/B0-s17.json").read_text())
+    configs["B0-s17"] = {**b0, "name": "p5l-r128-B0-s17", "model": {**b0["model"], "r": 128}, "backbone": dict(BACKBONE)}
     return configs
 
 

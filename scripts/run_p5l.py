@@ -15,6 +15,7 @@ from pathlib import Path
 from run_p1l_main import ROOT, fit, runtime, save
 
 LABELS = ("B8", "M1-L4", "B4", "B5-L4", "B3-L4")
+BASELINE = "B0"  # frozen base, evaluated only: its "training" writes the record and checkpoint, optimizes nothing
 SEEDS = (17, 29, 43)
 CONFIGS = "configs/p5l/main-r128"
 LOCK = "reports/p5l/r128/lr-S-lock.json"
@@ -38,6 +39,8 @@ def check_lock(lock: dict, labels, seed: int) -> None:
     if lock.get("status") != "locked" or lock.get("rank") != 128:
         raise ValueError("main requires a committed, locked r = 128 lock")
     for label in labels:
+        if label == BASELINE:
+            continue
         cfg = config(label, seed)
         if cfg["train"]["steps"] != lock["S"] or cfg["train"]["lr"] != lock["lrs"][label]:
             raise ValueError(f"{label}: the config disagrees with the lock (S or lr)")
@@ -82,7 +85,7 @@ def main() -> None:
     parser.add_argument("--out", type=Path, required=True)
     parser.add_argument("--steps", type=int)
     parser.add_argument("--seed", type=int, choices=SEEDS, default=17)
-    parser.add_argument("--labels", nargs="+", choices=LABELS)
+    parser.add_argument("--labels", nargs="+", choices=(*LABELS, BASELINE))
     args = parser.parse_args()
     if args.stage == "smoke" and (args.steps is None or args.steps < 10):
         parser.error("smoke requires --steps >= 10")

@@ -150,11 +150,11 @@ def b7_pass_cohort(request, p1l, tmp_path_factory):
 # ---- confirmation windows -----------------------------------------------------------------------------------------
 
 def test_confirmation_windows_are_named_registered_and_disjoint():
-    assert CONFIRMATION_WINDOWS == {"p1l": 100000, "p1l-s": 110000}
+    assert CONFIRMATION_WINDOWS == {"p1l": 100000, "p1l-s": 110000, "p5l": 104000}
     assert "confirmation" not in DEFAULTS["eval"]
     ranges = sorted([(start, start + 2000) for start in CONFIRMATION_WINDOWS.values()]
                     + [(REGISTERED_RANGE["start"], REGISTERED_RANGE["start"] + REGISTERED_RANGE["count"])])
-    assert all(left[1] <= right[0] for left, right in zip(ranges, ranges[1:])) and (110000, 112000) in ranges
+    assert all(left[1] <= right[0] for left, right in zip(ranges, ranges[1:])) and (110000, 112000) in ranges and (104000, 106000) in ranges
 
 
 @pytest.mark.parametrize("name", ["confirmation", "typed-replication"])

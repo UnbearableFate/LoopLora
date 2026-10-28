@@ -17,7 +17,7 @@ PROTOCOLS = ("memory_only", "context_retained")
 ORACLE_WRITERS = ("oracle_random", "oracle_rot", "oracle_shared")
 # Registered start of the confirmation window in the `test` split, by study. A window is named, never a free integer:
 # `eval.confirmation` (optional, absent = "p1l") selects it, so resolved configs without it keep their hashes.
-CONFIRMATION_WINDOWS = {"p1l": 100000, "p1l-s": 110000}
+CONFIRMATION_WINDOWS = {"p1l": 100000, "p1l-s": 110000, "p5l": 104000}
 OPTIONAL_EVAL = ("confirmation",)
 # Optional top-level `backbone` ({"id", "revision"}): another cached backbone of the Qwen3 family (docs/prereg/P5L.md).
 # Absent = the pinned Qwen3-0.6B-Base of `llm.inject`; like `eval.confirmation` it is not in DEFAULTS, so resolved

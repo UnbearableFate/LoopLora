@@ -167,13 +167,17 @@ def test_the_pinned_17b_backbone_has_the_registered_shape_and_the_same_tokenizer
 
 def test_p5l_configs_are_p1l_r128_with_the_backbone_added():
     configs = make()
-    assert sorted(configs) == sorted(f"{label}-s{seed}" for label in LABELS for seed in SEEDS) and len(configs) == 15
+    assert sorted(configs) == sorted([f"{label}-s{seed}" for label in LABELS for seed in SEEDS] + ["B0-s17"])
     for name, value in configs.items():
-        base = read(P1L_R128 / f"{name}.json")
         assert read(ROOT / run_p5l.CONFIGS / f"{name}.json") == value           # committed files are what the generator writes
-        assert value == {**base, "name": f"p5l-r128-{name}", "backbone": BACKBONE}
         resolved = resolve_config(value)
-        assert resolved["model"]["r"] == 128 and resolved["train"]["steps"] == 17000
+        assert resolved["backbone"] == BACKBONE and resolved["model"]["r"] == 128
+        if name == "B0-s17":                                                      # no parameters: P1-L's B0 at this rank
+            assert value == {**read(ROOT / "configs/p1l/main/B0-s17.json"), "name": "p5l-r128-B0-s17",
+                             "model": {**read(ROOT / "configs/p1l/main/B0-s17.json")["model"], "r": 128}, "backbone": BACKBONE}
+            continue
+        assert value == {**read(P1L_R128 / f"{name}.json"), "name": f"p5l-r128-{name}", "backbone": BACKBONE}
+        assert resolved["train"]["steps"] == 17000
         assert resolved["train"]["lr"] == (0.001 if name.startswith("B3-L4") else 0.003)
 
 
@@ -187,6 +191,7 @@ def lock():
 def test_runner_names_one_backbone_and_the_lock_must_agree_with_the_configs(monkeypatch):
     assert run_p5l.backbone_of(run_p5l.LABELS, 17) == BACKBONE
     run_p5l.check_lock(lock(), run_p5l.LABELS, 29)                                  # the carried P1-L values
+    run_p5l.check_lock(lock(), (*run_p5l.LABELS, "B0"), 17)                         # B0 has no lr or steps to lock
     for change in ({"status": "draft"}, {"rank": 32}, {"S": 16000}, {"lrs": {**lock()["lrs"], "B8": 0.001}}):
         with pytest.raises(ValueError):
             run_p5l.check_lock({**lock(), **change}, run_p5l.LABELS, 17)
