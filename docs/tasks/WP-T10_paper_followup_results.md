@@ -104,3 +104,44 @@ report). Sources: `docs/reports/DPFP.md`, `reports/p1l-dpfp/` (arms, arms-e8, au
    - Keep the claim contract: same-rank comparisons only; no end-to-end or learned-writer claim; latency is a cost.
 4. Record the test and smoke overrun (0.63 against the registered ≤ 0.5 node·h) only if the ledger records deviations.
 Report: append to `docs/reports/WP-T10.md`. Done line: `WP-T10 part 3b done`.
+
+## Part 4 (now): P5L second-scale confirmation
+First merge master into wp/paper. Use master `c6b5275` or later; it carries wp/p1l with the P5L record.
+Sources:
+- `reports/decisions/P5L.md` (decision record)
+- `docs/reports/P5L.md`
+- `reports/p5l/r128/` (`endpoints.json`, `results.md`, `memory-use.csv`, `accuracy.csv`, `inference.csv`, `record-numbers.txt`)
+- `reports/p5l/jobs.json`
+- `docs/prereg/P5L.md` (registered on master `99f0dae`)
+
+1. **Evidence ledger.** Add P5L rows to `docs/paper/evidence_llm.md` in the format of LP7–LP13. Use the next free IDs and
+   read every number from `endpoints.json` or `record-numbers.txt`.
+   - **Registered (supported):**
+     - The B7 memory-use check passes at Qwen3-1.7B-Base in every seed: hop-1 EM minus B3-L4@4 is B4@1 +30.62, B8@4
+       +28.90, M1-L4@4 +58.67 pp.
+     - The B6 equal-parameter contrast M1-L4@4 − B4@1 on hops {2, 3} is **+25.78 [24.53, 27.03]** pp, positive in every
+       seed (24.93 / 26.50 / 25.92). Both readers have 606,210 adapter parameters. The registered decision is
+       `holds_at_second_scale`.
+   - **Reported only:**
+     - G1-L fails: +1.03 [0.29, 1.80] pp. At 1.7B its hop-1 condition also fails (−1.72 [−3.32, −0.02]); it held at 0.6B.
+     - G2-L passes: +1.67 over B5-L4 and +7.17 over B3-L4.
+     - B8 has +24.3% adapter parameters over B4 at 1.7B.
+   - **Descriptive:** the per-hop table, the depth effect, walk specificity, `swap_successors`, inference time per
+     question (B4 0.49, M1-L4 0.63, B8 0.63 ms) and cost (38 jobs, 16.12 node·h).
+2. **LP4.** Add P5L as evidence that the r = 128 oracle equal-parameter result holds at a second scale of the same
+   family (Qwen3-0.6B-Base and Qwen3-1.7B-Base).
+   - Keep every existing limit: the oracle condition, the 768 seen names, the trained hops and Amendment B7 rule 3.
+   - Add the P5L-specific limits: lrs carried with no lr pilot at 1.7B, one oracle seed, three training seeds.
+   - Comparisons across the two scales are descriptive: no cross-scale test was registered. Do not write "improves with
+     scale" or any trend claim, and make no claim beyond these two sizes.
+   - The B8 statements stay as reported-only results (G1-L fails at both scales).
+3. **Draft.**
+   - Add P5L to §8 after the P1-L confirmation paragraph.
+   - Update §1, §9 and the abstract only where they state the model scale or call the LLM result single-scale. The
+     model text near line 1007 should name both backbones.
+   - Add to the must-not-say list: a scaling-trend claim; any claim for sizes other than 0.6B and 1.7B; any learned-writer
+     or end-to-end claim at 1.7B.
+   - The claim contract still applies: same-rank comparisons only, latency is a cost, and there is no efficiency claim.
+4. **Latency.** Timings from different scales and jobs are not compared with each other.
+
+Report: append to `docs/reports/WP-T10.md`. Done line: `WP-T10 part 4 done`.
