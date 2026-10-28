@@ -1,67 +1,51 @@
-# WP-P1L — in progress
+# WP-P1L — P1-L confirmation (oracle_random, r = 32 and r = 128), 2026-10-29
 
-Worker handover2026-10-27: Codex role is closing; all armed Codex wake-ups were
-cancelled. Claude Sonnet-5.5 resumes after10/28 22:00. The complete current
-job/artifact inventory and ordered commands are in P1L-state.md. Study incomplete.
+Author: sn-p1l (Claude Sonnet 5.5), branch `wp/p1l`. Decision record: `reports/decisions/P1L.md`. Tables:
+`reports/p1l/results.md` (r = 32), `reports/p1l/r128/results.md`, CSVs next to them, `reports/p1l/rank-comparison.json`,
+ledger `reports/p1l/jobs.json`, reproduction `reports/p1l/README.md`. Raw runs: `/work/xg24i002/x10041/LoopLora/runs/p1l/main/`.
 
-B5/master6de902b merged: WP-L4 selected no learned writer. Conditions are the
-two oracle ranks, k2, gate CIs97.5% fixed in confirmation-lock.json before any
-confirmation. After10/28 22:00 and all37 runs complete, evaluation is authorized
-without another permission request; until then confirmation remains held.
+## Result (confirmation set, test [100000, 102000), eval seed 4242, seeds 17/29/43, 97.5% CIs)
+Only `oracle_random` ran (WP-L4: no learned writer). Qwen3-0.6B-Base, adapter at layer 14, S = 17,000 steps.
 
-Operation-window correction06:50JST: normal operation ends10/27 08:00 per
-/etc/motd. Orchestrator authorized post10/28 22:00 confirmation and retaining
-B1/B2s43 queued. Four unstarted B4+B3 packs were cancelled and replaced by
-eight same-config/seed/S/lr singles3716612–3716619 at measured1.5x walltime
-(57m26s–58m21s), fitting07:58 if assigned promptly. Manifests updated; cancelled
-receipts retained. Details/evidence in P1L-state.md/dedicated-boundary-splits.json.
-Seven replacements started with requested ends by07:56:49; r128 B4-s43 alone
-remains queued among replacements. All seven running configs were verified.
+| Rank | B7 memory-use | G1-L (B8@4 − B4@1, hops {2, 3}) | G2-L | Reading |
+| --- | --- | --- | --- | --- |
+| r = 32 | **fail**: B4 +0.03 [0.00, 0.10], B8 +0.03 [−0.05, 0.13], M1-L4 +0.12 [0.02, 0.23] pp hop-1 EM over B3-L4 | fail (−0.01 [−0.11, 0.10]) | fail | "the readers did not learn to use the oracle memory"; outcomes not interpreted; no multiple-read claim (rule 2) |
+| r = 128 | **pass**: B4 +19.6 [18.4, 20.9], B8 +19.0 [17.9, 20.4], M1-L4 +47.9 [46.0, 49.7] pp, every seed | **fail**: +0.98 [0.27, 1.72] pp, below 3 pp (seed 29 +0.05) | pass: vs B5-L4 +0.83 [0.06, 1.55], vs B3-L4 +6.34 [5.76, 6.93] | interpreted (rule 3) |
 
-Oracle-random design/all22 run configs were committed before training(ea44bb6).
-The orchestrator's J-lens-inspired name-gradient probe A1 amendment was committed before Pilot-2(b5d923c).
-Merged master Amendments B1/B2: B2 supersedes the total cap, fixes S17000 and
-Pilot-2 5666steps; per-job<=8nodes x2h and maintenance deadline remain binding.
-Single GPU process, sequential backbone reuse, prefetch2. Smoke timing audit
-3715950 passed; S/packing locked1dc8a76. Pilot-2 jobs3715959–3715965 passed,
-5666steps per lr candidate. Selection3716286 onmg0019 fixed M1-L4 lr.003,
-all other trained readers lr.001; lr/S/config lockd644b9b precedes main.
-R32 main jobs3716288–3716306 submitted (19jobs/22runs), one node each,
-maximum request1h55min, B4/B3 pairs sequentially packed.
-Confirmation remains held for all main runs and the post-maintenance window;
-B5 supplies the WP-L4 decision and fixes k2/CI97.5%.
-Amendment B3 adds oracle r128 (15runs, own Pilot-2, B0–B2 reused); confirmation
-is now held for ALL conditions, with confidence1-.05/k fixed beforehand.
-B4 removes cross-rank single-read contrasts and adds descriptive adapter counts/
-inference timing; wrapper3716084 passed onmg0025. R128 smokes completed,
-sizing3716162 locked S17000(e955765), and Pilot-2 jobs3716168–3716172 passed.
-Selection3716392 onmg0021 fixed lr.003 for B8/M1/B4/B5, lr.001 for B3;
-lock1d1bbfd precedes all12 main jobs3716396–3716407 (15runs, one node/job,
-maximum2h; B4/B3 packed sequentially). See P1L-state.md for continuation.
-At06:17JST, B0 and two r32 B5 jobs exited0; two B4 records completed inside
-ongoing packs. Three r128 main jobs started as slots freed; other jobs are
-running/queued under the project16-job limit. Those wake-ups were subsequently
-cancelled for the worker handover; no Codex resumption remains armed.
-No test or confirmation data have been accessed.
+At r = 128 the shared-module reader M1-L4 composes: M1-L4@4 − B4@1 on hops {2, 3} is **+21.55 pp [20.38, 22.76]**
+(per seed 24.5 / 15.1 / 25.1; equal parameters, 475,138 each), so the Amendment-B6 equal-parameter criterion is met;
+depth effect +25.9 pp, walk specificity +22.3 pp; accuracy by hop 47.9 / 35.4 / 18.5 / 7.2% (hops 1–4), hops 5–8 ≤ 5%.
+The registered gated reader B8 (four unshared reads) does not: hops 2, 3 at 6.3% versus 5.4% for B4@1; B8 − M1-L4
+−20.6 pp [−21.8, −19.4]. The claim is limited by Amendment B7 rule 3: the reader learns the value→key lookup over the
+768 seen names and composes inside the LM; no equivalence with the symbolic oracle, no unseen-name claim, no learned
+writer, no P3 claim. Context-retained B1/B2 at r = 32 reach 99.7–99.9% on hops 1–3 (B0 0.1–0.3%).
 
-Raw root: /work/xg24i002/x10041/LoopLora/runs/p1l/main/.
-Preflight3715826 passed all7 paths onmg0024; peak7.2GB oracle/17.2GB context.
-Smoke3715854/3715855 passed (900steps, timing only; B2 accepts this ratio).
-Readout/oracle tests3715857 passed33checks onmg0022. J-lens-inspired name-gradient probe trial3715862 passed;
-full512-question validation-only gradient cache3715870 completed onmg0865 in932s.
-R128 support/exact reload tests3716000 passed34; short preflight3716009 passed,
-S17000 feasible. Its1700-step smokes3716020/3716021 passed. Gates/
-authorization tests3715889 passed4checks. A validation-only swap-wrapper test
-3715928 caught grouping by rewired hop rather than source hop; fixed and passed
-3715942 with source episode/query/hop retained and raw counterfactual samples.
-Initial
-sizing3715842 failed on sparse preflight timing logs; fixed/rechecked3715847.
-Validation-only full-model evaluation3716191 caught readout batch-bound
-shadowing; regression3716212 passed. Timing acceptance3716213 exposed a2.29e-5
-FP32 difference from separately recomputed residuals; actual deployed residual
-capture replaces recomputation(2823982), with5 exact replay/capture checks
-passed3716225 onmg0023. Full-model recheck3716226 passed onmg0022 with bit-exact
-deployed residual capture. A baseline timing submission
-3716221 used the central HEAD and failed before runtime; explicit-source
-replacement3716223 passed both protocols on validation only.
-Reproduction: reports/p1l/README.md. Final ledger/results/limitations pending.
+## Jobs and cost (`reports/p1l/jobs.json`, `--require-final`)
+101 jobs, **41.39 node·h**, one node each, no job above 2 h requested (B2: per-job cap only). Main training: 39 jobs,
+30.94 node·h (all 37 trainings complete; four cancelled pack jobs cost 0). Pilot-2: 12 jobs, 6.99. Confirmation
+(Step B, this stretch): tests 3720632 (`t-p1l-c-tests`, exit 0, 0.008), pre-confirmation check 3720681 (0.006),
+13 evaluation groups 2.11 node·h in total, all exit 0:
+
+| r = 128 | Job | node·h | r = 32 | Job | node·h |
+| --- | --- | ---: | --- | --- | ---: |
+| B8 | 3720689 | 0.241 | B8 | 3720694 | 0.212 |
+| M1-L4 | 3720690 | 0.606 | M1-L4 | 3721028 | 0.591 |
+| B4 | 3720691 | 0.031 | B4 | 3721029 | 0.031 |
+| B5-L4 | 3720692 | 0.033 | B5-L4 | 3721030 | 0.031 |
+| B3-L4 | 3720693 | 0.029 | B3-L4 | 3721031 | 0.030 |
+| | | | B1 / B2 / B0 | 3721032 / 3721033 / 3721290 | 0.117 / 0.118 / 0.040 |
+
+Finalizers `fin-p1l-r128` 3721292, `fin-p1l-r32` 3721297, `fin-p1l-ranks` 3721299 (exit 0, 0.022 node·h together).
+Earlier failures kept in the ledger: `t-p1l-swap` 3715928 (caught the swap-grouping bug, fixed and rerun 3715942) and
+sizing/eval smoke jobs that exited non-zero before their fixes.
+
+## Source and checks
+Confirmation ran at `P1L_SOURCE` `419276578c16f8d191a7ccb4d2ca67ea07fdec00` (authorization
+`reports/p1l/confirmation-authorization.json`: k = 2, 97.5%). The new tests (B7, P1L-C library, P1L-C statistics, gates)
+passed on compute before the confirmation (3720632). Exit 0 was not taken as success: the evaluation manifests were
+built with every record asserted complete and the finalizer status was read (`complete`).
+
+## Limits and next
+Three seeds, one oracle seed, one layout. B7 is a floor check at hop 1, not a causal proof that composition uses the
+memory. P1L-C (causal and read-position study of the r = 128 readers; `docs/reports/P1L-C-state.md`) is not started and
+waits for the orchestrator's go; it is gated on the r = 128 B7 pass, which holds.

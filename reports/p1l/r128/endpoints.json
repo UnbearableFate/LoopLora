@@ -1,0 +1,822 @@
+{
+  "G1_L": false,
+  "G2_L": true,
+  "authorization": {
+    "condition_manifests": {
+      "oracle-r128": "/work/xg24i002/x10041/LoopLora/runs/p1l/main/r128/training-manifest.json",
+      "oracle-r32": "/work/xg24i002/x10041/LoopLora/runs/p1l/main/training-manifest.json"
+    },
+    "confidence": 0.975,
+    "gated_conditions": 2,
+    "learned_condition": "not_run_no_writer_selected",
+    "locked_at": "2026-10-26T22:01:51.798838+00:00",
+    "not_before": "2026-10-28T22:00:00+09:00",
+    "orchestrator_decision": "Amendment B5: WP-L4 selected no learned writer; only the two oracle rank conditions; proceed without further permission after every main run is complete and the post-maintenance window begins.",
+    "prereg_commit": "6de902b5835c4650c0b19bfb0a822df93076451f",
+    "release_rule": "Verify all37 locked run records/checkpoints and all current main-job receipts complete successfully after2026-10-28 22:00JST, then create allowed evaluation authorization; no confirmation before release.",
+    "status": "allowed"
+  },
+  "confidence": 0.975,
+  "contrasts": {
+    "B8_vs_M1": {
+      "accuracy_a": 0.06341666666666666,
+      "accuracy_b": 0.2690833333333333,
+      "bootstrap_seed": 2330094639026045051,
+      "ci_high": -0.19358229166666666,
+      "ci_low": -0.217834375,
+      "cluster_unit": "episode",
+      "comparison": "B8@4 - M1-L4@4",
+      "condition": "memory_only/original",
+      "confidence": 0.975,
+      "depth_a": 4,
+      "depth_b": 4,
+      "difference": -0.20566666666666666,
+      "hops": [
+        2,
+        3
+      ],
+      "joint_episode_resampling": true,
+      "method": "paired_multiseed_percentile_bootstrap",
+      "n_episodes": 2000,
+      "n_queries_per_seed": 4000,
+      "n_seeds": 3,
+      "per_seed": [
+        {
+          "accuracy_a": 0.06525,
+          "accuracy_b": 0.3005,
+          "difference": -0.23525,
+          "seed": 17
+        },
+        {
+          "accuracy_a": 0.05675,
+          "accuracy_b": 0.20725,
+          "difference": -0.1505,
+          "seed": 29
+        },
+        {
+          "accuracy_a": 0.06825,
+          "accuracy_b": 0.2995,
+          "difference": -0.23125,
+          "seed": 43
+        }
+      ],
+      "resamples": 2000,
+      "seed": 2718,
+      "split": "confirm",
+      "statistic": "mean_per_seed_paired_accuracy_difference",
+      "training_seeds": [
+        17,
+        29,
+        43
+      ]
+    },
+    "G1_hop1": {
+      "accuracy_a": 0.19033333333333333,
+      "accuracy_b": 0.19633333333333333,
+      "bootstrap_seed": 4371895291286598694,
+      "ci_high": 0.007666666666666666,
+      "ci_low": -0.01983541666666666,
+      "cluster_unit": "episode",
+      "comparison": "B8@4 - B4@1",
+      "condition": "memory_only/original",
+      "confidence": 0.975,
+      "depth_a": 4,
+      "depth_b": 1,
+      "difference": -0.005999999999999999,
+      "hops": [
+        1
+      ],
+      "joint_episode_resampling": true,
+      "method": "paired_multiseed_percentile_bootstrap",
+      "n_episodes": 2000,
+      "n_queries_per_seed": 2000,
+      "n_seeds": 3,
+      "per_seed": [
+        {
+          "accuracy_a": 0.18,
+          "accuracy_b": 0.203,
+          "difference": -0.023,
+          "seed": 17
+        },
+        {
+          "accuracy_a": 0.1995,
+          "accuracy_b": 0.1875,
+          "difference": 0.012,
+          "seed": 29
+        },
+        {
+          "accuracy_a": 0.1915,
+          "accuracy_b": 0.1985,
+          "difference": -0.007,
+          "seed": 43
+        }
+      ],
+      "resamples": 2000,
+      "seed": 2718,
+      "split": "confirm",
+      "statistic": "mean_per_seed_paired_accuracy_difference",
+      "training_seeds": [
+        17,
+        29,
+        43
+      ]
+    },
+    "G1_reach": {
+      "accuracy_a": 0.06341666666666666,
+      "accuracy_b": 0.05358333333333334,
+      "bootstrap_seed": 2916392345825053644,
+      "ci_high": 0.017166666666666667,
+      "ci_low": 0.0026656250000000018,
+      "cluster_unit": "episode",
+      "comparison": "B8@4 - B4@1",
+      "condition": "memory_only/original",
+      "confidence": 0.975,
+      "depth_a": 4,
+      "depth_b": 1,
+      "difference": 0.009833333333333333,
+      "hops": [
+        2,
+        3
+      ],
+      "joint_episode_resampling": true,
+      "method": "paired_multiseed_percentile_bootstrap",
+      "n_episodes": 2000,
+      "n_queries_per_seed": 4000,
+      "n_seeds": 3,
+      "per_seed": [
+        {
+          "accuracy_a": 0.06525,
+          "accuracy_b": 0.056,
+          "difference": 0.00925,
+          "seed": 17
+        },
+        {
+          "accuracy_a": 0.05675,
+          "accuracy_b": 0.05625,
+          "difference": 0.0005,
+          "seed": 29
+        },
+        {
+          "accuracy_a": 0.06825,
+          "accuracy_b": 0.0485,
+          "difference": 0.01975,
+          "seed": 43
+        }
+      ],
+      "resamples": 2000,
+      "seed": 2718,
+      "split": "confirm",
+      "statistic": "mean_per_seed_paired_accuracy_difference",
+      "training_seeds": [
+        17,
+        29,
+        43
+      ]
+    },
+    "G1_typed": {
+      "accuracy_a": 0.06783333333333334,
+      "accuracy_b": 0.052333333333333336,
+      "bootstrap_seed": 2916392345825053644,
+      "ci_high": 0.023666666666666666,
+      "ci_low": 0.007666666666666666,
+      "cluster_unit": "episode",
+      "comparison": "B8@4 - B4@1",
+      "condition": "memory_only/original",
+      "confidence": 0.975,
+      "depth_a": 4,
+      "depth_b": 1,
+      "difference": 0.0155,
+      "hops": [
+        2,
+        3
+      ],
+      "joint_episode_resampling": true,
+      "method": "paired_multiseed_percentile_bootstrap",
+      "n_episodes": 2000,
+      "n_queries_per_seed": 4000,
+      "n_seeds": 3,
+      "per_seed": [
+        {
+          "accuracy_a": 0.06725,
+          "accuracy_b": 0.0515,
+          "difference": 0.01575,
+          "seed": 17
+        },
+        {
+          "accuracy_a": 0.059,
+          "accuracy_b": 0.053,
+          "difference": 0.006,
+          "seed": 29
+        },
+        {
+          "accuracy_a": 0.07725,
+          "accuracy_b": 0.0525,
+          "difference": 0.02475,
+          "seed": 43
+        }
+      ],
+      "resamples": 2000,
+      "seed": 2718,
+      "split": "confirm",
+      "statistic": "mean_per_seed_paired_accuracy_difference",
+      "training_seeds": [
+        17,
+        29,
+        43
+      ]
+    },
+    "G2_fixed_query": {
+      "accuracy_a": 0.06341666666666666,
+      "accuracy_b": 0.05508333333333334,
+      "bootstrap_seed": 2330094639026045051,
+      "ci_high": 0.01550104166666667,
+      "ci_low": 0.0005812500000000031,
+      "cluster_unit": "episode",
+      "comparison": "B8@4 - B5-L4@4",
+      "condition": "memory_only/original",
+      "confidence": 0.975,
+      "depth_a": 4,
+      "depth_b": 4,
+      "difference": 0.008333333333333333,
+      "hops": [
+        2,
+        3
+      ],
+      "joint_episode_resampling": true,
+      "method": "paired_multiseed_percentile_bootstrap",
+      "n_episodes": 2000,
+      "n_queries_per_seed": 4000,
+      "n_seeds": 3,
+      "per_seed": [
+        {
+          "accuracy_a": 0.06525,
+          "accuracy_b": 0.0565,
+          "difference": 0.00875,
+          "seed": 17
+        },
+        {
+          "accuracy_a": 0.05675,
+          "accuracy_b": 0.05575,
+          "difference": 0.001,
+          "seed": 29
+        },
+        {
+          "accuracy_a": 0.06825,
+          "accuracy_b": 0.053,
+          "difference": 0.01525,
+          "seed": 43
+        }
+      ],
+      "resamples": 2000,
+      "seed": 2718,
+      "split": "confirm",
+      "statistic": "mean_per_seed_paired_accuracy_difference",
+      "training_seeds": [
+        17,
+        29,
+        43
+      ]
+    },
+    "G2_no_memory": {
+      "accuracy_a": 0.06341666666666666,
+      "accuracy_b": 0.0,
+      "bootstrap_seed": 2330094639026045051,
+      "ci_high": 0.06933333333333332,
+      "ci_low": 0.05758333333333334,
+      "cluster_unit": "episode",
+      "comparison": "B8@4 - B3-L4@4",
+      "condition": "memory_only/original",
+      "confidence": 0.975,
+      "depth_a": 4,
+      "depth_b": 4,
+      "difference": 0.06341666666666666,
+      "hops": [
+        2,
+        3
+      ],
+      "joint_episode_resampling": true,
+      "method": "paired_multiseed_percentile_bootstrap",
+      "n_episodes": 2000,
+      "n_queries_per_seed": 4000,
+      "n_seeds": 3,
+      "per_seed": [
+        {
+          "accuracy_a": 0.06525,
+          "accuracy_b": 0.0,
+          "difference": 0.06525,
+          "seed": 17
+        },
+        {
+          "accuracy_a": 0.05675,
+          "accuracy_b": 0.0,
+          "difference": 0.05675,
+          "seed": 29
+        },
+        {
+          "accuracy_a": 0.06825,
+          "accuracy_b": 0.0,
+          "difference": 0.06825,
+          "seed": 43
+        }
+      ],
+      "resamples": 2000,
+      "seed": 2718,
+      "split": "confirm",
+      "statistic": "mean_per_seed_paired_accuracy_difference",
+      "training_seeds": [
+        17,
+        29,
+        43
+      ]
+    },
+    "M1_depth_far": {
+      "accuracy_a": 0.04727777777777778,
+      "accuracy_b": 0.0105,
+      "bootstrap_seed": 5314080115265547268,
+      "ci_high": 0.04183402777777778,
+      "ci_low": 0.03205555555555555,
+      "cluster_unit": "episode",
+      "comparison": "M1-L4@4 - M1-L4@1",
+      "condition": "memory_only/original",
+      "confidence": 0.975,
+      "depth_a": 4,
+      "depth_b": 1,
+      "difference": 0.03677777777777778,
+      "hops": [
+        6,
+        7,
+        8
+      ],
+      "joint_episode_resampling": true,
+      "method": "paired_multiseed_percentile_bootstrap",
+      "n_episodes": 2000,
+      "n_queries_per_seed": 6000,
+      "n_seeds": 3,
+      "per_seed": [
+        {
+          "accuracy_a": 0.0435,
+          "accuracy_b": 0.005166666666666667,
+          "difference": 0.03833333333333333,
+          "seed": 17
+        },
+        {
+          "accuracy_a": 0.060833333333333336,
+          "accuracy_b": 0.0225,
+          "difference": 0.03833333333333333,
+          "seed": 29
+        },
+        {
+          "accuracy_a": 0.0375,
+          "accuracy_b": 0.003833333333333333,
+          "difference": 0.033666666666666664,
+          "seed": 43
+        }
+      ],
+      "resamples": 2000,
+      "seed": 2718,
+      "split": "confirm",
+      "statistic": "mean_per_seed_paired_accuracy_difference",
+      "training_seeds": [
+        17,
+        29,
+        43
+      ]
+    },
+    "M1_depth_reach": {
+      "accuracy_a": 0.2690833333333333,
+      "accuracy_b": 0.009833333333333333,
+      "bootstrap_seed": 2916392345825053644,
+      "ci_high": 0.27050104166666666,
+      "ci_low": 0.2481604166666667,
+      "cluster_unit": "episode",
+      "comparison": "M1-L4@4 - M1-L4@1",
+      "condition": "memory_only/original",
+      "confidence": 0.975,
+      "depth_a": 4,
+      "depth_b": 1,
+      "difference": 0.25925,
+      "hops": [
+        2,
+        3
+      ],
+      "joint_episode_resampling": true,
+      "method": "paired_multiseed_percentile_bootstrap",
+      "n_episodes": 2000,
+      "n_queries_per_seed": 4000,
+      "n_seeds": 3,
+      "per_seed": [
+        {
+          "accuracy_a": 0.3005,
+          "accuracy_b": 0.005,
+          "difference": 0.2955,
+          "seed": 17
+        },
+        {
+          "accuracy_a": 0.20725,
+          "accuracy_b": 0.022,
+          "difference": 0.18525,
+          "seed": 29
+        },
+        {
+          "accuracy_a": 0.2995,
+          "accuracy_b": 0.0025,
+          "difference": 0.297,
+          "seed": 43
+        }
+      ],
+      "resamples": 2000,
+      "seed": 2718,
+      "split": "confirm",
+      "statistic": "mean_per_seed_paired_accuracy_difference",
+      "training_seeds": [
+        17,
+        29,
+        43
+      ]
+    },
+    "M1_vs_B3": {
+      "accuracy_a": 0.2690833333333333,
+      "accuracy_b": 0.0,
+      "bootstrap_seed": 2330094639026045051,
+      "ci_high": 0.27975,
+      "ci_low": 0.25758125,
+      "cluster_unit": "episode",
+      "comparison": "M1-L4@4 - B3-L4@4",
+      "condition": "memory_only/original",
+      "confidence": 0.975,
+      "depth_a": 4,
+      "depth_b": 4,
+      "difference": 0.2690833333333333,
+      "hops": [
+        2,
+        3
+      ],
+      "joint_episode_resampling": true,
+      "method": "paired_multiseed_percentile_bootstrap",
+      "n_episodes": 2000,
+      "n_queries_per_seed": 4000,
+      "n_seeds": 3,
+      "per_seed": [
+        {
+          "accuracy_a": 0.3005,
+          "accuracy_b": 0.0,
+          "difference": 0.3005,
+          "seed": 17
+        },
+        {
+          "accuracy_a": 0.20725,
+          "accuracy_b": 0.0,
+          "difference": 0.20725,
+          "seed": 29
+        },
+        {
+          "accuracy_a": 0.2995,
+          "accuracy_b": 0.0,
+          "difference": 0.2995,
+          "seed": 43
+        }
+      ],
+      "resamples": 2000,
+      "seed": 2718,
+      "split": "confirm",
+      "statistic": "mean_per_seed_paired_accuracy_difference",
+      "training_seeds": [
+        17,
+        29,
+        43
+      ]
+    },
+    "M1_vs_B4": {
+      "accuracy_a": 0.2690833333333333,
+      "accuracy_b": 0.05358333333333334,
+      "bootstrap_seed": 2916392345825053644,
+      "ci_high": 0.22758333333333333,
+      "ci_low": 0.20383229166666664,
+      "cluster_unit": "episode",
+      "comparison": "M1-L4@4 - B4@1",
+      "condition": "memory_only/original",
+      "confidence": 0.975,
+      "depth_a": 4,
+      "depth_b": 1,
+      "difference": 0.2155,
+      "hops": [
+        2,
+        3
+      ],
+      "joint_episode_resampling": true,
+      "method": "paired_multiseed_percentile_bootstrap",
+      "n_episodes": 2000,
+      "n_queries_per_seed": 4000,
+      "n_seeds": 3,
+      "per_seed": [
+        {
+          "accuracy_a": 0.3005,
+          "accuracy_b": 0.056,
+          "difference": 0.2445,
+          "seed": 17
+        },
+        {
+          "accuracy_a": 0.20725,
+          "accuracy_b": 0.05625,
+          "difference": 0.151,
+          "seed": 29
+        },
+        {
+          "accuracy_a": 0.2995,
+          "accuracy_b": 0.0485,
+          "difference": 0.251,
+          "seed": 43
+        }
+      ],
+      "resamples": 2000,
+      "seed": 2718,
+      "split": "confirm",
+      "statistic": "mean_per_seed_paired_accuracy_difference",
+      "training_seeds": [
+        17,
+        29,
+        43
+      ]
+    },
+    "M1_vs_B5": {
+      "accuracy_a": 0.2690833333333333,
+      "accuracy_b": 0.05508333333333334,
+      "bootstrap_seed": 2330094639026045051,
+      "ci_high": 0.22550104166666668,
+      "ci_low": 0.20216562500000002,
+      "cluster_unit": "episode",
+      "comparison": "M1-L4@4 - B5-L4@4",
+      "condition": "memory_only/original",
+      "confidence": 0.975,
+      "depth_a": 4,
+      "depth_b": 4,
+      "difference": 0.21399999999999997,
+      "hops": [
+        2,
+        3
+      ],
+      "joint_episode_resampling": true,
+      "method": "paired_multiseed_percentile_bootstrap",
+      "n_episodes": 2000,
+      "n_queries_per_seed": 4000,
+      "n_seeds": 3,
+      "per_seed": [
+        {
+          "accuracy_a": 0.3005,
+          "accuracy_b": 0.0565,
+          "difference": 0.244,
+          "seed": 17
+        },
+        {
+          "accuracy_a": 0.20725,
+          "accuracy_b": 0.05575,
+          "difference": 0.1515,
+          "seed": 29
+        },
+        {
+          "accuracy_a": 0.2995,
+          "accuracy_b": 0.053,
+          "difference": 0.2465,
+          "seed": 43
+        }
+      ],
+      "resamples": 2000,
+      "seed": 2718,
+      "split": "confirm",
+      "statistic": "mean_per_seed_paired_accuracy_difference",
+      "training_seeds": [
+        17,
+        29,
+        43
+      ]
+    },
+    "M1_walk_specificity": {
+      "bootstrap_seed": 3685017635058837478,
+      "ci_high": 0.23372326388888895,
+      "ci_low": 0.21155520833333352,
+      "cluster_unit": "episode",
+      "comparison": "reachable depth effect - far depth effect",
+      "condition": "memory_only/original",
+      "confidence": 0.975,
+      "depth_a": 4,
+      "depth_b": 1,
+      "difference": 0.22247222222222224,
+      "episode_weighting": "equal",
+      "far_difference": 0.03677777777777778,
+      "far_hops": [
+        6,
+        7,
+        8
+      ],
+      "joint_episode_resampling": true,
+      "method": "paired_multiseed_percentile_bootstrap",
+      "n_episodes": 2000,
+      "n_queries_per_seed": 10000,
+      "n_seeds": 3,
+      "per_seed": [
+        {
+          "difference": 0.2571666666666667,
+          "far_difference": 0.03833333333333333,
+          "reach_difference": 0.2955,
+          "seed": 17
+        },
+        {
+          "difference": 0.1469166666666667,
+          "far_difference": 0.03833333333333333,
+          "reach_difference": 0.18525,
+          "seed": 29
+        },
+        {
+          "difference": 0.26333333333333336,
+          "far_difference": 0.033666666666666664,
+          "reach_difference": 0.297,
+          "seed": 43
+        }
+      ],
+      "query_counts_by_subset": {
+        "far": 6000,
+        "reach": 4000
+      },
+      "reach_difference": 0.25925,
+      "reach_hops": [
+        2,
+        3
+      ],
+      "resamples": 2000,
+      "seed": 2718,
+      "split": "confirm",
+      "statistic": "mean_per_seed_episode_walk_specificity",
+      "training_seeds": [
+        17,
+        29,
+        43
+      ]
+    }
+  },
+  "memory_use": {
+    "comparator": "B3-L4@4",
+    "confidence": 0.975,
+    "contrasts": {
+      "B4_vs_B3_hop1": {
+        "accuracy_a": 0.19633333333333333,
+        "accuracy_b": 0.0,
+        "bootstrap_seed": 2699583710323696524,
+        "ci_high": 0.20933333333333334,
+        "ci_low": 0.18416666666666667,
+        "cluster_unit": "episode",
+        "comparison": "B4@1 - B3-L4@4",
+        "condition": "memory_only/original",
+        "confidence": 0.975,
+        "depth_a": 1,
+        "depth_b": 4,
+        "difference": 0.19633333333333333,
+        "hops": [
+          1
+        ],
+        "joint_episode_resampling": true,
+        "method": "paired_multiseed_percentile_bootstrap",
+        "n_episodes": 2000,
+        "n_queries_per_seed": 2000,
+        "n_seeds": 3,
+        "per_seed": [
+          {
+            "accuracy_a": 0.203,
+            "accuracy_b": 0.0,
+            "difference": 0.203,
+            "seed": 17
+          },
+          {
+            "accuracy_a": 0.1875,
+            "accuracy_b": 0.0,
+            "difference": 0.1875,
+            "seed": 29
+          },
+          {
+            "accuracy_a": 0.1985,
+            "accuracy_b": 0.0,
+            "difference": 0.1985,
+            "seed": 43
+          }
+        ],
+        "resamples": 2000,
+        "seed": 2718,
+        "split": "confirm",
+        "statistic": "mean_per_seed_paired_accuracy_difference",
+        "training_seeds": [
+          17,
+          29,
+          43
+        ]
+      },
+      "B8_vs_B3_hop1": {
+        "accuracy_a": 0.19033333333333333,
+        "accuracy_b": 0.0,
+        "bootstrap_seed": 6241248309804427305,
+        "ci_high": 0.20366666666666666,
+        "ci_low": 0.17866666666666667,
+        "cluster_unit": "episode",
+        "comparison": "B8@4 - B3-L4@4",
+        "condition": "memory_only/original",
+        "confidence": 0.975,
+        "depth_a": 4,
+        "depth_b": 4,
+        "difference": 0.19033333333333333,
+        "hops": [
+          1
+        ],
+        "joint_episode_resampling": true,
+        "method": "paired_multiseed_percentile_bootstrap",
+        "n_episodes": 2000,
+        "n_queries_per_seed": 2000,
+        "n_seeds": 3,
+        "per_seed": [
+          {
+            "accuracy_a": 0.18,
+            "accuracy_b": 0.0,
+            "difference": 0.18,
+            "seed": 17
+          },
+          {
+            "accuracy_a": 0.1995,
+            "accuracy_b": 0.0,
+            "difference": 0.1995,
+            "seed": 29
+          },
+          {
+            "accuracy_a": 0.1915,
+            "accuracy_b": 0.0,
+            "difference": 0.1915,
+            "seed": 43
+          }
+        ],
+        "resamples": 2000,
+        "seed": 2718,
+        "split": "confirm",
+        "statistic": "mean_per_seed_paired_accuracy_difference",
+        "training_seeds": [
+          17,
+          29,
+          43
+        ]
+      },
+      "M1_vs_B3_hop1": {
+        "accuracy_a": 0.4785000000000001,
+        "accuracy_b": 0.0,
+        "bootstrap_seed": 6241248309804427305,
+        "ci_high": 0.4966666666666666,
+        "ci_low": 0.4601645833333333,
+        "cluster_unit": "episode",
+        "comparison": "M1-L4@4 - B3-L4@4",
+        "condition": "memory_only/original",
+        "confidence": 0.975,
+        "depth_a": 4,
+        "depth_b": 4,
+        "difference": 0.4785000000000001,
+        "hops": [
+          1
+        ],
+        "joint_episode_resampling": true,
+        "method": "paired_multiseed_percentile_bootstrap",
+        "n_episodes": 2000,
+        "n_queries_per_seed": 2000,
+        "n_seeds": 3,
+        "per_seed": [
+          {
+            "accuracy_a": 0.514,
+            "accuracy_b": 0.0,
+            "difference": 0.514,
+            "seed": 17
+          },
+          {
+            "accuracy_a": 0.3965,
+            "accuracy_b": 0.0,
+            "difference": 0.3965,
+            "seed": 29
+          },
+          {
+            "accuracy_a": 0.525,
+            "accuracy_b": 0.0,
+            "difference": 0.525,
+            "seed": 43
+          }
+        ],
+        "resamples": 2000,
+        "seed": 2718,
+        "split": "confirm",
+        "statistic": "mean_per_seed_paired_accuracy_difference",
+        "training_seeds": [
+          17,
+          29,
+          43
+        ]
+      }
+    },
+    "hop": 1,
+    "passed": true,
+    "rule": "B7.1"
+  },
+  "memory_use_passed": true,
+  "passes": false,
+  "rank": 128,
+  "writer": "oracle_random"
+}
