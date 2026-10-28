@@ -1,0 +1,39 @@
+{
+  "audit_failures": 0,
+  "confidence": 0.95,
+  "created": "2026-10-28T14:44:00.587804+00:00",
+  "part": "A",
+  "reproduced": {
+    "joint": [
+      true,
+      true,
+      true,
+      true,
+      true,
+      true
+    ],
+    "joint_fact": [
+      true,
+      true,
+      true,
+      true,
+      true,
+      true
+    ],
+    "oracle_random": [
+      true,
+      true,
+      true,
+      true,
+      true,
+      true
+    ]
+  },
+  "resamples": 2000,
+  "seconds": 43.38939312000002,
+  "writers": [
+    "joint",
+    "joint_fact",
+    "oracle_random"
+  ]
+}

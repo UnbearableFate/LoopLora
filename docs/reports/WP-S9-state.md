@@ -1017,5 +1017,8 @@ Interpretations made in step 1f, stated as they are implemented (none changes a 
 | ivd-lock | 3720657.opbs | 0.01 | exit 0; `reports/ivd/design.json` (12 checkpoints, design_hash 50746f54e0cb346190f176a5e258fdb9); not committed: the orchestrator checks and commits it |
 | cvh-lock | 3720658.opbs | 0.01 | exit 0; `reports/cvh/design.json` (9 readers, design_hash 1659eb4141d4638139c1d8ae074b8539); not committed |
 | uns-lock | 3720659.opbs | 0.01 | exit 0; `reports/uns/design.json` (18 checkpoints, design_hash 1782cf998e5c3ae9e34401173b43d1fd); not committed |
-| uns-a (Part A) | 3720660.opbs | | queued |
-| ncr | 3720661.opbs | | queued |
+| uns-a (Part A) | 3720660.opbs | 0.02 | exit 0 (23:43 to 23:44); audit passed, 0 audit failures, all 18 reproductions true; `reports/uns/part-a` |
+| ncr | 3720661.opbs | 0.02 | exit 0 (23:43 to 23:44); 48 groups, 0 missing, 72 directories and 288000 rows verified; `reports/ncr` |
+| ivd-smoke | 3720673.opbs | | submitted at IVD_LOCK 2a8d063 (design checked by the orchestrator) |
+| cvh-smoke | 3720674.opbs | | submitted at CVH_LOCK 8a13c45 |
+| uns-time (optional timing run, two checkpoints; partial, never analysed, delete afterwards) | 3720675.opbs | | submitted at UNS_LOCK a836928 |
