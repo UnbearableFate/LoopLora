@@ -422,3 +422,40 @@ about 0.278 s per step (2 h / 1.5 less the load reserve); P1-L's M1-L4 measured 
 7. **Smoke and sizing commands** above are this section's design (the plan did not spell them out): analyze reads
    `<root>/smoke/<reader>-s17` for P1L-S, so the smoke is run with `--out $R/smoke`; `analyze size` and `select` call
    `require_compute()`, hence they are jobs.
+
+## Step 2 on compute (2026-10-28/29): result and job ledger
+
+**Registered decision: STOP.** Neither oracle code passes the registered hop-1 threshold (validation full-vocabulary EM,
+L = 4, final checkpoint, 1,000 episodes, seed 4242, threshold 0.30): `oracle_rot` 0.001 (checkpoint hash `b555847d…`),
+`oracle_shared` 0.118 (checkpoint hash `9094338f…`). `reports/wp-l6/decision.json` has `status: "stop"`, `selected:
+null`; `reports/wp-l6/sizing.json` holds the smoke sizing (separate jobs recommended: packed would need 01:05:00). Both
+pilots completed all 5,666 steps (`record.json` status complete, train log ends at step 5,666). Per the task, P1L-S runs
+only if a code is selected, so it does not run on this decision; the orchestrator decides what follows. The run is at
+7175e09; `decide` and `size` ran from an export of that commit.
+
+**Tests.** At 7175e09: `wp-l6-tests` passed (120 tests). `wp-l6-regr` failed one test of 140:
+`tests/test_p1l_main_gates.py::test_job_margin_is_enforced_before_submission`. Cause: at 7175e09 `launch_p1l_main.walltime`
+still has the hard-coded maintenance guard (refuses any job ending after 2026-10-28 00:00 UTC), which wp/p1l removed in
+02fc561; the test calls it and so fails on any date after the deadline. It is on the P1-L launcher path, not the WP-L6
+path; the other 139 tests passed and no assertion was changed. At 4dcc6b3 (guard removed) the same test passes
+(`ps-t-p1l`: 75 passed, 1 skipped; the skipped test is not identified in the `-q` log). Also at 4dcc6b3: `ps-t-pipeline`
+236 passed (all 11 GPU and real-artifact cases ran, none skipped), `ps-t-defaults` passed (the differential test against
+02fc561), `ps-t-oracle` 120 passed (overlay test with five files), `ps-t-regr` 187 passed.
+
+**Jobs** (1 node each; node·h = elapsed wall time):
+
+| Job | ID | Commit | Exit | Elapsed | Node·h |
+| --- | --- | --- | --- | --- | --- |
+| wp-l6-tests | 3720633.opbs | 7175e09 | 0 | 0.9 min | 0.015 |
+| wp-l6-regr | 3720634.opbs | 7175e09 | 1 (time-dependent P1-L guard) | 1.3 min | 0.022 |
+| ps-t-pipeline | 3720638.opbs | 4dcc6b3 | 0 | 2.0 min | 0.033 |
+| ps-t-defaults | 3720639.opbs | 4dcc6b3 | 0 | 0.9 min | 0.016 |
+| ps-t-oracle | 3720640.opbs | 4dcc6b3 | 0 | 0.9 min | 0.015 |
+| ps-t-regr | 3720641.opbs | 4dcc6b3 | 0 | 4.0 min | 0.066 |
+| ps-t-p1l | 3720753.opbs | 4dcc6b3 | 0 | 0.6 min | 0.010 |
+| wp-l6-smoke | 3720754.opbs | 7175e09 | 0 | 5.5 min | 0.091 |
+| wp-l6-rot | 3720811.opbs | 7175e09 | 0 | 19.3 min | 0.321 |
+| wp-l6-shared | 3720812.opbs | 7175e09 | 0 | 22.8 min | 0.380 |
+
+Total about 0.97 node·h (estimate before the run: 1.3 for step 2). Pilot step times: `oracle_rot` 0.194 s, `oracle_shared`
+0.231 s; peak memory about 7.2 GB each. The P1L-S ledger (`ps-` prefix) counts the five test jobs at 4dcc6b3.

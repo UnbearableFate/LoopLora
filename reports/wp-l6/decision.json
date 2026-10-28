@@ -1,0 +1,27 @@
+{
+  "arms": {
+    "oracle_rot": {
+      "checkpoint_hash": "b555847d207fdfdfc6ccf338e44712cc",
+      "hop1_L4_full_em": 0.001,
+      "job_id": "3720811.opbs",
+      "n": 1000,
+      "passed": false,
+      "record": "/work/xg24i002/x10041/LoopLora/runs/wp-l6/pilot-rot/oracle_rot/record.json",
+      "writer_hash": "0efc4652bafa4fe3a0d2d8623cdfeb5d"
+    },
+    "oracle_shared": {
+      "checkpoint_hash": "9094338fae1fb9777288e9126968e048",
+      "hop1_L4_full_em": 0.118,
+      "job_id": "3720812.opbs",
+      "n": 1000,
+      "passed": false,
+      "record": "/work/xg24i002/x10041/LoopLora/runs/wp-l6/pilot-shared/oracle_shared/record.json",
+      "writer_hash": "7f2f82e0ee35338b5ba3c923200195c6"
+    }
+  },
+  "metric": "hop-1 validation full-vocabulary EM, L = 4, final checkpoint (1000 episodes, seed 4242)",
+  "rule": "O-rot if it passes; else O-shared if it passes; else stop",
+  "selected": null,
+  "status": "stop",
+  "threshold": 0.3
+}
