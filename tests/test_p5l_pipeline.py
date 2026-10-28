@@ -172,9 +172,8 @@ def test_every_run_is_complete_unchanged_on_the_registered_backbone_under_the_lo
 def run_evaluator(monkeypatch, tmp_path, repo, name):
     """main() with the model, checkpoint load and evaluate() replaced; returns what it loaded and the configs it scores."""
     seen, loaded = [], []
-    base = {**read(Path(repo.runs[name]) / "config.json"), "device": "cpu"}
     from looplora.llm.config import resolve_config
-    base = resolve_config({k: v for k, v in base.items() if k != "device"})
+    base = resolve_config(read(ROOT / run_p5l.CONFIGS / f"{name}.json"))        # the committed training config
 
     class Loaded:
         config = base
