@@ -1,0 +1,286 @@
+{
+  "bootstrap": {
+    "confidence": 0.95,
+    "resamples": 2000,
+    "seed": 2718
+  },
+  "checkpoints": [
+    {
+      "blake2b": "baa774a450bf5870b47b3a7e7ff96dc5",
+      "name": "joint-M1L4-r32-s17",
+      "path": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p2s-f1/main/shard-00/main-joint-M1-r32-m32-s17-lr0.003/checkpoint.pt",
+      "r": 32,
+      "seed": 17,
+      "trained_depths": [
+        4
+      ],
+      "variant": "M1",
+      "writer": "joint"
+    },
+    {
+      "blake2b": "8dc86ba45cf185051fa924c572b6b910",
+      "name": "joint-B4-r32-s17",
+      "path": "/work/xg24i002/x10041/LoopLora/runs/p1s/main/20261026/runs/primary-joint-B4-r32-s17/checkpoint.pt",
+      "r": 32,
+      "seed": 17,
+      "trained_depths": [
+        1
+      ],
+      "variant": "B4",
+      "writer": "joint"
+    },
+    {
+      "blake2b": "43eb7429aca1cd3ab3ba50db14081fc2",
+      "name": "joint-M1L4-r32-s29",
+      "path": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p2s-f1/main/shard-01/main-joint-M1-r32-m32-s29-lr0.003/checkpoint.pt",
+      "r": 32,
+      "seed": 29,
+      "trained_depths": [
+        4
+      ],
+      "variant": "M1",
+      "writer": "joint"
+    },
+    {
+      "blake2b": "d1dd77428dbe5e777e7305723261ff2a",
+      "name": "joint-B4-r32-s29",
+      "path": "/work/xg24i002/x10041/LoopLora/runs/p1s/main/20261026/runs/primary-joint-B4-r32-s29/checkpoint.pt",
+      "r": 32,
+      "seed": 29,
+      "trained_depths": [
+        1
+      ],
+      "variant": "B4",
+      "writer": "joint"
+    },
+    {
+      "blake2b": "7e4918d9047c8fa5fdc3b4eff95bdfce",
+      "name": "joint-M1L4-r32-s43",
+      "path": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p2s-f1/main/shard-02/main-joint-M1-r32-m32-s43-lr0.003/checkpoint.pt",
+      "r": 32,
+      "seed": 43,
+      "trained_depths": [
+        4
+      ],
+      "variant": "M1",
+      "writer": "joint"
+    },
+    {
+      "blake2b": "f67350d548e9b11bf5f445fd373699ef",
+      "name": "joint-B4-r32-s43",
+      "path": "/work/xg24i002/x10041/LoopLora/runs/p1s/main/20261026/runs/primary-joint-B4-r32-s43/checkpoint.pt",
+      "r": 32,
+      "seed": 43,
+      "trained_depths": [
+        1
+      ],
+      "variant": "B4",
+      "writer": "joint"
+    },
+    {
+      "blake2b": "f5c6175686e4f03ffcc6392ce02ab022",
+      "name": "joint_fact-M1L4-r32-s17",
+      "path": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p2s-f1/main/shard-00/main-joint_fact-M1-r32-m32-s17-lr0.003/checkpoint.pt",
+      "r": 32,
+      "seed": 17,
+      "trained_depths": [
+        4
+      ],
+      "variant": "M1",
+      "writer": "joint_fact"
+    },
+    {
+      "blake2b": "d721243c107610e7f0636984ccb2cb47",
+      "name": "joint_fact-B4-r32-s17",
+      "path": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p1s/f2/main-readers/shard-03/f2-main-joint_fact-B4-s17/checkpoint.pt",
+      "r": 32,
+      "seed": 17,
+      "trained_depths": [
+        1
+      ],
+      "variant": "B4",
+      "writer": "joint_fact"
+    },
+    {
+      "blake2b": "86b42025de037499eea42f5d1875b5ba",
+      "name": "joint_fact-M1L4-r32-s29",
+      "path": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p2s-f1/main/shard-01/main-joint_fact-M1-r32-m32-s29-lr0.003/checkpoint.pt",
+      "r": 32,
+      "seed": 29,
+      "trained_depths": [
+        4
+      ],
+      "variant": "M1",
+      "writer": "joint_fact"
+    },
+    {
+      "blake2b": "31614c46884f12a85f0a4107dcaa4af1",
+      "name": "joint_fact-B4-r32-s29",
+      "path": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p1s/f2/main-readers/shard-01/f2-main-joint_fact-B4-s29/checkpoint.pt",
+      "r": 32,
+      "seed": 29,
+      "trained_depths": [
+        1
+      ],
+      "variant": "B4",
+      "writer": "joint_fact"
+    },
+    {
+      "blake2b": "d7b36bc43b7eb6a1b9a7585d9f213f3b",
+      "name": "joint_fact-M1L4-r32-s43",
+      "path": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p2s-f1/main/shard-02/main-joint_fact-M1-r32-m32-s43-lr0.003/checkpoint.pt",
+      "r": 32,
+      "seed": 43,
+      "trained_depths": [
+        4
+      ],
+      "variant": "M1",
+      "writer": "joint_fact"
+    },
+    {
+      "blake2b": "a5fd45ff91f207081ee59ee0a48ea593",
+      "name": "joint_fact-B4-r32-s43",
+      "path": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p1s/f2/main-readers/shard-03/f2-main-joint_fact-B4-s43/checkpoint.pt",
+      "r": 32,
+      "seed": 43,
+      "trained_depths": [
+        1
+      ],
+      "variant": "B4",
+      "writer": "joint_fact"
+    },
+    {
+      "blake2b": "d6b4177960c2001c5073aeeb223c808f",
+      "name": "oracle_random-M1L4-r32-s17",
+      "path": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p2s-f1/main/shard-00/main-oracle_random-M1-r32-m32-s17-lr0.003/checkpoint.pt",
+      "r": 32,
+      "seed": 17,
+      "trained_depths": [
+        4
+      ],
+      "variant": "M1",
+      "writer": "oracle_random"
+    },
+    {
+      "blake2b": "02111fa5ee0aa739f26085f505d8a9f0",
+      "name": "oracle_random-B4-r32-s17",
+      "path": "/work/xg24i002/x10041/LoopLora/runs/p1s/main/20261026/runs/primary-oracle_random-B4-r32-s17/checkpoint.pt",
+      "r": 32,
+      "seed": 17,
+      "trained_depths": [
+        1
+      ],
+      "variant": "B4",
+      "writer": "oracle_random"
+    },
+    {
+      "blake2b": "a8e70ae634d120026c938d3b83b6e681",
+      "name": "oracle_random-M1L4-r32-s29",
+      "path": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p2s-f1/main/shard-01/main-oracle_random-M1-r32-m32-s29-lr0.003/checkpoint.pt",
+      "r": 32,
+      "seed": 29,
+      "trained_depths": [
+        4
+      ],
+      "variant": "M1",
+      "writer": "oracle_random"
+    },
+    {
+      "blake2b": "61c41ad0a22ebe7b7e58dc4496d04822",
+      "name": "oracle_random-B4-r32-s29",
+      "path": "/work/xg24i002/x10041/LoopLora/runs/p1s/main/20261026/runs/primary-oracle_random-B4-r32-s29/checkpoint.pt",
+      "r": 32,
+      "seed": 29,
+      "trained_depths": [
+        1
+      ],
+      "variant": "B4",
+      "writer": "oracle_random"
+    },
+    {
+      "blake2b": "8196ca139f65aa5dca9798a94ad13205",
+      "name": "oracle_random-M1L4-r32-s43",
+      "path": "/work/xg24i002/x10041/LoopLora-wt/symf/runs/p2s-f1/main/shard-02/main-oracle_random-M1-r32-m32-s43-lr0.003/checkpoint.pt",
+      "r": 32,
+      "seed": 43,
+      "trained_depths": [
+        4
+      ],
+      "variant": "M1",
+      "writer": "oracle_random"
+    },
+    {
+      "blake2b": "1c4fccbf0ef51ec293d4553c3787c7e2",
+      "name": "oracle_random-B4-r32-s43",
+      "path": "/work/xg24i002/x10041/LoopLora/runs/p1s/main/20261026/runs/primary-oracle_random-B4-r32-s43/checkpoint.pt",
+      "r": 32,
+      "seed": 43,
+      "trained_depths": [
+        1
+      ],
+      "variant": "B4",
+      "writer": "oracle_random"
+    }
+  ],
+  "extension": {
+    "batch_size": 64,
+    "depths": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      6,
+      8,
+      12,
+      16
+    ],
+    "episodes": 2000,
+    "hops": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "seed": 999006,
+    "splits": [
+      "test",
+      "test_unseen"
+    ]
+  },
+  "p2sf1_manifest": "reports/p2s-f1/checkpoint_manifest.csv",
+  "part": "B",
+  "prereg": "docs/prereg/UNS.md",
+  "rank": 32,
+  "readers": [
+    "M1",
+    "B4"
+  ],
+  "seeds": [
+    17,
+    29,
+    43
+  ],
+  "source": {
+    "blake2b": "556779ac9d3a54494d5b135c3195d859",
+    "path": "/work/xg24i002/x10041/LoopLora/reports/p2s-f1/checkpoint_manifest.csv"
+  },
+  "study": "UNS",
+  "trained_depths": {
+    "B4": [
+      1
+    ],
+    "M1": [
+      4
+    ]
+  },
+  "writers": [
+    "joint",
+    "joint_fact",
+    "oracle_random"
+  ]
+}
