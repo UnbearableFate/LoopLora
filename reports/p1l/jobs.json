@@ -1,7 +1,7 @@
 {
   "accounting": "qstat observed elapsed_seconds times nodes; failed jobs included; live totals provisional",
-  "allocated_node_hours": 41.391666666666666,
-  "allocated_node_seconds": 149010,
+  "allocated_node_hours": 41.53138888888889,
+  "allocated_node_seconds": 149513,
   "budget_rule": "B2: per-job8nodes x2h; no total cap",
   "final": true,
   "jobs": [
@@ -2768,6 +2768,156 @@
       "source": {
         "kind": "commit",
         "ref": "419276578c16f8d191a7ccb4d2ca67ea07fdec00"
+      },
+      "status": "FINISH"
+    },
+    {
+      "allocated_seconds": 29,
+      "argv": [
+        "scripts/evaluate_p1l_causal.py",
+        "--smoke",
+        "--manifest",
+        "/work/xg24i002/x10041/LoopLora/runs/p1l/main/r128/training-manifest.json",
+        "--out",
+        "/work/xg24i002/x10041/LoopLora/runs/p1l/main/r128/causal-smoke",
+        "--runs",
+        "M1-L4-s17",
+        "B8-s17",
+        "B4-s17"
+      ],
+      "exit_code": 0,
+      "host": "mg0011",
+      "job_id": "3721352.opbs",
+      "log": "/work/xg24i002/x10041/LoopLora/logs/pbs/sm-p1l-c-smoke-20261029-012801-329590.log",
+      "name": "sm-p1l-c-smoke",
+      "node_hours": 0.008055555555555555,
+      "nodes": 1,
+      "requested_walltime": "00:20:00",
+      "source": {
+        "kind": "commit",
+        "ref": "395e30914149898006d63cd289b20dac15d732fe"
+      },
+      "status": "FINISH"
+    },
+    {
+      "allocated_seconds": 149,
+      "argv": [
+        "scripts/evaluate_p1l_causal.py",
+        "--manifest",
+        "/work/xg24i002/x10041/LoopLora/runs/p1l/main/r128/training-manifest.json",
+        "--authorization",
+        "/work/xg24i002/x10041/LoopLora-wt/p1l/reports/p1l/confirmation-authorization.json",
+        "--endpoints",
+        "/work/xg24i002/x10041/LoopLora-wt/p1l/reports/p1l/r128/endpoints.json",
+        "--out",
+        "/work/xg24i002/x10041/LoopLora/runs/p1l/main/r128/causal",
+        "--runs",
+        "M1-L4-s17",
+        "B8-s17",
+        "B4-s17"
+      ],
+      "exit_code": 0,
+      "host": "mg0003",
+      "job_id": "3721357.opbs",
+      "log": "/work/xg24i002/x10041/LoopLora/logs/pbs/ev-p1l-c-s17-20261029-012857-330613.log",
+      "name": "ev-p1l-c-s17",
+      "node_hours": 0.04138888888888889,
+      "nodes": 1,
+      "requested_walltime": "00:15:00",
+      "source": {
+        "kind": "commit",
+        "ref": "395e30914149898006d63cd289b20dac15d732fe"
+      },
+      "status": "FINISH"
+    },
+    {
+      "allocated_seconds": 148,
+      "argv": [
+        "scripts/evaluate_p1l_causal.py",
+        "--manifest",
+        "/work/xg24i002/x10041/LoopLora/runs/p1l/main/r128/training-manifest.json",
+        "--authorization",
+        "/work/xg24i002/x10041/LoopLora-wt/p1l/reports/p1l/confirmation-authorization.json",
+        "--endpoints",
+        "/work/xg24i002/x10041/LoopLora-wt/p1l/reports/p1l/r128/endpoints.json",
+        "--out",
+        "/work/xg24i002/x10041/LoopLora/runs/p1l/main/r128/causal",
+        "--runs",
+        "M1-L4-s29",
+        "B8-s29",
+        "B4-s29"
+      ],
+      "exit_code": 0,
+      "host": "mg0011",
+      "job_id": "3721358.opbs",
+      "log": "/work/xg24i002/x10041/LoopLora/logs/pbs/ev-p1l-c-s29-20261029-012857-330617.log",
+      "name": "ev-p1l-c-s29",
+      "node_hours": 0.04111111111111111,
+      "nodes": 1,
+      "requested_walltime": "00:15:00",
+      "source": {
+        "kind": "commit",
+        "ref": "395e30914149898006d63cd289b20dac15d732fe"
+      },
+      "status": "FINISH"
+    },
+    {
+      "allocated_seconds": 153,
+      "argv": [
+        "scripts/evaluate_p1l_causal.py",
+        "--manifest",
+        "/work/xg24i002/x10041/LoopLora/runs/p1l/main/r128/training-manifest.json",
+        "--authorization",
+        "/work/xg24i002/x10041/LoopLora-wt/p1l/reports/p1l/confirmation-authorization.json",
+        "--endpoints",
+        "/work/xg24i002/x10041/LoopLora-wt/p1l/reports/p1l/r128/endpoints.json",
+        "--out",
+        "/work/xg24i002/x10041/LoopLora/runs/p1l/main/r128/causal",
+        "--runs",
+        "M1-L4-s43",
+        "B8-s43",
+        "B4-s43"
+      ],
+      "exit_code": 0,
+      "host": "mg0013",
+      "job_id": "3721359.opbs",
+      "log": "/work/xg24i002/x10041/LoopLora/logs/pbs/ev-p1l-c-s43-20261029-012857-330621.log",
+      "name": "ev-p1l-c-s43",
+      "node_hours": 0.0425,
+      "nodes": 1,
+      "requested_walltime": "00:15:00",
+      "source": {
+        "kind": "commit",
+        "ref": "395e30914149898006d63cd289b20dac15d732fe"
+      },
+      "status": "FINISH"
+    },
+    {
+      "allocated_seconds": 24,
+      "argv": [
+        "scripts/finalize_p1l_causal.py",
+        "--root",
+        "/work/xg24i002/x10041/LoopLora/runs/p1l/main/r128/causal",
+        "--manifest",
+        "/work/xg24i002/x10041/LoopLora/runs/p1l/main/r128/training-manifest.json",
+        "--authorization",
+        "/work/xg24i002/x10041/LoopLora-wt/p1l/reports/p1l/confirmation-authorization.json",
+        "--endpoints",
+        "/work/xg24i002/x10041/LoopLora-wt/p1l/reports/p1l/r128/endpoints.json",
+        "--out",
+        "/work/xg24i002/x10041/LoopLora-wt/p1l/reports/p1lc"
+      ],
+      "exit_code": 0,
+      "host": "mg0003",
+      "job_id": "3721377.opbs",
+      "log": "/work/xg24i002/x10041/LoopLora/logs/pbs/fin-p1l-c-20261029-013143-348961.log",
+      "name": "fin-p1l-c",
+      "node_hours": 0.006666666666666667,
+      "nodes": 1,
+      "requested_walltime": "00:10:00",
+      "source": {
+        "kind": "commit",
+        "ref": "395e30914149898006d63cd289b20dac15d732fe"
       },
       "status": "FINISH"
     }
