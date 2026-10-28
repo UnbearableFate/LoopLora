@@ -5,8 +5,8 @@
 [LLM evidence ledger](evidence_llm.md). Main-text experimental claims carry ledger
 IDs in HTML comments. Symbolic results (including the registered follow-ups IVD, CVH,
 TSM, UNS and NCR) and the completed LLM writer screens (including RFX and the WP-L6
-stop) and the P1-L oracle-reader confirmation with P1L-C are included; DPFP, P1L-D and per-step
-readout results remain pending.
+stop) and the P1-L oracle-reader confirmation with P1L-C and its per-step readouts are included; DPFP and P1L-D results
+remain pending.
 P1-L Amendments B6/B7 and the run locks, committed after that cutoff, are cited where
 stated; [Appendix C](#appendix-c-claim-contract) lists each principal claim with its
 comparator, writer, split and gate.*
@@ -1289,17 +1289,25 @@ against 7.03% in the original world), but not when z_1 alone is replaced at the 
 **DPFP and P1L-D — TODO:** the DPFP writer screen and P1L-D (registered only if DPFP selects a writer) have no result here,
 and none is imputed. <!-- DP1 --><!-- PD1 --> P1L-S does not run (Section 8.4). <!-- WL1 -->
 
-**Secondary/readout results — TODO:** per-step entity ranks/top1 for M1-L4 and B8 are not reported here; the readouts need
-their own reading before they are cited. <!-- LP5 --> The protocol plans to
-decode z_s, s=1…4, through the trained output path/frozen upper layers and to
-compare projections onto name-logit-gradient directions with a random-direction
-baseline, by hop; directions average 512 validation questions for 1024 names.
-<!-- LP5 --> These are descriptive diagnostics, not gate criteria or observed
-ordered entity traces. <!-- LP5 --> A gradient g_j at the actual injection
+**Per-step readouts (descriptive).** For M1-L4 and B8 the state z_s after each read s=1…4 was decoded at the answer
+position on the confirmation episodes (three seeds pooled) through the trained output path and the frozen upper layers (logit
+lens), by projection onto name-gradient directions (a contrastive and a raw-logit variant) and by a random direction; chance for
+the top-1 rate of an entity is about 0.1%. <!-- LP5 --> At rank128 the logit lens recovers earlier-hop entities from M1-L4's
+early states, and best at a step s at or above the entity's hop e rather than at s=e: on hop-1 questions the hop-1 entity is the
+top-1 name in 38.6%, 64.3%, 61.1% and 47.9% of episodes at s=1…4, and on hop-2 questions the hop-2 entity in 1.1%, 11.0%, 30.2% and
+35.4%. The rates at s=4 for the question's own hop equal the deployed EM within 0.1 pp, and the hop-1 rates at s=2 and s=3 are close
+to the EM of the same checkpoint at depth 2 and 3 (64.15% and 61.28%); the corrected record reads this as the answer the reader
+would give if it stopped at step s. <!-- LP5 --> B8's lens decodes names only at s=4 (the hop-1 entity in 19.1% of hop-1
+questions) and at most 0.23% at s=1…3. The name-gradient projections and the random direction are at or near chance for both
+readers (maximum cell 0.28%), and at rank32 every method is at chance (maximum cell 0.27%), which adds nothing because the rank32
+readers did not use the memory. <!-- LP5 --> These are decoding results: not gate criteria, not an ordered entity trace, not path
+following, and not evidence for the composition claim above (LP4); bridge patching gives no causal claim. <!-- LP5 --><!-- PC1 -->
+A gradient g_j at the actual injection
 residual induces local reader sensitivity alpha B^T g_j; a gradient at another
 site requires the intervening transport Jacobian. This J-lens-inspired proxy differs from published
-averaged residual-transport lenses and from JS's recurrent transition Jacobian.
-Hypothetical per-step upper-layer forwards incur diagnostic cost separate from
+averaged residual-transport lenses and from JS's recurrent transition Jacobian, and its chance result limits what these directions
+decode without showing that names are absent from z_s.
+Per-step upper-layer forwards incur diagnostic cost separate from
 the deployed reader loop. <!-- LP5 --> Ordered readability would not alone
 establish causal path following. The [primary-source audit](../reports/lit_check.md#two-jacobians-and-the-projects-proposed-readouts)
 states those limits; the separate output-alignment intervention is not pursued
@@ -1411,7 +1419,7 @@ exact store together with the true key rescues the read, and the rank-32 oracle-
 <!-- LL2 --><!-- LL3 --><!-- LL7 --><!-- LL9 --><!-- RX1 --><!-- WL1 -->
 In the oracle-reader confirmation, a shared reader exceeds a single read of equal parameter count at rank128 while the
 registered four-unshared-reads reader fails its gate, bridge patching gives no causal claim, and at rank32 the readers did not
-learn to use the oracle memory; the intermediate-state readouts remain unreported.
+learn to use the oracle memory; the per-step readouts are descriptive decoding and not evidence for composition.
 <!-- LP4 --><!-- LP5 --><!-- LP7 --><!-- LP9 --><!-- LP11 --><!-- PC1 -->
 
 The additional load study narrows this result further: depth benefits decrease
@@ -1525,7 +1533,7 @@ conditions take priority over shortened manuscript wording.
 | LLM read fixes and audit | Same validation set; training seed17 | Audited historical W5 and OA (value/output ceiling); seven r32/r128 final arms with unequal timing-sized step budgets; final-checkpoint selection, no learned writer/no E8 retry. | LL7–LL10 <!-- LL7 --><!-- LL8 --><!-- LL9 --><!-- LL10 --> |
 | RFX | `val`, seed4242, episode indices [200000,204000), one hop-1 query per episode; fitting set of 4,096 `train` episodes | Frozen R/r128, R/r32 and W5/r32 (training seed17): the final-position read replaced by store (deployed delta, exact ridge) × query (raw, unit, true) cells; rescue rule and first-applying verdict; no training, no CIs. | RX1–RX3 <!-- RX1 --><!-- RX2 --><!-- RX3 --> |
 | WP-L6 | `val`, seed4242, 1,000 episodes | Rank-32 M1-L4 with O-rot and O-shared oracle codes, lr 0.003, seed17, 5,666 steps; hop-1 full-vocabulary EM at L=4 against a 30% threshold; pilot, no CIs; P1L-S not run. | WL1–WL2 <!-- WL1 --><!-- WL2 --> |
-| P1-L registered oracle readers | test episode indices[100000,102000), 2,000 episodes, eval seed4242 | oracle_random at r32/r128; seeds17/29/43, primary fixed-L4 B8 (not parameter-matched: +8.9% at r32, +31.0% at r128), same-rank gates, k2 and 97.5% intervals; Amendments B6 (equal-parameter rule) and B7 (per-rank memory-use check; no multi-read claim at r32). Rank32 fails the check, rank128 passes; at rank128 G1-L fails, G2-L passes and M1-L4@4 against B4@1 meets the B6 criterion. LP6 is training/validation evidence; readouts remain open. | LP1–LP13 <!-- LP1 --><!-- LP2 --><!-- LP3 --><!-- LP4 --><!-- LP5 --><!-- LP6 --><!-- LP7 --><!-- LP8 --><!-- LP9 --><!-- LP10 --><!-- LP11 --><!-- LP12 --><!-- LP13 --> |
+| P1-L registered oracle readers | test episode indices[100000,102000), 2,000 episodes, eval seed4242 | oracle_random at r32/r128; seeds17/29/43, primary fixed-L4 B8 (not parameter-matched: +8.9% at r32, +31.0% at r128), same-rank gates, k2 and 97.5% intervals; Amendments B6 (equal-parameter rule) and B7 (per-rank memory-use check; no multi-read claim at r32). Rank32 fails the check, rank128 passes; at rank128 G1-L fails, G2-L passes and M1-L4@4 against B4@1 meets the B6 criterion. LP6 is training/validation evidence; the per-step readouts (LP5) are descriptive. | LP1–LP13 <!-- LP1 --><!-- LP2 --><!-- LP3 --><!-- LP4 --><!-- LP5 --><!-- LP6 --><!-- LP7 --><!-- LP8 --><!-- LP9 --><!-- LP10 --><!-- LP11 --><!-- LP12 --><!-- LP13 --> |
 | P1L-C | test episode indices[102000,104000), 2,000 episodes (256 hop-2 episodes per seed for patching) | The nine rank128 checkpoints (M1-L4, B8, B4 × seeds17/29/43), nothing retrained; read-position analysis (descriptive), bridge patching with a registered causal bar of 10 pp, replication of the P1-L contrasts; 95% intervals. | PC1–PC4 <!-- PC1 --><!-- PC2 --><!-- PC3 --><!-- PC4 --> |
 
 The symbolic studies use training seeds 17/29/43. <!-- S1 --><!-- B3 --> P1-S/P2-S and their follow-ups use 2,000 paired
@@ -1591,7 +1599,7 @@ than populated from unmerged or provisional results.
 | Figure 5 | 7: stopping quality versus mean and tail latency | stopping_latency.pdf / stopping_latency.png |
 | Figure 6, Section 6 | 4: memory load×L | memory_load_depth.pdf / memory_load_depth.png <!-- IS1 --> |
 | Figure 7, Section 7 | JS extension: overshoot and longer walks | js_overshoot.pdf / js_overshoot.png <!-- JS1 --><!-- JS3 --><!-- JS5 --> |
-| TODO, Section 8 | 6: single-module / end-to-end correspondence | Not produced; the P1-L confirmation is reported in tables (Section 8.5), and the per-step readouts remain open. |
+| TODO, Section 8 | 6: single-module / end-to-end correspondence | Not produced; the P1-L confirmation is reported in tables (Section 8.5), and the per-step readouts (LP5) are decoding only. |
 
 ## Appendix C. Claim contract
 
@@ -1658,11 +1666,11 @@ Reading rules.
   always cites claim row B7 of the symbolic ledger, whereas "B7" in running text names the
   larger-memory reader.
 - **Descriptive rows.** Rows marked descriptive in the ledgers (IV3, CV4, TS2, UN2–UN4, PM1, NC2, RX2, RX3,
-  WL2, LP8, LP12, LP13 and PC2–PC4) have no gate in their preregistrations. They support only the wording that the preregistration
+  WL2, LP5, LP8, LP12, LP13 and PC2–PC4) have no gate in their preregistrations. They support only the wording that the preregistration
   attaches (for UNS, "the depth gain is also present on unseen-pool entities"; for NCR, the qualification of D).
-- **Pending.** DPFP, P1L-D and the per-step readouts are placeholders in this draft; no value is imputed. The
-  registered results of IVD, CVH, TSM, UNS, NCR, RFX, WP-L6, the P1-L confirmation with the memory-use check, and P1L-C are
-  reported.
+- **Pending.** DPFP and P1L-D are placeholders in this draft; no value is imputed. The
+  registered results of IVD, CVH, TSM, UNS, NCR, RFX, WP-L6, the P1-L confirmation with the memory-use check, and P1L-C
+  with the per-step readouts are reported.
 
 ## References and source records
 
