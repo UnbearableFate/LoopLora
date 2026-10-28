@@ -42,5 +42,29 @@ Sources (each report quotes its prereg; use the prereg's "Use of the results" wo
 Report: `docs/reports/WP-T10.md` (what changed where; any wording you could not settle from the preregs). Commit on
 wp/paper; no merge to master, no push. Done line: `WP-T10 part 1 done`.
 
-## Part 2 (only when the orchestrator says so)
-P1-L confirmation with B7, P1L-C (if run), DPFP and P1L-D (if run).
+## Part 2 (now): P1-L confirmation and P1L-C
+Merge master into wp/paper first (master 9ceb068 or later; wp/p1l, wp/oracle and wp/llm are merged).
+Sources:
+- `reports/decisions/P1L.md` (§1–§6), `docs/reports/P1L.md`, `reports/p1l/` (r = 32), `reports/p1l/r128/`,
+  `reports/p1l/rank-comparison.json`;
+- `docs/reports/P1L-C.md`, `reports/p1lc/`;
+- preregs `docs/prereg/P1L.md` (Amendments B5–B7, with the decision-use text) and `docs/prereg/P1L-C.md`.
+
+1. Fill LP4/LP6 and PC1 in `docs/paper/evidence_llm.md`.
+   - B7 per rank.
+   - r = 32 is reported as "the readers did not learn to use the oracle memory", with no interpretation.
+   - r = 128: G1-L fail for B8, G2-L pass, and the Amendment-B6 equal-parameter result for M1-L4 against B4, with per-seed
+     values and the parameter counts.
+   - P1L-C: no causal-bridge claim; the read-position result is descriptive.
+2. Update draft §8.4 and §8.5, the abstract, §1 and §9, and the claim contract.
+   - Stay within B7 rules 2–3: no r = 32 multi-read claim; no symbolic-oracle equivalence; no unseen-name claim.
+   - The equal-parameter claim is only M1-L4 against B4 at r = 128.
+   - B8 is not parameter-matched (+31.0%).
+   - Latency is a cost.
+3. Repoint the RFX and WP-L6 citations to the master paths.
+4. DPFP and P1L-D stay pending.
+
+Report: append to `docs/reports/WP-T10.md`. Done line: `WP-T10 part 2 done`.
+
+## Part 3 (only when the orchestrator says so)
+DPFP, and P1L-D if DPFP selects a writer.
