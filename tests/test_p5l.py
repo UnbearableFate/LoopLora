@@ -153,7 +153,7 @@ def snapshot(model_id, revision):
 
 
 def test_the_pinned_17b_backbone_has_the_registered_shape_and_the_same_tokenizer():
-    small, large = snapshot(MODEL_ID, MODEL_REVISION), snapshot(**BACKBONE)
+    small, large = snapshot(MODEL_ID, MODEL_REVISION), snapshot(BACKBONE["id"], BACKBONE["revision"])
     if not large.is_dir():
         pytest.skip("Qwen3-1.7B-Base is not cached here")
     config = read(large / "config.json")
