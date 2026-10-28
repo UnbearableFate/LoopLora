@@ -48,6 +48,9 @@ done: a stopped `train` manifest records the stopping child's run, exit code and
 killed, and the heartbeat thread's `join` waits at most 2 x `HEARTBEAT_SECONDS`. As before, nothing was run with torch, pytest or on a compute node; §10.11
 says what was checked and how.
 
+Step 3 (2026-10-29, §12): Step 2 is done (wp/sym 70bfdfc) and Step 3, the per-study reports, is done: `docs/reports/IVD.md`, `CVH.md`, `TSM.md`,
+`UNS.md` and `NCR.md`, with their tables generated and checked by `scripts/report_s9_tables.py`. Login node only; nothing was computed.
+
 ```bash
 SYM=/work/xg24i002/x10041/LoopLora-wt/sym     # worktree; step-2 outputs go to $SYM/runs/<study> (git-ignored)
                                               # and compact results to $SYM/reports/<study> (committed)
@@ -1027,7 +1030,7 @@ Interpretations made in step 1f, stated as they are implemented (none changes a 
 | uns-b | 3720792.opbs | 0.02 | exit 0 (1 m 30 s); manifest complete, 18 runs, not partial, checkpoints unchanged; `runs/uns/main` |
 | ivd-analyze | 3720881.opbs | 0.01 | exit 0; decisions: oracle_random supported (overlap gap 0.500), joint_fact not_supported (overlap gap 0.285); `reports/ivd/results` |
 | uns-b-audit | 3720882.opbs | 0.01 | exit 0; audit passed; `reports/uns/part-b` |
-| cvh-confirm | 3720887.opbs | | submitted with CVH_LOCK 8a13c45 and CVH_THETA 19c5613 (`reports/cvh/theta.json` identical to `runs/cvh/main/theta.json`), walltime 00:02:00 (suggestion 60 s); exit 0 (33 s); manifest complete, checkpoints unchanged, 9 readers, 2000 test episodes at seed 999005 each; 0.01 node·h |
+| cvh-confirm | 3720887.opbs | 0.01 | submitted with CVH_LOCK 8a13c45 and CVH_THETA 19c5613 (`reports/cvh/theta.json` identical to `runs/cvh/main/theta.json`), walltime 00:02:00 (suggestion 60 s); exit 0 (33 s); manifest complete, checkpoints unchanged, 9 readers, 2000 test episodes at seed 999005 each; 0.01 node·h |
 | tsm-lock | 3720888.opbs | 0.01 | exit 0; `reports/tsm/design.json` (6 templates, 6 references, design_hash b4e5975b4349e6f0caa7b92e67089295); not committed: the orchestrator checks and commits it |
 | tsm-smoke | 3720907.opbs | | submitted at CODE with the lock file committed as TSM_LOCK 1bf689b, `--procs 6`, walltime 00:20:00; queued |
 | cvh-analyze | 3720920.opbs | 0.01 | exit 0; passing: oracle_random/r32/M1/A1 only; `reports/cvh/results` |
@@ -1037,3 +1040,29 @@ Interpretations made in step 1f, stated as they are implemented (none changes a 
 | tsm-train-43 | 3720960.opbs | 0.24 | exit 0 (14 m 20 s of 25 min walltime; `--procs 6 --seeds 43 --label s43`, TSM_LOCK 1bf689b); manifest `complete`, 6 runs started, no training failure, none unfinished; all 6 records complete at 15000 steps, attempt 1 |
 | tsm-eval | 3721099.opbs | 0.01 | exit 0 (24 s of the 20 min walltime); first attempt at the training code d32463e (no flags, no decision), TSM_LOCK 1bf689b; manifest complete, 24 evaluations (T0, T1, T2: 64000 rows each; B4: 16000), 2000 test episodes at seed 999007, checkpoints unchanged, `restarts` empty |
 | tsm-analyze | 3721118.opbs | 0.01 | exit 0; arms_pass T1 false, T2 false; arm_outcome none for both; no training failure; `reports/tsm/results` |
+
+## 12. Step 3 (2026-10-29): study reports
+
+Login node only (no torch, no pytest, no job). Base: wp/sym 70bfdfc. Committed outputs only, plus the git-ignored `runs/` files that a table names
+(flagged in the report).
+
+- Reports: `docs/reports/IVD.md`, `CVH.md`, `TSM.md`, `UNS.md`, `NCR.md`. Each has the registered endpoints with their intervals at the registered
+  level and the decision as the prereg's rule states it; the reported (non-gating) items the prereg lists; the manipulation and audit checks; the jobs
+  and node-h; the prereg's "Use of the results" wording that now applies; and "Observations (not registered)". Every number comes from a file named in
+  the report. Passages of the preregs are quoted verbatim.
+- Tables: `scripts/report_s9_tables.py` (standard library only). The reports hold marker-delimited blocks `<!-- table:ID -->` ... `<!-- /table:ID -->`.
+  `--write` regenerates the blocks, `--check` (the default) exits 1 when a block differs from the rebuilt table, when a block or builder is missing, when
+  a number is not found in the study's own `summary.md` (248 strings: the registered tables and the per-cell rows), when a quoted passage
+  (`<!-- quote:PATH -->`) is not a substring of the quoted file, or when a sentence of an "Observations" section or a number of the prose is not
+  supported by the sources (the checks are in `observation_checks`). `--print ID` prints one table. The job tables are read from the table of section 11 above.
+- Tables that read `runs/` (git-ignored): `ivd-run`, `cvh-run`, `cvh-labels` (per-step A2 label rates), `tsm-run`, `uns-run`. `--check` skips them with a note
+  when the file is absent.
+- Edit to section 11: the node-h of `cvh-confirm` (3720887) was blank and is now 0.01, the value its own outcome text gives (33 s).
+- Facts the reports state that the sources fix: IVD oracle_random passes and joint_fact does not (`not_supported`); CVH only `oracle_random/r32/M1` A1 passes
+  and its latency condition fails; TSM no arm passes for either writer; UNS all six (writer, reader) results meet the 3 pp wording rule, Part A audit and
+  reproduction pass; NCR 48 groups verified, 16 hop-2 groups below the chance line.
+- Not available in a committed file, and not computed in step 3: the full theta-to-validation table of CVH (only the chosen rows are in
+  `reports/cvh/results/theta.csv` and `reports/cvh/theta.json`; the traces are in `runs/cvh/main/traces`).
+- Checks run: `python3 -m pyflakes scripts/report_s9_tables.py` (Python 3.9, no message); `py_compile` under Python 3.9 and under the venv Python 3.13
+  with `-I -B` and `cfile` in the scratchpad (no `__pycache__` in the worktree); `scripts/report_s9_tables.py --check` under both interpreters (ok: 42
+  tables, 248 evidence strings). A corrupted quote and a corrupted table cell were each detected by `--check` (negative test, reverted).
