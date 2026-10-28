@@ -32,11 +32,13 @@ before the finalizers).
 
 ### r = 32: not interpreted
 G1-L fail, G2-L fail (`results.md`). Every memory reader is at the no-memory floor (hop-1 EM 0.07–0.15%, B3-L4 0.03%;
-hops ≥ 2 ≤ 0.2%). By Amendment B7 rule 1 this rank is reported as **"the readers did not learn to use the oracle
+every memory-only cell of every non-context reader at every hop and depth ≤ 0.23%). By Amendment B7 rule 1 this rank is reported as **"the readers did not learn to use the oracle
 memory"**; its G1-L, G2-L and B6 outcomes are not interpreted, and by rule 2 **no claim about multiple reads in the LM
 at r = 32**. It is a failure of the oracle design (three random maps learned through a rank-32 adapter), not a reader
-comparison. Descriptive: the context-retained controls work (B1/B2 99.7–99.9% on hops 1–3, 82–83% hop 4, 11–15%
-hops 6–8; B0 0.1–0.3%), so the pipeline itself is sound.
+comparison. Descriptive: the context-retained controls work (`context_retained` protocol, seed mean: B1 99.75 / 99.85 /
+99.65% and B2 99.78 / 99.93 / 99.68% on hops 1–3, hop 4 82.45 and 83.43%, hops 6–8 14.47 / 12.62 / 11.68% (B1) and
+15.07 / 11.50 / 11.35% (B2); B0, the untrained adapter, seed 17 only, 1.00 / 0.40 / 0.45% on hops 1–3 and 0.30–1.00% on
+hops 1–8; in the `memory_only` protocol B0, B1 and B2 are 0.00% on every hop), so the pipeline itself is sound.
 
 ### r = 128: interpreted
 | Gate / contrast (hops {2, 3}) | Difference pp | 97.5% CI | Per seed 17/29/43 | Outcome |
@@ -58,10 +60,29 @@ Accuracy by hop (primary, seed mean, trained L): M1-L4@4 hops 1–4 = 47.9 / 35.
 at L = 1 is 37.8 / 1.1 / 0.9%; B4@1 19.6 / 5.4 / 5.4%; B8@4 19.0 / 6.7 / 6.0%; B5-L4 17.3 / 5.4 / 5.6%; B3-L4 0.0%.
 Typed replication, M1-L4@4 − B4@1 on hops {2, 3}: 28.5 vs 5.2% (point estimates; the finalizer computes a typed CI
 only for the gate contrast).
-Descriptive (screening, no gate): `swap_successors` follow rate of the swapped terminal at L = 4 is 14.4 / 11.8 /
-10.3% (hops 1–3) for M1-L4 and 8.1 / 7.6 / 6.8% for B8, against an unswapped baseline of 5–7%; the per-step readouts
-(logit lens, J-lens contrastive, random) put the hop-s entity at top-1 with rate ≤ 0.3% for both readers at every
-step, i.e. the intermediate states z_s are not readable as names by these decoders. r = 128 vs r = 32 (secondary,
+Descriptive (screening, no gate): `swap_successors` follow rate of the swapped terminal at L = 4 (hops 1–3) is
+20.45 / 17.10 / 14.08% for M1-L4 against 5.82 / 4.75 / 4.82% unswapped, and 8.12 / 7.60 / 6.83% for B8 against
+5.82 / 5.78 / 6.72%.
+
+Per-step readout (descriptive, J-lens-inspired endpoint of the prereg; `reports/p1l/readout-pooled.csv`, all cells;
+numbers from `scripts/p1l_record_numbers.py`, output in `reports/p1l/record-numbers.txt`). Top-1 rate of the hop-e entity
+when the state z_s (s = 1…4) is decoded at the answer position, seed-pooled over 2000 episodes per seed; chance is about
+0.1% (mean rank about 512 of 1024 names). At r = 128:
+- *Logit lens*, M1-L4: hop-1 entity (e = 1) 38.6 / 64.3 / 61.1 / 47.9% at s = 1…4 on hop-1 questions (per-seed maximum 73.3%
+  at s = 2), and 37.6 / 54.7 / 37.4 / 22.5% on hop-2 questions; hop-2 entity 1.1 / 11.0 / 30.2 / 35.4% (hop-2
+  questions); hop-3 entity 1.0 / 1.4 / 7.5 / 18.5% (hop-3 questions). The s = 4 rows match the deployed EM within 0.1 pp; the early states
+  carry the earlier-hop entities, and the hop-e entity is decoded best at a step s ≥ e rather than at s = e. These rates
+  track the exact-match accuracy of the same reader at depth s (M1-L4 at L = 2, 3 hop-1 EM 64.15 / 61.28%), so the lens
+  shows what the reader would answer if it stopped at step s. The largest single-seed cell for e = 1, s = 1 is 51.8%
+  (hop 6 questions).
+- *Logit lens*, B8: only the last step decodes names: e = 1 at s = 4 is 19.1 / 19.3 / 18.4% (hops 1–3), e = 2 at s = 4 is
+  6.6 / 6.9%, e = 3 is 6.1%; steps 1–3 are 0.05–0.22% (chance); the maximum cell is 19.3% (single seed 20.1%).
+- *J-lens contrastive*, *raw logit* and the *random direction*: at or near chance for both readers at every cell (maximum
+  pooled cell 0.27% / 0.28% contrastive, 0.27% / 0.08% raw logit, 0.10% / 0.22% random for M1-L4 / B8; mean ranks
+  476–509 for contrastive and raw logit, 500–526 for random).
+At r = 32 every cell of every method is at chance: maximum pooled cell 0.27% / 0.20% (logit lens M1-L4 / B8), 0.22% /
+0.22% (contrastive), 0.17% / 0.25% (raw logit), 0.02% / 0.08% (random); the logit-lens mean ranks (382–431) are only
+modestly below the 512 of chance. r = 128 vs r = 32 (secondary,
 `rank-comparison.json`): B8@4 hops {2, 3} +6.24 pp [5.64, 6.84], per seed 6.4 / 5.6 / 6.7.
 
 ## 4. Claims (within Amendment B7 rules 2–3)
