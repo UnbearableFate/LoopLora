@@ -204,3 +204,41 @@ that cap; total DPFP about 6.14 node·h.
    in DP2 as a description of the original-space overlap numbers; phi-space numbers are not compared with R.
 
 WP-T10 part 3b done
+
+# WP-T10 part 4 — P5L second-scale confirmation (Qwen3-1.7B-Base)
+
+Master `e3de256` merged first (carries wp/p1l `c6b5275` with `reports/decisions/P5L.md` and `reports/p5l/r128/`). Text only, static checks
+only (tags resolve, no duplicate IDs, table columns, links and anchors, `git diff --check`). Every effect and interval in the new rows was
+checked against `reports/p5l/r128/endpoints.json`; seed means, swap rates and parameter counts against `accuracy.csv`,
+`swap-successors.csv`, `record-numbers.txt`; node-hours against `reports/p5l/jobs.json`. Computed on the login node: the inference-time
+means from `inference.csv` (they match the record's 0.486/0.625/0.625 ms) and the 1.29 ratio of M1-L4 and B8 to B4.
+
+## What changed where
+
+**[evidence_llm.md](../paper/evidence_llm.md).** New section "P5L: second-scale confirmation (Qwen3-1.7B-Base)": LP14 (B7 passes in every
+seed: B4@1 +30.616667, B8@4 +28.900000, M1-L4@4 +58.666667 pp, supported), LP15 (B6 contrast M1-L4@4 - B4@1 on hops2-3
++25.783333 [24.533021, 27.025521], seeds 24.925/26.500/25.925, 606,210 parameters each, registered decision `holds_at_second_scale`,
+supported), LP16 (G1-L fails, reported only: +1.033333 [0.291563, 1.800104], hop 1 -1.716667 [-3.316667, -0.016458] fails where it held at
+0.6B; not supported), LP17 (G2-L passes, reported only: +1.675000, +7.166667), LP18 (descriptive: secondary contrasts, depth effect, walk
+specificity, accuracy by hop, swap rates, B0), LP19 (descriptive: parameters, inference time, cost 38 jobs / 16.12 node-h; B8 +24.3%),
+LP20 (descriptive: 0.6B and 1.7B values side by side; no trend, no other size). LP4 now covers both backbones with the existing limits
+(oracle, 768 seen names, trained hops, B7 rule 3) plus the P5L limits (lrs carried, one oracle seed, three training seeds, cross-scale
+comparison descriptive). Population V-L11, source key P5LE, V-L8 relabelled as 0.6B, backbone paragraph, scope bullet, two must-not-say bullets
+(scaling trend or any other size; learned-writer, end-to-end, causal-bridge, readout or unseen-name statement at 1.7B), audit boundary.
+
+**[draft.md](../paper/draft.md).** Section 8.5 "Second scale (P5L)" after the 0.6B rank-128 paragraph (0.6B paragraphs relabelled); Section 8.1
+names both backbones; header (also repairs a missing connective left by part 3b), abstract and Section 1 (two backbone sizes of one family,
+no other size, no trend); Section 9 (bounding paragraph, conclusion); Appendix B (P5L row), Appendix C (new P5L claim row; reading rules for
+descriptive rows, splits, scope and pending). Claim contract kept: same-rank comparisons only, equal parameters only M1-L4 vs B4, B8 not
+parameter-matched (+24.3% at 1.7B, +31.0% at 0.6B), latency a cost and not compared across scales.
+
+## Notes
+
+1. LP16 is labelled "not supported" (the G1-L claim) as LP9 is, although the task calls G1-L "reported only"; the conditions column states it
+   does not enter the decision.
+2. G1-L typed replication has a negative seed at 1.7B (seed 43 -0.300 pp) although the pooled interval is above 0; it is recorded in LP16.
+3. The 0.6B-versus-1.7B differences (adapter output width 1024 vs 2048, test ranges, carried learning rates) are listed in LP20 as reasons
+   a difference is not attributed to scale; no test across scales exists.
+4. `reports/p5l/` and the record give cost components that I took from the decision record; the total (16.1247 node-h) is from `jobs.json`.
+
+WP-T10 part 4 done
