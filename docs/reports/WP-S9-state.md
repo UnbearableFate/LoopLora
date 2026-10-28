@@ -1029,3 +1029,4 @@ Interpretations made in step 1f, stated as they are implemented (none changes a 
 | uns-b-audit | 3720882.opbs | 0.01 | exit 0; audit passed; `reports/uns/part-b` |
 | cvh-confirm | 3720887.opbs | | submitted with CVH_LOCK 8a13c45 and CVH_THETA 19c5613 (`reports/cvh/theta.json` identical to `runs/cvh/main/theta.json`), walltime 00:02:00 (suggestion 60 s); queued |
 | tsm-lock | 3720888.opbs | 0.01 | exit 0; `reports/tsm/design.json` (6 templates, 6 references, design_hash b4e5975b4349e6f0caa7b92e67089295); not committed: the orchestrator checks and commits it |
+| tsm-smoke | 3720907.opbs | | submitted at CODE with the lock file committed as TSM_LOCK 1bf689b, `--procs 6`, walltime 00:20:00; queued |
