@@ -67,4 +67,21 @@ Sources:
 Report: append to `docs/reports/WP-T10.md`. Done line: `WP-T10 part 2 done`.
 
 ## Part 3 (only when the orchestrator says so)
+### 3a (now): LP5 per-step readouts
+Merge master into wp/paper first (master 5eca4d2 or later; it carries the corrected P1-L record, f4f9a98).
+Source: `reports/decisions/P1L.md` §3 "Per-step readout" (numbers from `scripts/p1l_record_numbers.py`, output
+`reports/p1l/record-numbers.txt`; cells in `reports/p1l/readout-pooled.csv`, `reports/p1l/per-step-readout.csv`).
+1. Fill LP5 in `docs/paper/evidence_llm.md` as descriptive (no gate):
+   - r = 128 logit lens: M1-L4 decodes earlier-hop entities from early states, and it does so best at a step s ≥ e
+     rather than at s = e. The rates track the depth-s EM of the same reader, so the lens shows what the reader would
+     answer if it stopped at step s. B8 decodes names only at s = 4.
+   - J-lens contrastive, raw logit and random direction are at or near chance for both readers. r = 32 is at chance
+     for every method.
+2. Wording limits: decoding only, no ordered-trajectory or pointer-chasing claim (P1L-C gave no causal bridge, PC1).
+   The readouts are not evidence for the LP4 claim. Remove the "readouts need their own reading" mismatch note,
+   which the corrected record resolves, and cite the corrected record instead.
+3. Update the draft where LP5 is cited (§8.4/§8.5 and the must-not-say list) only as far as these limits allow.
+Report: append to `docs/reports/WP-T10.md`. Done line: `WP-T10 part 3a done`.
+
+### 3b (later, when the orchestrator says so)
 DPFP, and P1L-D if DPFP selects a writer.
