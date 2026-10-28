@@ -28,7 +28,8 @@ from looplora.llm.read_fix_run import fit, validate
 from looplora.llm.train import make_task_spec
 from looplora.llm.writer_fix import FixAdapter, alignment, auxiliary_losses, query_codes, true_fact_indices
 
-RANK = 4  # tiny-model adapter rank = r_mem
+RANK = 8  # tiny-model adapter rank = r_mem. At 4 the phi supports of the keys and of the query were disjoint in the
+# fixture (key_dim 8..24, 3..6 nonzeros), so M q_hat was exactly zero: no gradients and no effect of the memory (job 3720636)
 KEY_DIM = {arm: 2 * RANK * nu for arm, (_, nu) in SPECS.items()}
 
 
