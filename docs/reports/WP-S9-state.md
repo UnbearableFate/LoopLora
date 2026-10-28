@@ -1027,6 +1027,7 @@ Interpretations made in step 1f, stated as they are implemented (none changes a 
 | uns-b | 3720792.opbs | 0.02 | exit 0 (1 m 30 s); manifest complete, 18 runs, not partial, checkpoints unchanged; `runs/uns/main` |
 | ivd-analyze | 3720881.opbs | 0.01 | exit 0; decisions: oracle_random supported (overlap gap 0.500), joint_fact not_supported (overlap gap 0.285); `reports/ivd/results` |
 | uns-b-audit | 3720882.opbs | 0.01 | exit 0; audit passed; `reports/uns/part-b` |
-| cvh-confirm | 3720887.opbs | | submitted with CVH_LOCK 8a13c45 and CVH_THETA 19c5613 (`reports/cvh/theta.json` identical to `runs/cvh/main/theta.json`), walltime 00:02:00 (suggestion 60 s); queued |
+| cvh-confirm | 3720887.opbs | | submitted with CVH_LOCK 8a13c45 and CVH_THETA 19c5613 (`reports/cvh/theta.json` identical to `runs/cvh/main/theta.json`), walltime 00:02:00 (suggestion 60 s); exit 0 (33 s); manifest complete, checkpoints unchanged, 9 readers, 2000 test episodes at seed 999005 each; 0.01 node·h |
 | tsm-lock | 3720888.opbs | 0.01 | exit 0; `reports/tsm/design.json` (6 templates, 6 references, design_hash b4e5975b4349e6f0caa7b92e67089295); not committed: the orchestrator checks and commits it |
 | tsm-smoke | 3720907.opbs | | submitted at CODE with the lock file committed as TSM_LOCK 1bf689b, `--procs 6`, walltime 00:20:00; queued |
+| cvh-analyze | 3720920.opbs | 0.01 | exit 0; passing: oracle_random/r32/M1/A1 only; `reports/cvh/results` |
