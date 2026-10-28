@@ -1,0 +1,63 @@
+{
+  "confidence": 0.975,
+  "contrasts": {
+    "B8r128_vs_B8r32": {
+      "accuracy_a": 0.06341666666666666,
+      "accuracy_b": 0.001,
+      "bootstrap_seed": 2330094639026045051,
+      "ci_high": 0.06841666666666667,
+      "ci_low": 0.05641666666666667,
+      "cluster_unit": "episode",
+      "comparison": "B8-r128@4 - B8-r32@4",
+      "condition": "memory_only/original",
+      "confidence": 0.975,
+      "depth_a": 4,
+      "depth_b": 4,
+      "difference": 0.06241666666666667,
+      "hops": [
+        2,
+        3
+      ],
+      "joint_episode_resampling": true,
+      "method": "paired_multiseed_percentile_bootstrap",
+      "n_episodes": 2000,
+      "n_queries_per_seed": 4000,
+      "n_seeds": 3,
+      "per_seed": [
+        {
+          "accuracy_a": 0.06525,
+          "accuracy_b": 0.0015,
+          "difference": 0.06375,
+          "seed": 17
+        },
+        {
+          "accuracy_a": 0.05675,
+          "accuracy_b": 0.0005,
+          "difference": 0.05625,
+          "seed": 29
+        },
+        {
+          "accuracy_a": 0.06825,
+          "accuracy_b": 0.001,
+          "difference": 0.06725,
+          "seed": 43
+        }
+      ],
+      "resamples": 2000,
+      "seed": 2718,
+      "split": "confirm",
+      "statistic": "mean_per_seed_paired_accuracy_difference",
+      "training_seeds": [
+        17,
+        29,
+        43
+      ]
+    }
+  },
+  "secondary_only": true,
+  "steps": {
+    "128": 17000,
+    "32": 17000
+  },
+  "unequal_steps_flag": false
+}

@@ -55,6 +55,66 @@ def endpoints(primary, typed, confidence):
                 passes=bool(g1 and g2), contrasts=contrasts)
 
 
+# Amendment B7, rule 1: every memory reader must beat the no-memory loop B3-L4@4 at hop 1.
+MEMORY_USE_CONTRASTS = (("B4_vs_B3_hop1", "B4", 1), ("B8_vs_B3_hop1", "B8", 4),
+                        ("M1_vs_B3_hop1", "M1-L4", 4))
+
+
+def memory_use_check(primary, confidence):
+    """Hop-1 full-vocabulary EM of B4@1, B8@4 and M1-L4@4 minus B3-L4@4 on the confirmation set.
+
+    Pooled paired episode bootstrap (2000 draws) at the gate confidence; passed only if every
+    interval lies above zero. It reads the same samples as endpoints() and gates nothing there.
+    """
+    contrasts = {name: endpoint(primary, reader, "B3-L4", depth_left=depth, depth_right=4,
+                                hops=(1,), confidence=confidence)
+                 for name, reader, depth in MEMORY_USE_CONTRASTS}
+    return dict(rule="B7.1", hop=1, comparator="B3-L4@4", confidence=confidence,
+                passed=bool(all(row["ci_low"] > 0 for row in contrasts.values())),
+                contrasts=contrasts)
+
+
+def memory_use_rows(rank, memory):
+    rows = []
+    for name, row in memory["contrasts"].items():
+        base = dict(rank=rank, contrast=name, comparison=row["comparison"], hop=memory["hop"])
+        rows.append(dict(base, seed="pooled", reader_accuracy=row["accuracy_a"],
+                         comparator_accuracy=row["accuracy_b"], difference=row["difference"],
+                         ci_low=row["ci_low"], ci_high=row["ci_high"], confidence=row["confidence"],
+                         ci_above_zero=bool(row["ci_low"] > 0)))
+        rows.extend(dict(base, seed=item["seed"], reader_accuracy=item["accuracy_a"],
+                         comparator_accuracy=item["accuracy_b"], difference=item["difference"])
+                    for item in row["per_seed"])
+    return rows
+
+
+def memory_use_lines(rank, memory):
+    passed = memory["passed"]
+    lines = ["", "## Amendment B7: memory-use check", "",
+             f"Hop-1 full-vocabulary EM on the confirmation set; each reader minus B3-L4@4 (no memory); "
+             f"{memory['confidence']*100:g}% paired episode-bootstrap CIs, 2000 draws.",
+             f"Memory-use check: **{'pass' if passed else 'fail'}**.", "",
+             "| Contrast | Reader EM(%) | B3-L4@4 EM(%) | Difference(pp) | CI(pp) | Per-seed differences(pp) |",
+             "| --- | ---: | ---: | ---: | --- | --- |"]
+    for name, row in memory["contrasts"].items():
+        seed_values = ", ".join(f"{r['seed']}:{100*r['difference']:.2f}" for r in row["per_seed"])
+        lines.append(f"| {name} | {100*row['accuracy_a']:.2f} | {100*row['accuracy_b']:.2f} | "
+                     f"{100*row['difference']:.2f} | [{100*row['ci_low']:.2f},{100*row['ci_high']:.2f}] | "
+                     f"{seed_values} |")
+    lines.append("")
+    if not passed:
+        lines.append("The readers did not learn to use the oracle memory (rule 1): the G1-L, G2-L and "
+                     "Amendment-B6 outcomes above are reported but not interpreted as evidence for or "
+                     "against multiple reads.")
+    if rank == 32:
+        lines.append("Rule 2: no claim about multiple reads in the LM at r = 32, whatever the gate outcomes.")
+    elif passed:
+        lines.append("Rule 3: a G1-L or Amendment-B6 pass shows that the reader learns the value-to-key "
+                     "transition and composes reads inside the LM; it does not establish equivalence with "
+                     "the symbolic oracle condition, and no unseen-name claim is made.")
+    return lines
+
+
 def write_csv(path, rows):
     if not rows:
         raise ValueError(f"no rows for {path}")
@@ -156,6 +216,8 @@ def finalize(args):
         raise ValueError("oracle code hash differs across primary runs")
     confidence = 1 - .05 / authorization["gated_conditions"]
     result = endpoints(primary, typed, confidence)
+    result["memory_use"] = memory_use_check(primary, confidence)
+    result["memory_use_passed"] = result["memory_use"]["passed"]
     result["rank"] = rank
     result["authorization"] = authorization
     save(args.out / "endpoints.json", result)
@@ -164,6 +226,7 @@ def finalize(args):
     write_csv(args.out / "readout-faithfulness.csv", faithfulness)
     write_csv(args.out / "swap-successors.csv", swaps)
     write_csv(args.out / "inference.csv", inference)
+    write_csv(args.out / "memory-use.csv", memory_use_rows(rank, result["memory_use"]))
     save(args.out / "run-manifest.json", dict(status="audited", rank=rank, condition=manifest["condition"],
         S=manifest["S"], lrs=manifest["lrs"],
         oracle_hash=next(iter(oracle_hashes)), runs=artifact_rows))
@@ -177,8 +240,10 @@ def finalize(args):
         seed_values = ", ".join(f"{r['seed']}:{100*r['difference']:.2f}" for r in row["per_seed"])
         lines.append(f"| {name} | {100*row['difference']:.2f} | "
                      f"[{100*row['ci_low']:.2f},{100*row['ci_high']:.2f}] | {seed_values} |")
+    lines.extend(memory_use_lines(rank, result["memory_use"]))
     (args.out / "results.md").write_text("\n".join(lines) + "\n")
-    print(json.dumps(dict(status="complete", G1=result["G1_L"], G2=result["G2_L"])), flush=True)
+    print(json.dumps(dict(status="complete", G1=result["G1_L"], G2=result["G2_L"],
+                          memory_use=result["memory_use_passed"])), flush=True)
 
 
 def plot(out, counts):

@@ -1,0 +1,15 @@
+{
+  "status": "allowed",
+  "gated_conditions": 2,
+  "confidence": 0.975,
+  "condition_manifests": {
+    "oracle-r32": "/work/xg24i002/x10041/LoopLora/runs/p1l/main/training-manifest.json",
+    "oracle-r128": "/work/xg24i002/x10041/LoopLora/runs/p1l/main/r128/training-manifest.json"
+  },
+  "learned_condition": "not_run_no_writer_selected",
+  "not_before": "2026-10-28T22:00:00+09:00",
+  "prereg_commit": "6de902b5835c4650c0b19bfb0a822df93076451f",
+  "orchestrator_decision": "Amendment B5: WP-L4 selected no learned writer; only the two oracle rank conditions; proceed without further permission after every main run is complete and the post-maintenance window begins.",
+  "release_rule": "Verify all37 locked run records/checkpoints and all current main-job receipts complete successfully after2026-10-28 22:00JST, then create allowed evaluation authorization; no confirmation before release.",
+  "locked_at": "2026-10-26T22:01:51.798838+00:00"
+}
