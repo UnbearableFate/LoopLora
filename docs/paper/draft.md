@@ -5,8 +5,8 @@
 [LLM evidence ledger](evidence_llm.md). Main-text experimental claims carry ledger
 IDs in HTML comments. Symbolic results (including the registered follow-ups IVD, CVH,
 TSM, UNS and NCR) and the completed LLM writer screens (including RFX and the WP-L6
-stop) the P1-L oracle-reader confirmation with P1L-C and its per-step readouts, and the DPFP negative result (P1L-D not run) are
-included; no registered result remains pending.
+stop), the P1-L oracle-reader confirmation with P1L-C and its per-step readouts, its second-scale repeat (P5L), and the DPFP negative
+result (P1L-D not run) are included; no registered result remains pending.
 P1-L Amendments B6/B7 and the run locks, committed after that cutoff, are cited where
 stated; [Appendix C](#appendix-c-claim-contract) lists each principal claim with its
 comparator, writer, split and gate.*
@@ -36,9 +36,9 @@ output subspace, limitations of one-read observations, writer shortcuts, and fix
 certificates. In a single frozen language-model module, the completed validation
 screens, including the last registered DPFP screen, select no learned writer, despite informative input probes and a usable
 supplied-answer-code output path.<!-- DP1 --> In the registered oracle-reader confirmation, one shared module iterated four times
-exceeds a single read of equal parameter count at rank128, the four-unshared-reads reader fails its registered gate, a
-bridge-patching test gives no causal claim, and at rank32 the readers did not learn to use the oracle memory.
-<!-- LL2 --><!-- LL3 --><!-- LL9 --><!-- LP4 --><!-- LP7 --><!-- LP9 --><!-- LP11 --><!-- PC1 --> All results use a closed 1,024-name vocabulary and
+exceeds a single read of equal parameter count at rank128 on two backbone sizes of one family (Qwen3-0.6B-Base and Qwen3-1.7B-Base),
+the four-unshared-reads reader fails its registered gate at both, a bridge-patching test at the smaller size gives no causal claim, and at rank32 the readers did not learn to use the oracle memory.
+<!-- LL2 --><!-- LL3 --><!-- LL9 --><!-- LP4 --><!-- LP7 --><!-- LP9 --><!-- LP11 --><!-- LP15 --><!-- PC1 --> All results use a closed 1,024-name vocabulary and
 depths within those trained, oracle and learned writers are separate claims, and the
 language-model oracle is not the symbolic oracle; the 256 unseen-pool names of that
 vocabulary enter only as a descriptive scope row, where the depth gain is also present, and no
@@ -73,7 +73,8 @@ benefit at rank32 varies across the tested training seeds. <!-- S1 --><!-- S3 --
 factorized writer changes the depth profile and increases walk specificity, including
 when its T1-pretrained writer is frozen, but none of those factorized conditions passes
 the full hop-preservation gate. <!-- S9 --> In one frozen language-model module with a clean oracle memory, the shared reader
-composes at rank128 while the registered four-unshared-reads reader does not (Section 8). <!-- LP9 --><!-- LP11 --> This combination motivates treating writer
+composes at rank128 on two backbone sizes of one family while the registered four-unshared-reads reader does not (Section 8); no
+claim is made for any other size or as a trend. <!-- LP9 --><!-- LP11 --><!-- LP15 --><!-- LP20 --> This combination motivates treating writer
 design and reader depth as interacting parts of an inference system, rather than
 equating a positive average depth effect with a complete solution.
 
@@ -1006,7 +1007,8 @@ to each arm's own L1 in all four cells. <!-- TS2 -->
 
 The LLM experiments use frozen `Qwen/Qwen3-0.6B-Base`, revision
 `da87bfb608c14b7cf20ba1ce41287e8de496c0cd`, with one adapter at the zero-based
-layer-14 attention `o_proj` (2048→1024). <!-- LP1 --> The backbone uses bf16 and
+layer-14 attention `o_proj` (2048→1024); the second-scale confirmation (Section 8.5) uses `Qwen/Qwen3-1.7B-Base`, revision
+`ea980cb0a6c2ae4b936e82123acc929f1cec04c1` (28 layers, `o_proj` 2048→2048). <!-- LP1 --><!-- LP15 --> The backbone uses bf16 and
 SDPA; the adapter and memory state use fp32. <!-- LP1 --> The primary protocol
 is memory-only: support facts populate the adapter memory, then their backbone
 KV is discarded before questions are answered. <!-- LP1 --> Templated relations
@@ -1237,7 +1239,7 @@ statement about multiple reads at rank 32 (Amendment B7). <!-- WL1 --><!-- LP6 -
 
 ### 8.5 Confirmation results and pending items
 
-**Memory-use check.** The confirmation used split `test`, episode indices [100000,102000), 2,000 episodes, training seeds
+**Memory-use check.** The confirmation (Qwen3-0.6B-Base) used split `test`, episode indices [100000,102000), 2,000 episodes, training seeds
 17/29/43 and 97.5% paired episode-bootstrap intervals (2,000 draws) in the memory-only protocol, with one oracle memory
 (oracle seed17) shared by every reader; the intervals condition on the three seeds. Only the `oracle_random` condition ran,
 because the writer screens selected no learned writer. Hop1 full-vocabulary EM, and each reader minus the memory-free
@@ -1253,7 +1255,7 @@ multiple reads in the language model is made at rank32: its gate outcomes (G1-L 
 −0.008 pp [−0.108, 0.100]; M1-L4@4−B4@1 +0.058 pp [−0.050, 0.167]) are reported and not interpreted. <!-- LP7 --><!-- LP8 -->
 The check passes at rank128 in every seed. It is a floor at hop1 and does not show that composition uses the memory. <!-- LP7 -->
 
-**Rank128.** On hops2–3, the gated reader B8 (four unshared reads) exceeds B4@1 by +0.983 pp [0.267, 1.717] (6.342% against
+**Rank128 (Qwen3-0.6B-Base).** On hops2–3, the gated reader B8 (four unshared reads) exceeds B4@1 by +0.983 pp [0.267, 1.717] (6.342% against
 5.358%; seeds +0.925, +0.050, +1.975), below the registered 3 pp bar, so G1-L fails although its hop1 (−0.600 pp
 [−1.984, 0.767]) and typed-replication (+1.550 pp [0.767, 2.367]) conditions hold; this is a negative language-model result for
 B8 in this condition, which adds 147,456 parameters (+31.0%) over B4. <!-- LP9 --> G2-L passes (+0.833 pp [0.058, 1.550]
@@ -1272,7 +1274,25 @@ on one fixed oracle memory in 17,000 steps, not a statement about unshared reads
 added reads cost time: per question, M1-L4 takes about 1.42 and B8 about 1.57 times B4's 0.392 ms at rank128, and no efficiency
 claim is made. <!-- LP13 -->
 
-**P1L-C.** P1L-C ran after the rank128 check passed, evaluating the nine rank128 checkpoints (M1-L4, B8 and B4, three seeds;
+**Second scale (P5L).** P5L repeated the rank128 oracle condition on Qwen3-1.7B-Base (same family; layer-14 `o_proj`, 2048→2048;
+17,000 steps; the rank128 learning rates carried over without a pilot) on a range no earlier study used, `test` [104000,106000), with
+2,000 episodes, seeds 17/29/43, 97.5% intervals, the same oracle memory and the same 768 seen names. <!-- LP14 --> The memory-use check
+passes in every seed: hop1 EM exceeds the memory-free B3-L4@4 (0.033%) by +30.617 pp [29.167, 32.234] for B4@1, +28.900 pp [27.517, 30.433]
+for B8@4 and +58.667 pp [56.983, 60.400] for M1-L4@4. <!-- LP14 --> The Amendment-B6 contrast M1-L4@4−B4@1 on hops2–3 is +25.783 pp
+[24.533, 27.026] (31.958% against 6.175%; seeds +24.925, +26.500, +25.925), with 606,210 adapter parameters in each, so the registered
+decision is that the equal-parameter result holds at a second scale of the same family. <!-- LP15 --> It has the limits of the
+0.6B result (oracle memory, 768 seen names, trained hops, Amendment B7 rule 3), and in addition one oracle seed, three training seeds and
+learning rates carried without a pilot; it covers the two sizes tested and no other. <!-- LP15 --> Reported only: B8@4−B4@1 is +1.033 pp
+[0.292, 1.800] (seeds +0.200, +1.725, +1.175), below the 3 pp bar, so G1-L fails again, and its hop1 condition also fails at this scale
+(−1.717 pp [−3.317, −0.016]) where it held at 0.6B; G2-L passes (+1.675 pp [0.908, 2.383] over B5-L4@4 and +7.167 pp [6.583, 7.758] over
+B3-L4@4). <!-- LP16 --><!-- LP17 --> B8 adds 147,456 parameters (+24.3%) and is not parameter-matched. <!-- LP19 --> Descriptively,
+M1-L4@4 reaches 58.70%, 41.45%, 22.47% and 6.23% on hops1–4 (at most 3.92% on hops5–8), with a depth effect of +31.458 pp [30.267, 32.633]
+on hops2–3 and a walk specificity of +28.181 pp [26.844, 29.425]. <!-- LP18 --> These values sit next to the 0.6B ones (+21.550 pp for the
+B6 contrast; 47.85%, 35.35%, 18.47% and 7.25% on hops1–4) without any test across scales, and two sizes support no scaling trend.
+<!-- LP20 --> Latency is a cost and is not compared across scales: at 1.7B M1-L4 and B8 take about 1.29 times B4's 0.486 ms per question.
+<!-- LP19 --> P1L-C and the per-step readouts were not run at 1.7B.
+
+**P1L-C.** P1L-C ran at Qwen3-0.6B-Base after the rank128 check passed, evaluating the nine rank128 checkpoints (M1-L4, B8 and B4, three seeds;
 nothing retrained) on a second range, `test` [102000,104000), with 95% intervals. Keeping the memory only at the final question
 position lowers the hops1–3 EM of M1-L4@4 from 33.64% to 3.74% (−29.906 pp [−30.756, −29.094]), of B8@4 from 10.48% to 0.99%
 (−9.489 pp [−10.078, −8.911]) and of B4@1 from 10.39% to 1.26% (−9.133 pp [−9.711, −8.589]), in every seed and hop,
@@ -1353,7 +1373,10 @@ beside each principal claim.
 
 The rank128 language-model result is bounded further. It concerns the `oracle_random` memory over the 768 seen names, one
 oracle seed and layout and three training seeds; its equal-parameter claim is M1-L4 against B4 only, and the unshared reader B8
-fails its gate while adding 31.0% parameters. <!-- LP9 --><!-- LP11 --> P1L-C does not show where the bridge is carried: its
+fails its gate while adding 31.0% parameters (24.3% at the second scale). <!-- LP9 --><!-- LP11 --> The second scale (Qwen3-1.7B-Base)
+carries learning rates from the smaller model without a pilot, and covers two sizes of one family only: no test across scales was
+registered, so the paper claims no scaling trend, nothing for any other size, and no learned-writer or end-to-end result at either size.
+<!-- LP15 --><!-- LP20 --> P1L-C does not show where the bridge is carried: its
 read-position drop is a distribution shift, and bridge patching gives no causal claim. <!-- PC1 --><!-- PC2 -->
 
 UNS evaluates the 256 unseen-pool names of the same 1,024-name vocabulary, which carry fixed
@@ -1430,10 +1453,10 @@ The single-module LLM screens, DPFP included, select no learned writer (P1L-D is
 controls do not overcome the deployed-read/answer gap, a read-failure factorial finds that only an
 exact store together with the true key rescues the read, and the rank-32 oracle-code pilot stops.
 <!-- LL2 --><!-- LL3 --><!-- LL7 --><!-- LL9 --><!-- RX1 --><!-- WL1 -->
-In the oracle-reader confirmation, a shared reader exceeds a single read of equal parameter count at rank128 while the
-registered four-unshared-reads reader fails its gate, bridge patching gives no causal claim, and at rank32 the readers did not
+In the oracle-reader confirmation, a shared reader exceeds a single read of equal parameter count at rank128 on two backbone sizes
+of one family while the registered four-unshared-reads reader fails its gate, bridge patching (0.6B only) gives no causal claim, and at rank32 the readers did not
 learn to use the oracle memory; the per-step readouts are descriptive decoding and not evidence for composition.
-<!-- LP4 --><!-- LP5 --><!-- LP7 --><!-- LP9 --><!-- LP11 --><!-- PC1 -->
+<!-- LP4 --><!-- LP5 --><!-- LP7 --><!-- LP9 --><!-- LP11 --><!-- LP15 --><!-- PC1 -->
 
 The additional load study narrows this result further: depth benefits decrease
 under the registered load/layout changes, while multi-read capability remains
@@ -1549,6 +1572,7 @@ conditions take priority over shortened manuscript wording.
 | DPFP | `val`, seed4242, 1,000 episodes per arm | Learned LLM writers with DPFP key and query features (D32-3, D128-1, D128-3; T1, E=16, training seed17) against the WP-L4 references R at the same rank; registered E=8 retrain of D128-3; zero- and shuffled-memory audit; no CIs. P1L-D not run. | DP1–DP3, PD1 <!-- DP1 --><!-- DP2 --><!-- DP3 --><!-- PD1 --> |
 | P1-L registered oracle readers | test episode indices[100000,102000), 2,000 episodes, eval seed4242 | oracle_random at r32/r128; seeds17/29/43, primary fixed-L4 B8 (not parameter-matched: +8.9% at r32, +31.0% at r128), same-rank gates, k2 and 97.5% intervals; Amendments B6 (equal-parameter rule) and B7 (per-rank memory-use check; no multi-read claim at r32). Rank32 fails the check, rank128 passes; at rank128 G1-L fails, G2-L passes and M1-L4@4 against B4@1 meets the B6 criterion. LP6 is training/validation evidence; the per-step readouts (LP5) are descriptive. | LP1–LP13 <!-- LP1 --><!-- LP2 --><!-- LP3 --><!-- LP4 --><!-- LP5 --><!-- LP6 --><!-- LP7 --><!-- LP8 --><!-- LP9 --><!-- LP10 --><!-- LP11 --><!-- LP12 --><!-- LP13 --> |
 | P1L-C | test episode indices[102000,104000), 2,000 episodes (256 hop-2 episodes per seed for patching) | The nine rank128 checkpoints (M1-L4, B8, B4 × seeds17/29/43), nothing retrained; read-position analysis (descriptive), bridge patching with a registered causal bar of 10 pp, replication of the P1-L contrasts; 95% intervals. | PC1–PC4 <!-- PC1 --><!-- PC2 --><!-- PC3 --><!-- PC4 --> |
+| P5L | test episode indices[104000,106000), 2,000 episodes, eval seed4242 | Qwen3-1.7B-Base (revision ea980cb0…), oracle_random at rank128, readers B3-L4/B4/M1-L4/B8/B5-L4 × seeds17/29/43, S=17,000, learning rates carried from the 0.6B rank128 lock without a pilot, 97.5% intervals; B7 check then the B6 contrast decide; G1-L/G2-L reported only; no B1/B2, P1L-C or readouts. | LP14–LP20 <!-- LP14 --><!-- LP15 --><!-- LP16 --><!-- LP17 --><!-- LP18 --><!-- LP19 --><!-- LP20 --> |
 
 The symbolic studies use training seeds 17/29/43. <!-- S1 --><!-- B3 --> P1-S/P2-S and their follow-ups use 2,000 paired
 episode-bootstrap draws with seed2718 and confidence 97.5%, conditional on those
@@ -1645,6 +1669,7 @@ carry its numbers. Exact values and statuses stay in the [symbolic](evidence_sym
 | At the frozen R/r128 and R/r32 checkpoints only an exact store together with the true key rescues the deployed read (verdict store+query); W5/r32 is undecided; no LSQ arm runs | Cells that replace the final-position read of the same frozen checkpoint; no parameter comparison | Learned writers R (WP-L4) and W5 (WP-L3 rerun); no oracle | val: seed4242, episode indices [200000,204000), 4,000 queries; training seed17; no CIs | Rescue: normalized error ≤0.5 of the baseline and EM gain ≥10 pp; the first rule that applies gives the verdict | RX1–RX3 <!-- RX1 --><!-- RX2 --><!-- RX3 --> |
 | At rank 32 the LM path did not learn the O-rot and O-shared oracle codes within the pilot budget; P1L-S is not run | None: a pilot against a 30% hop-1 threshold; no B4 or B8 comparison, so no equal-parameter or multi-read claim | oracle_rot and oracle_shared (LLM oracle designs, not the symbolic oracle) | val: seed4242, 1,000 episodes; training seed17; no CIs | Hop-1 full-vocabulary EM ≥30% at L=4, final checkpoint, one arm per design; neither passes (0.1%, 11.8%) | WL1–WL2 <!-- WL1 --><!-- WL2 --> |
 | At rank128, with a clean oracle memory, the shared M1-L4 reader exceeds a single read of equal parameter count on hops2–3, and the gated B8 reader fails G1-L (G2-L passes); at rank32 the readers did not learn to use the oracle memory, and no multi-read claim is made | Per rank, B8@4 and M1-L4@4 against B4@1, B5-L4@4 and B3-L4@4 at the same rank. The equal-parameter claim only from M1-L4@4−B4@1 at rank128 (475,138 parameters each; Amendment B6); B8 is not parameter-matched (+8.9% at r32, +31.0% at r128); latency (M1-L4 about 1.42 and B8 about 1.57 times B4 at rank128) is a cost | oracle_random (the LLM oracle, with independent random pair-key and value tables, is not the symbolic oracle); no learned writer | test, episode indices [100000,102000), 2,000 episodes; seeds17/29/43; 97.5% CIs (k=2) | G1-L (B8@4−B4@1 ≥3 pp, CI>0, every seed, hop1 ≥−1 pp, typed CI>0): fails at r128 (+0.983 pp), outcome at r32 not interpreted; G2-L passes at r128; Amendment B6 criterion met by M1-L4@4−B4@1 (+21.550 pp); Amendment B7 memory-use check: fails at r32, passes at r128 | LP1–LP13; B9 <!-- LP1 --><!-- LP2 --><!-- LP3 --><!-- LP4 --><!-- LP5 --><!-- LP6 --><!-- LP7 --><!-- LP8 --><!-- LP9 --><!-- LP10 --><!-- LP11 --><!-- LP12 --><!-- LP13 --><!-- B9 --> |
+| The equal-parameter result holds at a second scale of the same family: at Qwen3-1.7B-Base, rank128, M1-L4@4 exceeds B4@1 on hops2–3 (the registered decision); B8 fails G1-L again (reported only); no scaling trend and no other size | B4@1 at the same rank; equal adapter parameters for M1-L4 and B4 (606,210); B8 is not parameter-matched (+24.3%); latency (M1-L4 and B8 about 1.29 times B4) is a cost and is not compared across scales | oracle_random (the LLM oracle, not the symbolic oracle); no learned writer | test, episode indices [104000,106000), 2,000 episodes; seeds17/29/43; 97.5% CIs | Memory-use check passes; B6 contrast ≥3 pp, CI>0, positive in every seed (+25.783 pp: met); G1-L (+1.033 pp, hop 1 −1.717 pp) and G2-L reported only; cross-scale values descriptive, no test | LP14–LP20 <!-- LP14 --><!-- LP15 --><!-- LP16 --><!-- LP17 --><!-- LP18 --><!-- LP19 --><!-- LP20 --> |
 | P1L-C: no causal bridge claim at rank128 for M1-L4 or B8; the read-position and replication results are descriptive | The same rank128 checkpoints (nothing retrained); no new parameter comparison | oracle_random | test, episode indices [102000,104000); 256 hop-2 episodes per seed for patching; 95% CIs | Causal bridge claim: pooled shift ≥10 pp, CI>0 and positive in every seed (M1-L4 +0.391 pp, B8 0.000 pp: not met); read position and replication gate nothing | PC1–PC4 <!-- PC1 --><!-- PC2 --><!-- PC3 --><!-- PC4 --> |
 | Conditional theory (Props.1–11) | Not applicable | Not applicable | Not applicable | None: conditional results that experiments are compatible with, or contradict only in their unconditional readings | Theory-to-measurement ledger in the symbolic ledger |
 
@@ -1665,7 +1690,7 @@ Reading rules.
   (Section 8.4), so no symbolic oracle result is carried over to it.
 - **Splits and reuse.** C777 is reused by the rank and factorized follow-ups and C888 by P2-S-F1, so
   their intervals there are not independent confirmation; C999, C999002 and C999003 and the follow-up
-  sets C999004–C999007 are fresh; the P1-L confirmation range [100000,102000) and the P1L-C range [102000,104000) are separate. NCR re-reads saved S4242 and C777 predictions and UNS Part A audits S4242;
+  sets C999004–C999007 are fresh; the P1-L confirmation range [100000,102000), the P1L-C range [102000,104000) and the P5L range [104000,106000) are separate. NCR re-reads saved S4242 and C777 predictions and UNS Part A audits S4242;
   neither adds an evaluation. Every
   interval conditions on the fixed training seeds 17/29/43 and is specific to its endpoint. Per-seed
   effects appear next to the pooled ones where the ledgers record them (S3, S8, B1, IS1, HL1, JS1–JS4).
@@ -1673,17 +1698,18 @@ Reading rules.
   UNS scope row on the 256-name unseen pool (UN1–UN3), so no claim covers names outside the vocabulary,
   new entity codes, or composition "for unseen entities". Effects hold at the trained hops (1–3) and trained depths; longer
   hops are reported as measured cells (S7, B6, H1–H6, JS3), not as extrapolation claims. No claim is
-  made about multiple reads in the language model at rank32.
+  made about multiple reads in the language model at rank32. The language-model results cover Qwen3-0.6B-Base and, for P5L only,
+  Qwen3-1.7B-Base; no claim is made for another size or as a trend across the two (LP20).
 - **Names.** Ledger IDs name claim rows. The reader names B3–B8 (for example B3 memory-free and B8
   step-specific) and the amendments B1–B7 of the P1-L preregistration (written "Amendment B6" and
   "Amendment B7" here) are separate namespaces: an HTML comment such as `<!-- B7 -->` in this manuscript
   always cites claim row B7 of the symbolic ledger, whereas "B7" in running text names the
   larger-memory reader.
 - **Descriptive rows.** Rows marked descriptive in the ledgers (IV3, CV4, TS2, UN2–UN4, PM1, NC2, RX2, RX3,
-  WL2, LP5, LP8, LP12, LP13, PC2–PC4, DP2 and DP3) have no gate in their preregistrations. They support only the wording that the preregistration
+  WL2, LP5, LP8, LP12, LP13, LP18–LP20, PC2–PC4, DP2 and DP3) have no gate in their preregistrations. They support only the wording that the preregistration
   attaches (for UNS, "the depth gain is also present on unseen-pool entities"; for NCR, the qualification of D).
 - **Pending.** Nothing registered is pending. The registered results of IVD, CVH, TSM, UNS, NCR, RFX, WP-L6, the P1-L
-  confirmation with the memory-use check, P1L-C with the per-step readouts, and DPFP (P1L-D not run) are reported.
+  confirmation with the memory-use check, P1L-C with the per-step readouts, its second-scale repeat (P5L), and DPFP (P1L-D not run) are reported.
 
 ## References and source records
 
