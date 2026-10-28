@@ -10,6 +10,10 @@ B6/B7), scope statements, the OA rename (value/output ceiling) and further exclu
 external reviews. Sources newer than the cutoff above are Amendments B6 (`26b96bd`) and B7
 (`2bf7506`), the run locks (PLK, merged `ca85a40`) and the capacity check (L6C). The ledger still
 contains no P1-L confirmation result.
+WP-T10 part 1 (2026-10-29, on `master` `abc2fa1`) adds the registered results of RFX (RX1–RX3) and the WP-L6 stop
+(WL1, WL2), whose records are on wp/llm and wp/oracle and are cited by commit, and a section of pending
+placeholders (DP1, PC1, PD1; P1-L confirmation and the B7 check stay in LP4 and LP6). It changes the status of no
+earlier row and adds no P1-L confirmation result.
 
 ## Status, populations, and metrics
 
@@ -31,6 +35,8 @@ confirmation or uncertainty over training seeds. No new statistics were estimate
 | P1-L confirmation (pending) | Split `test`, episode indices `[100000,102000)`, 2000 episodes | Registered 97.5% paired episode-bootstrap intervals; no effects or intervals supplied here. The interval is an index range, not an evaluation seed. |
 | T-L1 | P1-L main-run training logs at step 17000, rank 32 and 128: mean of the last five logged batches (steps 16600–17000; batch size 64 episodes), hops1–3 mixed, trained depth | Training-batch accuracy and loss as logged; no CI; neither validation nor confirmation. Local files (`runs/` is git-ignored). |
 | V-L5 | P1-L Pilot-2 at rank 32 (S/3 steps, training seed17, lr in {.001,.003}): split `val`, eval seed4242, 1000 episodes per (reader, lr, hop) cell, memory-only protocol, five readers (B3-L4 has no memory) | Full-vocabulary EM and episode-candidate accuracy against the 1/14 chance level; no CI; learning-rate selection data, not confirmation. Local files. |
+| V-L6 | RFX, frozen WP-L4/WP-L3 checkpoints (R/r128, R/r32, W5/r32; training seed17): split `val`, seed4242, episode indices [200000,204000), one hop-1 query per episode (4,000 queries); fitting set 4,096 `train` episodes (16,384 queries) | Full-vocabulary EM, normalized read error and entity-restricted EM of cells that replace the final-position read; one seed; no CI; validation data only. |
+| V-L7 | WP-L6 pilots, rank 32, M1-L4 with oracle code designs (seed17, 5,666 steps): split `val`, seed4242, 1,000 episodes, L=4, memory-only | Hop-1 full-vocabulary EM of the final checkpoint against a 30% threshold; one seed, one learning rate; no CI; pilot, not confirmation. |
 
 The backbone is frozen `Qwen/Qwen3-0.6B-Base` at revision
 `da87bfb608c14b7cf20ba1ce41287e8de496c0cd`. Screens use one layer14 adapter,
@@ -73,6 +79,8 @@ compute jobs; this synthesis reads only committed tables, records, and source.
 | PLK | [r32 run lock](../../reports/p1l/lr-S-lock.json), [r128 run lock](../../reports/p1l/r128/lr-S-lock.json) | r32 `d644b9b`; r128 `1d1bbfd`; merged with `ca85a40`, after this ledger's original cutoff; fields `S`, `lrs`, `selection` |
 | L6T | Main-run training logs `runs/p1l/main/main/*/*/train_log.jsonl` and `runs/p1l/main/r128/main/*/*/train_log.jsonl`; Pilot-2 `runs/p1l/main/pilot/*/*/validation/metrics.json` | **Not committed** (`runs/` is git-ignored). The committed record is the summary in PL B7 (`2bf7506`); WP-T9 re-read the raw files read-only |
 | L6C | [capacity check](../../reports/p1l-c1/capacity.json), [script](../../scripts/analyze_oracle_capacity.py) | `2bf7506`; rows `(r,seed,keys,map)`, means under `mean` |
+| RFXS | `reports/p1l-rfx/summary.json`, `R-r128.json`, `R-r32.json`, `W5-r32.json` and `docs/reports/RFX.md`; [preregistration](../prereg/RFX.md) | Branch wp/llm, not on this branch: summary and records `379fccd`, report `faacd37`; run at `efadc36`, job 3721047.opbs. Selectors: `verdicts`, `rescue`, `lsq_arms`; per-checkpoint `cells`, `refit`, `conditioning`, `write_order`, `checks` |
+| WL6D | `reports/wp-l6/decision.json`, `sizing.json` and `docs/reports/WP-L6.md`; [preregistration](../prereg/WP-L6.md) | Branch wp/oracle, not on this branch: `98d048c`; run at `7175e09`, jobs 3720811 and 3720812. Selectors: `status`, `selected`, `arms.<arm>.hop1_L4_full_em`, `threshold` |
 
 ## Writer-screen claim ledger
 
@@ -450,7 +458,38 @@ value as 99.8% (exact **99.85%**). Rotated keys are `normalize(Pi·global_codes[
 
 These tables describe the training and validation record the registered memory-use check (B7)
 responds to. The registered prediction (r32 fails the check, r128 passes) is a prediction, not an
-outcome; the check itself is confirmation-set evidence and is pending.
+outcome; the check itself is confirmation-set evidence and is pending. WL1 adds a rank-32 pilot with rotated and
+shared oracle codes: neither reached the registered hop-1 threshold (validation EM 0.1% and 11.8% against 30%), so P1L-S does
+not run; WL1 is pilot evidence and does not change the Amendment B7 rule or this prediction.
+
+## RFX and WP-L6: registered follow-up results
+
+Both studies were registered on master on 2026-10-27 ([RFX](../prereg/RFX.md), [WP-L6](../prereg/WP-L6.md)) before any run,
+and report single-seed validation results with no confidence intervals. Their records are on branches that master does not yet
+contain, so they are cited by commit: RFX `reports/p1l-rfx/*.json` at wp/llm `379fccd` and `docs/reports/RFX.md` at `faacd37`
+(run at `efadc36`, job 3721047.opbs); WP-L6 `reports/wp-l6/decision.json` and `sizing.json` and `docs/reports/WP-L6.md` at
+wp/oracle `98d048c` (run at `7175e09`, jobs 3720811 and 3720812). Neither is a P1-L confirmation result. Rows labelled
+**descriptive** have no gate in their preregistration.
+
+| ID and paper sentence | Status | Evidence | Conditions and non-implications | Source/selector |
+| --- | --- | --- | --- | --- |
+| RX1. “At the frozen WP-L4 checkpoints R/r128 and R/r32 only an exact (ridge) store read together with the true key rescues the read (registered verdict `store+query`); at W5/r32 the factors are not separated (verdict `none`); no LSQ arm was triggered.” | supported | V-L6, training seed17, one hop-1 query per episode. Rescue rule: normalized read error ≤0.5 of the baseline and EM gain ≥10 pp over the baseline EM_b (the better of the as-is and gain-fitted deployed read). Baseline error e_b **0.614510 / 0.655206 / 0.713594** and EM_b **33.800000 / 11.625000 / 14.875000%** for R/r128, R/r32, W5/r32. Rescue flags are true only for the clean control, `ridge/true/asis` and `ridge/true/fit` at R/r128 and R/r32, and for no cell at W5/r32. `ridge/true/fit`: error **3.22e-10 / 4.42e-08 / 4.44e-08**, EM **84.200000 / 49.050000 / 17.675000%**; clean control EM **84.400000 / 48.800000 / 17.625000%**. By the first rule that applies the verdicts are R/r128 `store+query`, R/r32 `store+query`, W5/r32 `none`; storage, normalization, query and decoder do not apply. `lsq_arms` is empty. | Single seed, one evaluation set of 4,000 validation queries (EM standard error 0.5–0.8 pp); no confidence intervals. The replaced read is a distribution shift for the LM path after the read, and the true-key cells use the label and are not deployable. The `store+query` verdict means that only the exact store together with the true key rescues; the exact store with the deployed or the unit query does not (EM **38.800000 / 38.750000%** against EM_b 33.8% at R/r128; **13.475000 / 13.650000%** against 11.6% at R/r32), and because `ridge/true` almost equals the clean control the rule does not separate store from query. The W5/r32 verdict `none` does not separate the factors: its own clean control reaches only 17.6%, so no cell can rescue. Under the LSQ preregistration no LSQ arm runs and no LSQ release exists; DPFP is the only remaining writer screen. The rule was changed at registration (orchestrator decisions 1–5 of the preregistration). | RFXS wp/llm `379fccd`: summary.json `verdicts`, `rescue`, `lsq_arms`; R-r128.json, R-r32.json, W5-r32.json `verdict`, `cells`; [prereg](../prereg/RFX.md) decision rule |
+| RX2. (descriptive) Reported cells of the RFX factorial: storage, query, decoder, conditioning. | descriptive | V-L6, R/r128 / R/r32 / W5/r32; error, full-vocabulary EM %. Deployed read (`delta/raw/asis`): **0.614522 / 0.658633 / 25.4377**, **33.800000 / 11.625000 / 14.875000**; gain-fitted (`delta/raw/fit`): **0.614510 / 0.655206 / 0.713594**, **33.775000 / 11.575000 / 8.525000**. Unit query on the deployed store (`delta/unit/fit`): **0.609681 / 0.650788 / 0.709338**, **33.950000 / 11.525000 / 8.625000**. True query on the deployed store (`delta/true/fit`): **0.497853 / 0.584000 / 0.566368**, **39.875000 / 13.950000 / 9.375000**. Exact store, raw query (`ridge/raw/fit`): **0.576519 / 0.601491 / 0.690632**, **38.800000 / 13.475000 / 9.100000**. Zero read EM **21.900000 / 7.500000 / 6.800000**. Clean-value head accuracy on the clean value **93.05 / 84.90 / 84.575%** and on the deployed read **18.95 / 7.125 / 11.10%**; refit linear decoder on the deployed reads **18.425 / 6.775 / 8.125%**, below the entity-restricted baseline at every checkpoint. Key Gram log10 condition number, median over 4,000 episodes (E=16 keys): **2.386 / 3.549 / 3.547**. | No gate. D3 is compared with the entity-restricted EM, not the full-vocabulary EM. The tables also hold error and EM by write age, by four random write orders (agreement with the natural order **97.8% / 95.3% / 77.2%** for the first permutation) and the normalization and gain effects (unit minus raw error about −0.005, EM at most +0.2 pp); they are descriptive. The four instrumentation checks pass at every checkpoint and the entity-EM guard passes (`full_hit_entity_miss` 0 in every cell). The W5/r32 as-is error 25.4 is a scale artifact that the fitted gain removes. | RFXS `379fccd`: R-r128.json, R-r32.json, W5-r32.json `cells`, `refit`, `conditioning`, `write_order`, `checks`; `docs/reports/RFX.md` `faacd37` tables |
+| RX3. (descriptive) “By the preregistered reading guide, at R/r128 and R/r32 write interference in the deployed delta store dominates and the query path is not the bottleneck.” | descriptive | Guide: `delta/true/fit` near the OA level means the query path is the bottleneck; near the checkpoint's own EM means write interference dominates. `delta/true/fit` EM **39.875000%** at R/r128 against its own EM 33.8% and the OA level 84.0%; **13.950000%** at R/r32 against its own 11.6% and the clean control 48.8%. The unit true key on the learned delta state still reads a cross-talked value (error **0.497853 / 0.584000**, against **3.22e-10 / 4.42e-08** for the exact store). The ridge store needed η=1 (a regularized, no longer interpolating store) with the learned queries and η=1e-6 with the true key. | The guide is descriptive and not a rule; one seed and one evaluation set. It does not isolate a unique mechanism or prove interference, it does not cover W5/r32 (`none`), and OA remains the value/output ceiling, not an addressing control. It is consistent with, and not additional to, LL7–LL10 (read distortion without a unique cause). | RFXS `379fccd`: `cells` delta/true/fit and ridge/true/fit, `parameters.eta`; [prereg](../prereg/RFX.md) “Reading guide”. |
+| WL1. “At rank 32 the LM path did not learn the two oracle code designs of WP-L6 within the pilot budget (one seed, one learning rate, 5,666 steps); P1L-S is not run.” | supported | V-L7, validation (`val`, eval seed4242, 1,000 episodes), memory-only, L=4, final checkpoint after step 5,666: hop-1 full-vocabulary EM O-rot **0.100000%**, O-shared **11.800000%**, both below the **30%** pass threshold. Registered decision: `stop`, `selected` null. Both pilots completed all 5,666 steps. | Registered conditions: M1-L4, r=r_mem=32, lr 3e-3 (P1-L's r32 selection, not retuned), seed17, constant lr, no early stopping, one run per arm. The result is not a proof of impossibility. O-shared above O-rot is descriptive and is not used for selection; no arm is compared with B4 or B8, and no statement about multiple reads follows. P1L-S (the rank-32 study with the selected code) does not run, and the P1-L r32 and r128 `oracle_random` conditions of LP3 are unchanged. | WL6D wp/oracle `98d048c`: `reports/wp-l6/decision.json` (`status`, `arms.*.hop1_L4_full_em`, `threshold`); [prereg](../prereg/WP-L6.md) |
+| WL2. (descriptive) Cost and step times of the WP-L6 pilots. | descriptive | Jobs 3720811 (O-rot) and 3720812 (O-shared), 19.3 and 22.8 min, **0.321** and **0.380** node·h; step time **0.194 / 0.231 s**, peak memory about 7.2 GB each; about **0.97** node·h for the whole step 2 including five test jobs and the smoke. `sizing.json` recommends separate jobs (a packed job would need 01:05:00). | No gate. The 32-cell (L, hop) tables and code-drift diagnostics of the registered reports are not cited here. At `7175e09` one of 140 regression tests (a time-dependent P1-L launcher guard, not on the WP-L6 path) failed; it passes at `4dcc6b3`, and no assertion was changed. | WL6D `98d048c`: `docs/reports/WP-L6.md` “Step 2 on compute”, `sizing.json` |
+
+## Pending follow-up placeholders
+
+No value is imputed for any item below, and no registered result exists for it in this ledger. These rows keep the places that
+WP-T10 part 2 fills when the orchestrator releases it.
+
+| ID and paper sentence | Status | Evidence | Conditions and non-implications | Source |
+| --- | --- | --- | --- | --- |
+| LP4, LP6 (existing rows). P1-L confirmation results at r32 and r128, and the memory-use check of Amendment B7. | open | **Pending.** Registered prediction (r32 fails the check, r128 passes) is not an outcome. | Confirmation split `test`, indices [100000,102000), seeds17/29/43, 97.5% intervals (k=2); no multi-read claim at r32 whatever the gates show; an r128 pass is not equivalence with the symbolic oracle. WL1 changes none of this. | LP3, LP4, LP6; PL B6, B7 |
+| DP1. “A learned writer with DPFP key and query features passes the WP-L4 writer gate (validation EM ≥0.80).” | open | **Pending.** No DPFP result is in this ledger. | Registered 2026-10-27 as an exception to “no further writer screens”. Candidates r32 (D32-3) then r128 (D128-1, D128-3); validation EM ≥0.80 selects, ≥0.50 allows one E=8 retraining. DPFP also changes query normalization, so a DPFP effect cannot be attributed to decorrelation alone (Amendment A1). With LSQ not run (RX1) it is the only remaining writer screen. | [DPFP prereg](../prereg/DPFP.md) |
+| PC1. “At r128 the reader's answer depends on the bridge entity carried by its state, and the read at the final question position carries the accuracy (P1L-C).” | open | **Pending.** | Evaluation only; runs only if r128 passes the memory-use check of Amendment B7, and only after the P1-L confirmation evaluation; otherwise it is not run. | [P1L-C prereg](../prereg/P1L-C.md) |
+| PD1. “A learned writer selected by DPFP passes G1-L and G2-L in a P1-L learned condition at its rank (P1L-D).” | open | **Pending.** | Registered only if DPFP selects a writer (LSQ does not run); one condition with a 95% interval; the oracle conditions keep k=2; P3 is reconsidered only if it passes. Not registered while no writer is selected. | [DPFP prereg](../prereg/DPFP.md) “Decision rule”; plan F3 |
 
 ## Three distinct privileged controls
 
@@ -483,6 +522,10 @@ These statements bound every row; a row's own conditions add to them.
   not writers.
 - **Oracle design.** The LLM oracle is not the symbolic oracle (LP6; the
   [symbolic scope statement](evidence_symbolic.md#scope-of-every-row)).
+- **Follow-up rows.** RX1–RX3 and WL1–WL2 are single-seed validation results (training seed17, validation seed4242)
+  without confidence intervals. RFX replaces the read at the final question position of frozen checkpoints and
+  trains nothing; WL1 is a pilot with a registered stop, not a P1-L confirmation. Neither changes the P1-L
+  preregistration, and B8 is not parameter-matched to B4 in either.
 
 ## Must-not-say list
 
@@ -531,6 +574,18 @@ These statements bound every row; a row's own conditions add to them.
 - “The r128 oracle implementation and final hyperparameter locks are established
   by a protocol amendment,” “episode index100000 is the evaluation seed,” or
   “planned per-step readability already demonstrates causal path following.”
+- “RFX identified storage, query or normalization as the failure of the deployed read,” “write
+  interference is established as the cause,” or “an exact store fixes the deployed read.” The RFX verdict
+  is `store+query` at R/r128 and R/r32: only the exact store together with the true key (a label, not
+  deployable) rescues, the exact store with the deployed or unit query does not, and the rule does not separate
+  store from query (RX1). The reading “write interference dominates” is a descriptive, single-seed use of
+  the preregistered guide (RX3). Nothing is identified for W5/r32 (`none`), and no LSQ arm was run.
+- “WP-L6 shows that the LM cannot learn oracle codes,” “O-shared is the selected design,” “P1L-S ran or was
+  decided,” or any statement about multiple reads at r32 from WL1. The pilot stopped on one seed, one
+  learning rate and 5,666 steps (O-rot 0.1%, O-shared 11.8% hop-1 EM against 30%); it is not a proof of
+  impossibility, and O-shared above O-rot is descriptive and not a selection.
+- Any DPFP, P1L-C or P1L-D result, or any P1-L confirmation or memory-use-check result. Their rows are
+  placeholders (DP1, PC1, PD1, LP4, LP6).
 
 The screen diagnostics motivate a bounded read-distortion interpretation, not
 a theorem about optimization or a universal ceiling. The symbolic B9 record
@@ -553,3 +608,7 @@ minima/maxima and arithmetic on registered counts were computed; no confirmation
 read.
 The original studies' runtime audits are historical evidence. P1-L confirmation,
 comparative inference measurements, and intermediate-state outcomes remain open.
+WP-T10 part 1 added RX1–RX3, WL1–WL2 and the placeholders. The RFX and WP-L6 numbers were read with `git show` from the
+committed JSON files and reports at wp/llm `379fccd`/`faacd37` and wp/oracle `98d048c` (those files are not on this
+branch); fractions were converted to percent and no statistic was recomputed. No checkpoint or sample was loaded
+and no job ran. The plan's result line for RFX cites `379fccd`; the report is at `faacd37`.
