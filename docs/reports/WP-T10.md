@@ -158,3 +158,49 @@ DPFP (DP1) and P1L-D (PD1), part 3b.
    record's and is labelled as such.
 
 WP-T10 part 3a done
+
+# WP-T10 part 3b — DPFP negative result; P1L-D not run
+
+Master `711d1ac` merged first (wp/llm with the DPFP report). Text only, static checks only (tags resolve, no duplicate DP/PD/LP/PC IDs,
+table columns, links and anchors, `git diff --check`). All numbers of the DPFP report were reproduced with
+`python3 scripts/analyze_dpfp.py reports/p1l-dpfp` (login node, stdlib only) and the audit values were read from
+`reports/p1l-dpfp/audit-e16.json` and `audit-e8.json`; the percentage-point differences are arithmetic on those values.
+
+Commits: the draft/ledger commit titled "WP-T10: DPFP negative result (DP1-DP3) and P1L-D not run (PD1) ..." plus this report.
+
+## What changed where
+
+**[evidence_llm.md](../paper/evidence_llm.md).** The pending-placeholder section is replaced by "DPFP and P1L-D: registered result":
+DP1 (not supported: E=16 val EM 39.0/58.0/60.8% against the 0.80 gate, the registered E=8 retrain of D128-3 reached 73.0% and is not
+accepted; registered decision stop, no writer, no further writer screen; LSQ ran no arm, so no learned writer reaches the WP-L4 gate in
+this project; Amendment A1: DPFP changes feature geometry and query normalization together, so no gain is credited to decorrelation
+alone, and the E=8 gain also mixes load), DP2 (descriptive: read error, head accuracies, value SIR and key overlap per arm; the
+original-space key overlap is not lower than R's), DP3 (descriptive: zero- and shuffled-memory audit; answers depend on the episode's own
+memory, not evidence of an accurate read), PD1 (new status "not run": P1L-D was not registered because no writer was selected). Population
+V-L10, source key DPFE, scope bullet, three must-not-say bullets (replacing the DPFP/P1L-D placeholder bullet), audit boundary,
+header notes. Nothing is pending in this ledger now.
+
+**[draft.md](../paper/draft.md).** Section 8.5 "DPFP and P1L-D" paragraph replaces the TODO; header and abstract no longer leave a writer
+result pending (the abstract sentence now says the screens, including the last registered DPFP screen, select no learned writer);
+Section 8.3 (LSQ/DPFP sentence and the E8 note), Section 9 conclusion, Appendix B (DPFP row), Appendix C (the LLM writer-screens claim row
+extended), reading rules (descriptive rows, pending list: nothing pending). Claim contract kept: same-rank comparisons only, no end-to-end or
+learned-writer claim, latency a cost. The sentence "no learned writer reaches the WP-L4 gate in this project" is in Section 8.5.
+
+**[evidence_symbolic.md](../paper/evidence_symbolic.md).** Pointer sentence updated to the new section.
+
+## Test and smoke overrun
+
+The ledger records no cost deviations, so the overrun is not entered there. For the record: `docs/reports/DPFP.md` gives about **0.78** node·h for
+tests plus smokes against the registered 0.5 (the task text's 0.63 is superseded); 0.17 tests, reproduction, failed run, rerun and debug,
+0.45 E=16 smokes, 0.13 E=8 smoke, 0.03 reload checks, 0.01 audit test; the E=16 arms (4.02) and the E=8 retrain (1.31) are science jobs outside
+that cap; total DPFP about 6.14 node·h.
+
+## Notes
+
+1. DP1's statement that the E=8 gain "mixes load with the DPFP features" is my reading (E=8 halves the facts per episode); the report says the
+   halving raises EM by 12.2 pp but does not say it is non-comparable. The prereg does allow the E=8 retrain as the registered fallback.
+2. "Not run" is a new status label (PD1 only), defined in the ledger's status paragraph.
+3. The report's reading that DPFP changes "the addressing geometry and the read, not a decorrelation of the learned projections K" is quoted
+   in DP2 as a description of the original-space overlap numbers; phi-space numbers are not compared with R.
+
+WP-T10 part 3b done

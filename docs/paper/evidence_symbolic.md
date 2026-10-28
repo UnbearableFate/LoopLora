@@ -642,8 +642,8 @@ and no value is imputed.
 
 No symbolic measurement is pending after WP-T10 part 1. PM1, which WP-T9 left open for the neighbour-confusion rate,
 is filled by the NCR analysis; its ID is kept in the follow-up section above. The P1-L confirmation, the memory-use check and P1L-C
-are reported in the [LLM ledger](evidence_llm.md#p1-l-confirmation-and-p1l-c-registered-results) (WP-T10 part 2); DPFP and P1L-D
-keep placeholders there (evidence_llm.md#pending-follow-up-placeholders).
+are reported in the [LLM ledger](evidence_llm.md#p1-l-confirmation-and-p1l-c-registered-results) (WP-T10 part 2); DPFP (negative result) and the
+not-run status of P1L-D are in the same ledger ([DPFP and P1L-D](evidence_llm.md#dpfp-and-p1l-d-registered-result), WP-T10 part 3b).
 
 ## Statements the paper must not make
 

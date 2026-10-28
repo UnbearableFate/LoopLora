@@ -4,7 +4,7 @@ Evidence cutoff: `master` at `f1dd6e2`, including the final WP-L4 release
 (`91fac0c`, merge `39f7f0b`) and P1-L Amendment B5 (`6de902b`). This ledger
 synthesizes committed validation screens and implementation/protocol records.
 It contains the registered P1-L confirmation and P1L-C results (WP-T10 part 2: rows LP7–LP13 and PC1–PC4) and no DPFP or P1L-D
-result. The corresponding
+result in its original text; the DPFP result and the not-run status of P1L-D were added by part 3b (DP1–DP3, PD1). The corresponding
 [symbolic ledger](evidence_symbolic.md) remains authoritative for symbolic claims.
 WP-T9 (2026-10-27, on `dc659e0`) adds LP6 (pre-confirmation memory-use evidence and Amendments
 B6/B7), scope statements, the OA rename (value/output ceiling) and further exclusions after two
@@ -19,10 +19,13 @@ WP-T10 part 2 (2026-10-29, on `master` `5d9c121`) adds the P1-L confirmation wit
 LP4 narrowed, LP6 and LP3 cross-referenced) and the P1L-C results (PC1–PC4), both merged to master, and repoints the RFX and
 WP-L6 citations to their master paths. The per-step readout results, DPFP (DP1) and P1L-D (PD1) stayed open.
 WP-T10 part 3a (2026-10-29, on `master` `88e8652`) enters the per-step readouts in LP5 as descriptive rows, from the corrected P1-L
-record (`f4f9a98`, merged `5eca4d2`); DPFP and P1L-D stay open.
+record (`f4f9a98`, merged `5eca4d2`).
+WP-T10 part 3b (2026-10-29, on `master` `711d1ac`) enters the DPFP negative result (DP1 not supported; DP2, DP3 descriptive) and marks
+P1L-D as not run (PD1); the former placeholder section is now "DPFP and P1L-D: registered result". Nothing is pending in this ledger.
 
 ## Status, populations, and metrics
 
+**Not run** (PD1) means the preregistered decision rule never registered the study.
 **Supported** means supported under the row's conditions; **narrowed** requires
 its stated restriction; **open** means the outcome is not available. Protocol
 support establishes what was registered, not that its eventual gates passed.
@@ -39,6 +42,7 @@ confirmation or uncertainty over training seeds. No new statistics were estimate
 | V-L4 | 1000 T1 E16 episodes, one answer per episode; frozen WP-L3 baseline audit and seven new arms | Full-vocabulary EM and exported diagnostics; no CI. Four gradient-audit minibatches are separate training examples. |
 | P1-L validation (planned protocol) | Split `val`, seed4242, 1000 episodes | Pilot-2 learning-rate selection, not confirmation. |
 | V-L8 | P1-L confirmation: split `test`, episode indices `[100000,102000)`, 2,000 episodes, eval seed4242, memory-only primary setting, oracle_random (oracle seed17) at rank 32 and 128, training seeds17/29/43 | Full-vocabulary EM; 97.5% paired episode-bootstrap intervals (2,000 draws; k=2) over the three trained seeds, per-seed effects beside them. The interval is an index range, not an evaluation seed. |
+| V-L10 | DPFP (WP-L5): split `val`, seed4242, 1,000 episodes per arm, T1 E=16 (E=8 for the one retrain), training seed17, arms D32-3, D128-1, D128-3 | Full-vocabulary EM and the WP-L4 diagnostics at the final checkpoint; one seed per arm; no CI (standard error about 1.5 pp); validation data only. |
 | V-L9 | P1L-C: split `test`, episode indices `[102000,104000)`, 2,000 episodes (read position and replication); the first 256 hop-2 long-chain episodes per seed (bridge patching); the nine rank-128 checkpoints (M1-L4, B8, B4 × seeds17/29/43), nothing retrained | Full-vocabulary EM and answer rates; 95% paired episode-bootstrap intervals (2,000 draws), descriptive except the registered causal-bridge bar. |
 | T-L1 | P1-L main-run training logs at step 17000, rank 32 and 128: mean of the last five logged batches (steps 16600–17000; batch size 64 episodes), hops1–3 mixed, trained depth | Training-batch accuracy and loss as logged; no CI; neither validation nor confirmation. Local files (`runs/` is git-ignored). |
 | V-L5 | P1-L Pilot-2 at rank 32 (S/3 steps, training seed17, lr in {.001,.003}): split `val`, eval seed4242, 1000 episodes per (reader, lr, hop) cell, memory-only protocol, five readers (B3-L4 has no memory) | Full-vocabulary EM and episode-candidate accuracy against the 1/14 chance level; no CI; learning-rate selection data, not confirmation. Local files. |
@@ -84,6 +88,7 @@ compute jobs; this synthesis reads only committed tables, records, and source.
 | C7 | [oracle report](../reports/WP-C7.md), [benchmark](../../reports/llm-oracle/benchmark.json), [oracle source](../../src/looplora/llm/oracle.py), [configuration guard](../../src/looplora/llm/config.py) | Report/benchmark `b0bf9a3`; implementation/tests `b54ec3a` |
 | PL | [P1-L preregistration](../prereg/P1L.md) | v2 final/readouts `f6dcb4e`; B1 `ae1ae22`, B2 `7bfaf16`, B3 `df21654`, B4 `379115d`, B5 `6de902b`, B6 `26b96bd`, B7 `2bf7506`; timestamp corrections `0dbea09`/`6b7f292` |
 | P1LE | P1-L confirmation: `reports/p1l/endpoints.json`, `reports/p1l/r128/endpoints.json`, the `memory-use.csv`, `accuracy.csv` and `inference.csv` of both ranks, `reports/p1l/rank-comparison.json`, `reports/p1l/jobs.json`, `reports/p1l/readout-pooled.csv`, `reports/p1l/per-step-readout.csv`, `reports/p1l/record-numbers.txt` (from `scripts/p1l_record_numbers.py`), [report](../reports/P1L.md), [decision record](../../reports/decisions/P1L.md) | Results `395e309`, merged to master as `16e4fca`; corrected descriptive record `f4f9a98`, merged `5eca4d2`; run at `P1L_SOURCE` `419276578c16f8d191a7ccb4d2ca67ea07fdec00`, authorization `reports/p1l/confirmation-authorization.json`. Selectors: `contrasts.<name>`, `memory_use.contrasts.<name>`, `G1_L`, `G2_L`, `memory_use_passed`; CSV rows by (rank, reader or contrast, seed) |
+| DPFE | DPFP: `reports/p1l-dpfp/` (`arms/`, `arms-e8/`, `refs/`, `e8-lock.json`, `release.json`, `release-e8.json`, `audit-e16.json`, `audit-e8.json`), [report](../reports/DPFP.md), [preregistration](../prereg/DPFP.md) | Branch wp/llm, merged to master as `711d1ac`; E=16 runs at `efadc36` (jobs 3721087–3721089), E=8 retrain at `72ed469` (job 3721535), final records and report `2b75fcf`, audit report `9a20135`. Selectors: arm records (`actual_steps`, validation EM, diagnostics), `e8-lock.json` `choice`, audit `runs.<arm>` |
 | P1LC | P1L-C: `reports/p1lc/results.json`, `read-position.csv`, `replication.csv`, `bridge-shift.csv`, `bridge-rates.csv`, [report](../reports/P1L-C.md), [preregistration](../prereg/P1L-C.md) | `2d9bb1d`, merged as `28e122f`; source `P1LC_SOURCE` `395e30914149898006d63cd289b20dac15d732fe`. Selectors: `(reader, hops, seed=pooled)`, `(reader, patch, seed)`, `(contrast, confidence, seed)` |
 | PLK | [r32 run lock](../../reports/p1l/lr-S-lock.json), [r128 run lock](../../reports/p1l/r128/lr-S-lock.json) | r32 `d644b9b`; r128 `1d1bbfd`; merged with `ca85a40`, after this ledger's original cutoff; fields `S`, `lrs`, `selection` |
 | L6T | Main-run training logs `runs/p1l/main/main/*/*/train_log.jsonl` and `runs/p1l/main/r128/main/*/*/train_log.jsonl`; Pilot-2 `runs/p1l/main/pilot/*/*/validation/metrics.json` | **Not committed** (`runs/` is git-ignored). The committed record is the summary in PL B7 (`2bf7506`); WP-T9 re-read the raw files read-only |
@@ -512,16 +517,20 @@ and report single-seed validation results with no confidence intervals. Their re
 | WL1. “At rank 32 the LM path did not learn the two oracle code designs of WP-L6 within the pilot budget (one seed, one learning rate, 5,666 steps); P1L-S is not run.” | supported | V-L7, validation (`val`, eval seed4242, 1,000 episodes), memory-only, L=4, final checkpoint after step 5,666: hop-1 full-vocabulary EM O-rot **0.100000%**, O-shared **11.800000%**, both below the **30%** pass threshold. Registered decision: `stop`, `selected` null. Both pilots completed all 5,666 steps. | Registered conditions: M1-L4, r=r_mem=32, lr 3e-3 (P1-L's r32 selection, not retuned), seed17, constant lr, no early stopping, one run per arm. The result is not a proof of impossibility. O-shared above O-rot is descriptive and is not used for selection; no arm is compared with B4 or B8, and no statement about multiple reads follows. P1L-S (the rank-32 study with the selected code) does not run, and the P1-L r32 and r128 `oracle_random` conditions of LP3 are unchanged. | WL6D wp/oracle `98d048c`: `reports/wp-l6/decision.json` (`status`, `arms.*.hop1_L4_full_em`, `threshold`); [prereg](../prereg/WP-L6.md) |
 | WL2. (descriptive) Cost and step times of the WP-L6 pilots. | descriptive | Jobs 3720811 (O-rot) and 3720812 (O-shared), 19.3 and 22.8 min, **0.321** and **0.380** node·h; step time **0.194 / 0.231 s**, peak memory about 7.2 GB each; about **0.97** node·h for the whole step 2 including five test jobs and the smoke. `sizing.json` recommends separate jobs (a packed job would need 01:05:00). | No gate. The 32-cell (L, hop) tables and code-drift diagnostics of the registered reports are not cited here. At `7175e09` one of 140 regression tests (a time-dependent P1-L launcher guard, not on the WP-L6 path) failed; it passes at `4dcc6b3`, and no assertion was changed. | WL6D `98d048c`: `docs/reports/WP-L6.md` “Step 2 on compute”, `sizing.json` |
 
-## Pending follow-up placeholders
+## DPFP and P1L-D: registered result
 
-No value is imputed for either item below, and no registered result exists for it in this ledger. These rows keep the places that
-WP-T10 part 3 fills when the orchestrator releases it. The P1-L confirmation, the memory-use check and P1L-C are no longer
-pending (LP7–LP13, PC1–PC4).
+DPFP ([preregistration](../prereg/DPFP.md), registered 2026-10-27, Amendment A1 before any run) is the last registered writer screen:
+learned writers with DPFP key and query features in the WP-L4 protocol (T1, E=16, training seed17, layer14, L=1, batch 32/Q 4, lr .003),
+arms D32-3 (r32, ν=3), D128-1 and D128-3 (r128, ν=1 and 3), one run per arm, validation episodes only (population V-L10). LSQ ran no arm
+(RX1), so this study ends the learned-writer line. No test or confirmation data were read. Rows labelled **descriptive** have no gate
+in the preregistration.
 
-| ID and paper sentence | Status | Evidence | Conditions and non-implications | Source |
+| ID and paper sentence | Status | Evidence | Conditions and non-implications | Source/selector |
 | --- | --- | --- | --- | --- |
-| DP1. “A learned writer with DPFP key and query features passes the WP-L4 writer gate (validation EM ≥0.80).” | open | **Pending.** No DPFP result is in this ledger. | Registered 2026-10-27 as an exception to “no further writer screens”. Candidates r32 (D32-3) then r128 (D128-1, D128-3); validation EM ≥0.80 selects, ≥0.50 allows one E=8 retraining. DPFP also changes query normalization, so a DPFP effect cannot be attributed to decorrelation alone (Amendment A1). With LSQ not run (RX1) it is the only remaining writer screen. | [DPFP prereg](../prereg/DPFP.md) |
-| PD1. “A learned writer selected by DPFP passes G1-L and G2-L in a P1-L learned condition at its rank (P1L-D).” | open | **Pending.** | Registered only if DPFP selects a writer (LSQ does not run); one condition with a 95% interval; the oracle conditions keep k=2; P3 is reconsidered only if it passes. Not registered while no writer is selected. | [DPFP prereg](../prereg/DPFP.md) “Decision rule”; plan F3 |
+| DP1. “A learned writer with DPFP key and query features passes the WP-L4 writer gate (validation EM ≥0.80).” | not supported | V-L10, final checkpoint, 1,000 validation episodes, eval seed4242. E=16: D32-3 **39.0%** (390/1000), D128-1 **58.0%** (580), D128-3 **60.8%** (608); the best arm is **19.2 pp** below the gate. WP-L4 references, not rerun: R at r32 **12.0%** (120), R at r128 **33.5%** (335). Registered rule: no arm reached 0.80 and the best reached ≥0.50, so D128-3 was retrained once at E=8 (flagged; lock `e8-lock.json`): **73.0%** (730/1000) at 26,065 steps (checkpoints **56.9/64.1/70.7/72.4/73.0%**), below 0.80 and not accepted. **Registered decision: stop. No writer is selected.** | Registered consequence: the paper reports the negative result and no further writer screen follows from this study; LSQ ran no arm (RX1), so no learned writer reaches the WP-L4 gate in this project. One seed, one learning rate, fixed budgets of 22,370–26,065 steps; a validation EM from 1,000 episodes has a standard error of about 1.5 pp. The curves flatten at E=16 but the E=8 arm was still rising (+0.6 pp over the last interval) and no longer run was made, so this is not a proof that learned writing is impossible. Amendment A1: DPFP changes both the key/query feature geometry and the query normalization (unit norm), so the gains over the WP-L4 references (**+27.0 pp** at r32, **+24.5/+27.3 pp** at r128) are not credited to decorrelation alone; the unit-normalized query effect on the frozen WP-L4 checkpoints was measured separately by RFX (RX2: error about −0.005, EM at most +0.2 pp, evaluation only), and whether a unit query changes training is not tested because no LSQ arm ran. The E=8 retrain halves the facts per episode, so its **+12.2 pp** gain over E=16 mixes memory load with the DPFP features and is not an equivalent comparison. Inference parameters are 103,426 (r32) and 475,138 (r128), equal to B4's at the same rank. | DPFE: `reports/p1l-dpfp/arms/*/record.json`, `arms-e8/D128-3`, `refs/R-r32`, `refs/R-r128`, `e8-lock.json`, `release.json`, `release-e8.json`; `docs/reports/DPFP.md` decision table; [prereg](../prereg/DPFP.md) Decision rule, A1 |
+| DP2. (descriptive) Read diagnostics of the DPFP arms. | descriptive | V-L10, final checkpoint, one seed. Normalized read error **0.391/0.431/0.363** (D32-3, D128-1, D128-3; E=8 retrain **0.269**) against **0.666** (R at r32) and **0.631** (R at r128). Read-value head accuracy **30.2/46.0/51.0%** (E=8 **62.9%**) against **8.8%** and **19.7%**; clean-value head accuracy **83.3/92.8/90.6%** (E=8 **89.1%**) against **84.5%** and **93.3%**, so the clean/read gap narrows (R at r128 93.3 to 19.7; D128-3 90.6 to 51.0) without closing. Value SIR **5.47/6.88/8.00** (E=8 **28.53**) against **0.48/0.55**. Key Gram RMS in the original space **0.374/0.366/0.321** (E=8 **0.313**) and mean maximum absolute cosine **0.907/0.870/0.829** (E=8 **0.710**) against **0.332/0.288** and **0.871/0.767** for R. | No gate. DPFP lowers the read error and raises the read-value head accuracy but not enough here; key overlap of the learned projections in the original space is not lower for the E=16 arms, so what changes is the addressing geometry and the read, not a decorrelation of the learned keys. The phi-space overlap values (Gram RMS 0.20/0.18/0.19) are not comparable with them, since phi features are nonnegative and have a positive cosine floor. Each head is a decoder fitted on its own checkpoint (one seed); a lower read error does not by itself give a correct answer. | DPFE: `docs/reports/DPFP.md` diagnostics table (printed by `scripts/analyze_dpfp.py reports/p1l-dpfp`) |
+| DP3. (descriptive) Zero- and shuffled-memory audit of the final DPFP checkpoints. | descriptive | V-L10, the same 1,000 validation episodes, original / zero memory / another episode's memory (EM %, NLL): D32-3 **39.0 (3.501) / 0.0 (15.087) / 0.0 (12.746)**; D128-1 **58.0 (2.277) / 0.0 (12.736) / 0.2 (13.635)**; D128-3 **60.8 (2.129) / 0.0 (17.440) / 0.2 (13.336)**; D128-3 at E=8 **73.0 (1.316) / 0.1 (11.612) / 0.2 (14.502)**. The original condition reproduces each arm's record (correct count and NLL). | Evaluation only, no training. The answers of every DPFP arm depend on the episode's own memory: with zero or another episode's memory the EM is at most 0.2% (2 of 1,000). This shows the writer's memory is used and is episode specific; it does not show that the read is accurate (normalized read error 0.27–0.43, DP2). | DPFE: `reports/p1l-dpfp/audit-e16.json`, `audit-e8.json` (`runs.<arm>.original`, `zero`, `shuffle`) |
+| PD1. “A learned writer selected by DPFP passes G1-L and G2-L in a P1-L learned condition at its rank (P1L-D).” | not run | None. P1L-D is registered only if DPFP selects a writer, and DP1's registered decision is stop (no writer selected), so P1L-D was not registered and not run. There is no P1-L learned condition and no P3. | Preregistration decision rule: a selected writer would trigger a new registration with a 95% interval for one condition, the oracle conditions keeping k=2, and P3 reconsidered only if it passed; none of this happened. The oracle conditions of P1-L are unchanged (LP7–LP11). | [DPFP prereg](../prereg/DPFP.md) “Decision rule”; `docs/reports/DPFP.md` (“Not done”); plan F3 |
 
 ## Three distinct privileged controls
 
@@ -554,6 +563,9 @@ These statements bound every row; a row's own conditions add to them.
   not writers.
 - **Oracle design.** The LLM oracle is not the symbolic oracle (LP6; the
   [symbolic scope statement](evidence_symbolic.md#scope-of-every-row)).
+- **DPFP rows.** DP1–DP3 are single-seed validation results (training seed17, one learning rate, validation seed4242, 1,000
+  episodes) without confidence intervals; they test the WP-L4 writer gate only, and P1L-D (PD1) was not run. DPFP does not
+  isolate decorrelation from the query normalization (Amendment A1).
 - **Confirmation rows.** LP7–LP13 and PC1–PC4 concern the `oracle_random` memory only (oracle seed17, one layout, no
   learned writer), the 768 seen names and the trained hops. At rank128 they show that the shared M1-L4 reader learns the
   value-to-key lookup and composes reads on hops2–3 (LP11); they do not establish equivalence with the symbolic oracle (Amendment B7
@@ -640,7 +652,15 @@ These statements bound every row; a row's own conditions add to them.
   decoding only: M1-L4's early states decode earlier-hop entities, best at a step s ≥ e rather than at s = e, and the rates
   track the reader's own depth-s accuracy; B8 decodes names only at s=4; the name-gradient and random directions are at or
   near chance for both readers, and every method is at chance at rank32. P1L-C gives no causal bridge (PC1).
-- Any DPFP or P1L-D result. Their rows are placeholders (DP1, PD1).
+- “DPFP selects a learned writer,” “a learned writer reaches the WP-L4 gate,” “P1L-D ran or passed,” “a learned P1-L condition or
+  P3 is planned,” or “learned writing in the LM is impossible.” DPFP reached 39.0%, 58.0% and 60.8% at E=16 and 73.0% for the E=8
+  retrain against a gate of 80%: the registered decision is stop, no writer, P1L-D not run (DP1, PD1); this is a one-seed,
+  one-learning-rate result with fixed budgets and not a proof of impossibility.
+- “DPFP's gain is due to decorrelation of the keys,” or “DPFP lowered key overlap.” DPFP also changed the query normalization
+  (Amendment A1); the original-space key overlap of the E=16 arms is not lower than R's (DP2); the E=8 gain over E=16 mixes load
+  with the features (DP1).
+- “The zero- and shuffled-memory audit shows the DPFP read is accurate.” It shows the answers depend on the episode's own
+  memory (DP3); the read error stays 0.27–0.43 (DP2).
 
 The screen diagnostics motivate a bounded read-distortion interpretation, not
 a theorem about optimization or a universal ceiling. The symbolic B9 record
@@ -666,6 +686,10 @@ WP-T10 part 1 added RX1–RX3, WL1–WL2 and the placeholders. The RFX and WP-L6
 committed JSON files and reports at wp/llm `379fccd`/`faacd37` and wp/oracle `98d048c` (those files are not on this
 branch); fractions were converted to percent and no statistic was recomputed. No checkpoint or sample was loaded
 and no job ran. The plan's result line for RFX cites `379fccd`; the report is at `faacd37`.
+WP-T10 part 3b added DP1–DP3 and PD1 from the committed `reports/p1l-dpfp/` records and `docs/reports/DPFP.md` (all numbers of the
+report's tables were reproduced with `scripts/analyze_dpfp.py reports/p1l-dpfp` on the login node, stdlib only; no checkpoint was
+loaded and no job ran; the audit values were read from `audit-e16.json` and `audit-e8.json`). The ledger records no cost deviations,
+so the report's test and smoke overrun (about 0.78 against the registered 0.5 node·h) is not entered here.
 WP-T10 part 2 added LP7–LP13 and PC1–PC4 and repointed the RFX and WP-L6 citations to master, where those files are unchanged from
 the cited commits (checked with `git diff`). The P1-L and P1L-C numbers were read on the login node with the Python standard
 library from the committed `reports/p1l/**` and `reports/p1lc/**` JSON and CSV files and converted to percent at six decimals
