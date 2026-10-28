@@ -3,8 +3,10 @@
 *Manuscript draft. Code cutoff: `f1dd6e2`; numerical and claim authority:
 [symbolic evidence ledger](evidence_symbolic.md) and
 [LLM evidence ledger](evidence_llm.md). Main-text experimental claims carry ledger
-IDs in HTML comments. Symbolic results and the completed LLM writer screens are
-included; P1-L multihop confirmation and per-step readout results remain pending.
+IDs in HTML comments. Symbolic results (including the registered follow-ups IVD, CVH,
+TSM, UNS and NCR) and the completed LLM writer screens (including RFX and the WP-L6
+stop) are included; P1-L multihop confirmation, DPFP, P1L-C, P1L-D and per-step readout
+results remain pending.
 P1-L Amendments B6/B7 and the run locks, committed after that cutoff, are cited where
 stated; [Appendix C](#appendix-c-claim-contract) lists each principal claim with its
 comparator, writer, split and gate.*
@@ -25,7 +27,9 @@ is claimed. <!-- FR1 --> At rank32, the reachable-hop L4−L1 benefit
 shrinks from E12 to E36 under the registered load/layout changes, while the multi-read
 capability criterion still holds at the tested training loads. <!-- IS1 --><!-- IS2 -->
 Post-hoc learned halting fails hop1 preservation in the six primary frozen-reader
-families. <!-- HL1 --> Training-time terminal-Jacobian regularization reduces
+families; a hop-1-constrained threshold gives one registered pass, for random-oracle
+writing, after about two executed updates and with no latency gain.
+<!-- HL1 --><!-- CV1 --><!-- CV3 --> Training-time terminal-Jacobian regularization reduces
 overshoot without meeting the registered removal criterion, and decreases longer-walk accuracy.
 <!-- JS1 --><!-- JS3 --> Conditional theory separates composition inside a fixed
 output subspace, limitations of one-read observations, writer shortcuts, and fixed-point
@@ -34,8 +38,10 @@ screens select no learned writer, despite informative input probes and a usable
 supplied-answer-code output path; oracle-reader confirmation remains pending.
 <!-- LL2 --><!-- LL3 --><!-- LL9 --><!-- LP4 --> All results use a closed 1,024-name vocabulary and
 depths within those trained, oracle and learned writers are separate claims, and the
-language-model oracle is not the symbolic oracle; no claim is made about unseen names or
-about multiple reads in the language model at rank32. <!-- LP2 --><!-- LP6 --> The resulting contribution is a bounded account of when repeated memory
+language-model oracle is not the symbolic oracle; the 256 unseen-pool names of that
+vocabulary enter only as a descriptive scope row, where the depth gain is also present, and no
+claim is made beyond the vocabulary, about new entity codes, or about multiple reads in the
+language model at rank32. <!-- UN2 --><!-- UN3 --><!-- LP2 --><!-- LP6 --> The resulting contribution is a bounded account of when repeated memory
 access helps, together with negative results that prevent capability gains from being
 mistaken for general efficiency or end-to-end reasoning gains. <!-- B7 --><!-- B8 --><!-- B9 -->
 
@@ -69,8 +75,10 @@ design and reader depth as interacting parts of an inference system, rather than
 equating a positive average depth effect with a complete solution.
 
 Three limits apply to every claim below. All entities come from a closed 1,024-name
-vocabulary, and every evaluation set draws on its seen pool, so nothing here concerns
-unseen names. Effects are stated at the trained hops and depths; longer hops appear only
+vocabulary, and every evaluation set draws on its seen pool, with one descriptive
+exception: a scope row on the 256-name unseen pool of the same vocabulary (Section 9), which
+supports only the wording that the depth gain is also present there. <!-- UN2 --><!-- UN3 -->
+Nothing here concerns names outside the vocabulary or new entity codes. Effects are stated at the trained hops and depths; longer hops appear only
 as measured cells. Oracle writers and learned writers answer different questions and are
 never pooled, and the language-model oracle of Section 8 differs from the symbolic oracle.
 <!-- LP2 --><!-- LP6 --> [Appendix C](#appendix-c-claim-contract) lists each principal claim with its
@@ -218,8 +226,9 @@ fixed-size adapter memory, and hops are spent in a reader loop rather than in la
 These studies therefore bound what we may claim without predicting our results. In particular,
 Zhang et al. make it unsafe to read B8's in-distribution advantage over the shared reader
 (Section 6; B8 is also not parameter-matched) as evidence for the unshared design, because that advantage is measured on trained
-hops and names; and the paper reports no test of composition over unseen names.
-<!-- B3 --><!-- B6 -->
+hops and names; and the paper reports only a descriptive scope row on unseen-pool names of its
+closed vocabulary (Section 9), not a test of composition over new names or codes.
+<!-- B3 --><!-- B6 --><!-- UN2 --><!-- UN3 -->
 
 Associative memory can also be viewed as regression at test time.
 [Wang et al.](https://arxiv.org/abs/2501.12352) treat a delta-rule write as one gradient step
@@ -435,7 +444,9 @@ intervals conditional on the three fixed training seeds; absolute point profiles
 have no standalone confidence intervals. <!-- S1 --><!-- S3 --><!-- S9 --> The depth
 effect D is L4 minus L1 on hops2–3; walk specificity W subtracts the corresponding
 effect on far hops6–8. This subtraction prevents a generic all-hop shift from being
-described as selective improvement on the trained reachable hops.
+described as selective improvement on the trained reachable hops. How far D measures
+composition rather than escape from a neighbour error is qualified in Section 6.
+<!-- PM1 -->
 
 The primary protocol treats reach, specificity, preservation of the single-hop task,
 and replication as separate requirements; an improvement on only the reachable-hop
@@ -612,9 +623,20 @@ L1 shows the same pattern, at 1.983% on hop2 and 1.033% on hop3. <!-- S12 --> Ac
 below chance indicates systematic errors rather than uninformed guessing. One candidate
 explanation is that a single read tends to return the one-hop neighbour of the queried
 entity, in which case part of a depth effect would be escape from that error rather than
-composition. **Neighbour-confusion rate — TODO (WP-S9):** the share of wrong hop2 answers
-that name the one-hop neighbour has not been measured, and no value is imputed here.
-<!-- PM1 -->
+composition. **Neighbour-confusion rate.** NCR categorises the wrong hop2 answers of the
+single read (L1) of released M1 and of B4, from the saved screening (S4242) and confirmation
+(C777) predictions of the existing r32 P1-S and F2 runs, with descriptive 95% intervals. In the
+16 groups whose hop2 accuracy is below the 7.143% chance line (t1_frozen_fact, joint_fact,
+oracle_random and oracle_orth, each with M1 and B4 on both sets), the share of errors that
+name the one-hop neighbour is 58.667–100.000%, against 7.692% for a uniform wrong guess, and
+every interval lower bound exceeds the uniform value. <!-- PM1 --> The share is 89.739–100.000%
+for B4 and 58.667–87.159% for M1, while the unfactorized joint and t1_frozen writers read above
+chance at hop2 with first-hop shares of 5.3–23.0%. <!-- PM1 --><!-- NC2 --> A share above
+its uniform value says that the single read returns the neighbour more often than a uniform error
+would; it does not identify the mechanism. <!-- PM1 --> The tables qualify the reading of D
+only: in the groups below chance, part of the L4−L1 gain on hops2–3 may measure escape from
+the neighbour error rather than composition, and because the errors at L4 are not categorised,
+no fraction of D is estimated. <!-- PM1 -->
 
 The two kinds of positive result should not be combined into an unrestricted resource
 claim. A fixed-rank depth sweep spends more reader operations at the same persistent
@@ -686,6 +708,27 @@ independent load bootstrap streams rather than cross-layout episode pairing. <!-
 This supports the registered operational load/depth prediction without identifying
 crosstalk as its sole cause or validating Proposition 4's operator bound as tight.
 <!-- IS1 -->
+
+IVD asks whether key interference explains this shrinkage, on the same frozen r32 M1
+checkpoints and a new set C999004 (evaluation seed999004, 2,000 episodes per checkpoint). It
+keeps the twelve-fact chains, queries, answers and the 14-entity candidate set fixed, adds up
+to 24 extra facts whose heads lie outside the episode and whose tails lie inside it, and
+varies the overlap of the extras' keys with the relevant keys at equal load. Its endpoint
+is IC=G(low)−G(high) at load 24, where G is L4−L1 of M1 on hops2–3; a writer passes if
+IC≥5 pp and the lower bound of the 97.5% interval is above 0. <!-- IV1 --><!-- IV2 --> For
+oracle_random, with constructed key codes, IC=+13.975 pp [12.642,15.242] (seeds +14.850,
++13.250, +13.825 pp) and the achieved overlap gap is 0.500, so the shrinkage is consistent with
+key interference, identified by IVD for oracle_random. <!-- IV1 --> For joint_fact, whose
+overlap is selected among candidate heads, IC=+3.208 pp [2.175,4.208] is below the 5 pp
+threshold (overlap gap 0.285): the paper does not offer interference as the identified
+explanation of the IS shrinkage for joint_fact, and states that load, graph layout and
+candidate distribution were changed together in IS. <!-- IV2 --> At load 24 G is below the
+unmodified base cell in every cell, including low overlap (oracle_random +25.542 pp at low
+overlap against +33.092; joint_fact +10.833 against +23.383), and a decay-only control leaves
+joint_fact's G unchanged at +23.383 pp. <!-- IV3 --> The extras bring the stored facts to 18
+or 36, outside the readers' training distribution, and the constructed codes can themselves
+be out of distribution; the result narrows the IS wording for one writer and does not make
+interference the sole cause for either. <!-- IV1 --><!-- IV2 -->
 
 ![Memory load and depth on fixed checkpoints](figures/memory_load_depth.png)
 
@@ -834,6 +877,34 @@ versus 3.072–3.308 ms for fixed L16, with no timing CIs. <!-- HL4 --> Those ti
 include the halting head and bookkeeping, exclude writer/backbone preparation,
 and do not establish a speedup or end-to-end request cost. <!-- HL4 -->
 
+### Hop-1-constrained thresholds and continuation-value heads
+
+CVH reuses the nine frozen r32 M1 readers of P4-S-L (random-oracle, joint_fact and
+t1_frozen_fact writers, seeds17/29/43) on a new confirmation set C999005 (test seed999005,
+2,000 episodes per reader). Arm A1 keeps the P4-S-L head, whose label is that the candidate
+argmax at step s is correct, and chooses its threshold on validation under a hop-1 constraint;
+arm A2 trains a new head of the same size to predict whether a later read would still lower
+the answer's loss by a 0.25-nat margin. An arm passes if its hops2–3 gain over L1 is at least
+3 pp with the interval above 0, its hop-1 change is at least −1 pp, and its mean executed
+updates are at most 8; the intervals are 99.166667% (six comparisons) and condition on the
+three seeds. <!-- CV1 --> Every validation threshold preserved hop 1, so the confirmation set
+was opened for all three families. <!-- CV2 -->
+
+Exactly one arm passes: A1 for oracle_random, with θ=0.10, a hops2–3 gain of +9.950 pp
+[9.153,10.845] over L1, a hop-1 change of +2.883 pp and 1.968 mean executed updates. A halting
+head with the correctness label and a hop-1-constrained validation threshold repairs overshoot
+for oracle_random on these frozen readers. <!-- CV1 --> The pass is a registered pattern, not
+a match to fixed-depth reading: the arm's gain is −23.275 pp [−24.622,−21.942] against fixed L4
+and −2.908 pp [−4.122,−1.608] against fixed L16, and the P4-S-L head at its original threshold
+(A0) still loses 14.800 pp on hop 1. <!-- CV1 --><!-- CV4 --> The A2 head for oracle_random gains
+only +0.492 pp [0.336,0.675], and both heads for joint_fact and t1_frozen_fact stop at the first
+read for every query (θ=0.05, gain +0.000 pp, 1.000 executed updates), so no head repairs
+overshoot for the factorized families. <!-- CV2 --> No latency claim is made for any arm. The
+passing arm takes 7.829 ms against 3.108 ms for the fixed 16-update read on a prepared batch of
+64, and the four arms whose wall time is below fixed L16 (2.395–2.420 ms against 3.081–3.114 ms)
+stop at step 1 and do not pass. <!-- CV3 --> The earlier P4-S-L failures stay reported. <!-- HL1 -->
+No gate depends on CVH. <!-- CV1 -->
+
 ### Random-depth training with a final-state Jacobian penalty
 
 JS changes training instead of fitting an exit to frozen trajectories. Its RS
@@ -906,6 +977,25 @@ three seeds and have no radius CIs. <!-- JS6 --> A pointwise radius below 1 at a
 finite state does not certify global contraction, convergence, terminal
 annihilation, or a correct decoded answer. Lower radii coexist here with the
 longer-walk and stopped-accuracy losses. <!-- JS3 --><!-- JS4 --><!-- JS6 -->
+
+### Stay training and a sticky gate
+
+TSM trains eighteen new r32 M1 readers (oracle_random and joint_fact writers, seeds17/29/43,
+15,000 steps, the released learning rate 0.003 with no search): T0 is M1-L4 retrained under the
+same code, T1 trains at depth 8 with an answer loss at every step s≥hop, and T2 adds a
+content-gated sticky update with two extra parameters. Evaluation uses a new set C999007
+(seed999007, 2,000 episodes) at depths 1, 4, 8 and 16, with the released B4 at L1 as the
+same-rank reference, and 98.75% intervals for the four arm-writer comparisons. An arm passes
+only if, for both writers, accuracy on hops1–3 differs between L16 and L4 by at most 1 pp
+(point), hops4–8 at L8 fall at most 1 pp below T0 (point), and the hops2–3 gain of L4 over B4 at
+L1 is at least 3 pp with the interval above 0. <!-- TS1 --> No arm passes for either writer. The
+gain condition holds in all four arm-writer cells (+16.575 and +16.567 pp for oracle_random
+T1 and T2, +16.950 and +21.533 pp for joint_fact) and the stay condition in one (joint_fact T1,
+−0.794 pp), but the far condition fails in all four (−11.667, −11.780, −5.733 and −4.553 pp).
+<!-- TS1 --> Neither stay training nor the sticky gate removed the overshoot under this protocol;
+fixed-depth training (M1-L4, B8) remains the remedy found, and the result does not generalise
+from one learning rate. <!-- TS1 --> Descriptively, hop 1 at L16 falls by 22.5–44.0 pp relative
+to each arm's own L1 in all four cells. <!-- TS2 -->
 
 ## 8. A single language-model module: writer screens and pending reader confirmation
 
@@ -1026,6 +1116,26 @@ The negative result concerns these single-module tasks, supervision choices,
 learning rates, and unequal fixed budgets. It establishes neither impossibility
 of learned writing in LLMs nor a universal output-path bottleneck. <!-- LL3 --><!-- LL9 -->
 
+RFX then separates storage, query and decoder at three frozen checkpoints (R at r128, R at r32
+and the W5 rerun at r32; one seed, validation episodes 200,000–203,999, 4,000 queries). It
+replaces only the read at the final question position, keeps the rest of the LM path, and trains
+nothing. A replacement rescues if it halves the normalized read error and gains at least 10 pp
+EM over the better of the deployed read and its gain-fitted version (33.8%, 11.6% and 14.9%).
+<!-- RX1 --> Only an exact ridge store read with the true key rescues, at both R checkpoints (EM
+84.2% and 49.05%, against clean controls of 84.4% and 48.8%). The exact store with the raw or
+unit query reaches 38.75–38.80% at r128 and 13.48–13.65% at r32, and the deployed store with
+the true key 39.9% and 13.95%, so no single factor rescues. <!-- RX1 --><!-- RX2 --> The
+registered verdict is store+query at R/r128 and R/r32 and none at W5/r32, where the clean
+control itself reaches only 17.6%. <!-- RX1 --> A refit linear decoder on the deployed reads
+stays below the entity-restricted baseline (18.4%, 6.8% and 8.1%). <!-- RX2 --> Read
+descriptively with the preregistered guide, the deployed store with the true key sits near each
+checkpoint's own EM rather than near the OA level, which fits write interference in the delta
+store more than a query bottleneck; this is one seed and not an identification of the cause.
+<!-- RX3 --> The verdicts trigger no LSQ arm, so the separately registered DPFP screen is the only
+one left, and it has no result here. <!-- RX1 --><!-- DP1 --> The true-key cells use the label and
+are not deployable, and a substituted read is a distribution shift for the layers after it.
+<!-- RX1 -->
+
 ### 8.4 Registered P1-L oracle-reader comparison
 
 The symbolic reader selection motivates primary B8 trained at fixed L4, with
@@ -1111,6 +1221,17 @@ keys: 99.2% and 100%); it is an upper bound and does not explain the rank32 fail
 The registered prediction is that rank32 fails the memory-use check and rank128 passes it;
 that prediction is not an outcome, and the check itself is pending. <!-- LP6 -->
 
+WP-L6 asked whether a rank-32 M1-L4 reader can learn the oracle memory when the oracle's keys are
+tied to its values. O-rot writes the key normalize(Π_ρ g_h) with one fixed orthogonal matrix per
+relation and the value g_t; O-shared trains a code table jointly with the reader. Both use the
+P1-L recipe (lr 0.003, seed17, 5,666 steps, validation seed4242), and an arm passes if its
+final-checkpoint hop-1 full-vocabulary EM at L=4 is at least 30%. <!-- WL1 --> Neither passes:
+O-rot reaches 0.1% and O-shared 11.8%, the registered decision is stop, and the study P1L-S that
+would have used the selected code does not run. <!-- WL1 --> At rank 32 the LM path did not learn
+these oracle codes within this budget (one seed, one learning rate, 5,666 steps); this is not a
+proof of impossibility, O-shared above O-rot is descriptive and not a selection, and it adds no
+statement about multiple reads at rank 32 (Amendment B7). <!-- WL1 --><!-- LP6 -->
+
 ### 8.5 Confirmation and intermediate-state results — pending
 
 **P1-L r32 results — TODO:** confirmation effects and intervals for G1-L/G2-L,
@@ -1130,6 +1251,11 @@ establish equivalence with the symbolic oracle or any claim about unseen names
 M1-L4@4 against B3-L4@4 with 97.5% intervals (Amendment B7). Its outcome decides whether
 that rank's gates are interpreted at all. No outcome is asserted; the registered prediction
 (rank32 fails, rank128 passes) is not a result. <!-- LP4 --><!-- LP6 -->
+
+**DPFP, P1L-C and P1L-D — TODO:** the DPFP writer screen, P1L-C (run only if rank128 passes
+the memory-use check) and P1L-D (registered only if DPFP selects a writer) have no result here,
+and none is imputed. <!-- DP1 --><!-- PC1 --><!-- PD1 --> P1L-S does not run (Section 8.4).
+<!-- WL1 -->
 
 **Secondary/readout results — TODO:** same-checkpoint scans, swaps, and per-step
 entity ranks/top1 for M1-L4 and B8. <!-- LP4 --><!-- LP5 --> The protocol plans to
@@ -1162,13 +1288,37 @@ from a controlled terminal task to generated language answers.
 Five statements are excluded. The language-model oracle is not the symbolic oracle: it needs
 a learned value-to-key lookup for every read after the first, so symbolic oracle results do
 not transfer to it. <!-- LP2 --><!-- LP6 --> No conclusion about multiple reads in the
-language model is drawn at rank32. <!-- LP6 --> No claim is made about unseen names, because
-every evaluation draws on the seen part of a closed 1,024-name vocabulary. OA is the
+language model is drawn at rank32. <!-- LP6 --> No claim is made that composition holds for
+unseen entities, beyond the closed 1,024-name vocabulary or for new entity codes: every
+evaluation draws on the seen pool except the descriptive UNS scope row below. <!-- UN2 --><!-- UN3 -->
+OA is the
 value/output ceiling, not an addressing control. <!-- LL6 --><!-- LL9 --> B8 is not
 parameter-matched to the single read or to M1: it adds 9,216 parameters, +8.9% at rank32,
 +31.0% at rank128 and +69.2% in the symbolic unfactorized joint model. <!-- FR1 -->
 [Appendix C](#appendix-c-claim-contract) repeats these and the remaining scope statements
 beside each principal claim.
+
+UNS evaluates the 256 unseen-pool names of the same 1,024-name vocabulary, which carry fixed
+random features and were never used in a training episode, with descriptive 95% intervals and no
+multiplicity correction. Part A reproduces the 18 committed unseen-pool M1 depth-contrast rows
+(three writers, hop1, hops2–3 and hops6–8, two confidence levels) exactly from the saved
+samples of 18 audited runs; the other committed unseen rows stay unaudited. <!-- UN1 --> A
+(writer, reader) result is described as "the depth gain is also present on unseen-pool entities"
+only if its unseen-pool M1 depth gain on hops2–3 is at least 3 pp with the interval above 0. All
+six results meet it, labelled by source and never pooled:
+
+| Writer | Part A (released mixed-depth M1, S4242): unseen-pool gain, pp [95% CI] | Part B (M1 trained at L4, new episodes C999006): unseen-pool gain, pp [95% CI] |
+| --- | --- | --- |
+| joint | +7.800 [7.067,8.508] <!-- UN2 --> | +47.008 [45.983,48.075] <!-- UN3 --> |
+| joint_fact | +19.958 [19.108,20.808] <!-- UN2 --> | +21.025 [20.083,21.975] <!-- UN3 --> |
+| oracle_random (control) | +31.592 [30.433,32.750] <!-- UN2 --> | +41.267 [39.966,42.534] <!-- UN3 --> |
+
+The unseen-minus-seen difference excludes 0 for joint_fact in both parts and for joint in
+Part B, always with the smaller unseen-pool gain (−3.942, −4.525 and −7.075 pp). <!-- UN2 --><!-- UN3 -->
+The wording is limited to M1's depth gain on hops2–3 and to these readers; the readers were not
+trained to be tested on new codes, so no sentence that composition holds for unseen entities or
+beyond the closed vocabulary is justified, and Parts A and B differ in reader and episodes.
+<!-- UN2 --><!-- UN3 -->
 
 The uncertainty also has a narrow estimand. The bootstrap conditions on the fixed
 training seeds, and the follow-ups reuse confirmation samples rather than supplying
@@ -1177,13 +1327,16 @@ Training-seed failures, longer rank-follow-up training, and the disclosed F2 dec
 deviation remain relevant even when a pooled interval is positive. <!-- S3 --><!-- S8 --><!-- S9 -->
 The original screening stopping results do not inherit parent-study intervals;
 P4-S-L and JS instead have their own fresh confirmation sets and scoped uncertainty.
-<!-- H1 --><!-- H4 --><!-- H5 --><!-- HL1 --><!-- JS1 -->
+<!-- H1 --><!-- H4 --><!-- H5 --><!-- HL1 --><!-- JS1 --> So do IVD, CVH, TSM and UNS Part B
+(C999004–C999007), with 97.5%, 99.166667%, 98.75% and descriptive 95% intervals.
+<!-- IV1 --><!-- CV1 --><!-- TS1 --><!-- UN3 -->
 
 IS now supplies a same-checkpoint load/layout sweep and a bounded update-task
 diagnostic. <!-- IS1 --><!-- IS4 --> Its fixed training protocol and varying layouts
 limit interpretation: neither operator-bound tightness, a pure crosstalk effect,
 nor a general benefit from load-specific retraining has been established.
-<!-- IS1 --><!-- IS3 --> The largest tested capability load is not an identified
+<!-- IS1 --><!-- IS3 --> IVD identifies key interference for oracle_random only; for joint_fact
+that reading is withdrawn. <!-- IV1 --><!-- IV2 --> The largest tested capability load is not an identified
 failure boundary, and low stale rates do not imply complete current-answer success.
 <!-- IS2 --><!-- IS4 --> JS supplies reached-state Jacobian measurements and an
 accuracy tradeoff, not proof of a stable terminal fixed point; verbalizable
@@ -1207,13 +1360,17 @@ providing the clearest evidence. <!-- S1 --><!-- S2 --><!-- S9 --><!-- B5 --> Th
 claim compares several reads with a single read at the same rank and reports their
 costs. <!-- FR1 --> Historical larger-rank controls and the original practical-gate
 failure remain in the record; neither is rewritten as a system-efficiency success.
-<!-- B1 --><!-- B7 --> Post-hoc halting does not repair hop preservation in the primary
-families, and training-time regularization reduces overshoot at a longer-walk cost.
-<!-- HL1 --><!-- JS1 --><!-- JS3 -->
+<!-- B1 --><!-- B7 --> Post-hoc halting with the P4-S-L protocol does not repair hop preservation in
+the primary families; a hop-1-constrained threshold gives one registered pass (random-oracle
+writing, about two executed updates, no latency gain), stay training and a sticky gate do not
+remove overshoot, and training-time regularization reduces overshoot at a longer-walk cost.
+<!-- HL1 --><!-- CV1 --><!-- CV3 --><!-- TS1 --><!-- JS1 --><!-- JS3 -->
 The appropriate conclusion is therefore a bounded mechanism result and a set of
 reproducible failures, with no efficiency claim over increasing rank. <!-- FR1 -->
 The single-module LLM screens select no learned writer; input probes and oracle
-controls do not overcome the deployed-read/answer gap. <!-- LL2 --><!-- LL3 --><!-- LL7 --><!-- LL9 -->
+controls do not overcome the deployed-read/answer gap, a read-failure factorial finds that only an
+exact store together with the true key rescues the read, and the rank-32 oracle-code pilot stops.
+<!-- LL2 --><!-- LL3 --><!-- LL7 --><!-- LL9 --><!-- RX1 --><!-- WL1 -->
 P1-L's multihop oracle-reader confirmation and intermediate-state results remain
 unreported. <!-- LP4 --><!-- LP5 -->
 
@@ -1317,10 +1474,17 @@ conditions take priority over shortened manuscript wording.
 | Stopping pilots | V4242 validation and S4242 screening, 2,000 episodes per checkpoint/split | Thresholds selected on validation, fixed before screening. Reuse mixed-depth checkpoints; no retraining or confirmation, no stopping CIs. | H1–H6 <!-- H1 --><!-- H2 --><!-- H3 --><!-- H4 --><!-- H5 --><!-- H6 --> |
 | P4-S-L | C999002: new confirmation seed999002, 2,000 episodes | Six primary frozen-reader families, r32; 3,393-parameter supervised heads, thresholds locked on V4242. Descriptive joint families stay outside primary qualification. | HL1–HL5 <!-- HL1 --><!-- HL2 --><!-- HL3 --><!-- HL4 --><!-- HL5 --> |
 | JS | C999003: new confirmation seed999003, 2,000 episodes | r32 M1; RS/RS+J train 15,000 steps with one uniform depth4–8 draw per batch; unchanged fixed-L4/mixed-depth references freshly evaluated. Stopped policies use locked V4242 thresholds and cap16. | JS1–JS6 <!-- JS1 --><!-- JS2 --><!-- JS3 --><!-- JS4 --><!-- JS5 --><!-- JS6 --> |
+| IVD | C999004: new confirmation seed999004, 2,000 episodes per checkpoint | 12 frozen r32 checkpoints (oracle_random and joint_fact × M1 and B4); up to 24 extra facts at fixed load with low, natural and high key overlap; IC=G(low)−G(high) at load 24 on hops2–3, 97.5% intervals; the joint_fact overlap is selected, not constructed. | IV1–IV3 <!-- IV1 --><!-- IV2 --><!-- IV3 --> |
+| CVH | C999005: new confirmation seed999005, 2,000 episodes per reader | Nine frozen P4-S-L M1 readers; A0 reference, A1 hop-1-constrained threshold, A2 continuation-value head (0.25-nat margin); 99.166667% intervals (six comparisons); wall-time latency on prepared batches of 64. | CV1–CV4 <!-- CV1 --><!-- CV2 --><!-- CV3 --><!-- CV4 --> |
+| TSM | C999007: new confirmation seed999007, 2,000 episodes | 18 newly trained r32 M1 arms (T0 M1-L4, T1 stay loss at depth 8, T2 sticky gate) at the released learning rate 0.003, no search; B4 at L1 as the same-rank reference; 98.75% intervals. | TS1–TS2 <!-- TS1 --><!-- TS2 --> |
+| UNS | Part A: S4242 screening (`test`, `test_unseen`); Part B: C999006, seed999006, 2,000 episodes per pool | joint, joint_fact and oracle_random (control); released mixed-depth M1 (Part A) or M1 trained at L4 (Part B) and B4; wording rule on the unseen-pool depth gain; descriptive 95% intervals; the parts are never pooled. | UN1–UN4 <!-- UN1 --><!-- UN2 --><!-- UN3 --><!-- UN4 --> |
+| NCR | S4242 and C777 saved predictions; no new evaluation | L1 errors of released M1 and of B4 on hops2–3, six writers of the existing r32 P1-S and F2 layouts; first-hop (neighbour) category; descriptive 95% intervals. | PM1, NC2 <!-- PM1 --><!-- NC2 --> |
 | Same-rank design | Architectural accounting; no accuracy sample or CI | Multi-read versus single-read at the same rank; registered adapter parameters and extra latency reported. LLM B8 overhead is dimension-specific architectural accounting, not a measured accuracy result: +9,216 parameters at r=r_mem=32 and +147,456 at r=r_mem=128, that is +8.9% and +31.0% of the P1-L adapter and +69.2% of the symbolic unfactorized joint model. | FR1 <!-- FR1 --> |
 | LLM Pilot-1 and diagnosis | Validation seed4242; training seed17 | T1; initial 1,500-step capacity screen, separate input probes, supplied-answer-code output control, 6,400-step unassisted writer/input-site fits; no confirmation CIs. | LL1–LL4 <!-- LL1 --><!-- LL2 --><!-- LL3 --><!-- LL4 --> |
 | LLM writer fixes | Same validation set; training seed17 | Seven 4,800-step arms; fresh 32,900-step OA (value/output ceiling) and W5 reruns; stronger auxiliary supervision, no multihop confirmation. | LL5/LL6 <!-- LL5 --><!-- LL6 --> |
 | LLM read fixes and audit | Same validation set; training seed17 | Audited historical W5 and OA (value/output ceiling); seven r32/r128 final arms with unequal timing-sized step budgets; final-checkpoint selection, no learned writer/no E8 retry. | LL7–LL10 <!-- LL7 --><!-- LL8 --><!-- LL9 --><!-- LL10 --> |
+| RFX | `val`, seed4242, episode indices [200000,204000), one hop-1 query per episode; fitting set of 4,096 `train` episodes | Frozen R/r128, R/r32 and W5/r32 (training seed17): the final-position read replaced by store (deployed delta, exact ridge) × query (raw, unit, true) cells; rescue rule and first-applying verdict; no training, no CIs. | RX1–RX3 <!-- RX1 --><!-- RX2 --><!-- RX3 --> |
+| WP-L6 | `val`, seed4242, 1,000 episodes | Rank-32 M1-L4 with O-rot and O-shared oracle codes, lr 0.003, seed17, 5,666 steps; hop-1 full-vocabulary EM at L=4 against a 30% threshold; pilot, no CIs; P1L-S not run. | WL1–WL2 <!-- WL1 --><!-- WL2 --> |
 | P1-L registered oracle readers | Confirmation pending: test episode indices[100000,102000) | oracle_random at r32/r128; planned seeds17/29/43, primary fixed-L4 B8 (not parameter-matched: +8.9% at r32, +31.0% at r128), same-rank gates, k2 and 97.5% intervals; Amendments B6 (equal-parameter rule) and B7 (per-rank memory-use check; no multi-read claim at r32); readouts secondary/descriptive. No reported result or CI; LP6 is training/validation evidence only. | LP1–LP6 <!-- LP1 --><!-- LP2 --><!-- LP3 --><!-- LP4 --><!-- LP5 --><!-- LP6 --> |
 
 The symbolic studies use training seeds 17/29/43. <!-- S1 --><!-- B3 --> P1-S/P2-S and their follow-ups use 2,000 paired
@@ -1405,11 +1569,18 @@ carry its numbers. Exact values and statuses stay in the [symbolic](evidence_sym
 | Same-rank policy: several reads against a single read at the same rank, with latency reported as a cost and no efficiency claim over larger-rank single reads | B4, the single read at the same rank. Equal architectural parameter counts only for shared M1-L4 versus B4. B8 is not parameter-matched: +9,216 parameters, +8.9% at r32 and +31.0% at r128 of the P1-L adapter, +69.2% of the symbolic unfactorized joint model | Not applicable | Not applicable (deterministic accounting) | None: a policy and a static count, not an accuracy result | FR1 <!-- FR1 --> |
 | Historical larger single reads: under joint writing B6/r128 and both B7 reads score above shared M1 (claim B1, that a larger single read could not replace it, is not supported); under random-oracle and factorized writing M1 outperforms them; the P2-S practical criterion fails; the factorized latency frontier is unmeasured | B6 larger-rank and B7 larger-memory single reads at L1 against r32 M1 at L4: different parameter and state budgets, so neither same-rank nor equal-parameter comparators | joint; oracle_random; joint_fact | C888: test, seed888001, 2,000 episodes (P2-S); reused by P2-S-F1 | P2-S Gate 3: the capability claim needs E1/E2 positive at every tested size and writer; the practical claim also needs a latency win (E4), which fails. P2-S-F1 F-E3: the joint_fact capability claim needs every contrast with CI>0 | B1, B2, B5, B7, B8 (open) <!-- B1 --><!-- B2 --><!-- B5 --><!-- B7 --><!-- B8 --> |
 | Sharing: step-specific B8 exceeds shared M1-L4 at matched training depth, but not on every hop; fixed-depth training improves shared M1 | B8@4 against shared M1-L4@4 at the same rank r32 and training depth; B8 adds 9,216 parameters (+69.2% in the joint model) and is not parameter-matched. M1-L4 against mixed-depth M1 compares separately trained protocols | joint; joint_fact; oracle_random | C888, reused by P2-S-F1; not a fresh confirmation sample | P2-S-F1 decision rule: B8 is carried into P1-L if F-E1>0 (CI) for joint and joint_fact, and fixed-depth training if F-E2>0 (CI); no gate on hop-wise superiority | B3, B4, B6, B9 <!-- B3 --><!-- B4 --><!-- B6 --><!-- B9 --> |
-| Memory load: the depth benefit shrinks from E12 to E36 for fixed checkpoints, while M1@4 and B8@4 keep exceeding B4@1 at the trained loads; updated-path diagnostics are partial | Same checkpoint at L1 (IS1); M1@4 and B8@4 against B4@1 at the same rank r32 and each load (IS2), where B8 adds 9,216 parameters and is not parameter-matched; IS3 compares load-trained with E12-trained systems | oracle_random and joint_fact (joint is descriptive) | C999: test, seed999001, 2,000 episodes per load (fresh) | IS-E1 (a negative DeltaD with CI<0 is consistent with Prop.4), IS-E2 (C(E)≥3 pp, CI>0); IS3 and IS4 descriptive | IS1–IS4 <!-- IS1 --><!-- IS2 --><!-- IS3 --><!-- IS4 --> |
+| Memory load: the depth benefit shrinks from E12 to E36 for fixed checkpoints, while M1@4 and B8@4 keep exceeding B4@1 at the trained loads; updated-path diagnostics are partial; key interference is identified for oracle_random only (IVD) | Same checkpoint at L1 (IS1); M1@4 and B8@4 against B4@1 at the same rank r32 and each load (IS2), where B8 adds 9,216 parameters and is not parameter-matched; IS3 compares load-trained with E12-trained systems | oracle_random and joint_fact (joint is descriptive) | C999: test, seed999001, 2,000 episodes per load (fresh) | IS-E1 (a negative DeltaD with CI<0 is consistent with Prop.4), IS-E2 (C(E)≥3 pp, CI>0); IS3 and IS4 descriptive; IVD (IV1, IV2) is a separate study with its own gate | IS1–IS4, IV1, IV2 <!-- IS1 --><!-- IS2 --><!-- IS3 --><!-- IS4 --><!-- IV1 --><!-- IV2 --> |
 | Post-hoc stopping pilots: label-free rules trade long-hop gain for hop1 loss and give no speedup | Fixed-depth evaluation of the same checkpoints (same parameters) | oracle_random at r128 from the 20,000-step F1 checkpoints (rank and steps confounded); joint_fact; joint at r32 | V4242 selection, S4242 screening, 2,000 episodes per checkpoint; no CIs | Screening only; no gate | H1–H6 <!-- H1 --><!-- H2 --><!-- H3 --><!-- H4 --><!-- H5 --><!-- H6 --> |
 | Learned post-hoc halting does not repair hop1 preservation in six primary frozen-reader families | Learned head against L1 of the same frozen reader; label-free reference; any-step oracle (label-informed, an upper bound only among the tested states) | joint_fact, oracle_random, t1_frozen_fact (primary); joint (descriptive) | C999002: test, seed999002, 2,000 episodes (fresh); 99.166667% adjusted CIs | Combined criterion: H≥−1 pp (point), D≥3 pp with CI>0, W with CI>0; every per-seed H also fails | HL1–HL5 <!-- HL1 --><!-- HL2 --><!-- HL3 --><!-- HL4 --><!-- HL5 --> |
 | Terminal-Jacobian regularization reduces overshoot, does not meet the removal criterion, and costs longer-walk accuracy | RS+J against RS: the same architecture, rank and parameters, shared initialization and RNG streams per seed, only the penalty differs; M1-L4 and M1-mixed references are descriptive | oracle_random; joint_fact | C999003: test, seed999003, 2,000 episodes (fresh); 97.5% CIs | Removal needs DeltaS>0 with CI>0 and S(RS+J)≥−1 pp; fails for both writers | JS1–JS6 <!-- JS1 --><!-- JS2 --><!-- JS3 --><!-- JS4 --><!-- JS5 --><!-- JS6 --> |
+| Key interference explains the IS shrinkage of the depth benefit for oracle_random, and is not offered as the identified explanation for joint_fact, where load, layout and candidate distribution changed together | Same frozen checkpoint, M1@4 against M1@1 (identical parameters), low- against high-overlap extra facts at equal load; B4@1 descriptive | oracle_random (constructed key codes); joint_fact (overlap selected among candidate heads, associational) | C999004: test, seed999004, 2,000 episodes per checkpoint (fresh); 97.5% CIs | IVD: IC=G(low)−G(high)≥5 pp at load 24 on hops2–3 with 97.5% lower bound>0, per writer; passes for oracle_random (+13.975 pp), fails for joint_fact (+3.208 pp) | IV1–IV3 <!-- IV1 --><!-- IV2 --><!-- IV3 --> |
+| A halting head with the correctness label and a hop-1-constrained validation threshold repairs overshoot for oracle_random on frozen readers; no other CVH arm passes; no CVH arm has a latency claim | Arm against L1 of the same frozen reader (identical parameters); fixed L4 and L16 and the P4-S-L head (A0) as references; latency against fixed L16 on prepared batches of 64 | oracle_random (pass); joint_fact and t1_frozen_fact (no pass) | C999005: test, seed999005, 2,000 episodes per reader (fresh); 99.166667% CIs | Gain ≥3 pp with CI>0, hop-1 change ≥−1 pp, mean executed updates ≤8; a latency claim only where wall time is below fixed L16 and the arm passes (it does not hold for the passing arm) | CV1–CV4 <!-- CV1 --><!-- CV2 --><!-- CV3 --><!-- CV4 --> |
+| Stay training (T1) and a content-gated sticky update (T2) do not remove the overshoot under this protocol; fixed-depth training remains the remedy found | T1 and T2 against T0 (M1-L4 retrained under the same code) and the released B4 at L1 (same rank); T2 adds two parameters over T1 | oracle_random; joint_fact | C999007: test, seed999007, 2,000 episodes (fresh); 98.75% CIs | An arm passes only for both writers: absolute L16−L4 difference ≤1 pp on hops1–3, hops4–8 at L8 at least −1 pp against T0, and gain ≥3 pp with CI>0 over B4; no arm passes | TS1–TS2 <!-- TS1 --><!-- TS2 --> |
+| The depth gain on hops2–3 is also present on unseen-pool entities (256 further names of the same vocabulary); no claim beyond the closed vocabulary or for new entity codes | M1 at L4 against L1 of the same checkpoint (Part A released mixed-depth, Part B trained at L4); B4@1 descriptive; parts never pooled | joint; joint_fact; oracle_random (control) | Part A: S4242 screening (`test_unseen`); Part B: C999006 (fresh); descriptive 95% CIs, no multiplicity correction | Descriptive wording rule: unseen-pool gain ≥3 pp with CI>0 (all six results meet it); Part A also reproduces the 18 committed M1 depth-contrast rows | UN1–UN4 <!-- UN1 --><!-- UN2 --><!-- UN3 --><!-- UN4 --> |
+| In the groups where the hop-2 single read is below the chance line, its errors are mostly the one-hop neighbour; this qualifies the reading of D | L1 of released M1 and of B4 at the same rank r32; no multi-read comparator | t1_frozen_fact, joint_fact, oracle_random, oracle_orth (below chance); joint and t1_frozen read above chance | S4242 and C777 saved predictions, 2,000 episodes; descriptive 95% CIs | None (descriptive); a first-hop share above its uniform value does not identify the mechanism, and no fraction of D is estimated | PM1, NC2 <!-- PM1 --><!-- NC2 --> |
 | LLM writer screens select no learned writer | Writer arms and read-supervision variants at unequal fixed budgets; OA and OAρ (the value/output ceiling) and the D2 supplied-answer control are privileged and ineligible; no parameter matching | Learned writers on the T1 task; no oracle | val: validation seed4242, 1,000 episodes; training seed17; no CIs | Selection EM≥0.80 (partial-learning threshold 0.30; E8 trigger 0.50) | LL1–LL10 <!-- LL1 --><!-- LL2 --><!-- LL3 --><!-- LL4 --><!-- LL5 --><!-- LL6 --><!-- LL7 --><!-- LL8 --><!-- LL9 --><!-- LL10 --> |
+| At the frozen R/r128 and R/r32 checkpoints only an exact store together with the true key rescues the deployed read (verdict store+query); W5/r32 is undecided; no LSQ arm runs | Cells that replace the final-position read of the same frozen checkpoint; no parameter comparison | Learned writers R (WP-L4) and W5 (WP-L3 rerun); no oracle | val: seed4242, episode indices [200000,204000), 4,000 queries; training seed17; no CIs | Rescue: normalized error ≤0.5 of the baseline and EM gain ≥10 pp; the first rule that applies gives the verdict | RX1–RX3 <!-- RX1 --><!-- RX2 --><!-- RX3 --> |
+| At rank 32 the LM path did not learn the O-rot and O-shared oracle codes within the pilot budget; P1L-S is not run | None: a pilot against a 30% hop-1 threshold; no B4 or B8 comparison, so no equal-parameter or multi-read claim | oracle_rot and oracle_shared (LLM oracle designs, not the symbolic oracle) | val: seed4242, 1,000 episodes; training seed17; no CIs | Hop-1 full-vocabulary EM ≥30% at L=4, final checkpoint, one arm per design; neither passes (0.1%, 11.8%) | WL1–WL2 <!-- WL1 --><!-- WL2 --> |
 | P1-L oracle readers: confirmation pending, no result | Per rank, B8@4 and M1-L4@4 against B4@1, B5-L4@4 and B3-L4@4 at the same rank. An equal-parameter claim only from M1-L4@4−B4@1 (Amendment B6); B8 is not parameter-matched (+8.9% at r32, +31.0% at r128) | oracle_random (the LLM oracle, with independent random pair-key and value tables, is not the symbolic oracle); no learned writer | test, episode indices [100000,102000), 2,000 episodes; seeds17/29/43; 97.5% CIs (k=2); pending | G1-L and G2-L; Amendment B6 rule; Amendment B7 memory-use check; no multi-read claim at r32 | LP1–LP6, with training/validation evidence only in LP6; B9 <!-- LP1 --><!-- LP2 --><!-- LP3 --><!-- LP4 --><!-- LP5 --><!-- LP6 --><!-- B9 --> |
 | Conditional theory (Props.1–11) | Not applicable | Not applicable | Not applicable | None: conditional results that experiments are compatible with, or contradict only in their unconditional readings | Theory-to-measurement ledger in the symbolic ledger |
 
@@ -1429,11 +1600,14 @@ Reading rules.
   language-model oracle needs a learned value-to-key lookup for every read after the first
   (Section 8.4), so no symbolic oracle result is carried over to it.
 - **Splits and reuse.** C777 is reused by the rank and factorized follow-ups and C888 by P2-S-F1, so
-  their intervals there are not independent confirmation; C999, C999002 and C999003 are fresh. Every
+  their intervals there are not independent confirmation; C999, C999002 and C999003 and the follow-up
+  sets C999004–C999007 are fresh. NCR re-reads saved S4242 and C777 predictions and UNS Part A audits S4242;
+  neither adds an evaluation. Every
   interval conditions on the fixed training seeds 17/29/43 and is specific to its endpoint. Per-seed
   effects appear next to the pooled ones where the ledgers record them (S3, S8, B1, IS1, HL1, JS1–JS4).
-- **Scope.** Every set draws on the seen pool of a closed 1,024-name vocabulary, so no claim covers
-  unseen names or new entity codes. Effects hold at the trained hops (1–3) and trained depths; longer
+- **Scope.** Every set draws on the seen pool of a closed 1,024-name vocabulary, except the descriptive
+  UNS scope row on the 256-name unseen pool (UN1–UN3), so no claim covers names outside the vocabulary,
+  new entity codes, or composition "for unseen entities". Effects hold at the trained hops (1–3) and trained depths; longer
   hops are reported as measured cells (S7, B6, H1–H6, JS3), not as extrapolation claims. No claim is
   made about multiple reads in the language model at rank32.
 - **Names.** Ledger IDs name claim rows. The reader names B3–B8 (for example B3 memory-free and B8
@@ -1441,8 +1615,12 @@ Reading rules.
   "Amendment B7" here) are separate namespaces: an HTML comment such as `<!-- B7 -->` in this manuscript
   always cites claim row B7 of the symbolic ledger, whereas "B7" in running text names the
   larger-memory reader.
-- **Pending.** The neighbour-confusion rate (PM1), every P1-L confirmation result and every registered
-  follow-up result are placeholders in this draft; no value is imputed.
+- **Descriptive rows.** Rows marked descriptive in the ledgers (IV3, CV4, TS2, UN2–UN4, PM1, NC2, RX2, RX3
+  and WL2) have no gate in their preregistrations. They support only the wording that the preregistration
+  attaches (for UNS, "the depth gain is also present on unseen-pool entities"; for NCR, the qualification of D).
+- **Pending.** Every P1-L confirmation result and the memory-use check, DPFP, P1L-C and P1L-D are
+  placeholders in this draft; no value is imputed. The registered results of IVD, CVH, TSM, UNS, NCR, RFX and
+  WP-L6 are reported.
 
 ## References and source records
 
