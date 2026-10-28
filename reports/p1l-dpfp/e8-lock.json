@@ -1,0 +1,54 @@
+{
+  "study": "DPFP",
+  "rule": "docs/prereg/DPFP.md decision rule: no arm reached val EM 0.80; best arm (ties keep candidate order) reached >= 0.50 -> retrain that arm once at E = 8, accept if val EM >= 0.80 (flagged)",
+  "choice": {
+    "action": "retry_e8",
+    "arm": "D128-3",
+    "E": 8,
+    "correct": {
+      "D32-3": 390,
+      "D128-1": 580,
+      "D128-3": 608
+    }
+  },
+  "flagged": true,
+  "prereg": {
+    "path": "docs/prereg/DPFP.md",
+    "blake2b": "157c3f0b9ec03e8e424b908e62136562"
+  },
+  "e16_release": {
+    "path": "reports/p1l-dpfp/release.json",
+    "blake2b": "9f349e56fefe6a82c801693097d80f05"
+  },
+  "records": [
+    {
+      "arm": "D32-3",
+      "path": "reports/p1l-dpfp/arms/D32-3/record.json",
+      "blake2b": "1888415c32bc4e7601a28308e297ffc8",
+      "job_id": "3721087.opbs",
+      "git_commit": "efadc36436e4d29514a4ea570596925b779b8b2d",
+      "actual_steps": 23015,
+      "correct": 390
+    },
+    {
+      "arm": "D128-1",
+      "path": "reports/p1l-dpfp/arms/D128-1/record.json",
+      "blake2b": "6efc9d6c660f4913f3a37db0f9ededf5",
+      "job_id": "3721088.opbs",
+      "git_commit": "efadc36436e4d29514a4ea570596925b779b8b2d",
+      "actual_steps": 23690,
+      "correct": 580
+    },
+    {
+      "arm": "D128-3",
+      "path": "reports/p1l-dpfp/arms/D128-3/record.json",
+      "blake2b": "bbe6a76f05cfc146c655279d77743381",
+      "job_id": "3721089.opbs",
+      "git_commit": "efadc36436e4d29514a4ea570596925b779b8b2d",
+      "actual_steps": 22370,
+      "correct": 608
+    }
+  ],
+  "audit": "orchestrator re-derived the choice from the three committed E16 records (status complete, smoke false, E 16) with the rule of dpfp_run.choose; counts are of 1000 val items",
+  "audited_at": "2026-10-29T02:25:44+09:00"
+}
