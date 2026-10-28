@@ -20,7 +20,7 @@ from looplora.data.relations import TaskSpec
 from looplora.infra.seeds import derive_seed
 from .batching import PreparedBatch, repeat_snapshot, tokenize_batch
 from .config import ORACLE_WRITERS
-from .inject import (MODEL_ID, MODEL_REVISION, AdapterBank, attach_adapters,
+from .inject import (AdapterBank, attach_adapters, backbone_pin,
                      configure_numerics, detach_adapters, load_model, load_tokenizer)
 from .protocols import SupportSnapshot, answer_scores, encode_support
 from .prefetch import BatchStream
@@ -59,8 +59,9 @@ class LLMExperiment:
                  writer_record: dict[str, Any] | None = None):
         configure_numerics()
         self.config = copy.deepcopy(config)
-        self.model = load_model(device=config["device"]) if model is None else model
-        self.tokenizer = load_tokenizer() if tokenizer is None else tokenizer
+        backbone = config.get("backbone")
+        self.model = load_model(device=config["device"], backbone=backbone) if model is None else model
+        self.tokenizer = load_tokenizer(backbone) if tokenizer is None else tokenizer
         if hasattr(self.model, "looplora_adapters"):
             raise ValueError("close the previous experiment before reusing a backbone")
         self.model.eval()
@@ -156,7 +157,8 @@ class LLMExperiment:
                         V=self.writer.V, n_rel=self.writer.n_rel, seed=self.writer.seed,
                         keys="global_entity_relation_pairs", values="OracleWriter.global_codes")
         cfg = self.writer.cfg
-        signature = {"model": MODEL_ID, "revision": MODEL_REVISION, "layer": self.layer,
+        model_id, revision = backbone_pin(self.config.get("backbone"))
+        signature = {"model": model_id, "revision": revision, "layer": self.layer,
                 "d_in": cfg.d_in, "d_out": cfg.d_out, "r": cfg.r, "r_mem": cfg.r_mem,
                 "gate": cfg.gate, "write_policy": self.config["write_policy"],
                 "V": self.config["task"]["V"]}
