@@ -1005,3 +1005,17 @@ Interpretations made in step 1f, stated as they are implemented (none changes a 
   during `torch.save`), in particular whether the raised message is the bare text or carries a prefix or a trace (the strings of the library were read, no
   failing call was made); a compute node; a PBS walltime kill (SIGKILL stands in for it); the heartbeat and the 300 s silence rule across nodes of the shared file
   system; a decision file on the shared file system. The first compute-node run of `tests/test_tsm_scripts.py` is part of the step-0 test job of §6.
+
+## 11. Step 2 on compute (from 2026-10-28 23:40 JST): job log
+
+`CODE` = d32463ec3c5ba26b5f9c676a820345e31591846e (wp/sym; every job below runs `submit.py --commit CODE`). Logs are under
+`/work/xg24i002/x10041/LoopLora/logs/pbs/`. Node·h is the elapsed time of the job on its single node (rounded up).
+
+| job | ID | node·h | outcome |
+| --- | --- | --- | --- |
+| s9-tests (the ten test files, `-B -p no:cacheprovider`) | 3720642.opbs | 0.02 | exit 0; 241 passed, 1 warning (`test_tsm.py:135`, a `requires_grad` tensor converted to a scalar); first run of these tests with real torch and pytest; no defect found |
+| ivd-lock | 3720657.opbs | 0.01 | exit 0; `reports/ivd/design.json` (12 checkpoints, design_hash 50746f54e0cb346190f176a5e258fdb9); not committed: the orchestrator checks and commits it |
+| cvh-lock | 3720658.opbs | 0.01 | exit 0; `reports/cvh/design.json` (9 readers, design_hash 1659eb4141d4638139c1d8ae074b8539); not committed |
+| uns-lock | 3720659.opbs | 0.01 | exit 0; `reports/uns/design.json` (18 checkpoints, design_hash 1782cf998e5c3ae9e34401173b43d1fd); not committed |
+| uns-a (Part A) | 3720660.opbs | | queued |
+| ncr | 3720661.opbs | | queued |
