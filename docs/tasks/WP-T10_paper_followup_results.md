@@ -83,5 +83,24 @@ Source: `reports/decisions/P1L.md` §3 "Per-step readout" (numbers from `scripts
 3. Update the draft where LP5 is cited (§8.4/§8.5 and the must-not-say list) only as far as these limits allow.
 Report: append to `docs/reports/WP-T10.md`. Done line: `WP-T10 part 3a done`.
 
-### 3b (later, when the orchestrator says so)
-DPFP, and P1L-D if DPFP selects a writer.
+### 3b (when the orchestrator says so): DPFP negative result; P1L-D not run
+Merge master into wp/paper first (the commit named in the orchestrator's message, which carries wp/llm with the DPFP
+report). Sources: `docs/reports/DPFP.md`, `reports/p1l-dpfp/` (arms, arms-e8, audit files, e8-lock.json),
+`docs/prereg/DPFP.md` (decision rule, Amendment A1), `plan/followup_2026-10-27.md` §F3.
+1. DP1 in `docs/paper/evidence_llm.md`: not supported.
+   - E16 val EM: D32-3 39.0%, D128-1 58.0%, D128-3 60.8%.
+   - The registered E = 8 retrain of D128-3 (flagged) reached 73.0%, below 0.80, so no writer is selected.
+   - Give the registered consequence: a negative result and no further writer screen. LSQ ran no arm (RX1), so the
+     learned-writer line ends.
+   - Descriptive only: read error and read-value head accuracy per arm, and the zero/shuffled-memory audit. The audit
+     shows the answers depend on the episode's own memory; it does not show the read is accurate.
+   - Amendment A1: DPFP changed both the feature geometry and the query normalization, so the E8 gain over E16 and the
+     gain over R-r128 are not attributed to decorrelation alone.
+2. PD1: not registered, because no writer was selected. State that it was not run.
+3. Draft: replace the §8 "DPFP and P1L-D — TODO" paragraph, update the header pending list, §9, the abstract and §1
+   only where they mention a pending writer result, and the must-not-say list. Add "no learned writer reaches the
+   WP-L4 gate in this project", and remove any wording that leaves end-to-end learned use open as a result still to
+   come.
+   - Keep the claim contract: same-rank comparisons only; no end-to-end or learned-writer claim; latency is a cost.
+4. Record the test and smoke overrun (0.63 against the registered ≤ 0.5 node·h) only if the ledger records deviations.
+Report: append to `docs/reports/WP-T10.md`. Done line: `WP-T10 part 3b done`.
