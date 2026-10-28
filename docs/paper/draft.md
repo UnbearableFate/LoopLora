@@ -5,8 +5,8 @@
 [LLM evidence ledger](evidence_llm.md). Main-text experimental claims carry ledger
 IDs in HTML comments. Symbolic results (including the registered follow-ups IVD, CVH,
 TSM, UNS and NCR) and the completed LLM writer screens (including RFX and the WP-L6
-stop) and the P1-L oracle-reader confirmation with P1L-C and its per-step readouts are included; DPFP and P1L-D results
-remain pending.
+stop) the P1-L oracle-reader confirmation with P1L-C and its per-step readouts, and the DPFP negative result (P1L-D not run) are
+included; no registered result remains pending.
 P1-L Amendments B6/B7 and the run locks, committed after that cutoff, are cited where
 stated; [Appendix C](#appendix-c-claim-contract) lists each principal claim with its
 comparator, writer, split and gate.*
@@ -34,8 +34,8 @@ overshoot without meeting the registered removal criterion, and decreases longer
 <!-- JS1 --><!-- JS3 --> Conditional theory separates composition inside a fixed
 output subspace, limitations of one-read observations, writer shortcuts, and fixed-point
 certificates. In a single frozen language-model module, the completed validation
-screens select no learned writer, despite informative input probes and a usable
-supplied-answer-code output path. In the registered oracle-reader confirmation, one shared module iterated four times
+screens, including the last registered DPFP screen, select no learned writer, despite informative input probes and a usable
+supplied-answer-code output path.<!-- DP1 --> In the registered oracle-reader confirmation, one shared module iterated four times
 exceeds a single read of equal parameter count at rank128, the four-unshared-reads reader fails its registered gate, a
 bridge-patching test gives no causal claim, and at rank32 the readers did not learn to use the oracle memory.
 <!-- LL2 --><!-- LL3 --><!-- LL9 --><!-- LP4 --><!-- LP7 --><!-- LP9 --><!-- LP11 --><!-- PC1 --> All results use a closed 1,024-name vocabulary and
@@ -1112,7 +1112,7 @@ while a decoder trained on clean values does not measure all information present
 in a read. <!-- LL9 -->
 
 The best eligible final arm is R/r128 at 33.5%, below both the 80% writer gate and
-the 50% E8-retraining trigger; no E8 retraining occurred. <!-- LL9 --> The completed
+the 50% E8-retraining trigger; no E8 retraining occurred. <!-- LL9 --> The later DPFP screen did retrain once at E=8 (Section 8.5). <!-- DP1 --> The completed
 selection therefore yields no learned P1-L condition and no P3; the separately
 registered oracle-reader study is reported in Sections 8.4 and 8.5. <!-- LL9 --><!-- LP3 --><!-- LP4 -->
 The negative result concerns these single-module tasks, supervision choices,
@@ -1134,8 +1134,8 @@ stays below the entity-restricted baseline (18.4%, 6.8% and 8.1%). <!-- RX2 --> 
 descriptively with the preregistered guide, the deployed store with the true key sits near each
 checkpoint's own EM rather than near the OA level, which fits write interference in the delta
 store more than a query bottleneck; this is one seed and not an identification of the cause.
-<!-- RX3 --> The verdicts trigger no LSQ arm, so the separately registered DPFP screen is the only
-one left, and it has no result here. <!-- RX1 --><!-- DP1 --> The true-key cells use the label and
+<!-- RX3 --> The verdicts trigger no LSQ arm, so the separately registered DPFP screen was the only
+one left; its result is in Section 8.5. <!-- RX1 --><!-- DP1 --> The true-key cells use the label and
 are not deployable, and a substituted read is a distribution shift for the layers after it.
 <!-- RX1 -->
 
@@ -1286,8 +1286,21 @@ against 7.03% in the original world), but not when z_1 alone is replaced at the 
 [−0.651, 2.344]). <!-- PC3 --> The P1-L contrasts replicate on this range (M1-L4@4−B4@1 +20.808 pp [19.725, 21.850], B8@4−B4@1
 +0.925 pp [0.283, 1.533]) without changing any gate. <!-- PC4 -->
 
-**DPFP and P1L-D — TODO:** the DPFP writer screen and P1L-D (registered only if DPFP selects a writer) have no result here,
-and none is imputed. <!-- DP1 --><!-- PD1 --> P1L-S does not run (Section 8.4). <!-- WL1 -->
+**DPFP and P1L-D.** The last registered writer screen replaced the keys and queries of the WP-L4 learned writer by DPFP features (three
+arms: D32-3 at rank32, D128-1 and D128-3 at rank128; one seed, T1, E=16, 1,000 validation episodes per arm; the WP-L4 references R at
+rank32 and rank128, 12.0% and 33.5%, were not rerun). <!-- DP1 --> No arm reaches the 80% writer gate: D32-3 39.0%, D128-1 58.0% and
+D128-3 60.8%. <!-- DP1 --> The best arm is above the 50% trigger, so D128-3 was retrained once at E=8 under the registered rule and
+reached 73.0%, again below 0.80. <!-- DP1 --> The registered decision is stop: no writer is selected, the paper reports a negative result,
+and no further writer screen follows; P1L-D, which would have run the P1-L learned condition for a selected writer, was not registered and
+was not run (the LSQ screen ran no arm, Section 8.3). <!-- DP1 --><!-- PD1 --><!-- RX1 --> No learned writer reaches the WP-L4 gate in this
+project. DPFP does raise the EM (by 27.0 pp at rank32 and by 24.5 and 27.3 pp at rank128 over the references), lowers the normalized read
+error (0.39, 0.43 and 0.36 against 0.67 and 0.63) and raises the read-value head accuracy (30.2%, 46.0% and 51.0% against 8.8% and 19.7%),
+but the clean/read gap narrows without closing, and the key overlap of the learned projections in the original space is not lower than R's.
+<!-- DP2 --> Because DPFP changes the feature geometry and the query normalization together (Amendment A1), neither these gains nor the
+12.2 pp gain of the E=8 retrain (which also halves the memory load) is attributed to decorrelation alone. <!-- DP1 --><!-- DP2 --> A zero-
+or shuffled-memory audit leaves at most 0.2% EM for every DPFP arm, which shows that the answers depend on the episode's own memory and not
+that the read is accurate. <!-- DP3 --> The result is one seed, one learning rate and fixed budgets, and it is not a proof that learned
+writing in a language model is impossible. <!-- DP1 --> P1L-S does not run (Section 8.4). <!-- WL1 -->
 
 **Per-step readouts (descriptive).** For M1-L4 and B8 the state z_s after each read s=1…4 was decoded at the answer
 position on the confirmation episodes (three seeds pooled) through the trained output path and the frozen upper layers (logit
@@ -1413,7 +1426,7 @@ remove overshoot, and training-time regularization reduces overshoot at a longer
 <!-- HL1 --><!-- CV1 --><!-- CV3 --><!-- TS1 --><!-- JS1 --><!-- JS3 -->
 The appropriate conclusion is therefore a bounded mechanism result and a set of
 reproducible failures, with no efficiency claim over increasing rank. <!-- FR1 -->
-The single-module LLM screens select no learned writer; input probes and oracle
+The single-module LLM screens, DPFP included, select no learned writer (P1L-D is not run); input probes and oracle
 controls do not overcome the deployed-read/answer gap, a read-failure factorial finds that only an
 exact store together with the true key rescues the read, and the rank-32 oracle-code pilot stops.
 <!-- LL2 --><!-- LL3 --><!-- LL7 --><!-- LL9 --><!-- RX1 --><!-- WL1 -->
@@ -1533,6 +1546,7 @@ conditions take priority over shortened manuscript wording.
 | LLM read fixes and audit | Same validation set; training seed17 | Audited historical W5 and OA (value/output ceiling); seven r32/r128 final arms with unequal timing-sized step budgets; final-checkpoint selection, no learned writer/no E8 retry. | LL7–LL10 <!-- LL7 --><!-- LL8 --><!-- LL9 --><!-- LL10 --> |
 | RFX | `val`, seed4242, episode indices [200000,204000), one hop-1 query per episode; fitting set of 4,096 `train` episodes | Frozen R/r128, R/r32 and W5/r32 (training seed17): the final-position read replaced by store (deployed delta, exact ridge) × query (raw, unit, true) cells; rescue rule and first-applying verdict; no training, no CIs. | RX1–RX3 <!-- RX1 --><!-- RX2 --><!-- RX3 --> |
 | WP-L6 | `val`, seed4242, 1,000 episodes | Rank-32 M1-L4 with O-rot and O-shared oracle codes, lr 0.003, seed17, 5,666 steps; hop-1 full-vocabulary EM at L=4 against a 30% threshold; pilot, no CIs; P1L-S not run. | WL1–WL2 <!-- WL1 --><!-- WL2 --> |
+| DPFP | `val`, seed4242, 1,000 episodes per arm | Learned LLM writers with DPFP key and query features (D32-3, D128-1, D128-3; T1, E=16, training seed17) against the WP-L4 references R at the same rank; registered E=8 retrain of D128-3; zero- and shuffled-memory audit; no CIs. P1L-D not run. | DP1–DP3, PD1 <!-- DP1 --><!-- DP2 --><!-- DP3 --><!-- PD1 --> |
 | P1-L registered oracle readers | test episode indices[100000,102000), 2,000 episodes, eval seed4242 | oracle_random at r32/r128; seeds17/29/43, primary fixed-L4 B8 (not parameter-matched: +8.9% at r32, +31.0% at r128), same-rank gates, k2 and 97.5% intervals; Amendments B6 (equal-parameter rule) and B7 (per-rank memory-use check; no multi-read claim at r32). Rank32 fails the check, rank128 passes; at rank128 G1-L fails, G2-L passes and M1-L4@4 against B4@1 meets the B6 criterion. LP6 is training/validation evidence; the per-step readouts (LP5) are descriptive. | LP1–LP13 <!-- LP1 --><!-- LP2 --><!-- LP3 --><!-- LP4 --><!-- LP5 --><!-- LP6 --><!-- LP7 --><!-- LP8 --><!-- LP9 --><!-- LP10 --><!-- LP11 --><!-- LP12 --><!-- LP13 --> |
 | P1L-C | test episode indices[102000,104000), 2,000 episodes (256 hop-2 episodes per seed for patching) | The nine rank128 checkpoints (M1-L4, B8, B4 × seeds17/29/43), nothing retrained; read-position analysis (descriptive), bridge patching with a registered causal bar of 10 pp, replication of the P1-L contrasts; 95% intervals. | PC1–PC4 <!-- PC1 --><!-- PC2 --><!-- PC3 --><!-- PC4 --> |
 
@@ -1627,7 +1641,7 @@ carry its numbers. Exact values and statuses stay in the [symbolic](evidence_sym
 | Stay training (T1) and a content-gated sticky update (T2) do not remove the overshoot under this protocol; fixed-depth training remains the remedy found | T1 and T2 against T0 (M1-L4 retrained under the same code) and the released B4 at L1 (same rank); T2 adds two parameters over T1 | oracle_random; joint_fact | C999007: test, seed999007, 2,000 episodes (fresh); 98.75% CIs | An arm passes only for both writers: absolute L16−L4 difference ≤1 pp on hops1–3, hops4–8 at L8 at least −1 pp against T0, and gain ≥3 pp with CI>0 over B4; no arm passes | TS1–TS2 <!-- TS1 --><!-- TS2 --> |
 | The depth gain on hops2–3 is also present on unseen-pool entities (256 further names of the same vocabulary); no claim beyond the closed vocabulary or for new entity codes | M1 at L4 against L1 of the same checkpoint (Part A released mixed-depth, Part B trained at L4); B4@1 descriptive; parts never pooled | joint; joint_fact; oracle_random (control) | Part A: S4242 screening (`test_unseen`); Part B: C999006 (fresh); descriptive 95% CIs, no multiplicity correction | Descriptive wording rule: unseen-pool gain ≥3 pp with CI>0 (all six results meet it); Part A also reproduces the 18 committed M1 depth-contrast rows | UN1–UN4 <!-- UN1 --><!-- UN2 --><!-- UN3 --><!-- UN4 --> |
 | In the groups where the hop-2 single read is below the chance line, its errors are mostly the one-hop neighbour; this qualifies the reading of D | L1 of released M1 and of B4 at the same rank r32; no multi-read comparator | t1_frozen_fact, joint_fact, oracle_random, oracle_orth (below chance); joint and t1_frozen read above chance | S4242 and C777 saved predictions, 2,000 episodes; descriptive 95% CIs | None (descriptive); a first-hop share above its uniform value does not identify the mechanism, and no fraction of D is estimated | PM1, NC2 <!-- PM1 --><!-- NC2 --> |
-| LLM writer screens select no learned writer | Writer arms and read-supervision variants at unequal fixed budgets; OA and OAρ (the value/output ceiling) and the D2 supplied-answer control are privileged and ineligible; no parameter matching | Learned writers on the T1 task; no oracle | val: validation seed4242, 1,000 episodes; training seed17; no CIs | Selection EM≥0.80 (partial-learning threshold 0.30; E8 trigger 0.50) | LL1–LL10 <!-- LL1 --><!-- LL2 --><!-- LL3 --><!-- LL4 --><!-- LL5 --><!-- LL6 --><!-- LL7 --><!-- LL8 --><!-- LL9 --><!-- LL10 --> |
+| LLM writer screens, including the last registered DPFP screen, select no learned writer; P1L-D is not run | Writer arms and read-supervision variants at unequal fixed budgets; OA and OAρ (the value/output ceiling) and the D2 supplied-answer control are privileged and ineligible; DPFP arms against the WP-L4 references R at the same rank (DPFP changes the feature geometry and the query normalization together, Amendment A1); no parameter matching beyond equal inference parameters at each rank | Learned writers on the T1 task; no oracle | val: validation seed4242, 1,000 episodes; training seed17; no CIs | Selection EM≥0.80 (partial-learning threshold 0.30; E8 trigger 0.50); DPFP: no E=16 arm reaches 0.80 (39.0%, 58.0%, 60.8%) and the E=8 retrain of D128-3 reaches 73.0%, so the decision is stop | LL1–LL10, DP1–DP3, PD1 <!-- DP1 --><!-- DP2 --><!-- DP3 --><!-- PD1 --><!-- LL1 --><!-- LL2 --><!-- LL3 --><!-- LL4 --><!-- LL5 --><!-- LL6 --><!-- LL7 --><!-- LL8 --><!-- LL9 --><!-- LL10 --> |
 | At the frozen R/r128 and R/r32 checkpoints only an exact store together with the true key rescues the deployed read (verdict store+query); W5/r32 is undecided; no LSQ arm runs | Cells that replace the final-position read of the same frozen checkpoint; no parameter comparison | Learned writers R (WP-L4) and W5 (WP-L3 rerun); no oracle | val: seed4242, episode indices [200000,204000), 4,000 queries; training seed17; no CIs | Rescue: normalized error ≤0.5 of the baseline and EM gain ≥10 pp; the first rule that applies gives the verdict | RX1–RX3 <!-- RX1 --><!-- RX2 --><!-- RX3 --> |
 | At rank 32 the LM path did not learn the O-rot and O-shared oracle codes within the pilot budget; P1L-S is not run | None: a pilot against a 30% hop-1 threshold; no B4 or B8 comparison, so no equal-parameter or multi-read claim | oracle_rot and oracle_shared (LLM oracle designs, not the symbolic oracle) | val: seed4242, 1,000 episodes; training seed17; no CIs | Hop-1 full-vocabulary EM ≥30% at L=4, final checkpoint, one arm per design; neither passes (0.1%, 11.8%) | WL1–WL2 <!-- WL1 --><!-- WL2 --> |
 | At rank128, with a clean oracle memory, the shared M1-L4 reader exceeds a single read of equal parameter count on hops2–3, and the gated B8 reader fails G1-L (G2-L passes); at rank32 the readers did not learn to use the oracle memory, and no multi-read claim is made | Per rank, B8@4 and M1-L4@4 against B4@1, B5-L4@4 and B3-L4@4 at the same rank. The equal-parameter claim only from M1-L4@4−B4@1 at rank128 (475,138 parameters each; Amendment B6); B8 is not parameter-matched (+8.9% at r32, +31.0% at r128); latency (M1-L4 about 1.42 and B8 about 1.57 times B4 at rank128) is a cost | oracle_random (the LLM oracle, with independent random pair-key and value tables, is not the symbolic oracle); no learned writer | test, episode indices [100000,102000), 2,000 episodes; seeds17/29/43; 97.5% CIs (k=2) | G1-L (B8@4−B4@1 ≥3 pp, CI>0, every seed, hop1 ≥−1 pp, typed CI>0): fails at r128 (+0.983 pp), outcome at r32 not interpreted; G2-L passes at r128; Amendment B6 criterion met by M1-L4@4−B4@1 (+21.550 pp); Amendment B7 memory-use check: fails at r32, passes at r128 | LP1–LP13; B9 <!-- LP1 --><!-- LP2 --><!-- LP3 --><!-- LP4 --><!-- LP5 --><!-- LP6 --><!-- LP7 --><!-- LP8 --><!-- LP9 --><!-- LP10 --><!-- LP11 --><!-- LP12 --><!-- LP13 --><!-- B9 --> |
@@ -1666,11 +1680,10 @@ Reading rules.
   always cites claim row B7 of the symbolic ledger, whereas "B7" in running text names the
   larger-memory reader.
 - **Descriptive rows.** Rows marked descriptive in the ledgers (IV3, CV4, TS2, UN2–UN4, PM1, NC2, RX2, RX3,
-  WL2, LP5, LP8, LP12, LP13 and PC2–PC4) have no gate in their preregistrations. They support only the wording that the preregistration
+  WL2, LP5, LP8, LP12, LP13, PC2–PC4, DP2 and DP3) have no gate in their preregistrations. They support only the wording that the preregistration
   attaches (for UNS, "the depth gain is also present on unseen-pool entities"; for NCR, the qualification of D).
-- **Pending.** DPFP and P1L-D are placeholders in this draft; no value is imputed. The
-  registered results of IVD, CVH, TSM, UNS, NCR, RFX, WP-L6, the P1-L confirmation with the memory-use check, and P1L-C
-  with the per-step readouts are reported.
+- **Pending.** Nothing registered is pending. The registered results of IVD, CVH, TSM, UNS, NCR, RFX, WP-L6, the P1-L
+  confirmation with the memory-use check, P1L-C with the per-step readouts, and DPFP (P1L-D not run) are reported.
 
 ## References and source records
 
