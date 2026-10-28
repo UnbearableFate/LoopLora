@@ -18,7 +18,8 @@ depth effect +25.9 pp, walk specificity +22.3 pp; accuracy by hop 47.9 / 35.4 / 
 The registered gated reader B8 (four unshared reads) does not: hops 2, 3 at 6.3% versus 5.4% for B4@1; B8 − M1-L4
 −20.6 pp [−21.8, −19.4]. The claim is limited by Amendment B7 rule 3: the reader learns the value→key lookup over the
 768 seen names and composes inside the LM; no equivalence with the symbolic oracle, no unseen-name claim, no learned
-writer, no P3 claim. Context-retained B1/B2 at r = 32 reach 99.7–99.9% on hops 1–3 (B0 0.1–0.3%).
+writer, no P3 claim. Context-retained B1/B2 at r = 32 reach 99.65–99.93% on hops 1–3 (B0, seed 17 only: 1.00 / 0.40 / 0.45%; all memory-only
+cells of B0-B2 are 0.00%).
 
 ## Jobs and cost (`reports/p1l/jobs.json`, `--require-final`)
 101 jobs, **41.39 node·h**, one node each, no job above 2 h requested (B2: per-job cap only). Main training: 39 jobs,
