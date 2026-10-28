@@ -38,6 +38,24 @@ of the script is load-bearing), which tests the logic and not torch's or the loa
 `docs/prereg/DPFP.md` and, registered 2026-10-27 11:05 JST before any RFX, LSQ or DPFP result, `docs/prereg/RFX.md` and
 `docs/prereg/LSQ.md`.
 
+## Step 2 status (compute from 2026-10-28 23:40 JST; commits on wp/llm, nothing merged)
+Source commit of every run: `efadc36436e4d29514a4ea570596925b779b8b2d` (= b79e0f8 plus one test-fixture commit).
+- **Tests** (`t-dpfp`, job 3720636, 6m19s): everything passed except three tests of `tests/test_llm_dpfp.py` (the unit-phi-keys test for D32-3
+  and D128-1; the zero/shuffle controls). Cause, measured in jobs 3720796 and 3720880: at the fixture's adapter rank 4 the nonzero entries
+  of phi(query) and of the stored phi keys did not overlap (3 to 6 nonzeros of key_dim 8 to 24), so `M q_hat` was exactly zero: no gradient, and
+  the zero-memory control equal to the original. At rank 8 the read is nonzero. Fix: `RANK = 8` in the test file (efadc36), no assertion changed.
+  `t-dpfp2` (3720890) ran the file at efadc36: all 16 passed. DPFP-off reproduction of WP-L4 R (`t-dpfp-repro`, 3720637): passed.
+- **DPFP smokes** (3720940-42, 8m40s to 9m09s each; timings only): steady step 0.204 / 0.198 / 0.210 s (D32-3 / D128-1 / D128-3), peak CUDA
+  allocated 3.1 / 3.5 / 4.4 GB. Reload checks (`scripts/check_smoke_reload.py`, 3721044-46, 23 s each): config equal, reload identical,
+  0 prediction mismatches for all three. Release `reports/p1l-dpfp/release.json` (committed 1dd1869): E16, steps 23015 / 23690 / 22370.
+- **RFX** (smoke 3720943; science 3721047, 4m52s): entity-EM guard passed, `full_hit_entity_miss` 0 in all 42 cells. Verdicts R-r128
+  store+query, R-r32 store+query, W5-r32 none; summary `reports/p1l-rfx/summary.json` (379fccd); report `docs/reports/RFX.md`.
+- **LSQ did not run.** `lsq_arms` in the RFX summary is empty: the registered rule triggers the least-squares arms only for a storage verdict
+  (K4 and RG) or a normalization verdict (U), and neither checkpoint of R got one (store+query; W5-r32 triggers nothing). Per the
+  orchestrator's decision there is no LSQ release and no LSQ run. The LSQ code, `scripts/prepare_lsq_release.py` and the LSQ tests stay in the
+  tree unused; the LSQ commands and release text below are not to be executed.
+- DPFP arms 3721087-89 (2 h each) were running when this was written; see `docs/reports/DPFP.md` for their outcome.
+
 ## What is implemented (WP-L5: DPFP)
 DPFP is `AdapterConfig.dpfp_nu` (default 0 = off). With nu >= 1 the write key and the read query are mapped to
 `phi_nu(.)/max(||phi_nu(.)||_2, eps)` and the memory is `[B, r_mem, key_dim]`, `key_dim = 2 * r_mem * nu`.
