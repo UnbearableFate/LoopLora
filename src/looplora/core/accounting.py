@@ -52,12 +52,12 @@ def macs_per_token(
         return base + steps * cfg.r**2
     if cfg.variant not in _MEMORY_VARIANTS:
         return base
-    read = 2 * cfg.r * cfg.r_mem + cfg.r_mem**2
+    read = 2 * cfg.r * cfg.r_mem + cfg.r_mem * cfg.key_dim
     if cfg.variant == "fixedq":
         reader = steps * cfg.r**2 + (read if steps else 0)
     else:
         reader = steps * (cfg.r**2 + read)
-    writer = 2 * cfg.r * cfg.r_mem + 2 * cfg.r_mem**2
+    writer = 2 * cfg.r * cfg.r_mem + 2 * cfg.r_mem * cfg.key_dim
     if cfg.gate == "input":
         writer += 2 * cfg.r
     return base + reader + n_writes * writer
@@ -73,4 +73,4 @@ def state_bytes(
         raise TypeError("dtype must be a torch.dtype")
     if cfg.variant not in _MEMORY_VARIANTS:
         return 0
-    return n_modules * batch * cfg.r_mem**2 * dtype.itemsize
+    return n_modules * batch * cfg.r_mem * cfg.key_dim * dtype.itemsize

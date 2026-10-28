@@ -91,6 +91,40 @@ These diagnostic interventions retain WP-L3's truncated memory-only scope.
 The default `configuration(arm)` and all existing variants remain unchanged.
 This implementation support does not authorize a new scientific run.
 
+# DPFP address features (WP-L5)
+
+`looplora.llm.dpfp.configuration(arm, steps, E=16, smoke=False)` builds the three registered arms D32-3, D128-1 and
+D128-3 of `docs/prereg/DPFP.md`: WP-L4's `read_fix.configuration('R', ...)` at rank r = r_mem = 32, 128 and 128, plus
+`model.dpfp_nu` (3, 1, 3) and a descriptive `dpfp` block; nothing else differs. `AdapterConfig.dpfp_nu` (default 0 =
+off) maps write keys and read queries through `core.memory.dpfp_features` and an L2 normalization, and the memory
+becomes `[B, r_mem, key_dim]` with `key_dim = 2 * r_mem * dpfp_nu` (`docs/notation.md` section 9). Like the WP-L3 and
+WP-L4 blocks, the new keys are added after `resolve_config`: they are not YAML or default fields, so existing
+configs, config hashes and checkpoints are unchanged, and writer signatures gain `dpfp_nu` only when it is nonzero.
+The option applies to the `fact_final` writers (W1-W3, W5, R), not to the paired W4 write. One arm per job:
+`python -m looplora.llm.dpfp_run --arm D32-3 --out ROOT (--steps N --smoke | --schedule release.json)`.
+`scripts/prepare_dpfp_release.py` (standard library only, runs on the login node with `PYTHONPATH=src`) writes the
+`release.json` from the timings of the three 10% smokes and never overwrites one; `scripts/check_smoke_reload.py` (compute
+only, one short job per smoke arm, run before the release is committed) reloads the arm's smoke export and checks its
+config and predictions.
+`docs/reports/WP-L5-state.md` has the tests and smoke commands. This support alone authorizes no scientific run.
+
+# Least-squares stores and the read-failure factorial (WP-L7)
+
+`AdapterConfig.store` (`delta` default, `ridge`, `sweep`), `store_eta`, `store_sweeps` and `unit_query` (all off by
+default; `docs/notation.md` section 10) add the two LSQ stores and unit-normalized queries. Like `dpfp_nu` they are read
+from `config['model']` after `resolve_config`, so existing configs, hashes, signatures and checkpoints are unchanged and the
+writer signature gains the fields only when non-default. `looplora.llm.lsq.configuration(arm, steps, E=16, smoke=False,
+eta=None)` builds the six conditional arms L32-U, L32-K4, L32-RG, L128-U, L128-K4 and L128-RG of `docs/prereg/LSQ.md`
+(WP-L4's R at rank 32 or 128 with unit queries, plus the store fields of K4 and RG; U keeps the delta store; an `lsq` block;
+the RG arms need their registered `eta`), one arm per job:
+`python -m looplora.llm.lsq_run --arm L32-K4 --out ROOT (--steps N --smoke [--eta X] | --schedule release.json)`.
+`python -m looplora.llm.rfx_run --out DIR [--smoke]` is the evaluation-only read-failure factorial of
+`docs/prereg/RFX.md` on the three frozen WP-L4 checkpoints (its `summary.json` has the verdicts, the rescue flags and the
+LSQ arms they trigger, `lsq_arms`; it is written only if the entity-restricted EM guard passed). `scripts/prepare_lsq_release.py`
+(standard library only, login node) turns that summary and the smokes of the triggered arms into the LSQ `release.json`;
+the same `scripts/check_smoke_reload.py` reloads each smoke export before the release is committed.
+`docs/reports/WP-L5-state.md` has the step-2 order and commands. This support alone authorizes no scientific run.
+
 # Fact-only oracle writer (WP-C7)
 
 Set `writer: oracle_random`, `stage: reader`, `model.r: 32` (or `128`, P1-L B3) and

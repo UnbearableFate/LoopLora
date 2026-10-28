@@ -1,0 +1,92 @@
+{
+  "backbone_load_seconds": 1.2813353120000102,
+  "completed_at": "2026-10-28T15:48:44.453915+00:00",
+  "created_at": "2026-10-28T15:44:12.437560+00:00",
+  "entity_em_guard": {
+    "passed": true,
+    "slack": 0.005
+  },
+  "eta_by_rank": {},
+  "git_commit": "efadc36436e4d29514a4ea570596925b779b8b2d",
+  "host": "mg0771",
+  "instrumentation_failures": {
+    "R-r128": [],
+    "R-r32": [],
+    "W5-r32": []
+  },
+  "job_id": "3721047.opbs",
+  "labels": [
+    "R-r128",
+    "R-r32",
+    "W5-r32"
+  ],
+  "lsq_arms": [],
+  "rescue": {
+    "R-r128": {
+      "clean": true,
+      "decoder_refit": false,
+      "delta/raw/asis": false,
+      "delta/raw/fit": false,
+      "delta/true/asis": false,
+      "delta/true/fit": false,
+      "delta/unit/asis": false,
+      "delta/unit/fit": false,
+      "ridge/raw/asis": false,
+      "ridge/raw/fit": false,
+      "ridge/true/asis": true,
+      "ridge/true/fit": true,
+      "ridge/unit/asis": false,
+      "ridge/unit/fit": false,
+      "zero": false
+    },
+    "R-r32": {
+      "clean": true,
+      "decoder_refit": false,
+      "delta/raw/asis": false,
+      "delta/raw/fit": false,
+      "delta/true/asis": false,
+      "delta/true/fit": false,
+      "delta/unit/asis": false,
+      "delta/unit/fit": false,
+      "ridge/raw/asis": false,
+      "ridge/raw/fit": false,
+      "ridge/true/asis": true,
+      "ridge/true/fit": true,
+      "ridge/unit/asis": false,
+      "ridge/unit/fit": false,
+      "zero": false
+    },
+    "W5-r32": {
+      "clean": false,
+      "decoder_refit": false,
+      "delta/raw/asis": false,
+      "delta/raw/fit": false,
+      "delta/true/asis": false,
+      "delta/true/fit": false,
+      "delta/unit/asis": false,
+      "delta/unit/fit": false,
+      "ridge/raw/asis": false,
+      "ridge/raw/fit": false,
+      "ridge/true/asis": false,
+      "ridge/true/fit": false,
+      "ridge/unit/asis": false,
+      "ridge/unit/fit": false,
+      "zero": false
+    }
+  },
+  "rfx_eta_by_rank": {},
+  "runtime": {
+    "cublas_workspace_config": ":4096:8",
+    "deterministic_algorithms": true,
+    "gpu": "NVIDIA GH200 120GB",
+    "torch": "2.14.0+cu132"
+  },
+  "smoke": false,
+  "source_dirty": false,
+  "source_hash": "f82d1283d3afaad34956cbd367aaef1b",
+  "verdicts": {
+    "R-r128": "store+query",
+    "R-r32": "store+query",
+    "W5-r32": "none"
+  }
+}

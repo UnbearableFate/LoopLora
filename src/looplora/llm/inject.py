@@ -66,7 +66,7 @@ class AdapterBank:
     def zero_states(self, batch: int) -> dict[int, Tensor]:
         return {
             layer: torch.zeros(
-                batch, module.adapter.cfg.r_mem, module.adapter.cfg.r_mem,
+                batch, module.adapter.cfg.r_mem, module.adapter.cfg.key_dim,
                 dtype=torch.float32, device=next(module.adapter.parameters()).device,
             )
             for layer, module in self.modules.items()

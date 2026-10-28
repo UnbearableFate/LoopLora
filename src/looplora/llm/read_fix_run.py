@@ -165,7 +165,9 @@ def fit(experiment,out,steps,*,evaluate=True):
                     address_loss=float(address.detach()),value_loss=float(value.detach()),
                     read_loss=float(read.detach()),decorrelation_loss=float(decor.detach()),
                     grad_norm=float(grad),clipped=bool(grad>1),step_seconds=duration,
-                    lr=optimizer.param_groups[0]['lr'],data_seed=seed)
+                    lr=optimizer.param_groups[0]['lr'],data_seed=seed,
+                    # Optional per-experiment columns (WP-L7: store conditioning); none for the WP-L4/L5 arms.
+                    **(experiment.log_extras() if hasattr(experiment,'log_extras') else {}))
                 log.write(json.dumps(row,allow_nan=False)+'\n'); log.flush()
                 print(json.dumps(dict(arm=experiment.read_arm,**row)),flush=True)
             if evaluate and step in checkpoints:

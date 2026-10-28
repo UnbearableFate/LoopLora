@@ -4,7 +4,8 @@ Source: plan §4–§6, §10 and Appendix A. Where this file is more specific th
 
 ## 1. Shapes and conventions
 Math uses column vectors. Code uses row-major batches: `x: [B, T, d_in]`; parameter matrices are stored with
-their math shape and applied as `x @ A.T`. Memory `M: [B, r_m, r_m]` maps key → value:
+their math shape and applied as `x @ A.T`. Memory `M: [B, r_m, r_m]` (`[B, r_m, 2 r_m ν]` with the optional DPFP
+features of §9) maps key → value:
 `m = M q` ⇔ `einsum("bij,bj->bi", M, q)`; a write `err kᵀ` ⇔ `einsum("bi,bj->bij", err, k)`.
 
 | Symbol | Shape (math) | Meaning | Trainable |
@@ -85,3 +86,33 @@ or the non-skip form with nonzero A, B and an outer scalar gate `g` initialised 
 `F(z) = u + ρ φ(H z)`, `H = R + U M Q`; `c = |ρ| L_φ ‖H‖₂ < 1` ⇒ unique fixed point and
 `‖z_s − z*‖ ≤ e_s / (1 − c)`, `e_s = ‖F(z_s) − z_s‖`. Use the bound `c ≤ |ρ| (‖R‖₂ + ‖U‖₂‖M‖₂‖Q‖₂)`
 when H is not formed. The bound says nothing about task correctness.
+
+## 9. Optional DPFP address features (WP-L5; off by default, `dpfp_nu = 0`)
+With `dpfp_nu = ν ≥ 1`, writer keys and reader queries pass through the parameter-free feature map of Schlag, Irie &
+Schmidhuber (2021, §5.4) before the unit normalization; values and everything else are unchanged:
+```
+r = ReLU([k; −k]) ;  φ_ν(k) = [ r ⊙ roll(r, j) ]_{j=1..ν} ∈ R^{2 d ν}      (roll shifts the last axis by j)
+k̂ = φ_ν(K u) / max(‖φ_ν(K u)‖₂, ε) ;  q̂ = φ_ν(Q z) / max(‖φ_ν(Q z)‖₂, ε)
+M ∈ R^{r_m × 2 r_m ν} ;  write: §3 with k̂ in place of k ;  read: m = M_prev q̂
+```
+φ_ν is nonnegative and homogeneous of degree two. Because ‖k̂‖ = 1, the §3 write overwrites exactly at β = 1
+(`M_new k̂ = v`), which is why L2 replaces Schlag et al.'s sum normalization. Address similarities (InfoNCE, key Gram,
+the exact Gram read) use `q̂·k̂_j` and `k̂_i·k̂_j` in φ space. Accounting (§7) uses `key_dim = 2 r_m ν` in place of
+`r_m` for `M q̂`, `M̄ k̂` and the outer product, and for the state bytes; φ_ν adds no parameters. With `ν = 0`, §2–§7 hold exactly.
+
+## 10. Optional least-squares stores and unit queries (WP-L7; off by default, `store = "delta"`, `unit_query = False`)
+`unit_query`: the read uses `q̂ = Q z / max(‖Q z‖₂, ε)` (read: `m = M_prev q̂`). `store` replaces the §3 write of one row's
+`n` final-only support writes (unit keys `k_j = K u_j / max(‖K u_j‖₂, ε)`, values `v_j = V u_j`; scalar gates;
+`Mb = λⁿ M₀`, `M₀ = 0` for a fresh support); `K = [k_1 … k_n] ∈ R^{r_m × n}`, `V = [v_1 … v_n]`, `W = diag(λ^{n−1−j})`:
+```
+ridge  (store_eta = η):    M = Mb + (V − Mb K) W Kᵀ (K W Kᵀ + η I)⁻¹      (weighted ridge least squares; solved in float64
+                           through the n×n system by Cholesky, differentiable; M k_j = v_j as η → 0 for independent keys)
+sweep  (store_sweeps = S): the β = 1 delta scan of §3 over the same n writes, repeated S times (Kaczmarz; at λ = 1 and
+                           independent keys the iterates converge to the interpolant as S grows)
+```
+Both read as §2 (`q̂` when `unit_query`), neither uses β, both need `gate = "scalar"` and no DPFP. `write` and
+`scan_prewrite` (online per-token writes) raise for a non-delta store. `unit_query` alone with `store = "delta"` is the
+unit-query-only arm U of the LSQ study: the §3 write and its learned λ and β are unchanged, only the read normalizes.
+The exact read `m = Σ_j d_j v_j` is available as `memory.ridge_coefficients` / `memory.sweep_coefficients`;
+`memory.gram_conditions` gives the (finite) condition numbers of the `n × n` key Gram `KᵀK` and of the weighted ridge
+system `W^½ KᵀK W^½ + η I`. With the defaults §2–§7 hold exactly.

@@ -79,6 +79,8 @@ class _WriterFix:
     def __init__(self,initial,arm: str):
         if arm not in ARMS:
             raise ValueError('unknown writer-fix arm')
+        if arm=='W4' and initial.cfg.dpfp_nu:
+            raise ValueError('DPFP features apply to the fact_final writers, not the paired W4 write')
         # Preserve the caller RNG; shared parameters are copied exactly below.
         with torch.random.fork_rng(devices=[]):
             torch.random.default_generator.manual_seed(derive_seed(17,'writer-fix-container'))
@@ -92,6 +94,7 @@ class _WriterFix:
         self.register_buffer('input_std',torch.ones(initial.cfg.d_in))
         self.phase = 'idle'
         self.positions = self.support_x = self.keys = self.values = self.oracle_values = None
+        self.base_keys = None
 
     def u(self,x: Tensor) -> Tensor:
         if self.arm in {'W1','W5'}:
@@ -122,8 +125,12 @@ class _WriterFix:
         # Match the core scan's per-write projection shape and FP32 rounding.
         inputs,kmap,vmap = ((packed,K,V) if self.arm=='W4' else (ku,self.K,self.V))
         raw = [F.linear(inputs[:,j],kmap) for j in range(inputs.shape[1])]
-        self.keys = torch.stack([k/torch.linalg.vector_norm(k,dim=-1,keepdim=True).clamp_min(
-            self.cfg.eps) for k in raw],1)
+        unit = lambda k: k/torch.linalg.vector_norm(k,dim=-1,keepdim=True).clamp_min(self.cfg.eps)
+        self.keys = torch.stack([unit(k) for k in raw],1)
+        if self.cfg.dpfp_nu:
+            # Keys are the unit DPFP features actually written; base_keys keep the projected space.
+            self.base_keys = self.keys
+            self.keys = torch.stack([unit(memory.dpfp_features(k,self.cfg.dpfp_nu)) for k in raw],1)
         self.values = torch.stack([F.linear(inputs[:,j],vmap) for j in range(inputs.shape[1])],1)
         return final
 
@@ -162,6 +169,7 @@ class FixBatch(PreparedBatch):
     values: Tensor
     positions: Tensor
     raw_support: Tensor
+    base_keys: Tensor | None = None
 
 
 class WriterFixExperiment(LLMExperiment):
@@ -202,7 +210,7 @@ class WriterFixExperiment(LLMExperiment):
         return FixBatch(snapshot,tokens.question_ids,tokens.question_mask,tokens.answer_ids,
             tokens.candidate_ids,tokens.candidate_mask,arrays,int(tokens.support_mask.sum()),
             write_mask.sum(-1),tokens.support_ids,tokens.support_mask,write_mask,
-            self.adapter.keys,self.adapter.values,positions,self.adapter.support_x)
+            self.adapter.keys,self.adapter.values,positions,self.adapter.support_x,self.adapter.base_keys)
 
     def score(self,prepared,L=None,*,capture_inputs=False):
         if L is None:
@@ -265,6 +273,9 @@ def query_codes(experiment,batch,question_x):
     # The addressing target supervises the first read, whose state is z^0 = u.
     Q = experiment.adapter.Q[0] if experiment.adapter.cfg.variant=='unshared' else experiment.adapter.Q
     raw = F.linear(experiment.adapter.u(x.float()),Q)
+    if experiment.adapter.cfg.dpfp_nu:
+        # DPFP: the address is the unit feature code that the deployed read uses.
+        return experiment.adapter.query_code(raw)
     return F.normalize(raw,dim=-1,eps=experiment.adapter.cfg.eps)
 
 
