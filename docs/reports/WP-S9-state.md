@@ -1032,6 +1032,7 @@ Interpretations made in step 1f, stated as they are implemented (none changes a 
 | tsm-smoke | 3720907.opbs | | submitted at CODE with the lock file committed as TSM_LOCK 1bf689b, `--procs 6`, walltime 00:20:00; queued |
 | cvh-analyze | 3720920.opbs | 0.01 | exit 0; passing: oracle_random/r32/M1/A1 only; `reports/cvh/results` |
 | tsm-smoke | 3720907.opbs | 0.01 | exit 0 (34 s); passed. Checked: all six cells (writer x arm T0, T1, T2, seed 17) complete with 200 steps, every final loss finite, validation on 200 episodes (6400 rows per T arm = 200 x 4 depths x 8 hops, 1600 per B4 reference), `steps` 200 in smoke.json. extrapolated_run_seconds 737 to 873 s per run at 6 concurrent runs; the 18 runs about 14916 s in all, 2486 s at 6 procs |
-| tsm-train-17 | 3720958.opbs | | submitted at CODE with TSM_LOCK 1bf689b, `--procs 6 --seeds 17 --label s17`, walltime 00:25:00 (6 runs of about 850 s each at 6 concurrent, x 1.5 plus start-up) |
-| tsm-train-29 | 3720959.opbs | | the same for seed 29, `--label s29` |
-| tsm-train-43 | 3720960.opbs | | the same for seed 43, `--label s43` |
+| tsm-train-17 | 3720958.opbs | 0.24 | exit 0 (14 m 20 s of 25 min walltime; `--procs 6 --seeds 17 --label s17`, TSM_LOCK 1bf689b); manifest `complete`, 6 runs started, no training failure, none unfinished; all 6 records complete at 15000 steps, attempt 1 |
+| tsm-train-29 | 3720959.opbs | 0.24 | exit 0 (14 m 20 s of 25 min walltime; `--procs 6 --seeds 29 --label s29`, TSM_LOCK 1bf689b); manifest `complete`, 6 runs started, no training failure, none unfinished; all 6 records complete at 15000 steps, attempt 1 |
+| tsm-train-43 | 3720960.opbs | 0.24 | exit 0 (14 m 20 s of 25 min walltime; `--procs 6 --seeds 43 --label s43`, TSM_LOCK 1bf689b); manifest `complete`, 6 runs started, no training failure, none unfinished; all 6 records complete at 15000 steps, attempt 1 |
+| tsm-eval | 3721099.opbs | | submitted at the training CODE d32463e (first attempt, no flags), TSM_LOCK 1bf689b, walltime 00:20:00; all 18 runs final (18 records complete, 0 attempts moved aside) |
