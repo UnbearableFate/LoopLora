@@ -20,6 +20,23 @@ from looplora.llm.inject import MODEL_ID, MODEL_REVISION, attach_adapters, backb
 from looplora.llm.train import LLMExperiment
 
 P1L_R128 = ROOT / "configs/p1l/main-r128"
+RECORDED = {
+    "B3-L4-s17": "b7931c9835a6a01a2c541c943dcb9e18",
+    "B3-L4-s29": "c11d70f5a28e73eeddd69d1ab037f46d",
+    "B3-L4-s43": "9503532e1e373ead94356bba3cb044f8",
+    "B4-s17": "be4343ffeedc1474f63dcd2354fa4cc7",
+    "B4-s29": "c215ddc72e6107f89fd3d9635304df9a",
+    "B4-s43": "72cc3bbbb5773edd749934d171bc36ed",
+    "B5-L4-s17": "fb3121a540a8603a3b111a001ce33c5a",
+    "B5-L4-s29": "05af0dad7d6bf41155a3b31aff2962da",
+    "B5-L4-s43": "abf18f7b02ef413d8d0c006364d6ac6a",
+    "B8-s17": "97174328c2defbc8708330296fe21113",
+    "B8-s29": "2f5acd6bd4f6e2d67d723b4aa0d6d1cc",
+    "B8-s43": "7e60777e32e36d74a4844f7960dadaff",
+    "M1-L4-s17": "8b56ec347c3f0be8f1c2f95a5237ebfa",
+    "M1-L4-s29": "a4adcccd53043d1af222c41a69a4a1c1",
+    "M1-L4-s43": "2a6e14e563901dded61c510a81004810",
+}
 
 
 def read(path):
@@ -29,14 +46,14 @@ def read(path):
 # ---------------------------------------------------------------------------------- the off path is unchanged
 
 def test_resolved_p1l_r128_configs_keep_their_recorded_hashes():
-    """Every committed P1-L r = 128 training config resolves to the config_hash its finished run recorded."""
-    recorded = {run["name"]: run["config_hash"] for run in read(ROOT / "reports/p1l/r128/run-manifest.json")["runs"]}
+    """Every committed P1-L r = 128 training config resolves to the config_hash its finished training run recorded
+    (record.json of runs/p1l/main/r128/main, read before the backbone option existed)."""
     names = sorted(path.stem for path in P1L_R128.glob("*.json"))
-    assert len(names) == 15 and set(names) <= set(recorded)
+    assert names == sorted(RECORDED)
     for name in names:
         resolved = resolve_config(read(P1L_R128 / f"{name}.json"))
         assert "backbone" not in resolved
-        assert stable_hash(resolved) == recorded[name], name
+        assert stable_hash(resolved) == RECORDED[name], name
 
 
 def test_backbone_is_an_optional_key_outside_the_defaults():
