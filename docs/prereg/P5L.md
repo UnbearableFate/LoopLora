@@ -1,7 +1,8 @@
-# P5L pre-registration — second-scale confirmation of the P1-L r = 128 oracle result on Qwen3-1.7B-Base (DRAFT v1, 2026-10-29)
+# P5L pre-registration — second-scale confirmation of the P1-L r = 128 oracle result on Qwen3-1.7B-Base (v1, registered 2026-10-29 05:19 JST)
 
-Status: **draft for the orchestrator to review and register on master before any run.** Written by sn-p1l
-(WP-P5L step 1, `docs/tasks/WP-P5L_second_scale.md`). Nothing below depends on any P5L score: none exists, and none
+Status: **registered** by the orchestrator on 2026-10-29 05:19 JST, before any P5L score exists. Drafted by sn-p1l
+(WP-P5L step 1, `docs/tasks/WP-P5L_second_scale.md`, wp/p1l d998f29); the orchestrator's decisions on the draft are in
+"Decisions at registration" at the end. Nothing below depends on any P5L score: none exists, and none
 was computed. The 1.7B timing smokes (`docs/reports/P5L-state.md`) expose only step times and peak memory
 (`smoke=True` never evaluates; no loss or accuracy field was read).
 
@@ -16,8 +17,9 @@ unseen-name claim.
 
 ## Information seen before registration
 - P1-L confirmation (test [100000, 102000)) and P1L-C (test [102000, 104000), 0.6B) results: `reports/decisions/P1L.md`,
-  `docs/reports/P1L-C.md`. P1L-C scored the 0.6B readers on the same episodes that P5L confirms on at 1.7B; no P5L
-  design choice below uses them (the design is P1-L's, with the backbone replaced).
+  `docs/reports/P1L-C.md`. No P5L design choice uses them (the design is P1-L's, with the backbone replaced). P5L
+  confirms on a test range no study has used or registered (below), so no episode of its confirmation set was scored
+  at either scale.
 - Timing and memory only at 1.7B: 100-step smokes of all five readers (seed 17, r = 128) and 1,700-step (10%) smokes of
   B8 and M1-L4; no score. Numbers in "Training budget".
 - Qwen3-1.7B-Base tokenizer files (`tokenizer.json`, `vocab.json`, `merges.txt`, `tokenizer_config.json`) have the same
@@ -42,7 +44,8 @@ unseen-name claim.
 - **Learning rates** carried from the P1-L r = 128 lock (`reports/p1l/r128/lr-S-lock.json`): **0.003 for B8, M1-L4, B4
   and B5-L4; 0.001 for B3-L4**. There is **no lr pilot**; this is a carried choice, not a selection at 1.7B. If a
   reader fails to learn at the carried lr, that is part of the result (B7), not a reason to retune.
-- **Confirmation set**: split `test`, episodes [102000, 104000) (disjoint from P1-L's [100000, 102000)), eval seed
+- **Confirmation set**: split `test`, episodes [104000, 106000) (disjoint from P1-L's [100000, 102000), P1L-C's
+  [102000, 104000) and P1L-S's registered [110000, 112000)), eval seed
   4242, 2000 episodes, memory-only protocol, hops 1–8, primary and `t2_typed` settings as P1-L. It is evaluated only
   after all 15 trainings have finished and the committed authorization names it (below).
 - **Intervals** 97.5% (1 − 0.05/2; two gated contrasts, B6's and G1-L's), paired episode bootstrap with 2000 draws and the
@@ -102,15 +105,23 @@ registration: 16.1–18.1 node·h**, plus the 0.36 node·h already spent on step
    above, `status: locked`) is committed before the first main training; `scripts/run_p5l.py main` checks that the
    lock, the prereg file and the configs agree. Jobs are pinned to a source commit (`submit.py --commit`).
 2. All 15 trainings finish and are verified (complete records, checkpoints, the unchanged oracle memory hash).
-3. A confirmation authorization (condition `p5l-r128`, 97.5%, window `p5l` = test [102000, 104000)) is committed;
+3. A confirmation authorization (condition `p5l-r128`, 97.5%, window `p5l` = test [104000, 106000)) is committed;
    the evaluator and finalizer are the P1-L ones, extended (not changed) for the study profile, the named window and
    the 1.7B backbone read from each checkpoint's config. No confirmation episode is generated before that commit.
 4. Finalizer outputs, decision record `reports/decisions/P5L.md` and report `docs/reports/P5L.md` follow.
 
-## Deviations flagged for the orchestrator
-- **B6 is the decision contrast, and the hop-1 and typed criteria of G1-L are reported with it, not required.**
-  P1-L's Amendment B6 wording ("meets the G1-L criterion") is read as the three-part rule above, as in
-  `reports/decisions/P1L.md` §3. Say if the stricter reading is wanted before registration.
-- k = 2 (97.5%) is kept from P1-L although only one condition is gated; the two contrasts are B6's and G1-L's.
-- The 1.7B step time is only about 1.2× the 0.6B's, so the scale test runs at about the P1-L training cost.
-- Same test window as P1L-C (see "Information seen").
+## Decisions at registration (orchestrator, 2026-10-29 05:19 JST)
+- **B6 reading accepted** as written: the decision contrast is M1-L4@4 − B4@1 on hops {2, 3}, ≥ 3 pp, 97.5% CI > 0,
+  positive in every seed; its hop-1 and `t2_typed` values are reported, not required. This is how B6 was applied in
+  `reports/decisions/P1L.md` §3, so the two scales are judged by the same rule.
+- **97.5% kept** from P1-L for comparability (two gated contrasts, B6's and G1-L's).
+- **Confirmation window changed** from the draft's [102000, 104000) (P1L-C's, already scored at 0.6B) to the unused
+  [104000, 106000); `CONFIRMATION_WINDOWS` gets `p5l: 104000`.
+- **Smoke deviation accepted**: the 10% (1,700-step) smoke ran for B8 and M1-L4 only, and 100-step timing smokes for the
+  other three readers, to stay within the 0.5 node·h step-1 budget; the 100- and 1,700-step step times of B8 and M1-L4
+  agree within 2%. Step 1 used 0.36 node·h.
+- **No resume path**: the slowest reader requests 1.67 h, inside one 2 h job; a run killed at walltime is rerun from
+  scratch as stated above.
+- **Step 2**: sn-p1l builds the evaluator/finalizer extension (study profile, window, B0, backbone from the checkpoint
+  config) with tests, and may time a validation-only evaluation on the smoke checkpoints to replace the confirmation
+  projection; neither reads a confirmation episode.
