@@ -1,6 +1,6 @@
-# WP-P5L state — step 1 done; step 2: 15 trainings and B0 done and verified, authorization committed, no confirmation episode generated
+# WP-P5L state — step 1 and step 2 done; confirmation evaluated, finalized, decision record and report written (holds at second scale)
 
-As of 2026-10-29 05:20 JST. Author: sn-p1l (Claude Sonnet 5.5), branch `wp/p1l`. Task: `docs/tasks/WP-P5L_second_scale.md`
+As of 2026-10-29 (final). Author: sn-p1l (Claude Sonnet 5.5), branch `wp/p1l`. Task: `docs/tasks/WP-P5L_second_scale.md`
 (master `1fcf56a`, merged into wp/p1l first). Prereg draft: `docs/prereg/P5L.md`. Nothing was trained beyond the smokes;
 no score was computed or read.
 
@@ -102,3 +102,32 @@ the manifest and `reports/p5l/confirmation-authorization.json` (hashes of prereg
 Main training: 16 jobs, 14.74 node·h (projection 14.8). Step 1 (tests and smokes): 0.36 node·h. Total so far 15.17 node·h.
 Next, after the orchestrator's reply on the authorization: 16 evaluation jobs (one per reader group, `ev-p5l-*`), the manifest of
 evaluations, `finalize_p5l.py`, the decision record `reports/decisions/P5L.md` and the report `docs/reports/P5L.md`.
+
+## Step 2, final stage: confirmation evaluation, finalizer, decision (2026-10-29)
+Authorization released by the orchestrator at `ad8efb5`. Evaluation, test and finalizer jobs all ran pinned to
+`ad8efb5eab5821bae898ebfcb2838869c4de16e5` and exited 0 (exit 0 was not taken as success, see the checks below).
+
+| Jobs | Name | node·h |
+| --- | --- | ---: |
+| 3722013 / 3722015 / 3722017 | `ev-p5l-B8-s17/29/43` | 0.064 / 0.066 / 0.065 |
+| 3722014 / 3722016 / 3722018 | `ev-p5l-M1-L4-s17/29/43` | 0.200 / 0.199 / 0.197 |
+| 3722019 / 3722020 / 3722021 | `ev-p5l-B4`, `ev-p5l-B5-L4`, `ev-p5l-B3-L4` (three seeds each) | 0.034 / 0.034 / 0.032 |
+| 3722022 | `ev-p5l-B0` | 0.041 |
+| 3722023 | `t-p5l-pipeline3` (`tests/test_p5l_pipeline.py` etc., 58 passed, no F or E) | 0.014 |
+| 3722052 | `fin-p5l` (`finalize_p5l.py`, status complete) | 0.008 |
+Evaluation: 10 jobs, 0.93 node·h (projection 1.2-3.2); with the test and finalizer jobs 0.95. Whole study
+(`reports/p5l/jobs.json`, `--study p5l --require-final`): **38 jobs, 16.12 node·h** (projection 16.1-18.1 plus 0.36 step 1);
+the only non-zero exits are the three test-fix jobs listed above (3721808, 3721815, 3721889).
+
+Checks before finalizing: every one of the 16 evaluation records is complete; confirmation window `p5l`, test episodes
+[104000, 106000) (`episode_ranges`), eval seed 4242, 2000 episodes, hops 1-8, backbone revision `ea980cb`; loop counts as
+registered (M1-L4 depths 1-8 and the trained depth 4, B8, B5-L4 and B3-L4 L = 4, B4 and B0 L = 1); the checkpoint hash in each
+record equals the training manifest's and the file's; source `ad8efb5` in every receipt.
+
+Walltime of M1-L4 against B8 (per job about 3.1x; per `evaluate()` about 5.5-5.9x). M1-L4 reads at 8 depths in the primary and typed
+settings and 3 depths in `swap_successors`, B8 at one depth, so M1-L4 does about 5-6x the forward work of one B8 evaluation.
+Comparison with P1-L's r = 128 confirmation (0.6B): there B8 took 0.24 node·h and M1-L4 0.61 (ratio about 2.5), because B8's time
+included the J-lens readout, which P5L does not run; with the readout excluded the `evaluate()` part (primary plus typed,
+from the timing files) is about 37 s for B8 and 200-220 s for M1-L4 at both scales (ratio 5.5 at 0.6B, 5.9 at 1.7B). So
+the ratio is the same at 0.6B; the difference between 2.5 and 3.3 per job is the readout time, not the scale. The swap
+and inference stages are not broken out in the timing files, so their share is not separated.

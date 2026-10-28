@@ -1,0 +1,268 @@
+== reports/p5l/r128 endpoints: G1 False G2 True B7 True ==
+  B8_vs_M1: -24.75 [-26.07,-23.45] (7.21 vs 31.96) per seed 17:-24.73, 29:-24.77, 43:-24.75
+  G1_hop1: -1.72 [-3.32,-0.02] (28.93 vs 30.65) per seed 17:-1.80, 29:-0.30, 43:-3.05
+  G1_reach: 1.03 [0.29,1.80] (7.21 vs 6.17) per seed 17:0.20, 29:1.73, 43:1.18
+  G1_typed: 1.13 [0.27,1.94] (7.06 vs 5.93) per seed 17:0.38, 29:3.30, 43:-0.30
+  G2_fixed_query: 1.67 [0.91,2.38] (7.21 vs 5.53) per seed 17:0.55, 29:3.60, 43:0.88
+  G2_no_memory: 7.17 [6.58,7.76] (7.21 vs 0.04) per seed 17:6.22, 29:8.82, 43:6.45
+  M1_depth_far: 3.28 [2.86,3.71] (3.78 vs 0.50) per seed 17:3.62, 29:3.22, 43:3.00
+  M1_depth_reach: 31.46 [30.27,32.63] (31.96 vs 0.50) per seed 17:30.20, 29:33.32, 43:30.85
+  M1_vs_B3: 31.92 [30.73,33.21] (31.96 vs 0.04) per seed 17:30.95, 29:33.60, 43:31.20
+  M1_vs_B4: 25.78 [24.53,27.03] (31.96 vs 6.17) per seed 17:24.93, 29:26.50, 43:25.92
+  M1_vs_B5: 26.42 [25.14,27.82] (31.96 vs 5.53) per seed 17:25.27, 29:28.38, 43:25.62
+  M1_walk_specificity: 28.18 [26.84,29.43] per seed 17:26.58, 29:30.11, 43:27.85
+  B7 B4_vs_B3_hop1: 30.62 [29.17,32.23] (30.65 vs 0.03)
+  B7 B8_vs_B3_hop1: 28.90 [27.52,30.43] (28.93 vs 0.03)
+  B7 M1_vs_B3_hop1: 58.67 [56.98,60.40] (58.70 vs 0.03)
+== reports/p5l/r128 accuracy (full-vocabulary EM %, seed mean; n_seeds; per seed) ==
+  context_retained B0     L=1 hop1:  26.35 (n=1; 17:26.35)
+  context_retained B0     L=1 hop2:  11.00 (n=1; 17:11.00)
+  context_retained B0     L=1 hop3:   7.05 (n=1; 17:7.05)
+  context_retained B0     L=1 hop4:   7.15 (n=1; 17:7.15)
+  context_retained B0     L=1 hop5:   7.10 (n=1; 17:7.10)
+  context_retained B0     L=1 hop6:   7.60 (n=1; 17:7.60)
+  context_retained B0     L=1 hop7:   7.15 (n=1; 17:7.15)
+  context_retained B0     L=1 hop8:   7.55 (n=1; 17:7.55)
+  memory_only      B0     L=1 hop1:   0.00 (n=1; 17:0.00)
+  memory_only      B0     L=1 hop2:   0.00 (n=1; 17:0.00)
+  memory_only      B0     L=1 hop3:   0.00 (n=1; 17:0.00)
+  memory_only      B0     L=1 hop4:   0.00 (n=1; 17:0.00)
+  memory_only      B0     L=1 hop5:   0.00 (n=1; 17:0.00)
+  memory_only      B0     L=1 hop6:   0.00 (n=1; 17:0.00)
+  memory_only      B0     L=1 hop7:   0.00 (n=1; 17:0.00)
+  memory_only      B0     L=1 hop8:   0.00 (n=1; 17:0.00)
+  memory_only      B3-L4  L=4 hop1:   0.03 (n=3; 17:0.00, 29:0.00, 43:0.10)
+  memory_only      B3-L4  L=4 hop2:   0.03 (n=3; 17:0.00, 29:0.00, 43:0.10)
+  memory_only      B3-L4  L=4 hop3:   0.05 (n=3; 17:0.00, 29:0.05, 43:0.10)
+  memory_only      B3-L4  L=4 hop4:   0.00 (n=3; 17:0.00, 29:0.00, 43:0.00)
+  memory_only      B3-L4  L=4 hop5:   0.05 (n=3; 17:0.00, 29:0.00, 43:0.15)
+  memory_only      B3-L4  L=4 hop6:   0.03 (n=3; 17:0.00, 29:0.00, 43:0.10)
+  memory_only      B3-L4  L=4 hop7:   0.03 (n=3; 17:0.00, 29:0.00, 43:0.10)
+  memory_only      B3-L4  L=4 hop8:   0.03 (n=3; 17:0.00, 29:0.00, 43:0.10)
+  memory_only      B4     L=1 hop1:  30.65 (n=3; 17:28.95, 29:31.60, 43:31.40)
+  memory_only      B4     L=1 hop2:   6.17 (n=3; 17:6.20, 29:7.00, 43:5.30)
+  memory_only      B4     L=1 hop3:   6.18 (n=3; 17:5.85, 29:7.25, 43:5.45)
+  memory_only      B4     L=1 hop4:   5.53 (n=3; 17:6.05, 29:6.05, 43:4.50)
+  memory_only      B4     L=1 hop5:   5.53 (n=3; 17:6.00, 29:5.45, 43:5.15)
+  memory_only      B4     L=1 hop6:   5.62 (n=3; 17:5.90, 29:5.55, 43:5.40)
+  memory_only      B4     L=1 hop7:   5.55 (n=3; 17:6.40, 29:5.60, 43:4.65)
+  memory_only      B4     L=1 hop8:   5.72 (n=3; 17:5.05, 29:6.75, 43:5.35)
+  memory_only      B5-L4  L=4 hop1:  28.88 (n=3; 17:25.40, 29:30.95, 43:30.30)
+  memory_only      B5-L4  L=4 hop2:   5.22 (n=3; 17:5.20, 29:5.40, 43:5.05)
+  memory_only      B5-L4  L=4 hop3:   5.85 (n=3; 17:6.15, 29:5.10, 43:6.30)
+  memory_only      B5-L4  L=4 hop4:   5.58 (n=3; 17:5.55, 29:5.55, 43:5.65)
+  memory_only      B5-L4  L=4 hop5:   5.67 (n=3; 17:5.90, 29:5.55, 43:5.55)
+  memory_only      B5-L4  L=4 hop6:   5.43 (n=3; 17:5.70, 29:5.40, 43:5.20)
+  memory_only      B5-L4  L=4 hop7:   5.60 (n=3; 17:5.85, 29:5.35, 43:5.60)
+  memory_only      B5-L4  L=4 hop8:   5.83 (n=3; 17:5.85, 29:6.15, 43:5.50)
+  memory_only      B8     L=4 hop1:  28.93 (n=3; 17:27.15, 29:31.30, 43:28.35)
+  memory_only      B8     L=4 hop2:   8.17 (n=3; 17:6.60, 29:11.05, 43:6.85)
+  memory_only      B8     L=4 hop3:   6.25 (n=3; 17:5.85, 29:6.65, 43:6.25)
+  memory_only      B8     L=4 hop4:   6.28 (n=3; 17:6.10, 29:6.45, 43:6.30)
+  memory_only      B8     L=4 hop5:   5.97 (n=3; 17:6.10, 29:6.15, 43:5.65)
+  memory_only      B8     L=4 hop6:   5.73 (n=3; 17:5.65, 29:5.90, 43:5.65)
+  memory_only      B8     L=4 hop7:   5.57 (n=3; 17:5.60, 29:5.65, 43:5.45)
+  memory_only      B8     L=4 hop8:   6.20 (n=3; 17:6.15, 29:6.05, 43:6.40)
+  memory_only      M1-L4  L=1 hop1:  34.07 (n=3; 17:46.05, 29:30.10, 43:26.05)
+  memory_only      M1-L4  L=1 hop2:   0.48 (n=3; 17:0.70, 29:0.20, 43:0.55)
+  memory_only      M1-L4  L=1 hop3:   0.52 (n=3; 17:0.80, 29:0.40, 43:0.35)
+  memory_only      M1-L4  L=1 hop4:   0.45 (n=3; 17:0.55, 29:0.40, 43:0.40)
+  memory_only      M1-L4  L=1 hop5:   0.53 (n=3; 17:0.75, 29:0.25, 43:0.60)
+  memory_only      M1-L4  L=1 hop6:   0.50 (n=3; 17:0.75, 29:0.20, 43:0.55)
+  memory_only      M1-L4  L=1 hop7:   0.48 (n=3; 17:0.60, 29:0.35, 43:0.50)
+  memory_only      M1-L4  L=1 hop8:   0.52 (n=3; 17:0.55, 29:0.50, 43:0.50)
+  memory_only      M1-L4  L=2 hop1:  77.60 (n=3; 17:78.55, 29:79.80, 43:74.45)
+  memory_only      M1-L4  L=2 hop2:  10.90 (n=3; 17:10.95, 29:9.25, 43:12.50)
+  memory_only      M1-L4  L=2 hop3:   1.23 (n=3; 17:1.90, 29:0.90, 43:0.90)
+  memory_only      M1-L4  L=2 hop4:   1.33 (n=3; 17:1.60, 29:1.00, 43:1.40)
+  memory_only      M1-L4  L=2 hop5:   1.10 (n=3; 17:1.70, 29:0.75, 43:0.85)
+  memory_only      M1-L4  L=2 hop6:   1.22 (n=3; 17:1.65, 29:0.90, 43:1.10)
+  memory_only      M1-L4  L=2 hop7:   1.15 (n=3; 17:1.60, 29:0.95, 43:0.90)
+  memory_only      M1-L4  L=2 hop8:   1.08 (n=3; 17:1.35, 29:0.70, 43:1.20)
+  memory_only      M1-L4  L=3 hop1:  70.63 (n=3; 17:68.95, 29:75.15, 43:67.80)
+  memory_only      M1-L4  L=3 hop2:  34.63 (n=3; 17:35.90, 29:34.65, 43:33.35)
+  memory_only      M1-L4  L=3 hop3:   6.55 (n=3; 17:6.40, 29:6.90, 43:6.35)
+  memory_only      M1-L4  L=3 hop4:   1.80 (n=3; 17:1.90, 29:1.40, 43:2.10)
+  memory_only      M1-L4  L=3 hop5:   1.95 (n=3; 17:2.40, 29:1.40, 43:2.05)
+  memory_only      M1-L4  L=3 hop6:   2.27 (n=3; 17:2.65, 29:2.10, 43:2.05)
+  memory_only      M1-L4  L=3 hop7:   2.18 (n=3; 17:2.70, 29:2.25, 43:1.60)
+  memory_only      M1-L4  L=3 hop8:   1.85 (n=3; 17:2.00, 29:1.65, 43:1.90)
+  memory_only      M1-L4  L=4 hop1:  58.70 (n=3; 17:57.20, 29:59.10, 43:59.80)
+  memory_only      M1-L4  L=4 hop2:  41.45 (n=3; 17:39.80, 29:43.85, 43:40.70)
+  memory_only      M1-L4  L=4 hop3:  22.47 (n=3; 17:22.10, 29:23.40, 43:21.90)
+  memory_only      M1-L4  L=4 hop4:   6.23 (n=3; 17:6.05, 29:6.00, 43:6.65)
+  memory_only      M1-L4  L=4 hop5:   3.10 (n=3; 17:3.55, 29:3.10, 43:2.65)
+  memory_only      M1-L4  L=4 hop6:   3.78 (n=3; 17:4.10, 29:3.70, 43:3.55)
+  memory_only      M1-L4  L=4 hop7:   3.63 (n=3; 17:4.15, 29:3.35, 43:3.40)
+  memory_only      M1-L4  L=4 hop8:   3.92 (n=3; 17:4.50, 29:3.65, 43:3.60)
+  memory_only      M1-L4  L=5 hop1:  44.88 (n=3; 17:42.70, 29:47.10, 43:44.85)
+  memory_only      M1-L4  L=5 hop2:  36.45 (n=3; 17:34.30, 29:38.05, 43:37.00)
+  memory_only      M1-L4  L=5 hop3:  29.30 (n=3; 17:27.60, 29:31.70, 43:28.60)
+  memory_only      M1-L4  L=5 hop4:  15.32 (n=3; 17:15.20, 29:15.75, 43:15.00)
+  memory_only      M1-L4  L=5 hop5:   5.88 (n=3; 17:5.90, 29:6.30, 43:5.45)
+  memory_only      M1-L4  L=5 hop6:   5.22 (n=3; 17:5.45, 29:5.10, 43:5.10)
+  memory_only      M1-L4  L=5 hop7:   5.80 (n=3; 17:6.00, 29:6.25, 43:5.15)
+  memory_only      M1-L4  L=5 hop8:   6.02 (n=3; 17:6.45, 29:5.65, 43:5.95)
+  memory_only      M1-L4  L=6 hop1:  34.93 (n=3; 17:33.05, 29:36.90, 43:34.85)
+  memory_only      M1-L4  L=6 hop2:  30.15 (n=3; 17:28.80, 29:31.15, 43:30.50)
+  memory_only      M1-L4  L=6 hop3:  27.03 (n=3; 17:25.95, 29:28.55, 43:26.60)
+  memory_only      M1-L4  L=6 hop4:  20.90 (n=3; 17:19.90, 29:22.30, 43:20.50)
+  memory_only      M1-L4  L=6 hop5:  11.95 (n=3; 17:10.55, 29:13.55, 43:11.75)
+  memory_only      M1-L4  L=6 hop6:   7.48 (n=3; 17:8.00, 29:7.05, 43:7.40)
+  memory_only      M1-L4  L=6 hop7:   6.92 (n=3; 17:7.30, 29:6.70, 43:6.75)
+  memory_only      M1-L4  L=6 hop8:   7.67 (n=3; 17:7.80, 29:7.60, 43:7.60)
+  memory_only      M1-L4  L=7 hop1:  28.98 (n=3; 17:26.75, 29:30.05, 43:30.15)
+  memory_only      M1-L4  L=7 hop2:  24.63 (n=3; 17:24.45, 29:24.30, 43:25.15)
+  memory_only      M1-L4  L=7 hop3:  24.25 (n=3; 17:23.70, 29:24.55, 43:24.50)
+  memory_only      M1-L4  L=7 hop4:  20.60 (n=3; 17:19.95, 29:21.35, 43:20.50)
+  memory_only      M1-L4  L=7 hop5:  16.85 (n=3; 17:16.60, 29:18.20, 43:15.75)
+  memory_only      M1-L4  L=7 hop6:  11.15 (n=3; 17:11.55, 29:10.90, 43:11.00)
+  memory_only      M1-L4  L=7 hop7:   8.68 (n=3; 17:9.05, 29:8.60, 43:8.40)
+  memory_only      M1-L4  L=7 hop8:   8.75 (n=3; 17:8.85, 29:8.60, 43:8.80)
+  memory_only      M1-L4  L=8 hop1:  24.07 (n=3; 17:21.95, 29:23.80, 43:26.45)
+  memory_only      M1-L4  L=8 hop2:  20.87 (n=3; 17:21.10, 29:20.55, 43:20.95)
+  memory_only      M1-L4  L=8 hop3:  21.35 (n=3; 17:22.30, 29:20.70, 43:21.05)
+  memory_only      M1-L4  L=8 hop4:  18.42 (n=3; 17:19.20, 29:18.35, 43:17.70)
+  memory_only      M1-L4  L=8 hop5:  17.77 (n=3; 17:18.65, 29:17.70, 43:16.95)
+  memory_only      M1-L4  L=8 hop6:  14.68 (n=3; 17:14.40, 29:15.10, 43:14.55)
+  memory_only      M1-L4  L=8 hop7:  10.67 (n=3; 17:10.80, 29:10.85, 43:10.35)
+  memory_only      M1-L4  L=8 hop8:   9.77 (n=3; 17:9.50, 29:9.40, 43:10.40)
+  mix hops2,3 M1-L4@4: primary 31.96%, typed 34.27%
+  mix hops2,3 B4@1: primary 6.17%, typed 5.93%
+  mix hops2,3 B8@4: primary 7.21%, typed 7.06%
+  mix hops2,3 B5-L4@4: primary 5.53%, typed 5.73%
+  mix hops2,3 B3-L4@4: primary 0.04%, typed 0.00%
+  adapter parameters: B0 0, B3-L4 540672, B4 606210, B5-L4 606210, B8 753666, M1-L4 606210
+  swap B8 L=4 hop1: follows 10.22% unswapped 6.18%
+  swap B8 L=4 hop2: follows 8.65% unswapped 6.42%
+  swap B8 L=4 hop3: follows 8.08% unswapped 6.67%
+  swap M1-L4 L=4 hop1: follows 25.62% unswapped 4.80%
+  swap M1-L4 L=4 hop2: follows 20.08% unswapped 4.02%
+  swap M1-L4 L=4 hop3: follows 16.82% unswapped 3.50%
+  mean inference ms/question: B0 0.303, B3-L4 0.453, B4 0.486, B5-L4 0.512, B8 0.625, M1-L4 0.625
+== reports/p1l/r128 endpoints: G1 False G2 True B7 True ==
+  B8_vs_M1: -20.57 [-21.78,-19.36] (6.34 vs 26.91) per seed 17:-23.52, 29:-15.05, 43:-23.12
+  G1_hop1: -0.60 [-1.98,0.77] (19.03 vs 19.63) per seed 17:-2.30, 29:1.20, 43:-0.70
+  G1_reach: 0.98 [0.27,1.72] (6.34 vs 5.36) per seed 17:0.92, 29:0.05, 43:1.98
+  G1_typed: 1.55 [0.77,2.37] (6.78 vs 5.23) per seed 17:1.57, 29:0.60, 43:2.48
+  G2_fixed_query: 0.83 [0.06,1.55] (6.34 vs 5.51) per seed 17:0.88, 29:0.10, 43:1.52
+  G2_no_memory: 6.34 [5.76,6.93] (6.34 vs 0.00) per seed 17:6.53, 29:5.67, 43:6.83
+  M1_depth_far: 3.68 [3.21,4.18] (4.73 vs 1.05) per seed 17:3.83, 29:3.83, 43:3.37
+  M1_depth_reach: 25.92 [24.82,27.05] (26.91 vs 0.98) per seed 17:29.55, 29:18.52, 43:29.70
+  M1_vs_B3: 26.91 [25.76,27.98] (26.91 vs 0.00) per seed 17:30.05, 29:20.72, 43:29.95
+  M1_vs_B4: 21.55 [20.38,22.76] (26.91 vs 5.36) per seed 17:24.45, 29:15.10, 43:25.10
+  M1_vs_B5: 21.40 [20.22,22.55] (26.91 vs 5.51) per seed 17:24.40, 29:15.15, 43:24.65
+  M1_walk_specificity: 22.25 [21.16,23.37] per seed 17:25.72, 29:14.69, 43:26.33
+  B7 B4_vs_B3_hop1: 19.63 [18.42,20.93] (19.63 vs 0.00)
+  B7 B8_vs_B3_hop1: 19.03 [17.87,20.37] (19.03 vs 0.00)
+  B7 M1_vs_B3_hop1: 47.85 [46.02,49.67] (47.85 vs 0.00)
+== reports/p1l/r128 accuracy (full-vocabulary EM %, seed mean; n_seeds; per seed) ==
+  memory_only      B3-L4  L=4 hop1:   0.00 (n=3; 17:0.00, 29:0.00, 43:0.00)
+  memory_only      B3-L4  L=4 hop2:   0.00 (n=3; 17:0.00, 29:0.00, 43:0.00)
+  memory_only      B3-L4  L=4 hop3:   0.00 (n=3; 17:0.00, 29:0.00, 43:0.00)
+  memory_only      B3-L4  L=4 hop4:   0.00 (n=3; 17:0.00, 29:0.00, 43:0.00)
+  memory_only      B3-L4  L=4 hop5:   0.00 (n=3; 17:0.00, 29:0.00, 43:0.00)
+  memory_only      B3-L4  L=4 hop6:   0.02 (n=3; 17:0.05, 29:0.00, 43:0.00)
+  memory_only      B3-L4  L=4 hop7:   0.00 (n=3; 17:0.00, 29:0.00, 43:0.00)
+  memory_only      B3-L4  L=4 hop8:   0.00 (n=3; 17:0.00, 29:0.00, 43:0.00)
+  memory_only      B4     L=1 hop1:  19.63 (n=3; 17:20.30, 29:18.75, 43:19.85)
+  memory_only      B4     L=1 hop2:   5.35 (n=3; 17:5.65, 29:5.70, 43:4.70)
+  memory_only      B4     L=1 hop3:   5.37 (n=3; 17:5.55, 29:5.55, 43:5.00)
+  memory_only      B4     L=1 hop4:   5.82 (n=3; 17:5.40, 29:6.65, 43:5.40)
+  memory_only      B4     L=1 hop5:   5.32 (n=3; 17:5.00, 29:5.65, 43:5.30)
+  memory_only      B4     L=1 hop6:   5.00 (n=3; 17:5.05, 29:4.90, 43:5.05)
+  memory_only      B4     L=1 hop7:   5.40 (n=3; 17:5.70, 29:4.85, 43:5.65)
+  memory_only      B4     L=1 hop8:   5.17 (n=3; 17:5.40, 29:5.40, 43:4.70)
+  memory_only      B5-L4  L=4 hop1:  17.27 (n=3; 17:17.00, 29:18.70, 43:16.10)
+  memory_only      B5-L4  L=4 hop2:   5.38 (n=3; 17:5.25, 29:5.65, 43:5.25)
+  memory_only      B5-L4  L=4 hop3:   5.63 (n=3; 17:6.05, 29:5.50, 43:5.35)
+  memory_only      B5-L4  L=4 hop4:   5.75 (n=3; 17:5.45, 29:5.75, 43:6.05)
+  memory_only      B5-L4  L=4 hop5:   5.52 (n=3; 17:5.25, 29:6.20, 43:5.10)
+  memory_only      B5-L4  L=4 hop6:   5.23 (n=3; 17:5.15, 29:6.20, 43:4.35)
+  memory_only      B5-L4  L=4 hop7:   5.57 (n=3; 17:5.10, 29:6.50, 43:5.10)
+  memory_only      B5-L4  L=4 hop8:   5.63 (n=3; 17:5.60, 29:6.35, 43:4.95)
+  memory_only      B8     L=4 hop1:  19.03 (n=3; 17:18.00, 29:19.95, 43:19.15)
+  memory_only      B8     L=4 hop2:   6.65 (n=3; 17:6.85, 29:5.85, 43:7.25)
+  memory_only      B8     L=4 hop3:   6.03 (n=3; 17:6.20, 29:5.50, 43:6.40)
+  memory_only      B8     L=4 hop4:   6.10 (n=3; 17:6.10, 29:6.05, 43:6.15)
+  memory_only      B8     L=4 hop5:   6.17 (n=3; 17:6.05, 29:6.15, 43:6.30)
+  memory_only      B8     L=4 hop6:   5.38 (n=3; 17:5.10, 29:5.70, 43:5.35)
+  memory_only      B8     L=4 hop7:   6.25 (n=3; 17:6.00, 29:6.50, 43:6.25)
+  memory_only      B8     L=4 hop8:   6.37 (n=3; 17:6.50, 29:6.80, 43:5.80)
+  memory_only      M1-L4  L=1 hop1:  37.83 (n=3; 17:49.15, 29:26.10, 43:38.25)
+  memory_only      M1-L4  L=1 hop2:   1.07 (n=3; 17:0.40, 29:2.65, 43:0.15)
+  memory_only      M1-L4  L=1 hop3:   0.90 (n=3; 17:0.60, 29:1.75, 43:0.35)
+  memory_only      M1-L4  L=1 hop4:   1.10 (n=3; 17:0.35, 29:2.20, 43:0.75)
+  memory_only      M1-L4  L=1 hop5:   0.80 (n=3; 17:0.40, 29:1.85, 43:0.15)
+  memory_only      M1-L4  L=1 hop6:   0.93 (n=3; 17:0.45, 29:2.10, 43:0.25)
+  memory_only      M1-L4  L=1 hop7:   1.10 (n=3; 17:0.55, 29:2.30, 43:0.45)
+  memory_only      M1-L4  L=1 hop8:   1.12 (n=3; 17:0.55, 29:2.35, 43:0.45)
+  memory_only      M1-L4  L=2 hop1:  64.15 (n=3; 17:73.00, 29:48.30, 43:71.15)
+  memory_only      M1-L4  L=2 hop2:  10.90 (n=3; 17:10.95, 29:12.65, 43:9.10)
+  memory_only      M1-L4  L=2 hop3:   1.40 (n=3; 17:0.85, 29:2.35, 43:1.00)
+  memory_only      M1-L4  L=2 hop4:   1.78 (n=3; 17:1.15, 29:3.25, 43:0.95)
+  memory_only      M1-L4  L=2 hop5:   1.57 (n=3; 17:0.95, 29:3.00, 43:0.75)
+  memory_only      M1-L4  L=2 hop6:   1.65 (n=3; 17:1.25, 29:2.80, 43:0.90)
+  memory_only      M1-L4  L=2 hop7:   1.73 (n=3; 17:1.15, 29:2.65, 43:1.40)
+  memory_only      M1-L4  L=2 hop8:   1.75 (n=3; 17:1.15, 29:2.80, 43:1.30)
+  memory_only      M1-L4  L=3 hop1:  61.28 (n=3; 17:67.75, 29:48.35, 43:67.75)
+  memory_only      M1-L4  L=3 hop2:  29.95 (n=3; 17:33.65, 29:23.60, 43:32.60)
+  memory_only      M1-L4  L=3 hop3:   7.45 (n=3; 17:7.15, 29:8.25, 43:6.95)
+  memory_only      M1-L4  L=3 hop4:   2.93 (n=3; 17:2.30, 29:4.50, 43:2.00)
+  memory_only      M1-L4  L=3 hop5:   2.55 (n=3; 17:2.05, 29:3.85, 43:1.75)
+  memory_only      M1-L4  L=3 hop6:   2.47 (n=3; 17:1.80, 29:3.25, 43:2.35)
+  memory_only      M1-L4  L=3 hop7:   2.93 (n=3; 17:2.30, 29:4.15, 43:2.35)
+  memory_only      M1-L4  L=3 hop8:   3.22 (n=3; 17:2.80, 29:4.50, 43:2.35)
+  memory_only      M1-L4  L=4 hop1:  47.85 (n=3; 17:51.40, 29:39.65, 43:52.50)
+  memory_only      M1-L4  L=4 hop2:  35.35 (n=3; 17:40.10, 29:26.25, 43:39.70)
+  memory_only      M1-L4  L=4 hop3:  18.47 (n=3; 17:20.00, 29:15.20, 43:20.20)
+  memory_only      M1-L4  L=4 hop4:   7.25 (n=3; 17:6.90, 29:8.65, 43:6.20)
+  memory_only      M1-L4  L=4 hop5:   3.90 (n=3; 17:3.70, 29:5.05, 43:2.95)
+  memory_only      M1-L4  L=4 hop6:   4.50 (n=3; 17:3.85, 29:6.15, 43:3.50)
+  memory_only      M1-L4  L=4 hop7:   4.72 (n=3; 17:4.50, 29:5.65, 43:4.00)
+  memory_only      M1-L4  L=4 hop8:   4.97 (n=3; 17:4.70, 29:6.45, 43:3.75)
+  memory_only      M1-L4  L=5 hop1:  37.18 (n=3; 17:39.25, 29:33.80, 43:38.50)
+  memory_only      M1-L4  L=5 hop2:  29.32 (n=3; 17:32.90, 29:22.80, 43:32.25)
+  memory_only      M1-L4  L=5 hop3:  24.17 (n=3; 17:26.95, 29:18.85, 43:26.70)
+  memory_only      M1-L4  L=5 hop4:  14.07 (n=3; 17:15.00, 29:12.15, 43:15.05)
+  memory_only      M1-L4  L=5 hop5:   7.17 (n=3; 17:7.60, 29:7.40, 43:6.50)
+  memory_only      M1-L4  L=5 hop6:   6.10 (n=3; 17:5.85, 29:7.35, 43:5.10)
+  memory_only      M1-L4  L=5 hop7:   6.70 (n=3; 17:6.60, 29:7.45, 43:6.05)
+  memory_only      M1-L4  L=5 hop8:   6.73 (n=3; 17:7.20, 29:7.55, 43:5.45)
+  memory_only      M1-L4  L=6 hop1:  28.10 (n=3; 17:27.95, 29:28.00, 43:28.35)
+  memory_only      M1-L4  L=6 hop2:  22.80 (n=3; 17:24.50, 29:20.15, 43:23.75)
+  memory_only      M1-L4  L=6 hop3:  20.60 (n=3; 17:21.95, 29:17.60, 43:22.25)
+  memory_only      M1-L4  L=6 hop4:  16.60 (n=3; 17:18.35, 29:13.95, 43:17.50)
+  memory_only      M1-L4  L=6 hop5:  11.58 (n=3; 17:12.25, 29:11.00, 43:11.50)
+  memory_only      M1-L4  L=6 hop6:   8.75 (n=3; 17:8.80, 29:9.55, 43:7.90)
+  memory_only      M1-L4  L=6 hop7:   8.50 (n=3; 17:9.00, 29:9.25, 43:7.25)
+  memory_only      M1-L4  L=6 hop8:   8.92 (n=3; 17:9.85, 29:9.30, 43:7.60)
+  memory_only      M1-L4  L=7 hop1:  22.57 (n=3; 17:22.05, 29:24.50, 43:21.15)
+  memory_only      M1-L4  L=7 hop2:  18.77 (n=3; 17:19.75, 29:18.00, 43:18.55)
+  memory_only      M1-L4  L=7 hop3:  17.72 (n=3; 17:19.25, 29:16.40, 43:17.50)
+  memory_only      M1-L4  L=7 hop4:  15.43 (n=3; 17:17.35, 29:13.65, 43:15.30)
+  memory_only      M1-L4  L=7 hop5:  13.48 (n=3; 17:14.40, 29:12.60, 43:13.45)
+  memory_only      M1-L4  L=7 hop6:  10.88 (n=3; 17:11.25, 29:11.05, 43:10.35)
+  memory_only      M1-L4  L=7 hop7:   9.48 (n=3; 17:10.25, 29:9.60, 43:8.60)
+  memory_only      M1-L4  L=7 hop8:   9.65 (n=3; 17:10.75, 29:10.00, 43:8.20)
+  memory_only      M1-L4  L=8 hop1:  19.00 (n=3; 17:18.70, 29:21.75, 43:16.55)
+  memory_only      M1-L4  L=8 hop2:  16.37 (n=3; 17:17.20, 29:16.75, 43:15.15)
+  memory_only      M1-L4  L=8 hop3:  14.95 (n=3; 17:15.90, 29:15.35, 43:13.60)
+  memory_only      M1-L4  L=8 hop4:  13.78 (n=3; 17:14.90, 29:13.75, 43:12.70)
+  memory_only      M1-L4  L=8 hop5:  13.50 (n=3; 17:13.75, 29:13.15, 43:13.60)
+  memory_only      M1-L4  L=8 hop6:  12.35 (n=3; 17:12.70, 29:12.40, 43:11.95)
+  memory_only      M1-L4  L=8 hop7:  10.58 (n=3; 17:11.20, 29:10.85, 43:9.70)
+  memory_only      M1-L4  L=8 hop8:   9.92 (n=3; 17:10.85, 29:10.20, 43:8.70)
+  mix hops2,3 M1-L4@4: primary 26.91%, typed 28.52%
+  mix hops2,3 B4@1: primary 5.36%, typed 5.23%
+  mix hops2,3 B8@4: primary 6.34%, typed 6.78%
+  mix hops2,3 B5-L4@4: primary 5.51%, typed 6.06%
+  mix hops2,3 B3-L4@4: primary 0.00%, typed 0.00%
+  adapter parameters: B3-L4 409600, B4 475138, B5-L4 475138, B8 622594, M1-L4 475138
+  swap B8 L=4 hop1: follows 8.12% unswapped 5.82%
+  swap B8 L=4 hop2: follows 7.60% unswapped 5.78%
+  swap B8 L=4 hop3: follows 6.83% unswapped 6.72%
+  swap M1-L4 L=4 hop1: follows 20.45% unswapped 5.82%
+  swap M1-L4 L=4 hop2: follows 17.10% unswapped 4.75%
+  swap M1-L4 L=4 hop3: follows 14.08% unswapped 4.82%
+  mean inference ms/question: B3-L4 0.370, B4 0.392, B5-L4 0.459, B8 0.617, M1-L4 0.556
