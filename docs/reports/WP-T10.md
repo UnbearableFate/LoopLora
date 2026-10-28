@@ -118,3 +118,43 @@ DPFP (DP1), P1L-D (PD1), and the per-step readouts (LP5; see below).
    check). A reviewer may prefer to leave the bridge-patching clause out.
 
 WP-T10 part 2 done
+
+# WP-T10 part 3a — LP5 per-step readouts
+
+Master `88e8652` merged first (corrected P1-L record `f4f9a98`, merged `5eca4d2`). Text only, static checks only (tags resolve, table
+columns, links, `git diff --check`; every LP5 number was compared with `reports/p1l/readout-pooled.csv` and
+`reports/p1l/record-numbers.txt`; the three accuracy values quoted for comparison were checked against `accuracy.csv`).
+
+Commit: the draft/ledger commit titled "WP-T10: LP5 per-step readouts entered as descriptive ..." plus this report.
+
+## What changed where
+
+**[evidence_llm.md](../paper/evidence_llm.md).** LP5 is rewritten as a descriptive row (no gate): at rank 128 the logit lens recovers
+earlier-hop entities from M1-L4's early states, best at s >= e rather than at s = e (hop-1 questions, e = 1: 38.62/64.28/61.13/47.93%
+at s = 1..4); the s = 4 cells match the deployed EM within 0.1 pp and the s = 2, 3 cells are close to the same checkpoint's EM at
+L = 2, 3 (64.15, 61.28%); B8 decodes names only at s = 4 (19.08/19.33/18.38% for e = 1, hops 1-3; at most 0.23% at s = 1..3);
+contrastive, raw-logit and random directions are at or near chance for both readers (maximum cell 0.28%); every method is at chance
+at rank 32 (maximum cell 0.27%). The "readouts need their own reading" mismatch note is removed and the corrected record is cited.
+The limits are stated in the row: decoding only, no ordered trajectory or path following, not evidence for LP4, no causal bridge
+(PC1); "what the reader would answer at step s" is marked as the record's interpretation of the EM matches. P1LE gains the readout
+files and the correction commits. LP4, the scope bullet, the must-not-say list (new bullet on trajectory/path-following/composition
+readings; readout item removed from the DPFP/P1L-D bullet) and the audit boundary are updated.
+
+**[draft.md](../paper/draft.md).** Header (readouts no longer pending); Section 8.5 "Per-step readouts (descriptive)" replaces the TODO
+paragraph (the J-lens-proxy and cost caveats kept); Section 9 conclusion; Appendix B row; figure-table row; reading rules (LP5 added to
+the descriptive rows; pending list now DPFP and P1L-D only). No abstract, Section 1 or claim-contract row changed, because the
+readouts support no claim.
+
+## Left pending
+
+DPFP (DP1) and P1L-D (PD1), part 3b.
+
+## Notes
+
+1. The corrected record says the B8 logit-lens cells at s = 1..3 are 0.05-0.22%; over all hops 1-8 in `readout-pooled.csv` the maximum
+   is 0.233%. LP5 and the draft use "at most 0.23%".
+2. The record's "largest single-seed cell for e = 1, s = 1 is 51.8% (hop 6 questions)" is not cited.
+3. No wording was unsettleable; the only interpretive sentence ("what the reader would answer if it stopped at step s") is the
+   record's and is labelled as such.
+
+WP-T10 part 3a done
