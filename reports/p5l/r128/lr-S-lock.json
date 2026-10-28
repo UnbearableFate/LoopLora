@@ -1,0 +1,41 @@
+{
+  "S": 17000,
+  "backbone": {
+    "id": "Qwen/Qwen3-1.7B-Base",
+    "revision": "ea980cb0a6c2ae4b936e82123acc929f1cec04c1"
+  },
+  "carried_from": "reports/p1l/r128/lr-S-lock.json",
+  "carried_from_hash": "92ac8eac57be3cf613a411a78a4400ad",
+  "condition": "p5l-r128",
+  "config_hashes": {
+    "B3-L4-s17": "8489713e1d62a387fa510ff2e04dee01",
+    "B3-L4-s29": "b827b7c46d10514c32bd7aab3e9d66b0",
+    "B3-L4-s43": "0170080cfa812ce610050181586649c5",
+    "B4-s17": "e9a79dac724eedc6f06bc12e7b2d3822",
+    "B4-s29": "ad93cd8a08407b2ef2c354bb6d155cf5",
+    "B4-s43": "aff09e49b8cd51c72921f4001de5eaff",
+    "B5-L4-s17": "5db8eba351194f64a5984f42442e20d1",
+    "B5-L4-s29": "e6e21dd483fa961c46127f86807f4a70",
+    "B5-L4-s43": "c9456fc3cb60d7d7284ea096ebb325c9",
+    "B8-s17": "1012b8ea4ba37b5d566c1cef16eeba4a",
+    "B8-s29": "b529fb998c86e20629b9c142e7d09780",
+    "B8-s43": "165249c393c36d224abc2dd49d99e684",
+    "M1-L4-s17": "44ab142fae712bc1aaa4ce399d44c918",
+    "M1-L4-s29": "34cc2f46626732d72bf5e9c311fd2ab0",
+    "M1-L4-s43": "f6ac73ed221c0558162ddacf66fbe411"
+  },
+  "configs": "configs/p5l/main-r128",
+  "lrs": {
+    "B3-L4": 0.001,
+    "B4": 0.003,
+    "B5-L4": 0.003,
+    "B8": 0.003,
+    "M1-L4": 0.003
+  },
+  "prereg": "docs/prereg/P5L.md",
+  "prereg_hash": "ff69d3511e433065f3ca8ff17fe66a69",
+  "rank": 128,
+  "rule": "carried unchanged from the P1-L r = 128 lock; no lr pilot at 1.7B (docs/prereg/P5L.md)",
+  "status": "locked",
+  "time": "2026-10-28T20:20:02.978739+00:00"
+}
