@@ -261,7 +261,7 @@ def test_ridge_final_on_dpfp_features_is_the_ridge_solution_over_the_feature_key
 def test_ridge_on_dpfp_is_differentiable_and_ignores_the_write_strength(device):
     cfg = AdapterConfig(d_in=6, d_out=6, r=5, r_mem=4, variant='iterq', store='ridge', store_eta=.05, dpfp_nu=3)
     adapter = make_adapter(cfg).double().to(device)
-    u = torch.randn(2, 6, 6, dtype=torch.float64, device=device)
+    u = torch.randn(2, 6, 5, dtype=torch.float64, device=device)
     zeros = torch.zeros(2, 4, cfg.key_dim, dtype=torch.float64, device=device)
     state = adapter.scan_final(zeros, u, None, None, None)
     assert state.shape == (2, 4, 24) and bool(torch.isfinite(state).all())
@@ -399,9 +399,9 @@ def test_load_continuation_reproduces_the_parent_at_step_zero_and_returns_its_op
         assert state['state'].keys() == parent['payload']['optimizer']['state'].keys()
         assert experiment.value_head is not None
         for name, value in parent['payload']['adapter'].items():
-            assert torch.equal(experiment.adapter.state_dict()[name].cpu(), value)
+            assert torch.equal(experiment.adapter.state_dict()[name].cpu(), value.cpu())
         for name, value in parent['payload']['value_head'].items():
-            assert torch.equal(experiment.value_head.state_dict()[name].cpu(), value)
+            assert torch.equal(experiment.value_head.state_dict()[name].cpu(), value.cpu())
     finally:
         experiment.close()
 
@@ -449,7 +449,11 @@ def test_the_continuation_trains_on_a_fresh_stream_with_constant_lr_and_the_pare
         assert all(('coefficient_loss' in row) == SPECS[arm][1] for row in rows)
         assert all(set(row) >= {'query_norm', 'direction_cosine', 'coefficient_cancellation_median'} for row in rows)  # the observe hook
         saved = torch.load(tmp_path / 'checkpoint.pt', weights_only=True)
-        assert all(float(s['step']) == 10 for s in saved['optimizer']['state'].values())  # Adam's counter continues from the parent's 5
+        steps = [float(s['step']) for s in saved['optimizer']['state'].values()]
+        # Adam's counter continues from the parent's 5; a parameter that never receives a gradient does not step (the ridge store
+        # ignores the write-strength gate, so its one gate parameter a_beta stays at 5)
+        assert set(steps) == ({10.} if SPECS[arm][0] == 'delta' else {5., 10.}) and max(steps) == 10.
+        assert steps.count(5.) == (0 if SPECS[arm][0] == 'delta' else 1)
     finally:
         experiment.close()
 

@@ -195,8 +195,8 @@ def test_scheduled_steps_follow_the_release_and_never_run_the_control():
 def records(correct, **changes):
     out = []
     for arm in ARMS:
-        out.append(dict(arm=arm, status='complete', smoke=False, config=dict(task=dict(E=16)),
-                        training=dict(actual_steps=10, metrics={'10': dict(correct=correct[arm])}), **changes))
+        out.append({**dict(arm=arm, status='complete', smoke=False, config=dict(task=dict(E=16)),
+                           training=dict(actual_steps=10, metrics={'10': dict(correct=correct[arm])})), **changes})
     return out
 
 

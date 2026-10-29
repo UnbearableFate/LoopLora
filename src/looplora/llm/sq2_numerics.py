@@ -43,8 +43,8 @@ def measure(experiment,count,*,etas=()):
     """Per training batch: the gradient-norm ratio ||grad L_read|| / ||grad L_coef|| and the coefficient statistics, and, for each
     eta, the mean normalized read error of the ridge store (eta-curve sums)."""
     params=[p for p in experiment.adapter.parameters() if p.requires_grad]
-    ratios,stats,errors={eta:[] for eta in etas},[]
-    deployed=[]
+    ratios,stats,deployed=[],[],[]
+    errors={eta:[] for eta in etas}
     for batch in stream_batches(experiment,count):
         logits,x=experiment.score(batch,1,capture_inputs=True)
         read,_=extra_losses(experiment,batch,x)
