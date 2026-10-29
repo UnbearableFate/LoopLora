@@ -5,6 +5,7 @@ Compute only (imports torch; a 2-layer backbone with hidden size 16 and the regi
 dimension 768, ridge store, T1 with E = 16). The adapter sits at the last layer, so only the final token's read reaches the
 logits. Backend semantics are in `test_slot_backend.py`; the registry, guard and rules are in `test_slot_data.py`.
 """
+import importlib.util
 import json
 import math
 import os
@@ -496,19 +497,24 @@ def tiny_study(monkeypatch, model, tokenizer, tmp_path):
     """The runner's own S1A code on the tiny model: the parent loader, the lock and the registered sets are replaced (the real
     parents and the registered sizes need the cluster); the stage config, the release checks, the trainer and the exports are
     the real ones. Returns the paths the modes take."""
-    sets = {('S1A', 'pilot'): slot_data.EvalSet('S1A', 'pilot', 'val', 0, 48, derive_seed(17, 'slot-test-pilot')),
+    sets = {('S0', 'calibration'): slot_data.EvalSet('S0', 'calibration', 'val', 0, 32, derive_seed(17, 'slot-test-calibration')),
+            ('S0', 'dev'): slot_data.EvalSet('S0', 'dev', 'val', 0, 32, derive_seed(17, 's0-test-dev')),
+            ('S1A', 'pilot'): slot_data.EvalSet('S1A', 'pilot', 'val', 0, 48, derive_seed(17, 'slot-test-pilot')),
             ('S1A', 'dev'): slot_data.EvalSet('S1A', 'dev', 'val', 0, 48, derive_seed(17, 'slot-test-dev')),
             ('S1A', 'smoke'): slot_data.EvalSet('S1A', 'smoke', 'train', 0, 64, derive_seed(17, 'slot-test-smoke'))}
     shared, registered = (model, tokenizer), slot_data.eval_set
 
     def load_parent(name, *, model=None, tokenizer=None, expected=None):
-        assert name == 'S-RE' and set(expected) <= set(PARENT_DIGESTS)
+        assert name in {'S-RE', 'D128-3'} and set(expected) <= set(PARENT_DIGESTS)
         return adopt(slot_golden.tiny_experiment(*shared))
 
     monkeypatch.setattr(slot_run, 'load_parent', load_parent)
     monkeypatch.setattr(slot_run, 'require_lock', lambda path: dict(status='locked', inventory={'S-RE': dict(PARENT_DIGESTS)}))
     monkeypatch.setattr(slot_data, 'eval_set', lambda stage, purpose, **kw: sets.get((stage, purpose)) or registered(stage, purpose, **kw))
     monkeypatch.setattr(slot_data, 'PILOT_STEPS', 20)
+    monkeypatch.setattr(slot_run, 'load_value_head', lambda name, device: None)
+    monkeypatch.setattr(slot_run, 'old_range_record', lambda experiment, name: dict(correct=608, n=1000, loss_float32=2.1291537284851074,
+                                                                                    passed=True))
     metrics = tmp_path / 's0_metrics.json'
     metrics.write_text(json.dumps(dict(calibration=dict(selected=SELECTED))))
     return dict(config=ROOT / 'configs' / 'slot_loop_v1' / 's1a.json', manifest=tmp_path / 'lock.json', s0=metrics, sets=sets)
@@ -611,3 +617,44 @@ def test_a_run_that_differs_from_its_release_does_not_start(tiny_study, tmp_path
     with pytest.raises(slot_run.StopRun):
         slot_run.run_train(tmp_path / 'run', path, 'matrix_L1', seed, config_path=tiny_study['config'], manifest_path=tiny_study['manifest'])
     assert not (tmp_path / 'run' / 'train_log.jsonl').exists()
+
+
+# ------------------------------------------------------------------------------------- the runner and the frozen analysis
+
+def analysis_script():
+    spec = importlib.util.spec_from_file_location('analyze_slot_study', ROOT / 'scripts' / 'analyze_slot_study.py')
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+def test_what_the_runner_writes_for_s0_is_what_the_frozen_analysis_reads(tiny_study, tmp_path):
+    analysis = analysis_script()
+    out = tmp_path / 's0'
+    metrics = slot_run.run_s0(out, ROOT / 'configs' / 'slot_loop_v1' / 's0.json', tiny_study['manifest'])
+    assert sorted(path.name for path in out.iterdir()) == ['calibration.json', 'd128_3_samples.npz', 'metrics.json', 'samples.npz']
+    assert metrics['n'] == 32 and metrics['calibration']['n'] == 32 and len(metrics['calibration']['candidates']) == 18
+    preflight = tmp_path / 'preflight.json'
+    preflight.write_text(json.dumps(dict(passed=True, checks={name: dict(passed=True) for name in analysis.CHECKS})))
+    assert analysis.main(['--stage', 'S0', '--records', str(out), '--out', str(tmp_path / 'decision'), '--preflight', str(preflight)]) == 0
+    decision = json.loads((tmp_path / 'decision' / 'decision_s0.json').read_text())
+    assert decision['row'] in {'R1', 'R2', 'R3', 'R4', 'R5'} and decision['n'] == 32 and decision['preflight']['failed'] == []
+    assert decision['calibration']['selected'] == metrics['calibration']['selected']
+    assert decision['s1a']['soft_slot'] == metrics['calibration']['selected']['soft']
+    assert set(decision['d128_3']['conditions']) == {f'{role}/all_valid_question' for role in analysis.D128_ROLES}
+    # the engineering gate: a failed check ends in R0 without reading any S0 data
+    preflight.write_text(json.dumps(dict(passed=False, checks={**{name: dict(passed=True) for name in analysis.CHECKS},
+                                                              'matrix_equals_native': dict(passed=False)})))
+    assert analysis.main(['--stage', 'S0', '--records', str(tmp_path), '--out', str(tmp_path / 'gate'), '--preflight', str(preflight)]) == 0
+    assert json.loads((tmp_path / 'gate' / 'decision_s0.json').read_text())['row'] == 'R0'
+
+
+def test_the_run_record_is_what_the_frozen_analysis_reads_for_the_dev_selection(tiny_study, tmp_path):
+    analysis = analysis_script()
+    release = release_for(tiny_study, tmp_path)
+    record = slot_run.run_train(tmp_path / 'matrix_L1' / 's43', release, 'matrix_L1', 43, config_path=tiny_study['config'],
+                                manifest_path=tiny_study['manifest'])
+    parsed = analysis.parse_run(json.loads((tmp_path / 'matrix_L1' / 's43' / 'record.json').read_text()), 'matrix_L1', 43)
+    assert parsed['steps'] == 20 and parsed['n'] == 48 and parsed['ids'] == record['dev_ids_blake2b_128']
+    assert parsed['selected']['step'] == record['selected_step'] and parsed['checkpoint'] == record['selected_checkpoint_blake2b_128']
+    assert parsed['training']['clipped_fraction'] == record['training']['clipped_fraction']
