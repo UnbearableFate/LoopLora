@@ -1,0 +1,53 @@
+{
+  "arm": "LT-U",
+  "best_rg": "LT-RG001",
+  "correct": {
+    "LT-K4": 383,
+    "LT-RG001": 461,
+    "LT-RG1": 426,
+    "LT-U": 360
+  },
+  "enters_registered_outcomes": false,
+  "n": 1000,
+  "r_r128_correct": 335,
+  "split": {
+    "store_LT-K4": {
+      "contrast": "LT-K4 - LT-U",
+      "pp": 2.3,
+      "se_pp": 2.16035
+    },
+    "store_LT-RG001": {
+      "contrast": "LT-RG001 - LT-U",
+      "pp": 10.1,
+      "se_pp": 2.18833
+    },
+    "store_LT-RG1": {
+      "contrast": "LT-RG1 - LT-U",
+      "pp": 6.6,
+      "se_pp": 2.179275
+    },
+    "total_LT-K4": {
+      "contrast": "LT-K4 - R-r128",
+      "pp": 4.8,
+      "se_pp": 2.142629
+    },
+    "total_LT-RG001": {
+      "contrast": "LT-RG001 - R-r128",
+      "pp": 12.6,
+      "se_pp": 2.170839
+    },
+    "total_LT-RG1": {
+      "contrast": "LT-RG1 - R-r128",
+      "pp": 9.1,
+      "se_pp": 2.16171
+    },
+    "unit_query": {
+      "contrast": "LT-U - R-r128",
+      "pp": 2.5,
+      "se_pp": 2.128791
+    }
+  },
+  "steps": 24560,
+  "study": "LSQT-U",
+  "u_reaches_0_80": false
+}
