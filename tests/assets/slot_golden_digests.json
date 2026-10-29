@@ -1,0 +1,22 @@
+{
+ "capture_commit": "38a923db6692e161e0b96c1d089b0c6185d26f4c",
+ "capture_job": "3727254.opbs",
+ "digests": {
+  "eval_inputs": "b33be9bd51d6119b82151eafa2b0880a",
+  "eval_logits_L1": "95efdc286f5275090ec0066da6f0def6",
+  "eval_logits_L2": "f102a5757693ef484079841fa40d0f3c",
+  "eval_logits_L4": "c5f3af55c581356c113c3765a34e28dd",
+  "eval_matrix_state": "3131e195f517dc98f972ac089276db77",
+  "train_gradient_names": "Q,R,U,B,A,K,V,a_lambda",
+  "train_gradients": "4595d8d79dab128edb9a711818923798",
+  "train_inputs": "024f999777bde60a5085a5d78f99ad65",
+  "train_logits_L1": "21b6230fdabc15cb82a5c49005e0a341",
+  "train_logits_L2": "a1fd230bd5b47e25944ac610e0e47dfc",
+  "train_logits_L4": "97abaa1d558ce81bfd8d01e0d72b23bc",
+  "train_matrix_state": "22e19ef93e0f8efcab6553a15694fae4"
+ },
+ "gpu": "NVIDIA GH200 120GB",
+ "note": "tests/slot_golden.py --old-commit: digests of the tiny S-RE-style experiment on the source before any slot code (old_commit), identical in two fresh processes and equal to the current tree at the capture commit",
+ "old_commit": "c6af756fca3df7f77491bb0bfba82f14a7bb26bc",
+ "torch": "2.14.0+cu132"
+}

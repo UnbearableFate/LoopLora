@@ -484,3 +484,131 @@ def test_sealed_sets_are_not_evaluated_without_the_open_record(tmp_path):
     for name in ('confirmation', 'unseen'):
         with pytest.raises(slot_data.SealedSetError):
             slot_run.evaluate_entries(('S1A', name), [entry], tmp_path / name)
+
+
+# ------------------------------------------------------------------------------------------------------- the S1A runner
+
+SELECTED = dict(matrix=dict(gain=1.0), soft=dict(gain=1.0, tau=0.3), hard=dict(gain=1.0))
+PARENT_DIGESTS = {'writer.pt': 'a' * 32, 'checkpoint.pt': 'b' * 32}
+
+
+@pytest.fixture
+def tiny_study(monkeypatch, model, tokenizer, tmp_path):
+    """The runner's own S1A code on the tiny model: the parent loader, the lock and the registered sets are replaced (the real
+    parents and the registered sizes need the cluster); the stage config, the release checks, the trainer and the exports are
+    the real ones. Returns the paths the modes take."""
+    sets = {('S1A', 'pilot'): slot_data.EvalSet('S1A', 'pilot', 'val', 0, 48, derive_seed(17, 'slot-test-pilot')),
+            ('S1A', 'dev'): slot_data.EvalSet('S1A', 'dev', 'val', 0, 48, derive_seed(17, 'slot-test-dev')),
+            ('S1A', 'smoke'): slot_data.EvalSet('S1A', 'smoke', 'train', 0, 64, derive_seed(17, 'slot-test-smoke'))}
+    shared, registered = (model, tokenizer), slot_data.eval_set
+
+    def load_parent(name, *, model=None, tokenizer=None, expected=None):
+        assert name == 'S-RE' and set(expected) <= set(PARENT_DIGESTS)
+        return adopt(slot_golden.tiny_experiment(*shared))
+
+    monkeypatch.setattr(slot_run, 'load_parent', load_parent)
+    monkeypatch.setattr(slot_run, 'require_lock', lambda path: dict(status='locked', inventory={'S-RE': dict(PARENT_DIGESTS)}))
+    monkeypatch.setattr(slot_data, 'eval_set', lambda stage, purpose, **kw: sets.get((stage, purpose)) or registered(stage, purpose, **kw))
+    monkeypatch.setattr(slot_data, 'PILOT_STEPS', 20)
+    metrics = tmp_path / 's0_metrics.json'
+    metrics.write_text(json.dumps(dict(calibration=dict(selected=SELECTED))))
+    return dict(config=ROOT / 'configs' / 'slot_loop_v1' / 's1a.json', manifest=tmp_path / 'lock.json', s0=metrics, sets=sets)
+
+
+def test_the_smoke_trains_both_arms_under_the_freeze_checks_and_its_exports_reload_to_the_saved_predictions(tiny_study, model, tokenizer, tmp_path):
+    result = slot_run.run_smoke(tmp_path / 'smoke', tiny_study['config'], tiny_study['manifest'], tiny_study['s0'], lr=1e-3, steps=6)
+    assert list(result['arms']) == ['matrix_L1', 'soft_slot_L1'] and result['steps'] == 6
+    arrays = episodes(tiny_study['sets']['S1A', 'smoke'])
+    for arm, report in result['arms'].items():
+        assert report['all_finite'] and report['freeze']['digests']['frozen_unchanged'] and report['freeze']['support']['equal']
+        assert [row['step'] for row in report['dev']] == [0, 6] and report['selected_checkpoint_blake2b_128']
+        check = slot_run.reload_check(tmp_path / 'smoke' / arm / 'selected.pt', tmp_path / 'smoke' / arm / 'smoke_predictions.npz', arrays,
+                                      model=model, tokenizer=tokenizer)
+        assert check['passed'] and all(check['equal'].values()) and check['read']['kind'] == slot_rules.ARM_KIND[arm]
+
+
+def test_the_pilot_writes_its_full_record_and_picks_each_arms_rate_and_the_step_count_by_the_rules(tiny_study, tmp_path):
+    out = tmp_path / 'pilot'
+    try:
+        result = slot_run.run_pilot(out, tiny_study['config'], tiny_study['manifest'], tiny_study['s0'])
+    except slot_run.StopRun:  # a registered stop is written to the record before it is raised
+        result = json.loads((out / 'pilot.json').read_text())
+        assert result['stop']
+    assert len(result['runs']) == 6 and {(r['arm'], r['lr']) for r in result['runs']} == {
+        (arm, lr) for arm in slot_rules.ARMS for lr in slot_rules.LR_GRID}
+    assert all(r['step0']['step'] == 0 and r['final']['step'] == 20 and r['final']['n'] == 48 for r in result['runs'])
+    for arm in slot_rules.ARMS:
+        rows = [r for r in result['runs'] if r['arm'] == arm]
+        try:
+            assert result['lr'][arm] == slot_rules.choose_lr(rows, rows[0]['step0']['nll'])['lr']
+        except slot_rules.StopForOrchestrator:
+            assert result['lr'][arm] is None and result['stop']
+    assert result['step_seconds'] == max(r['step_seconds_mean'] for r in result['runs'])
+    if result['stop'] is None:
+        steps = slot_rules.schedule_steps(result['step_seconds'], result['eval_seconds'], result['load_seconds'])
+        assert result['steps'] == steps and steps % 10 == 0 and result['walltime_seconds'] <= 3600
+    for arm in slot_rules.ARMS:
+        for lr in slot_rules.LR_GRID:
+            assert (out / arm / f'lr{lr:g}' / 'training.json').exists() and not (out / arm / f'lr{lr:g}' / 'selected.pt').exists()
+
+
+def release_for(tiny_study, tmp_path, steps=20, **edit):
+    """A release of the tiny study: the science commit and hashes the runner recomputes before it trains."""
+    arms = {arm: dict(lr=1e-3, read=slot_run.arm_spec(arm, SELECTED).as_dict()) for arm in slot_rules.ARMS}
+    hashes = {f'{arm}/{seed}': slot_rules.science_hash(slot_rules.science_config(
+        arm, seed, steps=steps, lr=1e-3, read=arms[arm]['read'], parent_digest=PARENT_DIGESTS['writer.pt']))
+        for arm in slot_rules.ARMS for seed in slot_data.RUN_SEEDS}
+    release = dict(science_commit=slot_run.provenance()['git_commit'], prereg_blake2b_128=slot_data.PREREG_BLAKE2B_128, steps=steps,
+                   parent=dict(writer_blake2b_128=PARENT_DIGESTS['writer.pt']), arms=arms, config_hashes=hashes)
+    release.update(edit)
+    path = tmp_path / 'release.json'
+    path.write_text(json.dumps(release))
+    return path
+
+
+def test_an_arm_seed_run_records_dev_selection_gradient_and_clipping_statistics_and_its_export_evaluates_to_the_same_numbers(
+        tiny_study, tmp_path):
+    release = release_for(tiny_study, tmp_path)
+    record = slot_run.run_train(tmp_path / 'run', release, 'soft_slot_L1', 29, config_path=tiny_study['config'],
+                                manifest_path=tiny_study['manifest'])
+    assert record['status'] == 'complete' and record['confirmation_accessed'] is False and record['steps'] == 20
+    assert [r['step'] for r in record['dev']] == [0] + slot_rules.checkpoint_steps(20)
+    assert record['selected_step'] == slot_rules.select_checkpoint([(r['step'], r['nll']) for r in record['dev'] if r['selectable']])
+    assert record['config']['train_base_seed'] == slot_data.TRAIN_BASE['S1A', 29]
+    training = record['training']
+    assert training['all_finite'] and 0.0 <= training['clipped_fraction'] <= 1.0 and training['grad_norm_max'] >= training['grad_norm']['median']
+    assert record['freeze']['digests']['frozen_unchanged'] and record['freeze']['digests']['trainable_changed']
+    assert record['trainable_parameters'] == 3 * 128 * 128 + 16 * 128  # Q, R, U (128 x 128) and B (hidden 16 x 128); 180,224 at hidden 1024
+    export = tmp_path / 'run' / 'selected.pt'
+    assert slot_data.file_digest(export) == record['selected_checkpoint_blake2b_128']
+    out = tmp_path / 'dev'
+    report = slot_run.evaluate_entries(('S1A', 'dev'), [
+        dict(label='soft_slot_L1_29', export=str(export), checkpoint_blake2b_128=record['selected_checkpoint_blake2b_128']),
+        dict(label='native', parent_writer_blake2b_128=PARENT_DIGESTS['writer.pt'], read=None)], out)
+    assert set(report) == {'soft_slot_L1_29', 'native'} and report['native']['n'] == 48
+    arm = np.load(out / 'soft_slot_L1_29.npz')
+    selected_row = next(r for r in record['dev'] if r['step'] == record['selected_step'])
+    assert int(arm['correct'].sum()) == selected_row['correct'] and float(arm['nll'].mean()) == pytest.approx(selected_row['loss_float32'], abs=1e-6)
+    assert set(np.load(out / 'native.npz').files) >= {'episode_id', 'answer', 'prediction', 'correct', 'nll', 'rel_err'}
+    assert np.array_equal(arm['episode_id'], np.load(out / 'native.npz')['episode_id'])
+
+
+@pytest.mark.parametrize('defect', ['commit', 'prereg', 'parent', 'science_config', 'unknown_run'])
+def test_a_run_that_differs_from_its_release_does_not_start(tiny_study, tmp_path, defect):
+    release = json.loads(release_for(tiny_study, tmp_path).read_text())
+    seed = 17
+    if defect == 'commit':
+        release['science_commit'] = '0' * 40
+    elif defect == 'prereg':
+        release['prereg_blake2b_128'] = '0' * 32
+    elif defect == 'parent':
+        release['parent']['writer_blake2b_128'] = 'f' * 32
+    elif defect == 'science_config':
+        release['arms']['matrix_L1']['lr'] = 3e-3  # the hash in the release is of lr 1e-3
+    else:
+        release['config_hashes'].pop('matrix_L1/17')
+    path = tmp_path / 'edited.json'
+    path.write_text(json.dumps(release))
+    with pytest.raises(slot_run.StopRun):
+        slot_run.run_train(tmp_path / 'run', path, 'matrix_L1', seed, config_path=tiny_study['config'], manifest_path=tiny_study['manifest'])
+    assert not (tmp_path / 'run' / 'train_log.jsonl').exists()
