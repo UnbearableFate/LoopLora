@@ -1,7 +1,7 @@
 # WP-L13 state: SLOT-LOOP-v1 (S0, S1A), step 2: implementation, tests, awaiting review
 
 Branch `wp/slot` (worktree `LoopLora-wt/slot`), based on master `177a4fe`; not merged into master, not pushed. Task: `docs/tasks/WP-L13_slot_loop.md`; registration `docs/prereg/SLOT-LOOP-v1.md` (blake2b-128 `56e8c611c01e0ef9b7ae32db97b0e334`, registered on master at `5f04a5c`, unchanged); results will go to `docs/reports/SLOT-LOOP-v1.md`.
-**Status: code and tests done; no preflight, no S0 data, no S1A data touched.** The next action is the orchestrator's static review (`STOP: review <hash>`); then the preflight, the manifest lock and S0.
+**Status: code written, all slot tests and the existing suite green on compute; no preflight, no S0 data, no S1A data touched.** The next action is the orchestrator's static review (`STOP: review`); then the preflight, the manifest lock and S0.
 
 ## What the code does
 New files only, except four typed-dispatch edits (below). Every new option is off in the old paths.
@@ -24,7 +24,7 @@ New files only, except four typed-dispatch edits (below). Every new option is of
 1. **Source diff.** `git diff c6af756..HEAD` (c6af756 is the last commit before any slot code) touches four existing files, 12 insertions and 4 deletions, each a typed dispatch on `isinstance(state, MemoryRead)`. All other changed paths are new files.
 2. **Golden digests.** `tests/slot_golden.py` hashes (blake2b-128) the matrix state, the keys and values, the logits at L = 1, 2 and 4 for a four-question training-shaped batch and a one-question evaluation-shaped batch, the question-site inputs, and the adapter gradients of one training loss, for a tiny S-RE-style experiment (2-layer backbone, registered rank-128 DPFP/ridge adapter). Job 3727254 computed them on the source of c6af756 twice in fresh processes (identical), and on the capture commit (identical to c6af756's). They are pinned in `tests/assets/slot_golden_digests.json`; `test_the_old_matrix_path_is_bitwise_unchanged` recomputes them with the current tree in a fresh process and requires equality.
 3. **Matrix (g = 1) against Native** through the new backend: logits bitwise equal at L = 1, 2, 4 for both batch shapes and the training gradients bitwise equal (`test_matrix_backend_logits_and_gradients_equal_native_bitwise`); the preflight repeats the logits check on the real S-RE over the old range, with the maximum difference reported (decision 5: a difference stops before any calibration or dev data are read).
-4. **The existing suite** (all test files except the three slot ones) was run on compute in two jobs, results below.
+4. **The existing suite** (every test file except the slot ones) ran on compute at `d6a5f9e` in two jobs: 3727337 (files `test_[a-l]*`) 1,054 passed, 3727338 (`test_[m-z]*` without `test_slot_*`) 1,864 passed and 1 skipped; no failure or error, both runs reached 100 %. Since `d6a5f9e` no existing file and no file they import has changed (`git diff d6a5f9e..fd8c914` lists `slot_experiment.py`, `slot_preflight.py`, `slot_run.py`, the new analysis script and tests, and this file), so the result holds for the reviewed tree.
 
 ## MemoryBackend interface (stable for S2 and S3 workers)
 `MemoryState = MatrixState | SlotState`. `MatrixState.matrix` is `[B, dv, dk]`; `SlotState` is `keys [B, S, dk]`, `values [B, S, dv]`, `valid [B, S]` (a prefix of True), `count [B]`. `build_slots(keys, values, capacity, valid=None)` pads with zeros to S slots and raises `CapacityError` when a row has more facts than slots (nothing is truncated).
@@ -33,7 +33,16 @@ New files only, except four typed-dispatch edits (below). Every new option is of
 In the adapter, `SlotFixAdapter.process_sequence` and `_masked_view_branch` do the reading; a tensor state falls through to the inherited code. `ReadSpec(kind, gain, tau, scope, recency, capacity)` plus `bind_batch(experiment, batch, spec)` is the entry point for experiments; `slot_read.final_read` returns the read `m` and its statistics at each question's final token.
 
 ## Tests (compute)
-Pending: see "Job ledger".
+All slot tests ran at `fd8c914` on `debug-g` (the reviewed commit differs from it only in this file); dots are `pytest -q` progress characters, none of the runs had a failure, an error or a skip. The tiny model has two layers (hidden 16) with the registered rank-128 DPFP/ridge adapter at the last layer, T1 with E = 16, so the real tokenizer, task generator and adapter code run.
+| file | job | result | what it checks |
+| --- | --- | --- | --- |
+| `tests/test_slot_backend.py` | 3727670 | 23 passed | the three backends against hand-computed cases, Matrix equal to the original read bitwise, small tau approaches Hard, empty rows read zero without NaN, padding slots inert, Hard ties to the lowest slot, the recency weight, owner-indexed reads under reordering, expansion and padding, bad owner and dtype refusals, the exact capacity boundary, byte accounting (masks and counts included), read-only state and `online_write` refusal, the scoped final-token read and the oracle, `ReadSpec` validation |
+| `tests/test_slot_data.py` | 3727670 | 39 passed | registered integers re-derived, a changed one refused, all sets and train streams disjoint from the old protected ids and from each other (overlap found for an old train seed, an old window, two sets), the old `CONFIRMATION_WINDOWS` pinned, sealed seeds only in `slot_data.py`, the open-token guard (valid record, wrong checkpoint, five of six checkpoints, wrong prereg or script digest, script edited after the record), the registered rules at their boundaries (calibration choice and ties, LR choice, step count, walltime, checkpoint choice and ties), `science_config` and `science_hash`, the committed stage files equal the registered rendering, the manifest script (pending manifest, lock only from a passed preflight on the files now on disk) |
+| `tests/test_slot_experiment.py` | 3727662 | 36 passed | the layout fixture; Matrix equal to Native bitwise (logits at L = 1, 2, 4 for four questions and for one, gradients); **the old matrix path against the golden digests**; tensor states keep the original paths; reads at the registered tokens for each owner (matrix, soft, hard, scoped, oracle); adapter checks (keys, values, matrix consistency, bytes, capacity, read-only); the freeze verification passes and catches each defect; `standardize` refused; export reload with buffers, settings and scope and reproduced predictions; the ablation query copy; the trainer (log, pre-clip norms, clipped fraction, selection by the rule, export, NaN stop); the S0 pipeline structure; the runner gates (lock, stage config, sealed sets); the S1A smoke with reload check, the pilot, an arm-seed run and its export evaluated to the same numbers, five ways a run can differ from its release (it does not start); the runner's S0 output and arm-seed record read by the frozen analysis script |
+| `tests/test_analyze_slot_study.py` | 3727670 | 70 passed | the frozen analysis: R0 to R5 at their exact thresholds, calibration and checkpoint ties, the bootstrap draw and interval, the S1A verdict at +3.0 pp, one seed at zero and `L <= 0`, refusals of malformed inputs, byte-deterministic outputs |
+| existing suite, files a to l | 3727337 (commit `d6a5f9e`) | 1,054 passed | |
+| existing suite, files m to z without the slot tests | 3727338 (commit `d6a5f9e`) | 1,864 passed, 1 skipped | |
+Defects the tests found in my own code (fixed, no assertion weakened): the fix container refused a state dict that already holds the buffers (`SlotFixAdapter`); `tensor_digests` and the golden helper could not byte-view 0-dim tensors (`a_lambda`, `a_beta`); a fixture left the backbone locked after a failed setup; `evaluate_entries` could not take a shared backbone; and a fixture that patched the registered pilot length, which the runner correctly refused because it is part of the stage config.
 
 ## Job ledger and node·h (S0 cap 1.0 node·h; S1A cap 4.5)
 Elapsed time is the `start` to `end` of the `[job]` lines in each log (1 node each). All jobs `debug-g`.
@@ -51,6 +60,17 @@ Elapsed time is the `start` to `end` of the `[job]` lines in each log (1 node ea
 | 3727254 | slot-golden | `38a923d` | passed: old tree twice and current tree identical | 0.014 |
 | 3727255 | slot-t-exp | `38a923d` | cancelled while queued (superseded) | 0 |
 | 3727256 | slot-t-data | `38a923d` | 39 passed | 0.020 |
+| 3727336 | slot-t-exp | `d6a5f9e` | cancelled while queued (superseded) | 0 |
+| 3727337 | slot-suite-a | `d6a5f9e` | existing suite, files a to l: 1,054 passed | 0.206 |
+| 3727338 | slot-suite-b | `d6a5f9e` | existing suite, files m to z without the slot tests: 1,864 passed, 1 skipped | 0.133 |
+| 3727342 | slot-t-exp | `ab4878c` | cancelled while queued (superseded) | 0 |
+| 3727362 | slot-t-exp | `9c9414b` | cancelled while queued (superseded: the analysis script was not in that commit) | 0 |
+| 3727479 | slot-t-exp | `21c7e81` | 26 experiment tests and 70 analysis tests passed, S0 cross-check passed, 9 runner tests failed: the fixture patched `PILOT_STEPS` (test defect) | 0.013 |
+| 3727662 | slot-t-exp | `fd8c914` | 36 passed | 0.046 |
+| 3727670 | slot-t-rest | `fd8c914` | 132 passed (23 + 39 + 70) | 0.022 |
+| | | | **total to the review** | **0.503** |
+
+Cumulative against the S0 cap of 1.0 node·h: 0.503 used, 0.497 left for the preflight and S0 (estimated 0.05 and 0.15 from the SQ2 evaluation times of 6 to 9 s per 1,000 episodes; the two largest items so far were the existing-suite shards, 0.34). S1A starts its own 4.5 node·h account.
 
 ## Interpretations and implementation choices (for the review)
 1. **Calibration tie, "the `g` nearest 1".** Implemented as the smallest `|g - 1|` (0.5 is nearer to 1 than 2.0 is), then the larger `tau`. Test: `test_the_calibration_choice_is_the_lowest_nll_and_ties_go_to_the_gain_nearest_one_then_the_larger_tau`.
@@ -71,5 +91,9 @@ Elapsed time is the `start` to `end` of the `[job]` lines in each log (1 node ea
 
 ## Not done / next
 - Orchestrator's static review of the new code (this stop).
-- Then: preflight (`slot_run --mode preflight`), `prepare_slot_manifest.py` lock and `checkpoint_inventory.json`, S0 (`--mode s0`) with the D128-3 recheck, `reports/slot-loop-v1/s0/`, `decision_s0.md`, this file and `docs/reports/SLOT-LOOP-v1.md`; `STOP: S0 done <hash>`.
-- S1A (pilot, release, six arm-seed runs, analysis) only after the orchestrator's OK.
+- After the review, in this order (R = `/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1`, C = the full 40-hex commit of the reviewed tree):
+  1. Preflight, one `debug-g` job (about 0.05 node·h): `scripts/submit.py --name slot-preflight --queue debug-g --walltime 00:20:00 --commit C -- -m looplora.llm.slot_run --mode preflight --config configs/slot_loop_v1/s0.json --out R/preflight`. It reads no calibration or dev data. A failed required check, or a Matrix-Native difference (the report carries the maximum absolute logit difference), ends in `STOP` before anything else runs.
+  2. Lock, login node: `scripts/prepare_slot_manifest.py --configs configs/slot_loop_v1 --preflight-report R/preflight/preflight.json --out reports/slot-loop-v1/manifest.lock.json --inventory-out reports/slot-loop-v1/checkpoint_inventory.json`; commit the lock, the inventory and the preflight report on `wp/slot`.
+  3. S0, one job on the lock commit (estimated 0.15 node·h): `... -m looplora.llm.slot_run --mode s0 --config configs/slot_loop_v1/s0.json --manifest reports/slot-loop-v1/manifest.lock.json --out R/s0` (18 calibration candidates on 2,048 episodes, 13 dev conditions, the D128-3 recheck).
+  4. Decision, login node (numpy only): `scripts/analyze_slot_study.py --stage S0 --records R/s0 --out reports/slot-loop-v1/s0 --preflight R/preflight/preflight.json`; then `decision_s0.md`, `docs/reports/SLOT-LOOP-v1.md`, this file; `STOP: S0 done <hash>` with the decision row and the S1A choices it implies.
+- S1A (smoke, pilot, release, six arm-seed runs, analysis) only after the orchestrator's OK.
