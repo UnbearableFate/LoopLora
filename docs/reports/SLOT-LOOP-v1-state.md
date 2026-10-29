@@ -321,7 +321,11 @@ Candidate builder 3728950.opbs passed on mg0002, 23:04:23–23:04:29 (6 s = 0.00
 
 | job | reload arm | request | outcome | node·h |
 | --- | --- | --- | --- | --- |
-| 3728988.opbs | matrix_L1 | 1 node, debug-g, 00:01:00 | pending | pending |
-| 3728990.opbs | soft_slot_L1 | 1 node, debug-g, 00:01:00 | pending | pending |
+| 3728988.opbs | matrix_L1 | 1 node, debug-g, 00:01:00 | passed on mg0027, 26 s, exit 0 | 0.007222 |
+| 3728990.opbs | soft_slot_L1 | 1 node, debug-g, 00:01:00 | passed on mg0029, 25 s, exit 0 | 0.006944 |
 
 Both reload jobs use science commit `1523b19c7949673ddcd1d89cc1e5fe518736805c`, the unchanged lock, persisted s1a-candidate.json, actual smoke selected.pt and smoke_predictions.npz. They write `$R/reload-matrix_L1.json` and `$R/reload-soft_slot_L1.json`. Logs: `/work/xg24i002/x10041/LoopLora/logs/pbs/slot-reload-mat-20261029-230728-3537965.log`, `/work/xg24i002/x10041/LoopLora/logs/pbs/slot-reload-soft-20261029-230728-3537974.log`. Check exact config_matches_release and all episode_id/prediction/correct/NLL equal flags plus actual export digests before building ready release. No formal runs and no sealed data access.
+
+
+Both real reloads accepted: passed/config_matches_release true, all episode_id/prediction/correct/NLL equality flags true, full loaded slot metadata/read exactly equal the persisted candidate, actual checkpoint file digests equal smoke and reload records. Matrix export blake2b-128 `2751f9f87cb16b89c1bae5db8b95b253`; SoftSlot `01906513a2c5a6be685822f868828924`. Reload cost 51 / 3,600 = 0.014167 node·h; S1A preparation cumulative 0.195000; whole-study cumulative 0.973278.
+Ready-release builder job 3729009.opbs (one node, debug-g, 00:01:00; science commit `1523b19c7949673ddcd1d89cc1e5fe518736805c`) repeats all self-checks with both actual reload reports and writes `$R/s1a-release.json`. Log: `/work/xg24i002/x10041/LoopLora/logs/pbs/slot-s1a-release-20261029-230901-3540812.log`. Outcome/runtime pending. Next: inspect status ready, verify final digests/config hashes/inputs, archive release and evidence, update state/report/costs, commit on wp/slot and STOP: release for approval.json. No formal run, dev selection or sealed evaluation is started.
