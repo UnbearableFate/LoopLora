@@ -37,6 +37,29 @@
   - 每个作业 ≤ 16 node·h（节点数 × walltime），由 `scripts/submit.py` 检查。walltime 仍按实测 × 1.5 申请。
   - SLOT-LOOP-v1 预注册文件不改，因为代码绑定了它的 blake2b。本条记录取代其预算一节。
   - 当时 S0 已用 0.701 node·h，其中两轮评审修复后的重测约 0.2。
+- **2026-10-29 22:20 JST** S0 完成，判定 R2（wp/slot 3475ecc，合并为 master 2f7abbc）。
+  - 评审：一轮静态评审，两轮交叉评审（rv-code 和 Opus 子代理）。之后按用户要求（“不要搞这么多次review,核心代码没问题就行”）不再增加评审轮次。剩下两项改为 S1A 前的跟进，不改 `src/`：release 摘要绑定、S1A runbook。
+  - preflight（作业 3728339）9 项全部通过。S-RE 原路径逐位复现：723/1000，NLL 1.642127275466919。Matrix 与 Native 的 logits 和梯度逐位一致。lock 为 2f22aba，`src/` 摘要 `fe548da4c06d77b7f4a8ae65349650f9`。
+  - S0 dev（1,000 题，全部有效问题位置），区间均为描述性：
+
+    | 读取方式 | EM | 相对 Matrix | 读取误差 |
+    | --- | ---: | ---: | ---: |
+    | Matrix | 72.0 % | 基准 | 0.184 |
+    | SoftSlot（g=1，τ=0.1） | 74.5 % | +2.5 pp | 0.092 |
+    | HardSlot | 78.1 % | +6.1 pp | 0.137 |
+
+    HardSlot 的 NLL 更差。只读最终位置时，干净读取为 92.6 %。D128-3 复核的方向相同。
+  - 按登记规则，判定为 R2：S1A 比较 SoftSlot-L1 与 Matrix-L1，两者都用 g=1，SoftSlot 用 τ=0.1；HardSlot 只作诊断。S1A 由 wk-slot 进行。
+  - S0 共用 0.778 node·h，含测试和重试。
+- **2026-10-29 22:45 JST** S1B 增补预注册 `docs/prereg/SLOT-LOOP-v1-S1B.md` 登记，blake2b-128 `6f2e776f2c6cfde131380fb343854784`。底稿是 wk-loop 的 73250eb，另加登记决定 1–6；其中 11 个种子和布局摘要已用标准库复算。
+  - 分支由 S1A 的判定机械决定：
+    - ADVANCE：M1、M4、S1、S4；
+    - NOT ADVANCED 且消融未标记：M1、M4；
+    - 消融被标记：四臂都带 `A_query`。
+  - 任务按 §8.1 用 T2 chain-end：E12，两条链长 8 和 4，关系 0，训练 hop 1–3，确认 hop 1–8。主对比用 hop 2–3。
+  - 冻结的 S-RE writer 是在 T1 上训练的，迁移到 T2 未经验证。由 preflight 把关；另设一个停止条件：校准后的 Matrix-L1 若 hop-1 EM 低于 10 %，就在 pilot 前停止。
+  - 确认循环增益的条件：L4−L1 的 Δ ≥ 3 pp，校正后的区间下界 > 0，每个 seed 的差都 > 0，hop-1 下降不超过 2 pp。四臂分支有三个对比，用 Bonferroni 98⅓ % 区间。
+  - wk-loop 是新开的 codex worker，在 wp/loop 上并行实现。S1A 完成前，wp/loop 与 wp/slot 不互相合并。
 
 ---
 

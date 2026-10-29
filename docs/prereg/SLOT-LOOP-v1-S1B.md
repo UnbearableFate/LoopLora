@@ -1,6 +1,6 @@
 # SLOT-LOOP-v1 S1B: storage and independently trained loop depth (WP-L14)
 
-**Status: draft for orchestrator registration, 2026-10-29.** Prepared by wk-loop on `wp/loop`, against master `8f4bb1da18d146d5979a6ae0fe9ea5c5dac27e1f`. No S1B code, model execution, episode generation, calibration, dev or confirmation access accompanied this draft. The orchestrator registers this addendum on master before implementation. Formal execution additionally waits for S1A completion, its recorded verdict/ablation status, the S1B preflight/lock and an approved ready release. This document defines future behavior; the existing S0/S1A runner does not implement it yet.
+**Status: registered 2026-10-29 22:45 JST by the orchestrator (decisions at the end).** Drafted by wk-loop on `wp/loop` (73250eb), against master `8f4bb1da18d146d5979a6ae0fe9ea5c5dac27e1f`. No S1B code, model execution, episode generation, calibration, dev or confirmation access accompanied this draft. The orchestrator registers this addendum on master before implementation. Formal execution additionally waits for S1A completion, its recorded verdict/ablation status, the S1B preflight/lock and an approved ready release. This document defines future behavior; the existing S0/S1A runner does not implement it yet.
 
 Authority: [parent preregistration](SLOT-LOOP-v1.md), especially registration decision 2; [task WP-L14](../tasks/WP-L14_slot_s1b.md); [plan](../../plan/looplora_diagnosis_and_execution_plan_2026-10-29.md) §§5, 8, 11–13 and its execution record. The 2026-10-29 budget clarification supersedes historic aggregate and one-hour caps: every job remains at most 16 node·h, with measured walltime ×1.5. No old verdict or writer gate is reopened.
 
@@ -174,3 +174,23 @@ Cycle: register addendum → implement and compute-test → one cross-review/fix
 7. **Later-stage estimate is conditional:** no S1B or slot-L4 step timing exists here. Explicit measured anchors, forecast arithmetic and per-job formulas are provided; S1A/S1B pilots must resolve them before release. Lifted aggregate caps do not authorize an unmeasured 16-hour request.
 
 Registration must accept or amend these choices before code. This draft changes no source, config, parent prereg, existing lock, old report verdict or S1A behavior.
+
+## Decisions at registration (orchestrator, 2026-10-29 22:45 JST)
+1. **Deviations 1 to 7 are accepted as written.**
+2. **Seeds and layout checked.** The orchestrator re-derived with stdlib blake2b:
+   - the eleven base seeds of §3;
+   - the layout digest `f556c1b91252b0b74d3ff674717be37c` of the §2 `TaskSpec`, whose 15 fields match `data/relations.py`.
+
+   All match. The compute preflight still re-derives them with the real `TaskSpec`.
+3. **Parent transfer, one sanity stop.**
+   - The calibration output reports the untrained L1 parent's EM and NLL per hop. This is descriptive.
+   - If the calibrated Matrix-L1 parent's hop-1 EM on S1B calibration is below 10 %, STOP before the pilot: that points to a broken transfer, prompt or position rule, not to a reading limit.
+   - Otherwise the transfer quality is reported, not gated.
+4. **Branch source.**
+   - The branch comes from S1A's frozen decision record and its §7.4 ablation record, and is written into the S1B release.
+   - S1B formal runs start only after S1A's decision record exists. An S1A that ends unstable or invalid needs the orchestrator's disposition first (§1).
+5. **Process.**
+   - Implement, then test on compute.
+   - The S1B core code gets one cross-review (rv-code and an Opus subagent). Fixes are checked by tests only (user, 2026-10-29: "不要搞这么多次review,核心代码没问题就行").
+   - Then the preflight and the lock; calibration, smoke, pilot, reload and release; and STOP for `approval.json`.
+6. **Resources.** Each job ≤ 16 node·h (user, 2026-10-29). The §7 estimates are planning figures; the release uses measured times.

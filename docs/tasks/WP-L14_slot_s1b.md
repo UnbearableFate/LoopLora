@@ -1,4 +1,4 @@
-# WP-L14: SLOT-LOOP-v1 S1B: storage effect against loop effect (2026-10-29 22:35 JST)
+# WP-L14: SLOT-LOOP-v1 S1B: storage effect against loop effect (2026-10-29 22:25 JST)
 
 **Worker.** wk-loop is a codex worker (GPT-6.1-sol, reasoning effort high). It works in worktree `LoopLora-wt/loop` on branch `wp/loop`, which starts from master 2f7abbc: the S0 code and results. It runs in parallel with wk-slot, which runs S1A on `wp/slot`.
 
@@ -50,3 +50,17 @@ End with `STOP: addendum <hash>`. Write no code before the orchestrator register
 - **Merging.** Do not merge wp/loop into master, and do not merge master into wp/loop without the orchestrator's word. wp/slot is locked on its own `src/` for S1A, so the two lines stay apart until S1A is done.
 - **Shared code.** Do not change S1A's registered behavior in shared files. Where S1B needs a change in shared code, make it explicit and keep S1A's path bitwise unchanged, with a test.
 - Commit on wp/loop only. Do not push.
+
+## Registration (2026-10-29 22:45 JST)
+The addendum is registered on master as `docs/prereg/SLOT-LOOP-v1-S1B.md`, blake2b-128 `6f2e776f2c6cfde131380fb343854784`. Its "Decisions at registration" 1-6 add three things to the draft:
+- the seed and layout check;
+- a hop-1 sanity stop after calibration;
+- the branch source and the process.
+
+**Next, Step 2.**
+1. Merge master into wp/loop once now. It brings docs only: the registered addendum, the plan record and this section.
+2. Implement S1B as registered and run its tests on compute.
+3. Update `docs/reports/WP-L14.md` (state and ledger).
+4. End with `STOP: review <full hash>`.
+
+That review is the one cross-review of the S1B core code. After it come the fixes (checked by tests), then the preflight and the lock. S1B formal runs wait for S1A's decision record.
