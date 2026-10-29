@@ -188,3 +188,27 @@ artifacts under `reports/ctc/`.
    cost section states. Every other job is 1 node, ≤ 1 h.
 5. **Stops.** STOP after the Stage A lock (`reports/ctc/stage-a-lock.json`) is committed. The orchestrator checks it before
    Stage B.
+
+## Clarification C1 (2026-10-29 13:34 JST, after the Stage A lock and before any Stage B run; from sn-oracle's step-2 STOP)
+1. **Walltime of the CE+ans job.** Decision 4's 0.30 s threshold is replaced by the walltime rule. The smoke measured
+   0.295 s per step, so 1.5 × (8,000 × 0.295 s) + load and export ≈ 3,630 s, which is over the 1 h cap.
+   - The CE+ans training job may therefore use `--scale-up docs/prereg/CTC.md` with a 01:10:00 walltime.
+   - Every other job stays at 1 node, ≤ 1 h.
+2. **Recorded from the Stage A lock (wp/oracle `fae2cda`), before Stage B.**
+   - Both entity heads read the entity at its own token: head at `head_last` and tail at `tail`, at site h14, rank64.
+     Under decision 2, a candidate is therefore worded "a learned parser plus a fixed code table".
+   - The relation is constant in `t2_chain_end`: the chain layout's relation column is 0 for every fact. The relation
+     head is therefore trivially exact, and the key is always pair_codes[head, 0]. The same holds for the oracle readers.
+   - The per-fact joint accuracy on the selection range is 0.99967. The writer has 268,292 parameters.
+3. **Expected outcome, recorded before Stage B.** With p ≈ 1, the hard-lookup memory equals the oracle memory in almost
+   every episode, so EM near the oracle reference on the same episodes is expected.
+   - A candidate flag would then show that the oracle-trained reader can be driven by token identification plus the fixed
+     code table. It would not show that a writer learned codes.
+   - Whether any confirmation is registered after a flag is decided by the orchestrator with the user. It is not
+     automatic.
+4. **Additions accepted.**
+   - A 768-way probe, equal to the registered 1,024-way head with the unseen logits masked. Parameters are reported at the
+     1,024-way size.
+   - B4 at L = 1 and B3-L4 at L = 4, their P1-L depths. M1-L4 at L = 1…8.
+   - One oracle-condition evaluation shared by both arms.
+5. **Stage B proceeds as registered.** Both arms run, the arm-selection rule applies, then the evaluation and the decision.
