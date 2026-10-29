@@ -1,0 +1,1209 @@
+{
+ "entries": [
+  {
+   "blake2b_128": "a9efceab20c7d1edc0cabdf3a3fb5c95",
+   "bytes": 14998132,
+   "checkpoint_blake2b_128": "ccc6effb3ec8cbd5c7d1413a7a7443bf",
+   "episodes": 1000,
+   "file": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/dev-depth-sweep/M1-s17-L1.npz",
+   "hops": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8
+   ],
+   "label": "M1/17@1",
+   "status": "passed",
+   "trace_agrees": true,
+   "trajectory_shapes": {
+    "m": [
+     1000,
+     8,
+     1,
+     128
+    ],
+    "q": [
+     1000,
+     8,
+     1,
+     768
+    ],
+    "z": [
+     1000,
+     8,
+     1,
+     128
+    ]
+   }
+  },
+  {
+   "blake2b_128": "3159b9d9c2cee6c6db70918f0336c4a0",
+   "bytes": 15197927,
+   "checkpoint_blake2b_128": "b1723115c2fb1742a3b8460e3f4395cb",
+   "episodes": 1000,
+   "file": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/dev-depth-sweep/M1-s29-L1.npz",
+   "hops": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8
+   ],
+   "label": "M1/29@1",
+   "status": "passed",
+   "trace_agrees": true,
+   "trajectory_shapes": {
+    "m": [
+     1000,
+     8,
+     1,
+     128
+    ],
+    "q": [
+     1000,
+     8,
+     1,
+     768
+    ],
+    "z": [
+     1000,
+     8,
+     1,
+     128
+    ]
+   }
+  },
+  {
+   "blake2b_128": "33e62ac8556ca67a9ebd764f20a40e9a",
+   "bytes": 15009481,
+   "checkpoint_blake2b_128": "e99b56e151f3fa85db7fb337f6265ddc",
+   "episodes": 1000,
+   "file": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/dev-depth-sweep/M1-s43-L1.npz",
+   "hops": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8
+   ],
+   "label": "M1/43@1",
+   "status": "passed",
+   "trace_agrees": true,
+   "trajectory_shapes": {
+    "m": [
+     1000,
+     8,
+     1,
+     128
+    ],
+    "q": [
+     1000,
+     8,
+     1,
+     768
+    ],
+    "z": [
+     1000,
+     8,
+     1,
+     128
+    ]
+   }
+  },
+  {
+   "blake2b_128": "456ad196dbb3b9b433d7c471fae7c2a3",
+   "bytes": 14807224,
+   "checkpoint_blake2b_128": "aa8e49d3bb9a9ab15142a029dd5d4ee1",
+   "episodes": 1000,
+   "file": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/dev-depth-sweep/M4-s17-L1.npz",
+   "hops": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8
+   ],
+   "label": "M4/17@1",
+   "status": "passed",
+   "trace_agrees": true,
+   "trajectory_shapes": {
+    "m": [
+     1000,
+     8,
+     1,
+     128
+    ],
+    "q": [
+     1000,
+     8,
+     1,
+     768
+    ],
+    "z": [
+     1000,
+     8,
+     1,
+     128
+    ]
+   }
+  },
+  {
+   "blake2b_128": "bfd8cc4811ea292fbf21b622bfd6fa45",
+   "bytes": 29251336,
+   "checkpoint_blake2b_128": "aa8e49d3bb9a9ab15142a029dd5d4ee1",
+   "episodes": 1000,
+   "file": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/dev-depth-sweep/M4-s17-L2.npz",
+   "hops": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8
+   ],
+   "label": "M4/17@2",
+   "status": "passed",
+   "trace_agrees": true,
+   "trajectory_shapes": {
+    "m": [
+     1000,
+     8,
+     2,
+     128
+    ],
+    "q": [
+     1000,
+     8,
+     2,
+     768
+    ],
+    "z": [
+     1000,
+     8,
+     2,
+     128
+    ]
+   }
+  },
+  {
+   "blake2b_128": "87c01b8a21a3d44e29db04a3687ac1bb",
+   "bytes": 56291237,
+   "checkpoint_blake2b_128": "aa8e49d3bb9a9ab15142a029dd5d4ee1",
+   "episodes": 1000,
+   "file": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/dev-depth-sweep/M4-s17-L4.npz",
+   "hops": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8
+   ],
+   "label": "M4/17@4",
+   "status": "passed",
+   "trace_agrees": true,
+   "trajectory_shapes": {
+    "m": [
+     1000,
+     8,
+     4,
+     128
+    ],
+    "q": [
+     1000,
+     8,
+     4,
+     768
+    ],
+    "z": [
+     1000,
+     8,
+     4,
+     128
+    ]
+   }
+  },
+  {
+   "blake2b_128": "2fd4614ea36a671a5f62f5a2b4dcbd52",
+   "bytes": 108112453,
+   "checkpoint_blake2b_128": "aa8e49d3bb9a9ab15142a029dd5d4ee1",
+   "episodes": 1000,
+   "file": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/dev-depth-sweep/M4-s17-L8.npz",
+   "hops": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8
+   ],
+   "label": "M4/17@8",
+   "status": "passed",
+   "trace_agrees": true,
+   "trajectory_shapes": {
+    "m": [
+     1000,
+     8,
+     8,
+     128
+    ],
+    "q": [
+     1000,
+     8,
+     8,
+     768
+    ],
+    "z": [
+     1000,
+     8,
+     8,
+     128
+    ]
+   }
+  },
+  {
+   "blake2b_128": "ed76eb3bc7ad7262f8d09fb1ab5a517d",
+   "bytes": 14864488,
+   "checkpoint_blake2b_128": "5c8644809202acb95b6b1a273defa41a",
+   "episodes": 1000,
+   "file": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/dev-depth-sweep/M4-s29-L1.npz",
+   "hops": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8
+   ],
+   "label": "M4/29@1",
+   "status": "passed",
+   "trace_agrees": true,
+   "trajectory_shapes": {
+    "m": [
+     1000,
+     8,
+     1,
+     128
+    ],
+    "q": [
+     1000,
+     8,
+     1,
+     768
+    ],
+    "z": [
+     1000,
+     8,
+     1,
+     128
+    ]
+   }
+  },
+  {
+   "blake2b_128": "d0aefdd132a54ada341eade016c4b1b1",
+   "bytes": 29265600,
+   "checkpoint_blake2b_128": "5c8644809202acb95b6b1a273defa41a",
+   "episodes": 1000,
+   "file": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/dev-depth-sweep/M4-s29-L2.npz",
+   "hops": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8
+   ],
+   "label": "M4/29@2",
+   "status": "passed",
+   "trace_agrees": true,
+   "trajectory_shapes": {
+    "m": [
+     1000,
+     8,
+     2,
+     128
+    ],
+    "q": [
+     1000,
+     8,
+     2,
+     768
+    ],
+    "z": [
+     1000,
+     8,
+     2,
+     128
+    ]
+   }
+  },
+  {
+   "blake2b_128": "d997cce721a027ce93cabe391fc1785f",
+   "bytes": 56463435,
+   "checkpoint_blake2b_128": "5c8644809202acb95b6b1a273defa41a",
+   "episodes": 1000,
+   "file": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/dev-depth-sweep/M4-s29-L4.npz",
+   "hops": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8
+   ],
+   "label": "M4/29@4",
+   "status": "passed",
+   "trace_agrees": true,
+   "trajectory_shapes": {
+    "m": [
+     1000,
+     8,
+     4,
+     128
+    ],
+    "q": [
+     1000,
+     8,
+     4,
+     768
+    ],
+    "z": [
+     1000,
+     8,
+     4,
+     128
+    ]
+   }
+  },
+  {
+   "blake2b_128": "6097f4bd7a1096b5526913ca57dfa939",
+   "bytes": 108934656,
+   "checkpoint_blake2b_128": "5c8644809202acb95b6b1a273defa41a",
+   "episodes": 1000,
+   "file": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/dev-depth-sweep/M4-s29-L8.npz",
+   "hops": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8
+   ],
+   "label": "M4/29@8",
+   "status": "passed",
+   "trace_agrees": true,
+   "trajectory_shapes": {
+    "m": [
+     1000,
+     8,
+     8,
+     128
+    ],
+    "q": [
+     1000,
+     8,
+     8,
+     768
+    ],
+    "z": [
+     1000,
+     8,
+     8,
+     128
+    ]
+   }
+  },
+  {
+   "blake2b_128": "63a99c46372ac8bf6335149d193f57c8",
+   "bytes": 14746166,
+   "checkpoint_blake2b_128": "e74fda78e2211e5b583cc97256d03760",
+   "episodes": 1000,
+   "file": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/dev-depth-sweep/M4-s43-L1.npz",
+   "hops": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8
+   ],
+   "label": "M4/43@1",
+   "status": "passed",
+   "trace_agrees": true,
+   "trajectory_shapes": {
+    "m": [
+     1000,
+     8,
+     1,
+     128
+    ],
+    "q": [
+     1000,
+     8,
+     1,
+     768
+    ],
+    "z": [
+     1000,
+     8,
+     1,
+     128
+    ]
+   }
+  },
+  {
+   "blake2b_128": "4bb29911ab0fb56461f878c3e75a61e2",
+   "bytes": 29097319,
+   "checkpoint_blake2b_128": "e74fda78e2211e5b583cc97256d03760",
+   "episodes": 1000,
+   "file": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/dev-depth-sweep/M4-s43-L2.npz",
+   "hops": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8
+   ],
+   "label": "M4/43@2",
+   "status": "passed",
+   "trace_agrees": true,
+   "trajectory_shapes": {
+    "m": [
+     1000,
+     8,
+     2,
+     128
+    ],
+    "q": [
+     1000,
+     8,
+     2,
+     768
+    ],
+    "z": [
+     1000,
+     8,
+     2,
+     128
+    ]
+   }
+  },
+  {
+   "blake2b_128": "36f94c36f665875adc642837cc473377",
+   "bytes": 56046766,
+   "checkpoint_blake2b_128": "e74fda78e2211e5b583cc97256d03760",
+   "episodes": 1000,
+   "file": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/dev-depth-sweep/M4-s43-L4.npz",
+   "hops": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8
+   ],
+   "label": "M4/43@4",
+   "status": "passed",
+   "trace_agrees": true,
+   "trajectory_shapes": {
+    "m": [
+     1000,
+     8,
+     4,
+     128
+    ],
+    "q": [
+     1000,
+     8,
+     4,
+     768
+    ],
+    "z": [
+     1000,
+     8,
+     4,
+     128
+    ]
+   }
+  },
+  {
+   "blake2b_128": "ed85656b179c0dde4cbbd5ea945ebf57",
+   "bytes": 107693664,
+   "checkpoint_blake2b_128": "e74fda78e2211e5b583cc97256d03760",
+   "episodes": 1000,
+   "file": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/dev-depth-sweep/M4-s43-L8.npz",
+   "hops": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8
+   ],
+   "label": "M4/43@8",
+   "status": "passed",
+   "trace_agrees": true,
+   "trajectory_shapes": {
+    "m": [
+     1000,
+     8,
+     8,
+     128
+    ],
+    "q": [
+     1000,
+     8,
+     8,
+     768
+    ],
+    "z": [
+     1000,
+     8,
+     8,
+     128
+    ]
+   }
+  },
+  {
+   "blake2b_128": "8f462c75e29466ab29bc967e0e87ca58",
+   "bytes": 14698618,
+   "checkpoint_blake2b_128": "0f3e7d002221df8870135b59b6207a80",
+   "episodes": 1000,
+   "file": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/dev-depth-sweep/S1-s17-L1.npz",
+   "hops": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8
+   ],
+   "label": "S1/17@1",
+   "status": "passed",
+   "trace_agrees": true,
+   "trajectory_shapes": {
+    "m": [
+     1000,
+     8,
+     1,
+     128
+    ],
+    "q": [
+     1000,
+     8,
+     1,
+     768
+    ],
+    "z": [
+     1000,
+     8,
+     1,
+     128
+    ]
+   }
+  },
+  {
+   "blake2b_128": "6d3851fa441494a86e9ebdfe62ed4dd0",
+   "bytes": 14674660,
+   "checkpoint_blake2b_128": "c919668733bcd33d5e34258eca24ab70",
+   "episodes": 1000,
+   "file": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/dev-depth-sweep/S1-s29-L1.npz",
+   "hops": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8
+   ],
+   "label": "S1/29@1",
+   "status": "passed",
+   "trace_agrees": true,
+   "trajectory_shapes": {
+    "m": [
+     1000,
+     8,
+     1,
+     128
+    ],
+    "q": [
+     1000,
+     8,
+     1,
+     768
+    ],
+    "z": [
+     1000,
+     8,
+     1,
+     128
+    ]
+   }
+  },
+  {
+   "blake2b_128": "6efc38061a4e69ce5fef0e444ffdac73",
+   "bytes": 14793935,
+   "checkpoint_blake2b_128": "f55950e835b0da7ef91c8e9eac6294ca",
+   "episodes": 1000,
+   "file": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/dev-depth-sweep/S1-s43-L1.npz",
+   "hops": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8
+   ],
+   "label": "S1/43@1",
+   "status": "passed",
+   "trace_agrees": true,
+   "trajectory_shapes": {
+    "m": [
+     1000,
+     8,
+     1,
+     128
+    ],
+    "q": [
+     1000,
+     8,
+     1,
+     768
+    ],
+    "z": [
+     1000,
+     8,
+     1,
+     128
+    ]
+   }
+  },
+  {
+   "blake2b_128": "17240fedc83c27c6e48f651f2fbdb51f",
+   "bytes": 14758715,
+   "checkpoint_blake2b_128": "85f44ffb2253ddb7894028ffd927162d",
+   "episodes": 1000,
+   "file": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/dev-depth-sweep/S4-s17-L1.npz",
+   "hops": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8
+   ],
+   "label": "S4/17@1",
+   "status": "passed",
+   "trace_agrees": true,
+   "trajectory_shapes": {
+    "m": [
+     1000,
+     8,
+     1,
+     128
+    ],
+    "q": [
+     1000,
+     8,
+     1,
+     768
+    ],
+    "z": [
+     1000,
+     8,
+     1,
+     128
+    ]
+   }
+  },
+  {
+   "blake2b_128": "59f08198286f7997d553cf338683c411",
+   "bytes": 29001852,
+   "checkpoint_blake2b_128": "85f44ffb2253ddb7894028ffd927162d",
+   "episodes": 1000,
+   "file": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/dev-depth-sweep/S4-s17-L2.npz",
+   "hops": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8
+   ],
+   "label": "S4/17@2",
+   "status": "passed",
+   "trace_agrees": true,
+   "trajectory_shapes": {
+    "m": [
+     1000,
+     8,
+     2,
+     128
+    ],
+    "q": [
+     1000,
+     8,
+     2,
+     768
+    ],
+    "z": [
+     1000,
+     8,
+     2,
+     128
+    ]
+   }
+  },
+  {
+   "blake2b_128": "481a80cbe6fc25e1983971a21f322191",
+   "bytes": 56661133,
+   "checkpoint_blake2b_128": "85f44ffb2253ddb7894028ffd927162d",
+   "episodes": 1000,
+   "file": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/dev-depth-sweep/S4-s17-L4.npz",
+   "hops": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8
+   ],
+   "label": "S4/17@4",
+   "status": "passed",
+   "trace_agrees": true,
+   "trajectory_shapes": {
+    "m": [
+     1000,
+     8,
+     4,
+     128
+    ],
+    "q": [
+     1000,
+     8,
+     4,
+     768
+    ],
+    "z": [
+     1000,
+     8,
+     4,
+     128
+    ]
+   }
+  },
+  {
+   "blake2b_128": "952b721303b4cbe07fe36c89b9285b4f",
+   "bytes": 109188651,
+   "checkpoint_blake2b_128": "85f44ffb2253ddb7894028ffd927162d",
+   "episodes": 1000,
+   "file": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/dev-depth-sweep/S4-s17-L8.npz",
+   "hops": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8
+   ],
+   "label": "S4/17@8",
+   "status": "passed",
+   "trace_agrees": true,
+   "trajectory_shapes": {
+    "m": [
+     1000,
+     8,
+     8,
+     128
+    ],
+    "q": [
+     1000,
+     8,
+     8,
+     768
+    ],
+    "z": [
+     1000,
+     8,
+     8,
+     128
+    ]
+   }
+  },
+  {
+   "blake2b_128": "56eba1adaaf0280db22beb166213716f",
+   "bytes": 14956790,
+   "checkpoint_blake2b_128": "bbd85b3b27941058edb92829cf041831",
+   "episodes": 1000,
+   "file": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/dev-depth-sweep/S4-s29-L1.npz",
+   "hops": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8
+   ],
+   "label": "S4/29@1",
+   "status": "passed",
+   "trace_agrees": true,
+   "trajectory_shapes": {
+    "m": [
+     1000,
+     8,
+     1,
+     128
+    ],
+    "q": [
+     1000,
+     8,
+     1,
+     768
+    ],
+    "z": [
+     1000,
+     8,
+     1,
+     128
+    ]
+   }
+  },
+  {
+   "blake2b_128": "4299f95c9d5307dba404b87af7492667",
+   "bytes": 29394260,
+   "checkpoint_blake2b_128": "bbd85b3b27941058edb92829cf041831",
+   "episodes": 1000,
+   "file": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/dev-depth-sweep/S4-s29-L2.npz",
+   "hops": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8
+   ],
+   "label": "S4/29@2",
+   "status": "passed",
+   "trace_agrees": true,
+   "trajectory_shapes": {
+    "m": [
+     1000,
+     8,
+     2,
+     128
+    ],
+    "q": [
+     1000,
+     8,
+     2,
+     768
+    ],
+    "z": [
+     1000,
+     8,
+     2,
+     128
+    ]
+   }
+  },
+  {
+   "blake2b_128": "2957ea567b76c0863e1f4f668fc8327c",
+   "bytes": 56919848,
+   "checkpoint_blake2b_128": "bbd85b3b27941058edb92829cf041831",
+   "episodes": 1000,
+   "file": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/dev-depth-sweep/S4-s29-L4.npz",
+   "hops": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8
+   ],
+   "label": "S4/29@4",
+   "status": "passed",
+   "trace_agrees": true,
+   "trajectory_shapes": {
+    "m": [
+     1000,
+     8,
+     4,
+     128
+    ],
+    "q": [
+     1000,
+     8,
+     4,
+     768
+    ],
+    "z": [
+     1000,
+     8,
+     4,
+     128
+    ]
+   }
+  },
+  {
+   "blake2b_128": "215369c9639e1a6b36e07f58d9ef0d68",
+   "bytes": 109969760,
+   "checkpoint_blake2b_128": "bbd85b3b27941058edb92829cf041831",
+   "episodes": 1000,
+   "file": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/dev-depth-sweep/S4-s29-L8.npz",
+   "hops": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8
+   ],
+   "label": "S4/29@8",
+   "status": "passed",
+   "trace_agrees": true,
+   "trajectory_shapes": {
+    "m": [
+     1000,
+     8,
+     8,
+     128
+    ],
+    "q": [
+     1000,
+     8,
+     8,
+     768
+    ],
+    "z": [
+     1000,
+     8,
+     8,
+     128
+    ]
+   }
+  },
+  {
+   "blake2b_128": "d2c4ab9517d04e555af756779fbdba78",
+   "bytes": 14808076,
+   "checkpoint_blake2b_128": "a3220bcd77b86669d592e07f80ab2594",
+   "episodes": 1000,
+   "file": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/dev-depth-sweep/S4-s43-L1.npz",
+   "hops": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8
+   ],
+   "label": "S4/43@1",
+   "status": "passed",
+   "trace_agrees": true,
+   "trajectory_shapes": {
+    "m": [
+     1000,
+     8,
+     1,
+     128
+    ],
+    "q": [
+     1000,
+     8,
+     1,
+     768
+    ],
+    "z": [
+     1000,
+     8,
+     1,
+     128
+    ]
+   }
+  },
+  {
+   "blake2b_128": "d3d14025408109e91a20c4f696ed0072",
+   "bytes": 29174260,
+   "checkpoint_blake2b_128": "a3220bcd77b86669d592e07f80ab2594",
+   "episodes": 1000,
+   "file": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/dev-depth-sweep/S4-s43-L2.npz",
+   "hops": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8
+   ],
+   "label": "S4/43@2",
+   "status": "passed",
+   "trace_agrees": true,
+   "trajectory_shapes": {
+    "m": [
+     1000,
+     8,
+     2,
+     128
+    ],
+    "q": [
+     1000,
+     8,
+     2,
+     768
+    ],
+    "z": [
+     1000,
+     8,
+     2,
+     128
+    ]
+   }
+  },
+  {
+   "blake2b_128": "0115a1b99b21cc27f195c2f67224c3c7",
+   "bytes": 56409337,
+   "checkpoint_blake2b_128": "a3220bcd77b86669d592e07f80ab2594",
+   "episodes": 1000,
+   "file": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/dev-depth-sweep/S4-s43-L4.npz",
+   "hops": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8
+   ],
+   "label": "S4/43@4",
+   "status": "passed",
+   "trace_agrees": true,
+   "trajectory_shapes": {
+    "m": [
+     1000,
+     8,
+     4,
+     128
+    ],
+    "q": [
+     1000,
+     8,
+     4,
+     768
+    ],
+    "z": [
+     1000,
+     8,
+     4,
+     128
+    ]
+   }
+  },
+  {
+   "blake2b_128": "bc18bd0aac222f53af84867b818c49f9",
+   "bytes": 108718011,
+   "checkpoint_blake2b_128": "a3220bcd77b86669d592e07f80ab2594",
+   "episodes": 1000,
+   "file": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/dev-depth-sweep/S4-s43-L8.npz",
+   "hops": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8
+   ],
+   "label": "S4/43@8",
+   "status": "passed",
+   "trace_agrees": true,
+   "trajectory_shapes": {
+    "m": [
+     1000,
+     8,
+     8,
+     128
+    ],
+    "q": [
+     1000,
+     8,
+     8,
+     768
+    ],
+    "z": [
+     1000,
+     8,
+     8,
+     128
+    ]
+   }
+  }
+ ],
+ "host": "mg0033",
+ "job_id": "3731365.opbs",
+ "source_commit": "258f5f5a24eae684f640a9fd62679bb643470a76",
+ "stage": "S1B-A1-DEV-SWEEP-AUDIT",
+ "status": "complete"
+}

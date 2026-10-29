@@ -1,0 +1,26 @@
+{
+ "command": [
+  "qstat",
+  "-ll",
+  "-H",
+  "3731365"
+ ],
+ "count": 1,
+ "jobs": [
+  {
+   "elapsed_seconds": 71,
+   "job_id": "3731365",
+   "job_name": "s1b-a1-verdict",
+   "nodes": 1,
+   "queue": "debug-g",
+   "start_date": "10/30 06:47:06",
+   "status": "FINISH"
+  }
+ ],
+ "notices": [
+  "Miyabi scheduled stop time: 2026/11/25(Wed) 09:00:00 (Remain: 26days 02:10:25)"
+ ],
+ "ok": true,
+ "schema_version": 1,
+ "source_count": 1
+}

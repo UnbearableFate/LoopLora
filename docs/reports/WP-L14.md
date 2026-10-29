@@ -1,6 +1,6 @@
 # WP-L14: S1B implementation and validation
 
-**Confirmation and dev depth evaluations completed; frozen CONFIRMATION analysis is submitted as 3731365.** Both evaluation jobs exited 0 and produced all thirty expected entries each. Frozen twelve-checkpoint selection `e3f269db39cd9b431d27e0a5eb528d6e`, orchestrator [open.json](../../reports/slot-loop-v1/s1b/open.json) `b698f7ce5e31b2b43da5c210134588b0`, release `d1ccbb7ff4c31fa53abfd7a3cc9ad572`, science `258f5f5a24eae684f640a9fd62679bb643470a76` and lock `2309d5a8ebae91332f32bbd85e5eeb8a` remain unchanged. Completed worker actual **17.922222 node·h** across 31 jobs; independent rerun **0.009444 node·h** separately. Pending analysis requests **0.333333 node·h**; verdict and descriptive dev tables await that compute result. Unseen remains off; mechanism controls await a later orchestrator release extension.
+**S1B A1 verdict: NOT ADVANCED; S2 primary: none.** Frozen [verdict.json](../../reports/slot-loop-v1/s1b/a1/confirmation-analysis/verdict.json), blake2b-128 **`dca8d4e9777a8aefb85b79d8a8cdd758`**, and [verdict.md](../../reports/slot-loop-v1/s1b/a1/confirmation-analysis/verdict.md) are archived unchanged. S4−S1 **+2.575 pp** and M4−M1 **+2.091667 pp** fall below the registered +3 pp threshold; S4−M4 **+0.466667 pp** has an interval spanning zero and a zero seed difference. Both descriptive sweep screens pass; neither backend qualifies for S2. All twelve main runs and sixty evaluation sample audits passed. Release/science/selection/open records remain frozen. Completed worker actual **17.941944 node·h** across 32 jobs; including the independent 34-second rerun, known S1B actual **17.951389 node·h**. No pending worker jobs. Unseen is unrun because the approved release fixed it false; mechanism controls are untriggered because no loop gain was confirmed.
 
 Worker wk-loop, branch `wp/loop`, login/control plane `miyabi-g2` (aarch64), no PBS allocation. Merged master **once**, as instructed: fast-forward `2f7abbc` → `8f4bb1da18d146d5979a6ae0fe9ea5c5dac27e1f`; only the task file/worker registry changed. No push.
 
@@ -485,3 +485,79 @@ After the frozen process completes, the same compute job separately audits all *
 Walltime derives from completed measurements: confirmation's timed prepare/forward total **748.639458 s** and dev's **378.075258 s** leave **(1181−748.639458)+(617−378.075258) = 671.285284 s** of generation, model setup, diagnostics, validation, compression and artifact handling. Conservatively allow that entire measured residual for reading/checking the two saved datasets; add the prior **36 s** frozen DEV job for module/release reconciliation/statistics. Expected **707.285284 s**, ×1.5 = **1060.927927 s**, rounded up to **1200 s / 0.333333 requested node·h**. This fits debug-g and the 16 node·h cap; actual remains pending. Log `/work/xg24i002/x10041/LoopLora/logs/pbs/s1b-a1-verdict-20261030-064703-2584073.log`.
 
 No scientific source/config/checkpoint/selection/open-record change since opening, no additional test run required, no unseen evaluation or mechanism control submitted, no merge/pull/push, sleep or polling. Login work was bounded stdlib JSON/log/metadata/archive inspection; all NPZ decoding, trajectory validation, statistics and metric summaries run on compute. On completion, verify and archive both frozen verdict outputs and descriptive dev evidence, report all verdict tables and actual costs, then STOP verdict for the orchestrator.
+
+### Frozen verdict archived: NOT ADVANCED
+
+Verified **3731365.opbs exit 0**, host **mg0033**, immutable science commit **`258f5f5a24eae684f640a9fd62679bb643470a76`**. The canonical log and `.log.pbs` copy are byte-identical, the separate exit marker is 0, and the frozen CLI and final wrapper both report complete. Log interval **2026-10-30 06:47:08–06:48:18 JST** is 70 s; the single finished-job PBS query gives **71 s / 0.019722 node·h**, including allocation overhead. Frozen confirmation analysis took **41.686182 s**; frozen analysis plus independent dev artifact audit/summary took **51.142172 s**. No failed, omitted or skipped sample audit. All **30 confirmation** and **30 descriptive dev** files passed their compute-side hash, provenance, ID/hop/count, finite trajectory, ordered-depth and trace-agreement checks. The complete 191-pass, zero-skip source validation remains applicable; this phase changed only records/reports and added no scientific source/config/test changes.
+
+The frozen source index matches the approved release, manifest, analysis script and exact verdict-file bytes. The final audit's output hashes match all five actual output files, and the dev audit contains thirty passed entries. Archived the original verdict JSON/Markdown/source index, final analysis receipt, job log/exit/history and full descriptive dev summary/audit **byte-for-byte**, with BLAKE2b checks, under [confirmation-analysis/](../../reports/slot-loop-v1/s1b/a1/confirmation-analysis/verdict.json) and [descriptive-dev/](../../reports/slot-loop-v1/s1b/a1/descriptive-dev/summary.json). Updated the durable [verdict-job ledger](../../reports/slot-loop-v1/s1b/a1/verdict-job.json) and [sample inventory](../../reports/slot-loop-v1/s1b/a1/opened-evaluation-artifacts.json) to complete/audited in both locations. [final-summary.json](../../reports/slot-loop-v1/s1b/a1/final-summary.json) records the frozen decision, selected mapping, output identities, unrun items and final cost totals. The selected exports and all raw sample/trajectory files remain in persistent storage; none was deleted or regenerated.
+
+| final artifact | blake2b-128 |
+| --- | --- |
+| confirmation-analysis/verdict.json | `dca8d4e9777a8aefb85b79d8a8cdd758` |
+| confirmation-analysis/verdict.md | `91753653761539da9c37616a1da8ecdb` |
+| confirmation-analysis/source_index.json | `1376bcbffa6d6268f26515ad3aad4a61` |
+| confirmation-analysis/analysis-audit.json | `0f402ed3e66a70311ea10af68914ee1d` |
+| descriptive-dev/summary.json | `e162aed7a79407ed24cdf7fe168d8089` |
+| descriptive-dev/audit.json | `b629db72532e3caddb84662f80daf8f6` |
+
+#### Registered confirmation decisions
+
+Results are conditional on **one S-RE writer, continuation seeds 17/29/43 and E12/(8,4)**. The three contrasts use the registered hop-2/3 statistic on **2,000 paired episode IDs**, with the episode axis preserved across seeds/hops in all **10,000** bootstrap draws (seed **5799536610111230359**). Intervals are the registered **98⅓%** Bonferroni intervals, computed from integer sums with exact rational boundary tests. Units below are percentage points; rounding is display only.
+
+| contrast | difference (pp) | 98⅓% interval (pp) | per-seed differences 17 / 29 / 43 (pp) | hop-1 difference (pp) | registered result |
+| --- | ---: | --- | --- | ---: | --- |
+| S4−S1 | +2.575000 | [1.733333, 3.391667] | +2.300 / +2.450 / +2.975 | +5.066667 | fail: point difference < +3 pp |
+| M4−M1 | +2.091667 | [1.191667, 3.000000] | +1.275 / +2.350 / +2.650 | +1.183333 | fail: point difference < +3 pp |
+| S4−M4 | +0.466667 | [−0.491667, 1.450000] | +1.350 / +0.050 / 0.000 | +7.633333 | fail: lower bound ≤0 and one seed difference is zero |
+
+Both loop contrasts have positive lower bounds, positive differences in every seed and acceptable hop-1 changes. Their point estimates fail the separately required **+3 pp** criterion. The storage contrast has a positive point estimate but fails its lower-positive and strictly-positive-in-every-seed requirements. Consequently the frozen verdict is **NOT ADVANCED**, with **`s2_primary: null`**; no storage-superiority claim is established.
+
+| backend | confirmed loop | same-checkpoint L4−L1 sweep differences, seeds 17 / 29 / 43 (pp) | sweep screen | S2 qualified |
+| --- | --- | --- | --- | --- |
+| Matrix | false | +7.200 / +6.300 / +5.200 | pass | false |
+| SoftSlot | false | +8.300 / +7.700 / +7.250 | pass | false |
+
+The descriptive sweep screen passes for both backends, with positive pooled and per-seed L4−L1 differences and verified trace agreement. The independently trained loop criteria also remain mandatory. No backend meets both conditions, so S1B opens no S2 advancement and triggers neither §6 mechanism control. Claims remain limited to the observed reading/memory-adaptation behavior under this writer/layout.
+
+#### Descriptive confirmation tables
+
+The frozen [verdict.md](../../reports/slot-loop-v1/s1b/a1/confirmation-analysis/verdict.md) contains the complete EM, correct counts, NLL and per-hop rows for **all twelve selected arm/seed pairs**, all **24 trained-L4 depth-sweep pairs**, plus S1−M1 and Memory×Depth descriptive contrasts. The compact pooled table below summarizes those unchanged rows. Each arm has **2,000 shared episode IDs ×3 seeds ×8 hops = 48,000 question responses**; pooling does not create 6,000 independent episodes. The inferential resampling unit remains the original 2,000 episode IDs.
+
+| selected arm | all-hop correct / 48,000 | all-hop EM (%) | hop-2/3 EM (%) | all-hop NLL (nats) |
+| --- | ---: | ---: | ---: | ---: |
+| M1 | 4888 | 10.183333 | 8.541667 | 5.864634 |
+| M4 | 5512 | 11.483333 | 10.633333 | 5.786496 |
+| S1 | 5165 | 10.760417 | 8.525000 | 5.806749 |
+| S4 | 6080 | 12.666667 | 11.100000 | 5.730412 |
+
+Descriptive hop-2/3 **S1−M1 = −0.016667 pp**; **Memory×Depth = +0.483333 pp**. These are descriptive point summaries and do not change any registered pass/fail decision.
+
+#### Same-checkpoint depth sweeps: descriptive only
+
+The following hop-2/3 EM values pool the three selected L4-trained checkpoints within each backend. Confirmation uses 2,000 episode IDs, dev uses its unchanged 1,000 episode IDs; each set retains the same paired inputs at every evaluated depth. The saved q/m/z trajectory axes and trace/forward checks passed throughout. The sharp depth dependence at L2/L8 is recorded descriptively; neither L8 monotonicity nor semantic transition stability is claimed.
+
+| set | L4-trained arm | EM@1 (%) | EM@2 (%) | EM@4 (%) | EM@8 (%) |
+| --- | --- | ---: | ---: | ---: | ---: |
+| confirmation | M4 | 4.400000 | 0.208333 | 10.633333 | 0.091667 |
+| confirmation | S4 | 3.350000 | 0.691667 | 11.100000 | 0.516667 |
+| dev | M4 | 3.816667 | 0.050000 | 9.733333 | 0.016667 |
+| dev | S4 | 2.883333 | 0.516667 | 11.233333 | 0.333333 |
+
+The separate [descriptive dev summary](../../reports/slot-loop-v1/s1b/a1/descriptive-dev/summary.json) preserves full per-arm/seed/hop and per-depth EM/count/NLL tables and the two descriptive contrasts, with `affects_decisions: false`. It was produced after the frozen confirmation verdict; dev sweep values neither select another checkpoint nor alter that verdict.
+
+#### Final resource ledger and stop
+
+| completed work | actual node seconds | actual node·h |
+| --- | ---: | ---: |
+| wk-loop through frozen DEV selection, including earlier failures/retries and superseded calibration/diagnosis | 62,722 | 17.422778 |
+| confirmation + registered depth sweep, 3731051 | 1,181 | 0.328056 |
+| descriptive dev depth sweep, 3731052 | 617 | 0.171389 |
+| frozen CONFIRMATION analysis + separate dev audit/summary, 3731365 | 71 | 0.019722 |
+| **wk-loop total, 32 completed jobs** | **64,591** | **17.941944** |
+| independent reviewer DEV rerun, 3730976, separate from worker total | 34 | 0.009444 |
+| **known combined S1B total, 33 completed jobs** | **64,625** | **17.951389** |
+
+Final analysis requested **1200 s / 0.333333 node·h**, actual **71 s / 0.019722 node·h**. Its conservative artifact-handling estimate included generation/compression/setup costs that reading the completed artifacts did not repeat; use the measured 71-second job when sizing a comparable future analysis. No worker job remains pending. Every completed job's actual cost includes its reported allocation time, with earlier failures and the stopped calibration retained in the running total.
+
+**Unrun items:** unseen was fixed **false** in the approved release; §6 mechanism controls are **not triggered** because neither backend has a confirmed loop gain. These are registered dispositions, with no omitted engineering audit or skipped test to explain. No scientific source, configuration, checkpoint, selection, release or opening record was changed, no extra evaluation/analysis rerun was submitted, and no merge/pull/push, sleep or polling occurred. Finalization on login used bounded stdlib metadata/hash/archive checks only. The requested verdict artifacts and ledger are complete; stop for the orchestrator at this commit.

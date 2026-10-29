@@ -1,9 +1,11 @@
 {
+ "analysis_audit_blake2b_128": "0f402ed3e66a70311ea10af68914ee1d",
+ "audit_job_id": "3731365.opbs",
  "entries": [
   {
    "blake2b_128": "d4de91152c2ac1a8c7a98dcebaa884e8",
    "bytes": 29996501,
-   "content_audit": "passed during evaluation; frozen analysis audit pending",
+   "content_audit": "passed frozen CONFIRMATION analysis",
    "evaluation_seconds": 19.51782809989527,
    "file": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/confirmation/M1-s17-L1.npz",
    "label": "M1/17@1",
@@ -12,7 +14,7 @@
   {
    "blake2b_128": "f42be20f54e62ddc1b21cae3a40fa48c",
    "bytes": 30399458,
-   "content_audit": "passed during evaluation; frozen analysis audit pending",
+   "content_audit": "passed frozen CONFIRMATION analysis",
    "evaluation_seconds": 17.356710581108928,
    "file": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/confirmation/M1-s29-L1.npz",
    "label": "M1/29@1",
@@ -21,7 +23,7 @@
   {
    "blake2b_128": "4cdb9dea42fba6f3e8d91c39a8f1281c",
    "bytes": 30014445,
-   "content_audit": "passed during evaluation; frozen analysis audit pending",
+   "content_audit": "passed frozen CONFIRMATION analysis",
    "evaluation_seconds": 17.216853375866776,
    "file": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/confirmation/M1-s43-L1.npz",
    "label": "M1/43@1",
@@ -30,7 +32,7 @@
   {
    "blake2b_128": "ecdadd22acc9a92f5841b8ab98b1c4f3",
    "bytes": 29621493,
-   "content_audit": "passed during evaluation; frozen analysis audit pending",
+   "content_audit": "passed frozen CONFIRMATION analysis",
    "evaluation_seconds": 17.44670463487273,
    "file": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/confirmation/M4-s17-L1.npz",
    "label": "M4/17@1",
@@ -39,7 +41,7 @@
   {
    "blake2b_128": "b043509547609028f2f32791c12f7d28",
    "bytes": 58484458,
-   "content_audit": "passed during evaluation; frozen analysis audit pending",
+   "content_audit": "passed frozen CONFIRMATION analysis",
    "evaluation_seconds": 19.991176499024732,
    "file": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/confirmation/M4-s17-L2.npz",
    "label": "M4/17@2",
@@ -48,7 +50,7 @@
   {
    "blake2b_128": "4af8c37b70c196ae623b34e367e43b19",
    "bytes": 112545035,
-   "content_audit": "passed during evaluation; frozen analysis audit pending",
+   "content_audit": "passed frozen CONFIRMATION analysis",
    "evaluation_seconds": 25.55539339367533,
    "file": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/confirmation/M4-s17-L4.npz",
    "label": "M4/17@4",
@@ -57,7 +59,7 @@
   {
    "blake2b_128": "c663627548795674f8fc2de3498ee866",
    "bytes": 216146431,
-   "content_audit": "passed during evaluation; frozen analysis audit pending",
+   "content_audit": "passed frozen CONFIRMATION analysis",
    "evaluation_seconds": 36.24365848393063,
    "file": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/confirmation/M4-s17-L8.npz",
    "label": "M4/17@8",
@@ -66,7 +68,7 @@
   {
    "blake2b_128": "a963f2e2c6f2eb8240f0bdf4324d7510",
    "bytes": 29725550,
-   "content_audit": "passed during evaluation; frozen analysis audit pending",
+   "content_audit": "passed frozen CONFIRMATION analysis",
    "evaluation_seconds": 17.27322082585306,
    "file": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/confirmation/M4-s29-L1.npz",
    "label": "M4/29@1",
@@ -75,7 +77,7 @@
   {
    "blake2b_128": "d33d3da0fe51e9e30aa579fa297af3cb",
    "bytes": 58536419,
-   "content_audit": "passed during evaluation; frozen analysis audit pending",
+   "content_audit": "passed frozen CONFIRMATION analysis",
    "evaluation_seconds": 20.00374627407291,
    "file": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/confirmation/M4-s29-L2.npz",
    "label": "M4/29@2",
@@ -84,7 +86,7 @@
   {
    "blake2b_128": "03ba4c9efa6a16a8b91e4b86cf7460f7",
    "bytes": 112946827,
-   "content_audit": "passed during evaluation; frozen analysis audit pending",
+   "content_audit": "passed frozen CONFIRMATION analysis",
    "evaluation_seconds": 25.429715027858038,
    "file": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/confirmation/M4-s29-L4.npz",
    "label": "M4/29@4",
@@ -93,7 +95,7 @@
   {
    "blake2b_128": "8d043fd93dec97b9a81115e36413c7df",
    "bytes": 217935037,
-   "content_audit": "passed during evaluation; frozen analysis audit pending",
+   "content_audit": "passed frozen CONFIRMATION analysis",
    "evaluation_seconds": 36.40603302672389,
    "file": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/confirmation/M4-s29-L8.npz",
    "label": "M4/29@8",
@@ -102,7 +104,7 @@
   {
    "blake2b_128": "c9757d985e4847bbd47aad748e1658e4",
    "bytes": 29479766,
-   "content_audit": "passed during evaluation; frozen analysis audit pending",
+   "content_audit": "passed frozen CONFIRMATION analysis",
    "evaluation_seconds": 17.48628964292584,
    "file": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/confirmation/M4-s43-L1.npz",
    "label": "M4/43@1",
@@ -111,7 +113,7 @@
   {
    "blake2b_128": "89d54c0a580502f1dbefb6a9e5cf7391",
    "bytes": 58195708,
-   "content_audit": "passed during evaluation; frozen analysis audit pending",
+   "content_audit": "passed frozen CONFIRMATION analysis",
    "evaluation_seconds": 20.089493671635864,
    "file": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/confirmation/M4-s43-L2.npz",
    "label": "M4/43@2",
@@ -120,7 +122,7 @@
   {
    "blake2b_128": "a2fea8ed1315fec8db592016904940a1",
    "bytes": 112075275,
-   "content_audit": "passed during evaluation; frozen analysis audit pending",
+   "content_audit": "passed frozen CONFIRMATION analysis",
    "evaluation_seconds": 25.01325447889394,
    "file": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/confirmation/M4-s43-L4.npz",
    "label": "M4/43@4",
@@ -129,7 +131,7 @@
   {
    "blake2b_128": "7bad9aaa967208e7c6e42c2f806a9616",
    "bytes": 215361766,
-   "content_audit": "passed during evaluation; frozen analysis audit pending",
+   "content_audit": "passed frozen CONFIRMATION analysis",
    "evaluation_seconds": 36.310990479949396,
    "file": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/confirmation/M4-s43-L8.npz",
    "label": "M4/43@8",
@@ -138,7 +140,7 @@
   {
    "blake2b_128": "5da205ab36dc3704cf7063d0c5e031d4",
    "bytes": 29382508,
-   "content_audit": "passed during evaluation; frozen analysis audit pending",
+   "content_audit": "passed frozen CONFIRMATION analysis",
    "evaluation_seconds": 18.21248496498447,
    "file": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/confirmation/S1-s17-L1.npz",
    "label": "S1/17@1",
@@ -147,7 +149,7 @@
   {
    "blake2b_128": "bbed7f7af858a9ffb3e1e98ad0b03e14",
    "bytes": 29325822,
-   "content_audit": "passed during evaluation; frozen analysis audit pending",
+   "content_audit": "passed frozen CONFIRMATION analysis",
    "evaluation_seconds": 18.539491766045103,
    "file": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/confirmation/S1-s29-L1.npz",
    "label": "S1/29@1",
@@ -156,7 +158,7 @@
   {
    "blake2b_128": "03dc9cc4735c66bf9659d1084fcfc156",
    "bytes": 29570987,
-   "content_audit": "passed during evaluation; frozen analysis audit pending",
+   "content_audit": "passed frozen CONFIRMATION analysis",
    "evaluation_seconds": 18.48388779020752,
    "file": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/confirmation/S1-s43-L1.npz",
    "label": "S1/43@1",
@@ -165,7 +167,7 @@
   {
    "blake2b_128": "22239a0abdf704938c6d9ae012bf9c0f",
    "bytes": 29535832,
-   "content_audit": "passed during evaluation; frozen analysis audit pending",
+   "content_audit": "passed frozen CONFIRMATION analysis",
    "evaluation_seconds": 18.873636161210015,
    "file": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/confirmation/S4-s17-L1.npz",
    "label": "S4/17@1",
@@ -174,7 +176,7 @@
   {
    "blake2b_128": "3ae33f9a69f111fa6b9a7250bb99c0f0",
    "bytes": 58006367,
-   "content_audit": "passed during evaluation; frozen analysis audit pending",
+   "content_audit": "passed frozen CONFIRMATION analysis",
    "evaluation_seconds": 22.02891510212794,
    "file": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/confirmation/S4-s17-L2.npz",
    "label": "S4/17@2",
@@ -183,7 +185,7 @@
   {
    "blake2b_128": "d7d676748c6e25a92de036942ddc13d5",
    "bytes": 113304933,
-   "content_audit": "passed during evaluation; frozen analysis audit pending",
+   "content_audit": "passed frozen CONFIRMATION analysis",
    "evaluation_seconds": 29.328552718943683,
    "file": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/confirmation/S4-s17-L4.npz",
    "label": "S4/17@4",
@@ -192,7 +194,7 @@
   {
    "blake2b_128": "168e24c026ca9204869308af3cd2cab1",
    "bytes": 218332385,
-   "content_audit": "passed during evaluation; frozen analysis audit pending",
+   "content_audit": "passed frozen CONFIRMATION analysis",
    "evaluation_seconds": 43.94449350627838,
    "file": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/confirmation/S4-s17-L8.npz",
    "label": "S4/17@8",
@@ -201,7 +203,7 @@
   {
    "blake2b_128": "83576ba050a9a0f73f64d571406c278b",
    "bytes": 29923175,
-   "content_audit": "passed during evaluation; frozen analysis audit pending",
+   "content_audit": "passed frozen CONFIRMATION analysis",
    "evaluation_seconds": 18.33268180981395,
    "file": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/confirmation/S4-s29-L1.npz",
    "label": "S4/29@1",
@@ -210,7 +212,7 @@
   {
    "blake2b_128": "580fb941ee9edf7e9f753bcbdfe4e5b7",
    "bytes": 58786373,
-   "content_audit": "passed during evaluation; frozen analysis audit pending",
+   "content_audit": "passed frozen CONFIRMATION analysis",
    "evaluation_seconds": 21.95403099482064,
    "file": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/confirmation/S4-s29-L2.npz",
    "label": "S4/29@2",
@@ -219,7 +221,7 @@
   {
    "blake2b_128": "78cdc11f9e10abc4e5222e55082d5273",
    "bytes": 113785909,
-   "content_audit": "passed during evaluation; frozen analysis audit pending",
+   "content_audit": "passed frozen CONFIRMATION analysis",
    "evaluation_seconds": 29.503301370801637,
    "file": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/confirmation/S4-s29-L4.npz",
    "label": "S4/29@4",
@@ -228,7 +230,7 @@
   {
    "blake2b_128": "6907a3a373cb5c46259d718a76d8f92f",
    "bytes": 219801813,
-   "content_audit": "passed during evaluation; frozen analysis audit pending",
+   "content_audit": "passed frozen CONFIRMATION analysis",
    "evaluation_seconds": 44.2531765481981,
    "file": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/confirmation/S4-s29-L8.npz",
    "label": "S4/29@8",
@@ -237,7 +239,7 @@
   {
    "blake2b_128": "353a25e51fc1fa0dfaba38382036ac7c",
    "bytes": 29622292,
-   "content_audit": "passed during evaluation; frozen analysis audit pending",
+   "content_audit": "passed frozen CONFIRMATION analysis",
    "evaluation_seconds": 18.53817649712437,
    "file": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/confirmation/S4-s43-L1.npz",
    "label": "S4/43@1",
@@ -246,7 +248,7 @@
   {
    "blake2b_128": "333a8042eefc23f8f7d3748f367f305e",
    "bytes": 58348091,
-   "content_audit": "passed during evaluation; frozen analysis audit pending",
+   "content_audit": "passed frozen CONFIRMATION analysis",
    "evaluation_seconds": 22.01572202227544,
    "file": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/confirmation/S4-s43-L2.npz",
    "label": "S4/43@2",
@@ -255,7 +257,7 @@
   {
    "blake2b_128": "3fc67731884a793a6dca428fbf31b11f",
    "bytes": 112800775,
-   "content_audit": "passed during evaluation; frozen analysis audit pending",
+   "content_audit": "passed frozen CONFIRMATION analysis",
    "evaluation_seconds": 29.374366045813076,
    "file": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/confirmation/S4-s43-L4.npz",
    "label": "S4/43@4",
@@ -264,7 +266,7 @@
   {
    "blake2b_128": "91573eb0f9c3003bfcda2d0e268f29b0",
    "bytes": 217407856,
-   "content_audit": "passed during evaluation; frozen analysis audit pending",
+   "content_audit": "passed frozen CONFIRMATION analysis",
    "evaluation_seconds": 43.915472128253896,
    "file": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/confirmation/S4-s43-L8.npz",
    "label": "S4/43@8",
@@ -273,7 +275,7 @@
   {
    "blake2b_128": "a9efceab20c7d1edc0cabdf3a3fb5c95",
    "bytes": 14998132,
-   "content_audit": "passed during evaluation; frozen analysis audit pending",
+   "content_audit": "passed descriptive dev audit",
    "evaluation_seconds": 10.941828727198299,
    "file": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/dev-depth-sweep/M1-s17-L1.npz",
    "label": "M1/17@1",
@@ -282,7 +284,7 @@
   {
    "blake2b_128": "3159b9d9c2cee6c6db70918f0336c4a0",
    "bytes": 15197927,
-   "content_audit": "passed during evaluation; frozen analysis audit pending",
+   "content_audit": "passed descriptive dev audit",
    "evaluation_seconds": 8.743583262810716,
    "file": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/dev-depth-sweep/M1-s29-L1.npz",
    "label": "M1/29@1",
@@ -291,7 +293,7 @@
   {
    "blake2b_128": "33e62ac8556ca67a9ebd764f20a40e9a",
    "bytes": 15009481,
-   "content_audit": "passed during evaluation; frozen analysis audit pending",
+   "content_audit": "passed descriptive dev audit",
    "evaluation_seconds": 8.463128954026615,
    "file": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/dev-depth-sweep/M1-s43-L1.npz",
    "label": "M1/43@1",
@@ -300,7 +302,7 @@
   {
    "blake2b_128": "456ad196dbb3b9b433d7c471fae7c2a3",
    "bytes": 14807224,
-   "content_audit": "passed during evaluation; frozen analysis audit pending",
+   "content_audit": "passed descriptive dev audit",
    "evaluation_seconds": 8.724015990796033,
    "file": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/dev-depth-sweep/M4-s17-L1.npz",
    "label": "M4/17@1",
@@ -309,7 +311,7 @@
   {
    "blake2b_128": "bfd8cc4811ea292fbf21b622bfd6fa45",
    "bytes": 29251336,
-   "content_audit": "passed during evaluation; frozen analysis audit pending",
+   "content_audit": "passed descriptive dev audit",
    "evaluation_seconds": 10.039812434202759,
    "file": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/dev-depth-sweep/M4-s17-L2.npz",
    "label": "M4/17@2",
@@ -318,7 +320,7 @@
   {
    "blake2b_128": "87c01b8a21a3d44e29db04a3687ac1bb",
    "bytes": 56291237,
-   "content_audit": "passed during evaluation; frozen analysis audit pending",
+   "content_audit": "passed descriptive dev audit",
    "evaluation_seconds": 12.636669658997562,
    "file": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/dev-depth-sweep/M4-s17-L4.npz",
    "label": "M4/17@4",
@@ -327,7 +329,7 @@
   {
    "blake2b_128": "2fd4614ea36a671a5f62f5a2b4dcbd52",
    "bytes": 108112453,
-   "content_audit": "passed during evaluation; frozen analysis audit pending",
+   "content_audit": "passed descriptive dev audit",
    "evaluation_seconds": 18.69345292885555,
    "file": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/dev-depth-sweep/M4-s17-L8.npz",
    "label": "M4/17@8",
@@ -336,7 +338,7 @@
   {
    "blake2b_128": "ed76eb3bc7ad7262f8d09fb1ab5a517d",
    "bytes": 14864488,
-   "content_audit": "passed during evaluation; frozen analysis audit pending",
+   "content_audit": "passed descriptive dev audit",
    "evaluation_seconds": 8.546817427064525,
    "file": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/dev-depth-sweep/M4-s29-L1.npz",
    "label": "M4/29@1",
@@ -345,7 +347,7 @@
   {
    "blake2b_128": "d0aefdd132a54ada341eade016c4b1b1",
    "bytes": 29265600,
-   "content_audit": "passed during evaluation; frozen analysis audit pending",
+   "content_audit": "passed descriptive dev audit",
    "evaluation_seconds": 10.125363179773558,
    "file": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/dev-depth-sweep/M4-s29-L2.npz",
    "label": "M4/29@2",
@@ -354,7 +356,7 @@
   {
    "blake2b_128": "d997cce721a027ce93cabe391fc1785f",
    "bytes": 56463435,
-   "content_audit": "passed during evaluation; frozen analysis audit pending",
+   "content_audit": "passed descriptive dev audit",
    "evaluation_seconds": 12.87682542274706,
    "file": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/dev-depth-sweep/M4-s29-L4.npz",
    "label": "M4/29@4",
@@ -363,7 +365,7 @@
   {
    "blake2b_128": "6097f4bd7a1096b5526913ca57dfa939",
    "bytes": 108934656,
-   "content_audit": "passed during evaluation; frozen analysis audit pending",
+   "content_audit": "passed descriptive dev audit",
    "evaluation_seconds": 17.721905770915328,
    "file": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/dev-depth-sweep/M4-s29-L8.npz",
    "label": "M4/29@8",
@@ -372,7 +374,7 @@
   {
    "blake2b_128": "63a99c46372ac8bf6335149d193f57c8",
    "bytes": 14746166,
-   "content_audit": "passed during evaluation; frozen analysis audit pending",
+   "content_audit": "passed descriptive dev audit",
    "evaluation_seconds": 8.604959700081963,
    "file": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/dev-depth-sweep/M4-s43-L1.npz",
    "label": "M4/43@1",
@@ -381,7 +383,7 @@
   {
    "blake2b_128": "4bb29911ab0fb56461f878c3e75a61e2",
    "bytes": 29097319,
-   "content_audit": "passed during evaluation; frozen analysis audit pending",
+   "content_audit": "passed descriptive dev audit",
    "evaluation_seconds": 10.119532053853618,
    "file": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/dev-depth-sweep/M4-s43-L2.npz",
    "label": "M4/43@2",
@@ -390,7 +392,7 @@
   {
    "blake2b_128": "36f94c36f665875adc642837cc473377",
    "bytes": 56046766,
-   "content_audit": "passed during evaluation; frozen analysis audit pending",
+   "content_audit": "passed descriptive dev audit",
    "evaluation_seconds": 12.919804937089793,
    "file": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/dev-depth-sweep/M4-s43-L4.npz",
    "label": "M4/43@4",
@@ -399,7 +401,7 @@
   {
    "blake2b_128": "ed85656b179c0dde4cbbd5ea945ebf57",
    "bytes": 107693664,
-   "content_audit": "passed during evaluation; frozen analysis audit pending",
+   "content_audit": "passed descriptive dev audit",
    "evaluation_seconds": 18.627888573071687,
    "file": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/dev-depth-sweep/M4-s43-L8.npz",
    "label": "M4/43@8",
@@ -408,7 +410,7 @@
   {
    "blake2b_128": "8f462c75e29466ab29bc967e0e87ca58",
    "bytes": 14698618,
-   "content_audit": "passed during evaluation; frozen analysis audit pending",
+   "content_audit": "passed descriptive dev audit",
    "evaluation_seconds": 9.206516272737645,
    "file": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/dev-depth-sweep/S1-s17-L1.npz",
    "label": "S1/17@1",
@@ -417,7 +419,7 @@
   {
    "blake2b_128": "6d3851fa441494a86e9ebdfe62ed4dd0",
    "bytes": 14674660,
-   "content_audit": "passed during evaluation; frozen analysis audit pending",
+   "content_audit": "passed descriptive dev audit",
    "evaluation_seconds": 9.045728060067631,
    "file": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/dev-depth-sweep/S1-s29-L1.npz",
    "label": "S1/29@1",
@@ -426,7 +428,7 @@
   {
    "blake2b_128": "6efc38061a4e69ce5fef0e444ffdac73",
    "bytes": 14793935,
-   "content_audit": "passed during evaluation; frozen analysis audit pending",
+   "content_audit": "passed descriptive dev audit",
    "evaluation_seconds": 9.27509273571195,
    "file": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/dev-depth-sweep/S1-s43-L1.npz",
    "label": "S1/43@1",
@@ -435,7 +437,7 @@
   {
    "blake2b_128": "17240fedc83c27c6e48f651f2fbdb51f",
    "bytes": 14758715,
-   "content_audit": "passed during evaluation; frozen analysis audit pending",
+   "content_audit": "passed descriptive dev audit",
    "evaluation_seconds": 9.290209868981037,
    "file": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/dev-depth-sweep/S4-s17-L1.npz",
    "label": "S4/17@1",
@@ -444,7 +446,7 @@
   {
    "blake2b_128": "59f08198286f7997d553cf338683c411",
    "bytes": 29001852,
-   "content_audit": "passed during evaluation; frozen analysis audit pending",
+   "content_audit": "passed descriptive dev audit",
    "evaluation_seconds": 11.198119890032103,
    "file": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/dev-depth-sweep/S4-s17-L2.npz",
    "label": "S4/17@2",
@@ -453,7 +455,7 @@
   {
    "blake2b_128": "481a80cbe6fc25e1983971a21f322191",
    "bytes": 56661133,
-   "content_audit": "passed during evaluation; frozen analysis audit pending",
+   "content_audit": "passed descriptive dev audit",
    "evaluation_seconds": 14.86422199991648,
    "file": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/dev-depth-sweep/S4-s17-L4.npz",
    "label": "S4/17@4",
@@ -462,7 +464,7 @@
   {
    "blake2b_128": "952b721303b4cbe07fe36c89b9285b4f",
    "bytes": 109188651,
-   "content_audit": "passed during evaluation; frozen analysis audit pending",
+   "content_audit": "passed descriptive dev audit",
    "evaluation_seconds": 22.554687124909833,
    "file": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/dev-depth-sweep/S4-s17-L8.npz",
    "label": "S4/17@8",
@@ -471,7 +473,7 @@
   {
    "blake2b_128": "56eba1adaaf0280db22beb166213716f",
    "bytes": 14956790,
-   "content_audit": "passed during evaluation; frozen analysis audit pending",
+   "content_audit": "passed descriptive dev audit",
    "evaluation_seconds": 9.066113587177824,
    "file": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/dev-depth-sweep/S4-s29-L1.npz",
    "label": "S4/29@1",
@@ -480,7 +482,7 @@
   {
    "blake2b_128": "4299f95c9d5307dba404b87af7492667",
    "bytes": 29394260,
-   "content_audit": "passed during evaluation; frozen analysis audit pending",
+   "content_audit": "passed descriptive dev audit",
    "evaluation_seconds": 10.967522684164578,
    "file": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/dev-depth-sweep/S4-s29-L2.npz",
    "label": "S4/29@2",
@@ -489,7 +491,7 @@
   {
    "blake2b_128": "2957ea567b76c0863e1f4f668fc8327c",
    "bytes": 56919848,
-   "content_audit": "passed during evaluation; frozen analysis audit pending",
+   "content_audit": "passed descriptive dev audit",
    "evaluation_seconds": 14.751942019036505,
    "file": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/dev-depth-sweep/S4-s29-L4.npz",
    "label": "S4/29@4",
@@ -498,7 +500,7 @@
   {
    "blake2b_128": "215369c9639e1a6b36e07f58d9ef0d68",
    "bytes": 109969760,
-   "content_audit": "passed during evaluation; frozen analysis audit pending",
+   "content_audit": "passed descriptive dev audit",
    "evaluation_seconds": 21.836177250981564,
    "file": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/dev-depth-sweep/S4-s29-L8.npz",
    "label": "S4/29@8",
@@ -507,7 +509,7 @@
   {
    "blake2b_128": "d2c4ab9517d04e555af756779fbdba78",
    "bytes": 14808076,
-   "content_audit": "passed during evaluation; frozen analysis audit pending",
+   "content_audit": "passed descriptive dev audit",
    "evaluation_seconds": 9.22935005518957,
    "file": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/dev-depth-sweep/S4-s43-L1.npz",
    "label": "S4/43@1",
@@ -516,7 +518,7 @@
   {
    "blake2b_128": "d3d14025408109e91a20c4f696ed0072",
    "bytes": 29174260,
-   "content_audit": "passed during evaluation; frozen analysis audit pending",
+   "content_audit": "passed descriptive dev audit",
    "evaluation_seconds": 11.059390137001174,
    "file": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/dev-depth-sweep/S4-s43-L2.npz",
    "label": "S4/43@2",
@@ -525,7 +527,7 @@
   {
    "blake2b_128": "0115a1b99b21cc27f195c2f67224c3c7",
    "bytes": 56409337,
-   "content_audit": "passed during evaluation; frozen analysis audit pending",
+   "content_audit": "passed descriptive dev audit",
    "evaluation_seconds": 15.207734447030816,
    "file": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/dev-depth-sweep/S4-s43-L4.npz",
    "label": "S4/43@4",
@@ -534,7 +536,7 @@
   {
    "blake2b_128": "bc18bd0aac222f53af84867b818c49f9",
    "bytes": 108718011,
-   "content_audit": "passed during evaluation; frozen analysis audit pending",
+   "content_audit": "passed descriptive dev audit",
    "evaluation_seconds": 22.736862580059096,
    "file": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/dev-depth-sweep/S4-s43-L8.npz",
    "label": "S4/43@8",
@@ -544,5 +546,5 @@
  "open_record_blake2b_128": "b698f7ce5e31b2b43da5c210134588b0",
  "release_blake2b_128": "d1ccbb7ff4c31fa53abfd7a3cc9ad572",
  "source_commit": "258f5f5a24eae684f640a9fd62679bb643470a76",
- "status": "evaluation_complete"
+ "status": "audited_complete"
 }
