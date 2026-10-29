@@ -20,7 +20,8 @@ import torch
 from looplora.llm.read_fix_run import validate
 from looplora.llm.run import source_metadata
 from looplora.llm.sq2 import SQ2Experiment, configuration, load_continuation, load_inference
-from looplora.llm.sq2_release import N_MAX, PARENT, SPECS, file_digest
+from looplora.infra.seeds import stable_hash
+from looplora.llm.sq2_release import N_MAX, PARENT, SPECS, file_digest, prereg_digest
 from looplora.sym.stats import load_samples
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -69,6 +70,11 @@ def reload(release_path, root, arm):
     options = dict(eta=numerics['eta'] if store == 'ridge' else None, w_c=numerics['w_c'] if coefficient else None,
                    numerics_digest=numerics['file_blake2b_128'])
     expected = json.loads(json.dumps(configuration(arm, steps, smoke=True, **options)))
+    # the science config the runner will build at the released N must be the frozen one, and the registration the frozen one
+    science = stable_hash(configuration(arm, release['steps_by_arm'][arm], eta=options['eta'], w_c=options['w_c'],
+                                        numerics_digest=options['numerics_digest']))
+    require(science == release['config_hashes'][arm], f'{arm}: the release holds another science config hash')
+    require(release['prereg_blake2b_128'] == prereg_digest(), f'{arm}: the registration differs from the release')
     require(record['config'] == expected, f'{arm}: the smoke ran another config than the code builds')
     experiment = load_inference(folder / 'writer.pt')
     try:
