@@ -39,6 +39,9 @@ PREREG = "docs/prereg/LSR.md"
 THRESHOLDS = "reports/lsr/thresholds.json"
 CONFIDENCE = 1 - 0.05 / 6
 AUDIT_BATCHES = 2
+# bf16 answer logits move by up to ~0.3 when the batch composition changes (smoke 2026-10-29: 2 of 128 questions flip in a plain
+# fixed-depth pass computed on half the batch); a disagreement is only an error when the grouped pass's top-2 gap exceeds this.
+TIE_GAP = 1.0
 
 
 def check_test_authorization(authorization: dict, thresholds: dict, root: Path = ROOT) -> None:
@@ -141,17 +144,25 @@ def latency_audit(experiment, spec, arrays, taus: dict, *, batch_size, repeats=5
         result["seconds_per_question"][label] = dict(mean=mean, std=spread)
     mismatches = {}
     for rule in taus:
-        count = 0
+        count = beyond = 0
+        largest = 0.0
         for batch, scan, depth in zip(prepared, scans, depths[rule]):
             row = torch.as_tensor(depth.reshape(-1), device=experiment.device)
-            predicted = lsr.stopped_logits(experiment, batch, row).argmax(-1).cpu().numpy()
+            logits = lsr.stopped_logits(experiment, batch, row).float()
+            predicted = logits.argmax(-1).cpu().numpy()
             assembled = np.take_along_axis(scan["pred"], depth[..., None], axis=-1)[..., 0]
-            count += int((predicted != assembled).sum())
-        mismatches[rule] = dict(count=count, fraction=count / questions)
+            wrong = predicted != assembled
+            top = logits.topk(2, dim=-1).values
+            gap = (top[..., 0] - top[..., 1]).cpu().numpy()[wrong]
+            count += int(wrong.sum())
+            beyond += int((gap > TIE_GAP).sum())
+            largest = max([largest, *gap.tolist()])
+        mismatches[rule] = dict(count=count, fraction=count / questions, beyond_tie_gap=beyond, max_top2_gap=largest)
     result["phase2_mismatch"] = mismatches
+    result["tie_gap"] = TIE_GAP
     result["mean_depth"] = {rule: float(np.mean([d.mean() for d in depths[rule]])) for rule in taus}
-    if any(value["fraction"] > 0.002 for value in mismatches.values()):
-        raise AssertionError(f"the grouped stopped pass disagrees with p^s* on more than 0.2% of questions: {mismatches}")
+    if any(value["beyond_tie_gap"] for value in mismatches.values()):
+        raise AssertionError(f"the grouped stopped pass disagrees with p^s* beyond bf16 near-ties: {mismatches}")
     return result
 
 
