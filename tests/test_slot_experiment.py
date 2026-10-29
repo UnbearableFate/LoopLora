@@ -511,7 +511,6 @@ def tiny_study(monkeypatch, model, tokenizer, tmp_path):
     monkeypatch.setattr(slot_run, 'load_parent', load_parent)
     monkeypatch.setattr(slot_run, 'require_lock', lambda path: dict(status='locked', inventory={'S-RE': dict(PARENT_DIGESTS)}))
     monkeypatch.setattr(slot_data, 'eval_set', lambda stage, purpose, **kw: sets.get((stage, purpose)) or registered(stage, purpose, **kw))
-    monkeypatch.setattr(slot_data, 'PILOT_STEPS', 20)
     monkeypatch.setattr(slot_run, 'load_value_head', lambda name, device: None)
     monkeypatch.setattr(slot_run, 'old_range_record', lambda experiment, name: dict(correct=608, n=1000, loss_float32=2.1291537284851074,
                                                                                     passed=True))
@@ -532,10 +531,15 @@ def test_the_smoke_trains_both_arms_under_the_freeze_checks_and_its_exports_relo
         assert check['passed'] and all(check['equal'].values()) and check['read']['kind'] == slot_rules.ARM_KIND[arm]
 
 
-def test_the_pilot_writes_its_full_record_and_picks_each_arms_rate_and_the_step_count_by_the_rules(tiny_study, tmp_path):
+def test_the_pilot_writes_its_full_record_and_picks_each_arms_rate_and_the_step_count_by_the_rules(tiny_study, tmp_path, monkeypatch):
     out = tmp_path / 'pilot'
+    with pytest.raises(ValueError, match='differs'):  # the registered 200 steps are part of the stage config the runner checks
+        monkeypatch.setattr(slot_data, 'PILOT_STEPS', 20)
+        slot_run.run_pilot(tmp_path / 'refused', tiny_study['config'], tiny_study['manifest'], tiny_study['s0'])
+    config = tmp_path / 's1a_pilot20.json'  # the rendering of the same stage with a 20-step pilot (200 steps are too slow here)
+    config.write_text(json.dumps(slot_rules.stage_config('S1A')))
     try:
-        result = slot_run.run_pilot(out, tiny_study['config'], tiny_study['manifest'], tiny_study['s0'])
+        result = slot_run.run_pilot(out, config, tiny_study['manifest'], tiny_study['s0'])
     except slot_run.StopRun:  # a registered stop is written to the record before it is raised
         result = json.loads((out / 'pilot.json').read_text())
         assert result['stop']
