@@ -101,3 +101,23 @@ The addendum is registered on master as `docs/prereg/SLOT-LOOP-v1-S2.md`, blake2
 3. **Stop.** Update `docs/reports/WP-L15.md`, then end with `STOP: review <full hash>`. The one cross-review covers all S2 core code at that commit.
 
 **Jobs.** While S1B's twelve main runs hold most of the project's 16 running slots, keep at most 4 wk-slot jobs queued or running.
+
+## Review (03:30): fixes before the preflight
+The one cross-review of `a727669` is running. rv-code's report is in: `docs/review/static_2026-10-29/s2-rv-code.md` (3 High, 3 Medium). The orchestrator checked C01 and C02 in the code. rv-opus's report comes later. Its findings that rv-code does not cover will be added here as further items.
+
+Fix these on wp/slot. Each fix gets a test that fails without it.
+1. **S2-C01 (branch evidence).** `backends()` must stop on missing or contradictory S1B evidence, never default to "not qualified".
+   - Require the exact continuation and contrast schema implied by the bound S1B release branch (advance: M and S rows, all three contrasts).
+   - Reconcile `qualified` with the recorded loop contrast and sweep screen.
+   - Check the parser against the verdict schema that S1B's own frozen analysis (`s1b_analysis.py` at `258f5f5`) writes. Build the test fixture with that code on synthetic inputs, not as a hand-written dict.
+2. **S2-C02 (lock coverage).** Hash every regular file under `src/` except bytecode, as the inherited `source_digest` does, plus the S2 science scripts and config. Add a mutation test on the name asset, including a consistent name/token permutation. Earlier stages keep their own digests.
+3. **S2-C03 (payload provenance).** Write origin metadata into every evaluation, trajectory, probe and intervention payload at production time: label, arm, backend, seed, checkpoint digest, release and config. Analysis reconciles each payload with the frozen selected mapping and its evaluation record. Add a negative test that swaps intact payloads between labels. Replace the reuse of one payload for all labels in `tests/test_s2_workflow.py` with distinct payloads.
+4. **S2-C04 (untrained interface audit).** Add the §3 smoke-only audit before any optimization: per relation, untrained first-query key top-1 and margins, plus raw-read and frozen-value-head diagnostics on hop 1. The preflight requires it to be complete; it is descriptive, with no quality threshold. The calibration audit records it as well.
+5. **S2-C05 (+Null diagnostics).** Capture diagnostics for both hard and soft inference at budgets 4 and 9. Emit the §7 and §10 short-hop and h4–8 stopping summaries with explicit denominators. Collection of a +Null run requires these artifacts.
+6. **S2-C06 (walltime accounting).** Measure every phase of a run:
+   - scale the per-checkpoint export and I/O cost to the eleven main evaluations;
+   - include support verification and the final audit and reload.
+
+   Add a fixture with distinguishable costs that checks the main total and the over-cap STOP.
+
+Then run all S2 tests plus the S0, S1A and S1B test modules on compute, update `docs/reports/WP-L15.md`, and end with `STOP: fixed <full hash>`. There is no second review round. The fixes are checked by tests only (user, 2026-10-29).
