@@ -16,8 +16,8 @@ def bundle(tmp_path, monkeypatch):
         path = tmp_path / name
         a.dump(path, value)
         return path
-    decision = write("s1a-summary.json", dict(stage="S1A", verdict="ADVANCE", release_blake2b_128="c" * 32))
-    dev = write("s1a-selection.json", dict(stage="S1A-DEV", outcome="no_trigger", release_blake2b_128="c" * 32))
+    decision = write("s1a-summary.json", dict(stage="S1A", verdict="ADVANCE", release_blake2b_128=d.S1A_RELEASE_DIGEST))
+    dev = write("s1a-selection.json", dict(stage="S1A-DEV", outcome="no_trigger", release_blake2b_128=d.S1A_RELEASE_DIGEST))
     branch = write("branch.json", a.branch_record(decision, dev))
     inventory = {"writer.pt": "f" * 32}
     manifest = dict(ids={"dev": dict(count=1000, ids_blake2b_128="dev-ids")})
@@ -28,26 +28,26 @@ def bundle(tmp_path, monkeypatch):
         checks={name: dict(passed=True) for name in a.REQUIRED}, inventory=inventory, manifest=manifest,
         source_blake2b_128="source"))
     lock = write("lock.json", a.make_lock(preflight))
-    candidates = []
-    for kind in ("matrix", "soft"):
-        for tau in ((None,) if kind == "matrix" else r.TAUS):
-            for g in r.GAINS:
-                candidates.append(dict(kind=kind, gain=g, tau=tau, nll=1 + abs(g - 1) + (abs(tau - .1) if tau else 0),
-                                       per_hop={"1": dict(em=.5)}))
-    cal = write("calibration.json", dict(status="complete", branch="advance", lock_blake2b_128=d.old.file_digest(lock),
-        candidates=candidates, selected={kind: r.choose_candidate(candidates, kind) for kind in ("matrix", "soft")}))
+    source = write("s1a-release.json", a.read(a.ROOT / "reports/slot-loop-v1/s1a-release.json"))
+    # Preserve the exact real release bytes: the digest, not reserialization, is the contract.
+    source.write_bytes((a.ROOT / "reports/slot-loop-v1/s1a-release.json").read_bytes())
+    stopped = tmp_path / "stopped-calibration.json"
+    stopped.write_bytes((a.ROOT / "reports/slot-loop-v1/s1b/diagnosis-6855048/calibration.input.json").read_bytes())
+    cal = write("read-settings.json", a.read_settings_record(source, stopped, branch, lock))
     provenance = dict(status="complete", branch="advance", lock_blake2b_128=d.old.file_digest(lock),
-                      calibration_blake2b_128=d.old.file_digest(cal), source_commit="a" * 40)
+                      branch_blake2b_128=d.old.file_digest(branch),
+                      read_settings_blake2b_128=d.old.file_digest(cal), source_commit="a" * 40, amendment_blake2b_128=d.AMENDMENT_DIGEST)
     pilot_arms, smoke_arms = {}, {}
     for arm in r.branch_arms("advance"):
         pilot_arms[arm] = dict(candidates=[dict(lr=lr, nll=.9, all_finite=True) for lr in r.LR_GRID],
             step0_nll=1., step_seconds=.2, eval_seconds=27., load_seconds=60., export_seconds=1., overhead_seconds=2.)
         smoke_arms[arm] = dict(steps=20, freeze=dict(digests=dict(frozen_unchanged=True), support=dict(equal=True)),
-                              all_finite=True, export_metadata=dict(arm=arm, control="shared"),
+                              all_finite=True, export_metadata=dict(arm=arm, control="shared",
+                                  read=r.read_config(arm).as_dict(), amendment_blake2b_128=d.AMENDMENT_DIGEST),
                               original_smoke_samples_blake2b_128="b" * 32, first_reload_matches_original=True)
     pilot = write("pilot.json", dict(provenance, arms=pilot_arms))
     smoke = write("smoke.json", dict(provenance, arms=smoke_arms))
-    paths = dict(lock=lock, branch=branch, cal=cal, pilot=pilot, smoke=smoke, preflight=preflight)
+    paths = dict(lock=lock, branch=branch, cal=cal, pilot=pilot, smoke=smoke, preflight=preflight, s1a=source, stopped=stopped)
     return SimpleNamespace(paths=paths, write=write, inventory=inventory, manifest=manifest)
 
 
@@ -73,7 +73,7 @@ def test_complete_candidate_to_ready_uses_exact_json_reports(bundle):
     a.require_approval(b.write("approval.json", dict(status="approved", release_blake2b_128=d.old.file_digest(path))), path)
 
 
-@pytest.mark.parametrize("defect", ["missing_preflight", "source", "pilot_lr", "smoke", "calibration", "branch_source"])
+@pytest.mark.parametrize("defect", ["missing_preflight", "source", "pilot_lr", "smoke", "read_settings", "branch_source"])
 def test_lock_and_release_refuse_incomplete_changed_inputs(bundle, defect, monkeypatch):
     b = bundle
     if defect == "missing_preflight":
@@ -93,7 +93,7 @@ def test_lock_and_release_refuse_incomplete_changed_inputs(bundle, defect, monke
         record = a.read(b.paths["smoke"])
         record["arms"]["S4"]["freeze"]["support"]["equal"] = False
         a.dump(b.paths["smoke"], record)
-    elif defect == "calibration":
+    elif defect == "read_settings":
         record = a.read(b.paths["cal"])
         record["selected"]["matrix"]["gain"] = 2
         a.dump(b.paths["cal"], record)
@@ -113,18 +113,13 @@ def test_reload_report_cannot_be_reused_after_candidate_changes(bundle):
         prepare(bundle, reloads)
 
 
-def test_calibration_writes_sanity_evidence_before_stopping(bundle, monkeypatch, tmp_path):
-    b = bundle
-    arrays = SimpleNamespace(episode_seed=np.arange(3))
-    monkeypatch.setattr(d, "episodes", lambda s: arrays)
-    monkeypatch.setattr(run.model, "load_parent", lambda *args, **kw: SimpleNamespace(close=lambda: None))
-    monkeypatch.setattr(run.model, "evaluate", lambda *args, **kw: dict(seconds=.1,
-        summary=dict(n=3, em=0., nll=1., per_hop={"1": dict(em=0., nll=1.)})))
-    out = tmp_path / "cal-stop"
-    out.mkdir()
-    with pytest.raises(r.StopForOrchestrator, match="10%"):
-        run.calibration(b.paths["lock"], b.paths["branch"], out)
-    assert a.read(out / "calibration.json")["selected"]["matrix"]["per_hop"]["1"]["em"] == 0
+def test_a1_transfers_reads_despite_stopped_hop1_em(bundle):
+    p = bundle.paths
+    record = a.require_read_settings(p["cal"], "advance", p["lock"])
+    assert a.read(p["stopped"])["selected"]["matrix"]["per_hop"]["1"]["em"] < .1
+    assert record["selected"]["soft"]["tau"] == .1
+    assert record["stopped_calibration_blake2b_128"] == d.STOPPED_CALIBRATION_DIGEST
+    assert prepare(bundle)["amendment_blake2b_128"] == d.AMENDMENT_DIGEST
 
 
 def test_pending_release_cannot_train_even_with_approval(bundle):

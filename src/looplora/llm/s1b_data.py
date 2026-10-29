@@ -11,12 +11,16 @@ from . import slot_data as old
 
 PREREG = "docs/prereg/SLOT-LOOP-v1-S1B.md"
 PREREG_DIGEST = "6f2e776f2c6cfde131380fb343854784"
+AMENDMENT = "docs/prereg/SLOT-LOOP-v1-S1B-A1.md"
+AMENDMENT_DIGEST = "341d3c71f9334a1384a102b097e7ad75"
+S1A_RELEASE_DIGEST = "523d11d57a08a2491893ebe7cedc86a7"
+STOPPED_CALIBRATION_DIGEST = "6e4f7346376cb010820a84832f6d7d91"
 LAYOUT_DIGEST = "f556c1b91252b0b74d3ff674717be37c"
 ANALYSIS = "scripts/analyze_s1b.py"
 TASK = dict(name="t2_chain_end", E=12, Q=4, V=1024, n_rel=4, head_sharing=.3,
             seen=(0, 768), unseen=(768, 1024), chain_lengths=(8, 4), hops=(1, 2, 3))
 RUN_SEEDS = (17, 29, 43)
-BATCH, STEPS, PILOT_STEPS = 32, 6000, 200
+BATCH, STEPS, PILOT_STEPS = 32, 18000, 200
 TRAIN_BASE = {17: 693232309558345634, 29: 373104883948690398,
               43: 6045459755310898920, "pilot": 907865416675862555}
 BOOTSTRAP = 5799536610111230359
@@ -98,6 +102,10 @@ def manifest():
     verify_registry()
     return dict(stage="S1B", task=json.loads(json.dumps(asdict(task_spec()))), layout_digest=LAYOUT_DIGEST,
                 generator_version=GENERATOR_VERSION, prereg_blake2b_128=PREREG_DIGEST,
+                amendment_blake2b_128=AMENDMENT_DIGEST,
+                train_streams={str(run): dict(split="train", start=0,
+                    count=BATCH * (PILOT_STEPS if run == "pilot" else STEPS), base_seed=base)
+                    for run, base in TRAIN_BASE.items()},
                 sets={p: dict(split=s.split, count=s.count, sealed=s.sealed,
                               hops=[1, 2, 3] if p in {"calibration", "pilot", "dev"} else list(range(1, 9)),
                               **({} if s.sealed else dict(base_seed=s.base_seed, query_seed=s.base_seed)))
@@ -131,7 +139,7 @@ def load_open_token(root, release_path, lock, selection):
               record.get("lock_blake2b_128") == release["lock_blake2b_128"],
               record.get("inventory_blake2b_128") == stable_hash(lock["inventory"]),
               release["status"] == "ready", selection.get("status") == "selected")
-    for name, digest in ((PREREG, PREREG_DIGEST), (old.PREREG, old.PREREG_BLAKE2B_128)):
+    for name, digest in ((PREREG, PREREG_DIGEST), (AMENDMENT, AMENDMENT_DIGEST), (old.PREREG, old.PREREG_BLAKE2B_128)):
         checks += (old.file_digest(root / name) == digest, record.get(name) == digest)
     if not all(checks):
         raise old.SealedSetError("S1B opening record provenance/mapping mismatch")

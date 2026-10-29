@@ -48,16 +48,17 @@ def control_release(lock_path, release_path, verdict_path, timings):
 
 def main(argv=None):
     p = argparse.ArgumentParser(description=__doc__)
-    p.add_argument("--mode", required=True, choices=("branch", "lock", "release", "control-release"))
+    p.add_argument("--mode", required=True, choices=("branch", "lock", "read-settings", "release", "control-release"))
     p.add_argument("--out", type=Path, required=True)
-    for name in ("decision", "dev", "ablation", "preflight", "manifest", "branch-record", "calibration", "pilot", "smoke", "release", "verdict", "timings"):
+    for name in ("decision", "dev", "ablation", "preflight", "manifest", "branch-record", "read-settings", "s1a-release", "stopped-calibration", "pilot", "smoke", "release", "verdict", "timings"):
         p.add_argument("--" + name, type=Path)
     p.add_argument("--science-commit")
     p.add_argument("--unseen", action="store_true")
     p.add_argument("--reload", action="append", default=[], metavar="ARM=ABS_REPORT")
     args = p.parse_args(argv)
     needed = dict(branch=["decision", "dev"], lock=["preflight"],
-                  release=["manifest", "branch_record", "calibration", "pilot", "smoke", "science_commit"],
+                  **{"read-settings": ["manifest", "branch_record", "s1a_release", "stopped_calibration"]},
+                  release=["manifest", "branch_record", "read_settings", "pilot", "smoke", "science_commit"],
                   **{"control-release": ["manifest", "release", "verdict", "timings"]})
     for name in needed[args.mode]:
         if getattr(args, name) is None:
@@ -68,8 +69,10 @@ def main(argv=None):
         result = a.make_lock(args.preflight)
     elif args.mode == "release":
         reloads = dict(v.split("=", 1) for v in args.reload) if args.reload else None
-        result = a.prepare_release(args.manifest, args.branch_record, args.calibration, args.pilot, args.smoke,
+        result = a.prepare_release(args.manifest, args.branch_record, args.read_settings, args.pilot, args.smoke,
                                    args.science_commit, unseen=args.unseen, reloads=reloads)
+    elif args.mode == "read-settings":
+        result = a.read_settings_record(args.s1a_release, args.stopped_calibration, args.branch_record, args.manifest)
     else:
         result = control_release(args.manifest, args.release, args.verdict, a.read(args.timings))
     a.dump(args.out, result)

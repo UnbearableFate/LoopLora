@@ -66,13 +66,15 @@ def science_config(branch, arm, seed, lr, read, *, control="shared"):
         raise ValueError("unregistered arm, seed or learning rate")
     if read["kind"] != ARM[arm][0] or read["capacity"] != 12 or read["scope"] != "all_valid_question" or read["recency"]:
         raise ValueError("S1B read differs from registered protocol")
-    if read["gain"] not in GAINS or (read["kind"] == "soft" and read["tau"] not in TAUS):
-        raise ValueError("S1B gain/temperature outside calibration grid")
+    if read["gain"] != 1. or read["tau"] != (.1 if read["kind"] == "soft" else None):
+        raise ValueError("S1B A1 reads must equal the released S1A settings")
     return dict(stage="S1B", branch=branch, arm=arm, seed=seed, lr=lr, read=read,
                 control=control, loop_depth=ARM[arm][1], task_digest=data.LAYOUT_DIGEST,
                 steps=data.STEPS, batch=data.BATCH, train_base=data.TRAIN_BASE[seed],
                 trainable=trainable(branch, control), optimizer=OPTIMIZER, warmup=20, clip=1.,
-                checkpoints=checkpoint_steps(data.STEPS), prereg_blake2b_128=data.PREREG_DIGEST)
+                checkpoints=checkpoint_steps(data.STEPS), prereg_blake2b_128=data.PREREG_DIGEST,
+                amendment_blake2b_128=data.AMENDMENT_DIGEST,
+                s1a_release_blake2b_128=data.S1A_RELEASE_DIGEST)
 
 
 def walltime(step, evaluation, load, io=0., steps=data.STEPS):
@@ -83,17 +85,6 @@ def walltime(step, evaluation, load, io=0., steps=data.STEPS):
     if seconds > 16 * 3600:
         raise StopForOrchestrator("indivisible S1B run exceeds 16 node-hours")
     return seconds
-
-
-def sanity(calibration):
-    if calibration["selected"]["matrix"]["per_hop"]["1"]["em"] < .10:
-        raise StopForOrchestrator("calibrated Matrix parent hop-1 calibration EM below 10%")
-
-
-def choose_calibration(rows, kind):
-    """The inherited selection rule after explicitly excluding failed/nonfinite candidates."""
-    finite = [row for row in rows if row.get("nll") is not None and math.isfinite(row["nll"])]
-    return choose_candidate(finite, kind)
 
 
 def config_hashes(release):

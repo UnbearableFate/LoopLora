@@ -41,12 +41,13 @@ def load_samples(path):
         return {name: payload[name].copy() for name in payload if name != "provenance"}, json.loads(str(payload["provenance"].item()))
 
 
-def common_provenance(lock_path, branch_path, calibration_path=None):
+def common_provenance(lock_path, branch_path, read_settings_path=None):
     branch = artifacts.require_branch(branch_path)
-    record = dict(stage="S1B", branch=branch["branch"], lock_blake2b_128=data.old.file_digest(lock_path),
+    record = dict(stage="S1B", branch=branch["branch"], amendment_blake2b_128=data.AMENDMENT_DIGEST,
+                  lock_blake2b_128=data.old.file_digest(lock_path),
                   branch_blake2b_128=data.old.file_digest(branch_path), source_commit=source_metadata()["git_commit"])
-    if calibration_path:
-        record["calibration_blake2b_128"] = data.old.file_digest(calibration_path)
+    if read_settings_path:
+        record["read_settings_blake2b_128"] = data.old.file_digest(read_settings_path)
     return record
 
 
@@ -55,41 +56,11 @@ def selected_spec(cal, arm):
     return rules.read_config(arm, choice["gain"], choice["tau"])
 
 
-def calibration(lock_path, branch_path, out):
+def smoke(lock_path, branch_path, read_settings_path, out):
     lock = artifacts.require_lock(lock_path)
-    provenance = common_provenance(lock_path, branch_path)
+    provenance = common_provenance(lock_path, branch_path, read_settings_path)
     branch = provenance["branch"]
-    arrays = data.episodes(data.eval_set("calibration"))
-    result, selected = [], {}
-    exp = model.load_parent(branch, expected=lock["inventory"])
-    try:
-        for kind in ["matrix"] + ([] if branch == "matrix_only" else ["soft"]):
-            arm = "M1" if kind == "matrix" else "S1"
-            for tau in ((None,) if kind == "matrix" else rules.TAUS):
-                for gain in rules.GAINS:
-                    try:
-                        value = model.evaluate(exp, arrays, rules.read_config(arm, gain, tau), 1)
-                        result.append(dict(kind=kind, gain=gain, tau=tau, seconds=value["seconds"], **value["summary"]))
-                    except FloatingPointError as error:
-                        result.append(dict(kind=kind, gain=gain, tau=tau, nll=None, error=str(error), all_finite=False))
-            try:
-                selected[kind] = rules.choose_calibration(result, kind)
-            except rules.StopForOrchestrator:
-                artifacts.dump(out / "calibration.json", dict(provenance, status="failed", candidates=result, selected=selected))
-                raise
-        record = dict(provenance, status="complete", candidates=result, selected=selected)
-        artifacts.dump(out / "calibration.json", record)
-        rules.sanity(record)
-        return record
-    finally:
-        exp.close()
-
-
-def smoke(lock_path, branch_path, calibration_path, out):
-    lock = artifacts.require_lock(lock_path)
-    provenance = common_provenance(lock_path, branch_path, calibration_path)
-    branch = provenance["branch"]
-    cal = artifacts.require_calibration(calibration_path, branch, lock_path)
+    cal = artifacts.require_read_settings(read_settings_path, branch, lock_path)
     raw = data.raw_episodes(data.eval_set("smoke"))
     dev = data.episodes(data.eval_set("smoke"), [1, 2, 3])
     reports = {}
@@ -125,11 +96,11 @@ def smoke(lock_path, branch_path, calibration_path, out):
     return record
 
 
-def pilot(lock_path, branch_path, calibration_path, out):
+def pilot(lock_path, branch_path, read_settings_path, out):
     lock = artifacts.require_lock(lock_path)
-    provenance = common_provenance(lock_path, branch_path, calibration_path)
+    provenance = common_provenance(lock_path, branch_path, read_settings_path)
     branch = provenance["branch"]
-    cal = artifacts.require_calibration(calibration_path, branch, lock_path)
+    cal = artifacts.require_read_settings(read_settings_path, branch, lock_path)
     dev, support = data.episodes(data.eval_set("pilot")), data.raw_episodes(data.eval_set("smoke"))
     arms = {}
     for arm in rules.branch_arms(branch):
@@ -489,9 +460,9 @@ def analysis_main(argv=None):
 
 def parser():
     p = argparse.ArgumentParser(description=__doc__)
-    p.add_argument("--mode", required=True, choices=("preflight", "calibration", "smoke", "pilot", "reload-check", "train", "evaluate", "control", "control-pilot", "benchmark"))
+    p.add_argument("--mode", required=True, choices=("preflight", "smoke", "pilot", "reload-check", "train", "evaluate", "control", "control-pilot", "benchmark"))
     p.add_argument("--out", type=Path, required=True)
-    for name in ("manifest", "branch-record", "calibration", "release", "approval", "export", "predictions", "selection", "entries", "open-root", "control-release", "verdict"):
+    for name in ("manifest", "branch-record", "read-settings", "release", "approval", "export", "predictions", "selection", "entries", "open-root", "control-release", "verdict"):
         p.add_argument("--" + name, type=Path)
     p.add_argument("--arm", choices=tuple(rules.ARM))
     p.add_argument("--seed", type=int, choices=data.RUN_SEEDS)
@@ -503,8 +474,8 @@ def parser():
 def main(argv=None):
     p = parser()
     a = p.parse_args(argv)
-    required = dict(preflight=[], calibration=["manifest", "branch_record"],
-                    smoke=["manifest", "branch_record", "calibration"], pilot=["manifest", "branch_record", "calibration"],
+    required = dict(preflight=[],
+                    smoke=["manifest", "branch_record", "read_settings"], pilot=["manifest", "branch_record", "read_settings"],
                     **{"reload-check": ["manifest", "release", "export", "predictions", "arm"]},
                     train=["manifest", "release", "approval", "arm", "seed"],
                     evaluate=["manifest", "release", "selection", "entries"],
@@ -520,10 +491,8 @@ def main(argv=None):
     if a.mode == "preflight":
         from .s1b_preflight import run
         run(out)
-    elif a.mode == "calibration":
-        calibration(a.manifest, a.branch_record, out)
     elif a.mode in {"smoke", "pilot"}:
-        {"smoke": smoke, "pilot": pilot}[a.mode](a.manifest, a.branch_record, a.calibration, out)
+        {"smoke": smoke, "pilot": pilot}[a.mode](a.manifest, a.branch_record, a.read_settings, out)
     elif a.mode == "reload-check":
         reload_check(a.manifest, a.release, a.export, a.predictions, a.arm, out)
     elif a.mode == "train":

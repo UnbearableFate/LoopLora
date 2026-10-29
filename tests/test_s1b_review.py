@@ -85,37 +85,18 @@ def test_review_branch_records_require_trigger_and_one_release(defect):
         rules.resolve_branch(decision, dev, abl)
 
 
-def test_review_nonfinite_calibration_candidates_are_recorded_and_excluded(bundle, monkeypatch, tmp_path):
-    monkeypatch.setattr(data, "episodes", lambda s: SimpleNamespace(episode_seed=np.arange(3)))
-    monkeypatch.setattr(model, "load_parent", lambda *a, **kw: SimpleNamespace(close=lambda: None))
-    def evaluate(exp, arrays, spec, depth):
-        if spec.gain == 2:
-            raise FloatingPointError("synthetic nonfinite candidate")
-        return dict(seconds=.1, summary=dict(n=3, em=.5, nll=.7 + abs(spec.gain - 1),
-                                            per_hop={"1": dict(em=.5, nll=.7)}))
-    monkeypatch.setattr(model, "evaluate", evaluate)
-    out = tmp_path / "cal"
-    out.mkdir()
+@pytest.mark.parametrize("input_name", ["s1a", "stopped"])
+def test_a1_rejects_changed_source_release_or_stopped_evidence(bundle, input_name):
     p = bundle.paths
-    record = run.calibration(p["lock"], p["branch"], out)
-    assert len(record["candidates"]) == 15
-    failed = [row for row in record["candidates"] if row["nll"] is None]
-    assert len(failed) == 5 and all(row["error"] == "synthetic nonfinite candidate" for row in failed)
-    assert artifacts.require_calibration(out / "calibration.json", "advance", p["lock"]) == record
+    p[input_name].write_text(p[input_name].read_text() + " ")
+    with pytest.raises(ValueError):
+        artifacts.require_read_settings(p["cal"], "advance", p["lock"])
 
 
-def test_review_all_nonfinite_calibration_records_failure_before_stop(bundle, monkeypatch, tmp_path):
-    monkeypatch.setattr(data, "episodes", lambda s: SimpleNamespace(episode_seed=np.arange(3)))
-    monkeypatch.setattr(model, "load_parent", lambda *a, **kw: SimpleNamespace(close=lambda: None))
-    def fail(*args, **kwargs):
-        raise FloatingPointError("nonfinite")
-    monkeypatch.setattr(model, "evaluate", fail)
-    out = tmp_path / "cal-failed"
-    out.mkdir()
-    with pytest.raises(rules.StopForOrchestrator):
-        run.calibration(bundle.paths["lock"], bundle.paths["branch"], out)
-    record = artifacts.read(out / "calibration.json")
-    assert record["status"] == "failed" and len(record["candidates"]) == 3
+def test_a1_calibration_cli_removed_before_data_or_model_work(tmp_path):
+    with pytest.raises(SystemExit):
+        run.main(["--mode", "calibration", "--out", str(tmp_path / "cal")])
+    assert not (tmp_path / "cal").exists()
 
 
 def test_review_real_t2_batchstream_runs_prefetched_token_positions(factory, monkeypatch, tmp_path):

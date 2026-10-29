@@ -23,7 +23,8 @@ def dump(path, value):
 
 
 def registered():
-    for path, expected in ((data.PREREG, data.PREREG_DIGEST), (data.old.PREREG, data.old.PREREG_BLAKE2B_128)):
+    for path, expected in ((data.PREREG, data.PREREG_DIGEST), (data.AMENDMENT, data.AMENDMENT_DIGEST),
+                           (data.old.PREREG, data.old.PREREG_BLAKE2B_128)):
         if data.old.file_digest(ROOT / path) != expected:
             raise ValueError("registered preregistration bytes differ")
     data.verify_registry()
@@ -68,7 +69,7 @@ def make_lock(report_path):
             or report.get("manifest") != manifest):
         raise ValueError("S1B preflight is incomplete/stale; no lock")
     return dict(stage="S1B", status="locked", manifest=manifest, inventory=inv, source_blake2b_128=source,
-                prereg_blake2b_128=data.PREREG_DIGEST, preflight=report,
+                prereg_blake2b_128=data.PREREG_DIGEST, amendment_blake2b_128=data.AMENDMENT_DIGEST, preflight=report,
                 preflight_blake2b_128=data.old.file_digest(report_path))
 
 
@@ -77,6 +78,7 @@ def require_lock(path):
     lock = read(path)
     if (lock.get("stage") != "S1B" or lock.get("status") != "locked"
             or lock.get("prereg_blake2b_128") != data.PREREG_DIGEST
+            or lock.get("amendment_blake2b_128") != data.AMENDMENT_DIGEST
             or lock.get("source_blake2b_128") != data.old.source_digest()
             or lock.get("inventory") != inventory() or lock.get("manifest") != data.manifest()
             or any(lock.get("preflight", {}).get("checks", {}).get(k, {}).get("passed") is not True for k in REQUIRED)):
@@ -84,25 +86,51 @@ def require_lock(path):
     return lock
 
 
-def require_calibration(path, branch, lock_path):
+def read_settings_record(s1a_release_path, stopped_calibration_path, branch_path, lock_path):
+    """A1 transfers the exact released S1A reads; stopped T2 scores never select them."""
+    require_lock(lock_path)
+    branch = require_branch(branch_path)
+    release_digest = data.old.file_digest(s1a_release_path)
+    if release_digest != data.S1A_RELEASE_DIGEST or branch["s1a_release_blake2b_128"] != release_digest:
+        raise ValueError("S1B A1 requires the registered S1A release by digest")
+    source = read(s1a_release_path)
+    if source.get("stage") != "S1A" or source.get("status") != "ready":
+        raise ValueError("S1B A1 read source must be a ready S1A release")
+    if data.old.file_digest(stopped_calibration_path) != data.STOPPED_CALIBRATION_DIGEST:
+        raise ValueError("S1B A1 stopped calibration evidence changed")
+    selected = {}
+    for kind, arm in (("matrix", "matrix_L1"), ("soft", "soft_slot_L1")):
+        settings = dict(source["arms"][arm]["read"])
+        if (settings != dict(kind=kind, gain=1., tau=.1 if kind == "soft" else None,
+                            scope="all_valid_question", recency=False, capacity=16)):
+            raise ValueError("S1A released read differs from A1")
+        settings["capacity"] = 12
+        selected[kind] = settings
+    return dict(stage="S1B-READS", status="complete", branch=branch["branch"],
+                amendment_blake2b_128=data.AMENDMENT_DIGEST,
+                lock_blake2b_128=data.old.file_digest(lock_path),
+                branch_blake2b_128=data.old.file_digest(branch_path),
+                s1a_release_path=str(Path(s1a_release_path).resolve()), s1a_release_blake2b_128=release_digest,
+                stopped_calibration_path=str(Path(stopped_calibration_path).resolve()),
+                stopped_calibration_blake2b_128=data.STOPPED_CALIBRATION_DIGEST,
+                stopped_calibration_role="descriptive evidence; A1 clears decision 3; no calibration repeated",
+                branch_path=str(Path(branch_path).resolve()), selected=selected)
+
+
+def require_read_settings(path, branch, lock_path):
     record = read(path)
-    if (record.get("status") != "complete" or record.get("branch") != branch
-            or record.get("lock_blake2b_128") != data.old.file_digest(lock_path)):
-        raise ValueError("S1B calibration provenance mismatch")
-    kinds = ["matrix"] if branch == "matrix_only" else ["matrix", "soft"]
-    if len(record["candidates"]) != (3 if len(kinds) == 1 else 15):
-        raise ValueError("incomplete S1B calibration grid")
-    for kind in kinds:
-        chosen = rules.choose_calibration(record["candidates"], kind)
-        if chosen != record["selected"][kind]:
-            raise ValueError("calibration choice differs from registered rule")
-    rules.sanity(record)
+    expected = read_settings_record(record["s1a_release_path"], record["stopped_calibration_path"],
+                                    record["branch_path"], lock_path)
+    if record != expected or record["branch"] != branch:
+        raise ValueError("S1B A1 read settings provenance mismatch")
     return record
 
 
-def prepare_release(lock_path, branch_path, calibration_path, pilot_path, smoke_path, science_commit, *, unseen=False, reloads=None):
+def prepare_release(lock_path, branch_path, read_settings_path, pilot_path, smoke_path, science_commit, *, unseen=False, reloads=None):
     lock, branch = require_lock(lock_path), require_branch(branch_path)
-    cal = require_calibration(calibration_path, branch["branch"], lock_path)
+    cal = require_read_settings(read_settings_path, branch["branch"], lock_path)
+    if cal["branch_blake2b_128"] != data.old.file_digest(branch_path):
+        raise ValueError("read settings bind another branch record")
     pilot, smoke = read(pilot_path), read(smoke_path)
     arms = rules.branch_arms(branch["branch"])
     if len(science_commit) != 40 or any(c not in "0123456789abcdef" for c in science_commit):
@@ -111,8 +139,10 @@ def prepare_release(lock_path, branch_path, calibration_path, pilot_path, smoke_
         raise ValueError("incomplete pilot/smoke")
     for record in (pilot, smoke):
         if (record.get("status") != "complete" or record.get("branch") != branch["branch"]
+                or record.get("amendment_blake2b_128") != data.AMENDMENT_DIGEST
+                or record.get("branch_blake2b_128") != data.old.file_digest(branch_path)
                 or record.get("lock_blake2b_128") != data.old.file_digest(lock_path)
-                or record.get("calibration_blake2b_128") != data.old.file_digest(calibration_path)
+                or record.get("read_settings_blake2b_128") != data.old.file_digest(read_settings_path)
                 or record.get("source_commit") != science_commit):
             raise ValueError("pilot/smoke provenance mismatch")
     released = {}
@@ -127,6 +157,8 @@ def prepare_release(lock_path, branch_path, calibration_path, pilot_path, smoke_
                          scope="all_valid_question", recency=False, capacity=12)
         if (s["steps"] != 20 or not s["freeze"]["digests"]["frozen_unchanged"]
                 or not s["freeze"]["support"]["equal"] or not s["all_finite"]
+                or s["export_metadata"].get("read") != read_spec
+                or s["export_metadata"].get("amendment_blake2b_128") != data.AMENDMENT_DIGEST
                 or s.get("first_reload_matches_original") is not True):
             raise ValueError("S1B smoke/freeze evidence failed")
         released[arm] = dict(lr=chosen["lr"], read=read_spec, trained_depth=depth,
@@ -137,10 +169,14 @@ def prepare_release(lock_path, branch_path, calibration_path, pilot_path, smoke_
                   lock_blake2b_128=data.old.file_digest(lock_path), inventory_blake2b_128=stable_hash(lock["inventory"]),
                   parent_writer_blake2b_128=lock["inventory"]["writer.pt"], source_commit=science_commit,
                   source_blake2b_128=lock["source_blake2b_128"], prereg_blake2b_128=data.PREREG_DIGEST,
+                  amendment_blake2b_128=data.AMENDMENT_DIGEST,
                   parent_prereg_blake2b_128=data.old.PREREG_BLAKE2B_128,
                   analysis_script_blake2b_128=data.old.file_digest(ROOT / data.ANALYSIS),
                   arms=released, steps=data.STEPS, unseen=bool(unseen), contrasts=rules.contrasts(branch["branch"]),
-                  calibration_blake2b_128=data.old.file_digest(calibration_path))
+                  read_settings_blake2b_128=data.old.file_digest(read_settings_path),
+                  read_settings_path=str(Path(read_settings_path).resolve()), read_settings=cal,
+                  s1a_release_blake2b_128=cal["s1a_release_blake2b_128"],
+                  stopped_calibration_blake2b_128=cal["stopped_calibration_blake2b_128"])
     result["config_hashes"] = rules.config_hashes(result)
     result["reload_basis"] = stable_hash(result)
     if reloads is not None:
@@ -162,6 +198,9 @@ def require_release(path, lock_path, *, ready=True):
             or release.get("lock_blake2b_128") != data.old.file_digest(lock_path)
             or release.get("source_blake2b_128") != lock["source_blake2b_128"]
             or release.get("prereg_blake2b_128") != data.PREREG_DIGEST
+            or release.get("amendment_blake2b_128") != data.AMENDMENT_DIGEST
+            or release.get("s1a_release_blake2b_128") != data.S1A_RELEASE_DIGEST
+            or release.get("stopped_calibration_blake2b_128") != data.STOPPED_CALIBRATION_DIGEST
             or release.get("parent_prereg_blake2b_128") != data.old.PREREG_BLAKE2B_128
             or release.get("analysis_script_blake2b_128") != data.old.file_digest(ROOT / data.ANALYSIS)
             or release.get("inventory_blake2b_128") != stable_hash(lock["inventory"])
@@ -172,10 +211,14 @@ def require_release(path, lock_path, *, ready=True):
     source = release["branch_evidence"]
     if source != branch_record(source["files"]["decision"], source["files"]["dev"], source["files"].get("ablation")):
         raise ValueError("release branch differs from frozen S1A evidence")
+    settings = require_read_settings(release["read_settings_path"], release["branch"], lock_path)
+    if (release.get("read_settings") != settings
+            or release.get("read_settings_blake2b_128") != data.old.file_digest(release["read_settings_path"])):
+        raise ValueError("S1B release read settings evidence changed")
     for kind in {rules.ARM[a][0] for a in rules.branch_arms(release["branch"])}:
         pair = [release["arms"][a]["read"] for a in rules.branch_arms(release["branch"]) if rules.ARM[a][0] == kind]
-        if any(p != pair[0] for p in pair):
-            raise ValueError("L1/L4 calibration differs within backend")
+        if any(p != settings["selected"][kind] for p in pair):
+            raise ValueError("L1/L4 reads differ from released S1A settings")
     return lock, release
 
 

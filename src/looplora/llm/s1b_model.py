@@ -267,7 +267,8 @@ def metadata(experiment, arm, seed, spec, step, parent_digest, config_hash):
                 trained_depth=rules.ARM[arm][1], read=spec.as_dict(), task_digest=data.LAYOUT_DIGEST,
                 task=json.loads(json.dumps(asdict(data.task_spec()))), step=step,
                 parent_writer_blake2b_128=parent_digest, science_hash=config_hash,
-                prereg_blake2b_128=data.PREREG_DIGEST, source_commit=source_metadata()["git_commit"],
+                prereg_blake2b_128=data.PREREG_DIGEST, amendment_blake2b_128=data.AMENDMENT_DIGEST,
+                source_commit=source_metadata()["git_commit"],
                 key_dim=experiment.adapter.cfg.key_dim, value_dim=experiment.adapter.cfg.r_mem,
                 feature_map=f"dpfp-nu{experiment.adapter.cfg.dpfp_nu}-unit", eps=experiment.adapter.cfg.eps,
                 trainable=rules.trainable(experiment.s1b_branch, experiment.s1b_control))
@@ -283,6 +284,7 @@ def load_export(path, *, model=None, tokenizer=None):
     payload = torch.load(path, map_location="cpu", weights_only=True)
     meta = payload.get("s1b", {})
     if (payload.get("s1b_version") != 1 or meta.get("prereg_blake2b_128") != data.PREREG_DIGEST
+            or meta.get("amendment_blake2b_128") != data.AMENDMENT_DIGEST
             or meta.get("task_digest") != data.LAYOUT_DIGEST or meta.get("task") != json.loads(json.dumps(asdict(data.task_spec())))
             or any(n not in payload.get("adapter", {}) for n in ("input_mean", "input_std"))
             or set(payload) != {"s1b_version", "config", "arm", "signature", "adapter", "s1b"}):

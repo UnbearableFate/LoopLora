@@ -26,7 +26,7 @@ def test_registered_bytes_task_seeds_and_old_state():
 
 def test_full_registered_prefixes_are_disjoint_with_original_layouts():
     rows = d.check_disjoint()
-    assert rows["train/17"]["count"] == 192000
+    assert rows["train/17"]["count"] == 576000
     assert rows["train/pilot"]["count"] == 6400
     assert rows["old/train/S1A/17"]["ids_blake2b_128"] == slot_data.ids_digest(slot_data.train_ids("S1A", 17, 6000))
     assert rows["dev"]["ids_blake2b_128"] == slot_data.ids_digest(d.SETS["dev"].ids())
@@ -86,13 +86,11 @@ def test_invalid_or_missing_branch_evidence_cannot_be_a_null():
         r.resolve_branch(dict(stage="S1A", verdict="pending"), dict(outcome="no_trigger"))
 
 
-def test_transfer_stop_and_resource_cap_boundaries():
-    cal = dict(selected=dict(matrix=dict(per_hop={"1": dict(em=.1)})))
-    r.sanity(cal)
-    cal["selected"]["matrix"]["per_hop"]["1"]["em"] = .099999
-    with pytest.raises(r.StopForOrchestrator):
-        r.sanity(cal)
-    assert r.walltime(.2, 27.33, 60) == 2400
+def test_amended_schedule_and_resource_cap_boundaries():
+    assert d.STEPS == 18000 and d.BATCH * d.STEPS == 576000
+    assert d.PILOT_STEPS == 200
+    assert r.checkpoint_steps(d.STEPS) == list(range(1800, 18001, 1800))
+    assert r.walltime(.2, 27.33, 60) == 6000
     with pytest.raises(r.StopForOrchestrator):
         r.walltime(10., 27.33, 60)
     with pytest.raises(ValueError):
@@ -176,7 +174,7 @@ def test_sample_guard_checks_two_axes_and_exact_hop_id_order():
 
 @pytest.fixture
 def opening(tmp_path):
-    for name in (d.PREREG, slot_data.PREREG, d.ANALYSIS):
+    for name in (d.PREREG, d.AMENDMENT, slot_data.PREREG, d.ANALYSIS):
         target = tmp_path / name
         target.parent.mkdir(parents=True, exist_ok=True)
         shutil.copy(ROOT / name, target)
@@ -192,7 +190,7 @@ def opening(tmp_path):
     release["lock_blake2b_128"] = "lock"
     release_path.write_text(json.dumps(release))
     selection["release_blake2b_128"] = record["release_blake2b_128"] = slot_data.file_digest(release_path)
-    record[d.PREREG], record[slot_data.PREREG] = d.PREREG_DIGEST, slot_data.PREREG_BLAKE2B_128
+    record[d.PREREG], record[d.AMENDMENT], record[slot_data.PREREG] = d.PREREG_DIGEST, d.AMENDMENT_DIGEST, slot_data.PREREG_BLAKE2B_128
     record_path = tmp_path / "reports/slot-loop-v1/s1b/open.json"
     record_path.parent.mkdir(parents=True)
     record_path.write_text(json.dumps(record))
