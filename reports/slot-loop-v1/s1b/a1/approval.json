@@ -28,7 +28,7 @@
   "science_commit": "258f5f5a24eae684f640a9fd62679bb643470a76",
   "scope": {
     "after the runs": "the frozen dev selection; then STOP: S1B selected, for the independent re-run and the orchestrator's s1b-open.json",
-    "jobs": "twelve main jobs, M1, M4, S1 and S4 x seeds 17, 29 and 43, at most six queued or running at once",
+    "jobs": "twelve main jobs, M1, M4, S1 and S4 x seeds 17, 29 and 43; all twelve may be queued at once (project run limit 16, otherwise idle; wk-slot keeps its test jobs short)",
     "not covered": "confirmation and unseen evaluation, the depth sweep, section 6 mechanism controls and any release extension",
     "resources": "one node each, regular-g, M1 01:30:00, M4 02:40:00, S1 01:40:00, S4 03:00:00, no --scale-up"
   },
