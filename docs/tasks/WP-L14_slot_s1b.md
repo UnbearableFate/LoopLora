@@ -160,3 +160,23 @@ The A1 ready release `d1ccbb7ff4c31fa53abfd7a3cc9ad572` is approved: `reports/sl
    A failure stops for diagnosis; do not resubmit a changed run.
 3. **When all twelve are complete,** run the frozen dev selection with the frozen analysis script. End with `STOP: selected <full hash>`. The independent re-run and the orchestrator's `s1b-open.json` come next. Do not open confirmation or unseen data.
 4. **Keep `docs/reports/WP-L14.md` current** (state and node·h ledger).
+
+## Opened (05:18): confirmation, the depth sweeps and the frozen verdict
+`STOP: selected fe5320e` is accepted. rv-code's independent re-run (job 3730976) reproduced the selection: `docs/review/static_2026-10-29/s1b-selection-rerun.md` on master (fee4bfa).
+
+**The open record** is `/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/open-root/reports/slot-loop-v1/s1b/open.json`, blake2b-128 `b698f7ce5e31b2b43da5c210134588b0`. The same bytes are committed on wp/loop at `reports/slot-loop-v1/s1b/open.json` (9f68575). The open root also holds read-only copies of `scripts/analyze_s1b.py` and the three preregistration files from `258f5f5`, at their registered digests. Pass `--open-root /work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/open-root`. Do not edit the open root or the record.
+
+**Authorized now,** from science commit `258f5f5a24eae684f640a9fd62679bb643470a76` with `scripts/submit.py --commit <full hash>`:
+1. **The entries file:** each of the twelve labels mapped to its `selected.pt`.
+2. **Confirmation evaluation** (`--mode evaluate --set confirmation`): the twelve selected checkpoints on the S1B confirmation set, 2,000 episodes, hops 1-8. The mode also runs the registered L = 1/2/4/8 sweep of M4 and S4. Unseen stays off, because the release fixed it false.
+3. **The descriptive dev depth sweep** (`--set dev`). It changes no decision.
+4. **The frozen confirmation analysis:** `scripts/analyze_s1b.py --stage CONFIRMATION` with the selection, the open root and the confirmation records. It writes `verdict.json` and `verdict.md`.
+
+**Jobs.** Size walltime as the measured evaluation time × 1.5. Use regular-g unless the job fits in 30 min. Each job stays at or below 16 node·h. End each turn that waits on jobs with `WAIT <ids>`. A failure stops for diagnosis; do not resubmit a changed job.
+
+**Then:**
+- Archive the verdict on wp/loop.
+- Update `docs/reports/WP-L14.md`: the state, the verdict tables and the node·h ledger.
+- End with `STOP: verdict <full hash>`.
+
+**Not yet.** Do not train the §6 mechanism controls. They run only for a backend with a confirmed loop gain, and only after the orchestrator reads the verdict and records a release extension.
