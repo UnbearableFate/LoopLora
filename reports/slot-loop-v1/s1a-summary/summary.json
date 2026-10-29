@@ -1,0 +1,371 @@
+{
+  "bootstrap": {
+    "block": 500,
+    "interval": "percentile 95 %",
+    "resamples": 10000,
+    "seed": 9056755664197379988
+  },
+  "confirmation": {
+    "arms": {
+      "matrix_L1": {
+        "em": 0.8226666666666667,
+        "nll": 0.9083146171186035,
+        "rel_err": 0.15029941381622727,
+        "seeds": {
+          "17": {
+            "checkpoint_blake2b_128": "00a1535965a0f2813b4a1b552b6e2ee2",
+            "correct": 1650,
+            "em": 0.825,
+            "nll": 0.9073499591339523,
+            "read": {
+              "capacity": 16,
+              "gain": 1.0,
+              "kind": "matrix",
+              "recency": false,
+              "scope": "all_valid_question",
+              "tau": null
+            },
+            "rel_err": 0.1508259258698672
+          },
+          "29": {
+            "checkpoint_blake2b_128": "b44f13443a4ce44e3d22d9f1ac77685d",
+            "correct": 1639,
+            "em": 0.8195,
+            "nll": 0.9183760254618828,
+            "read": {
+              "capacity": 16,
+              "gain": 1.0,
+              "kind": "matrix",
+              "recency": false,
+              "scope": "all_valid_question",
+              "tau": null
+            },
+            "rel_err": 0.15072289822064341
+          },
+          "43": {
+            "checkpoint_blake2b_128": "07e1ab7460f12615735fccb180d2dc3b",
+            "correct": 1647,
+            "em": 0.8235,
+            "nll": 0.8992178667599755,
+            "read": {
+              "capacity": 16,
+              "gain": 1.0,
+              "kind": "matrix",
+              "recency": false,
+              "scope": "all_valid_question",
+              "tau": null
+            },
+            "rel_err": 0.1493494173581712
+          }
+        }
+      },
+      "soft_slot_L1": {
+        "em": 0.86,
+        "nll": 0.7925933285850557,
+        "rel_err": 0.07698664291529515,
+        "seeds": {
+          "17": {
+            "checkpoint_blake2b_128": "d71e06da709ee4c588b5f008d68c0d15",
+            "correct": 1720,
+            "em": 0.86,
+            "nll": 0.7608762266156864,
+            "read": {
+              "capacity": 16,
+              "gain": 1.0,
+              "kind": "soft",
+              "recency": false,
+              "scope": "all_valid_question",
+              "tau": 0.1
+            },
+            "rel_err": 0.07760097977652822
+          },
+          "29": {
+            "checkpoint_blake2b_128": "136226b18beb45c5ca218451e9c13ea1",
+            "correct": 1723,
+            "em": 0.8615,
+            "nll": 0.8195962175583363,
+            "read": {
+              "capacity": 16,
+              "gain": 1.0,
+              "kind": "soft",
+              "recency": false,
+              "scope": "all_valid_question",
+              "tau": 0.1
+            },
+            "rel_err": 0.07577695278734017
+          },
+          "43": {
+            "checkpoint_blake2b_128": "52d43da424025388a8756bacb03f3058",
+            "correct": 1717,
+            "em": 0.8585,
+            "nll": 0.7973075415811445,
+            "read": {
+              "capacity": 16,
+              "gain": 1.0,
+              "kind": "soft",
+              "recency": false,
+              "scope": "all_valid_question",
+              "tau": 0.1
+            },
+            "rel_err": 0.07758199618201707
+          }
+        }
+      }
+    },
+    "contrast": {
+      "delta_pp": 3.7333333333333334,
+      "lower_end_positive": true,
+      "lower_pp": 2.7,
+      "seeds": {
+        "17": {
+          "delta_correct": 70,
+          "delta_pp": 3.5,
+          "lower_pp": 2.2,
+          "upper_pp": 4.8
+        },
+        "29": {
+          "delta_correct": 84,
+          "delta_pp": 4.2,
+          "lower_pp": 2.9,
+          "upper_pp": 5.5
+        },
+        "43": {
+          "delta_correct": 70,
+          "delta_pp": 3.5,
+          "lower_pp": 2.1,
+          "upper_pp": 4.95
+        }
+      },
+      "sum_delta_correct": 224,
+      "upper_pp": 4.816666666666666
+    },
+    "episode_ids_blake2b_128_le_int64": "3cd75bc09be400623e523da95d11f10b",
+    "expected_n": 2000,
+    "n": 2000,
+    "references": {
+      "matrix_step0": {
+        "checkpoint_blake2b_128": "3994a5631021de03b2039974ac934e56",
+        "correct": 1447,
+        "em": 0.7235,
+        "nll": 1.4731784659205551,
+        "read": {
+          "capacity": 16,
+          "gain": 1.0,
+          "kind": "matrix",
+          "recency": false,
+          "scope": "all_valid_question",
+          "tau": null
+        },
+        "rel_err": 0.1767381689674221
+      },
+      "s_re_native": {
+        "checkpoint_blake2b_128": "3994a5631021de03b2039974ac934e56",
+        "correct": 1447,
+        "em": 0.7235,
+        "nll": 1.4731784659205551,
+        "read": null,
+        "rel_err": 0.1767381689674221
+      },
+      "soft_step0": {
+        "checkpoint_blake2b_128": "3994a5631021de03b2039974ac934e56",
+        "correct": 1527,
+        "em": 0.7635,
+        "nll": 1.313162692863647,
+        "read": {
+          "capacity": 16,
+          "gain": 1.0,
+          "kind": "soft",
+          "recency": false,
+          "scope": "all_valid_question",
+          "tau": 0.1
+        },
+        "rel_err": 0.08084056183894985
+      }
+    }
+  },
+  "stage": "S1A",
+  "tests": {
+    "delta_at_least_3pp": true,
+    "lower_end_positive": true,
+    "seeds_all_positive": true
+  },
+  "unseen": {
+    "arms": {
+      "matrix_L1": {
+        "em": 0.1045,
+        "nll": 5.104967498021821,
+        "rel_err": 0.1921316863875836,
+        "seeds": {
+          "17": {
+            "checkpoint_blake2b_128": "00a1535965a0f2813b4a1b552b6e2ee2",
+            "correct": 212,
+            "em": 0.106,
+            "nll": 5.126225239214487,
+            "read": {
+              "capacity": 16,
+              "gain": 1.0,
+              "kind": "matrix",
+              "recency": false,
+              "scope": "all_valid_question",
+              "tau": null
+            },
+            "rel_err": 0.19192346119554712
+          },
+          "29": {
+            "checkpoint_blake2b_128": "b44f13443a4ce44e3d22d9f1ac77685d",
+            "correct": 207,
+            "em": 0.1035,
+            "nll": 5.101239747014828,
+            "read": {
+              "capacity": 16,
+              "gain": 1.0,
+              "kind": "matrix",
+              "recency": false,
+              "scope": "all_valid_question",
+              "tau": null
+            },
+            "rel_err": 0.19246705794008448
+          },
+          "43": {
+            "checkpoint_blake2b_128": "07e1ab7460f12615735fccb180d2dc3b",
+            "correct": 208,
+            "em": 0.104,
+            "nll": 5.087437507836148,
+            "read": {
+              "capacity": 16,
+              "gain": 1.0,
+              "kind": "matrix",
+              "recency": false,
+              "scope": "all_valid_question",
+              "tau": null
+            },
+            "rel_err": 0.19200454002711922
+          }
+        }
+      },
+      "soft_slot_L1": {
+        "em": 0.13433333333333333,
+        "nll": 4.753032323302235,
+        "rel_err": 0.11415703835339142,
+        "seeds": {
+          "17": {
+            "checkpoint_blake2b_128": "d71e06da709ee4c588b5f008d68c0d15",
+            "correct": 253,
+            "em": 0.1265,
+            "nll": 4.762351536344271,
+            "read": {
+              "capacity": 16,
+              "gain": 1.0,
+              "kind": "soft",
+              "recency": false,
+              "scope": "all_valid_question",
+              "tau": 0.1
+            },
+            "rel_err": 0.11432847132925235
+          },
+          "29": {
+            "checkpoint_blake2b_128": "136226b18beb45c5ca218451e9c13ea1",
+            "correct": 284,
+            "em": 0.142,
+            "nll": 4.78107243365515,
+            "read": {
+              "capacity": 16,
+              "gain": 1.0,
+              "kind": "soft",
+              "recency": false,
+              "scope": "all_valid_question",
+              "tau": 0.1
+            },
+            "rel_err": 0.11401054109298821
+          },
+          "43": {
+            "checkpoint_blake2b_128": "52d43da424025388a8756bacb03f3058",
+            "correct": 269,
+            "em": 0.1345,
+            "nll": 4.715672999907285,
+            "read": {
+              "capacity": 16,
+              "gain": 1.0,
+              "kind": "soft",
+              "recency": false,
+              "scope": "all_valid_question",
+              "tau": 0.1
+            },
+            "rel_err": 0.11413210263793372
+          }
+        }
+      }
+    },
+    "contrast": {
+      "delta_pp": 2.9833333333333334,
+      "lower_end_positive": true,
+      "lower_pp": 2.0833333333333335,
+      "seeds": {
+        "17": {
+          "delta_correct": 41,
+          "delta_pp": 2.05,
+          "lower_pp": 0.9,
+          "upper_pp": 3.15
+        },
+        "29": {
+          "delta_correct": 77,
+          "delta_pp": 3.85,
+          "lower_pp": 2.55,
+          "upper_pp": 5.15
+        },
+        "43": {
+          "delta_correct": 61,
+          "delta_pp": 3.05,
+          "lower_pp": 1.75,
+          "upper_pp": 4.35
+        }
+      },
+      "sum_delta_correct": 179,
+      "upper_pp": 3.8833333333333333
+    },
+    "episode_ids_blake2b_128_le_int64": "10df09f596dbce1e23567f67ed6be852",
+    "expected_n": 2000,
+    "n": 2000,
+    "references": {
+      "matrix_step0": {
+        "checkpoint_blake2b_128": "3994a5631021de03b2039974ac934e56",
+        "correct": 97,
+        "em": 0.0485,
+        "nll": 5.825520241575315,
+        "read": {
+          "capacity": 16,
+          "gain": 1.0,
+          "kind": "matrix",
+          "recency": false,
+          "scope": "all_valid_question",
+          "tau": null
+        },
+        "rel_err": 0.21988512101909147
+      },
+      "s_re_native": {
+        "checkpoint_blake2b_128": "3994a5631021de03b2039974ac934e56",
+        "correct": 97,
+        "em": 0.0485,
+        "nll": 5.825520241575315,
+        "read": null,
+        "rel_err": 0.21988512101909147
+      },
+      "soft_step0": {
+        "checkpoint_blake2b_128": "3994a5631021de03b2039974ac934e56",
+        "correct": 119,
+        "em": 0.0595,
+        "nll": 5.61539492097497,
+        "read": {
+          "capacity": 16,
+          "gain": 1.0,
+          "kind": "soft",
+          "recency": false,
+          "scope": "all_valid_question",
+          "tau": 0.1
+        },
+        "rel_err": 0.12187470046260068
+      }
+    }
+  },
+  "verdict": "ADVANCE"
+}

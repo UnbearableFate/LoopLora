@@ -1,7 +1,7 @@
-# WP-L13 state: SLOT-LOOP-v1, S1A selected; confirmation sealed
+# WP-L13 state: SLOT-LOOP-v1, S1A complete; ADVANCE
 
 Branch `wp/slot` (worktree `LoopLora-wt/slot`), master merged through `8632497` after handover at `ccdcc96`; not merged into master, not pushed. Task: `docs/tasks/WP-L13_slot_loop.md`; registration `docs/prereg/SLOT-LOOP-v1.md` (blake2b-128 `56e8c611c01e0ef9b7ae32db97b0e334`, registered on master at `5f04a5c`, unchanged); S0 results are in `docs/reports/SLOT-LOOP-v1.md`.
-**Status: authorized confirmation and unseen evaluation complete; frozen S1A analysis submitted.** Both sets contain all nine 2000-episode files with verified printed digests; no scores or verdict read before the frozen analysis.
+**Status: S1A complete, registered verdict ADVANCE; no jobs pending.** Confirmation and unseen evaluation and the frozen analysis passed. Decision and exact sample/summary artifacts are committed under `reports/slot-loop-v1/`; final report is `docs/reports/SLOT-LOOP-v1.md`. Full S1B 2×2 is eligible only after its addendum is registered, with new data; no S1B work started. The sections below retain the chronological runbook and earlier gate states; the final completion section supersedes pending/next statements.
 
 ## What the code does
 New files only, except four typed-dispatch edits (below). Every new option is off in the old paths.
@@ -421,3 +421,38 @@ Both jobs use science commit 1523b19c7949673ddcd1d89cc1e5fe518736805c and exact 
 Both evaluation jobs accepted: confirmation 3729313 on mg0036, 00:22:25–00:24:46 (141 s = 0.039167 node·h); unseen 3729314 on mg0009, 00:22:27–00:24:47 (140 s = 0.038889). Each used the science commit and exact opening/release/entries; nine expected labels, every printed count 2000, exact nine-file directory contents, all printed blake2b hashes match files and exit markers are 0. No metric inspection or adaptive choice; the frozen analysis validates sample-level IDs/provenance/finite arrays.
 Frozen S1A analysis job 3729369.opbs uses science commit 1523b19c7949673ddcd1d89cc1e5fe518736805c, one node debug-g 00:01:00. Inputs: $R/manifest.lock.json, $R/open-root/reports/slot-loop-v1/s1a-open.json, $R/s1a-release.json and $R/s1a-evaluation; persistent output $R/s1a-summary. Log: /work/xg24i002/x10041/LoopLora/logs/pbs/slot-s1a-analysis-20261030-002658-3876138.log. The analysis requires script/open/release digest consistency, exact checkpoint/read provenance, locked n/ids and the fixed 10000-draw paired interval before issuing the registered verdict.
 Evaluation cost 281/3600 = 0.078056 node·h. Worker cumulative 2.805222; including independent rerun job 3729280, 2.806889 node·h before this analysis. Next: inspect the frozen verdict and source index, archive the samples/summary, write the decision record and final report, account actual analysis runtime and STOP: S1A done. No additional experiment or stage authorized by this completion.
+
+## S1A complete: ADVANCE
+
+Frozen analysis job **3729369.opbs**, science commit `1523b19c7949673ddcd1d89cc1e5fe518736805c`, completed on mg0018, 2026-10-30 00:29:10–00:29:17 JST: exit 0, **7 s = 0.001944 node·h**. One node, debug-g, requested 00:01:00. Log: `/work/xg24i002/x10041/LoopLora/logs/pbs/slot-s1a-analysis-20261030-002658-3876138.log`. Command was the runbook's frozen `scripts/analyze_slot_study.py --stage S1A --manifest "$R/manifest.lock.json" --open-record "$R/open-root/reports/slot-loop-v1/s1a-open.json" --release "$R/s1a-release.json" --records "$R/s1a-evaluation" --out "$R/s1a-summary"`, through submit.py on the full science commit. No analysis ran on login.
+
+Primary confirmation: 2,000 episodes, ordered ID digest `3cd75bc09be400623e523da95d11f10b`; Matrix mean EM **82.266667%**, SoftSlot **86.000000%**. Difference **+3.733333 pp**, paired percentile 95% interval **[2.700000, 4.816667] pp**. Seed differences 17/29/43 are **+3.5/+4.2/+3.5 pp**. All registered tests pass: 224 × 100 >= 9 × 2000, lower bound > 0, all three seed differences > 0. The 10,000 whole-episode draws use seed 9056755664197379988 and common indices across arms/seeds. Mean NLL/read error: Matrix 0.908315/0.1503; SoftSlot 0.792593/0.0770. Native/Matrix step 0 EM 72.35%; SoftSlot step 0 76.35%. Full per-seed and reference metrics are in the frozen verdict.
+
+Unseen-name diagnostic: 2,000 episodes, ID digest `10df09f596dbce1e23567f67ed6be852`; Matrix mean EM 10.45%, SoftSlot 13.433333%, difference +2.983333 pp [2.083333, 3.883333]. Descriptive only, with low absolute accuracy. It does not decide ADVANCE. Dev-trigger outcome remains no_trigger, so no interface ablation ran. No optional common-fixed-LR runs were made.
+
+All 21 source-index inputs were verified against actual blake2b bytes: manifest, exact release and opening plus 18 sample files. Analysis script remains `843d2ff4d1a03224ccd16e68720ba344`; ready release `523d11d57a08a2491893ebe7cedc86a7`, opening `5a3b037e5aff8f66445df0091398fde0`, prereg `56e8c611c01e0ef9b7ae32db97b0e334`. All three outputs matched hashes printed in the job log:
+
+| frozen output under s1a-summary/ | blake2b-128 |
+| --- | --- |
+| source_index.json | 5a461a6f91a78ecbb3661bf8f6b7e302 |
+| summary.json | 4b53592eb8501f5c2d8ed6a65b2df367 |
+| verdict.md | ae98f1eddaadee4f3b230820097c31e9 |
+
+Exact copies of all 18 NPZs are under `reports/slot-loop-v1/s1a-evaluation/{confirmation,unseen}/`; exact analysis outputs and their 21-file archive inventory are under `reports/slot-loop-v1/s1a-summary/`. Originals remain in persistent `$R`. Decision records: `reports/slot-loop-v1/decision_s1a.{md,json}`. Final report: `docs/reports/SLOT-LOOP-v1.md`. The frozen analysis files were copied byte for byte; only reporting and metadata were authored after completion.
+
+Final accounting (one node each, log start/end basis):
+
+| completed phase | elapsed seconds | node·h |
+| --- | ---: | ---: |
+| S1A preparation, regression tests, smoke, pilot, candidate, reloads, release | 709 | 0.196944 |
+| six main continuations | 6301 | 1.750278 |
+| S1A-DEV | 6 | 0.001667 |
+| independent rv-code dev re-run 3729280 | 6 | 0.001667 |
+| confirmation evaluation 3729313 | 141 | 0.039167 |
+| unseen evaluation 3729314 | 140 | 0.038889 |
+| frozen S1A analysis 3729369 | 7 | 0.001944 |
+| **S1A total including independent re-run** | **7310** | **2.030556** |
+
+S0 and implementation/test accounting: inherited 0.503 + (420 + 294 + 277)/3600 = 0.778278 node·h. **Whole study including independent re-run: 2.808833 node·h**; worker-only total excluding that 6 s: **2.807167**. Final evaluation plus analysis: 288 s = 0.080000 node·h. Inherited 0.503 is the rounded handover basis. Every job is below 16 node·h; written stage caps were lifted. No jobs remain pending.
+
+H1 is supported conditional on one S-RE writer, these three continuation data-order seeds, T1/E16, L1, full-vocabulary EM and calibrated all-question reads under equal LR tuning effort. No interference-removal causal claim, loop/multi-hop claim or broad unseen-name generalization follows. The result makes the full S1B Matrix/SoftSlot × L1/L4 study eligible after a separately registered addendum and new data namespace. No source, frozen analysis, release or prereg change, no further training and no S1B data access. Final gate: **STOP: S1A done**, then await the orchestrator.
