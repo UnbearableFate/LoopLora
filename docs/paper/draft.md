@@ -1,3 +1,5 @@
+> **Superseded.** The manuscript of record is `docs/paper/tex/paper.tex` (PDF: `docs/paper/paper.pdf`, WP-T11 Part B). This markdown draft is kept for history; the evidence ledgers are unchanged.
+
 # Iterative Queries in a Low-Rank Memory Adapter: Composition, Writer Dependence, and Budget Limits
 
 *Manuscript draft (revised after the second external reviews, WP-T11: Section 8.6, the related-work additions and the seed-level statistics). Code cutoff: `f1dd6e2`; numerical and claim authority:

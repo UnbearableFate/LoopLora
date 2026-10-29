@@ -1,0 +1,48 @@
+\section{Claim contract, limitations, and reproducibility}
+\label{sec:limits}
+
+\paragraph{What the paper claims.}
+\begin{itemize}[leftmargin=1.4em,itemsep=2pt,topsep=3pt]
+\item The equal-parameter oracle contrast: at rank 128 with a clean oracle memory, the shared reader M1-L4 read four times beats a single read of equal parameter count on hops 2 to 3 at two backbone sizes of one family.  % LP11 LP15
+\item A negative result for B8, the four-unshared-reads reader, under one optimizer.  % LP9 LP16
+\item A negative result for learned writers: the symbolic learned writers give a smaller or hop-1-damaging benefit, and no language-model writer reaches the 0.80 gate (DPFP and DPFP-X included); every registered stop stands.  % S3 S9 LL9 DP1 DP4
+\item Per-step readouts as decoding only, and no causal bridge at the final question position.  % LP5 PC1
+\item No scale trend: two sizes, carried learning rates and no registered test across scales.  % LP20
+\end{itemize}
+
+\paragraph{What the paper does not claim.}
+The language-model oracle is not the symbolic oracle: it needs a learned value-to-key lookup for every read after the first, so symbolic oracle results do not transfer to it.  % LP2 LP6
+No conclusion about multiple reads in the language model is drawn at rank 32.  % LP6
+No claim covers unseen entities, names beyond the closed 1,024-name vocabulary, or new entity codes.  % UN2 UN3
+OA is the value and output ceiling, not an addressing control.  % LL6 LL9
+B8 is not parameter-matched to the single read or to M1: it adds 9,216 parameters (+8.9\%) at rank 32, 147,456 (+31.0\%) at rank 128 and +69.2\% in the symbolic unfactorized joint model.  % FR1
+The paper also does not say, and no evidence here supports, any of the following.
+\begin{itemize}[leftmargin=1.4em,itemsep=2pt,topsep=3pt]
+\item That the reader cannot go beyond hop 3, or that it composes up to hop 8 (Section~\ref{sec:depth-hop}).  % LP21
+\item That B8 cannot compose, or that sharing is necessary: B8 contains M1-L4, it was trained with one optimizer and no learning-rate pilot of its own, and a warm start has not been tested.  % LP9 LP16
+\item That an exact store would not help: it was tested only by evaluation on frozen checkpoints (RFX), and no trained least-squares store ran.  % RX1
+\item That the recurrence composes across question positions, or the converse: each position performs its own walk, and which position's walk carries the answer is untested.  % PC1 PC2 PC3
+\item That rank 256 or the 1.7B backbone fixes the learned writer, that DPFP-X selects a writer, any extrapolation of its rising curves, a scaling claim from X17, an explanation of X256's higher EM, or any learned-writer or end-to-end claim at either rank or backbone.  % DP4 DP5 DP6 DP7
+\item That the intervals cover future training seeds, other oracle code tables or layouts.  % LP22
+\end{itemize}
+
+\paragraph{Uncertainty.}
+The bootstrap conditions on the fixed training seeds, and the follow-ups reuse confirmation samples rather than supplying independent confirmation of every successive claim.  % S3 S8 B3 B5
+Training-seed failures, longer rank-follow-up training and the disclosed F2 decision deviation remain relevant even when a pooled interval is positive.  % S3 S8 S9
+The P1-L confirmation (test [100000, 102000), 97.5\%, $k=2$) and P1L-C (test [102000, 104000), 95\%) condition on three training seeds and one oracle seed and layout.  % LP7 PC1
+Section~\ref{sec:seeds} adds seed-level intervals; with three seeds they are wide, and they include 0 for the G1-L contrasts and for G2-L against the fixed-query reader at both backbones.  % LP22
+The depth matrix evaluates one L4-trained checkpoint at depths and hops that were never trained, without intervals, and its oracle-stop row uses the label.  % LP21
+The language-model oracle results rest on one random oracle code table.
+
+\paragraph{Stops and open items.}
+The registered stops are kept.
+No language-model writer was selected, so P1L-D and P1L-S did not run, and the LSQ screen ran no arm.  % LL9 PD1 WL1 RX1
+The rank-32 oracle-code pilot stopped on one seed, one learning rate and 5,666 steps, which is not a proof of impossibility.  % WL1
+Nothing registered is pending.
+The symbolic and language-model correspondence figure was not produced.
+
+\paragraph{Reproducibility.}
+The symbolic figures are produced by \texttt{scripts/paper\_figures.py} from committed CSV and JSON exports, and the tables of Sections~\ref{sec:lm-oracle} to~\ref{sec:seeds} by \texttt{scripts/paper\_tables\_g1.py} from the committed per-seed accuracy, timing and endpoint files.
+No checkpoint is re-evaluated and no bootstrap or timing measurement is rerun for this manuscript.
+The evidence ledgers (\texttt{docs/paper/evidence\_symbolic.md} and \texttt{docs/paper/evidence\_llm.md}) hold the exact stored values and artifact commits and take priority over any shortened wording here.
+Appendix~\ref{app:B} records the sets, seeds and comparisons, and Appendix~\ref{app:C} the claim contract.

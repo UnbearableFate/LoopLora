@@ -1,0 +1,48 @@
+\section{Introduction}
+
+A context-dependent adapter has to decide what to store and how to query it.
+A larger memory can keep more information.
+Spending more computation on the stored representation is a different option: an extra query may reveal a composition that the smaller state already holds.
+Neither option follows from counting parameters.
+We ask whether the query can improve over several updates while the input, the context and the frozen base projection stay fixed.
+
+The test case is a chain of associations.
+A query names a starting entity, and the target is the terminal of its chain.
+A reader with a suitable memory map can read a successor, form a new query from it, and continue.
+High accuracy on the terminal task does not by itself show that this happens.
+A learned writer can expose information about the terminal set directly, so a model can answer some questions without following the path.
+Proposition 10 (Appendix~\ref{app:D}) gives a conditional construction of such a statistic, and factorizing the writer inputs removes one direct term of it without removing every global statistic.
+
+We study a low-rank adapter whose reader updates a low-dimensional query several times over a fixed delta-rule memory (Section~\ref{sec:setting}).
+The writer makes one decay-first delta update per eligible context token.
+Three questions organize the paper.
+First, does a larger evaluation depth improve one trained reader while its input and memory stay the same?
+Second, do separately trained evolving-query systems beat single-read, fixed-query and memory-free controls at the same rank?
+Third, what do these comparisons cost in parameters and measured latency?
+Rank is held fixed so that extra reader computation is not mixed up with extra representation width, and extra latency is reported as a cost.  % FR1
+
+\paragraph{What we find.}
+\begin{itemize}[leftmargin=1.4em,itemsep=2pt,topsep=3pt]
+\item With an oracle writer, more reads help.
+In a symbolic task with orthogonal oracle codes, repeated reads improve the reachable hops and beat fixed-query and memory-free controls.  % S1 S2
+In a frozen language model at rank 128, one shared module read four times beats a single read with the same parameter count on hops 2 to 3, at two backbone sizes of one family: by +21.550 pp (Qwen3-0.6B-Base) and +25.783 pp (Qwen3-1.7B-Base), in every seed.  % LP11 LP15
+The four-unshared-reads reader B8 fails its registered gate at both sizes.  % LP9 LP16
+\item Learned writing is the weak point.
+In the symbolic task a learned writer gives a smaller, seed-dependent benefit, and a factorized writer gives a stronger walk-specific effect but loses single-hop accuracy.  % S3 S9
+In the language model, no learned writer reaches the registered 0.80 gate, including the DPFP and DPFP-X screens; each registered decision is to stop.  % LL9 DP1 DP4
+We therefore make no learned-writer and no end-to-end claim.
+\item The oracle result is bounded.
+At its trained depth the reader reaches hop 3; run deeper, the same checkpoint reaches hops 4 to 8 at low accuracy while it loses hop 1.  % LP21
+Per-step readouts are decoding only, and bridge patching gives no causal claim.  % LP5 PC1
+\item Stopping rules, memory load and budget controls are reported as costs and limits.
+Same-rank latency is a cost, and no efficiency claim is made over larger-rank single reads.  % FR1
+\end{itemize}
+
+\paragraph{Limits that apply to every claim.}
+All entities come from a closed 1,024-name vocabulary, and every evaluation set draws on its seen pool.
+The one exception is a descriptive scope row on 256 unseen-pool names of the same vocabulary, which supports only the statement that the depth gain is also present there.  % UN2 UN3
+Nothing here concerns names outside the vocabulary or new entity codes.
+Effects hold at the trained hops and depths, and longer hops appear only as measured cells.
+Oracle writers and learned writers answer different questions and are never pooled, and the language-model oracle differs from the symbolic oracle.  % LP2 LP6
+Every language-model composition number rests on one random oracle code table (one oracle seed) and three training seeds.  % LP22
+Appendix~\ref{app:C} lists each principal claim with its comparator, writer, split, gate and evidence rows.
