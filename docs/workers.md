@@ -114,6 +114,7 @@ Open or resume (new tab, worktree cwd):
 | WP-L12 LSQT-U control (descriptive; U 36.0 %, split +2.5 pp unit query / +10.1 pp store) | sn-llm | b60f144 |
 | master test after the cleanup of finished smoke/pilot weights (job 3727237 at 177a4fe: 2957 passed, 1 skipped; `docs/review/cleanup_2026-10-29.md`) | orchestrator | 177a4fe |
 | WP-T12 part 3 (LSQT U control in the ledger, manuscript and PDF; LQ4, LQ3 narrowed) | sn-paper | b932ef4 |
+| master test after the LSQT-U merge (job 3727608 at 37abbfc: 2960 passed, 1 skipped; +3 = `tests/test_analyze_lsqt_u.py`) | orchestrator | 37abbfc |
 | Merged master full test suite after DPFP-X (job 3723646, exit 0, 2717 passed, 1 expected skip) | orchestrator | e86bdfe |
 | Merged master full test suite after P5L (job 3722062, exit 0, 2676 passed, 1 expected skip) | orchestrator | c6b5275 |
 | Merged master full test suite (job 3721356, exit 0, 1 expected skip) | orchestrator | d4de948 |
