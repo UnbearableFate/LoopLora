@@ -163,3 +163,13 @@ Round-2 changes awaiting validation:
 No registered numerical rule changed. The optional common-fixed-LR run remains unregistered in the release; if later requested, it first needs a release entry. The D-F4 seal remains a workflow guard. All src edits in this round occur before the first real preflight, as required by source binding.
 
 RED outcome verified: the real smoke→smoke.json→builder→candidate JSON→reload CLI path reaches the strict-config STOP (not a setup failure); five evaluation-entry cases return success when they should refuse; changed-script/open-record case does not raise; four runbook cases identify obsolete commands or relative paths; all eleven direct analysis provenance/digest cases report DID NOT RAISE. Every selected regression failed for its intended pre-fix defect. Cumulative S0 account after RED: 0.629111 node·h; 0.370889 remaining. Next validation uses the fixed source at `11ff92a9fbe42cdd07d6ea23bc6f90cae581a8a8` (and any following docs-only commit). No runtime assertion has been weakened.
+
+
+Round-2 GREEN validation snapshot: `f39b21259b8c3758d79c8f466290f98d83a0a701`, includes all fixes and RED evidence. Jobs submitted with scripts/submit.py, no waiting/polling:
+
+| job | test files | walltime | result | actual node·h |
+| --- | --- | --- | --- | --- |
+| 3728256.opbs | test_slot_data.py, test_analyze_slot_study.py, test_slot_release.py | 00:03:00 | pending | pending |
+| 3728257.opbs | test_slot_experiment.py, test_slot_round2.py | 00:05:00 | pending | pending |
+
+Logs: `/work/xg24i002/x10041/LoopLora/logs/pbs/slot-r2-meta-20261029-213408-3287227.log` and `/work/xg24i002/x10041/LoopLora/logs/pbs/slot-r2-exp-20261029-213408-3287235.log`. Expected runtime basis: earlier metadata job 84 s, experiment file 167 s, full RED selection with integration 34 s; requested 180/300 s provide about 1.5× or more. Combined requested ceiling 0.133333 node·h fits the 0.370889 remaining; cumulative measured remains 0.629111 pending completion. After watcher wake-up, inspect both logs, investigate any unexpected failure, and update actual costs before the cross-review STOP. No non-slot module imports changed; the earlier legacy-suite evidence remains applicable.
