@@ -68,3 +68,22 @@ End with `STOP: addendum <full hash>`. Write no code before the orchestrator reg
 - **Merging.** Merge master into wp/slot once now. It brings the S1B addendum, A1 and the records. Do not merge wp/loop.
 - **Stay blind to S1B outcomes.** Do not read S1B pilot, dev, confirmation or unseen outputs, or S1B training records under `runs/slot-loop-v1/s1b/`, while drafting. The calibration and the diagnosis may be read.
 - **Commits.** Commit on wp/slot only. Do not push.
+
+## Registration (2026-10-30 01:55 JST)
+The addendum is registered on master as `docs/prereg/SLOT-LOOP-v1-S2.md`, blake2b-128 `a5262fc4ecf1ffdaab4613321b0ff2b0`. Its "Decisions at registration" 1–7 change the draft in four places:
+- the ladder runs in two waves (wave 1: Base-old, Base-budget, Arch, Arch+Role and +Transition; wave 2: +Null);
+- intervention control (1) is a donor a-only swap, reported without a threshold; question isolation becomes an engineering gate;
+- an S3 at fixed read budgets is open when H2 passes without H3;
+- implementation and tests may start before S1B's verdict.
+
+**Next, Step 2 (implementation; S1B still running on wp/loop).**
+1. **Merges.** Merge master into wp/slot once. Then merge wp/loop at exactly `258f5f5a24eae684f640a9fd62679bb643470a76`, the A1 lock commit, not wp/loop's tip. At that commit wp/loop holds only S1B's preflight, lock, stopped calibration and diagnosis.
+2. **Implement S2 as registered.** This covers both backends, all six arms including +Null, the wrapper, spans, losses, trajectory capture, interventions and the analysis. In shared files, keep S0/S1A/S1B registered behavior bitwise unchanged, with tests.
+3. **Tests on compute only.** Use synthetic fixtures, the real S-RE parent and the S2 smoke namespace (train [0,64)). Generate no calibration, pilot, dev, training, confirmation or unseen data. No preflight or lock: they bind S1B's branch evidence and wait for its verdict.
+4. **Report.** Update `docs/reports/WP-L15.md` with state and ledger.
+5. **Stop.** End with `STOP: review <full hash>`. That review is the one cross-review of the S2 core code. Fixes after it are checked by tests only.
+
+**Rules for Step 2.**
+- **Blindness.** Stay blind to S1B outcomes: do not read wp/loop commits after `258f5f5`, or anything under `runs/slot-loop-v1/s1b/` or `reports/slot-loop-v1/s1b/` that `258f5f5` does not contain.
+- **Jobs.** At most 6 wk-slot jobs queued or running, each ≤ 16 node·h, walltime = measured × 1.5. End a turn with `WAIT <ids>`; do not poll.
+- **Commits.** Commit on wp/slot only. Do not push.

@@ -79,6 +79,15 @@
     - N 由 6000 改为 18,000。理由：P1-L 的 M1-L4 在此布局上训练到 17,000 步仍在提升；按 dev NLL 选 checkpoint，加长步数只增加计算量。
     - 其余设计不变。A1 改动 src，需要重做 preflight 和 lock。
   - wk-slot 在 wp/slot 上并行起草 S2 增补（WP-L15，只写文档，不看 S1B 的结果）。
+- **2026-10-30 01:55 JST** S2 增补预注册 `docs/prereg/SLOT-LOOP-v1-S2.md` 登记，blake2b-128 `a5262fc4ecf1ffdaab4613321b0ff2b0`。底稿是 wk-slot 的 8948d00，另加登记决定 1–7。登记时还没有任何 S1B pilot、dev 或确认集结果。
+  - **布局与种子：** 布局摘要和全部种子已用标准库复算，结果一致。
+  - **修改：**
+    - 阶梯分两批：第一批是 Base-old、Base-budget、Arch、Arch+Role 和 +Transition，+Null 单独作为第二批，要等 Transition 的 dev 机制门通过。
+    - 干预的第一个对照改为只换 a，结果只报告、不设阈值。问题之间互不干扰的检查改为工程门。
+    - H2 通过而 H3 未通过时，允许登记只用固定读取次数的 S3。
+  - **进度：** S1B 判定之前，可以先写代码、跑测试，并做一次交叉评审。preflight、lock 和其后的步骤等 S1B 判定。wk-slot 合并 wp/loop 时只合到 A1 lock 提交 258f5f5，那个提交里没有 S1B 结果。
+  - **S1B（A1）：** lock 258f5f5，smoke 和 reload 已通过，LR pilot 作业 3729954 在跑。
+- **2026-10-30 01:42 JST** 第二档清理（用户批准"可以进行第二档清理"）：删除 P1-S 的逐样本数组，共 928 个文件、1.676 GB，记录见 `docs/review/cleanup_2026-10-29.md`。
 
 ---
 
