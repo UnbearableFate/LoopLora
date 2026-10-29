@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from dataclasses import asdict
+from types import SimpleNamespace
 
 import torch
 from torch.nn import functional as F
@@ -48,6 +49,26 @@ def trajectory_check(experiment, arrays):
     return dict(passed=True, depths=[1, 2, 4, 8])
 
 
+def owner_checks(experiment):
+    reports = []
+    for depth in (1, 2, 4, 8):
+        def process(x, state, _legacy_depth, valid):
+            return experiment.adapter.process_sequence(x, state, depth, valid)
+        view = SimpleNamespace(cfg=experiment.adapter.cfg, process_sequence=process)
+        report = checks.owner_mask_check(view, device=experiment.device, questions=8, seed=data.TRAIN_BASE[17])
+        reports.append(dict(report, depth=depth))
+    return dict(passed=all(r["passed"] for r in reports), depths=[1, 2, 4, 8], evidence=reports)
+
+
+@torch.no_grad()
+def capture_shapes(experiment, arrays):
+    batch = experiment.prepare(arrays)
+    B = len(arrays.episode_seed)
+    keys, values = list(batch.keys.shape), list(batch.values.shape)
+    passed = keys == [B, 12, 768] and values == [B, 12, 128] and bool((batch.write_count == 12).all())
+    return dict(passed=passed, keys=keys, values=values, writes=batch.write_count.cpu().tolist())
+
+
 def run(out):
     """No calibration/dev, only registered S1B smoke and recorded legacy replay."""
     from .s1b_train import fit
@@ -71,11 +92,13 @@ def run(out):
     for branch in ("advance", "query_copy"):
         exp = model.load_parent(branch, expected=inventory)
         try:
+            take("legacy", checks.matrix_identity(exp, checks.old_range(exp), depths=(1, 2, 4)))
             take("matrix_L4", matrix_identity(exp, tiny))
             take("trajectory", trajectory_check(exp, evaluation))
-            take("owner_mask", checks.owner_mask_check(exp.adapter, device=exp.device, questions=8, seed=data.TRAIN_BASE[17]))
+            take("owner_mask", owner_checks(exp))
             take("isolation", checks.isolation_check(exp, evaluation))
             take("features", checks.feature_check(exp, evaluation))
+            take("features", capture_shapes(exp, tiny))
             take("bytes", checks.bytes_check(exp, tiny, capacity=12))
             take("capacity", checks.capacity_check(exp, tiny, capacity=12))
             with torch.no_grad():

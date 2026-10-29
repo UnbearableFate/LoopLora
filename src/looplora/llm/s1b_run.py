@@ -67,9 +67,16 @@ def calibration(lock_path, branch_path, out):
             arm = "M1" if kind == "matrix" else "S1"
             for tau in ((None,) if kind == "matrix" else rules.TAUS):
                 for gain in rules.GAINS:
-                    value = model.evaluate(exp, arrays, rules.read_config(arm, gain, tau), 1)
-                    result.append(dict(kind=kind, gain=gain, tau=tau, seconds=value["seconds"], **value["summary"]))
-            selected[kind] = rules.choose_candidate(result, kind)
+                    try:
+                        value = model.evaluate(exp, arrays, rules.read_config(arm, gain, tau), 1)
+                        result.append(dict(kind=kind, gain=gain, tau=tau, seconds=value["seconds"], **value["summary"]))
+                    except FloatingPointError as error:
+                        result.append(dict(kind=kind, gain=gain, tau=tau, nll=None, error=str(error), all_finite=False))
+            try:
+                selected[kind] = rules.choose_calibration(result, kind)
+            except rules.StopForOrchestrator:
+                artifacts.dump(out / "calibration.json", dict(provenance, status="failed", candidates=result, selected=selected))
+                raise
         record = dict(provenance, status="complete", candidates=result, selected=selected)
         artifacts.dump(out / "calibration.json", record)
         rules.sanity(record)
@@ -95,15 +102,22 @@ def smoke(lock_path, branch_path, calibration_path, out):
             record = fit(exp, spec, arm=arm, seed=17, lr=1e-3, steps=20, out=out / arm, dev=dev,
                          dev_steps=[20], support=raw, parent_digest=lock["inventory"]["writer.pt"],
                          science_hash=stable_hash(config), source=source)
-            # Save the selected checkpoint's predictions, not the final weights if selection changes later.
+            if record["selected_step"] != 20:
+                raise ValueError("smoke must select its sole step-20 checkpoint")
+            original = model.evaluate(exp, dev, spec, rules.ARM[arm][1])["samples"]
+            save_samples(out / arm / "reload_samples.npz", original,
+                         checkpoint_blake2b_128=record["selected_checkpoint_blake2b_128"], step=20)
             reports[arm] = record
         finally:
             exp.close()
         restored = model.load_export(out / arm / "selected.pt")
         try:
             result = model.evaluate(restored, dev, spec, rules.ARM[arm][1])
-            save_samples(out / arm / "reload_samples.npz", result["samples"])
+            if set(result["samples"]) != set(original) or any(not np.array_equal(result["samples"][k], original[k]) for k in original):
+                raise ValueError("first S1B reload differs from original in-memory smoke")
             reports[arm]["export_metadata"] = restored.s1b
+            reports[arm]["original_smoke_samples_blake2b_128"] = data.old.file_digest(out / arm / "reload_samples.npz")
+            reports[arm]["first_reload_matches_original"] = True
         finally:
             restored.close()
     record = dict(provenance, status="complete", arms=reports)
@@ -164,6 +178,8 @@ def reload_check(lock_path, release_path, export, predictions, arm, out):
     exp = model.load_export(export)
     try:
         expected = release["arms"][arm]
+        if data.old.file_digest(predictions) != expected["original_smoke_samples_blake2b_128"]:
+            raise ValueError("original smoke sample file differs from candidate release")
         if exp.s1b != expected["smoke_metadata"] or exp.read_spec.as_dict() != expected["read"]:
             raise ValueError("export metadata differs from candidate release")
         actual = model.evaluate(exp, data.episodes(data.eval_set("smoke"), [1, 2, 3]), exp.read_spec, rules.ARM[arm][1])["samples"]
@@ -171,6 +187,7 @@ def reload_check(lock_path, release_path, export, predictions, arm, out):
         if set(actual) != set(saved) or any(not np.array_equal(actual[k], saved[k]) for k in actual):
             raise ValueError("S1B export reload failed prediction/NLL/ID check")
         record = dict(passed=True, arm=arm, metadata=exp.s1b, reload_basis=release["reload_basis"],
+                      original_smoke_samples_blake2b_128=data.old.file_digest(predictions),
                       export_blake2b_128=data.old.file_digest(export))
         artifacts.dump(out / "reload.json", record)
         return record
@@ -236,10 +253,12 @@ def evaluate_selected(lock_path, release_path, selection_path, entries_path, ope
             for depth in depths:
                 result = model.evaluate(exp, arrays, exp.read_spec, depth, diagnostics=True)
                 statistics.validate_samples(result["samples"], lock["manifest"]["ids"][purpose])
+                statistics.validate_trajectories(result["samples"], depth)
                 provenance = dict(label=label, checkpoint_blake2b_128=digest, evaluated_depth=depth,
                                   trained_depth=rules.ARM[arm][1], release_blake2b_128=token.release_digest,
                                   lock_blake2b_128=data.old.file_digest(lock_path), read=exp.read_spec.as_dict(),
                                   task_digest=data.LAYOUT_DIGEST, trace_agrees=True)
+                provenance["trajectory_order"] = ["episode", "hop", "step", "feature"]
                 filename = f"{arm}-s{seed_text}-L{depth}.npz"
                 save_samples(out / filename, result["samples"], **provenance)
                 index[f"{label}@{depth}"] = dict(file=filename, blake2b_128=data.old.file_digest(out / filename),
@@ -256,6 +275,16 @@ def analyze_dev(lock_path, release_path, records_root):
     lock, release = artifacts.require_release(release_path, lock_path)
     records = {f"{a}/{s}": artifacts.read(Path(records_root) / a / f"s{s}" / "record.json")
                for a in rules.branch_arms(release["branch"]) for s in data.RUN_SEEDS}
+    for label, record in records.items():
+        arm, seed = label.split("/")
+        for row in record["dev"]:
+            path = Path(record["artifact_root"]) / row["checkpoint"]["file"]
+            payload = torch.load(path, map_location="cpu", weights_only=True)
+            meta = payload["s1b"]
+            if (meta["step"] != row["step"] or meta["arm"] != arm or meta["seed"] != int(seed)
+                    or meta["science_hash"] != release["config_hashes"][label]
+                    or meta["read"] != release["arms"][arm]["read"]):
+                raise ValueError("dev row export metadata differs from its checkpoint/arm/seed")
     return statistics.select(records, release, lock, data.old.file_digest(release_path))
 
 
@@ -288,6 +317,9 @@ def analyze_confirmation(lock_path, release_path, selection_path, opening_root, 
                         or provenance.get("lock_blake2b_128") != data.old.file_digest(lock_path)):
                     raise ValueError("confirmation row provenance mismatch")
                 statistics.validate_samples(samples, lock["manifest"]["ids"]["confirmation"])
+                statistics.validate_trajectories(samples, depth)
+                if provenance.get("trajectory_order") != ["episode", "hop", "step", "feature"]:
+                    raise ValueError("trajectory ordering provenance differs")
                 if depth == rules.ARM[arm][1]:
                     main[arm, seed] = samples
                 if arm.endswith("4"):
@@ -321,6 +353,7 @@ def analyze_confirmation(lock_path, release_path, selection_path, opening_root, 
                     or provenance.get("evaluated_depth") != int(depth_text)):
                 raise ValueError("unseen row provenance mismatch")
             statistics.validate_samples(samples, lock["manifest"]["ids"]["unseen"])
+            statistics.validate_trajectories(samples, int(depth_text))
             descriptive[key] = model.per_hop(samples)
         result["unseen"] = dict(status="complete", descriptive=descriptive)
     return result
@@ -445,6 +478,7 @@ def analysis_main(argv=None):
             p.error("confirmation requires --selection and --open-root")
         result = analyze_confirmation(a.manifest, a.release, a.selection, a.open_root, a.records, a.unseen_records)
         name = "verdict.json"
+        (out / "verdict.md").write_text(statistics.confirmation_markdown(result))
     artifacts.dump(out / name, result)
     artifacts.dump(out / "source_index.json", dict(analysis_script_blake2b_128=data.old.file_digest(artifacts.ROOT / data.ANALYSIS),
         release_blake2b_128=data.old.file_digest(a.release), manifest_blake2b_128=data.old.file_digest(a.manifest),

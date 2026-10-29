@@ -32,8 +32,15 @@ def resolve_branch(decision, dev, ablation=None):
         raise ValueError("S1A frozen dev analysis is required")
     if dev["outcome"] == "ablation" and ablation is None:
         raise ValueError("triggered S1A ablation record is required")
+    if ablation is not None and dev["outcome"] != "ablation":
+        raise ValueError("untriggered S1A ablation record is forbidden")
     if ablation is not None and (ablation.get("stage") != "S1A-ABL" or not isinstance(ablation.get("flag"), bool)):
         raise ValueError("malformed S1A ablation record")
+    digest = decision.get("release_blake2b_128")
+    records = [decision, dev] + ([] if ablation is None else [ablation])
+    if (not isinstance(digest, str) or len(digest) != 32 or any(c not in "0123456789abcdef" for c in digest)
+            or any(record.get("release_blake2b_128") != digest for record in records)):
+        raise ValueError("S1A branch records must share one release digest")
     if decision["verdict"] == "ADVANCE":
         return "advance"
     return "query_copy" if ablation is not None and ablation["flag"] else "matrix_only"
@@ -81,6 +88,12 @@ def walltime(step, evaluation, load, io=0., steps=data.STEPS):
 def sanity(calibration):
     if calibration["selected"]["matrix"]["per_hop"]["1"]["em"] < .10:
         raise StopForOrchestrator("calibrated Matrix parent hop-1 calibration EM below 10%")
+
+
+def choose_calibration(rows, kind):
+    """The inherited selection rule after explicitly excluding failed/nonfinite candidates."""
+    finite = [row for row in rows if row.get("nll") is not None and math.isfinite(row["nll"])]
+    return choose_candidate(finite, kind)
 
 
 def config_hashes(release):

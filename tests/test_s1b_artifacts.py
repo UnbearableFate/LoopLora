@@ -16,8 +16,8 @@ def bundle(tmp_path, monkeypatch):
         path = tmp_path / name
         a.dump(path, value)
         return path
-    decision = write("s1a-summary.json", dict(stage="S1A", verdict="ADVANCE"))
-    dev = write("s1a-selection.json", dict(stage="S1A-DEV", outcome="no_trigger"))
+    decision = write("s1a-summary.json", dict(stage="S1A", verdict="ADVANCE", release_blake2b_128="c" * 32))
+    dev = write("s1a-selection.json", dict(stage="S1A-DEV", outcome="no_trigger", release_blake2b_128="c" * 32))
     branch = write("branch.json", a.branch_record(decision, dev))
     inventory = {"writer.pt": "f" * 32}
     manifest = dict(ids={"dev": dict(count=1000, ids_blake2b_128="dev-ids")})
@@ -43,7 +43,8 @@ def bundle(tmp_path, monkeypatch):
         pilot_arms[arm] = dict(candidates=[dict(lr=lr, nll=.9, all_finite=True) for lr in r.LR_GRID],
             step0_nll=1., step_seconds=.2, eval_seconds=27., load_seconds=60., export_seconds=1., overhead_seconds=2.)
         smoke_arms[arm] = dict(steps=20, freeze=dict(digests=dict(frozen_unchanged=True), support=dict(equal=True)),
-                              all_finite=True, export_metadata=dict(arm=arm, control="shared"))
+                              all_finite=True, export_metadata=dict(arm=arm, control="shared"),
+                              original_smoke_samples_blake2b_128="b" * 32, first_reload_matches_original=True)
     pilot = write("pilot.json", dict(provenance, arms=pilot_arms))
     smoke = write("smoke.json", dict(provenance, arms=smoke_arms))
     paths = dict(lock=lock, branch=branch, cal=cal, pilot=pilot, smoke=smoke, preflight=preflight)
@@ -62,6 +63,7 @@ def test_complete_candidate_to_ready_uses_exact_json_reports(bundle):
     assert candidate["arms"]["M1"]["read"] == candidate["arms"]["M4"]["read"]
     assert candidate["arms"]["S1"]["read"] == candidate["arms"]["S4"]["read"]
     reloads = {arm: b.write(f"{arm}-reload.json", dict(passed=True, arm=arm, reload_basis=candidate["reload_basis"],
+               original_smoke_samples_blake2b_128=candidate["arms"][arm]["original_smoke_samples_blake2b_128"],
                metadata=candidate["arms"][arm]["smoke_metadata"])) for arm in candidate["arms"]}
     release = prepare(b, reloads)
     path = b.write("ready.json", release)

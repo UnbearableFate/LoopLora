@@ -161,6 +161,7 @@ def trace_diagnostics(experiment, batch, arrays, spec, depth):
     """Group actual final-token reads by episode/query; no recomputed first-query surrogate."""
     B, Q = arrays.q_start.shape
     terms = {}
+    queries, reads, states = [], [], []
     labels = path_indices(arrays, experiment.device)
     adapter = experiment.adapter
     for s in range(1, depth + 1):
@@ -184,6 +185,9 @@ def trace_diagnostics(experiment, batch, arrays, spec, depth):
                             ("norm_ratio", m.norm(dim=-1) / clean.norm(dim=-1).clamp_min(1e-12))):
             terms[f"{name}_s{s}"] = torch.where(valid, value, torch.nan).reshape(B, Q).cpu().numpy()
         z = torch.cat([t["z"] for t in events])[order]
+        queries.append(q.reshape(B, Q, -1).cpu().numpy())
+        reads.append(m.reshape(B, Q, -1).cpu().numpy())
+        states.append(z.reshape(B, Q, -1).cpu().numpy())
         terms[f"state_norm_s{s}"] = z.norm(dim=-1).reshape(B, Q).cpu().numpy()
         if s > 1:
             earlier = [t for t in adapter.trace if t["step"] == s - 1 and len(t["owner"])]
@@ -198,6 +202,8 @@ def trace_diagnostics(experiment, batch, arrays, spec, depth):
             terms[f"entropy_s{s}"] = (-torch.xlogy(w, w).sum(-1)).reshape(B, Q).cpu().numpy()
             top = w.topk(2).values
             terms[f"gap_s{s}"] = (top[:, 0] - top[:, 1]).reshape(B, Q).cpu().numpy()
+    terms.update(trajectory_q=np.stack(queries, axis=2), trajectory_m=np.stack(reads, axis=2),
+                 trajectory_z=np.stack(states, axis=2))
     return terms
 
 
@@ -247,6 +253,8 @@ def evaluate(experiment, arrays, spec, depth, *, chunk=16, diagnostics=False, ti
         adapter.reset_observation()
     sample = {name: np.concatenate(parts) for name, parts in values.items()}
     sample.update(episode_id=arrays.episode_seed.copy(), hops=arrays.q_hop_true[0].copy())
+    if diagnostics:
+        sample["trajectory_step"] = np.arange(1, depth + 1, dtype=np.int64)
     if not np.all(arrays.q_hop_true == sample["hops"][None]):
         raise ValueError("evaluation questions are not hop-stratified")
     return dict(samples=sample, summary=per_hop(sample), prepare_seconds=prep_seconds, score_seconds=score_seconds,

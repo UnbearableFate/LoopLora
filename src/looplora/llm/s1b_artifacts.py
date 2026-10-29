@@ -35,6 +35,7 @@ def branch_record(decision, dev, ablation=None):
         inputs["ablation"] = str(Path(ablation).resolve())
     branch = rules.resolve_branch(read(decision), read(dev), read(ablation) if ablation else None)
     return dict(stage="S1B", branch=branch, files=inputs,
+                s1a_release_blake2b_128=read(decision)["release_blake2b_128"],
                 digests={key: data.old.file_digest(path) for key, path in inputs.items()})
 
 
@@ -92,7 +93,7 @@ def require_calibration(path, branch, lock_path):
     if len(record["candidates"]) != (3 if len(kinds) == 1 else 15):
         raise ValueError("incomplete S1B calibration grid")
     for kind in kinds:
-        chosen = rules.choose_candidate(record["candidates"], kind)
+        chosen = rules.choose_calibration(record["candidates"], kind)
         if chosen != record["selected"][kind]:
             raise ValueError("calibration choice differs from registered rule")
     rules.sanity(record)
@@ -125,10 +126,12 @@ def prepare_release(lock_path, branch_path, calibration_path, pilot_path, smoke_
         read_spec = dict(kind=kind, gain=settings["gain"], tau=settings["tau"],
                          scope="all_valid_question", recency=False, capacity=12)
         if (s["steps"] != 20 or not s["freeze"]["digests"]["frozen_unchanged"]
-                or not s["freeze"]["support"]["equal"] or not s["all_finite"]):
+                or not s["freeze"]["support"]["equal"] or not s["all_finite"]
+                or s.get("first_reload_matches_original") is not True):
             raise ValueError("S1B smoke/freeze evidence failed")
         released[arm] = dict(lr=chosen["lr"], read=read_spec, trained_depth=depth,
                              walltime_seconds=rules.walltime(p["step_seconds"], p["eval_seconds"], p["load_seconds"], p["overhead_seconds"]),
+                             original_smoke_samples_blake2b_128=s["original_smoke_samples_blake2b_128"],
                              smoke_metadata=s["export_metadata"])
     result = dict(stage="S1B", status="pending_reload", branch=branch["branch"], branch_evidence=branch,
                   lock_blake2b_128=data.old.file_digest(lock_path), inventory_blake2b_128=stable_hash(lock["inventory"]),
@@ -146,7 +149,8 @@ def prepare_release(lock_path, branch_path, calibration_path, pilot_path, smoke_
         for arm, path in reloads.items():
             r = read(path)
             if (r.get("passed") is not True or r.get("arm") != arm or r.get("reload_basis") != result["reload_basis"]
-                    or r.get("metadata") != released[arm]["smoke_metadata"]):
+                    or r.get("metadata") != released[arm]["smoke_metadata"]
+                    or r.get("original_smoke_samples_blake2b_128") != released[arm]["original_smoke_samples_blake2b_128"]):
                 raise ValueError("reload report differs from exact candidate")
         result.update(status="ready", reload_reports={arm: data.old.file_digest(path) for arm, path in reloads.items()})
     return result

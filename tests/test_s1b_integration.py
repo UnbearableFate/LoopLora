@@ -1,4 +1,6 @@
 """The real S1B smoke → JSON builder → candidate → reload CLI boundary, synthetic parent only."""
+import pytest
+import torch
 from test_s1b_artifacts import bundle
 from test_s1b_model import backbone, tokenizer
 import slot_golden
@@ -31,3 +33,35 @@ def test_smoke_builder_and_cli_reload_share_complete_json_metadata(bundle, backb
         reloads[arm] = out / "reload.json"
     ready = artifacts.prepare_release(p["lock"], p["branch"], p["cal"], p["pilot"], smoke_dir / "smoke.json", "a" * 40, reloads=reloads)
     assert ready["status"] == "ready" and len(ready["config_hashes"]) == 12
+    def altered_reload(path):
+        restored = original_load(path, model=backbone, tokenizer=tokenizer)
+        with torch.no_grad():
+            restored.adapter.B.add_(.01)
+        return restored
+    monkeypatch.setattr(model, "load_export", altered_reload)
+    arm = "M1"
+    with pytest.raises(ValueError, match="prediction/NLL"):
+        run.main(["--mode", "reload-check", "--manifest", str(p["lock"]), "--release", str(release_path),
+                  "--export", str(smoke_dir / arm / "selected.pt"), "--predictions", str(smoke_dir / arm / "reload_samples.npz"),
+                  "--arm", arm, "--out", str(tmp_path / "altered-cli-reload")])
+
+
+def test_review_first_reload_must_match_original_smoke_not_another_reload(bundle, backbone, tokenizer, tmp_path, monkeypatch):
+    def synthetic_parent(branch, **kwargs):
+        return model.configure(adopt(slot_golden.tiny_experiment(backbone, tokenizer)), branch)
+    original_load = model.load_export
+    def deterministic_altered_reload(path):
+        restored = original_load(path, model=backbone, tokenizer=tokenizer)
+        with torch.no_grad():
+            restored.adapter.B.add_(.01)
+        return restored
+    monkeypatch.setattr(model, "load_parent", synthetic_parent)
+    monkeypatch.setattr(model, "load_export", deterministic_altered_reload)
+    monkeypatch.setattr(run, "source_metadata", lambda: dict(git_commit="a" * 40))
+    smoke_dir = tmp_path / "altered-first-reload"
+    smoke_dir.mkdir()
+    p = bundle.paths
+    with pytest.raises(ValueError, match="original in-memory smoke"):
+        run.smoke(p["lock"], p["branch"], p["cal"], smoke_dir)
+    assert (smoke_dir / "M1/reload_samples.npz").is_file()
+    assert not (smoke_dir / "smoke.json").exists()

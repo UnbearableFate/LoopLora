@@ -156,13 +156,17 @@ def test_matched_training_freezes_writer_and_json_export_round_trip(factory, bac
     after = tensor_digests(exp.adapter)
     assert all(after[name] == digest for name, digest in frozen.items() if name not in r.trainable(branch))
     assert record["costs"]["logical_reads"] == 4 * record["costs"]["valid_read_positions"]
+    winning = next(row for row in record["dev"] if row["step"] == record["selected_step"])
+    with np.load(tmp_path / winning["checkpoint"]["samples"], allow_pickle=False) as samples:
+        original = {name: samples[name].copy() for name in samples if name not in {"step", "checkpoint_blake2b_128"}}
     exp.close()
     reloaded = m.load_export(tmp_path / "selected.pt", model=backbone, tokenizer=tokenizer)
     try:
         assert reloaded.s1b == json.loads(json.dumps(reloaded.s1b))
         assert reloaded.s1b["trained_depth"] == 4 and reloaded.s1b["task_digest"] == d.LAYOUT_DIGEST
         assert (reloaded.adapter.A_query is not None) == (branch == "query_copy")
-        original = m.evaluate(reloaded, dev, spec, 4)["samples"]
+        actual = m.evaluate(reloaded, dev, spec, 4)["samples"]
+        assert all(np.array_equal(actual[name], original[name]) for name in original)
     finally:
         reloaded.close()
     again = m.load_export(tmp_path / "selected.pt", model=backbone, tokenizer=tokenizer)

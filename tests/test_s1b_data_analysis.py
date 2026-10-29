@@ -70,8 +70,10 @@ def test_training_layout_evaluation_stratification_does_not_change_graphs():
     ("NOT ADVANCED", "ablation", True, "query_copy"),
 ])
 def test_all_registered_branch_outcomes(verdict, outcome, ablation, branch):
-    abl = None if ablation is None else dict(stage="S1A-ABL", flag=ablation)
-    assert r.resolve_branch(dict(stage="S1A", verdict=verdict), dict(stage="S1A-DEV", outcome=outcome), abl) == branch
+    digest = "c" * 32
+    abl = None if ablation is None else dict(stage="S1A-ABL", flag=ablation, release_blake2b_128=digest)
+    assert r.resolve_branch(dict(stage="S1A", verdict=verdict, release_blake2b_128=digest),
+                            dict(stage="S1A-DEV", outcome=outcome, release_blake2b_128=digest), abl) == branch
 
 
 def test_invalid_or_missing_branch_evidence_cannot_be_a_null():

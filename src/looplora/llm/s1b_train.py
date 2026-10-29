@@ -5,6 +5,7 @@ import contextlib
 import json
 import math
 from pathlib import Path
+import shutil
 import time
 
 import numpy as np
@@ -30,6 +31,7 @@ def fit(experiment, spec, *, arm, seed, lr, steps, out, dev, dev_steps, support,
     """Private primitive shared by registered smoke, pilot, main and gated controls."""
     out = Path(out)
     out.mkdir(parents=True, exist_ok=True)
+    (out / "checkpoints").mkdir(exist_ok=True)
     setup_tick = time.perf_counter()
     depth = rules.ARM[arm][1]
     names = rules.trainable(experiment.s1b_branch, experiment.s1b_control)
@@ -48,11 +50,22 @@ def fit(experiment, spec, *, arm, seed, lr, steps, out, dev, dev_steps, support,
         row = dict(result["summary"], step=step, seconds=result["seconds"], selectable=step != 0)
         if not math.isfinite(row["nll"]):
             raise FloatingPointError("nonfinite dev evaluation")
+        meta = model.metadata(experiment, arm, seed, spec, step, parent_digest, science_hash)
+        export_tick = time.perf_counter()
+        candidate = out / "checkpoints" / f"step-{step:06d}.pt"
+        digest = model.save_export(experiment, candidate, meta)
+        sample_file = candidate.with_suffix(".npz")
+        np.savez_compressed(sample_file, **result["samples"], checkpoint_blake2b_128=np.asarray(digest), step=np.asarray(step))
+        row["checkpoint"] = dict(step=step, file=str(candidate.relative_to(out)), blake2b_128=digest,
+                                 samples=str(sample_file.relative_to(out)), samples_blake2b_128=data.old.file_digest(sample_file))
+        row["export_seconds"] = time.perf_counter() - export_tick
+        export_seconds.append(row["export_seconds"])
         rows.append(row)
         return row
 
     setup_seconds = time.perf_counter() - setup_tick
-    evaluate_dev(0)
+    initial_row = evaluate_dev(0)
+    setup_seconds += initial_row["export_seconds"]
     stream_seed = data.TRAIN_BASE[seed] if stream_seed is None else stream_seed
     stream = (BatchStream(data.task_spec(), "train", data.BATCH, stream_seed, steps,
                           tokenizer=experiment.tokenizer, workers=workers) if source is None else contextlib.nullcontext(source))
@@ -96,11 +109,9 @@ def fit(experiment, spec, *, arm, seed, lr, steps, out, dev, dev_steps, support,
                     raise RuntimeError("writer/support changed at checkpoint")
                 if row["nll"] < best - 1e-6:
                     best, best_step = row["nll"], step
-                    meta = model.metadata(experiment, arm, seed, spec, step, parent_digest, science_hash)
-                    export_tick = time.perf_counter()
-                    selected_digest = model.save_export(experiment, out / "selected.pt", meta)
-                    export_seconds.append(time.perf_counter() - export_tick)
-                checkpoint_overhead.append(time.perf_counter() - overhead_tick)
+                    shutil.copyfile(out / row["checkpoint"]["file"], out / "selected.pt")
+                    selected_digest = row["checkpoint"]["blake2b_128"]
+                checkpoint_overhead.append(time.perf_counter() - overhead_tick + row["export_seconds"])
             if step == 1 or step % 50 == 0 or step == steps or step in dev_steps:
                 log.write(json.dumps(dict(step=step, loss=losses[-1], grad_norm=norms[-1],
                     clipped=norms[-1] > 1., lr=optimizer.param_groups[0]["lr"], seconds=durations[-1])) + "\n")
@@ -114,9 +125,12 @@ def fit(experiment, spec, *, arm, seed, lr, steps, out, dev, dev_steps, support,
     chosen = rules.select_checkpoint([(r["step"], r["nll"]) for r in rows if r["selectable"]])
     if chosen != best_step:
         raise RuntimeError("online checkpoint selection disagrees with registered rule")
+    if data.old.file_digest(out / "selected.pt") != selected_digest:
+        raise RuntimeError("selected export bytes do not match the winning dev row")
     np.savez_compressed(out / "train_steps.npz", loss=np.asarray(losses), grad_norm=np.asarray(norms),
                         step_seconds=np.asarray(durations))
     record = dict(status="complete", stage="S1B", arm=arm, seed=seed, steps=steps, lr=lr,
+                  artifact_root=str(out.resolve()),
                   branch=experiment.s1b_branch, control=experiment.s1b_control, trained_depth=depth,
                   stream_seed=stream_seed, train_episodes=steps * data.BATCH, train_questions=steps * data.BATCH * 4,
                   all_finite=bool(np.isfinite(losses).all() and np.isfinite(norms).all()), dev=rows,
