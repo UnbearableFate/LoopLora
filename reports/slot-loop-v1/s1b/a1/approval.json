@@ -1,0 +1,37 @@
+{
+  "amendment_blake2b_128": "341d3c71f9334a1384a102b097e7ad75",
+  "approval": "S1B (amendment A1) ready release approved for the twelve main arm-seed jobs and the registered steps up to STOP: S1B selected; reviewed against docs/prereg/SLOT-LOOP-v1-S1B.md and docs/prereg/SLOT-LOOP-v1-S1B-A1.md",
+  "approved_by": "orchestrator (Opus-5.5, main agent)",
+  "parent_prereg_blake2b_128": "56e8c611c01e0ef9b7ae32db97b0e334",
+  "prereg_blake2b_128": "6f2e776f2c6cfde131380fb343854784",
+  "recorded_at": "2026-10-30T02:42:00+09:00",
+  "release": "reports/slot-loop-v1/s1b/a1/release.json",
+  "release_blake2b_128": "d1ccbb7ff4c31fa53abfd7a3cc9ad572",
+  "release_committed_in": "046644b115af7810a7853dfe4e82497c27c408c3",
+  "release_persistent": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/release.json",
+  "reviewed": [
+    "status ready; the committed copy is byte-identical to the persistent release.json; file digest d1ccbb7ff4c31fa53abfd7a3cc9ad572",
+    "branch advance (M1, M4, S1, S4) from the copies of S1A's frozen decision (d9f00ee8b208a9e1f84edb6ebe935616) and dev selection (b6e5d452089045e27b22d4d94a57aacc); S1A release 523d11d57a08a2491893ebe7cedc86a7, copy equal to runs/slot-loop-v1/s1a-release.json",
+    "N = 18,000 per A1; dev checkpoints 1,800 to 18,000 every 1,800; training streams train [0, 576,000) under the registered base seeds of seeds 17, 29 and 43",
+    "reads per A1 from the S1A release: matrix g 1; soft g 1, tau 0.1; capacity 12; all valid question tokens; no recency; shared by L1 and L4",
+    "LR by the pilot rule: 3e-3 for all four arms. Pilot NLL M1 6.36655 (1e-3 0.0736 worse), M4 6.66372 (0.2696 worse), S1 6.34717 (0.0817 worse), S4 6.64115 (0.1476 worse); every candidate finite and better than its step-0 row (10.543, 22.516, 9.778, 22.312). 3e-3 is the top of the registered grid; the grid is not extended",
+    "twelve config hashes recomputed with stdlib stable_hash from the registered science_config fields: all equal",
+    "src digest recomputed from git archive of the science commit: d7e7ff0fb5987d5e5abfc312c82c449c, equal to the lock; no src, scripts, tests or configs change from 258f5f5 to 046644b",
+    "analysis script scripts/analyze_s1b.py at the science commit: 78f001a232595acce6d38091f0e4895b, equal to the release",
+    "parent S-RE files equal the lock inventory (writer.pt 3994a5631021de03b2039974ac934e56, checkpoint.pt, record.json, training.json, val-6000/samples.npz); inventory stable_hash 2e2ae18648e56b41eabe89b0bb3ad3ac; D128-3 writer.pt and checkpoint.pt equal their registered digests",
+    "lock 2309d5a8ebae91332f32bbd85e5eeb8a, read settings c0eec1c6d461a394eb1f8517c5784057, branch 6ded1c79c96b267aff4498c120b57b09 and stopped calibration 6e4f7346376cb010820a84832f6d7d91 (descriptive only) equal their files",
+    "smoke freeze in all four arms: frozen A, K, V, a_beta, a_lambda and the input buffers unchanged; Q, R, U, B changed; support unchanged; trainable gradient norms finite and nonzero; 180,224 trainable and 294,914 frozen parameters; L4 logical reads four times L1",
+    "four independent CLI reloads passed; reload basis ede5da36d6621f5d99f682fe3f38f362, smoke-sample digests and report file digests equal the release",
+    "walltime = ceil to 600 s of 1.5 x (load + 18000 x step + 11 x evaluation + overhead), from each arm's slowest finite pilot candidate: M1 5,400 s, M4 9,600 s, S1 6,000 s, S4 10,800 s; each within the 16 node-h cap; twelve runs request 26.5 node-h",
+    "optional unseen diagnostic fixed false before any formal run, as S1B section 3 allows; it is descriptive only"
+  ],
+  "science_commit": "258f5f5a24eae684f640a9fd62679bb643470a76",
+  "scope": {
+    "after the runs": "the frozen dev selection; then STOP: S1B selected, for the independent re-run and the orchestrator's s1b-open.json",
+    "jobs": "twelve main jobs, M1, M4, S1 and S4 x seeds 17, 29 and 43, at most six queued or running at once",
+    "not covered": "confirmation and unseen evaluation, the depth sweep, section 6 mechanism controls and any release extension",
+    "resources": "one node each, regular-g, M1 01:30:00, M4 02:40:00, S1 01:40:00, S4 03:00:00, no --scale-up"
+  },
+  "status": "approved",
+  "study": "SLOT-LOOP-v1 S1B, amendment A1"
+}
