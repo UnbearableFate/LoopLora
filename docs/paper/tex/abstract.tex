@@ -1,0 +1,13 @@
+Can a low-rank adapter use extra computation to extract compositions from a fixed context memory?
+We study a reader that updates a low-dimensional query several times over a fixed delta-rule memory, and we compare it with a single read at the same rank.
+With an oracle writer, more reads help.
+In a symbolic task, repeated reads improve the reachable hops and beat fixed-query and memory-free controls.  % S1 S2
+In a frozen language model at rank 128, one shared module read four times beats a single read of equal parameter count on hops 2 to 3 at two backbone sizes of one family (Qwen3-0.6B-Base and Qwen3-1.7B-Base), and the four-unshared-reads reader fails its registered gate at both.  % LP4 LP9 LP11 LP15
+At its trained depth the shared reader reaches hop 3; run deeper, the same checkpoint reaches hops 4 to 8 at 9.9 to 16.6\% (0.6B) and 9.8 to 20.9\% (1.7B) with the depth chosen by the label, while it loses hop 1.  % LP21
+Learned writing is the weak point.
+In the symbolic task a learned writer gives a smaller, seed-dependent benefit, and a factorized writer keeps a walk-specific depth effect but fails to preserve single-hop accuracy.  % S3 S9
+In the language model, the completed validation screens, including the registered DPFP and DPFP-X screens, select no learned writer, despite informative input probes and a usable supplied-answer-code output path.  % LL2 LL3 LL9 DP1 DP4
+Per-step readouts are decoding only and bridge patching gives no causal claim; at rank 32 the readers did not learn to use the oracle memory.  % LP5 PC1 LP7
+The comparison is against a single read at the same rank, extra latency is reported as a cost, and no efficiency advantage over a larger-rank single read is claimed.  % FR1
+All results use a closed 1,024-name vocabulary, depths within those trained, one oracle seed and three training seeds.
+The contribution is a bounded account of when repeated memory access helps, with negative results that keep capability gains from being mistaken for efficiency or end-to-end reasoning gains.  % B7 B8 B9
