@@ -96,3 +96,8 @@ Master `f2c438d` merged first. Text only: no training, no compute, no torch, no 
 2. Costs of the two studies (2.18 and 5.10 node-hours with the shared tests) are not printed in the paper; they are in the study reports.
 3. Remaining overfull boxes are small (largest about 21 pt in a landscape Appendix C table, 14 pt in one Appendix E table, 12 pt in one Appendix I table).
 4. The U control of LSQT has not reported and is not mentioned beyond the sentence that the split is untested.
+
+## Part 2 fix (review wording)
+- The early dip of the SQ2 ridge arms is now described as consistent with starting from AdamW moments of another objective (registered deviation 2), cause not tested
+  (`sec_writers.tex`, ledger row SQ2). "Because" and "explains" are removed.
+- W3 is no longer called a retraining: it is a separate ridge-plus-DPFP study that would need its own registration (`sec_writers.tex`, ledger row LQ1); no other place calls it a retraining.

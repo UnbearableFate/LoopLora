@@ -59,7 +59,7 @@ They are descriptive only, and each reading carries its limit.  % SQ2
 \item Ridge storage on the DPFP features roughly halves the read error (0.196 for S-RE against 0.359 for S-DE) and is +6.9 pp over the continued delta control, which still misses both registered conditions. This is one seed, and the validation episodes selected D128-3.  % SQ3
 \item The delta continuation alone gains 4.6 pp (60.8 to 65.4\%), so the parent had not converged and part of every continuation gain is the continuation.  % SQ3
 \item The coefficient loss did not help: S-DC is 2.4 pp below S-DE, S-RC is 2.8 pp below S-RE, the interaction is $-0.4$ pp, and the read error is unchanged by it.  % SQ3
-\item Swapping only the store at step 0, with no retraining, gives 68.7\% (read error 0.312); the ridge arms first dip below that value and then recover, because they start with optimizer moments from another objective.  % SQ2 SQ3
+\item Swapping only the store at step 0, with no retraining, gives 68.7\% (read error 0.312); the ridge arms first dip below that value and then recover, which is consistent with starting from AdamW moments of another objective (registered deviation 2) but was not tested.  % SQ2 SQ3
 \item The gradient clip (norm 1.0) is active at every logged step in all four arms, as it was in the training of D128-3; the paper makes no statement about what it does to the effect of the coefficient loss.  % SQ3
 \end{itemize}
 Zeroing or shuffling the memory leaves at most 2 of 1,000 answers correct in every arm, so the answers come from the stored episode, but the read error stays between 0.20 and 0.36.  % SQ3
@@ -70,7 +70,7 @@ Zeroing or shuffling the memory leaves at most 2 of 1,000 answers correct in eve
 \paragraph{LSQT: trained least-squares stores.}
 LSQT trains three arms from scratch at rank 128 with the unit query, with the delta store replaced by a least-squares store: LT-K4 (four Kaczmarz sweeps) and LT-RG001 and LT-RG1 (ridge with $\eta=0.01$ and $\eta=1$).
 The registered decision is that no arm reaches 0.80.
-The best ridge arm, LT-RG001, reaches 46.1\%, inside the band from 40\% to below 48.5\%, which neither falsifies the line nor triggers the W3 retraining, so the trained least-squares line stays open and the learned-writer line stays stopped.  % LQ1
+The best ridge arm, LT-RG001, reaches 46.1\%, inside the band from 40\% to below 48.5\%, which neither falsifies the line nor triggers W3 (a separate ridge-plus-DPFP study that would need its own registration), so the trained least-squares line stays open and the learned-writer line stays stopped.  % LQ1
 All three arms are above R-r128 (33.5\%), by +4.8, +12.6 and +9.1 pp, and well below D128-3 (60.8\%), by 22.5, 14.7 and 18.2 pp (Table~\ref{tab:lsqt}; the standard error of a difference is about 2.2 pp, one seed).  % LQ2
 The read error is not removed (0.554, 0.512 and 0.499, against 0.631 for R-r128 and 0.363 for D128-3), and the read-value head stays at 22 to 27\% against a clean-value head of 92 to 96\%.  % LQ2
 The registered prediction, that the best ridge arm would reach 50\% with a read error of at most 0.35, did not hold.  % LQ2
