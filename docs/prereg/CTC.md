@@ -1,9 +1,9 @@
-# Study CTC — a classify-then-code writer into the frozen P1-L readers, pre-registration draft
+# Study CTC — a classify-then-code writer into the frozen P1-L readers, pre-registered
 
-Drafted 2026-10-29 by sn-oracle (Claude Sonnet-5.5) for WP-L11 (plan G4, fable W1); **not registered**: the orchestrator
-reviews it and commits it to master before any code or run. Source: `docs/tasks/WP-L11_classify_then_code.md`,
-`docs/review/rv-fable_2026-10-29.md` §1.1 and W1. The design below follows the task file's fixed design; every addition or
-change is listed under "Flags" for the orchestrator.
+Registered 2026-10-29 13:10 JST by the orchestrator, before any CTC code, run or score. Drafted by sn-oracle (Claude
+Sonnet 5.5; WP-L11 step 1, wp/oracle `0726aa8`) from `docs/tasks/WP-L11_classify_then_code.md` and
+`docs/review/rv-fable_2026-10-29.md` §1.1 and W1. The user approved G1–G4 on 2026-10-29 13:00 JST ("OK,启动接下来的G1-G4").
+The orchestrator's decisions are in "Decisions at registration" at the end; they override the draft where they differ.
 
 Information seen before this draft: P1-L's registered r = 128 `oracle_random` results (`reports/p1l/r128/`: M1-L4@4
 hop 1/2/3 = 47.9/35.4/18.5 % and B4@1 = 19.6/5.3/5.4 % on the confirmation range, three seeds pooled); the WP-L3 pre-tail
@@ -169,3 +169,22 @@ choice. A candidate flag only licenses a separately registered three-seed confir
 
 Executed by a Claude Sonnet-5.5 subagent after the orchestrator registers this document. Report: `docs/reports/CTC.md`;
 artifacts under `reports/ctc/`.
+
+## Decisions at registration (orchestrator)
+1. **Flags 1–10 are accepted as written.** They cover the Stage A choice over 16 cells, the disjoint selection block, the
+   masked unseen names, both arms with the arm-selection rule, the integrity condition, the oracle reference, the soft-key
+   renormalization, S = 8,000 with lr 0.01, a single seed with validation only, and the new `llm/ctc.py` with its off path
+   tested.
+2. **Claim wording follows the selected positions.** Stage A may pick a head or tail entity at its own token (`head_last`
+   for the head, `tail` for the tail). If it does, the writer identifies that token there, and the report must say so.
+   - In that case a candidate is worded as "a learned parser plus a fixed code table drives the frozen composing reader",
+     not as a learned writer.
+   - In every case the report states that CTC uses privileged oracle codes, while DPFP and DPFP-X learn their own keys and
+     values. So CTC's EM is not compared with theirs as like for like.
+3. **Writer parameters** (open point). Full heads on `o14` would give about 4.2 M, and rank64 heads about 0.1 M each. Report
+   them as a cost, beside the reader's 475,138 adapter parameters. Stage A's tie-break already prefers fewer parameters, and
+   no parameter match is claimed.
+4. **`--scale-up`** is allowed only for the Stage B CE+ans training job, and only if the smoke step exceeds 0.30 s, as the
+   cost section states. Every other job is 1 node, ≤ 1 h.
+5. **Stops.** STOP after the Stage A lock (`reports/ctc/stage-a-lock.json`) is committed. The orchestrator checks it before
+   Stage B.
