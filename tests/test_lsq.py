@@ -434,7 +434,7 @@ def test_default_adapter_is_bitwise_the_pre_lsq_write_and_read(device):
     dict(store_eta=0.), dict(store_eta=-1e-3), dict(store_eta=math.inf), dict(store_eta=math.nan), dict(store_eta=True),
     dict(variant='lora', store='ridge'), dict(variant='parallel', store='sweep'), dict(variant='loop', unit_query=True),
     dict(store='ridge', gate='input'), dict(store='sweep', gate='input'),
-    dict(store='ridge', dpfp_nu=1), dict(store='sweep', dpfp_nu=3), dict(unit_query=True, dpfp_nu=1)])
+    dict(store='sweep', dpfp_nu=3), dict(unit_query=True, dpfp_nu=1), dict(store='ridge', dpfp_nu=1, unit_query=True)])
 def test_config_rejects_invalid_store_settings(kwargs):
     with pytest.raises(ValueError):
         AdapterConfig(d_in=4, d_out=4, r=3, **kwargs)
@@ -446,6 +446,8 @@ def test_config_accepts_the_registered_store_settings():
     assert AdapterConfig(d_in=4, d_out=4, r=3, store='sweep', store_sweeps=4, unit_query=True).store_sweeps == 4
     assert AdapterConfig(d_in=4, d_out=4, r=3, unit_query=True).store == 'delta'
     assert AdapterConfig(d_in=4, d_out=4, r=3, store='ridge', gate='scalar').key_dim == 3
+    # SQ2 (docs/prereg/SQ2.md): the ridge store takes DPFP features (state width 2 * r_mem * nu); the sweep store still does not.
+    assert AdapterConfig(d_in=4, d_out=4, r=3, store='ridge', dpfp_nu=3).key_dim == 18
 
 
 def test_parameter_counts_are_the_delta_rule_counts():

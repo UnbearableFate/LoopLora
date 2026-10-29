@@ -256,7 +256,7 @@ def _scalar_gate(value: Tensor | float, M0: Tensor, name: str) -> Tensor:
 def ridge_final(
     M0: Tensor, u: Tensor, valid: Tensor | None = None, write: Tensor | None = None,
     reset: Tensor | None = None, *, K: Tensor, V: Tensor, lam: Tensor | float, eta: float,
-    eps: float = 1e-6,
+    eps: float = 1e-6, feature_map: FeatureMap | None = None,
 ) -> Tensor:
     """Recency-weighted ridge least-squares store of a row's n packed writes (unit keys k_j, values v_j).
 
@@ -265,6 +265,8 @@ def ridge_final(
     For M0 = 0 and eta -> 0 it is the interpolant M k_j = v_j whenever the keys are independent (n <= r_mem), whatever
     lam. It is solved in float64 through the n x n system (K^T W K + eta I; a Cholesky solve, differentiable). A reset at
     token zero clears M0; interior resets are unsupported. Keys and values use the per-token projections of scan_final.
+    With a `feature_map` (DPFP, SQ2) the unit keys are the normalized features of the projected keys and the state is
+    [B, r_mem, key_dim] with key_dim the feature width; the solve is the same n x n system (key_dim need not equal r_mem).
     """
     _check_state(M0)
     if u.ndim != 3 or u.shape[0] != M0.shape[0] or u.device != M0.device:
@@ -280,7 +282,7 @@ def ridge_final(
         return M0
     if K.shape != (M0.shape[1], u.shape[-1]) or V.shape != K.shape:
         raise ValueError("K and V must have shape [r_mem, r]")
-    _check_key_width(M0, K, None)
+    _check_key_width(M0, K, feature_map)
     if not math.isfinite(eps) or eps <= 0:
         raise ValueError("eps must be finite and positive")
     if bool(reset_mask[:, 1:].any()):
@@ -303,6 +305,8 @@ def ridge_final(
     for step in range(maximum):
         token = packed[:, step].contiguous()
         raw = F.linear(token, K)
+        if feature_map is not None:
+            raw = feature_map(raw)
         keys.append(raw / torch.linalg.vector_norm(raw, dim=-1, keepdim=True).clamp_min(eps))
         values.append(F.linear(token, V))
     keys, values = torch.stack(keys, 1).double(), torch.stack(values, 1).double()

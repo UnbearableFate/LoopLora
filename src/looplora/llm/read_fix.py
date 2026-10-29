@@ -48,6 +48,11 @@ class ReadFixExperiment(WriterFixExperiment):
     def writer_signature(self):
         return {**super().writer_signature(),'read_fix':self.read_arm}
 
+    def coefficient_loss(self,batch,x):
+        """SQ2's weighted coefficient loss, or None when `read_fix.coefficient_weight` is absent or zero (every other study)."""
+        weight=self.config['read_fix'].get('coefficient_weight')
+        return None if not weight else float(weight)*coefficient_loss(self,batch,x)
+
 
 def question_terms(experiment,batch,x):
     """Raw linear query/read at the final question token, preserving gradients."""
@@ -85,6 +90,39 @@ def extra_losses(experiment,batch,x):
     read=raw_read_loss(terms['m'],terms['clean'])
     decor=key_decorrelation(batch.keys,batch.arrays.facts) if experiment.read_arm=='RK' else zero
     return read,decor
+
+
+COEFFICIENT_EPS=1e-6  # docs/prereg/SQ2.md: the epsilon of the directional coefficient loss
+
+
+def coefficient_loss(experiment,batch,x):
+    """SQ2: mean over queries of || d/(||d|| + eps) - e_t ||^2, with d the exact read coefficients of the deployed store
+    (Mq = sum_i d_i v_i, float64, graph kept) and e_t the basis vector of the true fact among the written facts."""
+    terms=question_terms(experiment,batch,x)
+    d=store_read(experiment.adapter,batch.keys,batch.values,terms['q'])['d']
+    target=F.one_hot(terms['target'],d.shape[-1]).to(d.dtype)
+    return (d/(d.norm(dim=-1,keepdim=True)+COEFFICIENT_EPS)-target).square().sum(-1).mean()
+
+
+@torch.no_grad()
+def coefficient_statistics(experiment,batch,x):
+    """SQ2 logging (means over the batch's queries): query norm, direction cosine d_t/||d||, coefficient cancellation
+    sum_i |d_i| ||v_i|| / ||sum_i d_i v_i|| (large when the coefficients cancel), and the log10 conditioning of the written keys."""
+    terms=question_terms(experiment,batch,x)
+    adapter=experiment.adapter
+    exact=store_read(adapter,batch.keys,batch.values,terms['q'])
+    d=exact['d']
+    target=terms['target']
+    cosine=d.gather(-1,target[...,None]).squeeze(-1)/d.norm(dim=-1).clamp_min(1e-12)
+    mass=(d.abs()*batch.values.double().norm(dim=-1)[:,None,:]).sum(-1)
+    cancellation=mass/exact['reconstructed'].norm(dim=-1).clamp_min(1e-12)
+    ridge=adapter.cfg.store=='ridge'
+    cond=gram_conditions(batch.keys.detach(),adapter.lam.detach() if ridge else None,adapter.cfg.store_eta if ridge else None)
+    result=dict(query_norm=float(terms['q'].norm(dim=-1).mean()),direction_cosine=float(cosine.mean()),
+        coefficient_cancellation_median=float(cancellation.median()),key_gram_log10_cond_median=float(cond['gram'].log10().median()))
+    if ridge:
+        result['ridge_log10_cond_median']=float(cond['ridge'].log10().median())
+    return result
 
 
 def gram_read(keys,values,q,lam,beta):
