@@ -147,7 +147,12 @@ def main(folder='reports/p1l-lsqt-u', lsqt='reports/p1l-lsqt', dpfp='reports/p1l
     rows += [[name] + [f'{s}: {100 * m[s]["em"]:.1f}' for s in sorted(m)] for name, (r, m) in refs.items()]
     out.append(table(['arm', '20 %', '40 %', '60 %', '80 %', '100 % (final)'], rows))
     r128 = refs['R-r128 (WP-L4, not rerun)'][1]
-    out.append('\nU minus R-r128 at the matched fractions (pp): ' + ', '.join(f'{100 * (metrics[s]["em"] - r128[t]["em"]):+.1f}' for s, t in zip(steps_u, sorted(r128))) + '.')
+    out.append('\nDifferences at the matched fractions of training (pp of val EM; each cell is a difference of two single evaluations of one seed):\n')
+    rows = [['U - R-r128'] + [f'{100 * (metrics[s]["em"] - r128[t]["em"]):+.1f}' for s, t in zip(steps_u, sorted(r128))]]
+    for a in ARMS:
+        m = arms[a][1]
+        rows.append([f'{a} - U'] + [f'{100 * (m[s]["em"] - metrics[t]["em"]):+.1f}' for s, t in zip(sorted(m), steps_u)])
+    out.append(table(['contrast', '20 %', '40 %', '60 %', '80 %', '100 % (final)'], rows))
     out.append('\n### Normalized read error at the five checkpoints\n')
     out.append(table(['arm', '20 %', '40 %', '60 %', '80 %', '100 % (final)'],
                      [[a] + [f'{m[s]["relative_read_error"]:.3f}' for s in sorted(m)] for a, (r, m) in [(CONTROL, run)] + list(arms.items()) + list(refs.items())]))
