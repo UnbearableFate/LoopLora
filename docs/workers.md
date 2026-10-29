@@ -105,6 +105,7 @@ Open or resume (new tab, worktree cwd):
 | WP-T11 G1 paper revision and readable LaTeX/PDF manuscript (tectonic, /write; user request) | sn-paper | 8b2ed97 |
 | WP-L9 LSR label-free stop rules (G2; R2 passes at both backbones, R1/R3 infeasible) | sn-core | 975bb6a |
 | WP-L10 B8W warm start (G3; untying keeps the solution, non-inferiority met) | sn-p1l | 6f3511d |
+| master test after WP-L9 and WP-L10 merges (job 3724308 at 6f3511d: 2801 passed, 1 skipped) | orchestrator | 6f3511d |
 | Merged master full test suite after DPFP-X (job 3723646, exit 0, 2717 passed, 1 expected skip) | orchestrator | e86bdfe |
 | Merged master full test suite after P5L (job 3722062, exit 0, 2676 passed, 1 expected skip) | orchestrator | c6b5275 |
 | Merged master full test suite (job 3721356, exit 0, 1 expected skip) | orchestrator | d4de948 |
