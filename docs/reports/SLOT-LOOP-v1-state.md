@@ -129,12 +129,15 @@ The release carries `science_commit`, `prereg_blake2b_128`, `analysis_script_bla
 Smoke reports include each selected export's `export_config`. For each arm run reload-check through `scripts/submit.py --commit C -- -m looplora.llm.slot_run --mode reload-check --manifest LOCK --release CANDIDATE --export R/smoke/ARM/selected.pt --predictions R/smoke/ARM/smoke_predictions.npz --out R/reload-ARM.json`. Reload must reproduce episode ids/predictions/correctness/NLL and match the candidate's exact slot config and calibrated read; its report records the export digest. Final builder validation consumes both reports, then STOP for `approval.json` as before. These are future commands; this round executes none of them.
 
 
-### Review-round-1 validation ledger (pending)
+### Review-round-1 validation ledger
 Test snapshot: `b78245003f2f75afc6f15055fb7d7d0acaf9f9b6`. Both jobs use `scripts/submit.py --commit` (one node, debug-g), no `--wait`; the orchestrator watcher supplies the next wake-up. No polling or science execution.
 
 | job | files | requested walltime | result | actual node·h |
 | --- | --- | --- | --- | --- |
-| 3728078.opbs | test_slot_data.py, test_analyze_slot_study.py, test_slot_release.py | 00:03:00 | submitted; pending logs | pending |
-| 3728079.opbs | test_slot_experiment.py | 00:05:00 | submitted; pending logs | pending |
+| 3728078.opbs | test_slot_data.py, test_analyze_slot_study.py, test_slot_release.py | 00:03:00 | 182 passed; exit 0 on mg0006, 84 s | 0.023333 |
+| 3728079.opbs | test_slot_experiment.py | 00:05:00 | 47 passed, 1 failed; exit 1 on mg0007, 169 s; fixture metadata incomplete | 0.046944 |
 
-Logs: `/work/xg24i002/x10041/LoopLora/logs/pbs/slot-r1-meta-20261029-205152-3029969.log` and `/work/xg24i002/x10041/LoopLora/logs/pbs/slot-r1-exp-20261029-205152-3029979.log`. Previous measured validation predicts about 0.07–0.09 node·h combined; requested ceiling is 0.133 node·h, inside S0's 0.497 node·h remaining at handover. Update actual elapsed node·h from the job logs on completion; historical cumulative remains 0.503 until then. Next: read logs and outputs, resolve any failures, update this ledger, then `STOP: review <full hash>` for cross-review. Preflight/lock/S0 remain on hold.
+Logs: `/work/xg24i002/x10041/LoopLora/logs/pbs/slot-r1-meta-20261029-205152-3029969.log` and `/work/xg24i002/x10041/LoopLora/logs/pbs/slot-r1-exp-20261029-205152-3029979.log`. Previous measured validation predicts about 0.07–0.09 node·h combined; requested ceiling is 0.133 node·h, inside S0's 0.497 node·h remaining at handover. Measured total added: 253 / 3,600 = 0.070278 node·h; cumulative S0 account 0.573278 node·h (0.426722 remaining). Next: rerun the experiment test file after the fixture correction, update this ledger, then `STOP: review <full hash>` for cross-review. Preflight/lock/S0 remain on hold.
+
+
+Failure diagnosis for 3728079: `test_what_the_runner_writes_for_s0_is_what_the_frozen_analysis_reads` reaches `analyze_slot_study.main`, which validates all five manifest sets before stage dispatch (lines 777–778). The tiny-study fixture only supplied its five ordinary runtime sets, omitting `S1A/confirmation` and `S1A/unseen`, so analysis refused the incomplete metadata before reading S0 results. Production lock metadata already contains all registered sets. Corrected only the fixture: merge the complete registry with its tiny ordinary-set overrides when building manifest counts/id digests; no sealed episode generation and no assertion changed. Production code and the passing metadata/analysis/release tests are unchanged. Static compilation and `git diff --check` passed. Repeat the whole changed experiment file on compute (previous measurement 169 s; request 300 s gives >1.5×).

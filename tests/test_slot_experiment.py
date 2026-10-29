@@ -516,9 +516,10 @@ def tiny_study(monkeypatch, model, tokenizer, tmp_path):
                                                                                     passed=True))
     metrics = tmp_path / 's0_metrics.json'
     metrics.write_text(json.dumps(dict(calibration=dict(selected=SELECTED))))
-    registry = dict(sets={s.name: dict(count=s.count) for s in sets.values()},
+    manifest_sets = {**slot_data.SETS, **sets}  # all registered metadata; only ordinary sets use tiny replacements
+    registry = dict(sets={s.name: dict(count=s.count) for s in manifest_sets.values()},
                     ids={f'eval/{s.name}': dict(count=s.count, ids_blake2b_128=slot_data.ids_digest(s.episode_ids()))
-                         for s in sets.values()})
+                         for s in manifest_sets.values()})
     (tmp_path / 'lock.json').write_text(json.dumps(dict(version=1, study=slot_data.STUDY, status='locked', manifest=registry)))
     return dict(config=ROOT / 'configs' / 'slot_loop_v1' / 's1a.json', manifest=tmp_path / 'lock.json', s0=metrics, sets=sets)
 
