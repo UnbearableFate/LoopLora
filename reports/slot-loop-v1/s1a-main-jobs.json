@@ -1,0 +1,152 @@
+{
+ "actual_elapsed_seconds_total": 6301,
+ "actual_node_hours_total": 1.7502777777777778,
+ "approval_commit": "11142874804290e630925c7aff20b0a77b708d99",
+ "jobs": [
+  {
+   "arm": "matrix_L1",
+   "job_id": "3729048.opbs",
+   "log": "/work/xg24i002/x10041/LoopLora/logs/pbs/slot-matrix_L1-s17-20261029-231407-3550986.log",
+   "result": {
+    "all_finite": true,
+    "confirmation_accessed": false,
+    "elapsed_seconds": 989,
+    "exit_code": 0,
+    "host": "mg0012",
+    "node_hours": 0.2747222222222222,
+    "release_blake2b_128": "523d11d57a08a2491893ebe7cedc86a7",
+    "selected_checkpoint_blake2b_128": "00a1535965a0f2813b4a1b552b6e2ee2",
+    "selected_step": 5400,
+    "status": "complete"
+   },
+   "seed": 17,
+   "source": {
+    "kind": "commit",
+    "ref": "1523b19c7949673ddcd1d89cc1e5fe518736805c"
+   },
+   "spec": "/work/xg24i002/x10041/LoopLora/logs/pbs/specs/slot-matrix_L1-s17-20261029-231407-3550986.json"
+  },
+  {
+   "arm": "matrix_L1",
+   "job_id": "3729049.opbs",
+   "log": "/work/xg24i002/x10041/LoopLora/logs/pbs/slot-matrix_L1-s29-20261029-231407-3551001.log",
+   "result": {
+    "all_finite": true,
+    "confirmation_accessed": false,
+    "elapsed_seconds": 1039,
+    "exit_code": 0,
+    "host": "mg0022",
+    "node_hours": 0.2886111111111111,
+    "release_blake2b_128": "523d11d57a08a2491893ebe7cedc86a7",
+    "selected_checkpoint_blake2b_128": "b44f13443a4ce44e3d22d9f1ac77685d",
+    "selected_step": 6000,
+    "status": "complete"
+   },
+   "seed": 29,
+   "source": {
+    "kind": "commit",
+    "ref": "1523b19c7949673ddcd1d89cc1e5fe518736805c"
+   },
+   "spec": "/work/xg24i002/x10041/LoopLora/logs/pbs/specs/slot-matrix_L1-s29-20261029-231407-3551001.json"
+  },
+  {
+   "arm": "matrix_L1",
+   "job_id": "3729050.opbs",
+   "log": "/work/xg24i002/x10041/LoopLora/logs/pbs/slot-matrix_L1-s43-20261029-231408-3551004.log",
+   "result": {
+    "all_finite": true,
+    "confirmation_accessed": false,
+    "elapsed_seconds": 1070,
+    "exit_code": 0,
+    "host": "mg0044",
+    "node_hours": 0.2972222222222222,
+    "release_blake2b_128": "523d11d57a08a2491893ebe7cedc86a7",
+    "selected_checkpoint_blake2b_128": "07e1ab7460f12615735fccb180d2dc3b",
+    "selected_step": 5400,
+    "status": "complete"
+   },
+   "seed": 43,
+   "source": {
+    "kind": "commit",
+    "ref": "1523b19c7949673ddcd1d89cc1e5fe518736805c"
+   },
+   "spec": "/work/xg24i002/x10041/LoopLora/logs/pbs/specs/slot-matrix_L1-s43-20261029-231408-3551004.json"
+  },
+  {
+   "arm": "soft_slot_L1",
+   "job_id": "3729051.opbs",
+   "log": "/work/xg24i002/x10041/LoopLora/logs/pbs/slot-soft_slot_L1-s17-20261029-231408-3551007.log",
+   "result": {
+    "all_finite": true,
+    "confirmation_accessed": false,
+    "elapsed_seconds": 1101,
+    "exit_code": 0,
+    "host": "mg0017",
+    "node_hours": 0.30583333333333335,
+    "release_blake2b_128": "523d11d57a08a2491893ebe7cedc86a7",
+    "selected_checkpoint_blake2b_128": "d71e06da709ee4c588b5f008d68c0d15",
+    "selected_step": 5400,
+    "status": "complete"
+   },
+   "seed": 17,
+   "source": {
+    "kind": "commit",
+    "ref": "1523b19c7949673ddcd1d89cc1e5fe518736805c"
+   },
+   "spec": "/work/xg24i002/x10041/LoopLora/logs/pbs/specs/slot-soft_slot_L1-s17-20261029-231408-3551007.json"
+  },
+  {
+   "arm": "soft_slot_L1",
+   "job_id": "3729052.opbs",
+   "log": "/work/xg24i002/x10041/LoopLora/logs/pbs/slot-soft_slot_L1-s29-20261029-231408-3551011.log",
+   "result": {
+    "all_finite": true,
+    "confirmation_accessed": false,
+    "elapsed_seconds": 1015,
+    "exit_code": 0,
+    "host": "mg0030",
+    "node_hours": 0.28194444444444444,
+    "release_blake2b_128": "523d11d57a08a2491893ebe7cedc86a7",
+    "selected_checkpoint_blake2b_128": "136226b18beb45c5ca218451e9c13ea1",
+    "selected_step": 6000,
+    "status": "complete"
+   },
+   "seed": 29,
+   "source": {
+    "kind": "commit",
+    "ref": "1523b19c7949673ddcd1d89cc1e5fe518736805c"
+   },
+   "spec": "/work/xg24i002/x10041/LoopLora/logs/pbs/specs/slot-soft_slot_L1-s29-20261029-231408-3551011.json"
+  },
+  {
+   "arm": "soft_slot_L1",
+   "job_id": "3729053.opbs",
+   "log": "/work/xg24i002/x10041/LoopLora/logs/pbs/slot-soft_slot_L1-s43-20261029-231408-3551014.log",
+   "result": {
+    "all_finite": true,
+    "confirmation_accessed": false,
+    "elapsed_seconds": 1087,
+    "exit_code": 0,
+    "host": "mg0034",
+    "node_hours": 0.30194444444444446,
+    "release_blake2b_128": "523d11d57a08a2491893ebe7cedc86a7",
+    "selected_checkpoint_blake2b_128": "52d43da424025388a8756bacb03f3058",
+    "selected_step": 4200,
+    "status": "complete"
+   },
+   "seed": 43,
+   "source": {
+    "kind": "commit",
+    "ref": "1523b19c7949673ddcd1d89cc1e5fe518736805c"
+   },
+   "spec": "/work/xg24i002/x10041/LoopLora/logs/pbs/specs/slot-soft_slot_L1-s43-20261029-231408-3551014.json"
+  }
+ ],
+ "nodes_per_job": 1,
+ "release_blake2b_128": "523d11d57a08a2491893ebe7cedc86a7",
+ "science_commit": "1523b19c7949673ddcd1d89cc1e5fe518736805c",
+ "stage": "S1A-main",
+ "study": "SLOT-LOOP-v1",
+ "version": 1,
+ "walltime_seconds": 1800
+}

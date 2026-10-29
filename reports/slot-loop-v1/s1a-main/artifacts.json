@@ -1,0 +1,142 @@
+{
+ "analysis_job": "3729237.opbs",
+ "files": {
+  "s1a-main/matrix_L1/s17/record.json": {
+   "blake2b_128": "63c77bf3191653cd5d8da3811a728a73",
+   "bytes": 6351,
+   "source": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1a/matrix_L1/s17/record.json"
+  },
+  "s1a-main/matrix_L1/s17/train_log.jsonl": {
+   "blake2b_128": "530fcf5d34c3a13b6af78cf1c60d0bb7",
+   "bytes": 24062,
+   "source": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1a/matrix_L1/s17/train_log.jsonl"
+  },
+  "s1a-main/matrix_L1/s17/train_steps.npz": {
+   "blake2b_128": "211abe309ff6d5730297c25a8bf7f46e",
+   "bytes": 41122,
+   "source": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1a/matrix_L1/s17/train_steps.npz"
+  },
+  "s1a-main/matrix_L1/s17/training.json": {
+   "blake2b_128": "8a379e3e83ff76f3372267b3200615a8",
+   "bytes": 4815,
+   "source": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1a/matrix_L1/s17/training.json"
+  },
+  "s1a-main/matrix_L1/s29/record.json": {
+   "blake2b_128": "c18d7e816efac96191f6aa97d69b100d",
+   "bytes": 6346,
+   "source": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1a/matrix_L1/s29/record.json"
+  },
+  "s1a-main/matrix_L1/s29/train_log.jsonl": {
+   "blake2b_128": "d8f6931d761f244858eaa9969a7c0116",
+   "bytes": 24066,
+   "source": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1a/matrix_L1/s29/train_log.jsonl"
+  },
+  "s1a-main/matrix_L1/s29/train_steps.npz": {
+   "blake2b_128": "50a39f0f10b334311ffe504ca069480f",
+   "bytes": 41111,
+   "source": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1a/matrix_L1/s29/train_steps.npz"
+  },
+  "s1a-main/matrix_L1/s29/training.json": {
+   "blake2b_128": "84a5f44cc7e5a60aa2cecdfacc087e79",
+   "bytes": 4811,
+   "source": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1a/matrix_L1/s29/training.json"
+  },
+  "s1a-main/matrix_L1/s43/record.json": {
+   "blake2b_128": "021aff80136b3eb4e54f7599e41838e4",
+   "bytes": 6348,
+   "source": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1a/matrix_L1/s43/record.json"
+  },
+  "s1a-main/matrix_L1/s43/train_log.jsonl": {
+   "blake2b_128": "a27010b94bb937e32545153ee916e3bb",
+   "bytes": 24012,
+   "source": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1a/matrix_L1/s43/train_log.jsonl"
+  },
+  "s1a-main/matrix_L1/s43/train_steps.npz": {
+   "blake2b_128": "0992a59af1dea27baa10f259a3e49a6c",
+   "bytes": 41120,
+   "source": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1a/matrix_L1/s43/train_steps.npz"
+  },
+  "s1a-main/matrix_L1/s43/training.json": {
+   "blake2b_128": "44eaec4d76274e240e3711a765666ea4",
+   "bytes": 4814,
+   "source": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1a/matrix_L1/s43/training.json"
+  },
+  "s1a-main/soft_slot_L1/s17/record.json": {
+   "blake2b_128": "f8c3512b3079da7f2313fa48dfeade5f",
+   "bytes": 6355,
+   "source": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1a/soft_slot_L1/s17/record.json"
+  },
+  "s1a-main/soft_slot_L1/s17/train_log.jsonl": {
+   "blake2b_128": "ff6c42a5881c0f75f1705f99d071f55a",
+   "bytes": 24109,
+   "source": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1a/soft_slot_L1/s17/train_log.jsonl"
+  },
+  "s1a-main/soft_slot_L1/s17/train_steps.npz": {
+   "blake2b_128": "4de356e62edc522124bf409d10c40e1f",
+   "bytes": 41314,
+   "source": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1a/soft_slot_L1/s17/train_steps.npz"
+  },
+  "s1a-main/soft_slot_L1/s17/training.json": {
+   "blake2b_128": "0c5907ed63000f1056ff59cec47a61fd",
+   "bytes": 4817,
+   "source": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1a/soft_slot_L1/s17/training.json"
+  },
+  "s1a-main/soft_slot_L1/s29/record.json": {
+   "blake2b_128": "d22267e36e854e4421047d68f47de690",
+   "bytes": 6351,
+   "source": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1a/soft_slot_L1/s29/record.json"
+  },
+  "s1a-main/soft_slot_L1/s29/train_log.jsonl": {
+   "blake2b_128": "03849c040be1d624fc03132ee7585e43",
+   "bytes": 24140,
+   "source": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1a/soft_slot_L1/s29/train_log.jsonl"
+  },
+  "s1a-main/soft_slot_L1/s29/train_steps.npz": {
+   "blake2b_128": "ecdd5f8e9638852cda028c7462ef7082",
+   "bytes": 41315,
+   "source": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1a/soft_slot_L1/s29/train_steps.npz"
+  },
+  "s1a-main/soft_slot_L1/s29/training.json": {
+   "blake2b_128": "e4adc46ca983f1689b92ce4fbe09a7ac",
+   "bytes": 4813,
+   "source": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1a/soft_slot_L1/s29/training.json"
+  },
+  "s1a-main/soft_slot_L1/s43/record.json": {
+   "blake2b_128": "9f2404b1e5ca74742bd02a9786e95bb1",
+   "bytes": 6353,
+   "source": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1a/soft_slot_L1/s43/record.json"
+  },
+  "s1a-main/soft_slot_L1/s43/train_log.jsonl": {
+   "blake2b_128": "9b4b05a75764f922eb95df8fdab4667f",
+   "bytes": 24112,
+   "source": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1a/soft_slot_L1/s43/train_log.jsonl"
+  },
+  "s1a-main/soft_slot_L1/s43/train_steps.npz": {
+   "blake2b_128": "37766f8b00fcc84c11be5f18bfc05610",
+   "bytes": 41314,
+   "source": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1a/soft_slot_L1/s43/train_steps.npz"
+  },
+  "s1a-main/soft_slot_L1/s43/training.json": {
+   "blake2b_128": "f3cb7dde5339e267ed85770d3b845654",
+   "bytes": 4815,
+   "source": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1a/soft_slot_L1/s43/training.json"
+  },
+  "s1a-main/source_index.json": {
+   "blake2b_128": "d711832ed2bba6147bc40236904ca154",
+   "bytes": 821,
+   "source": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1a-selection/source_index.json"
+  },
+  "s1a-selection.json": {
+   "blake2b_128": "b6e5d452089045e27b22d4d94a57aacc",
+   "bytes": 14315,
+   "source": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1a-selection/s1a-selection.json"
+  },
+  "s1a-selection.md": {
+   "blake2b_128": "843d0657f90fab3ed6e8a4711bee8ea5",
+   "bytes": 3878,
+   "source": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1a-selection/s1a-selection.md"
+  }
+ },
+ "selection_output_blake2b_128": "b6e5d452089045e27b22d4d94a57aacc",
+ "version": 1
+}

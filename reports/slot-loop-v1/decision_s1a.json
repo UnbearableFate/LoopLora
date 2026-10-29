@@ -1,0 +1,93 @@
+{
+ "ablation": {
+  "reason": "stable dev mean gap +3.5 pp is not below +3.0 pp",
+  "triggered": false
+ },
+ "analysis_script_blake2b_128": "843d2ff4d1a03224ccd16e68720ba344",
+ "bootstrap": {
+  "block": 500,
+  "interval": "percentile 95 %",
+  "resamples": 10000,
+  "seed": 9056755664197379988
+ },
+ "claim_scope": "One S-RE parent writer; three continuation data-order seeds; T1/E16; L1; full-vocabulary EM; calibrated all-valid-question reads; equal LR tuning effort.",
+ "next_stage": "Eligible for the full S1B 2x2 after an independently registered addendum; no S1B data accessed or jobs started.",
+ "open_record_blake2b_128": "5a3b037e5aff8f66445df0091398fde0",
+ "prereg_blake2b_128": "56e8c611c01e0ef9b7ae32db97b0e334",
+ "primary": {
+  "contrast": {
+   "delta_pp": 3.7333333333333334,
+   "lower_end_positive": true,
+   "lower_pp": 2.7,
+   "seeds": {
+    "17": {
+     "delta_correct": 70,
+     "delta_pp": 3.5,
+     "lower_pp": 2.2,
+     "upper_pp": 4.8
+    },
+    "29": {
+     "delta_correct": 84,
+     "delta_pp": 4.2,
+     "lower_pp": 2.9,
+     "upper_pp": 5.5
+    },
+    "43": {
+     "delta_correct": 70,
+     "delta_pp": 3.5,
+     "lower_pp": 2.1,
+     "upper_pp": 4.95
+    }
+   },
+   "sum_delta_correct": 224,
+   "upper_pp": 4.816666666666666
+  },
+  "matrix_mean_em": 0.8226666666666667,
+  "n": 2000,
+  "soft_slot_mean_em": 0.86
+ },
+ "release_blake2b_128": "523d11d57a08a2491893ebe7cedc86a7",
+ "science_commit": "1523b19c7949673ddcd1d89cc1e5fe518736805c",
+ "stage": "S1A",
+ "study": "SLOT-LOOP-v1",
+ "summary_blake2b_128": "4b53592eb8501f5c2d8ed6a65b2df367",
+ "tests": {
+  "delta_at_least_3pp": true,
+  "lower_end_positive": true,
+  "seeds_all_positive": true
+ },
+ "unseen_descriptive": {
+  "contrast": {
+   "delta_pp": 2.9833333333333334,
+   "lower_end_positive": true,
+   "lower_pp": 2.0833333333333335,
+   "seeds": {
+    "17": {
+     "delta_correct": 41,
+     "delta_pp": 2.05,
+     "lower_pp": 0.9,
+     "upper_pp": 3.15
+    },
+    "29": {
+     "delta_correct": 77,
+     "delta_pp": 3.85,
+     "lower_pp": 2.55,
+     "upper_pp": 5.15
+    },
+    "43": {
+     "delta_correct": 61,
+     "delta_pp": 3.05,
+     "lower_pp": 1.75,
+     "upper_pp": 4.35
+    }
+   },
+   "sum_delta_correct": 179,
+   "upper_pp": 3.8833333333333333
+  },
+  "matrix_mean_em": 0.1045,
+  "n": 2000,
+  "soft_slot_mean_em": 0.13433333333333333
+ },
+ "verdict": "ADVANCE",
+ "version": 1
+}

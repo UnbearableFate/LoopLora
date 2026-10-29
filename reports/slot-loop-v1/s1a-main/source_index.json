@@ -1,0 +1,16 @@
+{
+  "inputs": {
+    "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/manifest.lock.json": "5af7a9872827630280fa34218ffabde6",
+    "matrix_L1/s17/record.json": "63c77bf3191653cd5d8da3811a728a73",
+    "matrix_L1/s29/record.json": "c18d7e816efac96191f6aa97d69b100d",
+    "matrix_L1/s43/record.json": "021aff80136b3eb4e54f7599e41838e4",
+    "soft_slot_L1/s17/record.json": "f8c3512b3079da7f2313fa48dfeade5f",
+    "soft_slot_L1/s29/record.json": "d22267e36e854e4421047d68f47de690",
+    "soft_slot_L1/s43/record.json": "9f2404b1e5ca74742bd02a9786e95bb1"
+  },
+  "manifest": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/manifest.lock.json",
+  "manifest_blake2b_128": "5af7a9872827630280fa34218ffabde6",
+  "script": "analyze_slot_study.py",
+  "script_blake2b_128": "843d2ff4d1a03224ccd16e68720ba344",
+  "stage": "S1A-DEV"
+}

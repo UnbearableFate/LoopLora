@@ -1,0 +1,30 @@
+{
+  "approval": "S1A ready release approved for the six main arm-seed jobs and the registered steps up to STOP: S1A selected; reviewed against docs/prereg/SLOT-LOOP-v1.md",
+  "approved_by": "orchestrator (Opus-5.5, main agent)",
+  "prereg_blake2b_128": "56e8c611c01e0ef9b7ae32db97b0e334",
+  "recorded_at": "2026-10-29T23:13:09+09:00",
+  "release": "reports/slot-loop-v1/s1a-release.json",
+  "release_blake2b_128": "523d11d57a08a2491893ebe7cedc86a7",
+  "release_committed_in": "30e8dabdf4a0d4afc6f07de98599bc21b739a8c6",
+  "reviewed": [
+    "status ready; byte-identical to runs/slot-loop-v1/s1a-release.json",
+    "N = 6000: the registered formula gives 14145 with S 0.15896 s, Ev 8.320 s, Ld 1.37 s, capped at 6000",
+    "LR by the pilot rule: matrix_L1 1e-3 (NLL 1.13950; 3e-4 and 3e-3 more than 0.01 nats worse), soft_slot_L1 3e-3 (NLL 0.94585; 1e-3 0.0242 worse); all candidates finite and better than step 0",
+    "read settings from S0 decision R2: matrix_L1 g 1; soft_slot_L1 g 1, tau 0.1; capacity 16, all valid question tokens",
+    "eight config hashes recomputed with stable_hash: six main runs and the two seed-17 ablation runs",
+    "src digest at the science commit equals the lock (fe548da4c06d77b7f4a8ae65349650f9); no src or scripts change from 1523b19 to 30e8dab",
+    "analysis script digest 843d2ff4d1a03224ccd16e68720ba344 equals scripts/analyze_slot_study.py at the science commit",
+    "freeze: A, K, V, a_beta, a_lambda, input_mean, input_std unchanged; Q, R, U, B changed; support unchanged; trainable gradients finite and nonzero",
+    "reload checks passed for both arms: config, episode ids, predictions, correctness and NLL equal",
+    "parent S-RE writer 3994a5631021de03b2039974ac934e56; manifest 5af7a9872827630280fa34218ffabde6; inventory 4ee54329244ffaa60cec5e9a44f4277e",
+    "walltime 1800 s = (1.37 + 6000 x 0.15896 + 11 x 8.320) x 1.5 = 1570 s, rounded up to 5 min; 0.5 node-h per job, within the 16 node-h cap"
+  ],
+  "science_commit": "1523b19c7949673ddcd1d89cc1e5fe518736805c",
+  "scope": {
+    "jobs": "six main jobs, matrix_L1 and soft_slot_L1 x seeds 17, 29, 43, with the state-file runbook commands",
+    "resources": "one node each, debug-g, 00:30:00 (walltime_seconds 1800), no --scale-up",
+    "after the runs": "S1A-DEV selection; the two seed-17 ablation jobs and S1A-ABL only if the registered trigger fires; then STOP: S1A selected",
+    "not covered": "confirmation and unseen evaluation, which need the orchestrator's s1a-open.json"
+  },
+  "study": "SLOT-LOOP-v1 S1A"
+}

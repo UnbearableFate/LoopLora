@@ -545,7 +545,8 @@ def dev_record(arm, seed, nll, correct, steps=1000, **over):
     marks = [0] + [steps * k // 10 for k in range(1, 11)]
     rows = [dict(step=m, selectable=m >= 1, n=1000, correct=c, nll=v, em=c / 1000) for m, v, c in zip(marks, nll, correct)]
     rec = dict(status='complete', ablation=False, arm=arm, seed=seed, steps=steps, dev=rows, selected_step=None, selected_checkpoint_blake2b_128='ab' * 16,
-               dev_ids_blake2b_128='cd' * 16, training=dict(all_finite=True, clipped_fraction=0.1, grad_norm_max=3.0))
+               dev_ids_blake2b_128='cd' * 16, release_blake2b_128=blake(b'synthetic ready release'),
+               training=dict(all_finite=True, clipped_fraction=0.1, grad_norm_max=3.0))
     rec.update(over)
     return rec
 
@@ -575,9 +576,32 @@ def run_dev(tmp_path, out='out', **kw):
     return json.loads((tmp_path / out / 's1a-selection.json').read_text())
 
 
+def test_round3_release_binding_refuses_six_training_records_with_one_other_release(tmp_path):
+    def other_release(arm, seed, record):
+        if (arm, seed) == ('soft_slot_L1', 43):
+            record['release_blake2b_128'] = '0' * 32
+    root = dev_tree(tmp_path / 'dev', mutate=other_release)
+    refused('the six records differ in release_blake2b_128', '--stage', 'S1A-DEV', '--records', root, '--out', tmp_path / 'out')
+
+
+@pytest.mark.parametrize('value', [None, '', '0' * 31, '0' * 33, 'A' * 32, 'g' * 32])
+def test_dev_requires_each_training_release_digest_to_be_valid_lowercase_hex(tmp_path, value):
+    root = dev_tree(tmp_path / 'dev', mutate=lambda arm, seed, record: record.update(release_blake2b_128=value))
+    refused('release_blake2b_128 is not 32 lowercase hex digits', '--stage', 'S1A-DEV', '--records', root, '--out', tmp_path / 'out')
+
+
+def test_dev_requires_each_training_record_to_name_its_release(tmp_path):
+    def omit_release(arm, seed, record):
+        if (arm, seed) == ('soft_slot_L1', 43):
+            record.pop('release_blake2b_128')
+    root = dev_tree(tmp_path / 'dev', mutate=omit_release)
+    refused("lacks 'release_blake2b_128'", '--stage', 'S1A-DEV', '--records', root, '--out', tmp_path / 'out')
+
+
 def test_dev_trigger_boundary_is_exact_integer_arithmetic(tmp_path):
     d = run_dev(tmp_path, soft_extra=(30, 30, 30))          # sum of count differences 90: 90 * 100 == 9 * 1000, not below
     assert d['outcome'] == 'no_trigger' and d['differences']['sum_d_correct'] == 90 and d['differences']['mean_pp'] == 3.0
+    assert d['release_blake2b_128'] == blake(b'synthetic ready release')
     d = run_dev(tmp_path, out='b', soft_extra=(30, 30, 29))
     assert d['outcome'] == 'ablation' and d['differences']['sum_d_correct'] == 89 and d['reasons'] == []
     assert d['differences']['per_seed']['43'] == dict(d_correct=29, pp=2.9)
@@ -842,8 +866,9 @@ def write_open_metadata(root):
                    prereg_blake2b_128=prereg, analysis_script_blake2b_128=analysis,
                    manifest_blake2b_128=blake((root / 'manifest.lock.json').read_bytes()),
                    arms={arm: dict(read=read, lr=1e-3) for arm, read in READS.items()})
-    (root / 's1a-open.json').write_text(json.dumps(opened))
     (root / 's1a-release.json').write_text(json.dumps(release))
+    opened['release_blake2b_128'] = blake((root / 's1a-release.json').read_bytes())
+    (root / 's1a-open.json').write_text(json.dumps(opened))
 
 
 def direct_s1a(root):
@@ -958,6 +983,51 @@ def test_round2_analysis_changed_script_matching_open_record_is_refused_by_ready
     assert release['status'] == 'ready' and release['analysis_script_blake2b_128'] != blake(changed.read_bytes())
     monkeypatch.setattr(slot, '__file__', str(changed))
     with pytest.raises(SystemExit, match='refused: .*analysis script.*release'):
+        direct_s1a(root)
+
+
+def test_round3_release_binding_refuses_rebuilt_ready_release_even_with_matching_edited_script_and_open_record(tmp_path, monkeypatch):
+    root = tmp_path / 'tree'
+    s1a_tree(root, 400, ADVANCE)
+    changed = tmp_path / 'analyze_changed.py'
+    changed.write_bytes(SCRIPT.read_bytes() + b'\n# Edited after the training release.\n')
+    changed_digest = blake(changed.read_bytes())
+    opened_path = root / 's1a-open.json'
+    opened = json.loads(opened_path.read_text())
+    released_digest = opened['release_blake2b_128']
+    release = json.loads((root / 's1a-release.json').read_text())
+    release['analysis_script_blake2b_128'] = changed_digest
+    rebuilt = root / 'rebuilt-ready-release.json'
+    rebuilt.write_text(json.dumps(release))
+    opened['analysis_script_blake2b_128'] = changed_digest
+    opened_path.write_text(json.dumps(opened))
+    assert opened['release_blake2b_128'] == released_digest != blake(rebuilt.read_bytes())
+    assert release['status'] == 'ready'
+    assert opened['analysis_script_blake2b_128'] == release['analysis_script_blake2b_128'] == blake(changed.read_bytes())
+    monkeypatch.setattr(slot, '__file__', str(changed))
+    src = slot.Sources(root)
+    src.open_record_path = str(opened_path.resolve())
+    src.release_path = str(rebuilt.resolve())
+    manifest = json.loads((root / 'manifest.lock.json').read_text())
+    with pytest.raises(SystemExit, match='refused: .*release.*digest.*open record'):
+        slot.stage_s1a(src, manifest)
+
+
+@pytest.mark.parametrize('change', ['missing_open_digest', 'whitespace'])
+def test_s1a_release_binding_requires_the_exact_bytes_named_by_the_open_record(tmp_path, change):
+    root = tmp_path / 'tree'
+    s1a_tree(root, 400, ADVANCE)
+    if change == 'missing_open_digest':
+        path = root / 's1a-open.json'
+        opened = json.loads(path.read_text())
+        del opened['release_blake2b_128']
+        path.write_text(json.dumps(opened))
+    else:
+        path = root / 's1a-release.json'
+        original = path.read_text()
+        path.write_text(original + '\n')
+        assert json.loads(path.read_text()) == json.loads(original)
+    with pytest.raises(SystemExit, match='refused: .*release.*digest.*open record'):
         direct_s1a(root)
 
 

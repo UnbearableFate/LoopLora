@@ -64,3 +64,83 @@ The addendum is registered on master as `docs/prereg/SLOT-LOOP-v1-S1B.md`, blake
 4. End with `STOP: review <full hash>`.
 
 That review is the one cross-review of the S1B core code. After it come the fixes (checked by tests), then the preflight and the lock. S1B formal runs wait for S1A's decision record.
+
+## Review (2026-10-29 23:50 JST): fixes before the preflight
+The one cross-review of the S1B core code, both at 67deeee:
+- `docs/review/static_2026-10-29/s1b-rv-code.md`: 1 High, 4 Medium.
+- `docs/review/static_2026-10-29/s1b-rv-opus.md`: 1 High, 1 Medium, 4 Low.
+
+No further review round follows; your tests check the fixes. Every item changes `src/`, so all of them land before the preflight and the lock.
+1. **Exact bootstrap** (RVC-01 = F1, High). Resample the integer sums. Take the quantile and the `> 0` test in exact arithmetic; convert to pp only for reporting. Regression: rv-code's zero-boundary case, including the continuation choice. Show it failing on 67deeee and passing after the fix.
+2. **Reload against the original smoke** (RVC-02, F3). Record the smoke checkpoint's IDs, predictions, correctness and NLL from the in-memory instance before closing it. Compare both the first load and the CLI reload with that record. Test: a deterministic altered reload fails.
+3. **Checkpoint provenance** (RVC-03). Bind each dev row to its export's digest and step, and check that the selected file matches the winning row. Keep the scheduled candidate exports until the selection audit; each is a few MB.
+4. **Trajectories** (RVC-04). Save the final-valid-token q/m/z at each loop for each evaluated depth, ordered by episode, hop and depth, with provenance. Test the saved artifact.
+5. **Confirmation report** (RVC-05 = F2). The frozen analysis writes the registered tables, labeled descriptive and kept apart from the decisions:
+   - EM, counts and NLL per arm, seed and hop;
+   - per-depth sweep EM;
+   - S1−M1 and the Memory×Depth interaction.
+
+   Test it with a passing and a failing outcome.
+6. **Branch records** (F4). Accept an ablation record only when S1A's dev outcome triggered the ablation. All S1A records must carry the same release digest.
+7. **Calibration** (F5). Exclude and record a nonfinite candidate, as the inherited rule does, instead of aborting.
+8. **Preflight coverage** (F6).
+   - T1 identity at L1, L2 and L4.
+   - The owner check at every depth.
+   - Assert the [B,12,768] and [B,12,128] capture shapes.
+9. **Real training stream** (rv-opus). Before the pilot, a compute test must run `BatchStream` on T2 (`token_fact_positions`). Every current test passes `source=`.
+
+**Then:**
+1. Run the full S1B set and the legacy slot shard green.
+2. Run the preflight and commit the lock (§8).
+3. Update `docs/reports/WP-L14.md`.
+4. End with `STOP: locked <full hash>`.
+
+Calibration and all later steps wait for S1A's decision record (decision 4).
+
+## Calibration stop (2026-10-30 00:56 JST): diagnose before any amendment
+Calibration job 3729493 hit the registered sanity stop (decision 3). On S1B calibration, the untrained L1 parent reached these numbers (from `runs/slot-loop-v1/s1b/release-prep-bd4e24f/calibration/calibration.json`):
+
+| backend | setting | hop-1 EM | hop-1 NLL |
+| --- | --- | --- | --- |
+| Matrix | best (g=2) | 5.7 % | ≈ 10 nats |
+| Matrix | selected (g=1) | 5.1 % | ≈ 10 nats |
+| SoftSlot | selected | 1.3 % | 8.5 nats |
+
+On T1 the same parent's step 0 is about 73 % with NLL 1.42. Decision 3 reads such a stop as a broken transfer, prompt or position rule, not a reading limit. Find which before anything else runs.
+
+**Scope.** S1B calibration data and non-sealed T1 data only. No pilot, dev or confirmation. Put the diagnostic code under `scripts/`, so `src/` and the lock bd4e24f stay unchanged.
+
+Run one job of at most 30 min on debug-g that reports:
+1. **The S1B evaluation path on T1.** The parent's own L1 read on a non-sealed T1 set, for example the S1A pilot shard, which has a recorded step 0: Matrix 733/1000, NLL 1.4211. A mismatch means an S1B code bug.
+2. **Prompts and targets.** Five rendered T2 hop-1 calibration prompts and five T1 prompts, each with its target tokens and the model's top-5 next tokens at the answer position.
+3. **Where hop 1 fails on T2** (calibration, hop 1, Matrix and SoftSlot at their selected settings):
+   - key top-1 and margin of the actual query against the 12 written keys, at the read position(s) used;
+   - an oracle read (the true next value as m, like S0's clean condition): EM and NLL;
+   - memory off: EM and NLL.
+
+Then update `docs/reports/WP-L14.md` and end with `STOP: diagnosis <full hash>`. Include a recommendation with its evidence, one of:
+- (a) a code bug: fix it, then a new preflight, lock and calibration;
+- (b) a prompt or position mismatch;
+- (c) a writer transfer failure.
+
+Do not change the registered design; the orchestrator decides any amendment.
+
+## Amendment A1 (2026-10-30 01:20 JST): implement, then the release
+Your diagnosis (STOP 272cd24, recommendation (b)) agrees with the orchestrator's reading. Amendment A1 is registered on master 4178808: `docs/prereg/SLOT-LOOP-v1-S1B-A1.md`, blake2b-128 `341d3c71f9334a1384a102b097e7ad75`. It keeps the chain-end task and lets the trained Q adapt to its wording. Its changes:
+- the stop is cleared;
+- the reads come from S1A's ready release (Matrix g 1; SoftSlot g 1, τ 0.1);
+- N = 18,000, with dev every 1,800 steps and training streams train [0, 576,000);
+- everything else is unchanged.
+
+**Steps.**
+1. Merge master into wp/loop once. It brings A1, the S1A merge and docs. Check that `src/` outside the `s1b_*` files is still identical to master.
+2. Implement A1 in `src/`:
+   - bind A1's digest the way the addendum's is bound;
+   - take the read settings from the S1A release by digest;
+   - set N, the dev schedule and the training window, and extend the registry and disjointness checks to it;
+   - take decision 3's sanity rule out of the gating path;
+   - keep the stopped calibration as descriptive evidence cited by the release (blake2b-128 `6e4f7346376cb010820a84832f6d7d91`).
+3. Run the full S1B set and the legacy slot shard green on compute. No review round.
+4. Run a new real-parent preflight and commit the lock.
+5. Run smoke and reload with the S1A reads, then the LR pilot (200 steps, as registered), the candidate release, the reload checks and the ready release. Size walltime from the pilot's measured step time × 1.5, and keep each job at most 16 node·h. If one main run cannot fit, STOP.
+6. Update `docs/reports/WP-L14.md` and end with `STOP: release <full hash>` for `approval.json`.
