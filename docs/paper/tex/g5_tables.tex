@@ -23,7 +23,7 @@ D128-3 (parent) & delta, 22,370 steps & 60.8 & 0.363 & 90.6 & \\
 \begin{table}[htbp]
 \centering\footnotesize
 \setlength{\tabcolsep}{3pt}
-\caption{LSQT: trained least-squares stores at rank 128, trained from scratch with the unit query (validation episodes [0, 1000), one seed), against the delta-store references. The registered decision is that no arm reaches 0.80, the best ridge arm lies in the open band 40\% to below 48.5\%, and the trained-LSQ line stays open. The unit query is in every LSQT arm and not in R-r128. Clean and read head: accuracy of the value decoded from the stored and from the read value.}
+\caption{LSQT: trained least-squares stores at rank 128, trained from scratch with the unit query (validation episodes [0, 1000), one seed), against the delta-store references. The registered decision is that no arm reaches 0.80, the best ridge arm lies in the open band 40\% to below 48.5\%, and the trained-LSQ line stays open. The unit query is in every LSQT arm and not in R-r128. LT-U is the descriptive control (the delta store of R-r128 trained with the unit query); it is not a registered test and enters neither registered outcome. Clean and read head: accuracy of the value decoded from the stored and from the read value.}
 \label{tab:lsqt}
 \begin{tabular}{@{}llrrrrr@{}}
 \toprule
@@ -33,8 +33,45 @@ LT-K4 & four Kaczmarz sweeps & 38.3 & 0.554 & 92.3 & 27.4 & +4.8 \\
 LT-RG001 & ridge, $\eta=0.01$ & 46.1 & 0.512 & 93.9 & 26.5 & +12.6 \\
 LT-RG1 & ridge, $\eta=1$ & 42.6 & 0.499 & 95.9 & 22.3 & +9.1 \\
 \midrule
+LT-U (control) & delta, unit query & 36.0 & 0.589 & 93.7 & 21.6 & +2.5 \\
+\midrule
 R-r128 (WP-L4) & delta & 33.5 & 0.631 & 93.3 & 19.7 & \\
 D128-3 (DPFP) & delta & 60.8 & 0.363 & 90.6 & 51.0 & \\
+\bottomrule
+\end{tabular}
+\end{table}%
+}
+\newcommand{\lsqtsplittable}{%
+\begin{table}[htbp]
+\centering\footnotesize
+\setlength{\tabcolsep}{4pt}
+\caption{LSQT-U: the gain of each LSQT arm over R-r128 (percentage points of validation exact match at the final checkpoints), split through the control LT-U (R-r128's delta store trained with the unit query) into a unit-query part and a store part; the parts add up to the total. One seed. The standard errors in parentheses are unpaired binomial errors of the 1,000 episodes and cover episode sampling only. The split is descriptive: no ridge store with a learned query was trained, so an interaction of store and query cannot be separated, and the arms differ in step count (LT-U 24,560 steps, R-r128 24,645). LT-U is not a registered test and enters neither registered outcome.}
+\label{tab:lsqt-split}
+\begin{tabular}{@{}lrrrr@{}}
+\toprule
+ & & Total & Unit query & Store \\
+Arm & Steps & arm $-$ R-r128 & LT-U $-$ R-r128 & arm $-$ LT-U \\
+\midrule
+LT-K4 & 17,970 & +4.8 (2.1) & +2.5 (2.1) & +2.3 (2.2) \\
+LT-RG001 & 28,005 & +12.6 (2.2) & +2.5 (2.1) & +10.1 (2.2) \\
+LT-RG1 & 28,245 & +9.1 (2.2) & +2.5 (2.1) & +6.6 (2.2) \\
+\bottomrule
+\end{tabular}
+\end{table}%
+}
+\newcommand{\lsqtmatchtable}{%
+\begin{table}[htbp]
+\centering\footnotesize
+\caption{LSQT-U: differences of validation exact match (pp) at 20\%, 40\%, 60\%, 80\% and 100\% of each arm's training (one seed, 1,000 episodes; each cell is a difference of two single evaluations). First and last checkpoint, in steps: LT-U 4,912 and 24,560; R-r128 4,929 and 24,645; LT-K4 3,594 and 17,970; LT-RG001 5,601 and 28,005; LT-RG1 5,649 and 28,245.}
+\label{tab:i-lsqt-match}
+\begin{tabular}{@{}lrrrrr@{}}
+\toprule
+Difference & 20\% & 40\% & 60\% & 80\% & 100\% \\
+\midrule
+LT-U $-$ R-r128 & $-$0.4 & +2.1 & +2.7 & +1.8 & +2.5 \\
+LT-K4 $-$ LT-U & $-$1.0 & +1.4 & +0.1 & +4.8 & +2.3 \\
+LT-RG001 $-$ LT-U & +7.7 & +11.2 & +11.8 & +14.1 & +10.1 \\
+LT-RG1 $-$ LT-U & +7.1 & +5.6 & +5.4 & +3.8 & +6.6 \\
 \bottomrule
 \end{tabular}
 \end{table}%

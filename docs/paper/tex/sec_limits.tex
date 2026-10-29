@@ -29,7 +29,8 @@ The paper also does not say, and no evidence here supports, any of the following
 \item That adaptive stopping is efficient, that R2 improves every hop, that label-free stopping closes the gap to the best depth, or that no label-free stop can work (R1 and R3 had no feasible threshold; R2 lowers hops 2 and 3 and was not timed).  % LS1 LS2 LS3
 \item That untying improves B8, that B8 passes G1-L after the warm start, or that untied is better than shared (the difference is exploratory), or any reason why B8 fails from a random start.  % BW1 BW2
 \item That ridge storage solves or removes the read distortion, or that the coefficient loss helps: on the DPFP features ridge storage halves the read error and is +6.9 pp over the continued delta control (one seed, on the validation set that selected D128-3), the primary SQ2 contrast does not advance, and the coefficient loss did not help.  % SQ1 SQ2 SQ3
-\item That any SQ2 cell or LSQT arm is a writer candidate or a selected method, or that the LSQT gain over R-r128 is due to the store: the unit query is in every LSQT arm and in none of R-r128, and that split is untested.  % SQ1 LQ1 LQ3
+\item That any SQ2 cell or LSQT arm is a writer candidate or a selected method, or that the store causes or explains the LSQT gain over R-r128: the only split of that gain is the descriptive one through the control LT-U (one seed, unpaired standard errors that cover episode sampling only, no ridge store with a learned query so no interaction is separated, different step counts), which gives +10.1 pp for the store and +2.5 pp for the unit query for LT-RG001, and LT-U is not a registered test.  % SQ1 LQ1 LQ3 LQ4
+\item That the unit query helps, or that it does not matter: its part of that split is +2.5 pp with a standard error of 2.1 in one seed, which separates it neither from zero nor from a few pp.  % LQ3 LQ4
 \item That CTC is a learned writer, that the model learns its own codes, or that a CTC number is comparable with a DPFP or DPFP-X number.  % CT1 CT2
 \end{itemize}
 
@@ -40,7 +41,7 @@ The P1-L confirmation (test [100000, 102000), 97.5\%, $k=2$) and P1L-C (test [10
 Section~\ref{sec:seeds} adds seed-level intervals; with three seeds they are wide, and they include 0 for the G1-L contrasts and for G2-L against the fixed-query reader at both backbones.  % LP22
 The depth matrix evaluates one L4-trained checkpoint at depths and hops that were never trained, without intervals, and its oracle-stop row uses the label.  % LP21
 The language-model oracle results rest on one random oracle code table.
-The stop-rule, warm-start and CTC results (Sections~\ref{sec:stop} and~\ref{sec:ctc}) share that limit; CTC is validation episodes of one seed, B8W is one learning rate, one training length and three seeds, and SQ2 and LSQT are one seed on the validation set that selected D128-3.  % LS1 BW1 CT1 SQ1 LQ1
+The stop-rule, warm-start and CTC results (Sections~\ref{sec:stop} and~\ref{sec:ctc}) share that limit; CTC is validation episodes of one seed, B8W is one learning rate, one training length and three seeds, and SQ2, LSQT and its U control are one seed on the validation set that selected D128-3.  % LS1 BW1 CT1 SQ1 LQ1 LQ4
 
 \paragraph{Stops and open items.}
 The registered stops are kept.

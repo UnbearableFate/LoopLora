@@ -1,10 +1,10 @@
 \section{Follow-up studies G2 to G5: details}\label{app:I}
 
 This appendix holds the tables behind Sections~\ref{sec:stop} and~\ref{sec:ctc}, the B8 warm-start paragraph of Section~\ref{sec:lm-oracle} and the SQ2 and LSQT paragraphs of Section~\ref{sec:writers}.
-LSR, B8W and CTC are oracle-memory studies at rank 128 on the 768 seen names with one oracle seed; SQ2 and LSQT are validation-only learned-writer screens.
-The values of the first three are produced by \texttt{scripts/paper\_tables\_g2.py} from the committed files of each study (\texttt{reports/lsr}, \texttt{reports/b8w}, \texttt{reports/ctc}), and those of the last two by \texttt{scripts/paper\_tables\_g5.py} (\texttt{reports/p1l-sq2}, \texttt{reports/p1l-lsqt}); each script checks its key values against the figures the study reports state.
+LSR, B8W and CTC are oracle-memory studies at rank 128 on the 768 seen names with one oracle seed; SQ2 and LSQT (with its U control) are validation-only learned-writer screens.
+The values of the first three are produced by \texttt{scripts/paper\_tables\_g2.py} from the committed files of each study (\texttt{reports/lsr}, \texttt{reports/b8w}, \texttt{reports/ctc}), and those of the last two by \texttt{scripts/paper\_tables\_g5.py} (\texttt{reports/p1l-sq2}, \texttt{reports/p1l-lsqt}, \texttt{reports/p1l-lsqt-u}); each script checks its key values against the figures the study reports state.
 Rounding is half up on the stored value, so a cell that ends in an exact 5 (for example 64.55) prints 0.1 higher than in the study reports.
-The evidence ledger holds the exact values (rows LS1 to LS4, BW1 to BW3, CT1 to CT3, SQ1 to SQ3, LQ1 to LQ3) and wins over any shortened wording here.
+The evidence ledger holds the exact values (rows LS1 to LS4, BW1 to BW3, CT1 to CT3, SQ1 to SQ3, LQ1 to LQ4) and wins over any shortened wording here.
 
 \subsection{LSR: label-free stop rules (G2)}
 
@@ -191,7 +191,7 @@ Table~\ref{tab:i-lsqt} gives the trajectories at five evenly spaced checkpoints.
 
 \begin{table}[htbp]
 \centering\footnotesize
-\caption{LSQT: validation exact match (\%) and normalized read error at 20\%, 40\%, 60\%, 80\% and 100\% of each arm's training (one seed, 1,000 episodes).  % LQ2
+\caption{LSQT: validation exact match (\%) and normalized read error at 20\%, 40\%, 60\%, 80\% and 100\% of each arm's training (one seed, 1,000 episodes). LT-U is the descriptive control (R-r128's delta store trained with the unit query); R-r128 is the WP-L4 record.  % LQ2 LQ4
 }
 \label{tab:i-lsqt}
 \begin{tabular}{@{}lrrrrr@{}}
@@ -201,10 +201,14 @@ Arm & 20\% & 40\% & 60\% & 80\% & 100\% \\
 LT-K4, EM & 14.9 & 25.9 & 30.4 & 37.6 & 38.3 \\
 LT-RG001, EM & 23.6 & 35.7 & 42.1 & 46.9 & 46.1 \\
 LT-RG1, EM & 23.0 & 30.1 & 35.7 & 36.6 & 42.6 \\
+LT-U (control), EM & 15.9 & 24.5 & 30.3 & 32.8 & 36.0 \\
+R-r128, EM & 16.3 & 22.4 & 27.6 & 31.0 & 33.5 \\
 \midrule
 LT-K4, read error & 0.635 & 0.617 & 0.597 & 0.572 & 0.554 \\
 LT-RG001, read error & 0.619 & 0.604 & 0.418 & 0.350 & 0.512 \\
 LT-RG1, read error & 0.366 & 0.398 & 0.507 & 0.519 & 0.499 \\
+LT-U (control), read error & 0.615 & 0.593 & 0.596 & 0.596 & 0.589 \\
+R-r128, read error & 0.677 & 0.674 & 0.630 & 0.623 & 0.631 \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -217,5 +221,30 @@ Ridge is above Kaczmarz at the final checkpoints (+7.8 pp for LT-RG001 and +4.3 
 The gradient clip is active at every logged step in every arm.
 Zeroing or shuffling the memory leaves 1 to 4 of 1,000 answers correct, and every arm has 475,138 inference parameters and 65,536 bytes of persistent state per episode.  % LQ2
 R-r128 is the record of WP-L4, not rerun; it is a valid reference because the test that reproduces it with the DPFP and least-squares options off passes at the science commit.
-The unit query is part of every LSQT arm and of none of R-r128, so a gain over R-r128 cannot yet be split between the store and the unit query; within the three arms the two ridge parameters differ by 3.5 pp, one seed.  % LQ3
-Nothing more is attributed here.
+The unit query is part of every LSQT arm and of none of R-r128, so the gain over R-r128 mixes the store and the unit query, and the descriptive control below splits it.
+Within the three arms the two ridge parameters differ by 3.5 pp, one seed.  % LQ3
+
+\paragraph{The U control.}
+LT-U is the conditional control of the registration: the WP-L4 writer R at rank 128 with its own decay-first delta store, trained from scratch with the unit query on the same data stream, with E=16, seed 17, batch 32 with 4 questions per episode and learning rate 0.003.
+The recorded configurations of LT-U and R-r128 differ only in the unit query and the step count (24,560 against 24,645), and the step count was frozen by the same release rule as the arms (at most 2 hours).
+It ran after the three arms because the best of them reached 40\% or more.
+It is descriptive only: it enters neither registered outcome, and the registered LSQT decision is unchanged.
+LT-U reaches 36.0\% (360 of 1,000), with read error 0.589, a clean-value head of 93.7\% and a read-value head of 21.6\%; its EM rises at every checkpoint, so its final checkpoint, the registered selection, is also its highest.  % LQ4
+Zeroing or shuffling the memory leaves 2 and 0 of 1,000 answers correct, the gradient clip is active at all 493 logged steps, and LT-U has 475,138 inference parameters and 65,536 bytes of persistent state per episode.  % LQ4
+Table~\ref{tab:i-lsqt-match} gives the differences at matched fractions of training.
+LT-RG001 is above LT-U at all five fractions (+7.7 to +14.1 pp), and at 22,404 steps, fewer than LT-U's 24,560, it already has 46.9\% against LT-U's 36.0\%.
+LT-RG1 is above LT-U at all five fractions (+3.8 to +7.1 pp), but its lead at the end rests on its last interval: 36.6\% at 22,596 steps and 42.6\% at 28,245.
+LT-K4, with 17,970 steps, is within 1.4 pp of LT-U at 20, 40 and 60\% and above it by 4.8 and 2.3 pp at 80 and 100\%.
+LT-U is above R-r128 by 1.8 to 2.7 pp at four of the five fractions and 0.4 pp below it at 20\%.  % LQ4
+
+\lsqtmatchtable
+% LQ4
+
+The split of Table~\ref{tab:lsqt-split} uses the final checkpoint of each arm, as registered.
+The sizes of its parts are about 1.2 (unit query), 1.1 (LT-K4 store), 4.6 (LT-RG001 store) and 3.0 (LT-RG1 store) standard errors, as size references only, not tests.
+All of it is one seed.
+The standard errors are unpaired binomial errors of a difference of two EMs on 1,000 episodes, so they cover the sampling of the episodes only; training-seed variation was not measured, and a paired standard error was not computed.
+The two parts of one arm share the sampling error of LT-U, so their errors are not independent.
+No ridge store with a learned query was trained, so an interaction of store and query cannot be separated, and the step counts differ.
+RFX measured the unit query only on frozen delta stores at evaluation (EM at most +0.2 pp); that and the trained contrast here are different measurements and are not combined.
+Nothing more is attributed here.  % LQ3 LQ4
