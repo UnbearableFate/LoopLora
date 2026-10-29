@@ -124,3 +124,23 @@ Then update `docs/reports/WP-L14.md` and end with `STOP: diagnosis <full hash>`.
 - (c) a writer transfer failure.
 
 Do not change the registered design; the orchestrator decides any amendment.
+
+## Amendment A1 (2026-10-30 01:20 JST): implement, then the release
+Your diagnosis (STOP 272cd24, recommendation (b)) agrees with the orchestrator's reading. Amendment A1 is registered on master 4178808: `docs/prereg/SLOT-LOOP-v1-S1B-A1.md`, blake2b-128 `341d3c71f9334a1384a102b097e7ad75`. It keeps the chain-end task and lets the trained Q adapt to its wording. Its changes:
+- the stop is cleared;
+- the reads come from S1A's ready release (Matrix g 1; SoftSlot g 1, τ 0.1);
+- N = 18,000, with dev every 1,800 steps and training streams train [0, 576,000);
+- everything else is unchanged.
+
+**Steps.**
+1. Merge master into wp/loop once. It brings A1, the S1A merge and docs. Check that `src/` outside the `s1b_*` files is still identical to master.
+2. Implement A1 in `src/`:
+   - bind A1's digest the way the addendum's is bound;
+   - take the read settings from the S1A release by digest;
+   - set N, the dev schedule and the training window, and extend the registry and disjointness checks to it;
+   - take decision 3's sanity rule out of the gating path;
+   - keep the stopped calibration as descriptive evidence cited by the release (blake2b-128 `6e4f7346376cb010820a84832f6d7d91`).
+3. Run the full S1B set and the legacy slot shard green on compute. No review round.
+4. Run a new real-parent preflight and commit the lock.
+5. Run smoke and reload with the S1A reads, then the LR pilot (200 steps, as registered), the candidate release, the reload checks and the ready release. Size walltime from the pilot's measured step time × 1.5, and keep each job at most 16 node·h. If one main run cannot fit, STOP.
+6. Update `docs/reports/WP-L14.md` and end with `STOP: release <full hash>` for `approval.json`.
