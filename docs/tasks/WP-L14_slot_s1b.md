@@ -96,3 +96,31 @@ No further review round follows; your tests check the fixes. Every item changes 
 4. End with `STOP: locked <full hash>`.
 
 Calibration and all later steps wait for S1A's decision record (decision 4).
+
+## Calibration stop (2026-10-30 00:56 JST): diagnose before any amendment
+Calibration job 3729493 hit the registered sanity stop (decision 3). On S1B calibration, the untrained L1 parent reached these numbers (from `runs/slot-loop-v1/s1b/release-prep-bd4e24f/calibration/calibration.json`):
+
+| backend | setting | hop-1 EM | hop-1 NLL |
+| --- | --- | --- | --- |
+| Matrix | best (g=2) | 5.7 % | ≈ 10 nats |
+| Matrix | selected (g=1) | 5.1 % | ≈ 10 nats |
+| SoftSlot | selected | 1.3 % | 8.5 nats |
+
+On T1 the same parent's step 0 is about 73 % with NLL 1.42. Decision 3 reads such a stop as a broken transfer, prompt or position rule, not a reading limit. Find which before anything else runs.
+
+**Scope.** S1B calibration data and non-sealed T1 data only. No pilot, dev or confirmation. Put the diagnostic code under `scripts/`, so `src/` and the lock bd4e24f stay unchanged.
+
+Run one job of at most 30 min on debug-g that reports:
+1. **The S1B evaluation path on T1.** The parent's own L1 read on a non-sealed T1 set, for example the S1A pilot shard, which has a recorded step 0: Matrix 733/1000, NLL 1.4211. A mismatch means an S1B code bug.
+2. **Prompts and targets.** Five rendered T2 hop-1 calibration prompts and five T1 prompts, each with its target tokens and the model's top-5 next tokens at the answer position.
+3. **Where hop 1 fails on T2** (calibration, hop 1, Matrix and SoftSlot at their selected settings):
+   - key top-1 and margin of the actual query against the 12 written keys, at the read position(s) used;
+   - an oracle read (the true next value as m, like S0's clean condition): EM and NLL;
+   - memory off: EM and NLL.
+
+Then update `docs/reports/WP-L14.md` and end with `STOP: diagnosis <full hash>`. Include a recommendation with its evidence, one of:
+- (a) a code bug: fix it, then a new preflight, lock and calibration;
+- (b) a prompt or position mismatch;
+- (c) a writer transfer failure.
+
+Do not change the registered design; the orchestrator decides any amendment.
