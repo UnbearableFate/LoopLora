@@ -87,3 +87,17 @@ The addendum is registered on master as `docs/prereg/SLOT-LOOP-v1-S2.md`, blake2
 - **Blindness.** Stay blind to S1B outcomes: do not read wp/loop commits after `258f5f5`, or anything under `runs/slot-loop-v1/s1b/` or `reports/slot-loop-v1/s1b/` that `258f5f5` does not contain.
 - **Jobs.** At most 6 wk-slot jobs queued or running, each ≤ 16 node·h, walltime = measured × 1.5. End a turn with `WAIT <ids>`; do not poll.
 - **Commits.** Commit on wp/slot only. Do not push.
+
+## Before the review (02:50): complete the job entry points
+`STOP: review 72d30b3` is not the end of Step 2. The S2 science modules exist, but the code that runs and guards them does not. S1B's one review covered `s1b_run.py`, `s1b_preflight.py` and the release builder, and S2's one review must cover their counterparts. Code written after the review would go unreviewed.
+
+1. **Add the S2 entry points**, modeled on S1B and bound to the registered prereg:
+   - a CLI with `--manifest` for smoke, the calibration audit, the LR pilot, main training with dev checkpoints, the frozen dev selection, and, after `open.json`, the confirmation, unseen, sweep, probe and intervention evaluations;
+   - the real-parent preflight and lock builder, binding the S1B branch evidence (§11);
+   - the candidate and ready release builders with CLI reload checks;
+   - the approval and open-record checks;
+   - wave-2 release extension handling.
+2. **Test them on compute** with fixtures and the S2 smoke namespace. The preflight and lock may be tested with a synthetic branch record; the real ones still wait for S1B's verdict.
+3. **Stop.** Update `docs/reports/WP-L15.md`, then end with `STOP: review <full hash>`. The one cross-review covers all S2 core code at that commit.
+
+**Jobs.** While S1B's twelve main runs hold most of the project's 16 running slots, keep at most 4 wk-slot jobs queued or running.
