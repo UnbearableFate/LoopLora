@@ -1,0 +1,121 @@
+% Generated once by scripts/paper_md2tex.py from docs/paper/draft.md; edit this file from now on.
+\section{Experimental protocol and evidence map}\label{app:B}
+
+All empirical numbers in this draft are rounded from the authoritative
+symbolic and LLM evidence ledgers;
+figures use the symbolic ledger’s committed exports. The ledgers' status and
+conditions take priority over shortened manuscript wording.
+
+
+{\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{longtable}{W{83}{8}W{346}{8}W{487}{8}W{83}{8}}
+\toprule
+Stage & Evaluation set & Training and comparison conditions & Ledger IDs \\ \addlinespace[3pt]
+\midrule \endhead
+P1-S & C777: confirmation seed777001, 2,000 episodes & r32; 15,000 steps; train hops1-3, mixed L=\{1,2,4\}; B4 uses L1. Depth sweeps hold x/\allowbreak{}u/\allowbreak{}M fixed within checkpoint. & S1-S7 \\ \addlinespace[3pt]  % S1 S2 S3 S4 S5 S6 S7
+Rank follow-up F1 & C777 reused & r64/\allowbreak{}128; 20,000 steps; mixed depths; no replication. Rank and training duration both change relative to P1-S and are confounded. & S8 \\ \addlinespace[3pt]  % S8
+Factorized F2 & C777 reused & r32; 15,000 steps; joint\_fact and t1\_frozen\_fact; mixed depths; no replication. No factorized condition passes hop1 preservation. & S9-S12 \\ \addlinespace[3pt]  % S9 S10 S11 S12
+P2-S & C888: confirmation seed888001, 2,000 episodes & Primary endpoint models use 15,000 steps. Mixed-depth M1/\allowbreak{}r32 at L4 versus larger one-read B6/\allowbreak{}B7 or fixed-L4 B8; descriptive longer-trained references excluded from the primary gate. & B1/\allowbreak{}B2/\allowbreak{}B7 \\ \addlinespace[3pt]  % B1 B2 B7
+P2-S-F1 & C888 explicitly reused & Fixed-L4 M1 versus B8; fixed versus mixed M1; factorized mixed M1 versus larger one-read systems. No factorized timing benchmark. & B3-B6/\allowbreak{}B8/\allowbreak{}B9 \\ \addlinespace[3pt]  % B3 B4 B5 B6 B8 B9
+IS & C999: new confirmation seed999001, 2,000 episodes per load & r32; fixed E12 checkpoints across E6/\allowbreak{}12/\allowbreak{}18/\allowbreak{}24/\allowbreak{}36; E24/\allowbreak{}E36 training at inherited LR/\allowbreak{}15,000 steps; update check uses 14 physical records, base\_E12, hops1-4. & IS1-IS4 \\ \addlinespace[3pt]  % IS1 IS2 IS3 IS4
+A5 swaps & S4242 screening & Stratum-specific original/\allowbreak{}new-terminal diagnostics; no CIs; P1-S fitting-path and F2 new-path-length-one strata differ. & S11 \\ \addlinespace[3pt]  % S11
+Stopping pilots & V4242 validation and S4242 screening, 2,000 episodes per checkpoint/\allowbreak{}split & Thresholds selected on validation, fixed before screening. Reuse mixed-depth checkpoints; no retraining or confirmation, no stopping CIs. & H1-H6 \\ \addlinespace[3pt]  % H1 H2 H3 H4 H5 H6
+P4-S-L & C999002: new confirmation seed999002, 2,000 episodes & Six primary frozen-reader families, r32; 3,393-parameter supervised heads, thresholds locked on V4242. Descriptive joint families stay outside primary qualification. & HL1-HL5 \\ \addlinespace[3pt]  % HL1 HL2 HL3 HL4 HL5
+JS & C999003: new confirmation seed999003, 2,000 episodes & r32 M1; RS/\allowbreak{}RS+J train 15,000 steps with one uniform depth4-8 draw per batch; unchanged fixed-L4/\allowbreak{}mixed-depth references freshly evaluated. Stopped policies use locked V4242 thresholds and cap16. & JS1-JS6 \\ \addlinespace[3pt]  % JS1 JS2 JS3 JS4 JS5 JS6
+IVD & C999004: new confirmation seed999004, 2,000 episodes per checkpoint & 12 frozen r32 checkpoints (oracle\_random and joint\_fact \ensuremath{\times} M1 and B4); up to 24 extra facts at fixed load with low, natural and high key overlap; IC=G(low)\ensuremath{-}G(high) at load 24 on hops2-3, 97.5\% intervals; the joint\_fact overlap is selected, not constructed. & IV1-IV3 \\ \addlinespace[3pt]  % IV1 IV2 IV3
+CVH & C999005: new confirmation seed999005, 2,000 episodes per reader & Nine frozen P4-S-L M1 readers; A0 reference, A1 hop-1-constrained threshold, A2 continuation-value head (0.25-nat margin); 99.166667\% intervals (six comparisons); wall-time latency on prepared batches of 64. & CV1-CV4 \\ \addlinespace[3pt]  % CV1 CV2 CV3 CV4
+TSM & C999007: new confirmation seed999007, 2,000 episodes & 18 newly trained r32 M1 arms (T0 M1-L4, T1 stay loss at depth 8, T2 sticky gate) at the released learning rate 0.003, no search; B4 at L1 as the same-rank reference; 98.75\% intervals. & TS1-TS2 \\ \addlinespace[3pt]  % TS1 TS2
+UNS & Part A: S4242 screening (\texttt{test}, \texttt{test\_unseen}); Part B: C999006, seed999006, 2,000 episodes per pool & joint, joint\_fact and oracle\_random (control); released mixed-depth M1 (Part A) or M1 trained at L4 (Part B) and B4; wording rule on the unseen-pool depth gain; descriptive 95\% intervals; the parts are never pooled. & UN1-UN4 \\ \addlinespace[3pt]  % UN1 UN2 UN3 UN4
+NCR & S4242 and C777 saved predictions; no new evaluation & L1 errors of released M1 and of B4 on hops2-3, six writers of the existing r32 P1-S and F2 layouts; first-hop (neighbour) category; descriptive 95\% intervals. & PM1, NC2 \\ \addlinespace[3pt]  % PM1 NC2
+Same-rank design & Architectural accounting; no accuracy sample or CI & Multi-read versus single-read at the same rank; registered adapter parameters and extra latency reported. LLM B8 overhead is dimension-specific architectural accounting, not a measured accuracy result: +9,216 parameters at r=r\_mem=32 and +147,456 at r=r\_mem=128, that is +8.9\% and +31.0\% of the P1-L adapter and +69.2\% of the symbolic unfactorized joint model. & FR1 \\ \addlinespace[3pt]  % FR1
+LLM Pilot-1 and diagnosis & Validation seed4242; training seed17 & T1; initial 1,500-step capacity screen, separate input probes, supplied-answer-code output control, 6,400-step unassisted writer/\allowbreak{}input-site fits; no confirmation CIs. & LL1-LL4 \\ \addlinespace[3pt]  % LL1 LL2 LL3 LL4
+LLM writer fixes & Same validation set; training seed17 & Seven 4,800-step arms; fresh 32,900-step OA (value/\allowbreak{}output ceiling) and W5 reruns; stronger auxiliary supervision, no multihop confirmation. & LL5/\allowbreak{}LL6 \\ \addlinespace[3pt]  % LL5 LL6
+LLM read fixes and audit & Same validation set; training seed17 & Audited historical W5 and OA (value/\allowbreak{}output ceiling); seven r32/\allowbreak{}r128 final arms with unequal timing-sized step budgets; final-checkpoint selection, no learned writer/\allowbreak{}no E8 retry. & LL7-LL10 \\ \addlinespace[3pt]  % LL7 LL8 LL9 LL10
+RFX & \texttt{val}, seed4242, episode indices [200000,204000), one hop-1 query per episode; fitting set of 4,096 \texttt{train} episodes & Frozen R/\allowbreak{}r128, R/\allowbreak{}r32 and W5/\allowbreak{}r32 (training seed17): the final-position read replaced by store (deployed delta, exact ridge) \ensuremath{\times} query (raw, unit, true) cells; rescue rule and first-applying verdict; no training, no CIs. & RX1-RX3 \\ \addlinespace[3pt]  % RX1 RX2 RX3
+WP-L6 & \texttt{val}, seed4242, 1,000 episodes & Rank-32 M1-L4 with O-rot and O-shared oracle codes, lr 0.003, seed17, 5,666 steps; hop-1 full-vocabulary EM at L=4 against a 30\% threshold; pilot, no CIs; P1L-S not run. & WL1-WL2 \\ \addlinespace[3pt]  % WL1 WL2
+DPFP & \texttt{val}, seed4242, 1,000 episodes per arm & Learned LLM writers with DPFP key and query features (D32-3, D128-1, D128-3; T1, E=16, training seed17) against the WP-L4 references R at the same rank; registered E=8 retrain of D128-3; zero- and shuffled-memory audit; no CIs. P1L-D not run. & DP1-DP3, PD1 \\ \addlinespace[3pt]  % DP1 DP2 DP3 PD1
+DPFP-X & \texttt{val}, seed4242, 1,000 episodes per arm & The best DPFP design (\ensuremath{\nu}=3, E=16, training seed17) at rank256 on Qwen3-0.6B-Base (X256) and at rank128 on Qwen3-1.7B-Base (X17) against D128-3; five-checkpoint curves, read diagnostics, zero- and shuffled-memory audit; no E=8 retrain; no CIs. & DP4-DP7 \\ \addlinespace[3pt]  % DP4 DP5 DP6 DP7
+P1-L registered oracle readers & test episode indices[100000,102000), 2,000 episodes, eval seed4242 & oracle\_random at r32/\allowbreak{}r128; seeds17/\allowbreak{}29/\allowbreak{}43, primary fixed-L4 B8 (not parameter-matched: +8.9\% at r32, +31.0\% at r128), same-rank gates, k2 and 97.5\% intervals; Amendments B6 (equal-parameter rule) and B7 (per-rank memory-use check; no multi-read claim at r32). Rank32 fails the check, rank128 passes; at rank128 G1-L fails, G2-L passes and M1-L4@4 against B4@1 meets the B6 criterion. LP6 is training/\allowbreak{}validation evidence; the per-step readouts (LP5) are descriptive. & LP1-LP13 \\ \addlinespace[3pt]  % LP1 LP2 LP3 LP4 LP5 LP6 LP7 LP8 LP9 LP10 LP11 LP12 LP13
+P1L-C & test episode indices[102000,104000), 2,000 episodes (256 hop-2 episodes per seed for patching) & The nine rank128 checkpoints (M1-L4, B8, B4 \ensuremath{\times} seeds17/\allowbreak{}29/\allowbreak{}43), nothing retrained; read-position analysis (descriptive), bridge patching with a registered causal bar of 10 pp, replication of the P1-L contrasts; 95\% intervals. & PC1-PC4 \\ \addlinespace[3pt]  % PC1 PC2 PC3 PC4
+P5L & test episode indices[104000,106000), 2,000 episodes, eval seed4242 & Qwen3-1.7B-Base (revision ea980cb0\ldots{}), oracle\_random at rank128, readers B3-L4/\allowbreak{}B4/\allowbreak{}M1-L4/\allowbreak{}B8/\allowbreak{}B5-L4 \ensuremath{\times} seeds17/\allowbreak{}29/\allowbreak{}43, S=17,000, learning rates carried from the 0.6B rank128 lock without a pilot, 97.5\% intervals; B7 check then the B6 contrast decide; G1-L/\allowbreak{}G2-L reported only; no B1/\allowbreak{}B2, P1L-C or readouts. & LP14-LP20 \\ \addlinespace[3pt]  % LP14 LP15 LP16 LP17 LP18 LP19 LP20
+Revision tables (Section 8.6) & P1-L and P5L confirmation ranges (no new evaluation) & Seed means, per-seed effects and a seed-level t-interval from the committed per-seed \texttt{accuracy.csv}, \texttt{inference.csv} and \texttt{endpoints.json} of both ranges; M1-L4 scanned at L=1\ldots{}8 on hops1-8; state bytes derived as 4\ensuremath{\cdot}r\ensuremath{^2} & LP21-LP23 \\ \addlinespace[3pt]  % LP21 LP22 LP23
+\bottomrule
+\end{longtable}
+}
+
+
+The symbolic studies use training seeds 17/\allowbreak{}29/\allowbreak{}43. P1-S/\allowbreak{}P2-S and their follow-ups use 2,000 paired  % S1 B3
+episode-bootstrap draws with seed2718 and confidence 97.5\%, conditional on those
+seeds; episodes are the pairing units, and the same episode is not independent
+merely because several queries or model seeds are scored on it.  % S1 S3 B3
+IS uses the same fixed-seed episode-bootstrap convention within a load, but its
+E36\ensuremath{-}E12 change uses independent load-specific streams derived from base seed2718.
+ IS4 additionally exports absolute-rate episode-bootstrap intervals;  % IS1
+they are not current\ensuremath{-}stale or affected\ensuremath{-}untouched contrast intervals.  % IS4
+These intervals are endpoint-specific, not simultaneous guarantees for every
+sentence or model comparison. Absolute accuracy and timing points do not acquire
+intervals from a neighboring contrast.  % S7 B7 H2
+P4-S-L instead uses confidence 1\ensuremath{-}0.05/\allowbreak{}6=99.166667\% for its six primary families,
+with 2,000 paired episode draws conditional on the same three fixed seeds.
+ JS uses 97.5\% paired episode intervals; DeltaS jointly resamples all  % HL1
+four accuracy terms. Neither study’s uncertainty includes retraining,  % JS1
+head fitting, or threshold reselection on new training seeds.  % HL1 JS1
+The LLM writer screens have no such intervals: their reused validation episodes,
+single seed, diagnostic supervision, and sequential selections limit all
+cross-arm and cross-budget interpretations.  % LL1 LL6 LL9
+P1-L’s 97.5\% intervals belong to its confirmation (Section 8.5); they must not be
+attached to these writer-screen values.  % LP3 LP4
+
+The learned-writer P1-S replication uses typed chains(8,1), E=12, with distractors.  % S5
+Both primary oracle rows use a random-code replication at E=18 with chains(8,8,2);
+the orthogonal primary pass is not a second orthogonal replication.  % S1 S5
+Within each oracle or frozen-writer condition, reader variants share the designated
+writer/\allowbreak{}codebook; joint variants train separate writers.  % S2 S3 S9
+The fixed-versus-mixed M1 selected learning rates all equal 0.003 despite separate
+selection procedures; the manuscript does not invent a numerical learning-rate
+difference as an observed confound.  % B4
+
+P2-S and P4-S prepared-query timings use FP32 on GH200 with five warmups and
+20 repeats. P2-S excludes context/\allowbreak{}writer preparation and  % B7 H2
+input projection; P4-S includes candidate decoding and stopping bookkeeping but
+excludes writer/\allowbreak{}backbone preparation. State bytes are per  % B7 H2
+episode, and trained versus merely registered parameters must be distinguished
+for frozen oracle components. P4-S stopping caps at L16 and begins  % B7
+after the first update; read-norm uses L+1 reads, while relative-change and
+output-stability use L. Exported tail latency  % H1 H4 H5
+summaries are kept descriptive; they are not a pooled end-to-end request percentile.
+% H2
+P4-S-L times a prepared 64-query batch per seed, separately from complete-set
+accuracy/\allowbreak{}execution counters; selected depth can be less than executed depth on
+fallback, and post-state features require executed updates+1 reads.  % HL4
+JS radius summaries pool reached states over seeds and hops at L4/\allowbreak{}8/\allowbreak{}16; no radius
+CI, global contraction bound, or fixed-point certificate is exported.  % JS6
+
+Reproduction command and compute-job provenance are recorded in
+WP-T5, WP-T6, and
+WP-T7. Figure generation is a rendering job only:
+it neither opens model checkpoints nor changes the scientific estimands or
+registered decisions. Pending figure items are marked in Sections 8-9 rather
+than populated from unmerged or provisional results.
+
+
+{\small
+\setlength{\tabcolsep}{3pt}
+\begin{longtable}{W{133}{6}W{350}{6}W{517}{6}}
+\toprule
+Manuscript figure & Plan \S{}9.3 item & Committed figure pair \\ \addlinespace[3pt]
+\midrule \endhead
+Figure 1 & 1: quality-L by hop & quality\_depth.pdf /\allowbreak{} quality\_depth.png \\ \addlinespace[3pt]
+Figure 2 & 3: hop\ensuremath{\times}L heatmap & hop\_depth\_heatmap.pdf /\allowbreak{} hop\_depth\_heatmap.png \\ \addlinespace[3pt]
+Figure 3 & 5: fixed-query and memory-free paired contrasts & paired\_controls.pdf /\allowbreak{} paired\_controls.png \\ \addlinespace[3pt]
+Figure 4 & 2: quality-latency, larger single reads marked & budget\_latency.pdf /\allowbreak{} budget\_latency.png \\ \addlinespace[3pt]
+Figure 5 & 7: stopping quality versus mean and tail latency & stopping\_latency.pdf /\allowbreak{} stopping\_latency.png \\ \addlinespace[3pt]
+Figure 6, Section 6 & 4: memory load\ensuremath{\times}L & memory\_load\_depth.pdf /\allowbreak{} memory\_load\_depth.png \\ \addlinespace[3pt]  % IS1
+Figure 7, Section 7 & JS extension: overshoot and longer walks & js\_overshoot.pdf /\allowbreak{} js\_overshoot.png \\ \addlinespace[3pt]  % JS1 JS3 JS5
+TODO, Section 8 & 6: single-module /\allowbreak{} end-to-end correspondence & Not produced; the P1-L confirmation is reported in tables (Section 8.5), and the per-step readouts (LP5) are decoding only. \\ \addlinespace[3pt]
+\bottomrule
+\end{longtable}
+}
+
+

@@ -1,6 +1,8 @@
+> **Superseded.** The manuscript of record is `docs/paper/tex/paper.tex` (PDF: `docs/paper/paper.pdf`, WP-T11 Part B). This markdown draft is kept for history; the evidence ledgers are unchanged.
+
 # Iterative Queries in a Low-Rank Memory Adapter: Composition, Writer Dependence, and Budget Limits
 
-*Manuscript draft. Code cutoff: `f1dd6e2`; numerical and claim authority:
+*Manuscript draft (revised after the second external reviews, WP-T11: Section 8.6, the related-work additions and the seed-level statistics). Code cutoff: `f1dd6e2`; numerical and claim authority:
 [symbolic evidence ledger](evidence_symbolic.md) and
 [LLM evidence ledger](evidence_llm.md). Main-text experimental claims carry ledger
 IDs in HTML comments. Symbolic results (including the registered follow-ups IVD, CVH,
@@ -38,7 +40,7 @@ screens, including the registered DPFP screens, select no learned writer, despit
 supplied-answer-code output path.<!-- DP1 --> In the registered oracle-reader confirmation, one shared module iterated four times
 exceeds a single read of equal parameter count at rank128 on two backbone sizes of one family (Qwen3-0.6B-Base and Qwen3-1.7B-Base),
 the four-unshared-reads reader fails its registered gate at both, a bridge-patching test at the smaller size gives no causal claim, and at rank32 the readers did not learn to use the oracle memory.
-<!-- LL2 --><!-- LL3 --><!-- LL9 --><!-- LP4 --><!-- LP7 --><!-- LP9 --><!-- LP11 --><!-- LP15 --><!-- PC1 --> All results use a closed 1,024-name vocabulary and
+<!-- LL2 --><!-- LL3 --><!-- LL9 --><!-- LP4 --><!-- LP7 --><!-- LP9 --><!-- LP11 --><!-- LP15 --><!-- PC1 --> At its trained depth the shared reader reaches hop 3; run deeper, the same checkpoint reaches hops 4–8 at 9.9–16.6% (0.6B) and 9.8–20.9% (1.7B) with the depth chosen by the label, while it loses hop 1 (descriptive; Section 8.6). <!-- LP21 --> All results use a closed 1,024-name vocabulary and
 depths within those trained, oracle and learned writers are separate claims, and the
 language-model oracle is not the symbolic oracle; the 256 unseen-pool names of that
 vocabulary enter only as a descriptive scope row, where the depth gain is also present, and no
@@ -74,7 +76,7 @@ factorized writer changes the depth profile and increases walk specificity, incl
 when its T1-pretrained writer is frozen, but none of those factorized conditions passes
 the full hop-preservation gate. <!-- S9 --> In one frozen language-model module with a clean oracle memory, the shared reader
 composes at rank128 on two backbone sizes of one family while the registered four-unshared-reads reader does not (Section 8); no
-claim is made for any other size or as a trend. <!-- LP9 --><!-- LP11 --><!-- LP15 --><!-- LP20 --> This combination motivates treating writer
+claim is made for any other size or as a trend. <!-- LP9 --><!-- LP11 --><!-- LP15 --><!-- LP20 --> At its trained depth that reader reaches hop 3; run deeper it reaches later hops only at low accuracy (Section 8.6). <!-- LP21 --> This combination motivates treating writer
 design and reader depth as interacting parts of an inference system, rather than
 equating a positive average depth effect with a complete solution.
 
@@ -274,6 +276,41 @@ than in storage ([Frozen Memory Is Not Enough](https://arxiv.org/abs/2608.17050)
 [a hidden-state memory layer](https://neurips.cc/virtual/2026/170472)). That is compatible
 with, but does not confirm, the read-distortion measurements of Section 8.3, whose cause the
 audit leaves unidentified. <!-- LL7 --><!-- LL9 -->
+
+Two further external reviews ([rv-fable](../review/rv-fable_2026-10-29.md) and [rv-astra](../review/rv-astra_2026-10-29.md), 2026-10-29) added the works
+below. We cite their abstract pages as the reviewers recorded them, did not re-open the pages for this manuscript, and claim no priority from any of them.
+We study none of the writers, objectives or architectures named here; our writers are the one-step delta writer, its DPFP-feature variant and the oracle writers.
+[Zahn et al.](https://arxiv.org/abs/2601.15313) report that semantic keys overlap and recall falls near chance after a few related facts, while identifier keys do
+not, a setting close to the key-overlap questions of Section 8.3. Several works read the delta rule as online regression or filtering:
+[Pandey and Singh](https://arxiv.org/abs/2605.11196) use online ridge by Sherman–Morrison as approximate key orthogonalization;
+[Gated KalmaNet](https://arxiv.org/abs/2511.21016) shows a full-covariance Kalman update to be online ridge regression with fading memory;
+[Kalman Linear Attention](https://arxiv.org/abs/2602.10743) filters in information form, scan-parallel;
+[Kalman Delta Networks](https://arxiv.org/abs/2609.07816) use a per-channel Kalman gain whose isotropic case is the delta rule;
+[Preconditioned DeltaNet](https://arxiv.org/abs/2604.21100) reads the delta rule as a first-order regression step and adds preconditioning;
+[Longhorn](https://arxiv.org/abs/2407.14207) derives a state-space update as closed-form online recall;
+[MesaNet](https://arxiv.org/abs/2506.05233) optimizes a local regression at test time; and
+[Q-Delta](https://arxiv.org/abs/2606.08804) studies keys transformed by subsequent updates. Other works change the objective, the retention or the update:
+[It's All Connected](https://arxiv.org/abs/2504.13173) (attentional-bias objectives and retention gates),
+[Nested Learning](https://arxiv.org/abs/2512.24695) (a self-modifying model with continuum memory),
+[End-to-End Test-Time Training](https://arxiv.org/abs/2512.23675) (a meta-learned initialization),
+[Test-Time Training Done Right](https://arxiv.org/abs/2505.23884) (whole-chunk updates),
+[Infini-attention](https://arxiv.org/abs/2404.07143) (compressive memory with a delta-style update),
+[Gated DeltaNet-2](https://arxiv.org/abs/2605.22791) (separate erase and write gates),
+[Gated Slot Attention-2](https://arxiv.org/abs/2610.02816) (two-sided association correction through slots),
+[DeltaProduct](https://arxiv.org/abs/2502.10297) and [Sparse Delta Memory](https://arxiv.org/abs/2607.07386) (richer updates or larger states).
+[CAMELoT](https://arxiv.org/abs/2402.13449) attaches a training-free associative memory to a frozen language model, as a neighbor of the frozen-backbone
+setting here. These are different writers from those tested, and the learned-writer stop of Section 8.5 applies only to the writers it tested.
+
+For looped and latent reasoning, [DiscoLoop](https://arxiv.org/abs/2607.00341) reports that a bridge can be decodable yet misaligned for the next loop and mixes
+decoded embeddings with continuous states; [Fan, Svete and Lee](https://arxiv.org/abs/2606.31779) (called LOTUS in rv-astra) supervise looped transformers per position;
+[Chen](https://arxiv.org/abs/2603.21676) trains with final-only supervision, a near-identity gate and depth extrapolation, where intermediate supervision hurt;
+[Kuo et al.](https://arxiv.org/abs/2606.29983) report that a randomized loop count stabilizes extrapolation; and
+[CODI](https://arxiv.org/abs/2502.21074) and [Recurrent Self-Improvement](https://arxiv.org/abs/2610.10623) distill explicit reasoning into latent reasoning or
+use deeper teachers. [Sanford et al.](https://arxiv.org/abs/2402.09268) show that logarithmic depth suffices for k-hop problems, so one hop per read is a design
+choice of this adapter and not a bound. [Liang and Pan](https://arxiv.org/abs/2602.00449) warn that decodable intermediate states do not establish a complete serial
+algorithm, which is the boundary the per-step readouts of Section 8.5 respect: they are decoding only. <!-- LP5 --> [The orthogonalized read as a training scaffold](https://arxiv.org/abs/2607.19390)
+is reported as a removable training aid and not an inference rescue; whether sharing acts as such a scaffold for B8 is untested here. None of these
+training objectives, stopping rules or distillation methods is used in this paper.
 
 ### Verbalizable directions and the readout boundary
 
@@ -1268,7 +1305,7 @@ it is bounded by Amendment B7: the reader learns the value-to-key lookup over th
 language model for this oracle memory; it is not equivalent to the symbolic oracle condition, and nothing is claimed for unseen
 names or entity codes, a learned writer or end-to-end use. <!-- LP11 --><!-- LP6 --> Descriptively, M1-L4@4's depth effect (L4
 against L1) is +25.925 pp [24.816, 27.050] on hops2–3 and +3.678 pp [3.206, 4.183] on hops6–8, its accuracy on hops1–4 is
-47.85%, 35.35%, 18.47% and 7.25% (at most 5% on hops5–8), and B8@4 is 20.567 pp [19.358, 21.783] below it on hops2–3
+47.85%, 35.35%, 18.47% and 7.25% (at most 5% on hops5–8) at the trained depth L=4 (Section 8.6 gives every depth), and B8@4 is 20.567 pp [19.358, 21.783] below it on hops2–3
 (a secondary, ungated contrast). <!-- LP12 --> The difference between the two readers is one of these two architectures
 on one fixed oracle memory in 17,000 steps, not a statement about unshared reads in general. <!-- LP9 --><!-- LP12 --> The
 added reads cost time: per question, M1-L4 takes about 1.42 and B8 about 1.57 times B4's 0.392 ms at rank128, and no efficiency
@@ -1286,7 +1323,7 @@ learning rates carried without a pilot; it covers the two sizes tested and no ot
 [0.292, 1.800] (seeds +0.200, +1.725, +1.175), below the 3 pp bar, so G1-L fails again, and its hop1 condition also fails at this scale
 (−1.717 pp [−3.317, −0.016]) where it held at 0.6B; G2-L passes (+1.675 pp [0.908, 2.383] over B5-L4@4 and +7.167 pp [6.583, 7.758] over
 B3-L4@4). <!-- LP16 --><!-- LP17 --> B8 adds 147,456 parameters (+24.3%) and is not parameter-matched. <!-- LP19 --> Descriptively,
-M1-L4@4 reaches 58.70%, 41.45%, 22.47% and 6.23% on hops1–4 (at most 3.92% on hops5–8), with a depth effect of +31.458 pp [30.267, 32.633]
+M1-L4@4 reaches 58.70%, 41.45%, 22.47% and 6.23% on hops1–4 (at most 3.92% on hops5–8) at L=4, with a depth effect of +31.458 pp [30.267, 32.633]
 on hops2–3 and a walk specificity of +28.181 pp [26.844, 29.425]. <!-- LP18 --> These values sit next to the 0.6B ones (+21.550 pp for the
 B6 contrast; 47.85%, 35.35%, 18.47% and 7.25% on hops1–4) without any test across scales, and two sizes support no scaling trend.
 <!-- LP20 --> Latency is a cost and is not compared across scales: at 1.7B M1-L4 and B8 take about 1.29 times B4's 0.486 ms per question.
@@ -1297,7 +1334,7 @@ nothing retrained) on a second range, `test` [102000,104000), with 95% intervals
 position lowers the hops1–3 EM of M1-L4@4 from 33.64% to 3.74% (−29.906 pp [−30.756, −29.094]), of B8@4 from 10.48% to 0.99%
 (−9.489 pp [−10.078, −8.911]) and of B4@1 from 10.39% to 1.26% (−9.133 pp [−9.711, −8.589]), in every seed and hop,
 including hop1 of the single read. This is descriptive: the readers were trained with reads at every question position, so the
-drop is a distribution shift and not evidence of leakage, and it does not locate the bridge. <!-- PC2 --> Bridge patching, which
+drop is a distribution shift and not evidence of leakage, and it does not locate the bridge. <!-- PC2 --> Each question position runs its own walk, so the final position is one of several (Section 8.6). Bridge patching, which
 replaces the state z_1 after the first read at the final question position by the state from a world whose first edge points to
 another bridge, shifts the answer by +0.391 pp [−0.130, 0.781] for M1-L4 and 0.000 pp [−0.521, 0.000] for B8, against a
 registered bar of 10 pp with an interval above 0 and a positive shift in every seed. <!-- PC1 --> There is no causal bridge
@@ -1356,6 +1393,143 @@ after the writer-screen decision. <!-- LP5 -->
 P1-L confirmation is reported above in tables. The completed writer-screen negatives supply no multihop
 oracle-reader outcome or general language-reasoning claim. <!-- LL9 --><!-- LP4 -->
 
+### 8.6 The oracle condition at a glance: same-rank table, depth by hop, and seed-level statistics
+
+This subsection restates the language-model results of Sections 8.4 and 8.5 in one place. Every value is a seed mean, or an
+effect over the three training seeds 17/29/43, at rank128 with one oracle memory (oracle seed17) in the memory-only protocol. The
+tables were produced after the registered confirmation by a standard-library script
+([paper_tables_g1.py](../../scripts/paper_tables_g1.py)) from the committed accuracy, timing and endpoint files; the depth matrix and the
+seed-level statistics are descriptive, add no gate and change no registered decision. <!-- LP21 --><!-- LP22 --><!-- LP23 -->
+
+**Same-rank table.** Exact-match accuracy by hop (%), primary setting; B4@1 is the single read, M1-L4@4 and B8@4 read four times, all at
+rank128 and at the depth they were trained for. <!-- LP23 -->
+
+| Backbone | Reader | hop1 | hop2 | hop3 | hop4 | hop5 | hop6 | hop7 | hop8 |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 0.6B | B4@1 | 19.63 | 5.35 | 5.37 | 5.82 | 5.32 | 5.00 | 5.40 | 5.17 |
+| 0.6B | M1-L4@4 | 47.85 | 35.35 | 18.47 | 7.25 | 3.90 | 4.50 | 4.72 | 4.97 |
+| 0.6B | B8@4 | 19.03 | 6.65 | 6.03 | 6.10 | 6.17 | 5.38 | 6.25 | 6.37 |
+| 1.7B | B4@1 | 30.65 | 6.17 | 6.18 | 5.53 | 5.53 | 5.62 | 5.55 | 5.72 |
+| 1.7B | M1-L4@4 | 58.70 | 41.45 | 22.47 | 6.23 | 3.10 | 3.78 | 3.63 | 3.92 |
+| 1.7B | B8@4 | 28.93 | 8.17 | 6.25 | 6.28 | 5.97 | 5.73 | 5.57 | 6.20 |
+
+Costs of the same readers. M1-L4 and B4 have equal parameter counts; B8 adds 147,456 parameters (+31.0% at 0.6B, +24.3% at 1.7B). The state
+bytes are the persistent FP32 delta memory (r_mem × r_mem × 4 bytes per episode; derived from the rank, the same for the three readers because
+they read the same memory, and excluding the backbone cache). Time per question is a measured cost, compared only within one backbone; no
+efficiency claim is made. <!-- LP23 -->
+
+| Backbone | Reader | Adapter parameters | State bytes per episode | Time per question (ms) | Time relative to B4@1 |
+| --- | --- | --- | --- | --- | --- |
+| 0.6B | B4@1 | 475,138 | 65,536 | 0.392 | 1.00 |
+| 0.6B | M1-L4@4 | 475,138 | 65,536 | 0.556 | 1.42 |
+| 0.6B | B8@4 | 622,594 | 65,536 | 0.617 | 1.57 |
+| 1.7B | B4@1 | 606,210 | 65,536 | 0.486 | 1.00 |
+| 1.7B | M1-L4@4 | 606,210 | 65,536 | 0.625 | 1.29 |
+| 1.7B | B8@4 | 753,666 | 65,536 | 0.625 | 1.29 |
+
+**Three kinds of evidence.** The results fall into three kinds that answer different questions and are never pooled.
+
+| Kind of evidence | Question | Result | Rows |
+| --- | --- | --- | --- |
+| Oracle composition | Does a trained reader compose reads over a privileged memory? | M1-L4@4 exceeds B4@1 at equal parameters on hops2–3 by +21.550 pp (0.6B) and +25.783 pp (1.7B); B8 fails G1-L at both backbones | LP7–LP20 |
+| Learned-writer access | Can a learned writer build that memory? | No writer reaches the 0.80 gate in any screen (best final WP-L4 arm 33.5%; DPFP 60.8% and 73.0% at E=8; DPFP-X 66.2% and 59.3%); each registered decision is stop | LL9, DP1, DP4, PD1 |
+| Mechanism evidence | Where and how does the walk happen? | Per-step readouts are decoding only; bridge patching at the final question position shifts the answer by +0.391 pp against a 10 pp bar; final-position-only reads lower M1-L4's hops1–3 EM by 29.906 pp (a distribution shift) | LP5, PC1–PC3 |
+
+<!-- LL9 --><!-- DP1 --><!-- DP4 --><!-- PD1 --><!-- LP5 --><!-- PC1 --><!-- PC2 --><!-- PC3 --><!-- LP4 -->
+
+**Negative interventions and the exact gate each did not meet.** The matrix lists each repair or test that failed its registered criterion. Each
+row is one study under its own conditions (one training seed or three, one optimizer, a fixed budget). The rows record which criterion was not met;
+they do not show that learned writing, an exact store, unshared reads or composition at rank32 is impossible. Not run: the LSQ arms (none was
+triggered), P1L-D and P1L-S; a warm start of B8 from M1-L4 has not been tested.
+
+| Intervention | Conditions | Result | Registered criterion not met | Rows |
+| --- | --- | --- | --- | --- |
+| Learned writers of the WP-L4 screen (R, W5 and read-supervision variants) | Qwen3-0.6B-Base, ranks 32 and 128, one seed, 1,000 validation episodes | Best eligible arm 33.5% (R, rank128) | Validation EM ≥0.80 (and the 0.50 trigger of the E=8 retraining) | LL9 |
+| Read-failure factorial (RFX) | Frozen R/r128, R/r32 and W5/r32 checkpoints, evaluation only | Only an exact store together with the true key (a label) rescues the read; the exact store with the deployed or unit query gives 38.8% and 38.75% against 33.8% at R/r128 | Rescue: normalized read error ≤0.5 of the baseline and EM gain ≥10 pp | RX1 |
+| Oracle codes at rank32 (WP-L6) | M1-L4, r=r_mem=32, one seed, 5,666 steps | Hop-1 EM 0.1% (O-rot) and 11.8% (O-shared) | Hop-1 full-vocabulary EM ≥30% at L=4 | WL1 |
+| DPFP writer | Ranks 32 and 128, E=16, E=8 retrain of the best arm, one seed | 39.0%, 58.0% and 60.8% at E=16; 73.0% at E=8 | Validation EM ≥0.80 | DP1 |
+| DPFP-X writer | X256: Qwen3-0.6B-Base, r=256; X17: Qwen3-1.7B-Base, r=128; one seed | 66.2% and 59.3% | Validation EM ≥0.80 | DP4 |
+| Oracle readers at rank32 | B4, B8 and M1-L4 on the oracle memory, three seeds | Hop-1 EM at most 0.15%; the memory-use check fails | Amendment B7 rule 1: each reader's hop-1 EM above B3-L4@4 with a 97.5% interval above 0 (lower bounds 0.000 for B4, −0.050 for B8) | LP7 |
+| B8 (four unshared reads) at 0.6B | Rank128, three seeds | B8@4−B4@1 on hops2–3 +0.983 pp [0.267, 1.717] | G1-L point estimate ≥3 pp (its hop-1 and typed conditions held) | LP9 |
+| B8 at 1.7B | Rank128, three seeds | +1.033 pp [0.292, 1.800]; hop 1 −1.717 pp | G1-L point estimate ≥3 pp; hop-1 point estimate ≥−1 pp | LP16 |
+| Bridge patching | Rank128, 0.6B, L=4, state after the first read at the final question position | +0.391 pp [−0.130, 0.781] (M1-L4), 0.000 pp (B8) | Shift ≥10 pp, 95% interval above 0, positive in every seed | PC1 |
+
+<!-- LL9 --><!-- RX1 --><!-- WL1 --><!-- DP1 --><!-- DP4 --><!-- LP7 --><!-- LP9 --><!-- LP16 --><!-- PC1 -->
+
+**Depth by hop (descriptive).** Seed-mean EM (%) of the M1-L4 checkpoint, trained at L=4 on hops1–3, evaluated at depths L=1…8 on hops1–8 at
+Qwen3-0.6B-Base. The best depth of each hop is in bold. The last row, the oracle stop, takes the best depth per hop with the label; it is an upper
+bound and a maximum over eight noisy cells, not a stopping rule. <!-- LP21 -->
+
+| L | hop1 | hop2 | hop3 | hop4 | hop5 | hop6 | hop7 | hop8 |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 1 | 37.8 | 1.1 | 0.9 | 1.1 | 0.8 | 0.9 | 1.1 | 1.1 |
+| 2 | **64.2** | 10.9 | 1.4 | 1.8 | 1.6 | 1.7 | 1.7 | 1.8 |
+| 3 | 61.3 | 30.0 | 7.5 | 2.9 | 2.6 | 2.5 | 2.9 | 3.2 |
+| 4 (trained) | 47.9 | **35.4** | 18.5 | 7.3 | 3.9 | 4.5 | 4.7 | 5.0 |
+| 5 | 37.2 | 29.3 | **24.2** | 14.1 | 7.2 | 6.1 | 6.7 | 6.7 |
+| 6 | 28.1 | 22.8 | 20.6 | **16.6** | 11.6 | 8.8 | 8.5 | 8.9 |
+| 7 | 22.6 | 18.8 | 17.7 | 15.4 | 13.5 | 10.9 | 9.5 | 9.7 |
+| 8 | 19.0 | 16.4 | 15.0 | 13.8 | **13.5** | **12.4** | **10.6** | **9.9** |
+| oracle stop (best L, label used) | 64.2 (L2) | 35.4 (L4) | 24.2 (L5) | 16.6 (L6) | 13.5 (L8) | 12.4 (L8) | 10.6 (L8) | 9.9 (L8) |
+
+The same at Qwen3-1.7B-Base. <!-- LP21 -->
+
+| L | hop1 | hop2 | hop3 | hop4 | hop5 | hop6 | hop7 | hop8 |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 1 | 34.1 | 0.5 | 0.5 | 0.5 | 0.5 | 0.5 | 0.5 | 0.5 |
+| 2 | **77.6** | 10.9 | 1.2 | 1.3 | 1.1 | 1.2 | 1.2 | 1.1 |
+| 3 | 70.6 | 34.6 | 6.6 | 1.8 | 2.0 | 2.3 | 2.2 | 1.9 |
+| 4 (trained) | 58.7 | **41.5** | 22.5 | 6.2 | 3.1 | 3.8 | 3.6 | 3.9 |
+| 5 | 44.9 | 36.5 | **29.3** | 15.3 | 5.9 | 5.2 | 5.8 | 6.0 |
+| 6 | 34.9 | 30.2 | 27.0 | **20.9** | 12.0 | 7.5 | 6.9 | 7.7 |
+| 7 | 29.0 | 24.6 | 24.3 | 20.6 | 16.9 | 11.2 | 8.7 | 8.8 |
+| 8 | 24.1 | 20.9 | 21.4 | 18.4 | **17.8** | **14.7** | **10.7** | **9.8** |
+| oracle stop (best L, label used) | 77.6 (L2) | 41.5 (L4) | 29.3 (L5) | 20.9 (L6) | 17.8 (L8) | 14.7 (L8) | 10.7 (L8) | 9.8 (L8) |
+
+At the trained depth the reader reaches hop 3: at L=4 its EM on hops1–3 is 47.9/35.4/18.5% at 0.6B and 58.7/41.5/22.5% at 1.7B, and on hops5–8 it
+is 3.9–5.0% and 3.1–3.9%, not above the single read B4@1 (5.0–5.8% and 5.5–5.7% on hops4–8). The same checkpoint reaches hops4–8 at
+9.9–16.6% (0.6B) and 9.8–20.9% (1.7B) when run deeper (hop4 at L=6, hops5–8 at L=8, the largest depth evaluated, so their best depth is not
+located), while losing hop 1: at L=8 hop 1 is 19.0% and 24.1%, against 47.9% and 58.7% at L=4 and 64.2% and 77.6% at L=2. These
+cells are at hops and depths never trained, carry no interval and rest on one oracle seed and three training seeds; the paper does not say that the reader
+cannot go beyond hop 3, nor that it composes up to hop 8, and no stopping rule for this reader is evaluated. <!-- LP21 -->
+
+**Seed-level statistics.** The registered intervals resample episodes with the three fitted seeds held fixed. Beside each, the tables print the three
+seed effects and a seed-level interval: the mean of the seed effects ± t(0.9875; 2 degrees of freedom) = 6.205 times their sample standard
+error, the two-sided 97.5% level of the registered intervals. Both intervals are conditional on three fitted seeds and one fixed oracle code table
+(oracle seed17, one layout): neither covers future training seeds or other code tables, and the t-interval treats the three seed effects as exchangeable draws,
+which three values cannot test. <!-- LP22 -->
+
+Qwen3-0.6B-Base. <!-- LP22 -->
+
+| Contrast (pp) | Seed 17 | Seed 29 | Seed 43 | Seed mean | Seed-level 97.5% interval | Episode bootstrap 97.5% (registered) |
+| --- | --- | --- | --- | --- | --- | --- |
+| B6 contrast M1-L4@4 - B4@1, hops 2-3 | +24.450 | +15.100 | +25.100 | +21.550 | [+1.50, +41.60] | [+20.383, +22.758] |
+| G1-L reach B8@4 - B4@1, hops 2-3 | +0.925 | +0.050 | +1.975 | +0.983 | [-2.47, +4.44] | [+0.267, +1.717] |
+| G1-L hop 1 B8@4 - B4@1 | -2.300 | +1.200 | -0.700 | -0.600 | [-6.88, +5.68] | [-1.984, +0.767] |
+| G1-L typed replication B8@4 - B4@1, hops 2-3 | +1.575 | +0.600 | +2.475 | +1.550 | [-1.81, +4.91] | [+0.767, +2.367] |
+| G2-L B8@4 - B5-L4@4 (fixed query), hops 2-3 | +0.875 | +0.100 | +1.525 | +0.833 | [-1.72, +3.39] | [+0.058, +1.550] |
+| G2-L B8@4 - B3-L4@4 (memory-free), hops 2-3 | +6.525 | +5.675 | +6.825 | +6.342 | [+4.20, +8.48] | [+5.758, +6.933] |
+
+Qwen3-1.7B-Base. <!-- LP22 -->
+
+| Contrast (pp) | Seed 17 | Seed 29 | Seed 43 | Seed mean | Seed-level 97.5% interval | Episode bootstrap 97.5% (registered) |
+| --- | --- | --- | --- | --- | --- | --- |
+| B6 contrast M1-L4@4 - B4@1, hops 2-3 | +24.925 | +26.500 | +25.925 | +25.783 | [+22.93, +28.64] | [+24.533, +27.026] |
+| G1-L reach B8@4 - B4@1, hops 2-3 | +0.200 | +1.725 | +1.175 | +1.033 | [-1.73, +3.80] | [+0.292, +1.800] |
+| G1-L hop 1 B8@4 - B4@1 | -1.800 | -0.300 | -3.050 | -1.717 | [-6.65, +3.22] | [-3.317, -0.016] |
+| G1-L typed replication B8@4 - B4@1, hops 2-3 | +0.375 | +3.300 | -0.300 | +1.125 | [-5.73, +7.98] | [+0.275, +1.942] |
+| G2-L B8@4 - B5-L4@4 (fixed query), hops 2-3 | +0.550 | +3.600 | +0.875 | +1.675 | [-4.33, +7.68] | [+0.908, +2.383] |
+| G2-L B8@4 - B3-L4@4 (memory-free), hops 2-3 | +6.225 | +8.825 | +6.450 | +7.167 | [+2.01, +12.33] | [+6.583, +7.758] |
+
+The seed-level interval excludes 0 for the B6 contrast (M1-L4@4−B4@1) and for G2-L against the memory-free reader at both backbones. It includes 0 for the
+G1-L contrasts and for G2-L against the fixed-query reader at both backbones, so the G2-L pass over B5-L4@4 is a statement about the fitted seeds. The
+registered decisions use the episode intervals and are unchanged. <!-- LP22 -->
+
+**Mechanism wording.** The adapter acts at every question position. Each position performs its own vertical walk: its branch output enters that
+position's residual after the layer-14 attention and is not an input of any later position's adapter, and the frozen upper layers aggregate across positions.
+Which position's walk carries the answer is untested; "composes reads" in this paper means the iterated reads inside one position's loop (PC1–PC3 give
+no causal bridge claim and a distribution shift for final-position-only reads). <!-- PC1 --><!-- PC2 --><!-- PC3 -->
+
 ## 9. Limitations, reproducibility, and conclusion
 
 The central limitation is conditionality. Writer form, learned representation,
@@ -1384,6 +1558,14 @@ carries learning rates from the smaller model without a pilot, and covers two si
 registered, so the paper claims no scaling trend, nothing for any other size, and no learned-writer or end-to-end result at either size.
 <!-- LP15 --><!-- LP20 --> P1L-C does not show where the bridge is carried: its
 read-position drop is a distribution shift, and bridge patching gives no causal claim. <!-- PC1 --><!-- PC2 -->
+
+Section 8.6 adds its own limits. Every language-model composition number rests on one random oracle code table (one oracle seed) and three training seeds, so the
+episode intervals and the seed-level intervals are conditional on those and describe no other code table, layout or future training run; with three seeds the
+seed-level interval is wide, and it includes 0 for the G1-L contrasts and for G2-L against the fixed-query reader at both backbones. <!-- LP22 --> The depth matrix
+evaluates one L4-trained checkpoint at depths and hops that were never trained, without intervals; its oracle-stop row uses the label and is an upper bound, and
+hops5–8 peak at the largest depth evaluated. <!-- LP21 --> The unshared reader B8 contains the shared one and was trained with one optimizer and no learning-rate pilot of
+its own, so its failure is not a statement about unshared reads in general, and a warm start has not been tested. <!-- LP9 --><!-- LP16 --> An exact store was tested only by
+evaluation on frozen checkpoints (RFX), and no trained least-squares store ran. <!-- RX1 -->
 
 UNS evaluates the 256 unseen-pool names of the same 1,024-name vocabulary, which carry fixed
 random features and were never used in a training episode, with descriptive 95% intervals and no
@@ -1463,6 +1645,8 @@ In the oracle-reader confirmation, a shared reader exceeds a single read of equa
 of one family while the registered four-unshared-reads reader fails its gate, bridge patching (0.6B only) gives no causal claim, and at rank32 the readers did not
 learn to use the oracle memory; the per-step readouts are descriptive decoding and not evidence for composition.
 <!-- LP4 --><!-- LP5 --><!-- LP7 --><!-- LP9 --><!-- LP11 --><!-- LP15 --><!-- PC1 -->
+At its trained depth the shared reader reaches hop 3; run deeper, the same checkpoint reaches hops4–8 at 9.9–16.6% (0.6B) and 9.8–20.9% (1.7B) with the depth chosen by the label, while
+losing hop 1, and each question position runs its own walk (Section 8.6; descriptive). <!-- LP21 -->
 
 The additional load study narrows this result further: depth benefits decrease
 under the registered load/layout changes, while multi-read capability remains
@@ -1580,6 +1764,7 @@ conditions take priority over shortened manuscript wording.
 | P1-L registered oracle readers | test episode indices[100000,102000), 2,000 episodes, eval seed4242 | oracle_random at r32/r128; seeds17/29/43, primary fixed-L4 B8 (not parameter-matched: +8.9% at r32, +31.0% at r128), same-rank gates, k2 and 97.5% intervals; Amendments B6 (equal-parameter rule) and B7 (per-rank memory-use check; no multi-read claim at r32). Rank32 fails the check, rank128 passes; at rank128 G1-L fails, G2-L passes and M1-L4@4 against B4@1 meets the B6 criterion. LP6 is training/validation evidence; the per-step readouts (LP5) are descriptive. | LP1–LP13 <!-- LP1 --><!-- LP2 --><!-- LP3 --><!-- LP4 --><!-- LP5 --><!-- LP6 --><!-- LP7 --><!-- LP8 --><!-- LP9 --><!-- LP10 --><!-- LP11 --><!-- LP12 --><!-- LP13 --> |
 | P1L-C | test episode indices[102000,104000), 2,000 episodes (256 hop-2 episodes per seed for patching) | The nine rank128 checkpoints (M1-L4, B8, B4 × seeds17/29/43), nothing retrained; read-position analysis (descriptive), bridge patching with a registered causal bar of 10 pp, replication of the P1-L contrasts; 95% intervals. | PC1–PC4 <!-- PC1 --><!-- PC2 --><!-- PC3 --><!-- PC4 --> |
 | P5L | test episode indices[104000,106000), 2,000 episodes, eval seed4242 | Qwen3-1.7B-Base (revision ea980cb0…), oracle_random at rank128, readers B3-L4/B4/M1-L4/B8/B5-L4 × seeds17/29/43, S=17,000, learning rates carried from the 0.6B rank128 lock without a pilot, 97.5% intervals; B7 check then the B6 contrast decide; G1-L/G2-L reported only; no B1/B2, P1L-C or readouts. | LP14–LP20 <!-- LP14 --><!-- LP15 --><!-- LP16 --><!-- LP17 --><!-- LP18 --><!-- LP19 --><!-- LP20 --> |
+| Revision tables (Section 8.6) | P1-L and P5L confirmation ranges (no new evaluation) | Seed means, per-seed effects and a seed-level t-interval from the committed per-seed `accuracy.csv`, `inference.csv` and `endpoints.json` of both ranges; M1-L4 scanned at L=1…8 on hops1–8; state bytes derived as 4·r² | LP21–LP23 <!-- LP21 --><!-- LP22 --><!-- LP23 --> |
 
 The symbolic studies use training seeds 17/29/43. <!-- S1 --><!-- B3 --> P1-S/P2-S and their follow-ups use 2,000 paired
 episode-bootstrap draws with seed2718 and confidence 97.5%, conditional on those
@@ -1677,6 +1862,8 @@ carry its numbers. Exact values and statuses stay in the [symbolic](evidence_sym
 | At rank 32 the LM path did not learn the O-rot and O-shared oracle codes within the pilot budget; P1L-S is not run | None: a pilot against a 30% hop-1 threshold; no B4 or B8 comparison, so no equal-parameter or multi-read claim | oracle_rot and oracle_shared (LLM oracle designs, not the symbolic oracle) | val: seed4242, 1,000 episodes; training seed17; no CIs | Hop-1 full-vocabulary EM ≥30% at L=4, final checkpoint, one arm per design; neither passes (0.1%, 11.8%) | WL1–WL2 <!-- WL1 --><!-- WL2 --> |
 | At rank128, with a clean oracle memory, the shared M1-L4 reader exceeds a single read of equal parameter count on hops2–3, and the gated B8 reader fails G1-L (G2-L passes); at rank32 the readers did not learn to use the oracle memory, and no multi-read claim is made | Per rank, B8@4 and M1-L4@4 against B4@1, B5-L4@4 and B3-L4@4 at the same rank. The equal-parameter claim only from M1-L4@4−B4@1 at rank128 (475,138 parameters each; Amendment B6); B8 is not parameter-matched (+8.9% at r32, +31.0% at r128); latency (M1-L4 about 1.42 and B8 about 1.57 times B4 at rank128) is a cost | oracle_random (the LLM oracle, with independent random pair-key and value tables, is not the symbolic oracle); no learned writer | test, episode indices [100000,102000), 2,000 episodes; seeds17/29/43; 97.5% CIs (k=2) | G1-L (B8@4−B4@1 ≥3 pp, CI>0, every seed, hop1 ≥−1 pp, typed CI>0): fails at r128 (+0.983 pp), outcome at r32 not interpreted; G2-L passes at r128; Amendment B6 criterion met by M1-L4@4−B4@1 (+21.550 pp); Amendment B7 memory-use check: fails at r32, passes at r128 | LP1–LP13; B9 <!-- LP1 --><!-- LP2 --><!-- LP3 --><!-- LP4 --><!-- LP5 --><!-- LP6 --><!-- LP7 --><!-- LP8 --><!-- LP9 --><!-- LP10 --><!-- LP11 --><!-- LP12 --><!-- LP13 --><!-- B9 --> |
 | The equal-parameter result holds at a second scale of the same family: at Qwen3-1.7B-Base, rank128, M1-L4@4 exceeds B4@1 on hops2–3 (the registered decision); B8 fails G1-L again (reported only); no scaling trend and no other size | B4@1 at the same rank; equal adapter parameters for M1-L4 and B4 (606,210); B8 is not parameter-matched (+24.3%); latency (M1-L4 and B8 about 1.29 times B4) is a cost and is not compared across scales | oracle_random (the LLM oracle, not the symbolic oracle); no learned writer | test, episode indices [104000,106000), 2,000 episodes; seeds17/29/43; 97.5% CIs | Memory-use check passes; B6 contrast ≥3 pp, CI>0, positive in every seed (+25.783 pp: met); G1-L (+1.033 pp, hop 1 −1.717 pp) and G2-L reported only; cross-scale values descriptive, no test | LP14–LP20 <!-- LP14 --><!-- LP15 --><!-- LP16 --><!-- LP17 --><!-- LP18 --><!-- LP19 --><!-- LP20 --> |
+| At the trained depth the shared reader reaches hop 3; run deeper, the same checkpoint reaches hops4–8 at 9.9–16.6% (0.6B) and 9.8–20.9% (1.7B) with the best depth chosen by the label, while it loses hop 1 | None: the M1-L4 checkpoint at its other depths; B4@1 and the memory-free B3-L4@4 on hops4–8 are shown beside it | oracle_random | P1-L [100000,102000) (0.6B) and P5L [104000,106000) (1.7B); seed means of three training seeds, no interval | None (descriptive; the oracle stop uses labels and is an upper bound; hops and depths beyond training) | LP21 <!-- LP21 --> |
+| Headline contrasts carry the three seed effects and a seed-level interval beside the registered episode interval; both are conditional on three fitted seeds and one oracle code table | As the contrasts they accompany (M1-L4@4−B4@1, G1-L, G2-L at rank128) | oracle_random | P1-L and P5L ranges | None (descriptive; the registered decisions use the episode intervals) | LP22 <!-- LP22 --> |
 | P1L-C: no causal bridge claim at rank128 for M1-L4 or B8; the read-position and replication results are descriptive | The same rank128 checkpoints (nothing retrained); no new parameter comparison | oracle_random | test, episode indices [102000,104000); 256 hop-2 episodes per seed for patching; 95% CIs | Causal bridge claim: pooled shift ≥10 pp, CI>0 and positive in every seed (M1-L4 +0.391 pp, B8 0.000 pp: not met); read position and replication gate nothing | PC1–PC4 <!-- PC1 --><!-- PC2 --><!-- PC3 --><!-- PC4 --> |
 | Conditional theory (Props.1–11) | Not applicable | Not applicable | Not applicable | None: conditional results that experiments are compatible with, or contradict only in their unconditional readings | Theory-to-measurement ledger in the symbolic ledger |
 
@@ -1699,7 +1886,7 @@ Reading rules.
   their intervals there are not independent confirmation; C999, C999002 and C999003 and the follow-up
   sets C999004–C999007 are fresh; the P1-L confirmation range [100000,102000), the P1L-C range [102000,104000) and the P5L range [104000,106000) are separate. NCR re-reads saved S4242 and C777 predictions and UNS Part A audits S4242;
   neither adds an evaluation. Every
-  interval conditions on the fixed training seeds 17/29/43 and is specific to its endpoint. Per-seed
+  interval conditions on the fixed training seeds 17/29/43 and is specific to its endpoint; Section 8.6 prints a seed-level interval beside the registered one for the headline contrasts (LP22). Per-seed
   effects appear next to the pooled ones where the ledgers record them (S3, S8, B1, IS1, HL1, JS1–JS4).
 - **Scope.** Every set draws on the seen pool of a closed 1,024-name vocabulary, except the descriptive
   UNS scope row on the 256-name unseen pool (UN1–UN3), so no claim covers names outside the vocabulary,
@@ -1713,7 +1900,7 @@ Reading rules.
   always cites claim row B7 of the symbolic ledger, whereas "B7" in running text names the
   larger-memory reader.
 - **Descriptive rows.** Rows marked descriptive in the ledgers (IV3, CV4, TS2, UN2–UN4, PM1, NC2, RX2, RX3,
-  WL2, LP5, LP8, LP12, LP13, LP18–LP20, PC2–PC4, DP2, DP3 and DP5–DP7) have no gate in their preregistrations. They support only the wording that the preregistration
+  WL2, LP5, LP8, LP12, LP13, LP18–LP23, PC2–PC4, DP2, DP3 and DP5–DP7) have no gate in their preregistrations. They support only the wording that the preregistration
   attaches (for UNS, "the depth gain is also present on unseen-pool entities"; for NCR, the qualification of D).
 - **Pending.** Nothing registered is pending. The registered results of IVD, CVH, TSM, UNS, NCR, RFX, WP-L6, the P1-L
   confirmation with the memory-use check, P1L-C with the per-step readouts, its second-scale repeat (P5L), and DPFP with DPFP-X (P1L-D not run) are reported.
@@ -1772,6 +1959,37 @@ re-checked and are omitted):
 - Li et al., [*Frozen Memory Is Not Enough: Rethinking External Memory as Extraction*](https://arxiv.org/abs/2608.17050).
 - Wind, [*Prometheus Mind: Retrofitting Memory to Frozen Language Models*](https://arxiv.org/abs/2601.15324).
 - Zhouguoding, [*DHM: A Differentiable Hippocampal Memory Layer for Continual Knowledge Injection into Frozen Language Models*](https://neurips.cc/virtual/2026/170472) (workshop paper).
+Added after the second external reviews (abstract pages opened by the reviewers, not re-opened here; venues omitted):
+
+- Zahn, Beton, and Chana, [*Attention Is Not Retention: The Orthogonality Constraint in Infinite-Context Architectures*](https://arxiv.org/abs/2601.15313).
+- Pandey and Singh, [*Variational Linear Attention: Stable Associative Memory for Long-Context Transformers*](https://arxiv.org/abs/2605.11196).
+- Peng et al., [*Gated KalmaNet: A Fading Memory Layer Through Test-Time Ridge Regression*](https://arxiv.org/abs/2511.21016).
+- Shaj et al., [*Kalman Linear Attention: Parallel Bayesian Filtering For Efficient Language Modelling and State Tracking*](https://arxiv.org/abs/2602.10743).
+- Bui, Huang, and Ying, [*Kalman Delta Networks: Uncertainty-aware Associative Memory*](https://arxiv.org/abs/2609.07816).
+- Tumma, Loo, and Rus, [*Preconditioned DeltaNet: Curvature-aware Sequence Modeling for Linear Recurrences*](https://arxiv.org/abs/2604.21100).
+- Liu et al., [*Longhorn: State Space Models are Amortized Online Learners*](https://arxiv.org/abs/2407.14207).
+- von Oswald et al., [*MesaNet: Sequence Modeling by Locally Optimal Test-Time Training*](https://arxiv.org/abs/2506.05233).
+- Park, Kim, and Park, [*Q-Delta: Beyond Key-Value Associative State Evolution*](https://arxiv.org/abs/2606.08804).
+- Behrouz et al., [*It's All Connected: A Journey Through Test-Time Memorization, Attentional Bias, Retention, and Online Optimization*](https://arxiv.org/abs/2504.13173).
+- Behrouz et al., [*Nested Learning: The Illusion of Deep Learning Architectures*](https://arxiv.org/abs/2512.24695).
+- Tandon et al., [*End-to-End Test-Time Training for Long Context*](https://arxiv.org/abs/2512.23675).
+- Zhang et al., [*Test-Time Training Done Right*](https://arxiv.org/abs/2505.23884).
+- Munkhdalai, Faruqui, and Gopal, [*Leave No Context Behind: Efficient Infinite Context Transformers with Infini-attention*](https://arxiv.org/abs/2404.07143).
+- Hatamizadeh, Choi, and Kautz, [*Gated DeltaNet-2: Decoupling Erase and Write in Linear Attention*](https://arxiv.org/abs/2605.22791).
+- Li et al., [*Gated Slot Attention-2: Two-Sided Associative Memory Correction in Linear Attention*](https://arxiv.org/abs/2610.02816).
+- Siems et al., [*DeltaProduct: Improving State-Tracking in Linear RNNs via Householder Products*](https://arxiv.org/abs/2502.10297).
+- Cabannes et al., [*Sparse Delta Memory: Scaling the State of Linear RNNs through Sparsity*](https://arxiv.org/abs/2607.07386).
+- He et al., [*CAMELoT: Towards Large Language Models with Training-Free Consolidated Associative Memory*](https://arxiv.org/abs/2402.13449).
+- Fu et al., [*DiscoLoop: Looping Discrete Embeddings and Continuous Hidden States for Multi-hop Reasoning*](https://arxiv.org/abs/2607.00341).
+- Fan, Svete, and Lee, [*Bridging the Gap Between Latent and Explicit Reasoning with Looped Transformers*](https://arxiv.org/abs/2606.31779).
+- Chen, [*Thinking Deeper, Not Longer: Memory-Efficient Test-Time Reasoning with Depth-Recurrent Transformers for Compositional Generalization*](https://arxiv.org/abs/2603.21676).
+- Kuo et al., [*Stabilizing Extrapolation in Looped Transformers via Learned Stochastic Stopping*](https://arxiv.org/abs/2606.29983).
+- Shen et al., [*CODI: Compressing Chain-of-Thought into Continuous Space via Self-Distillation*](https://arxiv.org/abs/2502.21074).
+- Wang et al., [*Recurrent Self-Improvement: Dynamic Cross-Loop On-Policy Distillation for Looped Language Models*](https://arxiv.org/abs/2610.10623).
+- Sanford, Hsu, and Telgarsky, [*Transformers, parallel computation, and logarithmic depth*](https://arxiv.org/abs/2402.09268).
+- Liang and Pan, [*Do Latent-CoT Models Think Step-by-Step? A Mechanistic Study on Sequential Reasoning Tasks*](https://arxiv.org/abs/2602.00449).
+- Aquino-Michaels, [*The Orthogonalized Read Is a Removable Training Scaffold for Recurrent Memory*](https://arxiv.org/abs/2607.19390).
+
 - Project source records: [dated literature audit](../reports/lit_check.md),
   [symbolic evidence ledger](evidence_symbolic.md), [LLM evidence ledger](evidence_llm.md), [binding notation](../notation.md),
   and [full theory](../theory.md). The unresolved RecLoRA comparison remains a TODO.

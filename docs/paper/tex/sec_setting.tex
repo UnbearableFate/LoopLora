@@ -1,0 +1,75 @@
+\section{Setting: one write schedule, repeated low-dimensional reads}
+\label{sec:setting}
+
+\paragraph{The reader.}
+A frozen linear projection maps an input $x$ to $Wx+b$.
+The adapter first forms $u=Ax$, where $A$ has output dimension $r$.
+A memory matrix $M$ has shape $r_{\mathrm{mem}}\times r_{\mathrm{mem}}$.
+With column vectors, the shared reader is
+\[
+z^{(0)}=u,\qquad
+z^{(s+1)}=u+\rho\,\phi(Rz^{(s)}+UMQz^{(s)}),\qquad
+y=Wx+b+\alpha Bz^{(L)}.
+\]
+The same $M$ is used in every inner step.
+$Q$ maps the current state to a memory query, $U$ maps the read back into the reader coordinates, and $B$ is the output bottleneck.
+The input is reinjected at every update, so a larger $L$ changes the reader computation and leaves the base projection unchanged.
+Setting $L=0$ gives the ordinary low-rank branch.
+
+\paragraph{The writer.}
+The writer uses a normalized key $k$ and a value $v$ derived from the designated writer inputs.
+For an eligible write the decay-first update is
+\[
+\bar M=\lambda M,\qquad M^{+}=\bar M+\beta\,(v-\bar Mk)k^{\mathsf T}.
+\]
+Reading precedes the current token's write.
+Padding neither reads nor writes, reset clears the state before use, and a skipped write does not trigger decay.
+In the memory question-answering protocol, support facts fill the state and questions read without writing.
+Separate questions and evaluation depths fork from the same completed context snapshot.
+Oracle conditions specify their codes and gate values directly; learned writers train them.
+Appendix~\ref{app:D} gives the full method and the propositions.
+
+\paragraph{Readers compared.}
+Table~\ref{tab:readers} lists the readers.
+M1 is the shared reader with ReLU, and M1-lin has identity activation.
+B8 uses step-specific matrices and is trained for a fixed unrolled depth.
+It is a separate architecture, not a reader that can be extended by reusing a next shared step, and it is not parameter-matched to the shared readers: its extra step matrices add 3($r^2+2r\,r_{\mathrm{mem}}$) parameters.
+That is 9,216 at $r=r_{\mathrm{mem}}=32$ and 147,456 at $r=r_{\mathrm{mem}}=128$, or $+8.9\%$ (rank 32) and $+31.0\%$ (rank 128) of the language-model adapter, and $+69.2\%$ of the symbolic unfactorized joint model.  % FR1
+
+\begin{table}[htbp]
+\centering\small
+\caption{The readers compared. Rank is the same for every reader in a comparison unless the row says otherwise.}
+\label{tab:readers}
+\begin{tabular}{@{}lp{9.5cm}@{}}
+\toprule
+Reader & Definition \\
+\midrule
+B3 & Memory path removed (memory-free control). \\
+B4 & Single read at the same rank ($L=1$). \\
+B5 & Initial memory query held fixed; the read is cached while internal iterations continue (fixed-query control). \\
+B6 & Larger rank in a single step (historical control). \\
+B7 & Larger memory dimension with the smaller reader dimension (historical control). \\
+B8 & Step-specific R/U/Q matrices, fixed unrolled depth; not parameter-matched. \\
+M1, M1-lin & Shared reader with ReLU, and with identity activation. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{Which comparisons hold the memory fixed.}
+Oracle writing uses specified entity codes.  % S2
+A T1-pretrained frozen writer is shared across the reader variants for its seed.  % S5 S9
+Under joint writing each reader variant trains its own writer, so a contrast with B5 or B3 compares learned systems and does not isolate query evolution under an identical learned writer.  % S2 S3 S5 S9
+Factorized conditions restrict keys and the initial query to head and relation information and values to the tail input, which removes the direct head-subtraction statistic of Proposition 10.  % S9
+
+\paragraph{Tasks.}
+The symbolic primary layout has 12 edges in chains of lengths 8 and 4, 64-dimensional entity representations and $\rho=0.25$; reader and memory dimensions are both 32.  % S1 S3 S9
+Readers train on hops 1 to 3 with mixed depths $\{1,2,4\}$ unless a fixed-depth comparison is named.  % S1 S9 B3
+In the language model the adapter sits on the layer-14 attention output projection of a frozen Qwen3 Base model (2048$\rightarrow$1024 for Qwen3-0.6B-Base and 2048$\rightarrow$2048 for Qwen3-1.7B-Base).  % LP1 LP15
+The registered oracle writer builds the memory directly from the fact list with frozen random unit key codes for (entity, relation) and fixed entity value codes, so every read after the first needs a learned value-to-key lookup over the 768 seen names; this is not the symbolic oracle.  % LP2 LP6
+These task conditions are part of every claim below.
+
+\paragraph{Metrics and intervals.}
+The depth effect $D$ is L4 minus L1 on hops 2 to 3, and walk specificity $W$ subtracts the corresponding effect on far hops 6 to 8, so that a generic all-hop shift is not described as selective improvement.  % S1 PM1
+Symbolic accuracies are candidate-restricted; language-model results use full-vocabulary exact match (EM), and the two are not exchanged.  % S9 S12
+Confirmation intervals are 97.5\% paired episode-bootstrap intervals that condition on the fixed training seeds.  % S1 S3 S9
+Percentage points are written pp.

@@ -1,0 +1,37 @@
+\section{What the mechanism evidence shows, and what it does not}
+\label{sec:mechanism}
+
+\paragraph{Per-step readouts are decoding only.}
+For M1-L4 and B8 the state after each read $s=1,\dots,4$ was decoded at the answer position on the confirmation episodes (three seeds pooled), through the trained output path and the frozen upper layers (logit lens), by projection onto name-gradient directions, and by a random direction.  % LP5
+At rank 128 the logit lens recovers earlier-hop entities from M1-L4's early states, and best at a step at or above the entity's hop rather than at $s=e$.
+On hop-1 questions the hop-1 entity is the top-1 name in 38.6\%, 64.3\%, 61.1\% and 47.9\% of episodes at $s=1,\dots,4$, and on hop-2 questions the hop-2 entity in 1.1\%, 11.0\%, 30.2\% and 35.4\%.  % LP5
+The rates at $s=4$ equal the deployed EM within 0.1 pp, and the hop-1 rates at $s=2$ and $s=3$ are close to the EM of the same checkpoint at depth 2 and 3 (64.15\% and 61.28\%), which the corrected record reads as the answer the reader would give if it stopped at that step.  % LP5
+B8's lens decodes names only at $s=4$ (the hop-1 entity in 19.1\% of hop-1 questions) and at most 0.23\% at $s=1,\dots,3$.  % LP5
+The name-gradient projections and the random direction are at or near chance for both readers (maximum cell 0.28\%), and at rank 32 every method is at chance, which adds nothing because the rank-32 readers did not use the memory.  % LP5
+These are decoding results.
+They are not gate criteria, not an ordered entity trace, not path following, and not evidence for the composition claim; bridge patching gives no causal claim.  % LP5 PC1
+Liang and Pan warn that decodable intermediate states do not establish a complete serial algorithm; the readouts respect that boundary.
+
+\paragraph{P1L-C: no causal bridge.}
+P1L-C evaluated the nine rank-128 checkpoints (M1-L4, B8 and B4, three seeds; nothing retrained) at Qwen3-0.6B-Base on a second range, \texttt{test} [102000, 104000), with 95\% intervals.
+Keeping the memory only at the final question position lowers the hops 1 to 3 EM of M1-L4@4 from 33.64\% to 3.74\% ($-29.906$ pp [$-30.756$, $-29.094$]), of B8@4 from 10.48\% to 0.99\% ($-9.489$ pp [$-10.078$, $-8.911$]) and of B4@1 from 10.39\% to 1.26\% ($-9.133$ pp [$-9.711$, $-8.589$]), in every seed and hop.
+The readers were trained with reads at every question position, so the drop is a distribution shift, not evidence of leakage, and it does not locate the bridge.  % PC2
+Bridge patching replaces the state after the first read at the final question position by the state from a world whose first edge points to another bridge.
+It shifts the answer by +0.391 pp [$-0.130$, 0.781] for M1-L4 and 0.000 pp [$-0.521$, 0.000] for B8, against a registered bar of 10 pp with an interval above 0 and a positive shift in every seed.  % PC1
+There is no causal bridge claim for either reader.
+The M1-L4 answer does follow the other chain when the memory itself carries the other bridge (37.24\% against 7.03\%), but not when the state after the first read alone is replaced at the final or at every question position (+0.911 pp [$-0.651$, 2.344]).  % PC3
+The P1-L contrasts replicate on this range (M1-L4@4$-$B4@1 +20.808 pp [19.725, 21.850], B8@4$-$B4@1 +0.925 pp [0.283, 1.533]) without changing any gate.  % PC4
+
+\paragraph{Mechanism wording.}
+The adapter acts at every question position.
+Each position performs its own vertical walk: its branch output enters that position's residual after the layer-14 attention and is not an input of any later position's adapter, and the frozen upper layers aggregate across positions.
+Which position's walk carries the answer is untested.
+``Composes reads'' in this paper means the iterated reads inside one position's loop.  % PC1 PC2 PC3
+
+\paragraph{What the theory does and does not give.}
+The propositions of Appendix~\ref{app:D} are conditional.
+With a fixed memory and depth the branch output lies in a fixed subspace, so a depth comparison measures different computation inside one bottleneck (Proposition 1).
+An existence construction shows that a linear reader with an aligned successor map, orthonormal codes and exact storage can follow a chain (Proposition 3); the trained M1-lin reader is not identified with it (Section~\ref{sec:oracle}).
+Non-orthogonal delta writes can alter earlier associations, and a one-read reader sees the context only through one observation (Propositions 4 and 5).
+A fixed-point error bound needs a valid contraction constant and says nothing about a label without decoder-margin assumptions (Proposition 7).
+These are conditional explanations and diagnostic requirements, not fitted causes of the symbolic or language-model outcomes.

@@ -1,0 +1,585 @@
+% Generated once by scripts/paper_md2tex.py from docs/paper/draft.md; edit this file from now on.
+\section{Language-model studies in full}\label{app:F}
+\noindent Record section 8: the access protocol, every writer screen, the registered oracle-reader confirmation at two backbones, DPFP and DPFP-X, the per-step readouts, and the summary subsection.
+\subsection*{8. A single language-model module: writer screens and oracle-reader confirmation}\addcontentsline{toc}{subsection}{8. A single language-model module: writer screens and oracle-reader confirmation}
+
+\subsubsection*{8.1 Access protocol and scoring}
+
+The LLM experiments use frozen \texttt{Qwen/\allowbreak{}Qwen3-0.6B-Base}, revision
+\texttt{da87bfb6\allowbreak{}08c14b7c\allowbreak{}f20ba1ce\allowbreak{}41287e8d\allowbreak{}e496c0cd}, with one adapter at the zero-based
+layer-14 attention \texttt{o\_proj} (2048\ensuremath{\rightarrow}1024); the second-scale confirmation (Section 8.5) uses \texttt{Qwen/\allowbreak{}Qwen3-1.7B-Base}, revision
+\texttt{ea980cb0\allowbreak{}a6c2ae4b\allowbreak{}936e8212\allowbreak{}3acc929f\allowbreak{}1cec04c1} (28 layers, \texttt{o\_proj} 2048\ensuremath{\rightarrow}2048). The backbone uses bf16 and  % LP1 LP15
+SDPA; the adapter and memory state use fp32. The primary protocol  % LP1
+is memory-only: support facts populate the adapter memory, then their backbone
+KV is discarded before questions are answered. Templated relations  % LP1
+use single-token names, and the primary metric is unrestricted full-vocabulary
+greedy exact match at the one-token answer position. Secondary  % LP1
+candidate-restricted accuracy and auxiliary name-probe accuracy measure different
+objects; neither substitutes for full-vocabulary EM.  % LP1 LL2
+
+The completed writer studies use T1 single-hop facts, seed17, and validation
+seed4242 with 1,000 episodes and one scored question per episode.  % LL1 LL4 LL6 LL9
+Diagnosis and repair use E16, four relations, and head sharing 0.3; ordinary
+writer fits use M1 at L1, with ranks identified below.  % LL4 LL6 LL9
+Their training batches contain four questions per episode, but that does not
+make the validation sample 4,000 independent answers.  % LL4 LL6
+These are sequential validation screens with reused questions and no confirmation
+intervals or new-training-seed replication.  % LL1 LL4 LL6 LL9
+The backbone is frozen during T1 fitting, while eligible adapter parameters,
+including recurrence matrices, can train; the term writer stage does not imply
+a frozen reader recurrence.  % LL4 LL5
+
+\subsubsection*{8.2 Information and output controls, then writer repair}
+
+Pilot-1 found no admissible writer capacity under its registered 1,500-step
+budget: the best full-vocabulary validation EM was 0.3\%, and the selected
+fact-final policy at learning rate 0.0003 failed the capacity criteria at
+E8/\allowbreak{}12/\allowbreak{}16/\allowbreak{}24. This is a budgeted negative result, rather than an  % LL1
+estimate of the architecture’s maximum capacity. Separate rank32  % LL1
+frozen-feature probes recover tail identity at the tail-token input with 97.619\%
+accuracy, and question-start identity/\allowbreak{}relation at the final question position
+with 99.4\%/\allowbreak{}100.0\%. These are independently fitted classifiers over  % LL2
+seen name identities, not proof that one shared A jointly preserves all required
+information.  % LL2
+
+A supplied-answer-code control trains only a 1024\ensuremath{\times}32 code table and B and reaches
+98.7\% full-vocabulary EM after 1,500 steps at learning rate 0.003. It  % LL3
+bypasses the reader and its rho scale, establishing that this output path can
+express the answer when its identity is supplied; it does not establish learned
+retrieval or accessible writer codes. Extending unassisted writer  % LL3
+training to 6,400 steps and moving A’s input from \texttt{o\_proj} to the pre-layer-14
+residual did not rescue EM. At the final checkpoints, source-fact  % LL4
+key/\allowbreak{}query cosine top1 is 6.0-7.5\%, compared with the 1/\allowbreak{}16=6.25\% ranking baseline,
+with negative mean true-key margins. This supports a failed-matching  % LL4
+diagnosis for those fits, without identifying a unique cause or showing that
+additional training can never help.  % LL4
+
+The next screen adds input standardization (W1), normalized address supervision
+(W2), clean-value auxiliary CE (W3), a pre-tail-key/\allowbreak{}tail-token-value architecture
+(W4), and their W1+W2+W3 combination W5. W5 does not include W4;  % LL5
+W4 also has more deployed parameters than the other arms. Auxiliary  % LL5
+address and value labels exceed answer-only supervision, and the value head is
+discarded for inference. At 4,800 steps, W2 has 78.9\% key top1 but  % LL5
+only 0.5\% EM; W5 reaches 7.8\% EM. Thus improved normalized matching  % LL5
+need not imply useful deployed retrieval.  % LL5
+
+Fresh 32,900-step reruns give W5 14.4\% EM, despite 82.4\% key top1 and 39.3\%
+candidate accuracy. The diagnostic OA arm, the value/\allowbreak{}output ceiling, reaches  % LL6
+70.3\% EM and 95.7\% candidate accuracy. OA substitutes the true learned fact  % LL6
+value at every valid question token, bypassing the entire memory read, including
+addressing, attenuation and interference; it bounds what the learned value encoding and
+output path can achieve, and is not an addressing control.  % LL6
+It is also different from the supplied answer-state control and from P1-L’s
+fact-written random oracle. Neither W5 nor any  % LL3 LL6 LP2
+other eligible learned writer meets the selection threshold at this stage.
+% LL6
+
+\subsubsection*{8.3 Actual-read distortion and the final negative screen}
+
+WP-L4 audits the preceding W5 checkpoint without further training. Its mean query,
+true-value, and deployed-read norms are 19.012, 30.750, and 159.350; mean normalized
+squared read error is 26.635. The training-only value head decodes  % LL7
+clean values at 85.4\% but actual reads at 10.5\%. These measurements  % LL7
+make Proposition 11’s distinction concrete: normalized key rankings omit raw
+query scale, later-write erasure, and value-mixture geometry. They do not identify
+which component uniquely causes the final answer failures. Zeroing  % LL7
+or shuffling the deployed memory reduces W5 EM from 14.4\% to 0.1\%/\allowbreak{}0.2\% while
+question inputs stay fixed; this establishes sensitivity to the tested memory
+interventions, not successful path following.  % LL10
+
+The final screen tests R, which supervises the raw read with normalized squared
+error and a stopped target/\allowbreak{}denominator; R\ensuremath{\rho} raises rho to 0.5, and RK adds a
+distinct-address key-cosine penalty. OA\ensuremath{\rho} is a diagnostic gain variant  % LL8
+of OA, the value/\allowbreak{}output ceiling. The final checkpoints are:  % LL8
+
+
+{\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{longtable}{W{250}{8}W{250}{8}W{250}{8}W{250}{8}}
+\toprule
+Rank & Arm & Training steps & Full-vocabulary validation EM, \% \\ \addlinespace[3pt]
+\midrule \endhead
+32 & R & 23,590 & 12.0 \\ \addlinespace[3pt]  % LL8 LL8
+32 & R\ensuremath{\rho} & 24,220 & 12.2 \\ \addlinespace[3pt]  % LL8 LL8
+32 & RK & 21,980 & 12.0 \\ \addlinespace[3pt]  % LL8 LL8
+32 & OA\ensuremath{\rho}, value/\allowbreak{}output ceiling (diagnostic) & 27,040 & 74.7 \\ \addlinespace[3pt]  % LL8 LL8
+128 & W5 & 24,635 & 29.9 \\ \addlinespace[3pt]  % LL9 LL9
+128 & R & 24,645 & 33.5 \\ \addlinespace[3pt]  % LL9 LL9
+128 & OA, value/\allowbreak{}output ceiling (diagnostic) & 31,175 & 84.0 \\ \addlinespace[3pt]  % LL9 LL9
+\bottomrule
+\end{longtable}
+}
+
+
+For the three read-supervised r32 arms, normalized read error remains
+0.663-0.669 alongside 12.0-12.2\% EM.  % LL8
+All are single-seed validation points without CIs; per-arm budgets were fixed by
+timing, so final comparisons are not matched-step causal effects of rank or gain.
+ The predeclared matched-step OA\ensuremath{\rho} diagnostic at 6,580 steps  % LL8 LL9
+has higher observed EM than the earlier OA: 43.2\% versus 33.7\%. This does not  % LL8
+make either diagnostic eligible as a learned writer. R at rank128  % LL8
+has clean/\allowbreak{}read head accuracy 93.3\%/\allowbreak{}19.7\%, consistent with remaining read distortion,
+while a decoder trained on clean values does not measure all information present
+in a read.  % LL9
+
+The best eligible final arm is R/\allowbreak{}r128 at 33.5\%, below both the 80\% writer gate and
+the 50\% E8-retraining trigger; no E8 retraining occurred. The later DPFP screen did retrain once at E=8 (Section 8.5). The completed  % LL9 DP1
+selection therefore yields no learned P1-L condition and no P3; the separately
+registered oracle-reader study is reported in Sections 8.4 and 8.5.  % LL9 LP3 LP4
+The negative result concerns these single-module tasks, supervision choices,
+learning rates, and unequal fixed budgets. It establishes neither impossibility
+of learned writing in LLMs nor a universal output-path bottleneck.  % LL3 LL9
+
+RFX then separates storage, query and decoder at three frozen checkpoints (R at r128, R at r32
+and the W5 rerun at r32; one seed, validation episodes 200,000-203,999, 4,000 queries). It
+replaces only the read at the final question position, keeps the rest of the LM path, and trains
+nothing. A replacement rescues if it halves the normalized read error and gains at least 10 pp
+EM over the better of the deployed read and its gain-fitted version (33.8\%, 11.6\% and 14.9\%).
+ Only an exact ridge store read with the true key rescues, at both R checkpoints (EM  % RX1
+84.2\% and 49.05\%, against clean controls of 84.4\% and 48.8\%). The exact store with the raw or
+unit query reaches 38.75-38.80\% at r128 and 13.48-13.65\% at r32, and the deployed store with
+the true key 39.9\% and 13.95\%, so no single factor rescues. The  % RX1 RX2
+registered verdict is store+query at R/\allowbreak{}r128 and R/\allowbreak{}r32 and none at W5/\allowbreak{}r32, where the clean
+control itself reaches only 17.6\%. A refit linear decoder on the deployed reads  % RX1
+stays below the entity-restricted baseline (18.4\%, 6.8\% and 8.1\%). Read  % RX2
+descriptively with the preregistered guide, the deployed store with the true key sits near each
+checkpoint’s own EM rather than near the OA level, which fits write interference in the delta
+store more than a query bottleneck; this is one seed and not an identification of the cause.
+ The verdicts trigger no LSQ arm, so the separately registered DPFP screen was the only  % RX3
+one left at that point; its result, and that of the later DPFP-X, is in Section 8.5. The true-key cells use the label and  % RX1 DP1
+are not deployable, and a substituted read is a distribution shift for the layers after it.
+% RX1
+
+\subsubsection*{8.4 Registered P1-L oracle-reader comparison}
+
+The symbolic reader selection motivates primary B8 trained at fixed L4, with
+shared M1-L4 as a secondary comparator. P1-L registers two  % B9 LP3
+\texttt{oracle\_random} conditions, r=r\_mem=32 and r=r\_mem=128, with seeds17/\allowbreak{}29/\allowbreak{}43.  % LP3
+The writer constructs memory directly from the fact list using frozen random
+unit key codes for (entity,relation) and fixed entity value codes, oracle seed17,
+and lambda=beta=1. Support text is not rendered or forwarded through  % LP2
+the LM in this oracle protocol; question encoding and the reader/\allowbreak{}output path
+still train. Random codes do not imply orthogonality, lossless memory,  % LP2
+or the exact Proposition 3 construction.  % LP2
+
+This oracle is not the symbolic oracle of Section 5.1. The symbolic oracle takes the
+question code, the keys, the values and the decoder from one code table, so a read returns
+exactly the code that addresses the next fact and every transition is identity-like. The
+language-model oracle keys facts by independent random (entity,relation) pair codes and
+stores entity value codes from a different table, so every read after the first needs the
+reader to learn a map from a value code to an unrelated key, and the question encoding and
+output path must be learned as well. Symbolic oracle results are therefore not carried over
+to this condition.  % LP2 LP6
+
+The task is T2 E12, chains(8,4), four relations, head sharing 0.3, trained on
+hops1-3 and evaluated on hops1-8. Per rank, B8@4 is compared  % LP1 LP3
+with B4@1, fixed-query B5-L4@4, and memory-free B3-L4@4; M1-L4 supplies the shared
+variant. B8’s primary comparison holds rank fixed but is not  % LP3
+parameter-matched: its step matrices add 9,216 adapter parameters at rank32 (103,426 to
+112,642, +8.9\%) and 147,456 at rank128 (475,138 to 622,594, +31.0\%), and only the matched
+shared M1-L4/\allowbreak{}B4 architecture has equal parameter counts. Adapter parameters and inference time per question  % FR1 LP3
+are descriptive costs. B0-B2 provide descriptive baselines in both  % LP3
+access protocols; B1/\allowbreak{}B2 train with retained context and are not repeated at r128.
+% LP3
+
+The registered target was 17,000 training steps at r32, with r128 using that target if
+the timing rule permitted. Pilot-2 selected learning rate 0.001 or 0.003 at  % LP3
+\ensuremath{\lfloor}S/\allowbreak{}3\ensuremath{\rfloor} steps, using training seed17 and validation generator seed4242, before main
+training, and the committed run locks record S=17,000 at both ranks: at rank32 lr 0.003
+for M1-L4 and 0.001 for the other readers, at rank128 lr 0.001 for B3-L4 and 0.003 for the
+others. Over both learning rates, the selecting validation EM  % LP3 LP6
+(pooled hops1-3, 3,000 answers) of the memory readers is 0.033-0.133\% at rank32 (1-4
+answers), so those choices carry almost no information, and 3.1-8.1\% at rank128.
+ Confirmation uses split \texttt{test}, episode  % LP6
+indices [100000,102000), after all required training; this range is not an
+evaluation RNG seed. With two gated rank conditions, k=2, each gate  % LP3
+uses 97.5\% pooled paired episode-bootstrap intervals from 2,000 draws and reports
+seed-specific effects.  % LP3
+
+On hops2-3, G1-L requires B8@4\ensuremath{-}B4@1\ensuremath{\geq}3 pp as a point estimate, CI lower>0, and
+positive effects in every seed. Its hop1 point contrast must be  % LP3
+at least \ensuremath{-}1 pp, and the same checkpoints must have a positive interval on a typed
+replication with three same-head distractors. G2-L requires positive  % LP3
+intervals against both fixed-query B5-L4 and memory-free B3-L4.  % LP3
+M1-L4 comparisons and its same-checkpoint L1-8 scan are secondary; B8 has no
+shared-weight depth scan. No primary gate compares a lower-rank  % LP3
+multi-read system with a larger-rank single read.  % LP3
+
+Two amendments, registered before any confirmation score was read, bound how the
+confirmation may be interpreted. An equal-parameter claim that more reads beat one read is
+made only from the secondary contrast M1-L4@4\ensuremath{-}B4@1 (hops2-3, per rank), and only if it meets
+the G1-L criterion (point \ensuremath{\geq}3 pp, 97.5\% CI>0, positive in every seed); otherwise B8 is
+reported with its parameter difference and no equal-parameter claim is made for the
+language model (Amendment B6). At each rank a memory-use check precedes  % LP3
+interpretation: hop1 full-vocabulary EM of B4@1, B8@4 and M1-L4@4 must each exceed
+B3-L4@4 with a 97.5\% CI above 0, and otherwise that rank’s G1-L, G2-L and equal-parameter
+outcomes are reported but not interpreted as evidence for or against multiple reads. No
+claim about multiple reads in the language model is made at rank32 whatever the gates show.
+At rank128 the value-to-key transition is a learned lookup over the 768 seen names, so a
+pass would show that the reader learns it and composes reads inside the language model; it
+would not establish equivalence with the symbolic oracle, and no claim about unseen names is
+made (Amendment B7).  % LP3 LP6
+
+Before any confirmation score was read, the training logs and Pilot-2 validation of the main
+runs were inspected. This is training and validation evidence, not a result of the registered
+test; the logs are local files, and the committed record is Amendment B7. At rank32, after
+17,000 steps, the memory readers (B4, B5-L4, B8, M1-L4) had batch accuracies of
+0.391-1.641\% against 0.312-0.391\% for the memory-free B3-L4, while the context-retained
+B1/\allowbreak{}B2 reached 99.375-100.000\%; Pilot-2 validation at rank32 gave full-vocabulary EM of at most
+0.3\% and candidate accuracy of 7.2-9.1\% against a 7.1\% chance level. The rank32 readers were
+therefore at or near the memory-free level. At rank128 the batch accuracies were
+10.000-10.781\% (B4), 10.312-13.516\% (B5-L4), 11.250-12.812\% (B8) and 28.125-41.250\% (M1-L4),
+against 0.312-0.625\% for B3-L4. An in-sample capacity check of the oracle’s independent key
+and value tables puts hop2 addressing at 48.3\% at rank32 and 99.85\% at rank128 (rotation
+keys: 99.2\% and 100\%); it is an upper bound and does not explain the rank32 failure at hop1.
+The registered prediction was that rank32 fails the memory-use check and rank128 passes it;
+it was made before any confirmation score, and Section 8.5 reports the check.  % LP6 LP7
+
+WP-L6 asked whether a rank-32 M1-L4 reader can learn the oracle memory when the oracle’s keys are
+tied to its values. O-rot writes the key normalize(\ensuremath{\Pi}\_\ensuremath{\rho} g\_h) with one fixed orthogonal matrix per
+relation and the value g\_t; O-shared trains a code table jointly with the reader. Both use the
+P1-L recipe (lr 0.003, seed17, 5,666 steps, validation seed4242), and an arm passes if its
+final-checkpoint hop-1 full-vocabulary EM at L=4 is at least 30\%. Neither passes:  % WL1
+O-rot reaches 0.1\% and O-shared 11.8\%, the registered decision is stop, and the study P1L-S that
+would have used the selected code does not run. At rank 32 the LM path did not learn  % WL1
+these oracle codes within this budget (one seed, one learning rate, 5,666 steps); this is not a
+proof of impossibility, O-shared above O-rot is descriptive and not a selection, and it adds no
+statement about multiple reads at rank 32 (Amendment B7).  % WL1 LP6
+
+\subsubsection*{8.5 Confirmation results and pending items}
+
+\textbf{Memory-use check.} The confirmation (Qwen3-0.6B-Base) used split \texttt{test}, episode indices [100000,102000), 2,000 episodes, training seeds
+17/\allowbreak{}29/\allowbreak{}43 and 97.5\% paired episode-bootstrap intervals (2,000 draws) in the memory-only protocol, with one oracle memory
+(oracle seed17) shared by every reader; the intervals condition on the three seeds. Only the \texttt{oracle\_random} condition ran,
+because the writer screens selected no learned writer. Hop1 full-vocabulary EM, and each reader minus the memory-free
+B3-L4@4 in percentage points:
+
+
+{\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{longtable}{W{113}{12}W{213}{12}W{216}{12}W{223}{12}W{113}{12}W{122}{12}}
+\toprule
+Rank & B4@1 & B8@4 & M1-L4@4 & B3-L4@4 & Memory-use check \\ \addlinespace[3pt]
+\midrule \endhead
+32 & 0.067\% (+0.033 [0.000, 0.100]) & 0.067\% (+0.033 [\ensuremath{-}0.050, 0.133]) & 0.150\% (+0.117 [0.017, 0.233]) & 0.033\% & fails \\ \addlinespace[3pt]
+128 & 19.633\% (+19.633 [18.417, 20.933]) & 19.033\% (+19.033 [17.867, 20.367]) & 47.850\% (+47.850 [46.016, 49.667]) & 0.000\% & passes, every seed \\ \addlinespace[3pt]
+\bottomrule
+\end{longtable}
+}
+
+
+ The check fails at rank32, so the readers did not learn to use the oracle memory, and by Amendment B7 no claim about  % LP7
+multiple reads in the language model is made at rank32: its gate outcomes (G1-L and G2-L fail; B8@4\ensuremath{-}B4@1 on hops2-3
+\ensuremath{-}0.008 pp [\ensuremath{-}0.108, 0.100]; M1-L4@4\ensuremath{-}B4@1 +0.058 pp [\ensuremath{-}0.050, 0.167]) are reported and not interpreted.  % LP7 LP8
+The check passes at rank128 in every seed. It is a floor at hop1 and does not show that composition uses the memory.  % LP7
+
+\textbf{Rank128 (Qwen3-0.6B-Base).} On hops2-3, the gated reader B8 (four unshared reads) exceeds B4@1 by +0.983 pp [0.267, 1.717] (6.342\% against
+5.358\%; seeds +0.925, +0.050, +1.975), below the registered 3 pp bar, so G1-L fails although its hop1 (\ensuremath{-}0.600 pp
+[\ensuremath{-}1.984, 0.767]) and typed-replication (+1.550 pp [0.767, 2.367]) conditions hold; this is a negative language-model result for
+B8 in this condition, which adds 147,456 parameters (+31.0\%) over B4. G2-L passes (+0.833 pp [0.058, 1.550]  % LP9
+over the fixed-query B5-L4@4 and +6.342 pp [5.758, 6.933] over the memory-free B3-L4@4), but a G2-L pass without G1-L is not a
+multi-read claim for B8, and the memory-free reader is at 0.000\%. The shared reader does compose: M1-L4@4  % LP10
+exceeds B4@1 on hops2-3 by +21.550 pp [20.383, 22.758] (26.908\% against 5.358\%; seeds +24.450, +15.100, +25.100),
+meeting the Amendment-B6 criterion, with equal adapter parameter counts (475,138 each); it also exceeds B5-L4@4 by
++21.400 pp [20.217, 22.550] and B3-L4@4 by +26.908 pp [25.758, 27.975]. This is the only equal-parameter claim, and  % LP11
+it is bounded by Amendment B7: the reader learns the value-to-key lookup over the 768 seen names and composes reads inside the
+language model for this oracle memory; it is not equivalent to the symbolic oracle condition, and nothing is claimed for unseen
+names or entity codes, a learned writer or end-to-end use. Descriptively, M1-L4@4’s depth effect (L4  % LP11 LP6
+against L1) is +25.925 pp [24.816, 27.050] on hops2-3 and +3.678 pp [3.206, 4.183] on hops6-8, its accuracy on hops1-4 is
+47.85\%, 35.35\%, 18.47\% and 7.25\% (at most 5\% on hops5-8) at the trained depth L=4 (Section 8.6 gives every depth), and B8@4 is 20.567 pp [19.358, 21.783] below it on hops2-3
+(a secondary, ungated contrast). The difference between the two readers is one of these two architectures  % LP12
+on one fixed oracle memory in 17,000 steps, not a statement about unshared reads in general. The  % LP9 LP12
+added reads cost time: per question, M1-L4 takes about 1.42 and B8 about 1.57 times B4’s 0.392 ms at rank128, and no efficiency
+claim is made.  % LP13
+
+\textbf{Second scale (P5L).} P5L repeated the rank128 oracle condition on Qwen3-1.7B-Base (same family; layer-14 \texttt{o\_proj}, 2048\ensuremath{\rightarrow}2048;
+17,000 steps; the rank128 learning rates carried over without a pilot) on a range no earlier study used, \texttt{test} [104000,106000), with
+2,000 episodes, seeds 17/\allowbreak{}29/\allowbreak{}43, 97.5\% intervals, the same oracle memory and the same 768 seen names. The memory-use check  % LP14
+passes in every seed: hop1 EM exceeds the memory-free B3-L4@4 (0.033\%) by +30.617 pp [29.167, 32.234] for B4@1, +28.900 pp [27.517, 30.433]
+for B8@4 and +58.667 pp [56.983, 60.400] for M1-L4@4. The Amendment-B6 contrast M1-L4@4\ensuremath{-}B4@1 on hops2-3 is +25.783 pp  % LP14
+[24.533, 27.026] (31.958\% against 6.175\%; seeds +24.925, +26.500, +25.925), with 606,210 adapter parameters in each, so the registered
+decision is that the equal-parameter result holds at a second scale of the same family. It has the limits of the  % LP15
+0.6B result (oracle memory, 768 seen names, trained hops, Amendment B7 rule 3), and in addition one oracle seed, three training seeds and
+learning rates carried without a pilot; it covers the two sizes tested and no other. Reported only: B8@4\ensuremath{-}B4@1 is +1.033 pp  % LP15
+[0.292, 1.800] (seeds +0.200, +1.725, +1.175), below the 3 pp bar, so G1-L fails again, and its hop1 condition also fails at this scale
+(\ensuremath{-}1.717 pp [\ensuremath{-}3.317, \ensuremath{-}0.016]) where it held at 0.6B; G2-L passes (+1.675 pp [0.908, 2.383] over B5-L4@4 and +7.167 pp [6.583, 7.758] over
+B3-L4@4). B8 adds 147,456 parameters (+24.3\%) and is not parameter-matched. Descriptively,  % LP16 LP17 LP19
+M1-L4@4 reaches 58.70\%, 41.45\%, 22.47\% and 6.23\% on hops1-4 (at most 3.92\% on hops5-8) at L=4, with a depth effect of +31.458 pp [30.267, 32.633]
+on hops2-3 and a walk specificity of +28.181 pp [26.844, 29.425]. These values sit next to the 0.6B ones (+21.550 pp for the  % LP18
+B6 contrast; 47.85\%, 35.35\%, 18.47\% and 7.25\% on hops1-4) without any test across scales, and two sizes support no scaling trend.
+ Latency is a cost and is not compared across scales: at 1.7B M1-L4 and B8 take about 1.29 times B4’s 0.486 ms per question.  % LP20
+ P1L-C and the per-step readouts were not run at 1.7B.  % LP19
+
+\textbf{P1L-C.} P1L-C ran at Qwen3-0.6B-Base after the rank128 check passed, evaluating the nine rank128 checkpoints (M1-L4, B8 and B4, three seeds;
+nothing retrained) on a second range, \texttt{test} [102000,104000), with 95\% intervals. Keeping the memory only at the final question
+position lowers the hops1-3 EM of M1-L4@4 from 33.64\% to 3.74\% (\ensuremath{-}29.906 pp [\ensuremath{-}30.756, \ensuremath{-}29.094]), of B8@4 from 10.48\% to 0.99\%
+(\ensuremath{-}9.489 pp [\ensuremath{-}10.078, \ensuremath{-}8.911]) and of B4@1 from 10.39\% to 1.26\% (\ensuremath{-}9.133 pp [\ensuremath{-}9.711, \ensuremath{-}8.589]), in every seed and hop,
+including hop1 of the single read. This is descriptive: the readers were trained with reads at every question position, so the
+drop is a distribution shift and not evidence of leakage, and it does not locate the bridge. Each question position runs its own walk, so the final position is one of several (Section 8.6). Bridge patching, which  % PC2
+replaces the state z\_1 after the first read at the final question position by the state from a world whose first edge points to
+another bridge, shifts the answer by +0.391 pp [\ensuremath{-}0.130, 0.781] for M1-L4 and 0.000 pp [\ensuremath{-}0.521, 0.000] for B8, against a
+registered bar of 10 pp with an interval above 0 and a positive shift in every seed. There is no causal bridge  % PC1
+claim for either reader. The M1-L4 answer does follow the other chain when the memory itself carries the other bridge (37.24\%
+against 7.03\% in the original world), but not when z\_1 alone is replaced at the final or at every question position (+0.911 pp
+[\ensuremath{-}0.651, 2.344]). The P1-L contrasts replicate on this range (M1-L4@4\ensuremath{-}B4@1 +20.808 pp [19.725, 21.850], B8@4\ensuremath{-}B4@1  % PC3
++0.925 pp [0.283, 1.533]) without changing any gate.  % PC4
+
+\textbf{DPFP and P1L-D.} A registered writer screen replaced the keys and queries of the WP-L4 learned writer by DPFP features (three
+arms: D32-3 at rank32, D128-1 and D128-3 at rank128; one seed, T1, E=16, 1,000 validation episodes per arm; the WP-L4 references R at
+rank32 and rank128, 12.0\% and 33.5\%, were not rerun). No arm reaches the 80\% writer gate: D32-3 39.0\%, D128-1 58.0\% and  % DP1
+D128-3 60.8\%. The best arm is above the 50\% trigger, so D128-3 was retrained once at E=8 under the registered rule and  % DP1
+reached 73.0\%, again below 0.80. The registered decision is stop: no writer is selected, the paper reports a negative result,  % DP1
+and no further writer screen follows; P1L-D, which would have run the P1-L learned condition for a selected writer, was not registered and
+was not run (the LSQ screen ran no arm, Section 8.3). No learned writer reaches the WP-L4 gate in this  % DP1 PD1 RX1
+project. DPFP does raise the EM (by 27.0 pp at rank32 and by 24.5 and 27.3 pp at rank128 over the references), lowers the normalized read
+error (0.39, 0.43 and 0.36 against 0.67 and 0.63) and raises the read-value head accuracy (30.2\%, 46.0\% and 51.0\% against 8.8\% and 19.7\%),
+but the clean/\allowbreak{}read gap narrows without closing, and the key overlap of the learned projections in the original space is not lower than R’s.
+ Because DPFP changes the feature geometry and the query normalization together (Amendment A1), neither these gains nor the  % DP2
+12.2 pp gain of the E=8 retrain (which also halves the memory load) is attributed to decorrelation alone. A zero-  % DP1 DP2
+or shuffled-memory audit leaves at most 0.2\% EM for every DPFP arm, which shows that the answers depend on the episode’s own memory and not
+that the read is accurate. The result is one seed, one learning rate and fixed budgets, and it is not a proof that learned  % DP3
+writing in a language model is impossible. A follow-up registered after this stop, DPFP-X, trained the best DPFP design at  % DP1
+rank256 on Qwen3-0.6B-Base (X256) and at rank128 on Qwen3-1.7B-Base (X17), everything else as D128-3. Neither reaches 0.80 (X256 66.2\%,
+X17 59.3\%), so the learned-writer line stays stopped and both arms are descriptive rows next to DPFP. X17 differs from D128-3  % DP4
+(60.8\%) by \ensuremath{-}1.5 pp, which the registered rule calls not distinguished, and it is a diagnostic and not a scaling test; both curves were still
+rising at the final checkpoint (+3.5 and +2.3 pp over the last interval) but the study has no longer run and nothing is extrapolated, and
+X256’s higher EM is not accompanied by a lower read error or a better read-value head than D128-3’s. The  % DP5 DP6
+zero- and shuffled-memory audit again leaves at most 0.4\% EM. P1L-S does not run (Section 8.4).  % DP7 WL1
+
+\textbf{Per-step readouts (descriptive).} For M1-L4 and B8 the state z\_s after each read s=1\ldots{}4 was decoded at the answer
+position on the confirmation episodes (three seeds pooled) through the trained output path and the frozen upper layers (logit
+lens), by projection onto name-gradient directions (a contrastive and a raw-logit variant) and by a random direction; chance for
+the top-1 rate of an entity is about 0.1\%. At rank128 the logit lens recovers earlier-hop entities from M1-L4’s  % LP5
+early states, and best at a step s at or above the entity’s hop e rather than at s=e: on hop-1 questions the hop-1 entity is the
+top-1 name in 38.6\%, 64.3\%, 61.1\% and 47.9\% of episodes at s=1\ldots{}4, and on hop-2 questions the hop-2 entity in 1.1\%, 11.0\%, 30.2\% and
+35.4\%. The rates at s=4 for the question’s own hop equal the deployed EM within 0.1 pp, and the hop-1 rates at s=2 and s=3 are close
+to the EM of the same checkpoint at depth 2 and 3 (64.15\% and 61.28\%); the corrected record reads this as the answer the reader
+would give if it stopped at step s. B8’s lens decodes names only at s=4 (the hop-1 entity in 19.1\% of hop-1  % LP5
+questions) and at most 0.23\% at s=1\ldots{}3. The name-gradient projections and the random direction are at or near chance for both
+readers (maximum cell 0.28\%), and at rank32 every method is at chance (maximum cell 0.27\%), which adds nothing because the rank32
+readers did not use the memory. These are decoding results: not gate criteria, not an ordered entity trace, not path  % LP5
+following, and not evidence for the composition claim above (LP4); bridge patching gives no causal claim.  % LP5 PC1
+A gradient g\_j at the actual injection
+residual induces local reader sensitivity alpha B\textasciicircum{}T g\_j; a gradient at another
+site requires the intervening transport Jacobian. This J-lens-inspired proxy differs from published
+averaged residual-transport lenses and from JS’s recurrent transition Jacobian, and its chance result limits what these directions
+decode without showing that names are absent from z\_s.
+Per-step upper-layer forwards incur diagnostic cost separate from
+the deployed reader loop. Ordered readability would not alone  % LP5
+establish causal path following. The primary-source audit
+states those limits; the separate output-alignment intervention is not pursued
+after the writer-screen decision.  % LP5
+
+\textbf{TODO ,  plan \S{}9.3 item6:} the symbolic/\allowbreak{}LLM correspondence figure is not produced; the
+P1-L confirmation is reported above in tables. The completed writer-screen negatives supply no multihop
+oracle-reader outcome or general language-reasoning claim.  % LL9 LP4
+
+\subsubsection*{8.6 The oracle condition at a glance: same-rank table, depth by hop, and seed-level statistics}
+
+This subsection restates the language-model results of Sections 8.4 and 8.5 in one place. Every value is a seed mean, or an
+effect over the three training seeds 17/\allowbreak{}29/\allowbreak{}43, at rank128 with one oracle memory (oracle seed17) in the memory-only protocol. The
+tables were produced after the registered confirmation by a standard-library script
+(paper\_tables\_g1.py) from the committed accuracy, timing and endpoint files; the depth matrix and the
+seed-level statistics are descriptive, add no gate and change no registered decision.  % LP21 LP22 LP23
+
+\textbf{Same-rank table.} Exact-match accuracy by hop (\%), primary setting; B4@1 is the single read, M1-L4@4 and B8@4 read four times, all at
+rank128 and at the depth they were trained for.  % LP23
+
+
+{\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{longtable}{W{100}{20}W{100}{20}W{100}{20}W{100}{20}W{100}{20}W{100}{20}W{100}{20}W{100}{20}W{100}{20}W{100}{20}}
+\toprule
+Backbone & Reader & hop1 & hop2 & hop3 & hop4 & hop5 & hop6 & hop7 & hop8 \\ \addlinespace[3pt]
+\midrule \endhead
+0.6B & B4@1 & 19.63 & 5.35 & 5.37 & 5.82 & 5.32 & 5.00 & 5.40 & 5.17 \\ \addlinespace[3pt]
+0.6B & M1-L4@4 & 47.85 & 35.35 & 18.47 & 7.25 & 3.90 & 4.50 & 4.72 & 4.97 \\ \addlinespace[3pt]
+0.6B & B8@4 & 19.03 & 6.65 & 6.03 & 6.10 & 6.17 & 5.38 & 6.25 & 6.37 \\ \addlinespace[3pt]
+1.7B & B4@1 & 30.65 & 6.17 & 6.18 & 5.53 & 5.53 & 5.62 & 5.55 & 5.72 \\ \addlinespace[3pt]
+1.7B & M1-L4@4 & 58.70 & 41.45 & 22.47 & 6.23 & 3.10 & 3.78 & 3.63 & 3.92 \\ \addlinespace[3pt]
+1.7B & B8@4 & 28.93 & 8.17 & 6.25 & 6.28 & 5.97 & 5.73 & 5.57 & 6.20 \\ \addlinespace[3pt]
+\bottomrule
+\end{longtable}
+}
+
+
+Costs of the same readers. M1-L4 and B4 have equal parameter counts; B8 adds 147,456 parameters (+31.0\% at 0.6B, +24.3\% at 1.7B). The state
+bytes are the persistent FP32 delta memory (r\_mem \ensuremath{\times} r\_mem \ensuremath{\times} 4 bytes per episode; derived from the rank, the same for the three readers because
+they read the same memory, and excluding the backbone cache). Time per question is a measured cost, compared only within one backbone; no
+efficiency claim is made.  % LP23
+
+
+{\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{longtable}{W{167}{12}W{167}{12}W{167}{12}W{167}{12}W{167}{12}W{167}{12}}
+\toprule
+Backbone & Reader & Adapter parameters & State bytes per episode & Time per question (ms) & Time relative to B4@1 \\ \addlinespace[3pt]
+\midrule \endhead
+0.6B & B4@1 & 475,138 & 65,536 & 0.392 & 1.00 \\ \addlinespace[3pt]
+0.6B & M1-L4@4 & 475,138 & 65,536 & 0.556 & 1.42 \\ \addlinespace[3pt]
+0.6B & B8@4 & 622,594 & 65,536 & 0.617 & 1.57 \\ \addlinespace[3pt]
+1.7B & B4@1 & 606,210 & 65,536 & 0.486 & 1.00 \\ \addlinespace[3pt]
+1.7B & M1-L4@4 & 606,210 & 65,536 & 0.625 & 1.29 \\ \addlinespace[3pt]
+1.7B & B8@4 & 753,666 & 65,536 & 0.625 & 1.29 \\ \addlinespace[3pt]
+\bottomrule
+\end{longtable}
+}
+
+
+\textbf{Three kinds of evidence.} The results fall into three kinds that answer different questions and are never pooled.
+
+
+{\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{longtable}{W{134}{8}W{263}{8}W{515}{8}W{88}{8}}
+\toprule
+Kind of evidence & Question & Result & Rows \\ \addlinespace[3pt]
+\midrule \endhead
+Oracle composition & Does a trained reader compose reads over a privileged memory? & M1-L4@4 exceeds B4@1 at equal parameters on hops2-3 by +21.550 pp (0.6B) and +25.783 pp (1.7B); B8 fails G1-L at both backbones & LP7-LP20 \\ \addlinespace[3pt]
+Learned-writer access & Can a learned writer build that memory? & No writer reaches the 0.80 gate in any screen (best final WP-L4 arm 33.5\%; DPFP 60.8\% and 73.0\% at E=8; DPFP-X 66.2\% and 59.3\%); each registered decision is stop & LL9, DP1, DP4, PD1 \\ \addlinespace[3pt]
+Mechanism evidence & Where and how does the walk happen? & Per-step readouts are decoding only; bridge patching at the final question position shifts the answer by +0.391 pp against a 10 pp bar; final-position-only reads lower M1-L4’s hops1-3 EM by 29.906 pp (a distribution shift) & LP5, PC1-PC3 \\ \addlinespace[3pt]
+\bottomrule
+\end{longtable}
+}
+
+
+% LL9 DP1 DP4 PD1 LP5 PC1 PC2 PC3 LP4
+
+\textbf{Negative interventions and the exact gate each did not meet.} The matrix lists each repair or test that failed its registered criterion. Each
+row is one study under its own conditions (one training seed or three, one optimizer, a fixed budget). The rows record which criterion was not met;
+they do not show that learned writing, an exact store, unshared reads or composition at rank32 is impossible. Not run: the LSQ arms (none was
+triggered), P1L-D and P1L-S; a warm start of B8 from M1-L4 has not been tested.
+
+
+{\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{longtable}{W{132}{10}W{253}{10}W{264}{10}W{287}{10}W{64}{10}}
+\toprule
+Intervention & Conditions & Result & Registered criterion not met & Rows \\ \addlinespace[3pt]
+\midrule \endhead
+Learned writers of the WP-L4 screen (R, W5 and read-supervision variants) & Qwen3-0.6B-Base, ranks 32 and 128, one seed, 1,000 validation episodes & Best eligible arm 33.5\% (R, rank128) & Validation EM \ensuremath{\geq}0.80 (and the 0.50 trigger of the E=8 retraining) & LL9 \\ \addlinespace[3pt]
+Read-failure factorial (RFX) & Frozen R/\allowbreak{}r128, R/\allowbreak{}r32 and W5/\allowbreak{}r32 checkpoints, evaluation only & Only an exact store together with the true key (a label) rescues the read; the exact store with the deployed or unit query gives 38.8\% and 38.75\% against 33.8\% at R/\allowbreak{}r128 & Rescue: normalized read error \ensuremath{\leq}0.5 of the baseline and EM gain \ensuremath{\geq}10 pp & RX1 \\ \addlinespace[3pt]
+Oracle codes at rank32 (WP-L6) & M1-L4, r=r\_mem=32, one seed, 5,666 steps & Hop-1 EM 0.1\% (O-rot) and 11.8\% (O-shared) & Hop-1 full-vocabulary EM \ensuremath{\geq}30\% at L=4 & WL1 \\ \addlinespace[3pt]
+DPFP writer & Ranks 32 and 128, E=16, E=8 retrain of the best arm, one seed & 39.0\%, 58.0\% and 60.8\% at E=16; 73.0\% at E=8 & Validation EM \ensuremath{\geq}0.80 & DP1 \\ \addlinespace[3pt]
+DPFP-X writer & X256: Qwen3-0.6B-Base, r=256; X17: Qwen3-1.7B-Base, r=128; one seed & 66.2\% and 59.3\% & Validation EM \ensuremath{\geq}0.80 & DP4 \\ \addlinespace[3pt]
+Oracle readers at rank32 & B4, B8 and M1-L4 on the oracle memory, three seeds & Hop-1 EM at most 0.15\%; the memory-use check fails & Amendment B7 rule 1: each reader’s hop-1 EM above B3-L4@4 with a 97.5\% interval above 0 (lower bounds 0.000 for B4, \ensuremath{-}0.050 for B8) & LP7 \\ \addlinespace[3pt]
+B8 (four unshared reads) at 0.6B & Rank128, three seeds & B8@4\ensuremath{-}B4@1 on hops2-3 +0.983 pp [0.267, 1.717] & G1-L point estimate \ensuremath{\geq}3 pp (its hop-1 and typed conditions held) & LP9 \\ \addlinespace[3pt]
+B8 at 1.7B & Rank128, three seeds & +1.033 pp [0.292, 1.800]; hop 1 \ensuremath{-}1.717 pp & G1-L point estimate \ensuremath{\geq}3 pp; hop-1 point estimate \ensuremath{\geq}\ensuremath{-}1 pp & LP16 \\ \addlinespace[3pt]
+Bridge patching & Rank128, 0.6B, L=4, state after the first read at the final question position & +0.391 pp [\ensuremath{-}0.130, 0.781] (M1-L4), 0.000 pp (B8) & Shift \ensuremath{\geq}10 pp, 95\% interval above 0, positive in every seed & PC1 \\ \addlinespace[3pt]
+\bottomrule
+\end{longtable}
+}
+
+
+% LL9 RX1 WL1 DP1 DP4 LP7 LP9 LP16 PC1
+
+\textbf{Depth by hop (descriptive).} Seed-mean EM (\%) of the M1-L4 checkpoint, trained at L=4 on hops1-3, evaluated at depths L=1\ldots{}8 on hops1-8 at
+Qwen3-0.6B-Base. The best depth of each hop is in bold. The last row, the oracle stop, takes the best depth per hop with the label; it is an upper
+bound and a maximum over eight noisy cells, not a stopping rule.  % LP21
+
+
+{\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{longtable}{W{111}{18}W{111}{18}W{111}{18}W{111}{18}W{111}{18}W{111}{18}W{111}{18}W{111}{18}W{111}{18}}
+\toprule
+L & hop1 & hop2 & hop3 & hop4 & hop5 & hop6 & hop7 & hop8 \\ \addlinespace[3pt]
+\midrule \endhead
+1 & 37.8 & 1.1 & 0.9 & 1.1 & 0.8 & 0.9 & 1.1 & 1.1 \\ \addlinespace[3pt]
+2 & \textbf{64.2} & 10.9 & 1.4 & 1.8 & 1.6 & 1.7 & 1.7 & 1.8 \\ \addlinespace[3pt]
+3 & 61.3 & 30.0 & 7.5 & 2.9 & 2.6 & 2.5 & 2.9 & 3.2 \\ \addlinespace[3pt]
+4 (trained) & 47.9 & \textbf{35.4} & 18.5 & 7.3 & 3.9 & 4.5 & 4.7 & 5.0 \\ \addlinespace[3pt]
+5 & 37.2 & 29.3 & \textbf{24.2} & 14.1 & 7.2 & 6.1 & 6.7 & 6.7 \\ \addlinespace[3pt]
+6 & 28.1 & 22.8 & 20.6 & \textbf{16.6} & 11.6 & 8.8 & 8.5 & 8.9 \\ \addlinespace[3pt]
+7 & 22.6 & 18.8 & 17.7 & 15.4 & 13.5 & 10.9 & 9.5 & 9.7 \\ \addlinespace[3pt]
+8 & 19.0 & 16.4 & 15.0 & 13.8 & \textbf{13.5} & \textbf{12.4} & \textbf{10.6} & \textbf{9.9} \\ \addlinespace[3pt]
+oracle stop (best L, label used) & 64.2 (L2) & 35.4 (L4) & 24.2 (L5) & 16.6 (L6) & 13.5 (L8) & 12.4 (L8) & 10.6 (L8) & 9.9 (L8) \\ \addlinespace[3pt]
+\bottomrule
+\end{longtable}
+}
+
+
+The same at Qwen3-1.7B-Base.  % LP21
+
+
+{\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{longtable}{W{111}{18}W{111}{18}W{111}{18}W{111}{18}W{111}{18}W{111}{18}W{111}{18}W{111}{18}W{111}{18}}
+\toprule
+L & hop1 & hop2 & hop3 & hop4 & hop5 & hop6 & hop7 & hop8 \\ \addlinespace[3pt]
+\midrule \endhead
+1 & 34.1 & 0.5 & 0.5 & 0.5 & 0.5 & 0.5 & 0.5 & 0.5 \\ \addlinespace[3pt]
+2 & \textbf{77.6} & 10.9 & 1.2 & 1.3 & 1.1 & 1.2 & 1.2 & 1.1 \\ \addlinespace[3pt]
+3 & 70.6 & 34.6 & 6.6 & 1.8 & 2.0 & 2.3 & 2.2 & 1.9 \\ \addlinespace[3pt]
+4 (trained) & 58.7 & \textbf{41.5} & 22.5 & 6.2 & 3.1 & 3.8 & 3.6 & 3.9 \\ \addlinespace[3pt]
+5 & 44.9 & 36.5 & \textbf{29.3} & 15.3 & 5.9 & 5.2 & 5.8 & 6.0 \\ \addlinespace[3pt]
+6 & 34.9 & 30.2 & 27.0 & \textbf{20.9} & 12.0 & 7.5 & 6.9 & 7.7 \\ \addlinespace[3pt]
+7 & 29.0 & 24.6 & 24.3 & 20.6 & 16.9 & 11.2 & 8.7 & 8.8 \\ \addlinespace[3pt]
+8 & 24.1 & 20.9 & 21.4 & 18.4 & \textbf{17.8} & \textbf{14.7} & \textbf{10.7} & \textbf{9.8} \\ \addlinespace[3pt]
+oracle stop (best L, label used) & 77.6 (L2) & 41.5 (L4) & 29.3 (L5) & 20.9 (L6) & 17.8 (L8) & 14.7 (L8) & 10.7 (L8) & 9.8 (L8) \\ \addlinespace[3pt]
+\bottomrule
+\end{longtable}
+}
+
+
+At the trained depth the reader reaches hop 3: at L=4 its EM on hops1-3 is 47.9/\allowbreak{}35.4/\allowbreak{}18.5\% at 0.6B and 58.7/\allowbreak{}41.5/\allowbreak{}22.5\% at 1.7B, and on hops5-8 it
+is 3.9-5.0\% and 3.1-3.9\%, not above the single read B4@1 (5.0-5.8\% and 5.5-5.7\% on hops4-8). The same checkpoint reaches hops4-8 at
+9.9-16.6\% (0.6B) and 9.8-20.9\% (1.7B) when run deeper (hop4 at L=6, hops5-8 at L=8, the largest depth evaluated, so their best depth is not
+located), while losing hop 1: at L=8 hop 1 is 19.0\% and 24.1\%, against 47.9\% and 58.7\% at L=4 and 64.2\% and 77.6\% at L=2. These
+cells are at hops and depths never trained, carry no interval and rest on one oracle seed and three training seeds; the paper does not say that the reader
+cannot go beyond hop 3, nor that it composes up to hop 8, and no stopping rule for this reader is evaluated.  % LP21
+
+\textbf{Seed-level statistics.} The registered intervals resample episodes with the three fitted seeds held fixed. Beside each, the tables print the three
+seed effects and a seed-level interval: the mean of the seed effects \ensuremath{\pm} t(0.9875; 2 degrees of freedom) = 6.205 times their sample standard
+error, the two-sided 97.5\% level of the registered intervals. Both intervals are conditional on three fitted seeds and one fixed oracle code table
+(oracle seed17, one layout): neither covers future training seeds or other code tables, and the t-interval treats the three seed effects as exchangeable draws,
+which three values cannot test.  % LP22
+
+Qwen3-0.6B-Base.  % LP22
+
+
+{\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{longtable}{W{287}{14}W{103}{14}W{103}{14}W{103}{14}W{103}{14}W{135}{14}W{165}{14}}
+\toprule
+Contrast (pp) & Seed 17 & Seed 29 & Seed 43 & Seed mean & Seed-level 97.5\% interval & Episode bootstrap 97.5\% (registered) \\ \addlinespace[3pt]
+\midrule \endhead
+B6 contrast M1-L4@4 - B4@1, hops 2-3 & +24.450 & +15.100 & +25.100 & +21.550 & [+1.50, +41.60] & [+20.383, +22.758] \\ \addlinespace[3pt]
+G1-L reach B8@4 - B4@1, hops 2-3 & +0.925 & +0.050 & +1.975 & +0.983 & [-2.47, +4.44] & [+0.267, +1.717] \\ \addlinespace[3pt]
+G1-L hop 1 B8@4 - B4@1 & -2.300 & +1.200 & -0.700 & -0.600 & [-6.88, +5.68] & [-1.984, +0.767] \\ \addlinespace[3pt]
+G1-L typed replication B8@4 - B4@1, hops 2-3 & +1.575 & +0.600 & +2.475 & +1.550 & [-1.81, +4.91] & [+0.767, +2.367] \\ \addlinespace[3pt]
+G2-L B8@4 - B5-L4@4 (fixed query), hops 2-3 & +0.875 & +0.100 & +1.525 & +0.833 & [-1.72, +3.39] & [+0.058, +1.550] \\ \addlinespace[3pt]
+G2-L B8@4 - B3-L4@4 (memory-free), hops 2-3 & +6.525 & +5.675 & +6.825 & +6.342 & [+4.20, +8.48] & [+5.758, +6.933] \\ \addlinespace[3pt]
+\bottomrule
+\end{longtable}
+}
+
+
+Qwen3-1.7B-Base.  % LP22
+
+
+{\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{longtable}{W{286}{14}W{103}{14}W{103}{14}W{103}{14}W{103}{14}W{137}{14}W{164}{14}}
+\toprule
+Contrast (pp) & Seed 17 & Seed 29 & Seed 43 & Seed mean & Seed-level 97.5\% interval & Episode bootstrap 97.5\% (registered) \\ \addlinespace[3pt]
+\midrule \endhead
+B6 contrast M1-L4@4 - B4@1, hops 2-3 & +24.925 & +26.500 & +25.925 & +25.783 & [+22.93, +28.64] & [+24.533, +27.026] \\ \addlinespace[3pt]
+G1-L reach B8@4 - B4@1, hops 2-3 & +0.200 & +1.725 & +1.175 & +1.033 & [-1.73, +3.80] & [+0.292, +1.800] \\ \addlinespace[3pt]
+G1-L hop 1 B8@4 - B4@1 & -1.800 & -0.300 & -3.050 & -1.717 & [-6.65, +3.22] & [-3.317, -0.016] \\ \addlinespace[3pt]
+G1-L typed replication B8@4 - B4@1, hops 2-3 & +0.375 & +3.300 & -0.300 & +1.125 & [-5.73, +7.98] & [+0.275, +1.942] \\ \addlinespace[3pt]
+G2-L B8@4 - B5-L4@4 (fixed query), hops 2-3 & +0.550 & +3.600 & +0.875 & +1.675 & [-4.33, +7.68] & [+0.908, +2.383] \\ \addlinespace[3pt]
+G2-L B8@4 - B3-L4@4 (memory-free), hops 2-3 & +6.225 & +8.825 & +6.450 & +7.167 & [+2.01, +12.33] & [+6.583, +7.758] \\ \addlinespace[3pt]
+\bottomrule
+\end{longtable}
+}
+
+
+The seed-level interval excludes 0 for the B6 contrast (M1-L4@4\ensuremath{-}B4@1) and for G2-L against the memory-free reader at both backbones. It includes 0 for the
+G1-L contrasts and for G2-L against the fixed-query reader at both backbones, so the G2-L pass over B5-L4@4 is a statement about the fitted seeds. The
+registered decisions use the episode intervals and are unchanged.  % LP22
+
+\textbf{Mechanism wording.} The adapter acts at every question position. Each position performs its own vertical walk: its branch output enters that
+position’s residual after the layer-14 attention and is not an input of any later position’s adapter, and the frozen upper layers aggregate across positions.
+Which position’s walk carries the answer is untested; “composes reads” in this paper means the iterated reads inside one position’s loop (PC1-PC3 give
+no causal bridge claim and a distribution shift for final-position-only reads).  % PC1 PC2 PC3
+

@@ -231,3 +231,29 @@ orchestrator decides before the validation jobs. node·h are recorded per job in
    any other rule beyond the descriptive within-job timing.
 4. **Window.** Assert each registered `CONFIRMATION_WINDOWS` entry individually; WP-L10 (`b8w` 108000, B8W registered on
    master `3c9c396`) does the same. The orchestrator resolves the dict-literal conflict at merge by keeping every entry.
+
+## Clarification C1 (2026-10-29 13:30 JST, before the threshold lock and before any test episode; from sn-core's step-2 smoke)
+1. **Latency-audit stop condition.** The condition "more than 0.2 % disagreeing questions stops the job" is replaced, as
+   follows.
+   - The job records three things: the number and fraction of questions whose grouped stopped-pass argmax differs from
+     the assembled p^{s*}, and the largest top-2 logit gap among them.
+   - It stops for the orchestrator only if a disagreeing question has a top-2 gap above 1.0.
+
+   Reason: the smoke on val [0, 64) found 1.4–2.2 % disagreement for R1 and about 0 for R3. Every disagreeing question had
+   a top-2 gap of at most 0.125. The answer logits are bf16, and they depend on how the batch is grouped: a plain
+   fixed-depth pass on half the batch also flips 2 of 128 questions, with a maximum logit difference of 0.27. With a
+   constant depth, the grouped pass is bitwise equal to the plain pass (unit test).
+
+   Every registered statistic uses p^{s*} from the fixed-depth scan. Only the descriptive latency audit is affected, and the
+   report gives the disagreement fraction.
+2. **Where the latency audit runs.** It moves from the validation job to the test job, because it needs the locked
+   thresholds. It still runs on validation episodes [1000, 1128), never on test episodes.
+3. **Information seen before the threshold lock.** The smoke was on val [0, 64), which is P1-L's validation range and not
+   LSR's selection range [1000, 3000). It showed two things, and neither changes the grid, the objective or any rule:
+   - the hop × L shape, which looks like P1-L's matrix;
+   - the medians of the R1 and R3 signals at both backbones. At 1.7B the read ratio grows to about 10, and the relative
+     state change stays at 0.5–0.7.
+4. **Infeasible rules.** These stay as registered. A rule with no feasible validation threshold fails at that backbone,
+   and its test statistics are never computed. Nothing else is added. R2 has no threshold and is always evaluated.
+5. **Cost.** The smoke projects about 165 s per 2,000-episode scan, against the 113–123 s assumed in the cost section.
+   The projected total is about 0.45 node·h, inside the 0.8 cap.

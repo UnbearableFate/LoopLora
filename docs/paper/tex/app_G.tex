@@ -1,0 +1,136 @@
+% Generated once by scripts/paper_md2tex.py from docs/paper/draft.md; edit this file from now on.
+\section{Limitations and reproducibility in full}\label{app:G}
+\noindent Record section 9.
+\subsection*{9. Limitations, reproducibility, and conclusion}\addcontentsline{toc}{subsection}{9. Limitations, reproducibility, and conclusion}
+
+The central limitation is conditionality. Writer form, learned representation,
+reader training depth, and static budget all change the measured composition
+benefit. Candidate-restricted  % S3 S8 S9 B1 B3 B4
+accuracy is not full-vocabulary answer accuracy. These metrics should not be exchanged when moving  % S9 S12
+from a controlled terminal task to generated language answers.
+
+Five statements are excluded. The language-model oracle is not the symbolic oracle: it needs
+a learned value-to-key lookup for every read after the first, so symbolic oracle results do
+not transfer to it. No conclusion about multiple reads in the  % LP2 LP6
+language model is drawn at rank32. No claim is made that composition holds for  % LP6
+unseen entities, beyond the closed 1,024-name vocabulary or for new entity codes: every
+evaluation draws on the seen pool except the descriptive UNS scope row below.  % UN2 UN3
+OA is the
+value/\allowbreak{}output ceiling, not an addressing control. B8 is not  % LL6 LL9
+parameter-matched to the single read or to M1: it adds 9,216 parameters, +8.9\% at rank32,
++31.0\% at rank128 and +69.2\% in the symbolic unfactorized joint model.  % FR1
+Appendix C repeats these and the remaining scope statements
+beside each principal claim.
+
+The rank128 language-model result is bounded further. It concerns the \texttt{oracle\_random} memory over the 768 seen names, one
+oracle seed and layout and three training seeds; its equal-parameter claim is M1-L4 against B4 only, and the unshared reader B8
+fails its gate while adding 31.0\% parameters (24.3\% at the second scale). The second scale (Qwen3-1.7B-Base)  % LP9 LP11
+carries learning rates from the smaller model without a pilot, and covers two sizes of one family only: no test across scales was
+registered, so the paper claims no scaling trend, nothing for any other size, and no learned-writer or end-to-end result at either size.
+ P1L-C does not show where the bridge is carried: its  % LP15 LP20
+read-position drop is a distribution shift, and bridge patching gives no causal claim.  % PC1 PC2
+
+Section 8.6 adds its own limits. Every language-model composition number rests on one random oracle code table (one oracle seed) and three training seeds, so the
+episode intervals and the seed-level intervals are conditional on those and describe no other code table, layout or future training run; with three seeds the
+seed-level interval is wide, and it includes 0 for the G1-L contrasts and for G2-L against the fixed-query reader at both backbones. The depth matrix  % LP22
+evaluates one L4-trained checkpoint at depths and hops that were never trained, without intervals; its oracle-stop row uses the label and is an upper bound, and
+hops5-8 peak at the largest depth evaluated. The unshared reader B8 contains the shared one and was trained with one optimizer and no learning-rate pilot of  % LP21
+its own, so its failure is not a statement about unshared reads in general, and a warm start has not been tested. An exact store was tested only by  % LP9 LP16
+evaluation on frozen checkpoints (RFX), and no trained least-squares store ran.  % RX1
+
+UNS evaluates the 256 unseen-pool names of the same 1,024-name vocabulary, which carry fixed
+random features and were never used in a training episode, with descriptive 95\% intervals and no
+multiplicity correction. Part A reproduces the 18 committed unseen-pool M1 depth-contrast rows
+(three writers, hop1, hops2-3 and hops6-8, two confidence levels) exactly from the saved
+samples of 18 audited runs; the other committed unseen rows stay unaudited. A  % UN1
+(writer, reader) result is described as “the depth gain is also present on unseen-pool entities”
+only if its unseen-pool M1 depth gain on hops2-3 is at least 3 pp with the interval above 0. All
+six results meet it, labelled by source and never pooled:
+
+
+{\small
+\setlength{\tabcolsep}{3pt}
+\begin{longtable}{W{145}{6}W{411}{6}W{444}{6}}
+\toprule
+Writer & Part A (released mixed-depth M1, S4242): unseen-pool gain, pp [95\% CI] & Part B (M1 trained at L4, new episodes C999006): unseen-pool gain, pp [95\% CI] \\ \addlinespace[3pt]
+\midrule \endhead
+joint & +7.800 [7.067, 8.508] & +47.008 [45.983, 48.075] \\ \addlinespace[3pt]  % UN2 UN3
+joint\_fact & +19.958 [19.108, 20.808] & +21.025 [20.083, 21.975] \\ \addlinespace[3pt]  % UN2 UN3
+oracle\_random (control) & +31.592 [30.433, 32.750] & +41.267 [39.966, 42.534] \\ \addlinespace[3pt]  % UN2 UN3
+\bottomrule
+\end{longtable}
+}
+
+
+The unseen-minus-seen difference excludes 0 for joint\_fact in both parts and for joint in
+Part B, always with the smaller unseen-pool gain (\ensuremath{-}3.942, \ensuremath{-}4.525 and \ensuremath{-}7.075 pp).  % UN2 UN3
+The wording is limited to M1’s depth gain on hops2-3 and to these readers; the readers were not
+trained to be tested on new codes, so no sentence that composition holds for unseen entities or
+beyond the closed vocabulary is justified, and Parts A and B differ in reader and episodes.
+% UN2 UN3
+
+The uncertainty also has a narrow estimand. The bootstrap conditions on the fixed
+training seeds, and the follow-ups reuse confirmation samples rather than supplying
+independent confirmation of every successive claim.  % S3 S8 B3 B5
+Training-seed failures, longer rank-follow-up training, and the disclosed F2 decision
+deviation remain relevant even when a pooled interval is positive.  % S3 S8 S9
+The original screening stopping results do not inherit parent-study intervals;
+P4-S-L and JS instead have their own fresh confirmation sets and scoped uncertainty.
+ So do IVD, CVH, TSM and UNS Part B  % H1 H4 H5 HL1 JS1
+(C999004-C999007), with 97.5\%, 99.166667\%, 98.75\% and descriptive 95\% intervals.
+ The P1-L confirmation (test [100000,102000), 97.5\%, k=2) and P1L-C  % IV1 CV1 TS1 UN3
+(test [102000,104000), 95\%) condition on three training seeds and one oracle seed and layout.  % LP7 PC1
+
+IS now supplies a same-checkpoint load/\allowbreak{}layout sweep and a bounded update-task
+diagnostic. Its fixed training protocol and varying layouts  % IS1 IS4
+limit interpretation: neither operator-bound tightness, a pure crosstalk effect,
+nor a general benefit from load-specific retraining has been established.
+ IVD identifies key interference for oracle\_random only; for joint\_fact  % IS1 IS3
+that reading is withdrawn. The largest tested capability load is not an identified  % IV1 IV2
+failure boundary, and low stale rates do not imply complete current-answer success.
+ JS supplies reached-state Jacobian measurements and an  % IS2 IS4
+accuracy tradeoff, not proof of a stable terminal fixed point; verbalizable
+intermediate directions remain a separate diagnostic question.  % JS1 JS6
+
+Reproduction separates data access from rendering. The figures are produced by
+paper\_figures.py from committed CSV/\allowbreak{}JSON exports;
+the figure manifest identifies revisions, selectors,
+aggregation, and claim IDs. No checkpoints are reevaluated and no bootstrap or
+timing measurement is rerun for this manuscript. The evidence ledgers retain exact
+stored values and artifact commits; Appendix B records sets, seeds, and comparisons, and
+Appendix C the claim contract.
+Preparation cost and training cost per model remain outside the prepared-query
+timings. The paper’s primary same-rank comparison reports  % B7 B8
+parameters and extra latency as costs, and makes no larger-rank efficiency claim.
+% FR1
+
+Repeated low-dimensional queries are useful under particular writing and access
+conditions, with the orthogonal-oracle and factorized capability comparisons
+providing the clearest evidence. The current  % S1 S2 S9 B5
+claim compares several reads with a single read at the same rank and reports their
+costs. Historical larger-rank controls and the original practical-gate  % FR1
+failure remain in the record; neither is rewritten as a system-efficiency success.
+ Post-hoc halting with the P4-S-L protocol does not repair hop preservation in  % B1 B7
+the primary families; a hop-1-constrained threshold gives one registered pass (random-oracle
+writing, about two executed updates, no latency gain), stay training and a sticky gate do not
+remove overshoot, and training-time regularization reduces overshoot at a longer-walk cost.
+% HL1 CV1 CV3 TS1 JS1 JS3
+The appropriate conclusion is therefore a bounded mechanism result and a set of
+reproducible failures, with no efficiency claim over increasing rank.  % FR1
+The single-module LLM screens, DPFP included, select no learned writer (P1L-D is not run); input probes and oracle
+controls do not overcome the deployed-read/\allowbreak{}answer gap, a read-failure factorial finds that only an
+exact store together with the true key rescues the read, and the rank-32 oracle-code pilot stops.
+% LL2 LL3 LL7 LL9 RX1 WL1
+In the oracle-reader confirmation, a shared reader exceeds a single read of equal parameter count at rank128 on two backbone sizes
+of one family while the registered four-unshared-reads reader fails its gate, bridge patching (0.6B only) gives no causal claim, and at rank32 the readers did not
+learn to use the oracle memory; the per-step readouts are descriptive decoding and not evidence for composition.
+% LP4 LP5 LP7 LP9 LP11 LP15 PC1
+At its trained depth the shared reader reaches hop 3; run deeper, the same checkpoint reaches hops4-8 at 9.9-16.6\% (0.6B) and 9.8-20.9\% (1.7B) with the depth chosen by the label, while
+losing hop 1, and each question position runs its own walk (Section 8.6; descriptive).  % LP21
+
+The additional load study narrows this result further: depth benefits decrease
+under the registered load/\allowbreak{}layout changes, while multi-read capability remains
+positive at the tested training loads through E36. Existing  % IS1 IS2
+latent-recurrence and interpretability research motivates the next diagnostics;
+it supplies no missing efficiency, convergence, or end-to-end result for this adapter.
+
