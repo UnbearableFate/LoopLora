@@ -4,6 +4,8 @@
 `config_hashes` (the science configs at the released step counts, computed on compute by scripts/dpfp_config_hashes.py from
 `--steps-only`'s output) and `prereg_blake2b_128`.
 
+`--study LSQT-U` (WP-L12, docs/prereg/LSQT.md decision 2): the same rule for the conditional control LT-U alone (its own 2,400-step smoke).
+
 `--study LSQT` (WP-L12, docs/prereg/LSQT.md): the same for the three arms LT-K4, LT-RG001 and LT-RG1 at E16 (release also holds
 their registered `etas`); smokes of 2,400 steps as DPFP.
 
@@ -26,9 +28,10 @@ from looplora.llm.release import read_json,require,schedule_fields,smoke_timing,
 
 def check_release(release,*,E):
     """What the runner will do with the release: it must accept the step count of every arm the release names."""
-    require(release['study'] in ('DPFP','DPFP-X','LSQT') and release['E']==E,'the release names another study or capacity')
-    if release['study']=='LSQT':
-        require(set(release['steps_by_arm'])==set(lsqt_release.ARMS),'the LSQT release names its three registered arms')
+    require(release['study'] in ('DPFP','DPFP-X','LSQT','LSQT-U') and release['E']==E,'the release names another study or capacity')
+    if release['study'] in ('LSQT','LSQT-U'):
+        registered=lsqt_release.ARMS if release['study']=='LSQT' else (lsqt_release.CONTROL,)
+        require(set(release['steps_by_arm'])==set(registered),'the LSQT release names its three registered arms, the LSQT-U release the control alone')
         for arm,steps in release['steps_by_arm'].items():
             require(lsqt_release.scheduled_steps(arm,None,release)==steps,f'{arm}: the runner does not accept this release')
         return
@@ -56,14 +59,14 @@ def prepare(root,out,*,steps=2400,e8_decision=None,study='DPFP',config_hashes=No
     science config hashes of its two arms (a mapping arm -> hash); with out=None it only returns the release, unwritten."""
     if out is not None and Path(out).exists():
         raise FileExistsError(f'{out} exists: a frozen release is never overwritten')
-    if study in ('DPFP-X','LSQT'):
+    if study in ('DPFP-X','LSQT','LSQT-U'):
         require(e8_decision is None,f'{study} has no E8 retrain')
-        arms=XARMS if study=='DPFP-X' else lsqt_release.ARMS
+        arms=XARMS if study=='DPFP-X' else lsqt_release.ARMS if study=='LSQT' else (lsqt_release.CONTROL,)
         rows={arm:smoke_row(root,arm,steps=steps,E=16) for arm in arms}
         if study=='DPFP-X':
             release=dict(study='DPFP-X',E=16,**schedule_fields(rows),scale_up=PREREG_X,prereg_blake2b_128=prereg_digest())
         else:
-            release=dict(study='LSQT',E=16,**schedule_fields(rows),scale_up=lsqt_release.PREREG,
+            release=dict(study=study,E=16,**schedule_fields(rows),scale_up=lsqt_release.PREREG,
                          prereg_blake2b_128=lsqt_release.prereg_digest(),
                          etas={arm:lsqt_release.SPECS[arm][1] for arm in arms})
         check_release(release,E=16)
@@ -92,7 +95,7 @@ if __name__=='__main__':
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--root',type=Path,required=True,help='smoke output root: ROOT/ARM/record.json for every sized arm')
     parser.add_argument('--out',type=Path,help='the release file (must not exist)')
-    parser.add_argument('--study',choices=('DPFP','DPFP-X','LSQT'),default='DPFP')
+    parser.add_argument('--study',choices=('DPFP','DPFP-X','LSQT','LSQT-U'),default='DPFP')
     parser.add_argument('--steps',type=int,help='step count of the smokes (default 2400; DPFP-X: 1800)')
     parser.add_argument('--steps-only',action='store_true',help='DPFP-X or LSQT: print the released step counts, write nothing')
     parser.add_argument('--config-hashes',type=Path,help='DPFP-X or LSQT: JSON of scripts/dpfp_config_hashes.py')
@@ -100,7 +103,7 @@ if __name__=='__main__':
     args=parser.parse_args()
     steps=args.steps if args.steps is not None else (1800 if args.study=='DPFP-X' else 2400)
     if args.steps_only:
-        if args.study not in ('DPFP-X','LSQT') or args.out is not None:
+        if args.study not in ('DPFP-X','LSQT','LSQT-U') or args.out is not None:
             parser.error('--steps-only is for DPFP-X or LSQT and writes no release')
         print(json.dumps(prepare(args.root,None,steps=steps,study=args.study)['steps_by_arm']))
         raise SystemExit(0)

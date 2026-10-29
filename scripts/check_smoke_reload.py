@@ -22,8 +22,8 @@ from looplora.llm.read_fix_run import validate
 from looplora.llm.run import source_metadata
 from looplora.sym.stats import load_samples
 
-STUDIES = {'DPFP': (dpfp, dpfp_run), 'DPFP-X': (dpfp, dpfp_run), 'LSQ': (lsq, lsq_run), 'LSQT': (lsqt, lsqt_run)}
-PREREG_DIGESTS = {'DPFP-X': prereg_digest, 'LSQT': lsqt_release.prereg_digest}
+STUDIES = {'DPFP': (dpfp, dpfp_run), 'DPFP-X': (dpfp, dpfp_run), 'LSQ': (lsq, lsq_run), 'LSQT': (lsqt, lsqt_run), 'LSQT-U': (lsqt, lsqt_run)}
+PREREG_DIGESTS = {'DPFP-X': prereg_digest, 'LSQT': lsqt_release.prereg_digest, 'LSQT-U': lsqt_release.prereg_digest}
 EPISODES = 100  # the smoke's evaluation size
 
 

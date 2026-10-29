@@ -27,7 +27,7 @@ def prereg_digest(root=None):
 
 
 def scheduled_steps(arm,steps,schedule,*,smoke=False):
-    """Smoke: the explicit step count. Science: the frozen release's count for this arm (E16 only)."""
+    """Smoke: the explicit step count. Science: the frozen release's count for this arm (E16 only; LT-U only from a LSQT-U release)."""
     if arm not in SPECS:
         raise ValueError(f'{arm} is not a registered LSQT arm')
     if smoke:
@@ -36,11 +36,14 @@ def scheduled_steps(arm,steps,schedule,*,smoke=False):
         return steps
     if steps is not None or schedule is None:
         raise ValueError('scientific arms require an immutable schedule release')
-    if schedule['study']!='LSQT' or schedule['E']!=16:
+    if schedule['study'] not in ('LSQT','LSQT-U') or schedule['E']!=16:
         raise ValueError('schedule study/capacity mismatch')
     by_arm=schedule['steps_by_arm']
-    if arm==CONTROL or set(by_arm)!=set(ARMS):
-        raise ValueError('the LSQT release fixes the step counts of the three registered arms at once, at E16 only')
+    # The three registered arms are released together (study LSQT); the conditional control U is released alone (study LSQT-U),
+    # after the three have finished (docs/prereg/LSQT.md, decision 2).
+    registered=ARMS if schedule['study']=='LSQT' else (CONTROL,)
+    if arm not in registered or set(by_arm)!=set(registered):
+        raise ValueError('the LSQT release fixes the step counts of the three registered arms at once, the LSQT-U release that of the control alone, at E16 only')
     result=by_arm[arm]
     if isinstance(result,bool) or not isinstance(result,int) or result<5 or result%5:
         raise ValueError('scientific schedules require five equal integer intervals')

@@ -190,6 +190,18 @@ def test_scheduled_steps_follow_the_release_and_never_run_the_control():
             scheduled_steps(arm, given, schedule, smoke=smoke)
 
 
+def test_the_conditional_control_is_released_alone_in_its_own_study():
+    control = release({'LT-U': 12000}) | {'study': 'LSQT-U'}
+    assert scheduled_steps('LT-U', None, control) == 12000
+    registered = {'LT-K4': 8000, 'LT-RG001': 7500, 'LT-RG1': 7000}
+    for arm, schedule in (('LT-K4', control), ('LT-U', release(registered)), ('LT-U', release({**registered, 'LT-U': 5}) | {'study': 'LSQT-U'}),
+                          ('LT-U', release({'LT-U': 12001}) | {'study': 'LSQT-U'}), ('LT-U', release({'LT-K4': 8000}) | {'study': 'LSQT-U'}),
+                          ('LT-U', release({'LT-U': 12000}) | {'study': 'LSQT-U', 'E': 8}), ('LT-U', release({'LT-U': 12000}) | {'study': 'LSQ'})):
+        with pytest.raises(ValueError):
+            scheduled_steps(arm, None, schedule)
+    assert [scheduled_steps(arm, None, release(registered)) for arm in ARMS] == [8000, 7500, 7000]  # the LSQT release is unchanged
+
+
 # ---------------------------------------------------------------------------------------------------------- the decision rule
 
 def records(correct, **changes):

@@ -2,7 +2,7 @@
 
 `configuration` imports torch, so this runs on compute. Its output goes to `prepare_dpfp_release.py --config-hashes`, which freezes
 the hashes in the release; the runner then refuses any other config.
-Usage: dpfp_config_hashes.py [--study DPFP-X|LSQT|SQ2] [--numerics FILE (SQ2)] --out FILE ARM=STEPS ... (STEPS from `prepare_dpfp_release.py --steps-only`).
+Usage: dpfp_config_hashes.py [--study DPFP-X|LSQT|LSQT-U|SQ2] [--numerics FILE (SQ2)] --out FILE ARM=STEPS ... (STEPS from `prepare_dpfp_release.py --steps-only`).
 """
 from __future__ import annotations
 
@@ -24,6 +24,7 @@ def sq2_config(arm, steps, numerics):
 
 STUDIES = {'DPFP-X': (XARMS, lambda arm, steps, numerics: dpfp.configuration(arm, steps, E=16)),
            'LSQT': (lsqt_release.ARMS, lambda arm, steps, numerics: lsqt.configuration(arm, steps, E=16)),
+           'LSQT-U': ((lsqt_release.CONTROL,), lambda arm, steps, numerics: lsqt.configuration(arm, steps, E=16)),
            'SQ2': (sq2_release.ARMS, sq2_config)}
 
 if __name__ == '__main__':
