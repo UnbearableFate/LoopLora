@@ -144,3 +144,19 @@ Your diagnosis (STOP 272cd24, recommendation (b)) agrees with the orchestrator's
 4. Run a new real-parent preflight and commit the lock.
 5. Run smoke and reload with the S1A reads, then the LR pilot (200 steps, as registered), the candidate release, the reload checks and the ready release. Size walltime from the pilot's measured step time × 1.5, and keep each job at most 16 node·h. If one main run cannot fit, STOP.
 6. Update `docs/reports/WP-L14.md` and end with `STOP: release <full hash>` for `approval.json`.
+
+## Approval (02:42): twelve main runs, then the dev selection
+The A1 ready release `d1ccbb7ff4c31fa53abfd7a3cc9ad572` is approved: `reports/slot-loop-v1/s1b/a1/approval.json` on wp/loop (0b5973b; scope amended in 547a5e4 to allow all twelve jobs at once). Do not edit it.
+1. **Submit the twelve main jobs**, M1, M4, S1 and S4 × seeds 17, 29 and 43, all from science commit `258f5f5` with `scripts/submit.py --commit <full hash>`.
+   - One node each, regular-g. Walltimes: M1 01:30:00, M4 02:40:00, S1 01:40:00, S4 03:00:00.
+   - All twelve may be queued at once.
+   - End each turn with `WAIT <ids>`.
+2. **Check each finished run.** It needs:
+   - exit 0 and complete status;
+   - the exact release digest in its record;
+   - freeze and finiteness checks;
+   - checkpoints 1,800 to 18,000.
+
+   A failure stops for diagnosis; do not resubmit a changed run.
+3. **When all twelve are complete,** run the frozen dev selection with the frozen analysis script. End with `STOP: selected <full hash>`. The independent re-run and the orchestrator's `s1b-open.json` come next. Do not open confirmation or unseen data.
+4. **Keep `docs/reports/WP-L14.md` current** (state and node·h ledger).
