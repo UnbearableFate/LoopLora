@@ -1,0 +1,16 @@
+{
+  "confidence": 0.9916666666666667,
+  "confirmation_window": "lsr",
+  "gated_comparisons": 6,
+  "orchestrator_decision": "Orchestrator, 2026-10-29: threshold lock 47d9110 approved; the LSR test range test [106000, 108000) may be read, in the order analysis code committed (4a52120), this authorization, test scans, analysis. R1 and R3 are infeasible on validation and get no test statistic; R2 is evaluated.",
+  "prereg": {
+    "hash": "63da9c626d699252c239cc86e149f1ad",
+    "path": "docs/prereg/LSR.md"
+  },
+  "status": "allowed",
+  "study": "lsr",
+  "thresholds": {
+    "hash": "a9f1d50ec806a506fe6866378547eab9",
+    "path": "reports/lsr/thresholds.json"
+  }
+}
