@@ -406,3 +406,12 @@ S1A main + selection cost: 6307/3600 = 1.751944 node·h. Including S1A preparati
 Orchestrator opening committed at 7a113ae7dd03ad957a28388297610980b2e1c382; persistent open record is $R/open-root/reports/slot-loop-v1/s1a-open.json, byte-identical to committed copy, blake2b-128 5a3b037e5aff8f66445df0091398fde0. Independent rv-code job 3729280 reproduced all three dev selection outputs byte-for-byte (report read from master); its log-basis runtime is 6 s = 0.001667 node·h, accounted separately from worker jobs. Opening record matches approved ready-release file digest, frozen analysis/prereg files and selected six actual weight-file digests.
 Entries file $R/s1a-entries.json, archived at reports/slot-loop-v1/s1a-entries.json, digest a9324b78cb5474aca14c369bcd745fd0: exactly six selected arm/seed labels plus s_re_native, matrix_step0 and soft_step0. References use locked S-RE writer 3994a5631021de03b2039974ac934e56 and the released calibrated reads. No episode generated on login. Each set has registered count 2000 and a fresh output path.
 Measured maximum 1000-episode dev evaluation across the trained runs is 7.002737898 s. Expected sealed-set job time = 9*2*7.002737898 + 26 s setup = 152.05 s; margin 1.5 = 228.07 s, rounded to 240 s per one-node debug-g job. This replaces the earlier illustrative five-minute evaluation request using the measurements.
+
+
+
+| job | set | nodes × walltime | outcome | node·h |
+| --- | --- | --- | --- | --- |
+| 3729313.opbs | confirmation | 1 × 00:04:00 | submitted, watcher pending | pending |
+| 3729314.opbs | unseen | 1 × 00:04:00 | submitted, watcher pending | pending |
+
+Both jobs use science commit 1523b19c7949673ddcd1d89cc1e5fe518736805c and exact ready/open/entries artifacts. Full log/spec paths are in reports/slot-loop-v1/s1a-evaluation-jobs.json. Worker cumulative remains 2.727167 node·h pending these jobs; adding the independent re-run gives 2.728833. Next: inspect completion, nine file counts and printed digests, then run the frozen S1A analysis. Metrics and registered verdict are read only after the frozen analysis; no adaptive choice or further training.

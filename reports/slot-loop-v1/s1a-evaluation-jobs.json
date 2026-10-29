@@ -1,0 +1,32 @@
+{
+ "version": 1,
+ "stage": "S1A-evaluation",
+ "science_commit": "1523b19c7949673ddcd1d89cc1e5fe518736805c",
+ "release_blake2b_128": "523d11d57a08a2491893ebe7cedc86a7",
+ "open_record_blake2b_128": "5a3b037e5aff8f66445df0091398fde0",
+ "entries_blake2b_128": "a9324b78cb5474aca14c369bcd745fd0",
+ "nodes_per_job": 1,
+ "walltime_seconds": 240,
+ "jobs": [
+  {
+   "set": "confirmation",
+   "job_id": "3729313.opbs",
+   "log": "/work/xg24i002/x10041/LoopLora/logs/pbs/slot-eval-confirmation-20261030-001535-3859503.log",
+   "spec": "/work/xg24i002/x10041/LoopLora/logs/pbs/specs/slot-eval-confirmation-20261030-001535-3859503.json",
+   "source": {
+    "kind": "commit",
+    "ref": "1523b19c7949673ddcd1d89cc1e5fe518736805c"
+   }
+  },
+  {
+   "set": "unseen",
+   "job_id": "3729314.opbs",
+   "log": "/work/xg24i002/x10041/LoopLora/logs/pbs/slot-eval-unseen-20261030-001535-3859511.log",
+   "spec": "/work/xg24i002/x10041/LoopLora/logs/pbs/specs/slot-eval-unseen-20261030-001535-3859511.json",
+   "source": {
+    "kind": "commit",
+    "ref": "1523b19c7949673ddcd1d89cc1e5fe518736805c"
+   }
+  }
+ ]
+}
