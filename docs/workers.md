@@ -137,6 +137,8 @@ the orchestrator skips it (esc) and leaves updating to the user.
 | WP-T12 part 3 (LSQT U control in the ledger, manuscript and PDF; LQ4, LQ3 narrowed) | sn-paper | b932ef4 |
 | master test after the LSQT-U merge (job 3727608 at 37abbfc: 2960 passed, 1 skipped; +3 = `tests/test_analyze_lsqt_u.py`) | orchestrator | 37abbfc |
 | resource rule (user, 2026-10-29): written budgets no longer bind, each job ≤ 16 node·h in `scripts/submit.py` (job 3728309: `tests/test_submit_cap.py` 6 passed) | orchestrator | 07cf11a |
+| WP-L13 SLOT-LOOP-v1 S0 (slot backends, data, analysis; preflight with Matrix bitwise equal to Native; lock; decision R2) | sn-slot, wk-slot | 2f7abbc |
+| master test after the S0 merge (jobs 3728584 and 3728585 at 2f7abbc, split in two debug-g jobs: 3257 passed, 1 skipped) | orchestrator | 2f7abbc |
 | Merged master full test suite after DPFP-X (job 3723646, exit 0, 2717 passed, 1 expected skip) | orchestrator | e86bdfe |
 | Merged master full test suite after P5L (job 3722062, exit 0, 2676 passed, 1 expected skip) | orchestrator | c6b5275 |
 | Merged master full test suite (job 3721356, exit 0, 1 expected skip) | orchestrator | d4de948 |
