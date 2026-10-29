@@ -52,9 +52,11 @@ def model():
 
 @pytest.fixture
 def experiment(model, tokenizer):
-    experiment = adopt(slot_golden.tiny_experiment(model, tokenizer))
-    yield experiment
-    experiment.close()
+    experiment = slot_golden.tiny_experiment(model, tokenizer)
+    try:
+        yield adopt(experiment)
+    finally:
+        experiment.close()
 
 
 def eval_arrays(count=16, start=0):
@@ -448,7 +450,7 @@ def test_arms_read_with_their_calibrated_values():
 # ---------------------------------------------------------------------------------------------------------- the runner gate
 
 def test_the_runner_refuses_without_a_valid_lock(tmp_path, monkeypatch):
-    monkeypatch.setattr(slot_run, 'inventory', lambda: {'S-RE': {'writer.pt': 'a' * 32}})
+    monkeypatch.setattr(slot_data, 'inventory', lambda: {'S-RE': {'writer.pt': 'a' * 32}})
     monkeypatch.setattr(slot_data, 'manifest', lambda: {'ids': {'x': 1}})
     good = dict(status='locked', prereg_blake2b_128=slot_data.PREREG_BLAKE2B_128, preflight=dict(passed=True),
                 manifest={'ids': {'x': 1}}, inventory={'S-RE': {'writer.pt': 'a' * 32}})

@@ -97,7 +97,9 @@ def child(source):
     env = dict(os.environ)
     if source is not None:
         env['PYTHONPATH'] = str(Path(source) / 'src')
-    run = subprocess.run([sys.executable, str(Path(__file__).resolve())], env=env, check=True, capture_output=True, text=True)
+    run = subprocess.run([sys.executable, str(Path(__file__).resolve())], env=env, capture_output=True, text=True)
+    if run.returncode:
+        raise RuntimeError(f'digest child failed (source {source}, exit {run.returncode}):\n{run.stderr[-6000:]}')
     return json.loads(run.stdout.strip().splitlines()[-1])
 
 

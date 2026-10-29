@@ -15,6 +15,7 @@ from pathlib import Path
 
 from looplora.data.relations import GENERATOR_VERSION, TaskSpec
 from looplora.infra.seeds import derive_seed
+from .sq2_release import PARENT as D128_3
 
 STUDY = "slot-loop-v1"
 BASE_SEED = 20261029
@@ -27,6 +28,11 @@ RUN_SEEDS = (17, 29, 43)
 BATCH = 32
 MAX_STEPS = 6000
 PILOT_STEPS = 200
+
+# The parents: S-RE (the SQ2 arm whose weights both S1A arms start from) and D128-3 (the delta-store recheck of S0).
+PARENT_FOLDERS = {"S-RE": "/work/xg24i002/x10041/LoopLora/runs/p1l/sq2/arms/S-RE", "D128-3": D128_3["folder"]}
+PARENT_RECORD_FILES = {"S-RE": ("writer.pt", "checkpoint.pt", "record.json", "training.json", "val-6000/samples.npz"),
+                       "D128-3": ("writer.pt", "checkpoint.pt", "record.json", "training.json", "val-22370/samples.npz")}
 
 # S-RE's task (its record.json task block: T1, E 16, Q 4, V 1024, four relations, head sharing 0.3, hop 1 only).
 TASK = dict(name="t1", E=16, Q=4, V=1024, n_rel=4, seen=(0, 768), unseen=(768, 1024), head_sharing=0.3, hops=(1,))
@@ -191,6 +197,15 @@ def file_digest(path) -> str:
         for chunk in iter(lambda: handle.read(1 << 22), b""):
             digest.update(chunk)
     return digest.hexdigest()
+
+
+def inventory() -> dict:
+    """blake2b-128 of the real parents' files. D128-3's writer.pt and checkpoint.pt are registered and must match."""
+    out = {name: {file: file_digest(Path(PARENT_FOLDERS[name]) / file) for file in files}
+           for name, files in PARENT_RECORD_FILES.items()}
+    if any(out["D128-3"][file] != digest for file, digest in D128_3["digests"].items()):
+        raise ValueError("D128-3 differs from its registered digests")
+    return out
 
 
 class SealedSetError(PermissionError):

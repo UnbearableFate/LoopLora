@@ -34,8 +34,6 @@ RUNS = Path("/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1")
 PRIMARY, DIAGNOSTIC = "all_valid_question", "final_only"
 MODES = ("preflight", "s0", "smoke", "pilot", "train", "evaluate", "reload-check")
 REGISTERED_COUNTS = dict(trainable_parameters=180_224, frozen_parameters=294_914)
-PARENT_RECORD_FILES = {"S-RE": ("writer.pt", "checkpoint.pt", "record.json", "training.json", "val-6000/samples.npz"),
-                       "D128-3": ("writer.pt", "checkpoint.pt", "record.json", "training.json", "val-22370/samples.npz")}
 
 
 class StopRun(RuntimeError):
@@ -61,15 +59,6 @@ def check_config(path, stage: str) -> dict:
     return dict(config=expected, hash=stable_hash(expected))
 
 
-def inventory() -> dict:
-    """blake2b-128 of the real parents' files (D128-3's writer.pt and checkpoint.pt are registered and must match)."""
-    out = {name: {file: file_digest(Path(PARENT_FOLDERS[name]) / file) for file in files} for name, files in PARENT_RECORD_FILES.items()}
-    registered = D128_3["digests"]
-    if any(out["D128-3"][file] != digest for file, digest in registered.items()):
-        raise ValueError("D128-3 differs from its registered digests")
-    return out
-
-
 def require_lock(path) -> dict:
     """A locked manifest: registry and disjointness re-derived now equal the lock's, the preflight passed, the parents' files
     have the locked digests."""
@@ -80,7 +69,7 @@ def require_lock(path) -> dict:
         raise StopRun("the preflight did not pass; no science runs")
     if lock.get("manifest") != json.loads(json.dumps(slot_data.manifest())):
         raise StopRun("the registry differs from the locked manifest")
-    if lock.get("inventory") != inventory():
+    if lock.get("inventory") != slot_data.inventory():
         raise StopRun("a parent file differs from the locked inventory")
     return lock
 
@@ -211,7 +200,7 @@ def run_preflight(out, config_path) -> dict:
     out.mkdir(parents=True, exist_ok=False)
     config = check_config(config_path, "S0")
     manifest = slot_data.manifest()
-    inv = inventory()
+    inv = slot_data.inventory()
     smoke = slot_data.eval_set("S0", "smoke")
     smoke_eval, smoke_train = episodes(smoke), raw_episodes(smoke)
     checks, identity = {}, {}

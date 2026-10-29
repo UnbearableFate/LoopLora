@@ -21,11 +21,10 @@ from .evaluate import _slice
 from .run import source_metadata
 from .slot_read import ReadSpec, attach_slot_reader, bind_batch, final_query, final_read
 from .slot_rules import BUFFERS, FROZEN, TRAINABLE
-from .sq2_release import PARENT as D128_3
 from .train import make_task_spec, synchronize
 from .writer_fix import true_fact_indices
 
-PARENT_FOLDERS = {"S-RE": "/work/xg24i002/x10041/LoopLora/runs/p1l/sq2/arms/S-RE", "D128-3": D128_3["folder"]}
+PARENT_FOLDERS = slot_data.PARENT_FOLDERS
 CHUNK = 16  # `read_fix_run.validate`'s evaluation batch: the identity replays use the same batches
 EXPORT_VERSION = 1
 

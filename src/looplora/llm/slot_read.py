@@ -125,11 +125,24 @@ class SlotReadMixin:
         return branch, M0, self._stats(valid_mask, torch.zeros_like(valid_mask), loop_steps)
 
 
+class _Base:
+    """What the fix container takes as `initial`: the reader's config and the state its base class holds (the container adds
+    `input_mean` and `input_std` itself, so a state dict that already has them cannot be loaded into the base)."""
+
+    def __init__(self, adapter) -> None:
+        self.cfg = adapter.cfg
+        self._state = {k: v for k, v in adapter.state_dict().items() if k not in ("input_mean", "input_std")}
+
+    def state_dict(self) -> dict:
+        return self._state
+
+
 class SlotFixAdapter(SlotReadMixin, FixAdapter):
     """The WP-L3 fix adapter (S-RE, D128-3) with memory-backend reads and an optional separate reader projection."""
 
     def __init__(self, initial, arm: str) -> None:
-        super().__init__(initial, arm)
+        super().__init__(_Base(initial), arm)
+        self.load_state_dict(initial.state_dict(), strict=True)  # the weights and the input standardization buffers, exactly
         self.register_parameter("A_query", None)
 
     def add_query_projection(self) -> None:
