@@ -1,0 +1,156 @@
+{
+ "checks": [
+  {
+   "artifacts": {
+    "record.json": "8e224f20a351380ba67e6181072bcd7e",
+    "train_log.jsonl": "1b5957cb009cb0aa228193022dafcd31",
+    "train_steps.npz": "e6adad7366d5db06bea76a8097e9b86a"
+   },
+   "job_id": "3730250.opbs",
+   "label": "M1/17",
+   "metadata_checks": "passed",
+   "retained_dev_rows": 11,
+   "selected_step": 18000
+  },
+  {
+   "artifacts": {
+    "record.json": "22a77e4347bb20a3c42a173912ad46b4",
+    "train_log.jsonl": "4857ea23c8dbdb9ee3a13ed27dd227cd",
+    "train_steps.npz": "65ace7e72fe2292508d64e1a44bcb831"
+   },
+   "job_id": "3730251.opbs",
+   "label": "M1/29",
+   "metadata_checks": "passed",
+   "retained_dev_rows": 11,
+   "selected_step": 18000
+  },
+  {
+   "artifacts": {
+    "record.json": "9d21a5cb0b45cdca3f224dded30cebfa",
+    "train_log.jsonl": "4ad6e019cf7a97d6c5490389355f7a2b",
+    "train_steps.npz": "85702fbc81ea6473cd6895d963aef42c"
+   },
+   "job_id": "3730252.opbs",
+   "label": "M1/43",
+   "metadata_checks": "passed",
+   "retained_dev_rows": 11,
+   "selected_step": 18000
+  },
+  {
+   "artifacts": {
+    "record.json": "ca4d233a7626e843c81c04737a713f60",
+    "train_log.jsonl": "5d1a86cdb699a31be465bfbf9f77b88a",
+    "train_steps.npz": "bec9b500f8963eac4ca2b648b9d08d38"
+   },
+   "job_id": "3730253.opbs",
+   "label": "M4/17",
+   "metadata_checks": "passed",
+   "retained_dev_rows": 11,
+   "selected_step": 18000
+  },
+  {
+   "artifacts": {
+    "record.json": "a94717b6a76ac5540ce637b4632fda53",
+    "train_log.jsonl": "ad00fe86bd3338b7ba70d5efb9ccdc9b",
+    "train_steps.npz": "cd4673303bb2c96966fa677a0c350623"
+   },
+   "job_id": "3730254.opbs",
+   "label": "M4/29",
+   "metadata_checks": "passed",
+   "retained_dev_rows": 11,
+   "selected_step": 18000
+  },
+  {
+   "artifacts": {
+    "record.json": "e4e020c8e498b1ea97692adac4b05d3f",
+    "train_log.jsonl": "f1ead22f4c7c721825d6751508d2ad21",
+    "train_steps.npz": "455085dd14d32a0ad8c5fac9f9298e5d"
+   },
+   "job_id": "3730255.opbs",
+   "label": "M4/43",
+   "metadata_checks": "passed",
+   "retained_dev_rows": 11,
+   "selected_step": 16200
+  },
+  {
+   "artifacts": {
+    "record.json": "11d749819b757db1480bc4c1a9d51bee",
+    "train_log.jsonl": "30d152822679058149b84c43ecaa2e87",
+    "train_steps.npz": "fe81a440fa99ab499e1222a142dc7d42"
+   },
+   "job_id": "3730256.opbs",
+   "label": "S1/17",
+   "metadata_checks": "passed",
+   "retained_dev_rows": 11,
+   "selected_step": 18000
+  },
+  {
+   "artifacts": {
+    "record.json": "f7c6f3b4fe6a977991b65efa83ab2a30",
+    "train_log.jsonl": "fcd10419440f753ec8c45a0143d4b1c7",
+    "train_steps.npz": "62038f24765160dc9d8d407e250c4316"
+   },
+   "job_id": "3730257.opbs",
+   "label": "S1/29",
+   "metadata_checks": "passed",
+   "retained_dev_rows": 11,
+   "selected_step": 14400
+  },
+  {
+   "artifacts": {
+    "record.json": "dde120b74da5a0be452fba3867481264",
+    "train_log.jsonl": "dd3f9a66968891a5610aabaad98e31c2",
+    "train_steps.npz": "d306fbcb34241b307673635cc197149a"
+   },
+   "job_id": "3730258.opbs",
+   "label": "S1/43",
+   "metadata_checks": "passed",
+   "retained_dev_rows": 11,
+   "selected_step": 16200
+  },
+  {
+   "artifacts": {
+    "record.json": "1d7d6f536ba2b37f350ddc78ef02aa0c",
+    "train_log.jsonl": "60616aa9266c32ac330ad465f6ac4801",
+    "train_steps.npz": "d6d278fe021e51b0451732dc083601d7"
+   },
+   "job_id": "3730259.opbs",
+   "label": "S4/17",
+   "metadata_checks": "passed",
+   "retained_dev_rows": 11,
+   "selected_step": 18000
+  },
+  {
+   "artifacts": {
+    "record.json": "9d3adbdaa9fdf68993acb1c1774be1d7",
+    "train_log.jsonl": "c33fea0a5968fb553ba9b7b94ff42da6",
+    "train_steps.npz": "c9f59a61ad3057e8b5b40f6afc7fe260"
+   },
+   "job_id": "3730260.opbs",
+   "label": "S4/29",
+   "metadata_checks": "passed",
+   "retained_dev_rows": 11,
+   "selected_step": 14400
+  },
+  {
+   "artifacts": {
+    "record.json": "aad5d66fb907097181ac51bf634e3577",
+    "train_log.jsonl": "97116cb3f2b3edaf450391ccdc2074f7",
+    "train_steps.npz": "e170539006176baece9961a1dfe002a0"
+   },
+   "job_id": "3730261.opbs",
+   "label": "S4/43",
+   "metadata_checks": "passed",
+   "retained_dev_rows": 11,
+   "selected_step": 18000
+  }
+ ],
+ "release_blake2b_128": "d1ccbb7ff4c31fa53abfd7a3cc9ad572",
+ "retained_dev_bytes": 258295338,
+ "retained_dev_exports": 132,
+ "retained_dev_samples": 132,
+ "saved_array_and_export_content_audit": "pending compute DEV job",
+ "source_commit": "258f5f5a24eae684f640a9fd62679bb643470a76",
+ "stage": "S1B-A1-MAIN",
+ "status": "metadata_verified"
+}

@@ -1,0 +1,31 @@
+{
+ "name": "s1b-a1-S1-s43",
+ "queue": "regular-g",
+ "nodes": 1,
+ "walltime": "01:40:00",
+ "scale_up": null,
+ "source": {
+  "kind": "commit",
+  "ref": "258f5f5a24eae684f640a9fd62679bb643470a76"
+ },
+ "argv": [
+  "-m",
+  "looplora.llm.s1b_run",
+  "--mode",
+  "train",
+  "--manifest",
+  "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/manifest.lock.json",
+  "--release",
+  "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/release.json",
+  "--approval",
+  "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/approval.json",
+  "--arm",
+  "S1",
+  "--seed",
+  "43",
+  "--out",
+  "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/main/S1/s43"
+ ],
+ "log": "/work/xg24i002/x10041/LoopLora/logs/pbs/s1b-a1-S1-s43-20261030-024439-1881068.log",
+ "submitted": "2026-10-30T02:44:39.672895"
+}

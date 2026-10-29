@@ -1,0 +1,7 @@
+[job] host=mg0738 job=3730258.opbs spec=/work/xg24i002/x10041/LoopLora/logs/pbs/specs/s1b-a1-S1-s43-20261030-024439-1881068.json start=2026-10-30T02:50:33+09:00
+[job] source=commit:258f5f5a24eae684f640a9fd62679bb643470a76
+[job] argv=-m looplora.llm.s1b_run --mode train --manifest /work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/manifest.lock.json --release /work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/release.json --approval /work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/approval.json --arm S1 --seed 43 --out /work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/main/S1/s43
+[job] torch 2.14.0+cu132 cuda True
+`torch_dtype` is deprecated! Use `dtype` instead!
+{"mode": "train", "status": "complete", "out": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/main/S1/s43"}
+[job] exit=0 end=2026-10-30T03:54:08+09:00
