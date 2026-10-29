@@ -231,7 +231,7 @@ def test_reads_leave_the_state_untouched_and_online_write_refuses(device):
             backend.online_write(memory, torch.zeros(1, 20), torch.zeros(1, 8))
     assert (state_digest(state), state_digest(matrix)) == before
     cleared = reset_rows(state, torch.tensor([1], device=device))
-    assert cleared.count.tolist()[1] == 0 and not bool(cleared.valid[1].any()) and state_digest(state) == before
+    assert cleared.count.tolist()[1] == 0 and not bool(cleared.valid[1].any()) and state_digest(state) == before[0]
     assert state_digest(MatrixState(torch.zeros(1, 2, 2))) != state_digest(MatrixState(torch.ones(1, 2, 2)))
 
 
