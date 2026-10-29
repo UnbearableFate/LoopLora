@@ -21,3 +21,15 @@ Cost estimation uses measured load, steady step, evaluation, checkpoint/support-
 Tests target the registered data/seal boundaries, three branches, source/release mutations, whole-episode bootstrap and continuation screens, native Matrix-L4 logits/gradients, actual trajectory/label isolation, control initialization/read counts/gradient reachability, frozen-writer training and export reload. A synthetic-parent integration exercises the real 20-step smoke→JSON builder→candidate→reload CLI→ready path. Existing slot regression tests additionally check the unchanged T1/S1A/golden paths. No real parent run, preflight, lock, calibration, pilot, formal training/evaluation or sealed data access is performed in this step.
 
 Login validation: AST parsing of all new Python files without importing application code, registered-addendum blake2b check, and `git diff --check`. Compute test results and exact snapshot/job ledger follow below. Dependencies and old source files remain unchanged. The next gate after passing tests is the single core-code cross-review; preflight/lock remain deferred until that review/fix validation.
+
+### Compute test ledger (submitted; results pending)
+
+Snapshot **`a731d6dcbb94f06cf5fe0999b522f872653b6fef`** contains implementation, tests and this report's implementation record. Each command uses `/usr/bin/python3 -I scripts/submit.py --queue debug-g --nodes 1 --commit a731d6dcbb94f06cf5fe0999b522f872653b6fef`; no `--wait`, sleep or polling. The three payloads are `-m pytest -q` followed by the files below. Walltime basis: earlier slot metadata tests took 83–84 s and experiment tests 167–177 s; new actual-forward depth-eight tracing and the four-arm synthetic smoke merit the longer model shard. Requests include approximately 1.5× margin and remain below the per-job cap. No S1B science output is created.
+
+| job | payload files | requested walltime / node·h | outcome / actual node·h |
+| --- | --- | --- | --- |
+| 3728953.opbs | test_s1b_data_analysis.py, test_s1b_artifacts.py | 00:05:00 / 0.083333 | pending / pending |
+| 3728954.opbs | test_s1b_model.py, test_s1b_integration.py | 00:08:00 / 0.133333 | pending / pending |
+| 3728955.opbs | test_slot_experiment.py, test_slot_backend.py, test_slot_data.py | 00:07:00 / 0.116667 | pending / pending |
+
+Persistent logs under `/work/xg24i002/x10041/LoopLora/logs/pbs/`: `s1b-t-meta-20261029-230438-3532112.log`, `s1b-t-model-20261029-230438-3532117.log`, `s1b-t-legacy-20261029-230438-3532120.log`. Combined requested ceiling 0.333333 node·h; actual total is not yet known. Next: orchestrator watcher wakes wk-loop after all three leave PBS; inspect full failures/counts, source/argv and exit markers, fix defects if necessary, update this ledger, then `STOP: review <full hash>`. No real-parent preflight or manifest lock before that review.
