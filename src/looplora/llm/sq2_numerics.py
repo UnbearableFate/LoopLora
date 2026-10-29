@@ -2,6 +2,8 @@
 coefficient loss, from training-only numerics at the parent checkpoint. Train split only; no validation or test episode. Compute only."""
 from __future__ import annotations
 
+import math
+
 import numpy as np
 import torch
 
@@ -27,7 +29,7 @@ def stream_batches(experiment,count):
 
 def gradient_norm(loss,params):
     grads=torch.autograd.grad(loss,params,retain_graph=True,allow_unused=True)
-    return float(torch.sqrt(sum(float(g.double().square().sum()) for g in grads if g is not None)))
+    return math.sqrt(sum(float(g.double().square().sum()) for g in grads if g is not None))
 
 
 def read_error(experiment,batch,terms,eta):
