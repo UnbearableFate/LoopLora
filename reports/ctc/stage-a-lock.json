@@ -1,0 +1,112 @@
+{
+  "dimensions": {
+    "h14": 1024,
+    "h21": 1024,
+    "h28": 1024,
+    "o14": 2048
+  },
+  "entity_at_own_token": {
+    "head": true,
+    "tail": true
+  },
+  "feature_stats": {
+    "hash": "86f2f10b43728a621d652c68d6cdc4bc",
+    "path": "/work/xg24i002/x10041/LoopLora/runs/ctc/stage-a/feature-stats.pt"
+  },
+  "fits": 80,
+  "git_commit": "4e93b9e2f206038bb1515e060267e4bfa1242735",
+  "host": "mg0272",
+  "job_id": "3724058.opbs",
+  "plan": {
+    "head": {
+      "form": "rank64",
+      "position": "head_last",
+      "site": "h14"
+    },
+    "relation": {
+      "form": "full",
+      "position": "head_last",
+      "site": "h14"
+    },
+    "tail": {
+      "form": "rank64",
+      "position": "tail",
+      "site": "h14"
+    }
+  },
+  "predictions_hash": "1be73a72d014a0b8848a04342514bf6f",
+  "probe_steps": 1200,
+  "probes_csv_hash": "67a1b023eeea1efa25df9305c1e8d05c",
+  "reader_adapter_parameters": 475138,
+  "seconds": 92.47699708399887,
+  "selection": {
+    "head": {
+      "accuracy": 0.99975,
+      "form": "rank64",
+      "n": 12000,
+      "parameters": 132096,
+      "position": "head_last",
+      "site": "h14",
+      "train_accuracy": 1.0
+    },
+    "relation": {
+      "accuracy": 1.0,
+      "form": "full",
+      "n": 12000,
+      "parameters": 4100,
+      "position": "head_last",
+      "site": "h14",
+      "train_accuracy": 1.0
+    },
+    "tail": {
+      "accuracy": 0.9999166666666667,
+      "form": "rank64",
+      "n": 12000,
+      "parameters": 132096,
+      "position": "tail",
+      "site": "h14",
+      "train_accuracy": 1.0
+    }
+  },
+  "selection_facts": 12000,
+  "selection_joint_accuracy": 0.9996666666666667,
+  "selection_joint_by_fact": [
+    1.0,
+    0.999,
+    1.0,
+    1.0,
+    1.0,
+    0.999,
+    0.999,
+    1.0,
+    1.0,
+    1.0,
+    1.0,
+    0.999
+  ],
+  "selection_key_accuracy": 0.99975,
+  "selection_range": {
+    "episodes": 1000,
+    "seed": 4242,
+    "split": "val",
+    "start": 1000
+  },
+  "smoke": false,
+  "source_dirty": false,
+  "source_hash": "9d2b9275b036df179f20461917cb35b5",
+  "stage": "A",
+  "stage_seconds": {
+    "extract": 19.55749719099549,
+    "load": 1.3545543530053692
+  },
+  "status": "lock",
+  "study": "CTC",
+  "tie_margin": 0.005,
+  "train_range": {
+    "episodes": 8192,
+    "seed": 5917190808123512652,
+    "split": "train",
+    "start": 0
+  },
+  "writer_parameters": 268292
+}
