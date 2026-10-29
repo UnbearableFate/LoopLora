@@ -31,7 +31,7 @@ prepare_dpfp = load_script('prepare_dpfp_release')
 COMMIT = 'a' * 40
 EVALS = (0.9, 0.91, 0.89, 1.07, 0.9)  # seconds of the five 100-episode smoke evaluations
 SENTINEL = 987654  # a smoke "score": it must never reach a release
-STEP = {arm: 0.15 + 0.01 * i for i, arm in enumerate(lsq_release.ARMS + dpfp_release.ARMS)}  # seconds per training step
+STEP = {arm: 0.15 + 0.01 * i for i, arm in enumerate(lsq_release.ARMS + dpfp_release.ARMS + dpfp_release.XARMS)}  # seconds per training step
 
 STORAGE_BOTH = ['L32-K4', 'L32-RG', 'L128-K4', 'L128-RG']
 MIXED = ['L32-U', 'L128-K4', 'L128-RG']
@@ -55,8 +55,10 @@ def smoke_record(study, arm, *, steps=2400, E=16, commit=COMMIT, tweak=None):
         config['lsq'] = dict(arm=arm)
         record.update(rank=rank, store=store, store_eta=3e-3 if store == 'ridge' else None)
     else:
-        rank, nu = dpfp_release.SPECS[arm]
+        rank, nu, backbone = dpfp_release.arm_spec(arm)
         config['dpfp'] = dict(arm=arm)
+        if backbone is not None:
+            config['backbone'] = dict(backbone)
         record.update(rank=rank, dpfp_nu=nu)
     record.update(config=config, config_hash=stable_hash(config), training=dict(
         actual_steps=steps, training_episodes=32 * steps, eval_steps=marks, primary_eval_steps=marks, matched_eval_steps=[],
@@ -463,3 +465,78 @@ def test_the_study_registries_are_the_registered_candidate_orders():
     assert [lsq_release.SPECS[a] for a in lsq_release.ARMS] == [
         (32, 'delta'), (32, 'sweep'), (32, 'ridge'), (128, 'delta'), (128, 'sweep'), (128, 'ridge')]
     assert lsq_release.ETA_BOUNDS == (1e-4, 1e-1)
+
+
+# ------------------------------------------------------------------------------------- DPFP-X (WP-L8, docs/prereg/DPFP-X.md)
+
+X_STEPS = 1800
+X_HASHES = {'X256': 'a1' * 16, 'X17': 'b2' * 16}
+
+
+def x_steps(arm):
+    available = (7200 - 90) / 1.5 - 5 * 10 * max(EVALS)
+    return 5 * math.floor(available / STEP[arm] / 5)
+
+
+def x_release(tmp_path, **kwargs):
+    root = write_smokes(tmp_path / 'smoke', 'DPFP-X', dpfp_release.XARMS, steps=X_STEPS, **kwargs)
+    return root, tmp_path / 'sub' / 'release.json'
+
+
+def test_a_dpfp_x_release_names_both_arms_their_hashes_and_the_runner_accepts_it(tmp_path):
+    root, out = x_release(tmp_path)
+    steps_only = prepare_dpfp.prepare(root, None, steps=X_STEPS, study='DPFP-X')
+    assert steps_only['steps_by_arm'] == {arm: x_steps(arm) for arm in dpfp_release.XARMS} and 'config_hashes' not in steps_only
+    with pytest.raises(ValueError, match='config hashes'):
+        prepare_dpfp.prepare(root, out, steps=X_STEPS, study='DPFP-X')
+    assert not out.exists()
+    made = prepare_dpfp.prepare(root, out, steps=X_STEPS, study='DPFP-X', config_hashes=X_HASHES)
+    written = json.loads(out.read_text())
+    assert written == made and (written['study'], written['E'], written['science_commit']) == ('DPFP-X', 16, COMMIT)
+    assert written['scale_up'] == 'docs/prereg/DPFP-X.md' and written['config_hashes'] == X_HASHES
+    assert written['prereg_blake2b_128'] == dpfp_release.prereg_digest() and len(written['prereg_blake2b_128']) == 32
+    assert written['steps_by_arm'] == {arm: x_steps(arm) for arm in dpfp_release.XARMS}
+    assert written['primary_eval_steps_by_arm']['X17'] == [x_steps('X17') * k // 5 for k in range(1, 6)]
+    assert (written['smoke']['steps'], written['walltime'], written['max_job_seconds']) == (X_STEPS, '02:00:00', 7200)
+    for arm in dpfp_release.XARMS:
+        assert dpfp_release.scheduled_steps(arm, None, written) == x_steps(arm)
+        assert 1.5 * (written['steps_by_arm'][arm] * STEP[arm] + 5 * 10 * max(EVALS)) + 90 <= 7200
+    assert str(SENTINEL) not in out.read_text() and written['smoke']['quality_scores_exposed'] is False
+    with pytest.raises(FileExistsError):
+        prepare_dpfp.prepare(root, out, steps=X_STEPS, study='DPFP-X', config_hashes=X_HASHES)
+    with pytest.raises(ValueError):                    # the DPFP release checker does not take a DPFP arm in a DPFP-X release
+        prepare_dpfp.check_release({**written, 'steps_by_arm': {**written['steps_by_arm'], 'D32-3': 20000}}, E=16)
+    for hashes in ({'X256': X_HASHES['X256']}, {**X_HASHES, 'X17': 'short'}, {**X_HASHES, 'D32-3': 'c3' * 16}):
+        with pytest.raises(ValueError, match='config_hashes'):
+            prepare_dpfp.prepare(root, tmp_path / 'other.json', steps=X_STEPS, study='DPFP-X', config_hashes=hashes)
+    with pytest.raises(ValueError, match='E8'):
+        prepare_dpfp.prepare(root, tmp_path / 'e8.json', steps=X_STEPS, study='DPFP-X', e8_decision=tmp_path / 'lock.json')
+
+
+X_TWEAKS = [
+    (lambda r: r.update(rank=128 if r['rank'] == 256 else 256), 'belongs to another arm'),
+    (lambda r: r.update(dpfp_nu=2), 'belongs to another arm'),
+    (lambda r: r['config']['dpfp'].update(arm='X256'), 'belongs to another arm'),
+    (lambda r: r['config'].update(backbone={'id': 'Qwen/Qwen3-0.6B-Base', 'revision': 'x'}), 'belongs to another arm'),
+]
+
+
+@pytest.mark.parametrize('tweak, message', COMMON_TWEAKS + X_TWEAKS)
+def test_a_dpfp_x_smoke_record_that_is_not_the_arms_ten_percent_smoke_is_refused(tmp_path, tweak, message):
+    # the common tweaks are written for a 2400-step smoke (marks 480, ...): so is this one
+    root = write_smokes(tmp_path / 'smoke', 'DPFP-X', dpfp_release.XARMS, tweaks={'X17': tweak}, steps=2400)
+    with pytest.raises(ValueError, match=message):
+        prepare_dpfp.prepare(root, tmp_path / 'release.json', steps=2400, study='DPFP-X', config_hashes=X_HASHES)
+    assert not (tmp_path / 'release.json').exists()
+
+
+def test_x256_smoke_must_not_carry_a_backbone_and_dpfp_releases_are_unchanged(tmp_path):
+    root = write_smokes(tmp_path / 'smoke', 'DPFP-X', dpfp_release.XARMS, steps=X_STEPS,
+                        tweaks={'X256': lambda r: r['config'].update(backbone=dict(dpfp_release.BACKBONE_17B))})
+    with pytest.raises(ValueError, match='belongs to another arm'):
+        prepare_dpfp.prepare(root, None, steps=X_STEPS, study='DPFP-X')
+    # the DPFP release path accepts the same files as before and names no config hashes
+    dpfp_root = write_smokes(tmp_path / 'dpfp', 'DPFP', dpfp_release.ARMS)
+    written = prepare_dpfp.prepare(dpfp_root, tmp_path / 'dpfp-release.json')
+    assert 'config_hashes' not in written and 'prereg_blake2b_128' not in written and written['study'] == 'DPFP'
+    assert written['scale_up'] == 'docs/prereg/DPFP.md'
