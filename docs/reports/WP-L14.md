@@ -47,3 +47,14 @@ Diagnoses and focused corrections:
 - Detached the native-versus-Matrix logit-gap tensor before converting the diagnostic maximum to a float, resolving the observed autograd scalar-conversion warning without changing logits, gradients or the bitwise assertion.
 
 Retry the two affected S1B shards in full. Existing S0/S1A source imports and test files did not change; the passed 113-case legacy shard remains applicable. Review stop still waits for successful training/export/integration execution. Current checks on login: AST parsing and diff whitespace only; all runtime work remains in PBS.
+
+### Retry submissions
+
+Snapshot `5518661a4b8491daa99a48eac4730ced2b739899`, one node per job, debug-g, no `--wait` or polling. Both payloads use `-m pytest -o addopts= -q -ra --junitxml=ABS_PATH` and the same file sets as their initial shards; registered assertions remain unchanged.
+
+| job | shard | requested walltime / node·h | outcome / actual node·h |
+| --- | --- | --- | --- |
+| 3729032.opbs | metadata/statistics/artifacts | 00:01:00 / 0.016667 | pending / pending |
+| 3729033.opbs | reader/trainer/integration | 00:06:00 / 0.100000 | pending / pending |
+
+Metadata request is >1.5× its measured 24 s. The model's 27 s failed before training, so sizing still uses the related 167–177 s experiment measurements plus margin for the full four-arm smoke. Logs: `s1b-r1-meta-20261029-231206-3547267.log`, `s1b-r1-model-20261029-231206-3547278.log` under the same persistent PBS log root. JUnit XML: `/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b-tests/5518661-{meta,model}.xml`. Retry requested total 0.116667 node·h; cumulative actual remains 0.079444 until these complete. Next: watcher notification, inspect counts and XML (including every skip reason), then fix any remaining defect or issue the review stop after both pass.
