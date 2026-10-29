@@ -1,0 +1,89 @@
+{
+  "candidate_flagged": true,
+  "claim": "a learned parser plus a fixed code table drives the frozen composing reader (C1); not a learned writer; privileged oracle codes; not comparable with DPFP/DPFP-X",
+  "commit_of_evaluation": "7ae9619d206b642c22d89134630e21419e66a1e8",
+  "decision": {
+    "arm_rule": "higher hop-1 EM of M1-L4@4 (hard); a difference below 1 pp goes to ce",
+    "arms": {
+      "ce": {
+        "borderline": false,
+        "candidate": true,
+        "falsifier_F1": false,
+        "falsifier_F2": false,
+        "gain_ok": true,
+        "gain_pp": 24.05,
+        "hop1_em": 0.507,
+        "hop1_ok": true,
+        "integrity_ok": true
+      },
+      "ceans": {
+        "borderline": false,
+        "candidate": true,
+        "falsifier_F1": false,
+        "falsifier_F2": false,
+        "gain_ok": true,
+        "gain_pp": 24.15,
+        "hop1_em": 0.507,
+        "hop1_ok": true,
+        "integrity_ok": true
+      }
+    },
+    "outcome": "candidate",
+    "selected_arm": "ce"
+  },
+  "evaluation": {
+    "episodes": 1000,
+    "seed": 4242,
+    "split": "val",
+    "start": 0
+  },
+  "hashes": {
+    "eval_metrics": "903c373aa6bf7f07ee4e6238f1c7c05b",
+    "lock": "f69ccb4a89dc5d4362eb1a37debaa0c7",
+    "oracle": "db99a779aebd647bc72caf4aabba2c48",
+    "readers": {
+      "B3-L4": "37020c367f482656bd2d14bb97e85b8f",
+      "B4": "acfa784892a1dd2fd2e31a7d04ff86ae",
+      "M1-L4": "c90d23ff1a27d509ed61ae43d5185832"
+    },
+    "samples": "bb4d4ffc12767ab319f313c7a96e3ed0",
+    "writer_ce": "c6868f526541031ecad234f466b62b70",
+    "writer_ceans": "76fc4985a3b5628fdef2acb6b129bba3"
+  },
+  "numbers": {
+    "ce": {
+      "gain_ci95_pp": [
+        21.79875,
+        26.3
+      ],
+      "gain_pp": 24.05,
+      "hop1_em": 0.507,
+      "joint": 1.0,
+      "shuffled_hop1_em": 0.002,
+      "soft_gain_pp": 23.95,
+      "soft_hop1_em": 0.506,
+      "zero_hop1_em": 0.0
+    },
+    "ceans": {
+      "gain_ci95_pp": [
+        21.94875,
+        26.35
+      ],
+      "gain_pp": 24.15,
+      "hop1_em": 0.507,
+      "joint": 0.999916672706604,
+      "shuffled_hop1_em": 0.002,
+      "soft_gain_pp": 24.05,
+      "soft_hop1_em": 0.508,
+      "zero_hop1_em": 0.0
+    }
+  },
+  "oracle_reference": {
+    "gain_pp": 23.9,
+    "hop1_em": 0.506
+  },
+  "outcome": "candidate",
+  "prereg": "docs/prereg/CTC.md (with Clarification C1; master f750ee2, blake2b-128 546bbe39cb009b545528ef35b37c887a)",
+  "selected_arm": "ce",
+  "study": "CTC"
+}

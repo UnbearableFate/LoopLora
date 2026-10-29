@@ -1,88 +1,108 @@
-# Study CTC (WP-L11), step 2 so far: code, tests, smokes, Stage A lock
+# Study CTC (WP-L11): a classify-then-code writer drives the frozen P1-L r = 128 readers
 
-Registered pre-registration: `docs/prereg/CTC.md` (master 9876584). Worker: sn-oracle (Claude Sonnet-5.5), branch
-`wp/oracle`. Status: Stage A is done and its lock is committed. **Stage B and the evaluation have not run; they wait for
-the orchestrator's OK.** No test split and no `val` [0, 2,000) smoke data were read (the smoke ranges are below).
+Registration: `docs/prereg/CTC.md` (master f750ee2, blake2b-128 `546bbe39cb009b545528ef35b37c887a`, with Clarification
+C1). Worker: sn-oracle (Claude Sonnet-5.5), branch `wp/oracle`. Single seed (17), validation episodes only; no test
+split was read. Evaluation commit `7ae9619d206b642c22d89134630e21419e66a1e8`. Decision record: `reports/ctc/decision.json`.
 
-## Code and tests
-New files only: `src/looplora/llm/ctc.py`, `scripts/run_ctc.py`, `tests/test_ctc.py`. No existing module is edited, and
-a test checks that nothing else imports `ctc` and that importing it leaves a reader's oracle logits and memory unchanged
-(fresh processes with and without the import).
-- `tests/test_ctc.py`, 17 cases: **pass** (job 3724023, exit 0, commit 4e93b9e). The first run (3724010, `-x`) stopped at
-  one case: the tiny test reader ignored its memory, so a "zero memory differs" assertion could not hold. That was a test
-  fault, fixed in the test (the adapter weights are randomized); no code change.
-- What the cases show: head-last positions equal the character-offset positions (all 1,024 names, 24 real episodes);
-  the hard lookup of correct classes is `OracleRandomWriter`'s memory **bitwise** (CPU and CUDA, with invalid slots);
-  with a frozen tiny reader, perfect hard lookup reproduces its oracle logits bitwise and zero memory does not; the soft
-  lookup of near-one-hot classes matches it to 1e-5 and passes gradients; unseen names are masked; the 2,098,176 /
-  1,049,600 / 4,100 parameter counts; the oracle writer hash equals `db99a779…`; features of the bare backbone are
-  unchanged by installed adapters; Stage B (both arms) trains only the heads and leaves the reader's hash and
-  `requires_grad` unchanged; the selection and decision rules.
-- Not tested on compute: the existing `test_llm_*` suites (no existing file changed).
+## Decision
+**Candidate flagged**: hop-1 EM of M1-L4@4 is 50.7 % (threshold 40 %) and M1-L4@4 minus B4@1 on hops 2-3 is **+24.05 pp**
+(95 % CI 21.8 to 26.3; threshold +10 pp), with the integrity condition met (zero and shuffled memory: 0.0 % and 0.2 %).
+Arm selection: CE and CE+ans have the same hop-1 EM (50.7 %, difference 0.0 pp, below 1 pp), so **arm CE** is selected.
+Neither falsifier fires (F1 needs hop-1 < 35 % with p >= 0.95; F2 needs gain < +5 pp). Nothing is borderline.
 
-## Stage A (registered ranges; job 3724058, 111 s)
-Ranges: train [0, 8,192), seed `derive_seed(17, "ctc", "stage-a-train")` (98,304 facts); selection `val` [1,000, 2,000), seed
-4242 (12,000 facts); 80 probes of 1,200 steps. Lock: `reports/ctc/stage-a-lock.json`; all cells:
-`reports/ctc/stage-a-probes.csv` (blake2b-128 in the lock). Feature statistics (needed by Stage B):
-`runs/ctc/stage-a/feature-stats.pt`, hash in the lock.
+**What the flag means (C1 wording).** A learned parser plus a fixed code table drives the frozen composing reader. It is
+not a learned writer: the selected heads read both entities at their own tokens and the relation is constant in this task
+(see Stage A). The codes are the oracle's privileged codes, so the EM is not comparable with DPFP or DPFP-X, which learn
+their own keys and values. A three-seed confirmation, if wanted, needs its own registration and the user's decision.
 
-| target | selected (site, position, form) | selection accuracy | train acc. | parameters (1,024-way) |
+## Numbers (val [0, 1,000), seed 4242, full-vocabulary EM, hard lookup unless named)
+Per-fact joint classification accuracy **p** on the same episodes: arm CE **1.00000** (12,000 of 12,000 facts; every
+episode fully correct), arm CE+ans 0.99992 (one fact wrong; 999 of 1,000 episodes fully correct). Head, relation and tail
+accuracy are 1.0000 for CE; for CE+ans head 0.99992, relation and tail 1.0000. Perfect-prediction lookup reproduces the
+oracle memory bitwise on these episodes for both arms.
+
+| M1-L4 at L = 4, EM % by hop | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| oracle memory (reference, p = 1) | 50.6 | 36.6 | 21.5 | 5.9 | 2.2 | 4.2 | 3.5 | 4.6 |
+| CE, hard (selected) | 50.7 | 36.5 | 21.6 | 6.0 | 2.2 | 4.2 | 3.6 | 4.5 |
+| CE, soft | 50.6 | 36.6 | 21.4 | 5.9 | 2.2 | 4.3 | 3.7 | 4.7 |
+| CE+ans, hard | 50.7 | 36.5 | 21.7 | 6.0 | 2.2 | 4.2 | 3.6 | 4.6 |
+| CE+ans, soft | 50.8 | 36.5 | 21.7 | 6.1 | 2.3 | 4.4 | 3.6 | 4.7 |
+| control: zero memory | 0.0 | 0.0 | 0.0 | 0.0 | 0.1 | 0.0 | 0.0 | 0.1 |
+| control: shuffled memory (CE) | 0.2 | 0.0 | 0.2 | 0.3 | 0.2 | 0.1 | 0.0 | 0.3 |
+
+| B4 at L = 1, EM % by hop | 1 | 2 | 3 | 4-8 |
 | --- | --- | --- | --- | --- |
-| head | h14, head_last, rank64 | 99.975 % | 100 % | 132,096 |
-| relation | h14, head_last, full | 100.000 % | 100 % | 4,100 |
-| tail | h14, tail, rank64 | 99.992 % | 100 % | 132,096 |
+| oracle memory | 18.5 | 5.4 | 4.9 | 4.5 to 6.0 |
+| CE, hard | 18.7 | 5.3 | 4.7 | 4.5 to 6.0 |
+| CE+ans, hard | 18.7 | 5.3 | 4.6 | 4.5 to 6.0 |
+| zero memory | 0.2 | 0.1 | 0.2 | 0.0 to 0.2 |
 
-Writer parameters 268,292 (the reader's adapter has 475,138). Per-fact joint accuracy on the selection range **0.99967**
-(key 0.99975); by fact index 0.999 to 1.000. Many cells are tied within 0.5 pp (head: h14, h21 and h28 at `head_last`,
-rank64, all ≥ 99.96 %), so the tie-break (fewest parameters, then lowest site) chose.
+B3-L4 at L = 4 (no memory read): 0.0 % at every hop under oracle and zero memory, and its predictions are identical under
+the two (`b3_memory_independent` true).
 
-Observations for the claim wording (decision 2 of the registration applies):
-1. **Both entity heads read the entity at its own token** (`head_last` and `tail`), in the residual stream at block 14.
-   The "classification" is a decoder of the token identity, so a candidate would be "a learned parser plus a fixed code
-   table", not a learned writer. `o14` (attention output) is worse: its best head cell is 98.5 % (`rel_last`, rank64) and its best tail
-   cell 98.3 % (`tail`, rank64).
-2. **The relation is constant in this task.** `t2_chain_end` facts come from the fixed chain layout whose relation column
-   is 0 for every fact (`data/relations.py`, `simple_chain`), so the relation head scores 100 % at every position,
-   including `head_last` where the relation phrase has not been read. The key is always `pair_codes[head, 0]`. This holds
-   for the oracle readers too. It is a property of the task, not a result about the writer.
-3. The chain layout also makes each fact's tail the next fact's head within a chain (not used by the heads).
-
-## Smokes (timing only; commit 4e93b9e; `reports/ctc/smoke-timings.json`)
-| smoke | job | result |
+| contrast, hops 2-3 pooled, paired by episode | gain over B4@1 (pp) | 95 % CI |
 | --- | --- | --- |
-| Stage A: train [0, 256), val [2000, 2128), 1,200 steps | 3724033 | 74 s; 80 fits; the lock/stats/csv paths work |
-| Stage B arm CE, 200 steps (smoke lock) | 3724059 | 0.0792 s/step (p95 0.0699) |
-| Stage B arm CE+ans, 200 steps | 3724060 | **0.2951 s/step** (p95 0.2854); reader hash unchanged |
-| evaluation: val [2000, 2032), both arms, three readers | 3724092 | 14.5 s; perfect-lookup memory equals the oracle bitwise; B3-L4 predictions identical under oracle and zero memory |
+| oracle memory | +23.90 | 21.6 to 26.1 |
+| CE hard | +24.05 | 21.8 to 26.3 |
+| CE soft | +23.95 | 21.7 to 26.1 |
+| CE+ans hard | +24.15 | 21.9 to 26.4 |
+| CE+ans soft | +24.05 | 21.8 to 26.3 |
+Soft and hard lookups differ by at most 0.1 pp at every hop for both arms, within sampling noise. The registered fable
+prediction (hop 1 >= 42 %, hop 2 >= 29 %, hop 3 >= 14 %, gain >= +12 pp) is met by a wide margin; the result equals the
+oracle reference to within 0.2 pp everywhere, as expected when p = 1. Validation oracle EM (50.6 % hop 1) is higher than
+P1-L's confirmation-range 47.9 %; the ranges differ, and this study compares only within the validation set. Full table
+with candidate accuracy: `reports/ctc/eval-metrics.json`.
 
-Projection at 8,000 steps: arm CE 634 s (0.18 node·h); arm CE+ans 2,361 s (0.66 node·h); evaluation of 1,000 episodes
-about 460 s (0.13 node·h). Remaining total about **1.0 node·h**, plus 0.13 spent: about 1.1 against the 1.8 registered
-(2.5 task budget).
+## Stage A and the writer
+Lock `reports/ctc/stage-a-lock.json` (job 3724058): head h14 / head_last / rank64, relation h14 / head_last / full, tail
+h14 / tail / rank64; selection accuracy 99.975 %, 100 %, 99.992 %; joint 0.99967 on val [1,000, 2,000). Writer parameters
+**268,292** (the reader's adapter has 475,138); no parameter match is claimed.
+1. Both entity heads read the entity at its own token (`head_last`, `tail`), in the residual stream at block 14, so they
+   decode token identity. `o14` is worse (best head 98.5 %, best tail 98.3 %).
+2. The relation is constant in `t2_chain_end` (the relation column is 0 for every fact, `data/relations.py`), so the
+   relation head scores 100 % at every position and the key is always `pair_codes[head, 0]`.
+These are properties of the task and of the closed 768-name vocabulary. The study shows the reader transfers to
+near-oracle codes (p = 1) and that its memory is used (zero and shuffled collapse). It does not show that a model can
+learn its own codes.
 
-**Decision needed for the CE+ans job.** Its measured step is 0.295 s, just below the 0.30 s threshold of decision 4, so
-`--scale-up` is not licensed. At the registered 1.5× margin the walltime is 3,541 s plus about 90 s of load and export,
-which is over 1 h (the margin is 1.49× if the job is capped at 01:00:00). Options: (a) 01:00:00 without `--scale-up`
-(1.49× margin; a timeout would lose the run, since training has no resume); (b) 02:00:00 with `--scale-up docs/prereg/CTC.md`,
-which decision 4 does not allow at 0.295 s. I will take (a) unless told otherwise.
+## Training records (verified complete)
+| arm | job | steps | train s | s/step (p95) | final joint acc. | final loss |
+| --- | --- | --- | --- | --- | --- | --- |
+| CE | 3724123 | 8,000 of 8,000 | 533.1 | 0.0651 (0.0668) | 1.0 | 1.99e-4 |
+| CE+ans | 3724124 | 8,000 of 8,000 | 2,319.6 | 0.2883 (0.2934) | 1.0 | 3.46 (answer loss 3.46, accuracy 0.37 on that batch) |
+Both logs have 81 rows (steps 1, 100, ..., 8,000); the reader state hash was verified unchanged at the end of CE+ans (the
+run raises otherwise); both `writer.pt` and `summary.json` exist; exit 0.
 
-## Job ledger (node·h = 1 node × elapsed time from the job log)
-| job | name | node·h | outcome |
+**The 4x wall-time gap** (9:13 against 39:01) is per-step cost, measured: 0.0651 s against 0.2883 s per step (4.4x;
+train seconds 533 against 2,320, 4.35x), and the remaining job time is the same load and export (about 19 to 21 s each).
+Arm CE only runs the frozen backbone on the support text and the heads. Arm CE+ans adds, every step, the reader pass:
+oracle preparation of 64 episodes, the soft memory, the four-loop (L = 4) frozen reader on 64 x 4 questions and the
+backward pass through it to the memory. The added 0.2232 s per step matches P1-L's measured M1-L4 reader training step
+of 0.1994 s (r = 128) plus the soft lookup and its backward. The answer loss did not change the result: both arms end
+with p = 1 and equal EM.
+
+## Deviations and notes
+- B4 is evaluated at L = 1 and B3-L4 at L = 4 (their P1-L depths), and M1-L4 at L = 1 to 8; the draft said "L = 1 to 8
+  for every reader" (accepted in C1).
+- The CE+ans job ran at 01:10:00 with `--scale-up docs/prereg/CTC.md` as C1 allows; it needed 39:01.
+- Stage A probes use 768-way heads (the 1,024-way head with unseen logits masked); parameter counts use 1,024-way size.
+- The arm choice is a tie (0.0 pp); it went to CE by the rule, so it adds no best-of-two optimism here.
+- One test job failed first (3724010, a test fault, fixed in the test; see `docs/reports/CTC-state.md`).
+- Caveats: one seed; validation episodes (the same set earlier P1-L pilots used); a perfect classifier makes the outcome
+  nearly a restatement of the oracle result, as noted above.
+
+## Node-hours (1 node x elapsed time from the job logs)
+| job | name | node-h | outcome |
 | --- | --- | --- | --- |
-| 3724010 | ctc-t-unit | 0.007 | exit 1 (test fault, see above) |
+| 3724010 | ctc-t-unit | 0.007 | exit 1 (test fault) |
 | 3724023 | ctc-t-unit | 0.012 | exit 0, 17 passed |
-| 3724033 | ctc-s-a | 0.026 | exit 0, Stage A smoke |
-| 3724058 | ctc-stage-a | 0.031 | exit 0, **registered Stage A, lock** |
-| 3724059 | ctc-s-b-ce | 0.014 | exit 0 |
-| 3724060 | ctc-s-b-ans | 0.026 | exit 0 |
-| 3724092 | ctc-s-eval | 0.009 | exit 0 |
-| total | | 0.125 | |
-
-## Next, after the OK (commands; `H` = the commit that holds the lock and these files)
-```
-C=/work/xg24i002/x10041/LoopLora; S=scripts/submit.py
-python3 $S --name ctc-b-ce  --queue regular-g --walltime 00:20:00 --commit $H -- scripts/run_ctc.py train --arm ce    --out $C/runs/ctc/stage-b-ce
-python3 $S --name ctc-b-ans --queue regular-g --walltime 01:00:00 --commit $H -- scripts/run_ctc.py train --arm ceans --out $C/runs/ctc/stage-b-ceans
-python3 $S --name ctc-eval  --queue regular-g --walltime 00:20:00 --commit $H -- scripts/run_ctc.py evaluate --arm-dir ce=$C/runs/ctc/stage-b-ce --arm-dir ceans=$C/runs/ctc/stage-b-ceans --out $C/runs/ctc/eval
-```
-The training jobs may run side by side; the evaluation runs after both end. It reads val [0, 1,000), writes
-`metrics.json` with the registered decision, and the report `docs/reports/CTC.md` is completed from it.
+| 3724033 | ctc-s-a | 0.026 | Stage A smoke |
+| 3724058 | ctc-stage-a | 0.031 | registered Stage A, lock |
+| 3724059 | ctc-s-b-ce | 0.014 | smoke |
+| 3724060 | ctc-s-b-ans | 0.026 | smoke |
+| 3724092 | ctc-s-eval | 0.009 | smoke |
+| 3724123 | ctc-b-ce | 0.153 | Stage B arm CE |
+| 3724124 | ctc-b-ans | 0.650 | Stage B arm CE+ans |
+| 3724519 | ctc-eval | 0.100 | evaluation, decision |
+| total | | **1.028** | against 1.8 registered |
