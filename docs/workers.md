@@ -112,6 +112,7 @@ Open or resume (new tab, worktree cwd):
 | master test after the WP-L12 merge (job 3725533 at 1e28bed: 2957 passed, 1 skipped) | orchestrator | 1e28bed |
 | WP-T12 part 2 (G5 SQ2 and LSQT into the ledger, LaTeX manuscript and PDF; 64 pages) | sn-paper | dc5cbdf |
 | WP-L12 LSQT-U control (descriptive; U 36.0 %, split +2.5 pp unit query / +10.1 pp store) | sn-llm | b60f144 |
+| master test after the cleanup of finished smoke/pilot weights (job 3727237 at 177a4fe: 2957 passed, 1 skipped; `docs/review/cleanup_2026-10-29.md`) | orchestrator | 177a4fe |
 | Merged master full test suite after DPFP-X (job 3723646, exit 0, 2717 passed, 1 expected skip) | orchestrator | e86bdfe |
 | Merged master full test suite after P5L (job 3722062, exit 0, 2676 passed, 1 expected skip) | orchestrator | c6b5275 |
 | Merged master full test suite (job 3721356, exit 0, 1 expected skip) | orchestrator | d4de948 |
