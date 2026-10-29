@@ -1,7 +1,7 @@
 {
   "accounting": "qstat observed elapsed_seconds times nodes; failed jobs included; live totals provisional",
-  "allocated_node_hours": 0.9183333333333333,
-  "allocated_node_seconds": 3306,
+  "allocated_node_hours": 1.0041666666666667,
+  "allocated_node_seconds": 3615,
   "budget_rule": "B8W: 1.0-2.0 node-h in total including tests and smokes; per-job 1 node x 1 h",
   "final": true,
   "jobs": [
@@ -179,6 +179,100 @@
       "source": {
         "kind": "commit",
         "ref": "44cfcb3fa1474f94ae1bd663a13e7df6fda38c96"
+      },
+      "status": "FINISH"
+    },
+    {
+      "allocated_seconds": 20,
+      "argv": [
+        "scripts/evaluate_b8w.py",
+        "--check-only",
+        "--manifest",
+        "reports/b8w/continuation-manifest.json",
+        "--authorization",
+        "reports/b8w/confirmation-authorization.json",
+        "--out",
+        "/work/xg24i002/x10041/LoopLora/runs/b8w/authcheck-unused"
+      ],
+      "exit_code": 0,
+      "host": "mg0028",
+      "job_id": "3724218.opbs",
+      "log": "/work/xg24i002/x10041/LoopLora/logs/pbs/t-b8w-authcheck-20261029-134654-916536.log",
+      "name": "t-b8w-authcheck",
+      "node_hours": 0.005555555555555556,
+      "nodes": 1,
+      "requested_walltime": "00:10:00",
+      "source": {
+        "kind": "commit",
+        "ref": "123a28fac67a7b09774d2fab87f9187cbf320dbf"
+      },
+      "status": "FINISH"
+    },
+    {
+      "allocated_seconds": 263,
+      "argv": [
+        "scripts/evaluate_b8w.py",
+        "--manifest",
+        "reports/b8w/continuation-manifest.json",
+        "--authorization",
+        "reports/b8w/confirmation-authorization.json",
+        "--out",
+        "/work/xg24i002/x10041/LoopLora/runs/b8w/confirmation",
+        "--runs",
+        "start-s17",
+        "start-s29",
+        "start-s43",
+        "shared-s17",
+        "shared-s29",
+        "shared-s43",
+        "untied-s17",
+        "untied-s29",
+        "untied-s43",
+        "B4-s17",
+        "B4-s29",
+        "B4-s43",
+        "B8-s17",
+        "B8-s29",
+        "B8-s43"
+      ],
+      "exit_code": 0,
+      "host": "mg0412",
+      "job_id": "3724223.opbs",
+      "log": "/work/xg24i002/x10041/LoopLora/logs/pbs/ev-b8w-all-20261029-134753-917888.log",
+      "name": "ev-b8w-all",
+      "node_hours": 0.07305555555555555,
+      "nodes": 1,
+      "requested_walltime": "00:40:00",
+      "source": {
+        "kind": "commit",
+        "ref": "123a28fac67a7b09774d2fab87f9187cbf320dbf"
+      },
+      "status": "FINISH"
+    },
+    {
+      "allocated_seconds": 26,
+      "argv": [
+        "scripts/finalize_b8w.py",
+        "--manifest",
+        "/work/xg24i002/x10041/LoopLora-wt/p1l/reports/b8w/continuation-manifest.json",
+        "--evaluations",
+        "/work/xg24i002/x10041/LoopLora/runs/b8w/evaluation-manifest.json",
+        "--authorization",
+        "/work/xg24i002/x10041/LoopLora-wt/p1l/reports/b8w/confirmation-authorization.json",
+        "--out",
+        "/work/xg24i002/x10041/LoopLora-wt/p1l/reports/b8w/results"
+      ],
+      "exit_code": 0,
+      "host": "mg0017",
+      "job_id": "3724260.opbs",
+      "log": "/work/xg24i002/x10041/LoopLora/logs/pbs/fin-b8w-20261029-135428-934451.log",
+      "name": "fin-b8w",
+      "node_hours": 0.007222222222222222,
+      "nodes": 1,
+      "requested_walltime": "00:20:00",
+      "source": {
+        "kind": "commit",
+        "ref": "123a28fac67a7b09774d2fab87f9187cbf320dbf"
       },
       "status": "FINISH"
     }

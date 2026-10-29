@@ -1,4 +1,4 @@
-# WP-L10 (B8W) state — continuations done and verified, authorization committed, no test episode generated (2026-10-29)
+# WP-L10 (B8W) state — finished: evaluated, finalized, decision record and report written (untying keeps the solution)
 
 Author: sn-p1l (Claude Sonnet 5.5), branch `wp/p1l`. Prereg (registered, master 3c9c396): `docs/prereg/B8W.md`, blake2b-128
 `7414b6e0118d8d53a913467d6e7848b2`. No test episode was generated or read; the equality gate and the smoke use the validation split.
@@ -45,5 +45,13 @@ hash equal to P1-L's, exit-0 receipts) and wrote `reports/b8w/continuation-manif
 Training loss (logged batch loss, training data only; not a decision input): step 2000 shared / untied: seed 17 2.989 / 3.169,
 seed 29 3.781 / 3.595, seed 43 2.800 / 2.656; mean of the last five logged steps (1600-2000): 2.789 / 2.736, 3.423 / 3.301, 2.968 / 2.872.
 
-## Next (after the orchestrator checks the authorization)
-Authorization check job (`evaluate_b8w.py --check-only`), then 15 evaluations in one or two jobs, `finalize_b8w.py`, decision record and report.
+
+## Evaluation and finalizer (authorization approved at 123a28f; both pinned to 123a28fac67a7b09774d2fab87f9187cbf320dbf)
+| Job | Name | Exit | Walltime | node·h |
+| --- | --- | ---: | --- | ---: |
+| 3724218 | `t-b8w-authcheck` (`evaluate_b8w.py --check-only`) | 0 | 0:20 | 0.006 |
+| 3724223 | `ev-b8w-all` (15 groups, one job) | 0 | 4:23 | 0.073 |
+| 3724260 | `fin-b8w` (`finalize_b8w.py`, status complete) | 0 | 0:25 | 0.007 |
+All 15 evaluation records were verified before the finalizer (complete, checkpoint hashes equal the manifest's, window `b8w`, 2,000 episodes, seed 4242, hops 1-8, `episode_ranges`
+test 108000 + 2000, depths 4 (B4: 1)). The evaluation manifest is `reports/b8w/evaluation-manifest.json`. Result: `reports/decisions/B8W.md`.
+Study total (ledger, 10 jobs): **1.004 node·h**.

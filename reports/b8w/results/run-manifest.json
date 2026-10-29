@@ -1,0 +1,147 @@
+{
+  "lock": {
+    "hash": "998ecf829fa6cc1f46a0efb1a9e35e25",
+    "path": "reports/b8w/checkpoint-lock.json"
+  },
+  "lr": 0.003,
+  "runs": [
+    {
+      "checkpoint_hash": "acfa784892a1dd2fd2e31a7d04ff86ae",
+      "evaluation": "/work/xg24i002/x10041/LoopLora/runs/b8w/confirmation/B4-s17",
+      "evaluation_record_hash": "159ed0d8b276bfb570521c84d28e7f1a",
+      "metrics_hash": "73acdfb0e8a3c43127f762865fd9d190",
+      "name": "B4-s17",
+      "run": "/work/xg24i002/x10041/LoopLora/runs/p1l/main/r128/main/B4-s17/B4-s17",
+      "samples_hash": "170d969dc8c4f3ed570489ef6ad26d21"
+    },
+    {
+      "checkpoint_hash": "558ceca24cb0fa24af967d8c3fc4e3b8",
+      "evaluation": "/work/xg24i002/x10041/LoopLora/runs/b8w/confirmation/B4-s29",
+      "evaluation_record_hash": "4118446709abd5664b8735b29ed3ba17",
+      "metrics_hash": "0fb64149de65ea877ec3531947a32eaa",
+      "name": "B4-s29",
+      "run": "/work/xg24i002/x10041/LoopLora/runs/p1l/main/r128/main/B4-s29/B4-s29",
+      "samples_hash": "55d0551c94762f5aec8324a99ce7f06c"
+    },
+    {
+      "checkpoint_hash": "682626adf4ae6e14123ca5c1a6e77b2a",
+      "evaluation": "/work/xg24i002/x10041/LoopLora/runs/b8w/confirmation/B4-s43",
+      "evaluation_record_hash": "4443882ec90f3bc7d2a3e0b8c44bc526",
+      "metrics_hash": "e05642ba84fe6e680a51cf909faa128e",
+      "name": "B4-s43",
+      "run": "/work/xg24i002/x10041/LoopLora/runs/p1l/main/r128/main/B4-s43/B4-s43",
+      "samples_hash": "c7b6917f6ee5fdf64cbb132e6cef05e1"
+    },
+    {
+      "checkpoint_hash": "243dfcee7710792d8452745e6bd06b35",
+      "evaluation": "/work/xg24i002/x10041/LoopLora/runs/b8w/confirmation/B8-s17",
+      "evaluation_record_hash": "ee36dc3f4c2795062a2062b9ddf4222c",
+      "metrics_hash": "2fb760ed603aa87b0c4c43f7787a8716",
+      "name": "B8-s17",
+      "run": "/work/xg24i002/x10041/LoopLora/runs/p1l/main/r128/main/B8-s17/B8-s17",
+      "samples_hash": "1c2150b7b5600cb6cb13a1549c2bd2c9"
+    },
+    {
+      "checkpoint_hash": "d599783f6fadab6beaf6a5a448777c2e",
+      "evaluation": "/work/xg24i002/x10041/LoopLora/runs/b8w/confirmation/B8-s29",
+      "evaluation_record_hash": "40caac4c268b0276b028ba503f8db5ad",
+      "metrics_hash": "cbb1c021e90f8b49ef9c32c696af610e",
+      "name": "B8-s29",
+      "run": "/work/xg24i002/x10041/LoopLora/runs/p1l/main/r128/main/B8-s29/B8-s29",
+      "samples_hash": "fc2040a1db4d322882dc020352b9b898"
+    },
+    {
+      "checkpoint_hash": "743d5021d223466361a6ae5a9a794f0d",
+      "evaluation": "/work/xg24i002/x10041/LoopLora/runs/b8w/confirmation/B8-s43",
+      "evaluation_record_hash": "7a28af6f81fb055953182247557e9ba7",
+      "metrics_hash": "58796740fd8120044272d173b48c2aee",
+      "name": "B8-s43",
+      "run": "/work/xg24i002/x10041/LoopLora/runs/p1l/main/r128/main/B8-s43/B8-s43",
+      "samples_hash": "6597a7a6b2797a478c53b42b50892138"
+    },
+    {
+      "checkpoint_hash": "ed12a3181837a00cf9c171c5b9851e93",
+      "evaluation": "/work/xg24i002/x10041/LoopLora/runs/b8w/confirmation/shared-s17",
+      "evaluation_record_hash": "8a4e164ccd18df04aab899f3a324ba5b",
+      "metrics_hash": "e8fa23035120f576eb3c38c1b1d26844",
+      "name": "shared-s17",
+      "run": "/work/xg24i002/x10041/LoopLora/runs/b8w/main/s17/shared",
+      "samples_hash": "44703aa32809be36a3616bcbc76646f1"
+    },
+    {
+      "checkpoint_hash": "1349181d3f24940ce339eb7fcbfa2bca",
+      "evaluation": "/work/xg24i002/x10041/LoopLora/runs/b8w/confirmation/shared-s29",
+      "evaluation_record_hash": "6ca4bdcdaf8c2728be51c92c449e4970",
+      "metrics_hash": "22d4c7efb04c3a807759c5c08c0c1406",
+      "name": "shared-s29",
+      "run": "/work/xg24i002/x10041/LoopLora/runs/b8w/main/s29/shared",
+      "samples_hash": "fc1344ea1fd034e127adfaf593b76661"
+    },
+    {
+      "checkpoint_hash": "7e2da237235c231e4eb3e58b95405d87",
+      "evaluation": "/work/xg24i002/x10041/LoopLora/runs/b8w/confirmation/shared-s43",
+      "evaluation_record_hash": "49632454f474a130f644e9c034090535",
+      "metrics_hash": "b0e3bfe4ea5b8ded3b989f3d873b9e12",
+      "name": "shared-s43",
+      "run": "/work/xg24i002/x10041/LoopLora/runs/b8w/main/s43/shared",
+      "samples_hash": "5da2742e97325ec14a85ac2e8009b685"
+    },
+    {
+      "checkpoint_hash": "c90d23ff1a27d509ed61ae43d5185832",
+      "evaluation": "/work/xg24i002/x10041/LoopLora/runs/b8w/confirmation/start-s17",
+      "evaluation_record_hash": "cc6f0f7dc0fe04cf5ab67c643480ff4f",
+      "metrics_hash": "8d535fd174bcc8b0eb9fa44e00e48b8f",
+      "name": "start-s17",
+      "run": "/work/xg24i002/x10041/LoopLora/runs/p1l/main/r128/main/M1-s17/M1-L4-s17",
+      "samples_hash": "b13eb856bacb02e4f833efb416a886ac"
+    },
+    {
+      "checkpoint_hash": "59e293ee6f36f29d03413c3f580f7fa7",
+      "evaluation": "/work/xg24i002/x10041/LoopLora/runs/b8w/confirmation/start-s29",
+      "evaluation_record_hash": "2a710534e0c56d04af1819a4844db820",
+      "metrics_hash": "83f0792b9b12ff7a01a086d0def0ab64",
+      "name": "start-s29",
+      "run": "/work/xg24i002/x10041/LoopLora/runs/p1l/main/r128/main/M1-s29/M1-L4-s29",
+      "samples_hash": "cfe7b3906540d2670f7aec3264671f30"
+    },
+    {
+      "checkpoint_hash": "37a7baf0e832e3cad35e10b7ef1d1c39",
+      "evaluation": "/work/xg24i002/x10041/LoopLora/runs/b8w/confirmation/start-s43",
+      "evaluation_record_hash": "13bfec74bcb591ad154022fa8d4c91ff",
+      "metrics_hash": "9457b123f0ae9e6c53dae1c30881072c",
+      "name": "start-s43",
+      "run": "/work/xg24i002/x10041/LoopLora/runs/p1l/main/r128/main/M1-s43/M1-L4-s43",
+      "samples_hash": "e0cc4050d5704b988542b3bb1e22b203"
+    },
+    {
+      "checkpoint_hash": "129718105a12232f6bf0dbb2cc1f6fb8",
+      "evaluation": "/work/xg24i002/x10041/LoopLora/runs/b8w/confirmation/untied-s17",
+      "evaluation_record_hash": "697a49841228a8f71d8c1ef6f91d4db1",
+      "metrics_hash": "eed5733435e86cffb0addc46bc57af0c",
+      "name": "untied-s17",
+      "run": "/work/xg24i002/x10041/LoopLora/runs/b8w/main/s17/untied",
+      "samples_hash": "aaaa560c7a932376dcd3089f7d81bdad"
+    },
+    {
+      "checkpoint_hash": "a0c052c7b37c98905b3f0653d98374a7",
+      "evaluation": "/work/xg24i002/x10041/LoopLora/runs/b8w/confirmation/untied-s29",
+      "evaluation_record_hash": "9495f9b9347908df14828079c98eff35",
+      "metrics_hash": "a3068ab26b4304f2e3a1739235926a39",
+      "name": "untied-s29",
+      "run": "/work/xg24i002/x10041/LoopLora/runs/b8w/main/s29/untied",
+      "samples_hash": "71878d597393e4cd310152606d8031a2"
+    },
+    {
+      "checkpoint_hash": "dae90285cc5f5a3b11fe9354b1c1dfef",
+      "evaluation": "/work/xg24i002/x10041/LoopLora/runs/b8w/confirmation/untied-s43",
+      "evaluation_record_hash": "feee46c85b05817f89caa04773a846de",
+      "metrics_hash": "a28d0d99d4c1c5e3cb2799cfb75e5b78",
+      "name": "untied-s43",
+      "run": "/work/xg24i002/x10041/LoopLora/runs/b8w/main/s43/untied",
+      "samples_hash": "665ba1dbb04d9105aad5dd3e0d2c3029"
+    }
+  ],
+  "status": "audited",
+  "steps": 2000,
+  "window": "b8w"
+}
