@@ -180,3 +180,28 @@ The A1 ready release `d1ccbb7ff4c31fa53abfd7a3cc9ad572` is approved: `reports/sl
 - End with `STOP: verdict <full hash>`.
 
 **Not yet.** Do not train the §6 mechanism controls. They run only for a backend with a confirmed loop gain, and only after the orchestrator reads the verdict and records a release extension.
+
+## Verdict accepted (06:55): S1B is done; write the study report
+`STOP: verdict d5c6b64` is accepted.
+- **Check.** The archived `verdict.json` (`dca8d4e9`) and `verdict.md` equal the persistent copies. The orchestrator recomputed the three point estimates from the 24 trained-depth confirmation files with numpy, outside the project code, and got the same values.
+- **Merge.** wp/loop is merged into master as `2a27f57`. The master test runs as jobs 3731406-3731408.
+- **Registered consequences:**
+  - no backend qualifies, so S2 is not entered (S1B §5, plan §8.3);
+  - the §6 mechanism controls do not train, because no loop gain was confirmed;
+  - S3 needs H2 from S2, so it is not entered either.
+
+**Next: the SLOT-LOOP-v1 study report.** Update `docs/reports/SLOT-LOOP-v1.md` on wp/loop. First merge master (`2a27f57` or later) into wp/loop.
+- **Top section:** the study result for S0, S1A and S1B. Answer plan §15.3's six questions one by one, each with numbers and links to the frozen records.
+- **Keep:** the existing S1A section as it is.
+- **Add:** an S1B section with:
+  - the three registered contrasts, with per-seed and hop-1 differences;
+  - the continuation table;
+  - the descriptive same-checkpoint sweeps;
+  - absolute EM by arm and hop, marking where it sits near the 1/12 chance level of E12;
+  - the A1 history and the cost ledger.
+- **Sources.** Take S0 and S1A numbers from their frozen records (`reports/slot-loop-v1/`, `docs/reports/SLOT-LOOP-v1-*.md`). Recompute nothing that needs compute. Mark interpretations as such.
+- **Scope of the claims.** Say what the results do not establish:
+  - no loop gain at the registered size;
+  - no S2 mechanism evidence;
+  - no S3 cost or practicality claim.
+- **Finish.** Check links, then end with `STOP: report <full hash>`. No jobs are needed.
