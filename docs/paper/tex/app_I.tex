@@ -1,10 +1,10 @@
-\section{Follow-up studies G2 to G4: details}\label{app:I}
+\section{Follow-up studies G2 to G5: details}\label{app:I}
 
-This appendix holds the tables behind Sections~\ref{sec:stop} and~\ref{sec:ctc} and the B8 warm-start paragraph of Section~\ref{sec:lm-oracle}.
-All three studies are oracle-memory studies at rank 128 on the 768 seen names with one oracle seed.
-Their values are produced by \texttt{scripts/paper\_tables\_g2.py} from the committed files of each study (\texttt{reports/lsr}, \texttt{reports/b8w}, \texttt{reports/ctc}), which checks its key values against the figures the three study reports state.
+This appendix holds the tables behind Sections~\ref{sec:stop} and~\ref{sec:ctc}, the B8 warm-start paragraph of Section~\ref{sec:lm-oracle} and the SQ2 and LSQT paragraphs of Section~\ref{sec:writers}.
+LSR, B8W and CTC are oracle-memory studies at rank 128 on the 768 seen names with one oracle seed; SQ2 and LSQT are validation-only learned-writer screens.
+The values of the first three are produced by \texttt{scripts/paper\_tables\_g2.py} from the committed files of each study (\texttt{reports/lsr}, \texttt{reports/b8w}, \texttt{reports/ctc}), and those of the last two by \texttt{scripts/paper\_tables\_g5.py} (\texttt{reports/p1l-sq2}, \texttt{reports/p1l-lsqt}); each script checks its key values against the figures the study reports state.
 Rounding is half up on the stored value, so a cell that ends in an exact 5 (for example 64.55) prints 0.1 higher than in the study reports.
-The evidence ledger holds the exact values (rows LS1 to LS4, BW1 to BW3, CT1 to CT3) and wins over any shortened wording here.
+The evidence ledger holds the exact values (rows LS1 to LS4, BW1 to BW3, CT1 to CT3, SQ1 to SQ3, LQ1 to LQ3) and wins over any shortened wording here.
 
 \subsection{LSR: label-free stop rules (G2)}
 
@@ -145,3 +145,77 @@ The memory-free B3-L4 gives 0.0\% at every hop, and its predictions are identica
 The writer is not a learned writer in the sense of the DPFP rows: both entity heads read their entity at its own token, and the relation is constant in this task, so the relation head scores 100\% at every position.  % CT1 CT2
 The study shows that the reader transfers to near-oracle codes and uses its memory; it does not show that a model can learn its own codes, and no CTC number is placed beside a DPFP number.  % CT2
 Arm CE trained 8,000 steps in 533 s (0.0651 s per step) and arm CE+ans in 2,320 s (0.2883 s per step), because it also runs the frozen reader and its backward pass every step; the study used 1.028 node-hours against 1.8 registered.  % CT3
+
+\subsection{SQ2: ridge storage and the coefficient loss (G5)}
+
+The four arms continue the final D128-3 checkpoint (adapter, training-only value head and optimizer state) for 6,000 steps on one fresh training stream at learning rate 0.003, batch 32 with 4 questions per episode, E=16, seed 17, and are evaluated on the 1,000 validation episodes (evaluation seed 4242) at step 0 and every 1,200 steps.
+The ridge store solves a regularized least-squares fit of the stored values on the DPFP features of the keys ($\eta=10^{-4}$, the lower bound of the registered clip, because the numerics showed the error is flat up to $10^{-3}$); the coefficient loss has weight $w_c=1$ (Clarification C1, a log2 rounding of the gradient-norm ratio).
+At step 0 the delta arms equal D128-3 exactly (608 correct, all 1,000 predictions identical to the parent's), and the ridge store on the same weights gives 687 correct.  % SQ3
+Table~\ref{tab:i-sq2} gives the trajectories.
+
+\begin{table}[htbp]
+\centering\footnotesize
+\caption{SQ2: validation exact match (\%) and normalized read error at step 0 and the five checkpoints (one seed, 1,000 episodes).  % SQ2 SQ3
+}
+\label{tab:i-sq2}
+\begin{tabular}{@{}lrrrrrr@{}}
+\toprule
+Arm & 0 & 1,200 & 2,400 & 3,600 & 4,800 & 6,000 \\
+\midrule
+S-DE, EM & 60.8 & 61.5 & 62.7 & 61.5 & 63.6 & 65.4 \\
+S-DC, EM & 60.8 & 61.1 & 63.6 & 62.3 & 64.4 & 63.0 \\
+S-RE, EM & 68.7 & 64.2 & 67.1 & 70.7 & 69.3 & 72.3 \\
+S-RC, EM & 68.7 & 63.9 & 66.8 & 68.5 & 68.2 & 69.5 \\
+\midrule
+S-DE, read error & 0.363 & 0.390 & 0.364 & 0.370 & 0.361 & 0.359 \\
+S-DC, read error & 0.363 & 0.388 & 0.385 & 0.364 & 0.364 & 0.353 \\
+S-RE, read error & 0.312 & 0.274 & 0.242 & 0.202 & 0.216 & 0.196 \\
+S-RC, read error & 0.312 & 0.304 & 0.226 & 0.217 & 0.215 & 0.199 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The gains over the 6,000 steps are +4.6 pp (S-DE), +2.2 pp (S-DC), +3.6 pp (S-RE, from 687 correct) and +0.8 pp (S-RC).
+The standard error of a difference of two EMs at 1,000 episodes is about 2.2 pp, and about 4.4 pp for the double difference of the interaction ($-0.4$ pp), so none of the differences between S-DC, S-RC and their controls is resolved, and S-RE against S-DE (+6.9 pp) is about three standard errors in one seed.  % SQ3
+Decoding stayed stable: every logged loss and gradient is finite, and the clean-value head of S-RC is between 91.6\% and 94.4\% at the five checkpoints, above the registered floor of 88.7\%.  % SQ1
+The global gradient-norm clip (1.0) is active at 121 of 121 logged steps in every arm, with a pre-clip norm of about 8 to 10, and D128-3's own training log shows the same (449 of 449 logged steps); the norm is that of the total objective and the gradients of the individual loss terms were not logged.  % SQ3
+Zeroing or shuffling the memory of each final checkpoint leaves 0 to 2 of 1,000 answers correct.  % SQ3
+Every arm has 475,138 inference parameters and 393,216 bytes of persistent state per episode (a [128, 768] float32 store, against 65,536 bytes for the rank-128 delta store of the oracle readers).  % SQ3
+All of this is one seed, on the validation set that selected D128-3, and no three-seed confirmation is flagged.
+
+\subsection{LSQT: trained least-squares stores (G5)}
+
+Each of the three arms is the WP-L4 writer R at rank 128 with the unit query, trained from scratch on the WP-L4 data stream for the registered number of steps (17,970 for LT-K4, 28,005 for LT-RG001, 28,245 for LT-RG1), with E=16, seed 17, batch 32 with 4 questions per episode and learning rate 0.003; evaluation is on the same 1,000 validation episodes.
+The ridge stores use recency weights and a float64 Cholesky solve; LT-K4 uses four Kaczmarz sweeps.
+Table~\ref{tab:i-lsqt} gives the trajectories at five evenly spaced checkpoints.
+
+\begin{table}[htbp]
+\centering\footnotesize
+\caption{LSQT: validation exact match (\%) and normalized read error at 20\%, 40\%, 60\%, 80\% and 100\% of each arm's training (one seed, 1,000 episodes).  % LQ2
+}
+\label{tab:i-lsqt}
+\begin{tabular}{@{}lrrrrr@{}}
+\toprule
+Arm & 20\% & 40\% & 60\% & 80\% & 100\% \\
+\midrule
+LT-K4, EM & 14.9 & 25.9 & 30.4 & 37.6 & 38.3 \\
+LT-RG001, EM & 23.6 & 35.7 & 42.1 & 46.9 & 46.1 \\
+LT-RG1, EM & 23.0 & 30.1 & 35.7 & 36.6 & 42.6 \\
+\midrule
+LT-K4, read error & 0.635 & 0.617 & 0.597 & 0.572 & 0.554 \\
+LT-RG001, read error & 0.619 & 0.604 & 0.418 & 0.350 & 0.512 \\
+LT-RG1, read error & 0.366 & 0.398 & 0.507 & 0.519 & 0.499 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The decision uses the final checkpoint; for LT-RG001 the checkpoint at 80\% (46.9\%) lies in the same band.
+The read error does not follow the EM: LT-RG1 has its lowest read error (0.366) at 20\% of training, when its EM is 23.0\%, and LT-RG001's read error falls to 0.350 at 80\% and returns to 0.512 at 100\%.
+With one seed the checkpoint-to-checkpoint movement is not separated from run noise.  % LQ2
+The Gram reconstruction of the read is exact in every arm (relative error below $10^{-6}$), so what the exact coefficients describe is the deployed read: the store does what it is built to do, and the read is still far from the stored value.  % LQ2
+Ridge is above Kaczmarz at the final checkpoints (+7.8 pp for LT-RG001 and +4.3 pp for LT-RG1); the arms have different step counts, and at the checkpoints nearest K4's final step count LT-RG001 has 42.1\% and LT-RG1 35.7\% against K4's 38.3\%.  % LQ2
+The gradient clip is active at every logged step in every arm.
+Zeroing or shuffling the memory leaves 1 to 4 of 1,000 answers correct, and every arm has 475,138 inference parameters and 65,536 bytes of persistent state per episode.  % LQ2
+R-r128 is the record of WP-L4, not rerun; it is a valid reference because the test that reproduces it with the DPFP and least-squares options off passes at the science commit.
+The unit query is part of every LSQT arm and of none of R-r128, so a gain over R-r128 cannot yet be split between the store and the unit query; within the three arms the two ridge parameters differ by 3.5 pp, one seed.  % LQ3
+Nothing more is attributed here.

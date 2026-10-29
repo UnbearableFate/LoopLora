@@ -28,13 +28,13 @@ The deployed read is the problem.
 For the audited W5 arm, the clean-value head reads 85.4\% while the read-value head reads 10.5\%, and zero- or shuffled-memory interventions show sensitivity to the memory channel without localizing the failure.  % LL7 LL10
 The final rank-128 arms reached at best 33.5\% (R), 29.9\% (W5) and, for the ineligible value/output ceiling OA, 84.0\%.  % LL9
 A read-failure factorial (RFX) on frozen checkpoints found that only an exact store together with the true key rescues the read, and the true key is a label, not deployable; the exact store with the deployed or unit query does not.  % RX1
-The verdict does not separate store from query, and no trained least-squares arm ran.  % RX1
+The verdict does not separate store from query; the trained least-squares study LSQT, registered and run afterwards, is reported below.  % RX1 LQ1
 
 \paragraph{DPFP.}
 A registered screen replaced the keys and queries of the WP-L4 learned writer by DPFP features: three arms (D32-3 at rank 32, D128-1 and D128-3 at rank 128), one seed, 1,000 validation episodes each.  % DP1
 No arm reaches the 80\% gate: D32-3 reaches 39.0\%, D128-1 58.0\% and D128-3 60.8\%.  % DP1
 The best arm is above the 50\% trigger, so D128-3 was retrained once at E=8 under the registered rule and reached 73.0\%, again below 0.80.  % DP1
-The registered decision is stop: no writer is selected, no further writer screen follows, and P1L-D (the P1-L learned condition for a selected writer) was not registered and was not run.  % DP1 PD1
+The registered decision is stop: no writer is selected, no further writer screen follows from that rule (the later, separately registered screens are reported below), and P1L-D (the P1-L learned condition for a selected writer) was not registered and was not run.  % DP1 PD1
 DPFP does raise EM (by 27.0 pp at rank 32 and by 24.5 and 27.3 pp at rank 128 over the WP-L4 references), lowers the normalized read error (0.39, 0.43 and 0.36 against 0.67 and 0.63) and raises the read-value head accuracy (30.2\%, 46.0\% and 51.0\% against 8.8\% and 19.7\%), but the clean-to-read gap narrows without closing.  % DP2
 DPFP changes the feature geometry and the query normalization together (Amendment A1), so neither these gains nor the 12.2 pp gain of the E=8 retrain, which also halves the memory load, is attributed to decorrelation alone.  % DP1 DP2
 A zero- or shuffled-memory audit leaves at most 0.2\% EM for every arm, which shows that the answers depend on the episode's own memory, not that the read is accurate.  % DP3
@@ -48,6 +48,38 @@ Both curves were still rising at the final checkpoint (+3.5 and +2.3 pp over the
 X256's higher EM is not accompanied by a lower read error or a better read-value head than D128-3's, and the paper gives no explanation for it.  % DP6
 The zero- and shuffled-memory audit again leaves at most 0.4\% EM.  % DP7
 
+\paragraph{SQ2: ridge storage on the DPFP features.}
+SQ2 continued the final D128-3 checkpoint for 6,000 steps in four arms that cross the store (the delta store as trained, or a ridge store on the DPFP features) with a coefficient loss (off or on); it used the same validation episodes and one seed.
+The registered primary contrast is S-RC (ridge with the coefficient loss) against S-DE (the continued delta control), and it does not advance: the EM gain is +4.1 pp where +10 is needed, and the read error is 0.554 of S-DE's where at most 0.5 is needed; only the stability condition is met.
+No cell reaches 0.80, so no writer candidate is flagged and the learned-writer line stays stopped.
+The registered prediction, that S-RC would gain 10 pp and halve the read error, did not hold.  % SQ1
+Table~\ref{tab:sq2} gives the four cells and the parent.
+They are descriptive only, and each reading carries its limit.  % SQ2
+\begin{itemize}[leftmargin=1.4em,itemsep=2pt,topsep=3pt]
+\item Ridge storage on the DPFP features roughly halves the read error (0.196 for S-RE against 0.359 for S-DE) and is +6.9 pp over the continued delta control, which still misses both registered conditions. This is one seed, and the validation episodes selected D128-3.  % SQ3
+\item The delta continuation alone gains 4.6 pp (60.8 to 65.4\%), so the parent had not converged and part of every continuation gain is the continuation.  % SQ3
+\item The coefficient loss did not help: S-DC is 2.4 pp below S-DE, S-RC is 2.8 pp below S-RE, the interaction is $-0.4$ pp, and the read error is unchanged by it.  % SQ3
+\item Swapping only the store at step 0, with no retraining, gives 68.7\% (read error 0.312); the ridge arms first dip below that value and then recover, which is consistent with starting from AdamW moments of another objective (registered deviation 2) but was not tested.  % SQ2 SQ3
+\item The gradient clip (norm 1.0) is active at every logged step in all four arms, as it was in the training of D128-3; the paper makes no statement about what it does to the effect of the coefficient loss.  % SQ3
+\end{itemize}
+Zeroing or shuffling the memory leaves at most 2 of 1,000 answers correct in every arm, so the answers come from the stored episode, but the read error stays between 0.20 and 0.36.  % SQ3
+
+\sqtwotable
+% SQ1 SQ2
+
+\paragraph{LSQT: trained least-squares stores.}
+LSQT trains three arms from scratch at rank 128 with the unit query, with the delta store replaced by a least-squares store: LT-K4 (four Kaczmarz sweeps) and LT-RG001 and LT-RG1 (ridge with $\eta=0.01$ and $\eta=1$).
+The registered decision is that no arm reaches 0.80.
+The best ridge arm, LT-RG001, reaches 46.1\%, inside the band from 40\% to below 48.5\%, which neither falsifies the line nor triggers W3 (a separate ridge-plus-DPFP study that would need its own registration), so the trained least-squares line stays open and the learned-writer line stays stopped.  % LQ1
+All three arms are above R-r128 (33.5\%), by +4.8, +12.6 and +9.1 pp, and well below D128-3 (60.8\%), by 22.5, 14.7 and 18.2 pp (Table~\ref{tab:lsqt}; the standard error of a difference is about 2.2 pp, one seed).  % LQ2
+The read error is not removed (0.554, 0.512 and 0.499, against 0.631 for R-r128 and 0.363 for D128-3), and the read-value head stays at 22 to 27\% against a clean-value head of 92 to 96\%.  % LQ2
+The registered prediction, that the best ridge arm would reach 50\% with a read error of at most 0.35, did not hold.  % LQ2
+The unit query is in every LSQT arm and in none of R-r128, so the gain over R-r128 cannot be split between the store and the unit query; that split is untested.  % LQ3
+The arms differ in step count, two of the curves were still rising at the end, and nothing is extrapolated.  % LQ2
+
+\lsqttable
+% LQ1 LQ2
+
 \subsection{Negative interventions and the gate each did not meet}
 \label{sec:negmatrix}
 
@@ -55,13 +87,13 @@ Table~\ref{tab:neg} lists each repair or test that failed its registered criteri
 Each row is one study under its own conditions (one training seed or three, one optimizer, a fixed budget).
 The rows record which criterion was not met.
 They do not show that learned writing, an exact store, unshared reads or composition at rank 32 is impossible.
-Not run: the LSQ arms (none was triggered), P1L-D and P1L-S.
+Not triggered: the LSQ arms of the RFX rule (the separately registered LSQT is reported above). Not run: P1L-D and P1L-S.
 A warm start of B8 from M1-L4 (Section~\ref{sec:lm-oracle}) kept the shared solution, so it is not a failed repair and has no row here.  % BW1
 
 \begin{table}[htbp]
 \centering\footnotesize
 \setlength{\tabcolsep}{3pt}
-\caption{Negative interventions and the registered criterion each did not meet.  % LL9 RX1 WL1 DP1 DP4 LP7 LP9 LP16 PC1
+\caption{Negative interventions and the registered criterion each did not meet.  % LL9 RX1 WL1 DP1 DP4 LP7 LP9 LP16 PC1 SQ1 LQ1
 }
 \label{tab:neg}
 \begin{tabular}{@{}W{160}{10}W{190}{10}W{240}{10}W{300}{10}W{110}{10}@{}}
@@ -76,6 +108,8 @@ DPFP-X writer & X256: Qwen3-0.6B-Base, $r=256$; X17: Qwen3-1.7B-Base, $r=128$; o
 Oracle readers at rank 32 & B4, B8 and M1-L4 on the oracle memory, three seeds & Hop 1 EM at most 0.15\%; the memory-use check fails & Amendment B7 rule 1: each reader's hop 1 EM above B3-L4@4 with a 97.5\% interval above 0 (lower bounds 0.000 for B4, $-0.050$ for B8) & LP7 \\
 B8 (four unshared reads) at 0.6B & Rank 128, three seeds & B8@4$-$B4@1 on hops 2 to 3: +0.983 pp [0.267, 1.717] & G1-L point estimate $\geq$ 3 pp (its hop 1 and typed conditions held) & LP9 \\
 B8 at 1.7B & Rank 128, three seeds & +1.033 pp [0.292, 1.800]; hop 1 $-1.717$ pp & G1-L point estimate $\geq$ 3 pp; hop 1 point estimate $\geq -1$ pp & LP16 \\
+Ridge storage and coefficient loss on the DPFP features (SQ2, primary contrast S-RC against S-DE) & Continuation of D128-3 for 6,000 steps, rank 128, one seed, 1,000 validation episodes & EM gain +4.1 pp, read error ratio 0.554; best cell S-RE 72.3\% & EM gain $\geq$ +10 pp and read error ratio $\leq$ 0.5 (stable decoding met); no cell reaches 0.80 & SQ1 \\
+Trained least-squares stores (LSQT: Kaczmarz, ridge $\eta=0.01$ and $\eta=1$) & Rank 128 from scratch with the unit query, one seed, 1,000 validation episodes & 38.3\%, 46.1\% and 42.6\% & Validation EM $\geq$ 0.80; the best ridge arm lies in the open band 40\% to below 48.5\% (line open, W3 not triggered) & LQ1 \\
 Bridge patching & Rank 128, 0.6B, L=4, state after the first read at the final question position & +0.391 pp [$-0.130$, 0.781] (M1-L4), 0.000 pp (B8) & Shift $\geq$ 10 pp, 95\% interval above 0, positive in every seed & PC1 \\
 \bottomrule
 \end{tabular}

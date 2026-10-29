@@ -4,10 +4,10 @@
 1. Every evidence tag `% ID ...` (a trailing LaTeX comment made only of ledger ids) resolves to a row of
    docs/paper/evidence_llm.md or docs/paper/evidence_symbolic.md.
 2. Every tag of docs/paper/draft.md (the superseded markdown record) still occurs somewhere in the .tex sources
-   (WP-T12 adds tags LS/BW/CT to the .tex sources and the ledger only; the draft is not extended).
+   (WP-T12 adds tags LS/BW/CT/SQ/LQ to the .tex sources and the ledger only; the draft is not extended).
 3. No en dash, em dash or `--` in any .tex source (house style), and no tab characters.
 4. Every number in the hand-written main text (abstract.tex, sec_*.tex) occurs in draft.md, a ledger or the
-   generated G1 and G2 tables (so no number was invented while condensing).
+   generated G1, G2 and G5 tables (so no number was invented while condensing).
 5. refs.bib has one entry per reference of draft.md.
 Exit status 1 if any check fails.
 """
@@ -73,10 +73,11 @@ def main():
             print("tab in", os.path.basename(f))
             bad += 1
     pool = numbers(draft)
-    for name in ("evidence_llm.md", "evidence_symbolic.md", "g1_tables.txt", "g2_tables.txt"):
+    for name in ("evidence_llm.md", "evidence_symbolic.md", "g1_tables.txt", "g2_tables.txt", "g5_tables.txt"):
         pool |= numbers(read(os.path.join(P, name)))
     pool |= numbers(read(os.path.join(TEX, "g1_tables.tex")))
     pool |= numbers(read(os.path.join(TEX, "g2_tables.tex")))
+    pool |= numbers(read(os.path.join(TEX, "g5_tables.tex")))
     main_files = [os.path.join(TEX, "abstract.tex")] + sorted(glob.glob(os.path.join(TEX, "sec_*.tex")))
     unmatched = {}
     floats = []

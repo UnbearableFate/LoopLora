@@ -53,3 +53,51 @@ the new prose (only LaTeX-option false positives), `git diff --check`, pages 9-1
 3. Remaining overfull boxes are small (largest about 21 pt in a landscape Appendix C table, 14 pt in one Appendix E table, 12 pt in an
    Appendix I table); the tables render legibly.
 4. All three studies are one oracle seed, three training seeds (CTC: one seed) and the 768 seen names; the paper says so next to each.
+
+# WP-T12 part 2 - G5 (SQ2 and LSQT) in the ledger, the LaTeX manuscript and the PDF
+
+Master `f2c438d` merged first. Text only: no training, no compute, no torch, no data read beyond committed CSV/JSON.
+
+## What changed
+
+- `scripts/paper_tables_g5.py` (stdlib): reads `reports/p1l-sq2/`, `reports/p1l-lsqt/` and the two DPFP reference records (D128-3, R-r128), prints every number
+  the paper uses (output `docs/paper/g5_tables.txt`; `--tex` writes `docs/paper/tex/g5_tables.tex`), asserts the registered outcomes (SQ2 does not advance, no candidate;
+  LSQT outcome no_candidate, band open, trained-LSQ line open, prediction not held) and checks its key values against the figures the two reports state.
+  Differences in pp come from the integer correct counts out of 1,000.
+- `docs/paper/evidence_llm.md`: rows SQ1-SQ3 (SQ2) and LQ1-LQ3 (LSQT), population V-L15, source keys SQ2E, LSQTE, G5T, a scope statement, five must-not-say bullets, the
+  exact-store bullet updated (LSQT has run), an audit-boundary paragraph. No status or value of an earlier row changed; the RX1 and DPFP statements that no trained LSQ arm
+  ran were true when entered, and the ledger says so.
+- `docs/paper/tex/`: SQ2 and LSQT paragraphs with Tables 11 and 12 in Section 4.2, next to DPFP and DPFP-X; two new rows in the negative-intervention table; the "three kinds of evidence"
+  row, abstract, introduction, claims and "does not claim" lists, stops and open items and conclusion updated; Appendix B and C rows; Appendix I extended to G5
+  (trajectories, diagnostics, limits); statements that "no trained least-squares arm ran" or that the LSQ screen ran no arm are now scoped to the RFX rule (Sections 4.2 and 4.3,
+  Appendices C, F and G). `scripts/check_paper_tex.py` also draws numbers from the G5 tables.
+- `docs/paper/paper.pdf` rebuilt with `timeout 600 tectonic -X compile docs/paper/tex/paper.tex --outdir docs/paper`: 64 pages, 536,171 bytes (about 524 KiB), no undefined references.
+
+## Registered statements
+
+- SQ2: the primary contrast S-RC against S-DE does not advance (+4.1 pp where +10 is needed, read error ratio 0.554 where at most 0.5 is needed); no cell reaches 0.80, so the learned-writer
+  line stays stopped. The four cells (EM and read error) and the parent D128-3 are in Table 11. Each descriptive reading has its limit next to it: ridge storage on the DPFP features
+  halves the read error and is +6.9 pp over the continued delta control (one seed, validation set that selected D128-3); the delta continuation alone gains 4.6 pp (parent not converged);
+  the coefficient loss did not help (interaction -0.4 pp); the store swap alone at step 0 gives 68.7%; the gradient clip is active at every logged step.
+- LSQT: best ridge arm LT-RG001 46.1%, inside the 40% to below 48.5% band, so it neither falsifies the line nor triggers W3 and the trained-LSQ line stays open. All three arms against R-r128 (33.5%)
+  and D128-3 (60.8%) are in Table 12; the registered prediction (RG at least 50% with read error at most 0.35) did not hold. The store-versus-query split is stated as untested (the unit query
+  is in every LSQT arm and in none of R-r128); Part 3 replaces that sentence when the U control reports.
+- Must-not-say additions are in the ledger and in the "does not claim" list of Section 6. The learned-writer stop statement stays.
+
+## Checks run
+
+`scripts/check_paper_tex.py` (124 tex tags resolve; all 108 draft tags present; no number outside draft, ledgers and generated tables; no dash; refs.bib 76 = 76), the ledger md check
+(tags resolve; known reader-name duplicates only), `scripts/paper_tables_g5.py` (internal assertions and report cross-checks), the Punctuation Gate on the new prose (LaTeX-option false positives only),
+`git diff --check`, pages 12-13 rendered and inspected.
+
+## Notes and limits
+
+1. SQ2 and LSQT are one seed on the 1,000 validation episodes that selected D128-3; the standard error of a difference is about 2.2 pp, and the paper says so beside each reading.
+2. Costs of the two studies (2.18 and 5.10 node-hours with the shared tests) are not printed in the paper; they are in the study reports.
+3. Remaining overfull boxes are small (largest about 21 pt in a landscape Appendix C table, 14 pt in one Appendix E table, 12 pt in one Appendix I table).
+4. The U control of LSQT has not reported and is not mentioned beyond the sentence that the split is untested.
+
+## Part 2 fix (review wording)
+- The early dip of the SQ2 ridge arms is now described as consistent with starting from AdamW moments of another objective (registered deviation 2), cause not tested
+  (`sec_writers.tex`, ledger row SQ2). "Because" and "explains" are removed.
+- W3 is no longer called a retraining: it is a separate ridge-plus-DPFP study that would need its own registration (`sec_writers.tex`, ledger row LQ1); no other place calls it a retraining.
