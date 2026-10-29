@@ -1,0 +1,2 @@
+{"step": 1, "loss": 0.9913269281387329, "accuracy": 0.84375, "grad_norm": 0.7464777827262878, "clipped": false, "lr": 5e-05, "step_seconds": 0.18691174899868201, "data_seed": 5181101083092932984}
+{"step": 20, "loss": 0.9826611280441284, "accuracy": 0.8828125, "grad_norm": 0.5550798773765564, "clipped": false, "lr": 0.001, "step_seconds": 0.1909470690006856, "data_seed": 5181101083092932984}

@@ -1,0 +1,61 @@
+[
+ {
+  "checkpoint_blake2b_128": "00a1535965a0f2813b4a1b552b6e2ee2",
+  "export": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1a/matrix_L1/s17/selected.pt",
+  "label": "matrix_L1_s17"
+ },
+ {
+  "checkpoint_blake2b_128": "b44f13443a4ce44e3d22d9f1ac77685d",
+  "export": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1a/matrix_L1/s29/selected.pt",
+  "label": "matrix_L1_s29"
+ },
+ {
+  "checkpoint_blake2b_128": "07e1ab7460f12615735fccb180d2dc3b",
+  "export": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1a/matrix_L1/s43/selected.pt",
+  "label": "matrix_L1_s43"
+ },
+ {
+  "checkpoint_blake2b_128": "d71e06da709ee4c588b5f008d68c0d15",
+  "export": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1a/soft_slot_L1/s17/selected.pt",
+  "label": "soft_slot_L1_s17"
+ },
+ {
+  "checkpoint_blake2b_128": "136226b18beb45c5ca218451e9c13ea1",
+  "export": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1a/soft_slot_L1/s29/selected.pt",
+  "label": "soft_slot_L1_s29"
+ },
+ {
+  "checkpoint_blake2b_128": "52d43da424025388a8756bacb03f3058",
+  "export": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1a/soft_slot_L1/s43/selected.pt",
+  "label": "soft_slot_L1_s43"
+ },
+ {
+  "label": "s_re_native",
+  "parent_writer_blake2b_128": "3994a5631021de03b2039974ac934e56",
+  "read": null
+ },
+ {
+  "label": "matrix_step0",
+  "parent_writer_blake2b_128": "3994a5631021de03b2039974ac934e56",
+  "read": {
+   "capacity": 16,
+   "gain": 1.0,
+   "kind": "matrix",
+   "recency": false,
+   "scope": "all_valid_question",
+   "tau": null
+  }
+ },
+ {
+  "label": "soft_step0",
+  "parent_writer_blake2b_128": "3994a5631021de03b2039974ac934e56",
+  "read": {
+   "capacity": 16,
+   "gain": 1.0,
+   "kind": "soft",
+   "recency": false,
+   "scope": "all_valid_question",
+   "tau": 0.1
+  }
+ }
+]

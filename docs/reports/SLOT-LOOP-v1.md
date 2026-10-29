@@ -1,26 +1,30 @@
-# SLOT-LOOP-v1 S0 (WP-L13): frozen read replacement
+# SLOT-LOOP-v1 (WP-L13): S1A complete
 
-**Decision: R2, full S1A adaptation.** HardSlot improves EM by 6.1 pp over Matrix with lower read error on the registered 1,000-episode dev set. Calibrated SoftSlot improves EM by 2.5 pp, below the exploratory 5 pp threshold. S1A choices: **Matrix-L1 g=1; SoftSlot-L1 g=1, tau=0.1**, all valid question tokens. HardSlot remains diagnostic. S1A is unstarted and waits for the orchestrator.
+**Decision: ADVANCE.** SoftSlot-L1 achieved 86.00% mean confirmation EM against Matrix-L1's 82.27% on 2,000 registered episodes: **+3.733 pp, paired 95% interval [2.700, 4.817]**. The registered +3 pp threshold, positive lower bound and three positive seed differences all pass. H1 is supported at the registered level.
 
-Calibration used the registered 2,048 episodes, all 18 candidates and fixed NLL selection. Matrix and HardSlot selected g=1; SoftSlot selected g=1/tau=0.1. Uncalibrated SoftSlot (tau=1) reached 2.1% EM, so temperature is consequential. No dev setting or recency variant replaced the registered selection.
+| continuation seed | Matrix EM | SoftSlot EM | difference (paired 95% interval), pp |
+| --- | ---: | ---: | --- |
+| 17 | 82.50% | 86.00% | +3.50 [2.20, 4.80] |
+| 29 | 81.95% | 86.15% | +4.20 [2.90, 5.50] |
+| 43 | 82.35% | 85.85% | +3.50 [2.10, 4.95] |
+| mean | 82.27% | 86.00% | +3.733 [2.700, 4.817] |
 
-| S-RE condition, all valid question tokens | EM | NLL | Mean relative read error | EM difference vs Matrix (descriptive paired 95% interval) |
-| --- | ---: | ---: | ---: | --- |
-| Native / Matrix, g=1 | 72.0% | 1.577648 | 0.183978 | reference |
-| SoftSlot, g=1/tau=0.1 | 74.5% | 1.505075 | 0.092405 | +2.5 pp [0.6, 4.4] |
-| HardSlot, g=1 | 78.1% | 2.434278 | 0.137009 | +6.1 pp [3.8, 8.4] |
-| SoftSlot recency-matched, same settings | 74.6% | 1.504875 | 0.092405 | +2.6 pp [0.7, 4.5] |
+Confirmation mean NLL/read error: Matrix 0.908315/0.1503; SoftSlot 0.792593/0.0770. Native and Matrix step 0 both reached 72.35% EM, NLL 1.473178, read error 0.1767; calibrated SoftSlot step 0 reached 76.35%, 1.313163, 0.0808. Unseen-name results are descriptive: Matrix 10.45%, SoftSlot 13.43%, +2.983 pp [2.083, 3.883]; absolute accuracy remains low.
 
-The separate final-only table gives Matrix 72.0%, SoftSlot 75.5%, HardSlot 80.3%, and Clean-final oracle 92.6%. HardSlot's NLL is worse despite higher EM; S0 uses the registered EM/read-error rule. D128-3's descriptive recheck, at S-RE's settings without recalibration, gives Matrix 63.3%, SoftSlot 73.7%, HardSlot 74.8%: the same direction. S0 is exploratory, conditional on one parent and task, and does not establish interference removal as the cause. The 10,000-resample paired intervals are descriptive.
+Both arms continued the same S-RE writer for 6,000 steps at L1, T1/E16, full-vocabulary EM and all valid question reads; Q/R/U/B trained while the writer, shared A, backbone and buffers remained frozen. Equal pilot effort selected LR 0.001 for Matrix and 0.003 for SoftSlot, with g=1 for both and SoftSlot tau=0.1. Checkpoints were selected by dev NLL before opening. The stable dev mean gap was +3.5 pp, so the registered below-3 pp ablation trigger did not fire. No optional common-fixed-LR run was made.
 
-**Validation.** All nine preflight checks passed. S-RE reproduced the old 723/1,000 and NLL 1.642127275466919 bitwise; D128-3 reproduced 608/1,000. Matrix–Native logits and gradients were bitwise identical (maximum differences 0). Owner/mask, isolation, frozen set, feature consistency, exact bytes and capacity errors passed. Analysis checked locked counts/IDs, per-sample Native/Matrix correctness/NLL, calibration selection and decision thresholds. Input/script/output blake2b digests matched before archiving. No source change after preflight and no sealed S1A data opened.
+S0 selected R2 (full adaptation): frozen Matrix/SoftSlot/HardSlot dev EM was 72.0/74.5/78.1%; all nine preflight checks passed, including bitwise Matrix–Native logits and gradients. The source has remained frozen since preflight. [S0 decision](../../reports/slot-loop-v1/s0/decision_s0.md), [release report](SLOT-LOOP-v1-release.md), [dev selection](SLOT-LOOP-v1-selected.md).
 
-| job | result | actual node·h |
+**Validation.** Compute tests passed before release: jobs 3728741 (158 analysis, release, runbook and round-2 tests) and 3728742 (48 experiment tests); smoke, timing/LR pilot and both reload checks passed. Six main runs completed with finite losses/norms, correct frozen/support/config/release digests and selected-export hashes. Independent job 3729280 reproduced dev selection byte for byte before opening. Jobs 3729313/3729314 evaluated nine entries per set; frozen analysis job 3729369 validated locked counts/IDs and provenance, then used 10,000 paired whole-episode resamples (seed 9056755664197379988). All 21 analysis-input and three output hashes matched; exact samples and outputs are archived. No science rule deviation; written budget caps were lifted by the user.
+
+| final jobs, one node each | outcome | actual node·h |
 | --- | --- | ---: |
-| 3728339.opbs, preflight, mg0031 | all required checks passed, 53 s | 0.014722 |
-| 3728354.opbs, S0, mg0046 | 18 calibration candidates, 13 dev conditions and D128-3 recheck, 218 s | 0.060556 |
-| 3728547.opbs, analysis, mg0022 | R2, persistent decision artifacts, 6 s | 0.001667 |
+| 3729313 confirmation, mg0036 | nine × 2,000 episodes; 141 s | 0.039167 |
+| 3729314 unseen, mg0009 | nine × 2,000 episodes; 140 s | 0.038889 |
+| 3729369 analysis, mg0018 | ADVANCE; 7 s | 0.001944 |
 
-Execution adds 0.076944 node·h; cumulative including tests/retries is 0.778278 node·h (inherited accounting 0.503). Written stage budgets were lifted; every job is below 16 node·h. Preflight commit: `7febf58c3440483fe081e99c263f68ad62512b10`; lock/S0/analysis commit: `2f22aba2f6e93029198d1126ede2b9528cd3eef4`; source blake2b-128: `fe548da4c06d77b7f4a8ae65349650f9`.
+S1A total including preparation, tests and independent re-run: **2.030556 node·h**; whole study **2.808833 node·h**, using inherited rounded accounting of 0.503. Worker-only total is 2.807167; every job is below 16 node·h. Full ledger and log paths: [state](SLOT-LOOP-v1-state.md).
 
-Artifacts: [decision](../../reports/slot-loop-v1/s0/decision_s0.md), [metrics and samples inventory](../../reports/slot-loop-v1/s0/artifacts.json), [lock](../../reports/slot-loop-v1/manifest.lock.json), [preflight](../../reports/slot-loop-v1/preflight/preflight.json), [detailed state](SLOT-LOOP-v1-state.md). Persistent originals: `/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/`. Deferred S1A follow-ups are task Review round 3: analysis-only release-file digest binding and complete S1A runbook/parser tests; no further review round. No deviation from registered S0 science rules.
+The result is conditional on one parent writer and three data-order seeds, this task, name pool and calibrated read interface. It does not establish interference removal as the cause, loops, multi-hop reasoning or broad unseen-name generalization. ADVANCE makes the full S1B Matrix/SoftSlot × L1/L4 study eligible under a separately registered addendum with new data. No S1B work has started.
+
+Evidence: [decision](../../reports/slot-loop-v1/decision_s1a.md), [frozen verdict and full metrics](../../reports/slot-loop-v1/s1a-summary/verdict.md), [archive inventory](../../reports/slot-loop-v1/s1a-summary/artifacts.json). Science commit `1523b19c7949673ddcd1d89cc1e5fe518736805c`; release blake2b-128 `523d11d57a08a2491893ebe7cedc86a7`; frozen analysis `843d2ff4d1a03224ccd16e68720ba344`.

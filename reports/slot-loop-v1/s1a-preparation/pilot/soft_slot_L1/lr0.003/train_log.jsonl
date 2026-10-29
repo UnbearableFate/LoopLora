@@ -1,0 +1,5 @@
+{"step": 1, "loss": 1.4139667749404907, "accuracy": 0.7890625, "grad_norm": 0.8658577799797058, "clipped": false, "lr": 0.00015000000000000001, "step_seconds": 0.16606259300897364, "data_seed": 2442741374644229280}
+{"step": 50, "loss": 0.774824857711792, "accuracy": 0.84375, "grad_norm": 0.8555055856704712, "clipped": false, "lr": 0.003, "step_seconds": 0.1566521369968541, "data_seed": 2442741374644229280}
+{"step": 100, "loss": 0.7201389074325562, "accuracy": 0.8671875, "grad_norm": 0.7122819423675537, "clipped": false, "lr": 0.003, "step_seconds": 0.15512463499908336, "data_seed": 2442741374644229280}
+{"step": 150, "loss": 1.0246689319610596, "accuracy": 0.828125, "grad_norm": 0.9014862775802612, "clipped": false, "lr": 0.003, "step_seconds": 0.15678173198830336, "data_seed": 2442741374644229280}
+{"step": 200, "loss": 1.4017409086227417, "accuracy": 0.8125, "grad_norm": 0.8281024694442749, "clipped": false, "lr": 0.003, "step_seconds": 0.16107193400966935, "data_seed": 2442741374644229280}

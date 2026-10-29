@@ -1,0 +1,74 @@
+{
+ "checkpoint_blake2b_128": "2751f9f87cb16b89c1bae5db8b95b253",
+ "config_matches_release": true,
+ "equal": {
+  "correct": true,
+  "episode_id": true,
+  "nll": true,
+  "prediction": true
+ },
+ "passed": true,
+ "read": {
+  "capacity": 16,
+  "gain": 1.0,
+  "kind": "matrix",
+  "recency": false,
+  "scope": "all_valid_question",
+  "tau": null
+ },
+ "slot": {
+  "arm": "matrix_L1",
+  "eps": 1e-06,
+  "feature_map": "dpfp-nu3-unit",
+  "key_dim": 768,
+  "layout_digest": "b7f93c1ca56e5dd1f79a9dccfe2f6054",
+  "loop_steps": 1,
+  "parent": {
+   "arm": "S-RE",
+   "checkpoint_blake2b_128": "455bf733b9acccc7a38cfd51aa8a1ede",
+   "name": "S-RE",
+   "writer_blake2b_128": "3994a5631021de03b2039974ac934e56"
+  },
+  "prereg_blake2b_128": "56e8c611c01e0ef9b7ae32db97b0e334",
+  "query_projection": "shared",
+  "read": {
+   "capacity": 16,
+   "gain": 1.0,
+   "kind": "matrix",
+   "recency": false,
+   "scope": "all_valid_question",
+   "tau": null
+  },
+  "run": {
+   "seed": null,
+   "stage": "smoke"
+  },
+  "source_commit": "1523b19c7949673ddcd1d89cc1e5fe518736805c",
+  "task": {
+   "E": 16,
+   "Q": 4,
+   "V": 1024,
+   "head_sharing": 0.3,
+   "hops": [
+    1
+   ],
+   "n_rel": 4,
+   "name": "t1",
+   "seen": [
+    0,
+    768
+   ],
+   "unseen": [
+    768,
+    1024
+   ]
+  },
+  "trainable": [
+   "Q",
+   "R",
+   "U",
+   "B"
+  ],
+  "value_dim": 128
+ }
+}

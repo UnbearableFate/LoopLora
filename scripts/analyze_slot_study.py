@@ -513,13 +513,18 @@ def parse_run(raw, arm, seed, ablation=False):
     ids = get(raw, 'dev_ids_blake2b_128', where)
     if not isinstance(ids, str):
         refuse(f'{where}: dev_ids_blake2b_128 is not a string')
+    release = get(raw, 'release_blake2b_128', where)
+    if not (isinstance(release, str) and len(release) == 32 and all(c in '0123456789abcdef' for c in release)):
+        refuse(f'{where}: release_blake2b_128 is not 32 lowercase hex digits')
     return dict(steps=steps, n=rows[0]['n'], rows=rows, selected=best, checkpoint=checkpoint if best else None, ids=ids,
+                release_blake2b_128=release,
                 all_finite=training['all_finite'], training=dict(extra, all_finite=training['all_finite']))
 
 
 def read_main_runs(src, manifest):
     runs = {(arm, seed): parse_run(src.json(f'{arm}/s{seed}/record.json'), arm, seed) for arm in ARMS for seed in SEEDS}
-    for field, what in (('ids', 'dev_ids_blake2b_128'), ('n', 'dev n'), ('steps', 'steps')):
+    for field, what in (('ids', 'dev_ids_blake2b_128'), ('n', 'dev n'), ('steps', 'steps'),
+                        ('release_blake2b_128', 'release_blake2b_128')):
         if len({r[field] for r in runs.values()}) != 1:
             refuse(f'the six records differ in {what}')
     for r in runs.values():
@@ -546,6 +551,7 @@ def stage_dev(src, manifest):
                     sum_d_correct=total, mean_pp=float(Fraction(100 * total, 3 * n)), trigger_below_pp=3.0)
     outcome = 'stop_unstable' if reasons else 'ablation' if gaps['sum_d_correct'] * 100 < 9 * n else 'no_trigger'
     summary = dict(stage='S1A-DEV', outcome=outcome, reasons=reasons, n=n, steps=next(iter(runs.values()))['steps'],
+                   release_blake2b_128=next(iter(runs.values()))['release_blake2b_128'],
                    dev_ids_blake2b_128=next(iter(runs.values()))['ids'], differences=gaps,
                    runs={f'{a}/s{s}': dict(selected_step=None if r['selected'] is None else r['selected']['step'],
                                            selected_checkpoint_blake2b_128=r['checkpoint'], training=r['training'],
@@ -589,6 +595,8 @@ def s1a_provenance(src, manifest):
         refuse('the analysis script differs from the ready release or open record')
     if any(record.get('prereg_blake2b_128') != PREREG_BLAKE2B_128 for record in (manifest, release, opened)):
         refuse('the open record, ready release or locked manifest differs from the registered prereg')
+    if opened.get('release_blake2b_128') != src.digests[str(Path(src.release_path).resolve())]:
+        refuse('the ready release file digest differs from the open record')
     selected = get(opened, 'selected_checkpoints', 'open record')
     keys = {f'{arm}/{seed}' for arm in ARMS for seed in SEEDS}
     if not isinstance(selected, dict) or set(selected) != keys:
