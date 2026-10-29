@@ -1,0 +1,92 @@
+{
+  "accounting": "qstat observed elapsed_seconds times nodes; failed jobs included; live totals provisional",
+  "allocated_node_hours": 0.20166666666666666,
+  "allocated_node_seconds": 726,
+  "budget_rule": "B8W: 1.0-2.0 node-h in total including tests and smokes; per-job 1 node x 1 h",
+  "final": true,
+  "jobs": [
+    {
+      "allocated_seconds": 317,
+      "argv": [
+        "-m",
+        "pytest",
+        "-q",
+        "tests/test_b8w.py",
+        "tests/test_p1ls_pipeline.py",
+        "tests/test_p5l.py",
+        "tests/test_llm_prefetch.py",
+        "tests/test_llm_train.py",
+        "tests/test_llm_b8.py",
+        "tests/test_llm_oracle.py"
+      ],
+      "exit_code": 1,
+      "host": "mg0045",
+      "job_id": "3723982.opbs",
+      "log": "/work/xg24i002/x10041/LoopLora/logs/pbs/t-b8w-tests-20261029-131300-834688.log",
+      "name": "t-b8w-tests",
+      "node_hours": 0.08805555555555555,
+      "nodes": 1,
+      "requested_walltime": "00:20:00",
+      "source": {
+        "kind": "commit",
+        "ref": "d0b27928f29435e311792eb7eef34bd48efd8a09"
+      },
+      "status": "FINISH"
+    },
+    {
+      "allocated_seconds": 90,
+      "argv": [
+        "scripts/run_b8w.py",
+        "smoke",
+        "--steps",
+        "100",
+        "--seed",
+        "17",
+        "--out",
+        "/work/xg24i002/x10041/LoopLora/runs/b8w/smoke-100"
+      ],
+      "exit_code": 0,
+      "host": "mg0043",
+      "job_id": "3723983.opbs",
+      "log": "/work/xg24i002/x10041/LoopLora/logs/pbs/sm-b8w-s17-20261029-131300-834695.log",
+      "name": "sm-b8w-s17",
+      "node_hours": 0.025,
+      "nodes": 1,
+      "requested_walltime": "00:20:00",
+      "source": {
+        "kind": "commit",
+        "ref": "d0b27928f29435e311792eb7eef34bd48efd8a09"
+      },
+      "status": "FINISH"
+    },
+    {
+      "allocated_seconds": 319,
+      "argv": [
+        "-m",
+        "pytest",
+        "-q",
+        "tests/test_b8w.py",
+        "tests/test_p1ls_pipeline.py",
+        "tests/test_p5l.py",
+        "tests/test_llm_prefetch.py",
+        "tests/test_llm_train.py",
+        "tests/test_llm_b8.py",
+        "tests/test_llm_oracle.py"
+      ],
+      "exit_code": 0,
+      "host": "mg0043",
+      "job_id": "3724025.opbs",
+      "log": "/work/xg24i002/x10041/LoopLora/logs/pbs/t-b8w-tests2-20261029-132226-855135.log",
+      "name": "t-b8w-tests2",
+      "node_hours": 0.08861111111111111,
+      "nodes": 1,
+      "requested_walltime": "00:20:00",
+      "source": {
+        "kind": "commit",
+        "ref": "0a5b2c91a05b970faa0f700a0c67d528d285afaa"
+      },
+      "status": "FINISH"
+    }
+  ],
+  "task": "WP-L10"
+}
