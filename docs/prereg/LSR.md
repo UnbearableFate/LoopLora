@@ -1,9 +1,10 @@
-# Study LSR: label-free stop rules on the r = 128 M1-L4 checkpoints at two backbones, pre-registered (draft v1)
+# Study LSR: label-free stop rules on the r = 128 M1-L4 checkpoints at two backbones, pre-registered
 
-Status: **draft for registration**, written 2026-10-29 by sn-core (WP-L9 step 1, `docs/tasks/WP-L9_stop_rules.md`,
-wp/core) on the login node from code and committed files only. The orchestrator registers it on master before any code is
-written or any job runs. The user approved G1-G4 on 2026-10-29 13:00 JST (`plan/followup_2026-10-29.md` §4). Proposal R1 of
-`docs/review/rv-fable_2026-10-29.md`. Evaluation only: no training, no gradient step, no new checkpoint.
+Registered 2026-10-29 13:15 JST by the orchestrator, before any LSR code, run, validation score or test episode. Drafted by
+sn-core (Claude Sonnet 5.5; WP-L9 step 1, `docs/tasks/WP-L9_stop_rules.md`, wp/core `e206189`) on the login node from code and
+committed files only. The user approved G1–G4 on 2026-10-29 13:00 JST ("OK,启动接下来的G1-G4"; `plan/followup_2026-10-29.md` §4).
+Proposal R1 of `docs/review/rv-fable_2026-10-29.md`. Evaluation only: no training, no gradient step, no new checkpoint. The
+orchestrator's decisions are in "Decisions at registration" at the end.
 
 ## Question
 The (hop, L) matrix of the M1-L4 checkpoint peaks at L ~ h + 1 to h + 2 for hop h and decays afterwards
@@ -216,3 +217,17 @@ orchestrator decides before the validation jobs. node·h are recorded per job in
 - Evaluation only: no optimizer, no `requires_grad` change, no checkpoint is written. The new module patches adapter methods inside a
   context manager and restores them (`p1lc.read_control`'s contract); a test shows the plain evaluation path is bitwise unchanged.
 - Executed by sn-core (Claude Sonnet-5.5 subagent) on wp/core; every job through `scripts/submit.py --commit <full hash>`.
+
+## Decisions at registration (orchestrator)
+1. **Flags 1–9 are accepted as written.** They cover R1 look-back, R3 as ‖UMQz^s‖/‖UMQz^0‖, the stop decided at the final
+   position and applied to the whole question, R2 with patience 2, the selection details, the decision-rule details,
+   10,000 draws, the descriptive additions, and the per-entry window test.
+2. **Gate thresholds** (open question 1): accepted.
+   - The hops 4–8 gain is at least +3 pp, with the 99.17 % interval above 0.
+   - The 8 pp pooled margin applies on validation.
+   - Hop 1 is judged on its point estimate (≥ −10 pp pooled and in every seed), and its interval is reported.
+3. **R2 cost** (open question 2): accepted. R2's pass count is reported and R2 is not timed. The report states that R2 needs
+   s* + 1 passes through layers 15–28 per question. No latency or efficiency statement is made for R2, and none is made for
+   any other rule beyond the descriptive within-job timing.
+4. **Window.** Assert each registered `CONFIRMATION_WINDOWS` entry individually; WP-L10 (`b8w` 108000, B8W registered on
+   master `3c9c396`) does the same. The orchestrator resolves the dict-literal conflict at merge by keeping every entry.
