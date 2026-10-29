@@ -18,6 +18,9 @@ from run_p1l_main import ROOT, digest, save
 
 PREREG = "docs/prereg/LSR.md"
 DESIGN = "reports/lsr/design.json"
+# Clarification C1 (master ad1a9b5) changed the prereg file after the validation runs started; it changes no rule and no code. The
+# validation records carry the hash of the prereg as registered at 23112ba.
+EARLIER_PREREG_HASHES = {"91235d80a38f200e3a7b3bec907c1f1e": "registered 23112ba, before Clarification C1"}
 THRESHOLDS = "reports/lsr/thresholds.json"
 OBJECTIVE = ("per rule R1/R3 and backbone: maximise the summed correct count on hops 4-8 over the pooled validation questions of the "
              "three seeds, over grid values with pooled hop-1 change against fixed L = 4 >= -8 pp and >= -10 pp in every seed; "
@@ -40,7 +43,8 @@ def checkpoints() -> dict:
 
 
 def design() -> dict:
-    return dict(study="lsr", prereg=dict(path=PREREG, hash=digest(ROOT / PREREG)), rules=dict(
+    return dict(study="lsr", prereg=dict(path=PREREG, hash=digest(ROOT / PREREG)),
+                earlier_prereg_hashes=EARLIER_PREREG_HASHES, rules=dict(
         R1="||z^s - z^(s-1)|| / ||z^(s-1)|| <= tau1, first s in 1..8, s = 8 forced; cost s reads",
         R2="p^s = p^(s-1) = p^(s-2) (p^0 = L = 0 prediction), s >= 2, s = 8 forced; cost s reads and s + 1 upper-layer passes",
         R3="||r^s|| / ||r^0|| <= tau2 with r = U M Q z, s = 1..7, s = 8 forced; cost s + 1 reads"),
@@ -62,7 +66,7 @@ def load_backbone(directory: Path, backbone: str, locked: dict) -> tuple[dict, d
         if (record["status"] != "complete" or record["trace_hash"] != digest(trace_path) or record["backbone"] != backbone
                 or record["split"] != "val" or record["window"] != rules.VAL_RANGE
                 or record["checkpoint_hash"] != locked["checkpoints"][backbone]["runs"][name]["checkpoint_hash"]
-                or record["prereg_hash"] != prereg_hash or record["source_dirty"]):
+                or record["prereg_hash"] not in {prereg_hash, *locked["earlier_prereg_hashes"]} or record["source_dirty"]):
             raise ValueError(f"{name}: the validation record does not match the design lock")
         commits.add(record["git_commit"])
         with np.load(trace_path) as data:

@@ -1,4 +1,4 @@
-# LSR state (WP-L9 step 2; sn-core, wp/core). Registered `docs/prereg/LSR.md`, blake2b-128 `91235d80a38f200e3a7b3bec907c1f1e`
+# LSR state (WP-L9 step 2; sn-core, wp/core). Registered `docs/prereg/LSR.md`, blake2b-128 `63da9c626d699252c239cc86e149f1ad` (with Clarification C1, master ad1a9b5; the validation runs recorded the pre-C1 hash `91235d80a38f200e3a7b3bec907c1f1e`, which `design.json` lists in `earlier_prereg_hashes`)
 
 Status 2026-10-29: code, tests and smoke done; validation jobs running. No test episode has been generated.
 
@@ -37,3 +37,8 @@ Status 2026-10-29: code, tests and smoke done; validation jobs running. No test 
 - Observation, not a result: on val [0, 64) hop-1 EM peaks at L = 2 and hop 4 at L = 6-7, the P1-L shape; the median read ratio ||r^s||/||r^0|| is
   1.0-1.1 at 0.6B and grows to about 10 at s = 7 at 1.7B, and the median relative change falls from 0.13 to 0.01 at 0.6B and stays 0.5-0.7 at
   1.7B. Whether the grid has a feasible value is for the validation selection to say.
+
+## Clarification C1 (orchestrator, ad1a9b5)
+The audit change above, the placement of the latency audit in the test job on val [1000, 1128), the val [0, 64) smoke observations as
+information seen before the lock, and the unchanged handling of infeasible rules are registered. `design.json` is re-locked with the new
+prereg hash; `analyze_lsr.py select` accepts validation records carrying either hash (no rule and no code changed with C1).

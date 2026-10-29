@@ -50,6 +50,9 @@
       }
     }
   },
+  "earlier_prereg_hashes": {
+    "91235d80a38f200e3a7b3bec907c1f1e": "registered 23112ba, before Clarification C1"
+  },
   "grid": "tau = 2^(k/2)",
   "grid_k": [
     -20,
@@ -84,7 +87,7 @@
   },
   "objective": "per rule R1/R3 and backbone: maximise the summed correct count on hops 4-8 over the pooled validation questions of the three seeds, over grid values with pooled hop-1 change against fixed L = 4 >= -8 pp and >= -10 pp in every seed; ties: fewer mean reads, then smaller k; no feasible value: the rule fails and its test statistics are never computed",
   "prereg": {
-    "hash": "91235d80a38f200e3a7b3bec907c1f1e",
+    "hash": "63da9c626d699252c239cc86e149f1ad",
     "path": "docs/prereg/LSR.md"
   },
   "ranges": {
