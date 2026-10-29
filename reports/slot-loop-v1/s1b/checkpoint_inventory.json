@@ -1,0 +1,32 @@
+{
+ "parents": {
+  "S-RE": {
+   "files": {
+    "checkpoint.pt": "455bf733b9acccc7a38cfd51aa8a1ede",
+    "record.json": "816570a0882ed6952b4f851b67d4ef9f",
+    "training.json": "b918151ab8fa5c7d03ab9e767954cd4a",
+    "val-6000/samples.npz": "1bd24adac61f0ce147a159fac30bf56b",
+    "writer.pt": "3994a5631021de03b2039974ac934e56"
+   },
+   "format": "read_fix_version 1 inference export (adapter, signature, config)",
+   "loader": "looplora.llm.sq2.load_inference",
+   "old_range_replay": {
+    "correct": 723,
+    "loss_float32": 1.642127275466919,
+    "relative_read_error": 0.19612866640090942
+   },
+   "path": "/work/xg24i002/x10041/LoopLora/runs/p1l/sq2/arms/S-RE",
+   "role": "Identical unadapted parent for every S1B branch, arm and run; optimizer and training-only value head unused"
+  }
+ },
+ "preflight": {
+  "git_commit": "09044cea3a642d64b6b0470051e5f562045fb1e2",
+  "job": "3729312.opbs",
+  "report": "preflight/preflight.json",
+  "report_blake2b_128": "f7b14c225bc72d9712cab3183d7de665"
+ },
+ "source_blake2b_128": "bb60b89c78ee840a940c5ec855455604",
+ "stage": "S1B",
+ "study": "slot-loop-v1",
+ "version": 1
+}

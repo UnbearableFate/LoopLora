@@ -1,6 +1,6 @@
 # WP-L14: S1B implementation and validation
 
-**All nine cross-review fixes pass combined validation; real-parent preflight is next.** Job **3729273.opbs** passed **179 tests, zero failures/errors/skips**, including all review regressions and the legacy slot shard, at `4a76e16d3ae25a2fc4d3268d7cb8ff8531461b89`. The exact-zero regression failed for the intended reason on the unchanged reviewed source. Cumulative actual cost including all failures/retries: **0.265556 node·h**. Historical records follow; current preflight/lock work is at the end.
+**S1B is locked after all nine cross-review fixes, combined green validation and the real-parent preflight.** Job **3729273.opbs** passed **179 tests, zero failures/errors/skips**, including all review regressions and the legacy slot shard, at `4a76e16d3ae25a2fc4d3268d7cb8ff8531461b89`. Job **3729312.opbs** passed all eleven preflight checks on identical source. The committed [lock](../../reports/slot-loop-v1/s1b/manifest.lock.json) binds source blake2b-128 `bb60b89c78ee840a940c5ec855455604`. The exact-zero regression failed for the intended reason on the unchanged reviewed source. Cumulative actual cost including all failures/retries: **0.313056 node·h**. Calibration and later stages remain held for S1A's frozen decision record. Historical records and final evidence follow.
 
 Worker wk-loop, branch `wp/loop`, login/control plane `miyabi-g2` (aarch64), no PBS allocation. Merged master **once**, as instructed: fast-forward `2f7abbc` → `8f4bb1da18d146d5979a6ae0fe9ea5c5dac27e1f`; only the task file/worker registry changed. No push.
 
@@ -101,4 +101,34 @@ Authorization remains the main-cba968b review section, read directly without mer
 
 Request one node/debug-g/00:15:00 (0.250000 node·h). Planning anchors: prior real-parent S0 preflight 53 s, S-RE 0.199 s/step and 6.84 s/1,000 one-question evaluations. S1B adds 160 updates, both projection branches' T1 three-depth Native/Matrix comparisons and repeated strict parent/reload instances; allow roughly ten minutes for these expanded checks/loading, ×1.5 walltime. Actual S1B preflight duration will replace this estimate. No source edits after the passed tests. If all eleven checks pass and source/inventory/manifest match, create the S1B-specific lock, archive its preflight report/inventory in `reports/slot-loop-v1/s1b/`, commit locally and STOP locked. Any failed check blocks the lock. Calibration and all later stages remain held for S1A's frozen decision record.
 
-Submitted **3729312.opbs**, `s1b-preflight`, immutable snapshot **`09044cea3a642d64b6b0470051e5f562045fb1e2`**, one node/debug-g/00:15:00. Log `/work/xg24i002/x10041/LoopLora/logs/pbs/s1b-preflight-20261030-001531-3859454.log`; persistent output as above. Outcome/actual node·h pending. `src/`, scripts, tests and configs are identical to the 179-test green snapshot. No waiting/polling; next action after watcher notification is to inspect every required check and then create/commit the source-bound lock only on success.
+Completed **3729312.opbs**, `s1b-preflight`, immutable snapshot **`09044cea3a642d64b6b0470051e5f562045fb1e2`**, one node/debug-g/00:15:00. Log `/work/xg24i002/x10041/LoopLora/logs/pbs/s1b-preflight-20261030-001531-3859454.log`; persistent output as above. Verified **exit 0, status complete, passed true**, host mg0034, 2026-10-30 00:22:23–00:25:14 JST: **171 s / 0.047500 node·h**. The log binds the intended commit/argv, confirms CUDA and ends with exit 0; the separate exit marker is 0. Its sole warning is the inherited `torch_dtype` deprecation. No checks skipped. Measured equivalent-preflight sizing is now 171×1.5 = 256.5 s, rounded to a five-minute request if a future source change requires a rerun. Cumulative actual for all nine jobs, including failures/retries: **(643+7+306+171)/3600 = 0.313056 node·h**.
+
+Inspected all eleven mandatory checks and their nested evidence in the completed report:
+
+| check | observed evidence |
+| --- | --- |
+| bytes | both projection branches: capacity 12; Slot 43,028 B/episode, Matrix 393,216 B/episode; measured Slot bytes equal formula |
+| capacity | both branches: E=S=12 succeeds; E>S raises |
+| features | both branches: actual `[4,12,768]` keys, `[4,12,128]` values, exactly 12 writes per episode; unit keys and no base-key substitution; key gap 5.96e-8 ≤ 1e-5, value gap 0, reconstruction relative error 1.10e-7 ≤ 1e-6 |
+| frozen | eight real-parent 20-update runs, advance/query-copy × M1/M4/S1/S4: frozen tensors and support unchanged, trainable tensors changed; exact trainable counts 180,224 / 442,368 respectively |
+| isolation | both branches pass label isolation and immutable-memory checks |
+| legacy | S-RE replay exactly 723/1,000, NLL 1.642127275466919, relative-read error 0.19612866640090942; all saved per-sample fields bitwise equal and no differences; T1 L1/2/4 on both branches, 1,000 episodes and 455,808,000 elements per branch, zero unequal elements / max gap 0 |
+| matrix_L4 | both branches: full-logit max gap 0 and Q/R/U/B gradient gaps 0 versus native tensor loop |
+| owner_mask | both branches: every L1/2/4/8 owner/padding/reorder check passes for all three backends |
+| registry | registered T2 layout `f556c1b91252b0b74d3ff674717be37c`, all 22 registered ID groups checked disjoint |
+| reload | all eight smoke exports reload with complete matching metadata and evidence |
+| trajectory | both branches at L1/2/4/8 agree with actual forward; fixed-query and identical-start untied checks pass |
+
+### Committed S1B lock
+
+Archived the original preflight JSON byte-for-byte and created the lock with the reviewed metadata command `scripts/prepare_s1b.py --mode lock --preflight reports/slot-loop-v1/s1b/preflight/preflight.json --out reports/slot-loop-v1/s1b/manifest.lock.json`. The builder rechecked the registered prereg, actual S-RE inventory, full ID manifest, all mandatory checks and current source before writing `status: locked`. This bounded lock preparation ran on the login/control node; no torch, pytest, training or evaluation ran there. The standalone inventory follows the existing inventory format and records S-RE's role, loader, real file digests, legacy replay and preflight provenance. S0/S1A inventories and locks are unchanged.
+
+| committed artifact | blake2b-128 |
+| --- | --- |
+| [manifest.lock.json](../../reports/slot-loop-v1/s1b/manifest.lock.json) | `a91da220da5fee75d5b26f923116083f` |
+| [checkpoint_inventory.json](../../reports/slot-loop-v1/s1b/checkpoint_inventory.json) | `aec34c268f7c66991dca466e34b8255c` |
+| [preflight/preflight.json](../../reports/slot-loop-v1/s1b/preflight/preflight.json) | `f7b14c225bc72d9712cab3183d7de665` |
+
+Final bounded stdlib metadata verification checks archived/original report equality, embedded report/manifest/inventory binding, all eleven passed flags, prereg digest `6f2e776f2c6cfde131380fb343854784`, and the actual sorted-source digest `bb60b89c78ee840a940c5ec855455604` (101 files, 1,220,063 bytes; excludes bytecode). `src/`, scripts, tests and configs remain identical to the 179-test green snapshot and preflight snapshot; only report and lock metadata follow. `git diff --check` passes. No additional merge, push, sleep or polling.
+
+Stop at the committed lock. **Calibration, pilot, later smoke/release and formal execution remain held for S1A's frozen decision record**, per registered decision 4 and the review instruction. Branch preparation will fail closed unless the required S1A records carry an identical explicit release digest; no S1A schema/source was changed here. Any later `src/` edit invalidates this lock and requires another preflight.
