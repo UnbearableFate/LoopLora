@@ -1,7 +1,7 @@
-# WP-L13 state: SLOT-LOOP-v1, S0 R2 and S1A release ready
+# WP-L13 state: SLOT-LOOP-v1, S1A selected; confirmation sealed
 
 Branch `wp/slot` (worktree `LoopLora-wt/slot`), master merged through `8632497` after handover at `ccdcc96`; not merged into master, not pushed. Task: `docs/tasks/WP-L13_slot_loop.md`; registration `docs/prereg/SLOT-LOOP-v1.md` (blake2b-128 `56e8c611c01e0ef9b7ae32db97b0e334`, registered on master at `5f04a5c`, unchanged); S0 results are in `docs/reports/SLOT-LOOP-v1.md`.
-**Status: all six approved main jobs complete; frozen S1A-DEV analysis submitted.** Six logs/records/checkpoints passed step, finite, freeze, config and approved-release checks. Conditional ablation awaits the registered trigger; confirmation/unseen remain sealed.
+**Status: S1A selected; frozen dev analysis outcome no_trigger.** Mean dev EM gap +3.5 pp, all six stable; ablation not run because the registered trigger is false. Await independent re-run and opening authorization. Confirmation/unseen remain sealed; no jobs pending.
 
 ## What the code does
 New files only, except four typed-dispatch edits (below). Every new option is off in the old paths.
@@ -382,3 +382,21 @@ All six main runs accepted: N=6000, 11 dev rows (0 and every 600), 121 expected 
 | 3729053.opbs | soft_slot_L1 | 43 | 1087 | 0.301944 | 4200 |
 
 Main-run total 6301/3600 = 1.750278 node·h. S1A including preparation 1.947222 node·h; whole study cumulative 2.725500 node·h. All per-job runs <0.5 node·h. S1A-DEV job 3729237.opbs uses science commit 1523b19c7949673ddcd1d89cc1e5fe518736805c, one node debug-g 00:01:00, and writes $R/s1a-selection. Log: /work/xg24i002/x10041/LoopLora/logs/pbs/slot-s1a-dev-20261029-235708-3765921.log. Outcome/runtime pending. The frozen script checks selection, stability, shared release digest and the mean-dev-gap trigger. Only if outcome=ablation submit the two seed-17 ablation jobs; otherwise proceed to STOP: S1A selected. No confirmation/unseen data opened.
+
+
+
+## S1A selected: no ablation trigger
+S1A-DEV job 3729237.opbs completed on mg0008, 2026-10-30 00:01:46–00:01:52 JST (6 s = 0.001667 node·h), exit/log marker 0, science commit `1523b19c7949673ddcd1d89cc1e5fe518736805c`. Frozen outcome no_trigger, reasons empty, six stable runs with selected NLL below step 0 and shared release digest `523d11d57a08a2491893ebe7cedc86a7`. Registered arithmetic: 100*(33+35+37)=10500 >= 9*1000=9000; therefore mean dev gap is 3.5 pp and the below-3 pp ablation trigger is false.
+
+| arm | seed | selected step | correct / 1000 | selected checkpoint blake2b-128 |
+| --- | ---: | ---: | ---: | --- |
+| matrix_L1 | 17 | 5400 | 834 | 00a1535965a0f2813b4a1b552b6e2ee2 |
+| matrix_L1 | 29 | 6000 | 833 | b44f13443a4ce44e3d22d9f1ac77685d |
+| matrix_L1 | 43 | 5400 | 838 | 07e1ab7460f12615735fccb180d2dc3b |
+| soft_slot_L1 | 17 | 5400 | 867 | d71e06da709ee4c588b5f008d68c0d15 |
+| soft_slot_L1 | 29 | 6000 | 868 | 136226b18beb45c5ca218451e9c13ea1 |
+| soft_slot_L1 | 43 | 4200 | 875 | 52d43da424025388a8756bacb03f3058 |
+
+Selected dev EM means: 83.5% Matrix, 87.0% SoftSlot. These are dev results only; no confirmatory verdict. Selection is by registered NLL with the earlier-step tie rule, never by EM. Neither the two ablation trainings nor S1A-ABL ran, because the trigger is false.
+Verified every source-index input digest, frozen script digest and three output digests printed in the job log; six selected.pt file digests matched the records/selection. Archived the exact selection JSON/Markdown at `reports/slot-loop-v1/s1a-selection.{json,md}` and source_index plus 24 run record/training/log/step-array artifacts under `s1a-main/`. `s1a-selected-checkpoints.json` records all six actual persistent paths, selected steps/counts/NLL, read settings and digests for the independent re-run and later authorized evaluation. Raw weights stay in persistent runs. Report: `docs/reports/SLOT-LOOP-v1-selected.md`.
+S1A main + selection cost: 6307/3600 = 1.751944 node·h. Including S1A preparation: 7016/3600 = 1.948889 node·h. Whole-study cumulative: inherited 0.503 + (420+294+277+7016)/3600 = 2.727167 node·h. No src/analysis changes; no confirmation/unseen data opened and no s1a-open.json written. Next: STOP: S1A selected, then await the orchestrator's independent frozen-analysis re-run, selection verification and opening authorization.
