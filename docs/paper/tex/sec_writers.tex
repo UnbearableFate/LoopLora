@@ -74,11 +74,27 @@ The best ridge arm, LT-RG001, reaches 46.1\%, inside the band from 40\% to below
 All three arms are above R-r128 (33.5\%), by +4.8, +12.6 and +9.1 pp, and well below D128-3 (60.8\%), by 22.5, 14.7 and 18.2 pp (Table~\ref{tab:lsqt}; the standard error of a difference is about 2.2 pp, one seed).  % LQ2
 The read error is not removed (0.554, 0.512 and 0.499, against 0.631 for R-r128 and 0.363 for D128-3), and the read-value head stays at 22 to 27\% against a clean-value head of 92 to 96\%.  % LQ2
 The registered prediction, that the best ridge arm would reach 50\% with a read error of at most 0.35, did not hold.  % LQ2
-The unit query is in every LSQT arm and in none of R-r128, so the gain over R-r128 cannot be split between the store and the unit query; that split is untested.  % LQ3
 The arms differ in step count, two of the curves were still rising at the end, and nothing is extrapolated.  % LQ2
 
 \lsqttable
-% LQ1 LQ2
+% LQ1 LQ2 LQ4
+
+\paragraph{LSQT: the U control and the split of the gain.}
+The unit query is in every LSQT arm and in none of R-r128, so the gain over R-r128 mixes the store and the unit query.
+The registration provided a conditional control for this, LT-U: R-r128's own delta store, trained from scratch with the unit query.
+It ran because the best ridge arm reached 40\% or more.
+It is descriptive, not a registered test, and it enters neither registered outcome, so the registered LSQT decision above is unchanged.
+LT-U reaches 36.0\% (read error 0.589), well below 0.80, and its final checkpoint, the one the registration selects for every arm, is also its highest (Table~\ref{tab:lsqt}; trajectory in Appendix~\ref{app:I}).  % LQ4
+Through LT-U, the +12.6 pp of LT-RG001 over R-r128 splits, in point estimates, into +2.5 pp for the unit query (LT-U minus R-r128, standard error 2.1) and +10.1 pp for the store (LT-RG001 minus LT-U, standard error 2.2); Table~\ref{tab:lsqt-split} gives the other two arms.  % LQ3 LQ4
+These numbers come from one seed, and each part is a difference of two single evaluations.
+The standard errors are unpaired and cover the sampling of the 1,000 episodes only, not training seeds.
+No ridge store with a learned query was trained, so an interaction of store and query cannot be separated: the store part is measured with the unit query in place, and the unit-query part with the delta store.  % LQ3 LQ4
+The step counts differ (LT-U 24,560, LT-RG001 28,005), but at matched fractions of training LT-RG001 is above LT-U at all five (+7.7 to +14.1 pp), and its checkpoint at 22,404 steps (46.9\%) already exceeds LT-U's final one at 24,560 steps (36.0\%).  % LQ4
+LT-RG1 is also above LT-U at all five fractions, but its final lead rests on its last interval (36.6\% at 22,596 steps, 42.6\% at 28,245).  % LQ4
+The unit-query part is about 1.2 of its standard errors, so one seed separates it neither from zero nor from a few pp; it is not a finding that the unit query helps, and not a finding that it does not matter.  % LQ3 LQ4
+
+\lsqtsplittable
+% LQ3 LQ4
 
 \subsection{Negative interventions and the gate each did not meet}
 \label{sec:negmatrix}
