@@ -181,3 +181,10 @@ Final round-2 validation: both arms passed the integration through 20 optimizer 
 ## Preflight and S0 execution (reviews closed)
 User authorization: merge master 8632497, execute runbook steps 1–4, commit the lock locally when all required checks pass, then S0 and its decision. No additional review stop and no src edits. The two round-3 S1A follow-ups (analysis-only release-digest binding, and complete S1A runbook/parser checks) are deferred until before their registered S1A deadlines. The old prereg file remains byte-identical; its stage budget caps no longer bind (task Budget section). Node·h accounting continues, each job ≤16 node·h.
 Preflight outputs are new absolute paths under `/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/preflight`; the S0 directory does not yet exist. Gate: all nine required checks true, Native replay valid, Matrix maximum absolute logit difference exactly zero, and parent/config/source identities current. No calibration or dev episodes are generated until this gate passes and the lock is committed.
+
+
+| job | stage | snapshot | requested resources | outcome | actual node·h |
+| --- | --- | --- | --- | --- | --- |
+| 3728339.opbs | real-parent preflight | `7febf58c3440483fe081e99c263f68ad62512b10` | debug-g, 1 node × 00:20:00 | submitted, waiting for watcher | pending |
+
+Preflight log: `/work/xg24i002/x10041/LoopLora/logs/pbs/slot-preflight-20261029-215406-3324539.log`. `REVIEW_COMMIT=7febf58c3440483fe081e99c263f68ad62512b10`. Runbook step 1 submitted exactly with resolved full commit and absolute config/output paths. Prior cumulative runtime: 0.701333 node·h. Next: inspect job log, preflight.json and identity.json; on complete success, run the metadata lock command, commit the lock/inventory/preflight on wp/slot, then submit S0 on that lock commit. Any failed required check stops before calibration/dev.
