@@ -1,0 +1,102 @@
+{
+ "M1/record.json": {
+  "blake2b_128": "f3c0a4e180461b51c640f4928248cbbc",
+  "bytes": 3713,
+  "source": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/smoke/M1/record.json"
+ },
+ "M1/reload_samples.npz": {
+  "blake2b_128": "f3807693f45f1686b14958e275798c3a",
+  "bytes": 3686,
+  "source": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/smoke/M1/reload_samples.npz"
+ },
+ "M1/selected.pt": {
+  "blake2b_128": "f0eabc727df5126e47c31a52b214c8b1",
+  "bytes": 1925702,
+  "source": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/smoke/M1/selected.pt"
+ },
+ "M1/train_log.jsonl": {
+  "blake2b_128": "a61764736366f8c950fd6884f81c6ad5",
+  "bytes": 266,
+  "source": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/smoke/M1/train_log.jsonl"
+ },
+ "M1/train_steps.npz": {
+  "blake2b_128": "a8ae08146967f0c5628e09b41d202785",
+  "bytes": 925,
+  "source": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/smoke/M1/train_steps.npz"
+ },
+ "M4/record.json": {
+  "blake2b_128": "e3e170a2e4a23ff594cf2a47bb3fcdcc",
+  "bytes": 3669,
+  "source": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/smoke/M4/record.json"
+ },
+ "M4/reload_samples.npz": {
+  "blake2b_128": "cff499aced20ac82705699f5e1421c79",
+  "bytes": 3191,
+  "source": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/smoke/M4/reload_samples.npz"
+ },
+ "M4/selected.pt": {
+  "blake2b_128": "ce3edb9816ff6241305f1819dffd7865",
+  "bytes": 1925702,
+  "source": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/smoke/M4/selected.pt"
+ },
+ "M4/train_log.jsonl": {
+  "blake2b_128": "a0130576a34c9d6fe7de5cf6408883bd",
+  "bytes": 268,
+  "source": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/smoke/M4/train_log.jsonl"
+ },
+ "M4/train_steps.npz": {
+  "blake2b_128": "81f34781ecb0daa73b4303cd78dfa04f",
+  "bytes": 920,
+  "source": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/smoke/M4/train_steps.npz"
+ },
+ "S1/record.json": {
+  "blake2b_128": "de5016814e87b9c2b4f9cf65bdb64823",
+  "bytes": 3688,
+  "source": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/smoke/S1/record.json"
+ },
+ "S1/reload_samples.npz": {
+  "blake2b_128": "6bca5947a0f926070e39b7a8d3f3430c",
+  "bytes": 3665,
+  "source": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/smoke/S1/reload_samples.npz"
+ },
+ "S1/selected.pt": {
+  "blake2b_128": "f4a77777acfe432d1098bfa4577c1313",
+  "bytes": 1925702,
+  "source": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/smoke/S1/selected.pt"
+ },
+ "S1/train_log.jsonl": {
+  "blake2b_128": "c7c5cf220194ad39c0a2d666e85fc2c9",
+  "bytes": 269,
+  "source": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/smoke/S1/train_log.jsonl"
+ },
+ "S1/train_steps.npz": {
+  "blake2b_128": "3f813df3c2e4f69161d1546ca8722663",
+  "bytes": 927,
+  "source": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/smoke/S1/train_steps.npz"
+ },
+ "S4/record.json": {
+  "blake2b_128": "ca2630e29da6b41ca60f5fcb337c2f79",
+  "bytes": 3674,
+  "source": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/smoke/S4/record.json"
+ },
+ "S4/reload_samples.npz": {
+  "blake2b_128": "bca456735aa4b9ba25b32f48476b6ae9",
+  "bytes": 3163,
+  "source": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/smoke/S4/reload_samples.npz"
+ },
+ "S4/selected.pt": {
+  "blake2b_128": "4c8ccfdf784ab0aeb3529c82de4ee921",
+  "bytes": 1925702,
+  "source": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/smoke/S4/selected.pt"
+ },
+ "S4/train_log.jsonl": {
+  "blake2b_128": "37683c34a826eed58480ce94436172fd",
+  "bytes": 270,
+  "source": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/smoke/S4/train_log.jsonl"
+ },
+ "S4/train_steps.npz": {
+  "blake2b_128": "dcd32f13943042a36b71961eaa77eeb0",
+  "bytes": 918,
+  "source": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/smoke/S4/train_steps.npz"
+ }
+}
