@@ -35,7 +35,8 @@ episode intervals and the seed-level intervals are conditional on those and desc
 seed-level interval is wide, and it includes 0 for the G1-L contrasts and for G2-L against the fixed-query reader at both backbones. The depth matrix  % LP22
 evaluates one L4-trained checkpoint at depths and hops that were never trained, without intervals; its oracle-stop row uses the label and is an upper bound, and
 hops5-8 peak at the largest depth evaluated. The unshared reader B8 contains the shared one and was trained with one optimizer and no learning-rate pilot of  % LP21
-its own, so its failure is not a statement about unshared reads in general, and a warm start has not been tested. An exact store was tested only by  % LP9 LP16
+its own, so its failure is not a statement about unshared reads in general; a warm start from M1-L4 keeps the shared solution (Appendix~\ref{app:I}) and  % LP9 LP16 BW1
+says nothing about why B8 fails from a random start. An exact store was tested only by  % BW1
 evaluation on frozen checkpoints (RFX), and no trained least-squares store ran.  % RX1
 
 UNS evaluates the 256 unseen-pool names of the same 1,024-name vocabulary, which carry fixed

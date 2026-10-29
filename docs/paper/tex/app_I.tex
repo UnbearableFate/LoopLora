@@ -1,0 +1,147 @@
+\section{Follow-up studies G2 to G4: details}\label{app:I}
+
+This appendix holds the tables behind Sections~\ref{sec:stop} and~\ref{sec:ctc} and the B8 warm-start paragraph of Section~\ref{sec:lm-oracle}.
+All three studies are oracle-memory studies at rank 128 on the 768 seen names with one oracle seed.
+Their values are produced by \texttt{scripts/paper\_tables\_g2.py} from the committed files of each study (\texttt{reports/lsr}, \texttt{reports/b8w}, \texttt{reports/ctc}), which checks its key values against the figures the three study reports state.
+Rounding is half up on the stored value, so a cell that ends in an exact 5 (for example 64.55) prints 0.1 higher than in the study reports.
+The evidence ledger holds the exact values (rows LS1 to LS4, BW1 to BW3, CT1 to CT3) and wins over any shortened wording here.
+
+\subsection{LSR: label-free stop rules (G2)}
+
+The test range is [106000, 108000), 2,000 episodes at eight hops per checkpoint, and the six checkpoints are the registered rank-128 M1-L4 runs at Qwen3-0.6B-Base (P1-L) and Qwen3-1.7B-Base (P5L), seeds 17, 29, 43.
+Thresholds were chosen on validation episodes [1000, 3000) and nothing was retrained.
+The registered intervals are 99.17\% paired episode-bootstrap intervals (six comparisons, 10,000 draws shared across seeds, hops and rules); descriptive intervals are 95\%.  % LS1
+Table~\ref{tab:lsr} in Section~\ref{sec:stop} gives the EM by hop of the fixed-depth rows, R2 and the two depth-per-hop references.
+Table~\ref{tab:i-lsr} gives R2 against fixed L=4.
+
+\begin{table}[htbp]
+\centering\footnotesize
+\caption{R2 against fixed L=4 (which equals the best fixed depth L\textsubscript{c} under the validation constraint), pp.  % LS1 LS3
+Intervals are 99.17\% for the registered rows (hops 4 to 8, hop 1) and 95\% for the descriptive rows.}
+\label{tab:i-lsr}
+\begin{tabular}{@{}W{400}{4}W{300}{4}W{300}{4}@{}}
+\toprule
+ & Qwen3-0.6B-Base & Qwen3-1.7B-Base \\
+\midrule
+Hops 4 to 8 gain & +3.90 [3.35, 4.43] & +5.68 [5.09, 6.25] \\ \addlinespace[3pt]
+Hops 4 to 8 gain per seed (17/29/43) & +4.58/+3.25/+3.87 & +5.46/+5.71/+5.86 \\ \addlinespace[3pt]
+Hop 1 change & +6.28 [5.09, 7.51] & +4.70 [3.48, 5.92] \\ \addlinespace[3pt]
+Hop 1 change per seed & +8.90/+3.95/+6.00 & +7.35/+4.40/+2.35 \\ \addlinespace[3pt]
+Hop 2 change (descriptive) & $-10.83$ [$-11.85$, $-9.87$] & $-12.27$ [$-13.32$, $-11.23$] \\ \addlinespace[3pt]
+Hop 3 change & $-3.28$ & $-3.65$ \\ \addlinespace[3pt]
+Hops 1 to 3 pooled change & $-2.61$ [$-3.18$, $-2.06$] & $-3.74$ [$-4.32$, $-3.16$] \\ \addlinespace[3pt]
+R2 minus L=8, hops 4 to 8 & $-3.54$ [$-3.93$, $-3.15$] & $-5.05$ [$-5.47$, $-4.62$] \\ \addlinespace[3pt]
+R2 minus L=8, hop 1 & +34.1 & +39.4 \\ \addlinespace[3pt]
+R2 minus L=4 by hop 1 to 8 & +6.28, $-10.83$, $-3.28$, +4.48, +4.98, +4.27, +3.08, +2.68 & +4.70, $-12.27$, $-3.65$, +7.35, +7.85, +5.32, +4.33, +3.53 \\ \addlinespace[3pt]
+Mean reads per question & 5.60 & 5.66 \\ \addlinespace[3pt]
+Upper-layer passes per question ($s^{*}+1$) & 6.60 & 6.66 \\ \addlinespace[3pt]
+Mean reads by hop 1 to 8 & 4.97, 5.48, 5.67, 5.76, 5.67, 5.70, 5.73, 5.86 & 4.87, 5.46, 5.72, 5.87, 5.80, 5.77, 5.84, 5.93 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The registered conditions (gain of at least 3 pp with an interval above 0, hop 1 not below $-10$ pp, every seed) are all met at both backbones.  % LS1
+R1 and R3 are infeasible at both backbones: none of their 25 validation grid values kept the hop-1 loss against fixed L=4 within 8 pp pooled and 10 pp per seed, so their test statistics were never computed.  % LS2
+A prediction recorded before registration (R3: hops 4 to 8 at least 12\%, hop 1 at least 55\% at 0.6B) was not a gate and is not met.  % LS2
+Latency is descriptive and was measured within one validation job, in ms per question (0.6B/1.7B): fixed L=4 0.56/0.62, fixed L=8 0.74/0.81, the L=8 trace pass 0.81/0.87.
+R2 itself was not timed, because its early exit needs a pass through the upper layers for each lens evaluation, and no latency or efficiency statement is made.  % LS3
+At hops 4 to 8 R2 (9.1\% and 10.2\%) lies between fixed L=4 (5.2\% and 4.5\%) and fixed L=8 (12.6\% and 15.3\%), and the validation-chosen depth per hop (O1) reaches 13.0\% and 15.8\%.  % LS3 LS4
+A fixed L=5 reaches 8.5\% on hops 4 to 8 at 0.6B with hop 1 at 36.6\%, close to R2's 9.1\% with hop 1 at 54.3\%; it lies outside the validation constraint (it lost more than the hop-1 margin) and no interval is attached to this comparison.  % LS4
+The intervals condition on three training seeds per backbone and one oracle seed and layout, and they do not cover new training seeds.
+
+\subsection{B8W: a B8 copy started from M1-L4 (G3)}
+
+The continuations start from the registered P1-L M1-L4 checkpoints (Qwen3-0.6B-Base, rank 128, seeds 17, 29, 43) and run 2,000 steps at learning rate 0.003 with a fresh optimizer on the P1-L stream, in two arms: the shared M1-L4 continued, and a B8 copy with four untied step matrices.
+Evaluation is on test [108000, 110000), 2,000 episodes, L=4 (B4 at L=1), with 95\% paired episode-bootstrap intervals (2,000 draws).
+The equality gate (bf16 logits, predicted tokens, the control and the fp32 read) held in every seed with a maximum absolute difference of 0 at tolerance 0, and the protocol check (shared arm more than 2 pp below the start) was not triggered.  % BW1
+Table~\ref{tab:i-b8w} gives every registered reference contrast, and Table~\ref{tab:i-b8w-hop} the accuracy by hop.
+
+\begin{table}[htbp]
+\centering\footnotesize
+\caption{B8W contrasts on hops 2 to 3 unless stated (pp, 95\% interval).  % BW1 BW2 BW3
+The first row is the registered decision; the others are descriptive.}
+\label{tab:i-b8w}
+\begin{tabular}{@{}W{330}{4}W{250}{4}W{190}{4}W{230}{4}@{}}
+\toprule
+Contrast & Difference [95\% interval] & Accuracies (\%) & Per seed (17/29/43) \\
+\midrule
+untied@4 $-$ shared@4 (decision) & +0.90 [0.09, 1.71] & 32.40 vs 31.50 & +1.05/+0.90/+0.75 \\ \addlinespace[3pt]
+untied $-$ shared, hop 1 & +2.77 [1.55, 4.02] & 55.47 vs 52.70 & +2.85/+1.70/+3.75 \\ \addlinespace[3pt]
+untied $-$ start (M1-L4@4) & +5.99 [5.07, 6.88] & 32.40 vs 26.41 & +5.08/+6.38/+6.53 \\ \addlinespace[3pt]
+shared $-$ start & +5.09 [4.18, 6.01] & 31.50 vs 26.41 & +4.03/+5.48/+5.78 \\ \addlinespace[3pt]
+untied $-$ start, hop 1 & +7.45 [6.00, 8.95] & 55.47 vs 48.02 & +6.40/+8.75/+7.20 \\ \addlinespace[3pt]
+shared $-$ start, hop 1 & +4.68 [3.33, 6.02] & 52.70 vs 48.02 & +3.55/+7.05/+3.45 \\ \addlinespace[3pt]
+untied $-$ original B8@4 (P1-L) & +26.07 [24.98, 27.13] & 32.40 vs 6.33 & +29.38/+20.03/+28.80 \\ \addlinespace[3pt]
+untied $-$ B4@1 & +26.98 [25.87, 28.08] & 32.40 vs 5.42 & +29.88/+21.38/+29.70 \\ \addlinespace[3pt]
+shared $-$ B4@1 & +26.08 [24.98, 27.19] & 31.50 vs 5.42 & +28.83/+20.47/+28.95 \\ \addlinespace[3pt]
+start M1-L4@4 $-$ B4@1 & +20.99 [19.97, 22.06] & 26.41 vs 5.42 & +24.80/+15.00/+23.18 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The decision rule asks that every seed loses at most 2 pp and that the pooled lower bound is above $-2$ pp; both hold, and no seed has a loss at all.  % BW1
+The 97.5\% interval of the decision contrast is [$-0.04$, 1.81], which touches 0.
+No superiority test was registered, so the untied arm being nominally above the shared arm is exploratory and is not a finding.  % BW2
+Both arms improved by about 5 to 6 pp over the start, so the starting reader had not converged, and this says nothing about untying being better.  % BW2 BW3
+
+\begin{table}[htbp]
+\centering\footnotesize
+\caption{B8W: exact match (\%) by hop, seed means, L=4 (B4 at L=1).  % BW3
+}
+\label{tab:i-b8w-hop}
+\begin{tabular}{@{}lrrrrrrrr@{}}
+\toprule
+Reader & 1 & 2 & 3 & 4 & 5 & 6 & 7 & 8 \\
+\midrule
+Start (M1-L4) & 48.0 & 34.7 & 18.2 & 6.8 & 4.6 & 5.1 & 4.9 & 5.1 \\
+Shared, continued & 52.7 & 41.9 & 21.1 & 5.5 & 3.6 & 4.2 & 3.7 & 4.1 \\
+Untied copy & 55.5 & 40.8 & 24.0 & 4.2 & 3.4 & 4.0 & 3.6 & 3.6 \\
+Original B8 (P1-L) & 18.8 & 6.7 & 6.0 & 5.8 & 5.9 & 5.9 & 6.2 & 6.0 \\
+B4@1 & 20.0 & 5.6 & 5.3 & 5.1 & 5.6 & 5.3 & 5.5 & 5.1 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The starting M1-L4, the original B8 and B4@1 on hops 2 to 3 (26.41\%, 6.33\%, 5.42\%) match the values of P1-L on its own range (26.91\%, 6.34\%, 5.36\%) within 0.5 pp.
+At hops 4 to 8 both continued arms are below the starting reader, which is descriptive.  % BW3
+The relative Frobenius change of the continued tensors from their start is, for R, 0.44 to 0.49 (shared) and 0.48 to 0.58 (untied copies); for U, 0.22 to 0.23 and 0.26 to 0.32; for Q, 0.21 to 0.24 and 0.22 to 0.29.
+The mean pairwise cosine distance between the four untied copies is 0.191 to 0.215 for R, 0.072 to 0.074 for U and 0.051 for Q.
+So the copies separated from each other, and the untied arm did not stay tied in practice.  % BW3
+Not claimed: that sharing is or is not necessary for composition, the cause of B8's failure from a random start (optimization, update allocation and the inductive bias of sharing are not separated; the original B8 stays at 6.33\% on hops 2 to 3), a revised G1-L, equal-parameter status for B8, or anything at rank 32, for learned writers, unseen names, other scales or other training lengths.  % BW2
+The study used 1.004 node-hours over ten jobs.
+
+\subsection{CTC: a classify-then-code writer (G4)}
+
+All values are on validation episodes [0, 1000) with evaluation seed 4242, one seed, full-vocabulary EM.
+The readers are the frozen P1-L rank-128 checkpoints of training seed 17 (B3-L4, B4, M1-L4).
+Table~\ref{tab:i-ctc} gives M1-L4 at L=4 for every memory condition.
+The hard lookup writes the code of the predicted class; the soft lookup writes the class-probability mixture of the codes; the two differ by at most 0.1 pp at every hop for both arms.  % CT1
+
+\begin{table}[htbp]
+\centering\footnotesize
+\caption{CTC: M1-L4 at L=4, exact match (\%) by hop on validation episodes [0, 1000).  % CT1 CT3
+CE and CE+ans are the two registered training arms (class cross-entropy only; with an answer loss added).}
+\label{tab:i-ctc}
+\begin{tabular}{@{}lrrrrrrrr@{}}
+\toprule
+Memory & 1 & 2 & 3 & 4 & 5 & 6 & 7 & 8 \\
+\midrule
+Oracle memory (reference, $p=1$) & 50.6 & 36.6 & 21.5 & 5.9 & 2.2 & 4.2 & 3.5 & 4.6 \\
+CE, hard (selected) & 50.7 & 36.5 & 21.6 & 6.0 & 2.2 & 4.2 & 3.6 & 4.5 \\
+CE, soft & 50.6 & 36.6 & 21.4 & 5.9 & 2.2 & 4.3 & 3.7 & 4.7 \\
+CE+ans, hard & 50.7 & 36.5 & 21.7 & 6.0 & 2.2 & 4.2 & 3.6 & 4.6 \\
+CE+ans, soft & 50.8 & 36.5 & 21.7 & 6.1 & 2.3 & 4.4 & 3.6 & 4.7 \\
+Zero memory & 0.0 & 0.0 & 0.0 & 0.0 & 0.1 & 0.0 & 0.0 & 0.1 \\
+Shuffled memory (CE) & 0.2 & 0.0 & 0.2 & 0.3 & 0.2 & 0.1 & 0.0 & 0.3 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The per-fact joint classification accuracy is 1.00000 for CE (12,000 of 12,000 facts, every episode fully correct) and 0.99992 for CE+ans (one fact wrong), and a perfect-prediction lookup reproduces the oracle memory bit for bit on these episodes.  % CT1
+The gain over B4@1 on hops 2 to 3 is +24.05 pp [21.80, 26.30] for CE hard against +23.90 pp with the oracle memory; hop 1 is 50.7\% against a threshold of 40\%.
+Neither registered falsifier fires, and the arm choice is a tie (0.0 pp), which the rule gives to CE.  % CT1
+B4 at L=1 gives 18.7/5.3/4.7\% on hops 1 to 3 (CE hard) against 18.5/5.4/4.9\% with the oracle memory, and 4.5 to 6.0\% on hops 4 to 8 in both; with zero memory it gives 0.2/0.1/0.2\%.
+The memory-free B3-L4 gives 0.0\% at every hop, and its predictions are identical under the oracle and the zero memory.  % CT3
+The writer is not a learned writer in the sense of the DPFP rows: both entity heads read their entity at its own token, and the relation is constant in this task, so the relation head scores 100\% at every position.  % CT1 CT2
+The study shows that the reader transfers to near-oracle codes and uses its memory; it does not show that a model can learn its own codes, and no CTC number is placed beside a DPFP number.  % CT2
+Arm CE trained 8,000 steps in 533 s (0.0651 s per step) and arm CE+ans in 2,320 s (0.2883 s per step), because it also runs the frozen reader and its backward pass every step; the study used 1.028 node-hours against 1.8 registered.  % CT3

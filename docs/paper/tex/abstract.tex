@@ -2,11 +2,13 @@ Can a low-rank adapter use extra computation to extract compositions from a fixe
 We study a reader that updates a low-dimensional query several times over a fixed delta-rule memory, and we compare it with a single read at the same rank.
 With an oracle writer, more reads help.
 In a symbolic task, repeated reads improve the reachable hops and beat fixed-query and memory-free controls.  % S1 S2
-In a frozen language model at rank 128, one shared module read four times beats a single read of equal parameter count on hops 2 to 3 at two backbone sizes of one family (Qwen3-0.6B-Base and Qwen3-1.7B-Base), and the four-unshared-reads reader fails its registered gate at both.  % LP4 LP9 LP11 LP15
+In a frozen language model at rank 128, one shared module read four times beats a single read of equal parameter count on hops 2 to 3 at two backbone sizes of one family (Qwen3-0.6B-Base and Qwen3-1.7B-Base), and the four-unshared-reads reader fails its registered gate at both; a copy of it started from the shared solution keeps that solution and leaves the verdict unchanged.  % LP4 LP9 LP11 LP15 BW1
 At its trained depth the shared reader reaches hop 3; run deeper, the same checkpoint reaches hops 4 to 8 at 9.9 to 16.6\% (0.6B) and 9.8 to 20.9\% (1.7B) with the depth chosen by the label, while it loses hop 1.  % LP21
+A label-free per-question stop raises hops 4 to 8 over the trained depth by +3.90 pp (0.6B) and +5.68 pp (1.7B), at the cost of hop 2 ($-10.83$ and $-12.27$ pp) and of extra reads, and no efficiency claim is made.  % LS1 LS3
 Learned writing is the weak point.
 In the symbolic task a learned writer gives a smaller, seed-dependent benefit, and a factorized writer keeps a walk-specific depth effect but fails to preserve single-hop accuracy.  % S3 S9
 In the language model, the completed validation screens, including the registered DPFP and DPFP-X screens, select no learned writer, despite informative input probes and a usable supplied-answer-code output path.  % LL2 LL3 LL9 DP1 DP4
+A parser into a fixed table of the oracle's own codes drives the frozen reader at the oracle's level (validation, one seed), but it is not a learned writer and is not compared with the DPFP results.  % CT1 CT2
 Per-step readouts are decoding only and bridge patching gives no causal claim; at rank 32 the readers did not learn to use the oracle memory.  % LP5 PC1 LP7
 The comparison is against a single read at the same rank, extra latency is reported as a cost, and no efficiency advantage over a larger-rank single read is claimed.  % FR1
 All results use a closed 1,024-name vocabulary, depths within those trained, one oracle seed and three training seeds.

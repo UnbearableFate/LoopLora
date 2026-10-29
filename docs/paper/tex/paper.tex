@@ -22,10 +22,11 @@
 \newcolumntype{W}[2]{>{\raggedright\arraybackslash}p{\dimexpr(\linewidth-#2\tabcolsep)*#1/1000\relax}}
 \setcounter{tocdepth}{2}
 \input{g1_tables.tex}
+\input{g2_tables.tex}
 
 \title{Iterative Queries in a Low-Rank Memory Adapter:\\Composition, Writer Dependence, and Budget Limits}
 \author{}
-\date{Manuscript revised after the second round of external review (2026-10-29)}
+\date{Manuscript revised after the second round of external review and the G2 to G4 follow-up studies (2026-10-29)}
 
 \begin{document}
 \maketitle
@@ -40,6 +41,7 @@ Every principal claim, with its comparator, writer, split and gate, is in Append
 The appendices hold the method and theory in full, every symbolic and language-model study, and the full related work.
 Numerical and claim authority is the pair of evidence ledgers (\texttt{evidence\_symbolic.md}, \texttt{evidence\_llm.md}); the ledger wins over any shortened wording here.
 Section numbers inside Appendices D to H follow the numbering of the record from which they were taken.
+Appendix~\ref{app:I} holds the full tables of the three follow-up studies (stop rules, B8 warm start, classify-then-code writer).
 \normalsize
 
 \tableofcontents
@@ -63,6 +65,7 @@ Section numbers inside Appendices D to H follow the numbering of the record from
 \input{app_F.tex}
 \input{app_G.tex}
 \input{app_H.tex}
+\input{app_I.tex}
 
 \section*{References and source records}
 \addcontentsline{toc}{section}{References and source records}
