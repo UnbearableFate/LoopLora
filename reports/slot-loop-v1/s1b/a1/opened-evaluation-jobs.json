@@ -1,5 +1,9 @@
 {
+ "actual_node_hours": 0.49944444444444447,
+ "actual_node_seconds": 1798,
+ "completed_worker_actual_node_seconds": 64520,
  "completed_worker_actual_node_seconds_before": 62722,
+ "completed_worker_and_independent_actual_node_seconds": 64554,
  "diagnostic_trace_and_serialization_allowance": "one additional full ordinary evaluation per row; conservative estimate, not a new timing measurement",
  "entries_blake2b_128": "1a355810c35058d8bc9519aa13bd596c",
  "expected_entries_each": 30,
@@ -22,41 +26,73 @@
  "independent_rerun_report_blake2b_128": "8b6f3eb96876b33794854e73167432bb",
  "jobs": [
   {
+   "actual_node_hours": 0.32805555555555554,
+   "actual_node_seconds": 1181,
+   "exit_status": 0,
    "expected_seconds": 3487.947106146564,
+   "index_blake2b_128": "401aa6180ad213a7f75a54dd07674e4a",
    "job_id": "3731051.opbs",
    "log": "/work/xg24i002/x10041/LoopLora/logs/pbs/s1b-a1-confirm-20261030-052205-2428093.log",
    "name": "s1b-a1-confirm",
    "nodes": 1,
    "out": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/confirmation",
+   "pbs_history": {
+    "elapsed_seconds": 1181,
+    "job_id": "3731051",
+    "job_name": "s1b-a1-confirm",
+    "nodes": 1,
+    "queue": "small-g",
+    "start_date": "10/30 06:21:09",
+    "status": "FINISH"
+   },
    "purpose": "confirmation",
    "queue": "regular-g",
    "requested_node_hours": 1.5,
    "requested_node_seconds": 5400,
+   "sample_bytes": 2689399287,
+   "sample_files": 30,
    "source": {
     "kind": "commit",
     "ref": "258f5f5a24eae684f640a9fd62679bb643470a76"
    },
    "spec": "/work/xg24i002/x10041/LoopLora/logs/pbs/specs/s1b-a1-confirm-20261030-052205-2428093.json",
-   "status": "submitted",
+   "status": "complete",
+   "total_instrumented_evaluation_seconds": 748.6394579231855,
    "walltime": "01:30:00"
   },
   {
+   "actual_node_hours": 0.1713888888888889,
+   "actual_node_seconds": 617,
+   "exit_status": 0,
    "expected_seconds": 1773.973553073282,
+   "index_blake2b_128": "d520239db3acc135d660234eda04953f",
    "job_id": "3731052.opbs",
    "log": "/work/xg24i002/x10041/LoopLora/logs/pbs/s1b-a1-devdepth-20261030-052205-2428102.log",
    "name": "s1b-a1-devdepth",
    "nodes": 1,
    "out": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/dev-depth-sweep",
+   "pbs_history": {
+    "elapsed_seconds": 617,
+    "job_id": "3731052",
+    "job_name": "s1b-a1-devdepth",
+    "nodes": 1,
+    "queue": "small-g",
+    "start_date": "10/30 05:42:26",
+    "status": "FINISH"
+   },
    "purpose": "dev",
    "queue": "regular-g",
    "requested_node_hours": 0.8333333333333334,
    "requested_node_seconds": 3000,
+   "sample_bytes": 1344907790,
+   "sample_files": 30,
    "source": {
     "kind": "commit",
     "ref": "258f5f5a24eae684f640a9fd62679bb643470a76"
    },
    "spec": "/work/xg24i002/x10041/LoopLora/logs/pbs/specs/s1b-a1-devdepth-20261030-052205-2428102.json",
-   "status": "submitted",
+   "status": "complete",
+   "total_instrumented_evaluation_seconds": 378.0752577344829,
    "walltime": "00:50:00"
   }
  ],
@@ -77,6 +113,6 @@
  "selection_blake2b_128": "e3f269db39cd9b431d27e0a5eb528d6e",
  "source_commit": "258f5f5a24eae684f640a9fd62679bb643470a76",
  "stage": "S1B-A1-OPENED-EVALUATION",
- "status": "submitted",
+ "status": "complete",
  "unseen": false
 }
