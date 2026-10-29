@@ -170,3 +170,41 @@ There is no high finding. Fix all of the items below in one round, because they 
 10. **M-F4.** No code change. Note in the state file that a first load long enough to make the N rule and the walltime cap contradict each other ends in a STOP, as it does now.
 
 Then run the changed slot test files, and any existing test file whose imports changed, on compute. Update the state file (interpretations, schemas, runbook, ledger) and end with `STOP: review <hash>`. The review of this round is a cross-review by two independent reviewers: a codex reviewer (GPT-6-Astra xhigh) and an Opus subagent. After it, the steps continue as in Step 2: preflight, lock, S0, `decision_s0.md`, then `STOP: S0 done`.
+
+## Review round 2: fixes before the preflight (2026-10-29 21:25 JST)
+**Reviews.** Two reviewers cross-reviewed `2438599` independently:
+- rv-code (codex GPT-6-Astra xhigh): `docs/review/static_2026-10-29/round2-rv-code.md`;
+- rv-opus (Opus-5.5 xhigh subagent): `docs/review/static_2026-10-29/round2-rv-opus.md`.
+
+Neither found code that opens a sealed set early or changes a registered number when used as registered. Round-1 items are done except item 7 (and item 4 for rv-code), which the findings below cover.
+- Both reviewers found defects 1, 2 and 4 independently.
+- rv-opus also found defect 3.
+
+Fix all four now, before the preflight. Defects 1-3 change `src/`, and M-F2 binds the lock to `src/`.
+
+1. **The reload check can never pass** (rv-code R2-C2, rv-opus R2-1; both reproduced it with the stdlib).
+   - Cause: `save_export` stores `slot_data.TASK` with tuples, the JSON release holds lists, and `reload_check` compares them exactly.
+   - Fix: store the slot metadata in one JSON-shaped form and keep the comparison strict.
+   - Test: an integration test along the real path: smoke, then `smoke.json`, then `scripts/prepare_slot_release.py`, then the JSON release, then `reload_check` as the CLI calls it. It must fail before the fix.
+2. **Confirmation rows are not bound to checkpoints** (rv-code R2-C1, rated High; rv-opus R2-2, rated Medium).
+   - I rate it Medium. An entry error is needed to change a verdict, but the verdict record cannot show which checkpoint made which row, and the prereg needs that.
+   - Keep the `arm/seed → digest` map in the open token.
+   - In `evaluate_entries`, require each of the six main labels exactly once. Its digest must equal `selected_checkpoints[arm/seed]`. The reloaded export's `slot.arm`, `slot.run.seed` and `slot.run.ablation is False` must match the label.
+   - Admit the S-RE digest only under the three reference labels.
+   - Save the checkpoint blake2b-128 and the read in each evaluation file. Stage `S1A` checks them against the open record and refuses a mismatch.
+   - Tests: two valid entries swapped; one checkpoint under two labels; the reference under a main label. Each must be refused.
+3. **The analysis-script digest is not bound to the release** (rv-opus R2-3, Low).
+   - `load_open_token` requires the open record's digest = the ready release's digest = the file's digest.
+   - Stage `S1A` refuses when its own digest differs from the release's.
+   - Test: a changed script with a matching open record is refused.
+4. **Runbook step 4 cannot write the S0 decision** (rv-code R2-C3, rv-opus R2-4).
+   - The job must run on the lock commit: the reviewed commit has no lock file.
+   - Its output must be absolute and outside the job snapshot, which is deleted at exit (for example `R/s0/decision`). Copy `decision_s0.md` to the report location afterwards.
+   - Write the `submit.py` argv without a second interpreter: `-- scripts/analyze_slot_study.py ...`.
+   - Check steps 1-3 the same way, so each command runs exactly as written.
+
+**Noted, no change:**
+- The D-F4 guard is a workflow guard, not a security boundary (rv-code).
+- The optional common-fixed-LR comparison has no config hash in the release, so `run_train` would refuse it (rv-opus). It is optional and descriptive. If it is ever run, it first needs a release entry.
+
+Then run the changed test files on compute, update the state file, and end with `STOP: review <hash>`. Both reviewers then check the fix diff `2438599..<hash>` before the preflight.
