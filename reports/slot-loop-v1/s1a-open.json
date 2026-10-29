@@ -1,0 +1,30 @@
+{
+  "analysis_script_blake2b_128": "843d2ff4d1a03224ccd16e68720ba344",
+  "authorization": "S1A confirmation and unseen sets opened for the six selected checkpoints and the three registered references, then the frozen S1A analysis",
+  "independent_rerun": {
+    "job": "3729280.opbs",
+    "report": "docs/review/static_2026-10-29/s1a-selection-rerun.md",
+    "result": "selection reproduced: s1a-selection.json, s1a-selection.md and source_index.json byte-identical to job 3729237"
+  },
+  "opened_by": "orchestrator (Opus-5.5, main agent)",
+  "prereg_blake2b_128": "56e8c611c01e0ef9b7ae32db97b0e334",
+  "recorded_at": "2026-10-30T00:12:12+09:00",
+  "release_blake2b_128": "523d11d57a08a2491893ebe7cedc86a7",
+  "science_commit": "1523b19c7949673ddcd1d89cc1e5fe518736805c",
+  "selected_checkpoints": {
+    "matrix_L1/17": "00a1535965a0f2813b4a1b552b6e2ee2",
+    "matrix_L1/29": "b44f13443a4ce44e3d22d9f1ac77685d",
+    "matrix_L1/43": "07e1ab7460f12615735fccb180d2dc3b",
+    "soft_slot_L1/17": "d71e06da709ee4c588b5f008d68c0d15",
+    "soft_slot_L1/29": "136226b18beb45c5ca218451e9c13ea1",
+    "soft_slot_L1/43": "52d43da424025388a8756bacb03f3058"
+  },
+  "selection": "wp/slot 03c604686c742b54f6e1cbb39886983bf7cc7b6b, outcome no_trigger (no ablation)",
+  "stage": "S1A",
+  "study": "slot-loop-v1",
+  "verified": [
+    "all six record.json carry release_blake2b_128 523d11d57a08a2491893ebe7cedc86a7, the file digest of runs/slot-loop-v1/s1a-release.json",
+    "each selected.pt file digest equals its selected checkpoint above",
+    "open-root prereg and analysis script digests equal the registered and released ones"
+  ]
+}
