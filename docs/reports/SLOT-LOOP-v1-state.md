@@ -291,3 +291,13 @@ Execution total 277 / 3,600 = 0.076944 node·h. Cumulative including tests/retri
 S0 accepted by the orchestrator. Step 3 authorized through the release stop; no new review round. RED snapshot e6c98b69fbc6a813afdafac51536397a45e7905f, job 3728718.opbs (one node, debug-g, requested 00:01:00), runs the rebuilt-release, mismatched-record-release and complete-runbook-parser regressions before fixes. Log: /work/xg24i002/x10041/LoopLora/logs/pbs/slot-s1a-red-20261029-222707-3411194.log. Verified 3 intended RED failures: mismatched six-record release digests and rebuilt release both DID NOT RAISE; old reload submission rejected by actual submit parser for missing --name/--walltime. Exit 1 on mg0040, 22:27:14–22:27:32 (18 s = 0.005000 node·h). Production changes are analysis-only: shared training-record release digest and exact ready-release-file digest binding. The open-record token still checks script=release=file, while the orchestrator checks its release digest against all six records before opening, per task Review round 3. All S1A submission commands now include complete submit/target argv and persistent paths. The old round-2 step-1 RED was a command-extraction artifact; the improved extraction test selects the submission itself.
 
 S1A preparation accounting starts at 0.005000 node·h for the RED tests; whole-study cumulative is 0.783278 node·h. GREEN validates the full analysis suite, complete runbook/target parser checks, updated extraction test and experiment record parser integration before any real S1A smoke. No src change; original preflight remains valid.
+
+
+S1A follow-up GREEN snapshot: `18995b97dd685f3c306436ae11da40346324a947`.
+
+| job | tests | requested | result | node·h |
+| --- | --- | --- | --- | --- |
+| 3728741.opbs | analysis, round2 integration/extraction, complete runbook parser | 1 node, debug-g, 00:02:00 | pending | pending |
+| 3728742.opbs | experiment suite including direct run-record parser | 1 node, debug-g, 00:05:00 | pending | pending |
+
+Logs: `/work/xg24i002/x10041/LoopLora/logs/pbs/slot-s1a-tests-20261029-223049-3437042.log`, `/work/xg24i002/x10041/LoopLora/logs/pbs/slot-s1a-exp-20261029-223049-3437054.log`. Next: inspect both logs; if successful, stage unchanged manifest/config plus frozen analysis in persistent paths and submit the real 20-step-per-arm S1A smoke. Wait through the orchestrator watcher; no polling.
