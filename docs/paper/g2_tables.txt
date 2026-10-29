@@ -1,0 +1,108 @@
+Rounding: half up on the stored value. A cell that ends in an exact 5 (for example 64.55) therefore prints 0.1 higher than in the study reports, which round such cells by float arithmetic.
+
+## LSR (G2): label-free per-question stop rules at r = 128, evaluation only; test [106000, 108000), 2,000 episodes per checkpoint, seeds 17/29/43
+
+Registered decision: R1 and R3 infeasible at both backbones; R2 passes at both (99.17% intervals, six comparisons).
+R1 and R3: 0 of 25 validation grid values feasible at each backbone (hop-1 loss against fixed L = 4 beyond 8 pp pooled / 10 pp per seed).
+
+### EM % by hop (seed-pooled), same range for every row
+
+**Qwen3-0.6B-Base**
+
+| Row | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | hops 4-8 |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| L = 2 | 64.6 | 9.6 | 1.5 | 1.9 | 1.8 | 2.3 | 2.1 | 1.8 | 2.0 |
+| L = 4 (trained) | 48.0 | 33.8 | 18.1 | 6.1 | 4.4 | 4.9 | 5.1 | 5.5 | 5.2 |
+| L = 6 | 28.9 | 23.0 | 20.8 | 15.8 | 12.1 | 9.6 | 8.9 | 9.4 | 11.2 |
+| L = 8 | 20.2 | 16.7 | 15.5 | 13.8 | 14.4 | 13.2 | 11.5 | 10.3 | 12.6 |
+| R2 (label-free stop) | 54.3 | 22.9 | 14.8 | 10.6 | 9.4 | 9.1 | 8.2 | 8.2 | 9.1 |
+| O1 (best fixed L per hop, chosen on validation) | 64.6 | 33.8 | 23.3 | 15.8 | 14.4 | 13.2 | 11.5 | 10.3 | 13.0 |
+| O2 (best test cell per hop, labels used) | 64.6 | 33.8 | 23.3 | 15.8 | 14.4 | 13.2 | 11.5 | 10.4 | 13.0 |
+
+**Qwen3-1.7B-Base**
+
+| Row | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | hops 4-8 |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| L = 2 | 77.2 | 10.9 | 0.8 | 1.3 | 1.2 | 1.2 | 1.3 | 1.5 | 1.3 |
+| L = 4 (trained) | 59.2 | 42.4 | 23.0 | 6.5 | 3.4 | 4.7 | 4.1 | 4.0 | 4.5 |
+| L = 6 | 36.8 | 29.9 | 28.2 | 22.5 | 13.0 | 8.5 | 7.6 | 8.2 | 11.9 |
+| L = 8 | 24.6 | 21.1 | 21.2 | 19.6 | 18.8 | 15.5 | 12.2 | 10.2 | 15.3 |
+| R2 (label-free stop) | 63.9 | 30.1 | 19.3 | 13.9 | 11.2 | 10.0 | 8.4 | 7.5 | 10.2 |
+| O1 (best fixed L per hop, chosen on validation) | 77.2 | 42.4 | 30.6 | 22.5 | 18.8 | 15.5 | 12.2 | 10.2 | 15.8 |
+| O2 (best test cell per hop, labels used) | 77.2 | 42.4 | 30.6 | 22.5 | 18.8 | 15.5 | 12.2 | 10.2 | 15.8 |
+
+### R2 against fixed L = 4 (= L_c), pp [intervals: registered 99.17%, descriptive 95%]
+
+| | 0.6B | 1.7B |
+| --- | --- | --- |
+| Hops 4-8 gain | +3.90 | +5.68 |
+|   interval (99.17%) | [3.35, 4.43] | [5.09, 6.25] |
+| Hop 1 change | +6.28 | +4.70 |
+|   interval (99.17%) | [5.09, 7.51] | [3.48, 5.92] |
+| Hops 4-8 gain per seed (17/29/43) | +4.58/+3.25/+3.87 | +5.46/+5.71/+5.86 |
+| Hop 1 change per seed | +8.90/+3.95/+6.00 | +7.35/+4.40/+2.35 |
+| Hop 2 change (descriptive) | -10.83 | -12.27 |
+|   interval (95%) | [-11.85, -9.87] | [-13.32, -11.23] |
+| Hop 3 change | -3.28 | -3.65 |
+| Hops 1-3 pooled change | -2.61 | -3.74 |
+|   interval (95%) | [-3.18, -2.06] | [-4.32, -3.16] |
+| R2 minus L = 8, hops 4-8 | -3.54 | -5.05 |
+|   interval (95%) | [-3.93, -3.15] | [-5.47, -4.62] |
+| R2 minus L = 8, hop 1 | +34.1 | +39.4 |
+| Mean reads per question | 5.60 | 5.66 |
+| Upper-layer passes per question (s* + 1) | 6.60 | 6.66 |
+| Mean reads by hop 1..8 | 4.97, 5.48, 5.67, 5.76, 5.67, 5.70, 5.73, 5.86 | 4.87, 5.46, 5.72, 5.87, 5.80, 5.77, 5.84, 5.93 |
+| R2 minus L = 4 by hop 1..8 | +6.28, -10.83, -3.28, +4.48, +4.98, +4.27, +3.08, +2.68 | +4.70, -12.27, -3.65, +7.35, +7.85, +5.32, +4.33, +3.53 |
+
+Latency (descriptive, within one job, validation, ms per question, mean of the three seeds; R2 not timed): Qwen3-0.6B-Base: L=4 0.56, L=8 0.74, L=8 trace pass 0.81; Qwen3-1.7B-Base: L=4 0.62, L=8 0.81, L=8 trace pass 0.87
+
+## B8W (G3): B8 warm start from the M1-L4 solution; Qwen3-0.6B-Base, r = 128, test [108000, 110000), 2,000 episodes, L = 4, seeds 17/29/43, 95% intervals
+
+Registered decision: untying keeps the solution: the copied B8 stays within 2 pp of continued M1-L4 on hops 2 and 3 in every seed and the pooled interval excludes a loss worse than 2 pp (no equal-parameter status; G1-L stays failed; nothing about why B8 failed from a random start)
+
+| Contrast (hops 2-3 unless stated) | Difference pp [95% interval] | Accuracies % | Per seed 17/29/43 |
+| --- | --- | --- | --- |
+| Delta = untied@4 - shared@4 (decision) | +0.90 [0.09, 1.71] | 32.40 vs 31.50 | +1.05/+0.90/+0.75 |
+| untied - shared, hop 1 | +2.77 [1.55, 4.02] | 55.47 vs 52.70 | +2.85/+1.70/+3.75 |
+| untied - start (M1-L4@4) | +5.99 [5.07, 6.88] | 32.40 vs 26.41 | +5.08/+6.38/+6.53 |
+| shared - start | +5.09 [4.18, 6.01] | 31.50 vs 26.41 | +4.03/+5.48/+5.78 |
+| untied - start, hop 1 | +7.45 [6.00, 8.95] | 55.47 vs 48.02 | +6.40/+8.75/+7.20 |
+| shared - start, hop 1 | +4.68 [3.33, 6.02] | 52.70 vs 48.02 | +3.55/+7.05/+3.45 |
+| untied - original B8@4 (P1-L) | +26.07 [24.98, 27.13] | 32.40 vs 6.33 | +29.38/+20.03/+28.80 |
+| untied - B4@1 | +26.98 [25.87, 28.08] | 32.40 vs 5.42 | +29.88/+21.38/+29.70 |
+| shared - B4@1 | +26.08 [24.98, 27.19] | 31.50 vs 5.42 | +28.83/+20.47/+28.95 |
+| start M1-L4@4 - B4@1 | +20.99 [19.97, 22.06] | 26.41 vs 5.42 | +24.80/+15.00/+23.18 |
+
+Delta, 97.5% interval: [-0.04, 1.81] (touches 0; exploratory only).
+
+Accuracy by hop 1..8, seed means (%): start 48.0/34.7/18.2/6.8/4.6/5.1/4.9/5.1; shared 52.7/41.9/21.1/5.5/3.6/4.2/3.7/4.1; untied 55.5/40.8/24.0/4.2/3.4/4.0/3.6/3.6; B8 18.8/6.7/6.0/5.8/5.9/5.9/6.2/6.0; B4 20.0/5.6/5.3/5.1/5.6/5.3/5.5/5.1
+
+Drift R: shared 0.44-0.49, untied copies 0.48-0.58, pairwise cosine distance 0.191-0.215
+Drift U: shared 0.22-0.23, untied copies 0.26-0.32, pairwise cosine distance 0.072-0.074
+Drift Q: shared 0.21-0.24, untied copies 0.22-0.29, pairwise cosine distance 0.051-0.051
+
+## CTC (G4): classify-then-code writer into the frozen P1-L r = 128 readers; validation [0, 1,000), seed 17 readers, eval seed 4242
+
+Decision: outcome candidate, selected arm ce; hop-1 EM of M1-L4@4 50.7%; gain over B4@1 on hops 2-3 +24.05 pp [21.80, 26.30]; oracle reference gain +23.90 pp (hop-1 50.6%); joint classification accuracy p = 1.00000 (CE), 0.99992 (CE+ans); zero / shuffled memory hop-1 EM 0.0% / 0.2%
+Writer parameters 268,292 (CE); perfect lookup equals the oracle memory: True
+
+| M1-L4 at L = 4, EM % by hop | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| oracle memory (reference) | 50.6 | 36.6 | 21.5 | 5.9 | 2.2 | 4.2 | 3.5 | 4.6 |
+| CE, hard (selected) | 50.7 | 36.5 | 21.6 | 6.0 | 2.2 | 4.2 | 3.6 | 4.5 |
+| CE, soft | 50.6 | 36.6 | 21.4 | 5.9 | 2.2 | 4.3 | 3.7 | 4.7 |
+| CE+ans, hard | 50.7 | 36.5 | 21.7 | 6.0 | 2.2 | 4.2 | 3.6 | 4.6 |
+| CE+ans, soft | 50.8 | 36.5 | 21.7 | 6.1 | 2.3 | 4.4 | 3.6 | 4.7 |
+| zero memory | 0.0 | 0.0 | 0.0 | 0.0 | 0.1 | 0.0 | 0.0 | 0.1 |
+| shuffled memory (CE) | 0.2 | 0.0 | 0.2 | 0.3 | 0.2 | 0.1 | 0.0 | 0.3 |
+
+Largest hop-wise difference between CE hard and the oracle reference: 0.1 pp
+
+| B4 at L = 1, EM % by hop | 1 | 2 | 3 | 4 to 8 |
+| --- | --- | --- | --- | --- |
+| oracle memory | 18.5 | 5.4 | 4.9 | 4.5 to 6.0 |
+| CE, hard | 18.7 | 5.3 | 4.7 | 4.5 to 6.0 |
+| CE+ans, hard | 18.7 | 5.3 | 4.6 | 4.5 to 6.0 |
+| zero memory | 0.2 | 0.1 | 0.2 | 0.0 to 0.2 |
+
+B3-L4 at L = 4, EM % at every hop: oracle 0.0 (max), zero 0.0 (max); predictions identical under both: True

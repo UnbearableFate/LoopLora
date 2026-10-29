@@ -56,7 +56,7 @@ Each row is one study under its own conditions (one training seed or three, one 
 The rows record which criterion was not met.
 They do not show that learned writing, an exact store, unshared reads or composition at rank 32 is impossible.
 Not run: the LSQ arms (none was triggered), P1L-D and P1L-S.
-A warm start of B8 from M1-L4 has not been tested.
+A warm start of B8 from M1-L4 (Section~\ref{sec:lm-oracle}) kept the shared solution, so it is not a failed repair and has no row here.  % BW1
 
 \begin{table}[htbp]
 \centering\footnotesize
@@ -80,3 +80,21 @@ Bridge patching & Rank 128, 0.6B, L=4, state after the first read at the final q
 \bottomrule
 \end{tabular}
 \end{table}
+
+\subsection{A learned parser with a fixed code table (CTC)}
+\label{sec:ctc}
+
+This study is not a learned writer, and its numbers are not comparable with the DPFP rows above.
+A classify-then-code writer reads the support text with frozen layer-14 states, classifies the head, relation and tail of each fact with trained heads, and writes the oracle's fixed codes for the predicted names into the memory.
+The frozen P1-L rank-128 readers then run unchanged.
+The writer has 268,292 parameters; no parameter match is claimed.  % CT1
+The registered decision flags a candidate (validation episodes [0, 1000), one seed, arm CE selected because CE and CE+ans have the same hop-1 EM).
+The wording registered for it is: a learned parser plus a fixed code table drives the frozen composing reader.  % CT1
+The per-fact classification accuracy is p=1 (12,000 of 12,000 facts correct), and M1-L4@4 reaches 50.7/36.5/21.6\% on hops 1 to 3 against 50.6/36.6/21.5\% with the oracle memory, so the EM equals the oracle reference within 0.2 pp.
+The gain over B4@1 on hops 2 to 3 is +24.05 pp [21.80, 26.30] (+23.90 pp with the oracle memory), and zero or shuffled memory leaves 0.0\% and 0.2\% hop-1 EM.  % CT1 CT3
+The accuracy is 1 because both entities are read at their own tokens and the relation is constant in this task (it is 0 for every fact), so the key is always the code of the head entity.
+These are properties of the task and of the closed 768-name vocabulary.  % CT1
+The codes are the oracle's privileged codes.
+The study shows that the reader transfers to near-oracle codes and that it uses its memory; it does not show that a model can learn its own codes.  % CT2
+No confirmation was run, and a three-seed confirmation would need its own registration and the user's decision.
+The learned-writer line stays stopped (Section~\ref{sec:writers}).  % CT2 DP1 DP4

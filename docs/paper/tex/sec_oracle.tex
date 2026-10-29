@@ -80,6 +80,17 @@ It has the limits of the 0.6B result, and in addition one oracle seed, three tra
 B8@4$-$B4@1 is +1.033 pp [0.292, 1.800] (seeds +0.200, +1.725, +1.175), below the 3 pp bar, so G1-L fails again, and its hop 1 condition also fails here ($-1.717$ pp [$-3.317$, $-0.016$]) where it held at 0.6B; G2-L passes (+1.675 pp [0.908, 2.383] over B5-L4@4 and +7.167 pp [6.583, 7.758] over B3-L4@4).  % LP16 LP17
 Two sizes support no scaling trend, no test across scales was registered, and the values are placed side by side without one.  % LP20
 
+\paragraph{A copy of B8 started from the shared solution keeps it.}
+G3 (B8W) tests whether a B8 reader started at the M1-L4 solution keeps that solution when its step matrices are untied.
+Each M1-L4 checkpoint (Qwen3-0.6B-Base, rank 128) was copied into B8 and gave identical logits to the original in every seed (tolerance 0) before any test episode.
+Then the untied copy and a continued shared M1-L4 were trained for 2,000 more steps and compared at L=4 on hops 2 to 3 of a fresh range (test [108000, 110000)).
+The registered decision is that untying keeps the solution.
+The untied arm minus the shared arm is +0.90 pp [0.09, 1.71] (32.40\% against 31.50\%; seeds +1.05, +0.90, +0.75), so no seed loses more than 2 pp and the pooled lower bound is above $-2$ pp.  % BW1
+The shared arm moved up from its start by +5.09 pp [4.18, 6.01], so the starting reader had not converged.  % BW3
+The registered wording stays: B8 has no equal-parameter status (622,594 adapter parameters against 475,138), G1-L stays failed, and nothing is said about why B8 fails from a random start.  % BW1 BW2
+The untied arm is nominally above the shared arm, but the 97.5\% interval [$-0.04$, 1.81] touches 0 and no superiority test was registered, so that difference is exploratory and is not a finding.  % BW2
+The result rests on one learning rate, one training length (2,000 steps), three seeds and one range, and it is sensitive to the length because the shared reference was still improving.  % BW1
+
 \paragraph{Same-rank table.}
 Table~\ref{tab:mainem} gives hop-wise EM at rank 128 for the single read B4@1 and for the two four-read readers at their trained depth.
 Table~\ref{tab:maincost} gives their costs.
@@ -154,7 +165,39 @@ Hop 4 peaks at L=6, and hops 5 to 8 peak at L=8, the largest depth evaluated, so
 Over the same range hop 1 is lost: at L=8 it is 19.0\% and 24.1\%, against 47.9\% and 58.7\% at L=4 and 64.2\% and 77.6\% at L=2.  % LP21
 These cells are at hops and depths that were never trained, they carry no interval, and they rest on one oracle seed and three training seeds.
 The paper does not say that the reader cannot go beyond hop 3, and it does not say that the reader composes up to hop 8.
-No stopping rule for this reader is evaluated.
+A label-free stop is evaluated in Section~\ref{sec:stop}.
+
+\subsection{A label-free stop at inference}
+\label{sec:stop}
+
+The matrix suggests that the depth that suits a hop grows with the hop, and that the deployed depth L=4 is a compromise.
+LSR (G2) asks whether a per-question stop that uses no label can raise hops 4 to 8 over fixed L=4 without a large loss on hop 1.
+It evaluates the six rank-128 M1-L4 checkpoints (three seeds at each backbone) and trains nothing.
+Three rules were registered: R1 stops when the relative change of the state falls below a threshold, R3 when the norm of the read, relative to the first read, falls below a threshold, and R2 when the model's top-1 answer has not changed over two consecutive depths (no parameter).
+The thresholds of R1 and R3 were chosen on validation episodes under a hop-1 constraint, and the registered comparisons use the test range [106000, 108000) with 99.17\% intervals for six comparisons.  % LS1
+
+\paragraph{R1 and R3 had no feasible threshold.}
+At both backbones no value of the 25-value validation grid kept the hop-1 loss against fixed L=4 within the registered margin (8 pp pooled, 10 pp per seed), so no test statistic was computed.
+The traces show why.
+At 0.6B the read norm relative to the first read never falls below 1 (median 1.0 to 1.1), so a threshold below 1 never fires and one above 1 stops at the first step.
+At 1.7B it grows to about 10 and the relative change of the state stays at 0.5 to 0.7, so both rules stop at the first step or run to depth 8.
+This does not show that no other label-free signal works.  % LS2
+
+\paragraph{R2 raises hops 4 to 8 over fixed L=4.}
+Against fixed L=4, which is also the best fixed depth under the validation constraint, the R2 stop raises hops 4 to 8 by +3.90 pp [3.35, 4.43] at 0.6B and +5.68 pp [5.09, 6.25] at 1.7B, in every seed (+4.58, +3.25, +3.87 and +5.46, +5.71, +5.86), and it raises hop 1 by +6.28 and +4.70 pp.
+So a label-free per-question stop raised hops 4 to 8 over fixed L=4 at both scales, in the oracle-memory condition, evaluation only.  % LS1
+The result comes with its costs.
+Hop 2 falls by 10.83 pp [$-11.85$, $-9.87$] at 0.6B and by 12.27 pp [$-13.32$, $-11.23$] at 1.7B, and hop 3 by 3.28 and 3.65 pp, so R2 does not improve every hop.
+On hops 4 to 8 it stays below fixed L=8 ($-3.54$ and $-5.05$ pp), and it recovers about half of the headroom between L=4 and the best fixed depth for each hop.
+It reads 5.60 and 5.66 times per question against 4, and each stopping decision needs a pass through the frozen upper layers, so a question that stops after $s^{*}$ reads needs $s^{*}+1$ such passes (6.60 and 6.66 on average).
+R2 was not timed, and no efficiency or latency claim is made.  % LS3
+The stop depends only weakly on the hop: the mean number of reads rises from 4.97 at hop 1 to 5.86 at hop 8 at 0.6B, and from 4.87 to 5.93 at 1.7B.  % LS3
+Table~\ref{tab:lsr} puts the R2 row next to the fixed-depth rows.
+The LSR range differs from the range of the matrices above, so its L=4 cells differ slightly from them (hop 1 is 48.0\% here and 47.9\% there), and the two are not pooled.  % LS4
+The intervals condition on three training seeds per backbone and one oracle code table.
+
+\lsrtable
+% LS4
 
 \subsection{Seed-level statistics}
 \label{sec:seeds}
