@@ -1,4 +1,4 @@
-# WP-L13: SLOT-LOOP-v1, stages S0 and S1A (sn-slot; LoopLora-wt/slot, wp/slot)
+# WP-L13: SLOT-LOOP-v1, stages S0 to S3 (sn-slot; LoopLora-wt/slot, wp/slot)
 
 The specification is `plan/looplora_diagnosis_and_execution_plan_2026-10-29.md` (4e6778a, "the plan").
 - It was written against a255e81. Since then master has gained only docs, and the LSQT U control is still running on wp/llm.
@@ -24,11 +24,23 @@ The specification is `plan/looplora_diagnosis_and_execution_plan_2026-10-29.md` 
   - prereg structure: `docs/prereg/SQ2.md`, `docs/prereg/LSQT.md`.
 
 ## Scope and budget (authorized)
-- **Authorized:** S0 (plan §6) and S1A (plan §7) only.
-  - S1B (§8) needs its own registration after S1A.
-  - S2 and S3 are not authorized.
-- **Budget:** S0 with its tests and preflight ≤ 1.0 node·h. S1A with its pilot, release, runs, evaluation and analysis ≤ 4.5 node·h.
+- **Authorized:** all stages of the plan: S0, S1A, S1B, S2 and S3. The user said on 2026-10-29: "S2和S3以及新计划的所有任务都一起授权，按计划推进".
+- **Order:** the stages run in the plan's order. Each stage starts only when its entry condition is met:
+  - plan §0.3;
+  - §6.5 (S0 to S1A);
+  - §7.4 and §14.3 (S1A to S1B);
+  - §8.3 (S1B to S2; S2 runs on the matrix reader if slots add nothing);
+  - §10.5 (S3, and the real task within it).
+  If a condition fails, the plan's own consequence applies (§14.3). The line is not pushed past a failed gate.
+- **Registration:** `docs/prereg/SLOT-LOOP-v1.md` registers S0 and S1A now. S1B, S2 and S3 each get an addendum: a section of the same file or `SLOT-LOOP-v1-S1B.md` and so on. Each addendum has its own data namespace, decision rule and budget table, and the orchestrator registers it before any data of that stage is seen. An S2 that changes after an opened S1 test uses new confirmation data (plan §5.1).
+- **Budget:**
+  - S0 with its tests and preflight ≤ 1.0 node·h;
+  - S1A with its pilot, release, runs, evaluation and analysis ≤ 4.5 node·h;
+  - S1B ≤ 11.5 node·h, the plan's figure;
+  - S2 and S3: set in their addenda from measured step times, and approved by the orchestrator at registration.
+  Record cumulative node·h in the state file.
 - **Jobs:** one node each. Each job ≤ 1 h; ≤ 2 h only with `--scale-up docs/prereg/SLOT-LOOP-v1.md` where that prereg allows it. Keep at most 6 of your jobs queued or running.
+- **Parallel help:** once the S0 code is merged, the orchestrator may give S2 or S3 preparation to a second worker. Examples are the S2 labels and reader code on top of your `MemoryBackend`, or the S3 measurement harness. Keep the backend interface stable and documented in the state file.
 - **Old studies are untouched:**
   - The old verdicts (P1L, SQ2, LSQT, DPFP and the 0.80 writer gate) stay as they are.
   - Read no old test or confirmation window.
@@ -37,7 +49,7 @@ The specification is `plan/looplora_diagnosis_and_execution_plan_2026-10-29.md` 
 ## Step 1 (login node only): preregistration draft, then STOP
 Write `docs/prereg/SLOT-LOOP-v1.md` on wp/slot. It must contain the following.
 
-1. **Hypotheses and claim boundaries.** H1 (plan §3.1) for this registration. State that S1B, S2 and S3 are out of scope.
+1. **Hypotheses and claim boundaries.** H1 (plan §3.1) is locked here. H2 and H3 (§3.2–3.3) are named, with their tests left to the S1B and S2 addenda. Include an overview of all stages and their entry conditions.
 2. **Data.** Fix every value below before any result.
    - The manifest scheme of plan §5.1:
      - `derive_seed(20261029, "slot-loop-v1", purpose, stage[, run_seed])`, with the integers resolved;
@@ -91,6 +103,21 @@ STOP with `STOP: SLOT-LOOP-v1 prereg draft <hash>`. Write no science code before
 - **Runs.** Run the six arm-seed jobs, select checkpoints on dev, then run the confirmation evaluation.
 - **Analysis.** Run the bootstrap analysis on compute. Before the confirmation results are opened, the orchestrator has an independent reviewer re-run the analysis script.
 - **Report and stop.** Write the decision and the report, and STOP with `STOP: S1A done <hash>`.
+
+## Later steps: S1B, S2 and S3
+Each later stage follows the same cycle:
+1. Write the addendum and STOP for registration.
+2. Implement and test, then STOP for review.
+3. Pilot and release, then STOP for `approval.json`.
+4. Do the runs, the selection, the confirmation and the analysis, with the independent re-run before opening.
+5. Write the decision and the report, then STOP.
+
+Sequence of the stages:
+- **S1B:** §8, the 2×2 on registered T2. The two mechanism controls of §8.2 run only after a loop gain appears.
+- **S2:** §9, step by step through the factor ladder.
+  - `t2_typed` with `n_distract` already exists in `src/looplora/data/relations.py`. Check it against §9.4 before writing new generators.
+  - The bridge, NULL and role labels go only to losses and metrics, never to `forward`, `read` or `stop`.
+- **S3:** §10. Same-content runs, fixed-byte-budget runs, load E = 16/32/64/96 (out of distribution first), and deployment timing (§10.4). The real-task extension (§10.5) needs its own addendum after the others are reliable.
 
 ## Rules repeated here because they bit us before
 - Pass `--commit` the full 40-character hash. `HEAD` resolves in the main checkout.
