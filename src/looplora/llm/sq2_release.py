@@ -46,7 +46,7 @@ def choose_eta(curve):
 
 
 def round_weight(ratios):
-    """The registered rule: the median gradient-norm ratio, rounded to the nearest power of two, clipped to [1/16, 16]."""
+    """The registered rule (Clarification C1): w_c = 2^round(log2(median gradient-norm ratio)), clipped to [1/16, 16]."""
     ordered=sorted(ratios)
     n=len(ordered)
     if n==0 or any(not math.isfinite(r) or r<=0 for r in ordered):

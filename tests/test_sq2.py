@@ -32,7 +32,7 @@ from looplora.llm.sq2_release import (ARMS, ETA_BOUNDS, ETA_GRID, PARENT, SPECS,
 from looplora.llm.train import make_task_spec
 
 ROOT = Path(__file__).resolve().parents[1]
-REGISTERED_BLAKE2B_128 = '9c21d638427ff1973536899b748a05d5'  # docs/prereg/SQ2.md at registration (847b17f)
+REGISTERED_BLAKE2B_128 = '9f725a62e918ac668dd70220873038c5'  # docs/prereg/SQ2.md with Clarification C1 (a3013ff)
 ETA, WEIGHT = 1e-2, 2.0
 DEVICES = ['cpu', 'cuda']
 

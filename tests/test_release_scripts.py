@@ -680,7 +680,7 @@ def test_an_sq2_release_freezes_one_n_the_numerics_the_step0_check_and_the_hashe
     assert written['numerics']['eta'] == NUMERICS['eta'] and written['numerics']['w_c'] == NUMERICS['w_c']
     assert written['numerics']['file_blake2b_128'] == sq2_release.file_digest(numerics)
     assert written['step0'] == SQ2_STEP0 and written['config_hashes'] == SQ2_HASHES and written['scale_up'] is None
-    assert written['prereg_blake2b_128'] == sq2_release.prereg_digest() == '9c21d638427ff1973536899b748a05d5'
+    assert written['prereg_blake2b_128'] == sq2_release.prereg_digest() == '9f725a62e918ac668dd70220873038c5'
     assert (written['smoke']['steps'], written['walltime'], written['max_job_seconds']) == (600, '01:00:00', 3600)
     assert written['parent']['config_hash'] == sq2_release.PARENT['config_hash'] and written['parent']['digests'] == sq2_release.PARENT['digests']
     for arm in sq2_release.ARMS:
