@@ -1,0 +1,79 @@
+{
+  "git_commit": "9214790db52b977029edf6c1dbd17b1519982aad",
+  "runs": {
+    "X17-E16": {
+      "E": 16,
+      "arm": "X17",
+      "checkpoint_git_commit": "9214790db52b977029edf6c1dbd17b1519982aad",
+      "checkpoint_job_id": "3722796.opbs",
+      "dpfp_nu": 3,
+      "episodes": 1000,
+      "eval_seed": 4242,
+      "git_commit": "9214790db52b977029edf6c1dbd17b1519982aad",
+      "max_repeated_logit_drift": 0.0,
+      "optimizer_steps": 0,
+      "original": {
+        "correct": 593,
+        "em": 0.593,
+        "nll": 2.0997350215911865
+      },
+      "original_matches_record": {
+        "correct": true,
+        "record_correct": 593,
+        "record_nll": 2.0997350215911865
+      },
+      "rank": 128,
+      "shuffle": {
+        "correct": 1,
+        "em": 0.001,
+        "nll": 12.376935958862305
+      },
+      "source_dirty": false,
+      "source_hash": "ece54b137cfa80790f35935973362533",
+      "steps": 21980,
+      "zero": {
+        "correct": 4,
+        "em": 0.004,
+        "nll": 10.239672660827637
+      }
+    },
+    "X256-E16": {
+      "E": 16,
+      "arm": "X256",
+      "checkpoint_git_commit": "9214790db52b977029edf6c1dbd17b1519982aad",
+      "checkpoint_job_id": "3722795.opbs",
+      "dpfp_nu": 3,
+      "episodes": 1000,
+      "eval_seed": 4242,
+      "git_commit": "9214790db52b977029edf6c1dbd17b1519982aad",
+      "max_repeated_logit_drift": 0.0,
+      "optimizer_steps": 0,
+      "original": {
+        "correct": 662,
+        "em": 0.662,
+        "nll": 1.7527978420257568
+      },
+      "original_matches_record": {
+        "correct": true,
+        "record_correct": 662,
+        "record_nll": 1.7527978420257568
+      },
+      "rank": 256,
+      "shuffle": {
+        "correct": 2,
+        "em": 0.002,
+        "nll": 13.567537307739258
+      },
+      "source_dirty": false,
+      "source_hash": "ece54b137cfa80790f35935973362533",
+      "steps": 22780,
+      "zero": {
+        "correct": 0,
+        "em": 0.0,
+        "nll": 12.029619216918945
+      }
+    }
+  },
+  "source_dirty": false,
+  "source_hash": "ece54b137cfa80790f35935973362533"
+}

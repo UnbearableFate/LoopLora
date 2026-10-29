@@ -1,0 +1,14 @@
+{
+  "candidates": [],
+  "correct": {
+    "X17": 593,
+    "X256": 662
+  },
+  "e8_retrain": false,
+  "line": "stopped",
+  "study": "DPFP-X",
+  "x17_candidate": false,
+  "x17_gap_pp": -1.5,
+  "x17_vs_d128_3": "not_distinguished",
+  "x256": "no_writer"
+}

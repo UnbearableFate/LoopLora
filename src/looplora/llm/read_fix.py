@@ -18,8 +18,9 @@ RUNS=CANDIDATES+((32,'OArho'),(128,'OA'))
 LABELS=dict(R='R',Rrho='Rρ',RK='RK',OArho='OAρ',W5='W5',OA='OA')
 
 
-def configuration(arm,steps,*,E=16,smoke=False,rank=32):
-    if (rank,arm) not in RUNS or E not in (8,16):
+def configuration(arm,steps,*,E=16,smoke=False,rank=32,extra_runs=()):
+    # extra_runs: (rank, arm) pairs that are not WP-L4 runs but are registered elsewhere (DPFP-X's rank 256); empty for WP-L4.
+    if (rank,arm) not in RUNS+tuple(extra_runs) or E not in (8,16):
         raise ValueError('WP-L4 requires a registered arm at E16 or the conditional E8')
     base='OA' if arm in {'OArho','OA'} else 'W5'
     cfg=writer_configuration(base,steps,prefetch_workers=2)
