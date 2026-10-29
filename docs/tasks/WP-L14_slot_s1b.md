@@ -64,3 +64,35 @@ The addendum is registered on master as `docs/prereg/SLOT-LOOP-v1-S1B.md`, blake
 4. End with `STOP: review <full hash>`.
 
 That review is the one cross-review of the S1B core code. After it come the fixes (checked by tests), then the preflight and the lock. S1B formal runs wait for S1A's decision record.
+
+## Review (2026-10-29 23:50 JST): fixes before the preflight
+The one cross-review of the S1B core code, both at 67deeee:
+- `docs/review/static_2026-10-29/s1b-rv-code.md`: 1 High, 4 Medium.
+- `docs/review/static_2026-10-29/s1b-rv-opus.md`: 1 High, 1 Medium, 4 Low.
+
+No further review round follows; your tests check the fixes. Every item changes `src/`, so all of them land before the preflight and the lock.
+1. **Exact bootstrap** (RVC-01 = F1, High). Resample the integer sums. Take the quantile and the `> 0` test in exact arithmetic; convert to pp only for reporting. Regression: rv-code's zero-boundary case, including the continuation choice. Show it failing on 67deeee and passing after the fix.
+2. **Reload against the original smoke** (RVC-02, F3). Record the smoke checkpoint's IDs, predictions, correctness and NLL from the in-memory instance before closing it. Compare both the first load and the CLI reload with that record. Test: a deterministic altered reload fails.
+3. **Checkpoint provenance** (RVC-03). Bind each dev row to its export's digest and step, and check that the selected file matches the winning row. Keep the scheduled candidate exports until the selection audit; each is a few MB.
+4. **Trajectories** (RVC-04). Save the final-valid-token q/m/z at each loop for each evaluated depth, ordered by episode, hop and depth, with provenance. Test the saved artifact.
+5. **Confirmation report** (RVC-05 = F2). The frozen analysis writes the registered tables, labeled descriptive and kept apart from the decisions:
+   - EM, counts and NLL per arm, seed and hop;
+   - per-depth sweep EM;
+   - S1−M1 and the Memory×Depth interaction.
+
+   Test it with a passing and a failing outcome.
+6. **Branch records** (F4). Accept an ablation record only when S1A's dev outcome triggered the ablation. All S1A records must carry the same release digest.
+7. **Calibration** (F5). Exclude and record a nonfinite candidate, as the inherited rule does, instead of aborting.
+8. **Preflight coverage** (F6).
+   - T1 identity at L1, L2 and L4.
+   - The owner check at every depth.
+   - Assert the [B,12,768] and [B,12,128] capture shapes.
+9. **Real training stream** (rv-opus). Before the pilot, a compute test must run `BatchStream` on T2 (`token_fact_positions`). Every current test passes `source=`.
+
+**Then:**
+1. Run the full S1B set and the legacy slot shard green.
+2. Run the preflight and commit the lock (§8).
+3. Update `docs/reports/WP-L14.md`.
+4. End with `STOP: locked <full hash>`.
+
+Calibration and all later steps wait for S1A's decision record (decision 4).
