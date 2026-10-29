@@ -126,3 +126,47 @@ Sequence of the stages:
 - Exit 0 is not success. Check the steps, the evaluations, NaN/inf, and the config and commit hashes.
 - Use blake2b and never SHA-256. Put no dates in code.
 - Commit on wp/slot only. No merge, no push.
+
+## Review round 1: fixes before the preflight (2026-10-29 20:40 JST)
+**Handover.** From now on the worker for this task is a codex worker (wk-slot, GPT-6.1-sol high, herdr tab, same worktree and branch). It takes over from the subagent sn-slot (user request, 2026-10-29). Its starting point is wp/slot `ccdcc96` and `docs/reports/SLOT-LOOP-v1-state.md`.
+
+**Reviews.** The static review of `ccdcc96` is on master `6c21e19`:
+- `docs/review/static_2026-10-29/slot-data-analysis.md` (D-F1 to D-F5);
+- `docs/review/static_2026-10-29/slot-model-training.md` (M-F1 to M-F4).
+There is no high finding. Fix all of the items below in one round, because they are small and one cross-review then covers them. Merge master into wp/slot first.
+
+**Before the preflight and S0:**
+1. **D-F5 (c).** In `stage_s0`, R0 holds when `matrix_uncal/all_valid_question` differs from `native/all_valid_question` on S0 dev, in any per-sample correctness or NLL.
+2. **D-F5 (a).**
+   - Add `--manifest` (the locked `manifest.lock.json`, whose digest goes into the analysis output) to `scripts/analyze_slot_study.py`.
+   - Refuse any set whose n or ids digest differs from the manifest. This covers S0 calibration 2,048, S0 dev 1,000, S1A dev 1,000, S1A confirmation 2,000 and the unseen set.
+   - The test that says "a different n is reported, not refused" changes to "refused".
+3. **M-F2.** Science modes refuse to run when the source they run differs from the source that passed the preflight.
+   - Bind the lock to the `src/` content (blake2b) rather than to the commit, so edits to scripts or docs do not force a new preflight.
+   - After any `src/` change, the preflight runs again. That job is small.
+4. **D-F3.** Write the runbook commands with an interpreter: `.venv/bin/python` or `uv run python` for `prepare_slot_manifest.py`, and `python3` for the analysis.
+5. **D-F4.**
+   - `raw_episodes`/`episodes` refuse a sealed set that was not opened through `eval_set` with the token. Add a test that `episodes(SETS["S1A", "confirmation"])` raises.
+   - Drop the sealed sets' `base_seed`/`query_seed` from `manifest()`. Their id digest and count stay.
+
+**Before the S1A release (do them now as well):**
+6. **D-F1.** Add the analysis stage `S1A-ABL`, with the reviewer's rule, which is registered here as Interpretation 9(f).
+   - Inputs: `ablation/matrix_L1/s17/record.json` and `ablation/soft_slot_L1/s17/record.json`. Both must be `complete`, carry `ablation: true`, and share n and dev ids with each other and with the six main records.
+   - Comparison: each run's dev-NLL-selected checkpoint, with the same selection rule as the main arms. Flag iff `(c_soft - c_matrix) * 100 >= 3 n` in exact integers. Print counts and the flag only.
+   - `parse_run` requires `ablation is False` for the six main records.
+7. **M-F3 / D-F2.**
+   - Document the open-record schema in the state file.
+   - `load_open_token` takes the S-RE reference digest from the locked inventory, so the record needs no seventh field. Add a test with a reference entry.
+   - `--open-root` has no default and must be absolute.
+   - Add a release builder script with self-checks. It carries:
+     - the six main and two ablation config hashes;
+     - the steps, the LR per arm and g/tau;
+     - the walltime;
+     - the prereg digest and the analysis-script digest.
+   - `reload_check` also requires that the config equals the release's.
+8. **D-F5 (b).** A missing reference file (`s_re_native`, `matrix_step0`, `soft_step0`) is refused.
+   - The unseen set stays optional, as the prereg says ("descriptive, optional"). If its files are absent, the report says "not run", and the analysis does not fail.
+9. **M-F1.** In the LR pilot, a non-finite candidate is excluded and recorded rather than aborting the pilot (prereg line 108). Add a test.
+10. **M-F4.** No code change. Note in the state file that a first load long enough to make the N rule and the walltime cap contradict each other ends in a STOP, as it does now.
+
+Then run the changed slot test files, and any existing test file whose imports changed, on compute. Update the state file (interpretations, schemas, runbook, ledger) and end with `STOP: review <hash>`. The review of this round is a cross-review by two independent reviewers: a codex reviewer (GPT-6-Astra xhigh) and an Opus subagent. After it, the steps continue as in Step 2: preflight, lock, S0, `decision_s0.md`, then `STOP: S0 done`.
