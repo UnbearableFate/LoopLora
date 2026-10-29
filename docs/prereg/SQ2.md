@@ -1,9 +1,10 @@
-# Study SQ2: storage x read-coefficient supervision, continued from D128-3 (WP-L12, G5 of `plan/followup_2026-10-29.md`), pre-registration draft
+# Study SQ2: storage x read-coefficient supervision, continued from D128-3 (WP-L12, G5 of `plan/followup_2026-10-29.md`), pre-registered
 
-**Draft** by sn-llm, 2026-10-29 (WP-L12 step 1, no compute, no run, no smoke), for the orchestrator to review and register on master before any
-implementation, smoke or run. The user approved the design on 2026-10-29 ("两个方案都试一下"). Source: `docs/review/rv-astra_2026-10-29.md` proposal 4
-("Jointly learn effective query coordinates and storage"; a new hypothesis informed by Q-Delta, not its implementation). The sister study LSQT
-(`docs/prereg/LSQT.md`) is an independent registration. Both are validation screens; neither reads a test range.
+Registered 2026-10-29 13:13 JST by the orchestrator, before any implementation, smoke or run. The user approved G5 with both designs on 2026-10-29
+("OK，按你的建议启动G5，两个方案都试一下"). Drafted by sn-llm (Claude Sonnet 5.5; WP-L12 step 1, wp/llm `f67ea82`).
+Source: `docs/review/rv-astra_2026-10-29.md` proposal 4 (a new hypothesis informed by Q-Delta, not its implementation). The
+sister study LSQT is an independent registration. Both are validation screens; neither reads a test range. The
+orchestrator's decisions are at the end.
 
 ## What was known at drafting
 - D128-3 (DPFP, nu = 3, r = 128, key dimension 768, E = 16; `docs/reports/DPFP.md`): val EM 60.8 % (608 of 1,000), normalized read error 0.363, read-value head 51.0 %
@@ -110,3 +111,25 @@ The four arm jobs run in parallel. Estimates from the measured step times (0.196
 | total | about 2.1 (task range 1.8 to 2.5) |
 
 Node·h is recorded per job. Executed by sn-llm (Sonnet-5.5) on wp/llm; reports `docs/reports/SQ2.md` and `docs/reports/SQ2-state.md`.
+
+## Decisions at registration (orchestrator)
+1. **Deviations 1–8 are accepted as written.** They cover:
+   - one fresh stream shared by all arms;
+   - the loaded AdamW state with constant lr 3e-3;
+   - the step-0 evaluation;
+   - new code for ridge on the DPFP features;
+   - η in [1e-4, 1] with the w_c rule;
+   - N ≤ 6,000;
+   - validation reuse;
+   - the unit query as part of the DPFP map.
+2. **The η rule and the w_c rule are accepted as written** (open points). The numerics job uses only the train split. Its
+   outputs (η, w_c and the reported curves) are frozen in the release before any smoke output is read. Smokes are read for
+   time and memory only.
+3. **The stability definition (condition 3) is accepted as written:**
+   - no nonfinite loss or gradient;
+   - the clean-value head at each of the five checkpoints ≥ `S-DE`'s final value − 5 pp.
+4. **Step-0 check.** If `S-DE` at step 0 does not reproduce D128-3's 608 correct and its NLL exactly, the continuation is void.
+   STOP and report before any arm job runs. Run this check in the reload/step-0 job, before the arm jobs.
+5. **Stops.** Step 2 ends with the release committed (N, η, w_c, checkpoint digests, the science commit, config hashes, this
+   file's blake2b and the step-0 check). STOP there. Step 3 runs the four arms in parallel, then the audit and the decision,
+   and STOPs.

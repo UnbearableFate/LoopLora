@@ -1,9 +1,10 @@
-# Study LSQT: trained least-squares stores at r = 128, from scratch (WP-L12, G5 of `plan/followup_2026-10-29.md`), pre-registration draft
+# Study LSQT: trained least-squares stores at r = 128, from scratch (WP-L12, G5 of `plan/followup_2026-10-29.md`), pre-registered
 
-**Draft** by sn-llm, 2026-10-29 (WP-L12 step 1, no compute, no run, no smoke), for the orchestrator to review and register on master before any
-implementation, smoke or run. The user approved the design on 2026-10-29 ("两个方案都试一下"). Source of the design: `docs/review/rv-fable_2026-10-29.md`
-proposal W2. It reuses `docs/prereg/LSQ.md` and `src/looplora/llm/lsq.py` (written, statically checked, tested on a tiny model, never run on a real model:
-RFX triggered no LSQ arm). The sister study SQ2 (`docs/prereg/SQ2.md`) is an independent registration. Both are validation screens; neither reads a test range.
+Registered 2026-10-29 13:13 JST by the orchestrator, before any implementation, smoke or run. The user approved G5 with both designs on 2026-10-29
+("OK，按你的建议启动G5，两个方案都试一下"). Drafted by sn-llm (Claude Sonnet 5.5; WP-L12 step 1, wp/llm `f67ea82`).
+Source of the design: `docs/review/rv-fable_2026-10-29.md` proposal W2. It reuses `docs/prereg/LSQ.md` and `src/looplora/llm/lsq.py`
+(written and tested on a tiny model, never run on a real model; RFX triggered no LSQ arm). The sister study SQ2 is an independent
+registration. Both are validation screens; neither reads a test range. The orchestrator's decisions are at the end.
 
 ## What was known at drafting
 - WP-L4 (`docs/reports/P1L-read-fix.md`): R at r = 128 reaches val EM 33.5 % (normalized read error 0.631, clean/read value-head 93.3 % / 19.7 %); the oracle-addressing
@@ -107,3 +108,17 @@ episode; K4 repeats the 16 sequential writes four times, so its step time is unk
 
 The registered set is the three arms (about 4.6 node·h). Tests, smokes, reload checks and audit together stay <= 0.8 node·h. Node·h is recorded per job. Jobs of the arms run in parallel
 (6-job cap). Executed by sn-llm (Sonnet-5.5) on wp/llm; reports `docs/reports/LSQT.md` and `docs/reports/LSQT-state.md`.
+
+## Decisions at registration (orchestrator)
+1. **Deviations 1–8 are accepted as written.**
+2. **The U control is conditional.** It runs only after the three registered arms (`LT-K4`, `LT-RG001`, `LT-RG1`) have
+   finished, and only if the best of them reaches val EM ≥ 40 %. Below 40 % the trained-LSQ line closes, so there is no gain
+   to attribute.
+   - If U runs, it uses the same release rule (its own smoke, frozen steps, at most 2 h) and the same audit.
+   - Its result is descriptive only: it splits a gain over R-r128 between the store and the unit query.
+   - It enters neither outcome 1 nor outcome 2. If U itself reaches 0.80, that is reported and the orchestrator decides.
+   - If U does not run, the report says so and makes no store-versus-query attribution beyond K4 against RG.
+3. **Stops.**
+   - Step 2 ends with the release committed: three arms, η, steps, the science commit, config hashes, this file's blake2b
+     and the reload checks. STOP there for the orchestrator's OK.
+   - Step 3 runs the three arms in parallel, then the audit and the decision, and STOPs before U.
