@@ -120,7 +120,8 @@ def test_the_weight_rule_is_the_median_ratio_rounded_to_a_power_of_two_and_clipp
     assert round_weight([3.]) == 4. and round_weight([1.4]) == 1. and round_weight([.7, 1., 100.]) == 1.
     assert round_weight([2., 4.]) == 4.  # the median of an even count is the mean (3), whose log2 rounds to 2
     assert round_weight([1e-4, 2e-4, 3e-4]) == WEIGHT_BOUNDS[0] and round_weight([1e5, 2e5, 3e5]) == WEIGHT_BOUNDS[1]
-    assert round_weight([5.7]) == 4. and round_weight([5.8]) == 8.
+    # rounding is on the log2 scale (the ratio is multiplicative): the boundary between 4 and 8 is 4*sqrt(2) = 5.657
+    assert round_weight([5.6]) == 4. and round_weight([5.7]) == 8.
     for bad in ([], [0.], [-1.], [math.nan], [math.inf], [1., math.nan]):
         with pytest.raises(ValueError):
             round_weight(bad)
