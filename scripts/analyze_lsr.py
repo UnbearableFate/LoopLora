@@ -2,6 +2,8 @@
 """LSR offline analysis (numpy only; docs/prereg/LSR.md).
 
   design   write reports/lsr/design.json: the registered prereg digest, grid, rules, ranges and the six checkpoints
+  test     read the test traces of both backbones, apply the locked thresholds and write the registered endpoints, the paired
+           episode bootstrap (10,000 draws, 99.17%), the per-seed conditions, the descriptive tables and the oracles
   select   read the validation traces of both backbones and write reports/lsr/thresholds.json (status locked): the six
            thresholds, L_c, the O1 depths, and every grid value's validation numbers. Validation traces only.
 """
@@ -11,9 +13,11 @@ import argparse
 import json
 from pathlib import Path
 
+import csv
+
 import numpy as np
 
-from looplora.llm import lsr_rules as rules
+from looplora.llm import lsr_rules as rules, lsr_stats as stats
 from run_p1l_main import ROOT, digest, save
 
 PREREG = "docs/prereg/LSR.md"
@@ -97,6 +101,95 @@ def select(args) -> dict:
     return result
 
 
+def load_test(directory: Path, backbone: str, locked: dict, prereg_hash: str) -> tuple[dict, dict]:
+    """Test traces of the three seeds, checked against their records and the design lock."""
+    traces, hashes, commits, latency = {}, {}, set(), {}
+    window = dict(split="test", start=106000, count=2000, seed=rules.SEED)
+    for seed in rules.SEEDS:
+        name = f"M1-L4-s{seed}"
+        record = json.loads((directory / name / "record.json").read_text())
+        trace_path = directory / name / "trace.npz"
+        if (record["status"] != "complete" or record["trace_hash"] != digest(trace_path) or record["backbone"] != backbone
+                or record["split"] != "test" or record["window"] != window or record["prereg_hash"] != prereg_hash
+                or record["checkpoint_hash"] != locked["checkpoints"][backbone]["runs"][name]["checkpoint_hash"]
+                or record["source_dirty"]):
+            raise ValueError(f"{name}: the test record does not match the design lock")
+        commits.add(record["git_commit"])
+        with np.load(trace_path) as data:
+            trace = {key: data[key] for key in data.files}
+        if trace["pred"].shape != (2000, 8, 9) or not np.array_equal(trace["episode_index"], 106000 + np.arange(2000)):
+            raise ValueError(f"{name}: unexpected test trace shape or episodes")
+        traces[seed], hashes[name] = trace, record["trace_hash"]
+        if "latency" in record:
+            latency[name] = record["latency"]
+    if len(commits) != 1:
+        raise ValueError("the three test runs of a backbone must share one source commit")
+    return traces, dict(trace_hashes=hashes, source_commit=commits.pop(), latency=latency)
+
+
+def write_tables(result: dict, out: Path) -> None:
+    out.mkdir(parents=True, exist_ok=True)
+    endpoints, accuracy, depths = [], [], []
+    for backbone, value in result["backbones"].items():
+        for rule, entry in value["rules"].items():
+            row = dict(backbone=backbone, rule=rule, status=entry["status"], passes=entry["passes"])
+            if entry["status"] == "evaluated":
+                row.update(tau=entry["tau"], gain48_pp=entry["gain48"][0], gain48_lo=entry["gain48"][1], gain48_hi=entry["gain48"][2],
+                           hop1_pp=entry["hop1"][0], hop1_lo=entry["hop1"][1], hop1_hi=entry["hop1"][2],
+                           **{f"cond_{k}": v for k, v in entry["conditions"].items()},
+                           **{f"seed{s}_gain48": v["gain48"][0] for s, v in entry["per_seed"].items()},
+                           **{f"seed{s}_hop1": v["hop1"][0] for s, v in entry["per_seed"].items()},
+                           mean_reads=entry["mean_reads"], mean_depth=entry["mean_depth"],
+                           upper_layer_passes=entry["upper_layer_passes"])
+                for hop, em in enumerate(entry["em_by_hop"], 1):
+                    accuracy.append(dict(backbone=backbone, series=rule, seed="pooled", hop=hop, em=em))
+                for seed, ems in entry["em_by_hop_per_seed"].items():
+                    for hop, em in enumerate(ems, 1):
+                        accuracy.append(dict(backbone=backbone, series=rule, seed=seed, hop=hop, em=em))
+                for hop, counts in enumerate(entry["stop_depth_counts_by_hop"], 1):
+                    for depth, count in enumerate(counts, 1):
+                        depths.append(dict(backbone=backbone, rule=rule, hop=hop, depth=depth, count=count,
+                                           mean_reads=entry["mean_reads_by_hop"][hop - 1]))
+            endpoints.append(row)
+        for name, entry in value["fixed"].items():
+            if "em_by_hop" in entry:
+                for hop, em in enumerate(entry["em_by_hop"], 1):
+                    accuracy.append(dict(backbone=backbone, series=name, seed="pooled", hop=hop, em=em))
+                for seed, ems in entry["em_by_hop_per_seed"].items():
+                    for hop, em in enumerate(ems, 1):
+                        accuracy.append(dict(backbone=backbone, series=name, seed=seed, hop=hop, em=em))
+        for name, entry in value["oracles"].items():
+            if isinstance(entry, dict):
+                for hop, em in enumerate(entry["em_by_hop"], 1):
+                    accuracy.append(dict(backbone=backbone, series=name.split("_")[0], seed="pooled", hop=hop, em=em))
+    for name, table in (("endpoints.csv", endpoints), ("accuracy.csv", accuracy), ("stop-depth.csv", depths)):
+        keys = list(dict.fromkeys(key for row in table for key in row))
+        with (out / name).open("w", newline="") as stream:
+            writer = csv.DictWriter(stream, fieldnames=keys)
+            writer.writeheader()
+            writer.writerows(table)
+
+
+def test(args) -> dict:
+    locked = json.loads((ROOT / DESIGN).read_text())
+    thresholds_path = ROOT / THRESHOLDS
+    thresholds = json.loads(thresholds_path.read_text())
+    prereg_hash = digest(ROOT / PREREG)
+    if (thresholds["status"] != "locked" or thresholds["prereg"]["hash"] != prereg_hash
+            or locked["prereg"]["hash"] != prereg_hash or thresholds["design"]["hash"] != digest(ROOT / DESIGN)):
+        raise ValueError("the thresholds are not locked under this prereg and design")
+    result = dict(study="lsr", prereg=dict(path=PREREG, hash=prereg_hash),
+                  thresholds=dict(path=THRESHOLDS, hash=digest(thresholds_path)), comparisons=stats.COMPARISONS,
+                  confidence=1 - stats.ALPHA, draws=stats.DRAWS, backbones={}, provenance={})
+    for backbone, directory in (("0.6b", args.test_06b), ("1.7b", args.test_17b)):
+        traces, provenance = load_test(directory, backbone, locked, prereg_hash)
+        result["backbones"][backbone] = stats.evaluate_backbone(traces, thresholds["backbones"][backbone], backbone)
+        result["provenance"][backbone] = provenance
+    result["passing"] = {backbone: {rule: entry["passes"] for rule, entry in value["rules"].items()}
+                         for backbone, value in result["backbones"].items()}
+    return result
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     sub = parser.add_subparsers(dest="command", required=True)
@@ -105,7 +198,19 @@ def main():
     chosen.add_argument("--val-06b", type=Path, required=True)
     chosen.add_argument("--val-17b", type=Path, required=True)
     chosen.add_argument("--out", type=Path, required=True, help="absolute path: a job's ROOT is a throw-away snapshot")
+    tested = sub.add_parser("test")
+    tested.add_argument("--test-06b", type=Path, required=True)
+    tested.add_argument("--test-17b", type=Path, required=True)
+    tested.add_argument("--out", type=Path, required=True, help="absolute directory for results.json and the CSV tables")
     args = parser.parse_args()
+    if args.command == "test":
+        if (args.out / "results.json").exists():
+            raise ValueError("results.json exists: the test analysis is written once")
+        result = test(args)
+        save(args.out / "results.json", result)
+        write_tables(result, args.out)
+        print(json.dumps(result["passing"]), flush=True)
+        return
     if args.command == "design":
         save(args.out, design())
     else:
