@@ -1,7 +1,7 @@
 # WP-L13 state: SLOT-LOOP-v1, S0 R2 and S1A release ready
 
 Branch `wp/slot` (worktree `LoopLora-wt/slot`), master merged through `8632497` after handover at `ccdcc96`; not merged into master, not pushed. Task: `docs/tasks/WP-L13_slot_loop.md`; registration `docs/prereg/SLOT-LOOP-v1.md` (blake2b-128 `56e8c611c01e0ef9b7ae32db97b0e334`, registered on master at `5f04a5c`, unchanged); S0 results are in `docs/reports/SLOT-LOOP-v1.md`.
-**Status: S1A release ready; both follow-ups, tests, real smoke, LR/timing pilot and exact reloads passed.** Awaiting approval.json. No formal training, dev selection or sealed evaluation has started. Science commit 1523b19c7949673ddcd1d89cc1e5fe518736805c; source remains identical to the accepted preflight.
+**Status: ready release approved in 1114287; all six main arm-seed jobs submitted.** Next: verify results, S1A-DEV, conditional registered ablation, then STOP: S1A selected. Confirmation/unseen remain sealed. No source or science-setting changes.
 
 ## What the code does
 New files only, except four typed-dispatch edits (below). Every new option is off in the old paths.
@@ -352,3 +352,19 @@ Archived 32 exact release/preparation files plus artifacts.json: candidate/ready
 
 S1A preparation total 709/3,600 = 0.196944 node·h. Whole-study total inherited 0.503 + (420 + 294 + 277 + 709)/3,600 = 0.975222 node·h. Written stage caps remain lifted; all per-job requests stay within 16 node·h.
 Next: STOP: release with the artifact commit, await approval.json. No formal arm-seed runs, dev selection, ablation or sealed confirmation/unseen evaluation has started. No src changes since preflight; the two round-3 analysis/runbook follow-ups and their tests are complete, without another review round. The orchestrator will later compare the ready-release file digest with all six training records before writing s1a-open.json; analysis enforces shared record hashes and opening-record/release-file equality.
+
+
+
+## S1A main jobs approved and submitted
+Approval: `reports/slot-loop-v1/approval.json`, committed by the orchestrator at `11142874804290e630925c7aff20b0a77b708d99`. Before submission verified the approved release file digest `523d11d57a08a2491893ebe7cedc86a7`, exact persistent/committed release bytes, prereg digest and science commit. All six output paths were fresh. Each job is one node, debug-g, 00:30:00, N=6000, science commit `1523b19c7949673ddcd1d89cc1e5fe518736805c`, actual approved release at `$R/s1a-release.json`; no --scale-up. This is six active submissions, the worker limit. Requested total 3 node·h; actual usage pending. Whole-study cumulative measured remains 0.975222 node·h.
+
+| job | arm | seed | actual outcome | node·h |
+| --- | --- | ---: | --- | --- |
+| 3729048.opbs | matrix_L1 | 17 | submitted; watcher pending | pending |
+| 3729049.opbs | matrix_L1 | 29 | submitted; watcher pending | pending |
+| 3729050.opbs | matrix_L1 | 43 | submitted; watcher pending | pending |
+| 3729051.opbs | soft_slot_L1 | 17 | submitted; watcher pending | pending |
+| 3729052.opbs | soft_slot_L1 | 29 | submitted; watcher pending | pending |
+| 3729053.opbs | soft_slot_L1 | 43 | submitted; watcher pending | pending |
+
+Exact log/spec/source paths are committed in `reports/slot-loop-v1/s1a-main-jobs.json`. No polling or sleeps. After watcher completion inspect all six logs/records: 6000 steps, eleven dev rows, finite losses/norms, correct source/config/release hashes, fixed writer/support digests, selected exports and no confirmation access. Then S1A-DEV selection; the seed-17 two-arm ablation and S1A-ABL run only if the registered stable-dev trigger fires. End with STOP: S1A selected. Confirmation/unseen evaluation is outside this approval and remains sealed.
