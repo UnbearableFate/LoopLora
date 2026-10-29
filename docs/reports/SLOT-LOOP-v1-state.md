@@ -136,8 +136,11 @@ Test snapshot: `b78245003f2f75afc6f15055fb7d7d0acaf9f9b6`. Both jobs use `script
 | --- | --- | --- | --- | --- |
 | 3728078.opbs | test_slot_data.py, test_analyze_slot_study.py, test_slot_release.py | 00:03:00 | 182 passed; exit 0 on mg0006, 84 s | 0.023333 |
 | 3728079.opbs | test_slot_experiment.py | 00:05:00 | 47 passed, 1 failed; exit 1 on mg0007, 169 s; fixture metadata incomplete | 0.046944 |
+| 3728107.opbs | test_slot_experiment.py, snapshot `ca2855a2b26b08d85908b65925f81600a00e7533` | 00:05:00 | submitted; pending logs | pending |
 
 Logs: `/work/xg24i002/x10041/LoopLora/logs/pbs/slot-r1-meta-20261029-205152-3029969.log` and `/work/xg24i002/x10041/LoopLora/logs/pbs/slot-r1-exp-20261029-205152-3029979.log`. Previous measured validation predicts about 0.07–0.09 node·h combined; requested ceiling is 0.133 node·h, inside S0's 0.497 node·h remaining at handover. Measured total added: 253 / 3,600 = 0.070278 node·h; cumulative S0 account 0.573278 node·h (0.426722 remaining). Next: rerun the experiment test file after the fixture correction, update this ledger, then `STOP: review <full hash>` for cross-review. Preflight/lock/S0 remain on hold.
 
 
 Failure diagnosis for 3728079: `test_what_the_runner_writes_for_s0_is_what_the_frozen_analysis_reads` reaches `analyze_slot_study.main`, which validates all five manifest sets before stage dispatch (lines 777–778). The tiny-study fixture only supplied its five ordinary runtime sets, omitting `S1A/confirmation` and `S1A/unseen`, so analysis refused the incomplete metadata before reading S0 results. Production lock metadata already contains all registered sets. Corrected only the fixture: merge the complete registry with its tiny ordinary-set overrides when building manifest counts/id digests; no sealed episode generation and no assertion changed. Production code and the passing metadata/analysis/release tests are unchanged. Static compilation and `git diff --check` passed. Repeat the whole changed experiment file on compute (previous measurement 169 s; request 300 s gives >1.5×).
+
+Retry log: `/work/xg24i002/x10041/LoopLora/logs/pbs/slot-r1-exp2-20261029-205734-3080878.log`. Waiting for the orchestrator watcher; next action is to inspect this log and account for runtime, then cross-review STOP if all checks pass.
