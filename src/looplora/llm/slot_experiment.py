@@ -173,7 +173,7 @@ def tensor_digests(adapter) -> dict[str, str]:
     out = {}
     for name, tensor in adapter.state_dict().items():
         host = tensor.detach().cpu().contiguous()
-        out[name] = hashlib.blake2b(host.view(torch.uint8).numpy().tobytes(), digest_size=16).hexdigest()
+        out[name] = hashlib.blake2b(host.reshape(-1).view(torch.uint8).numpy().tobytes(), digest_size=16).hexdigest()
     return out
 
 
@@ -224,7 +224,7 @@ def support_digest(experiment, arrays) -> str:
     for begin in range(0, len(arrays.episode_seed), CHUNK):
         batch = experiment.prepare(_slice(arrays, slice(begin, min(begin + CHUNK, len(arrays.episode_seed)))))
         for tensor in (batch.keys, batch.values, batch.snapshot.states[experiment.layer]):
-            digest.update(tensor.detach().cpu().contiguous().view(torch.uint8).numpy().tobytes())
+            digest.update(tensor.detach().cpu().contiguous().reshape(-1).view(torch.uint8).numpy().tobytes())
     return digest.hexdigest()
 
 

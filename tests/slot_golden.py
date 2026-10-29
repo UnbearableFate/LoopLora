@@ -58,7 +58,7 @@ def tiny_experiment(model, tokenizer):
 def digest(*tensors):
     h = hashlib.blake2b(digest_size=16)
     for t in tensors:
-        h.update(t.detach().cpu().contiguous().view(torch.uint8).numpy().tobytes())
+        h.update(t.detach().cpu().contiguous().reshape(-1).view(torch.uint8).numpy().tobytes())
     return h.hexdigest()
 
 

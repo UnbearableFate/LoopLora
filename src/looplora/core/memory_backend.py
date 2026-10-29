@@ -113,7 +113,7 @@ def state_digest(state: MemoryState) -> str:
     for name, tensor in state.tensors().items():
         host = tensor.detach().cpu().contiguous()
         digest.update(f"{name}|{host.dtype}|{tuple(host.shape)}|".encode())
-        digest.update(host.view(torch.uint8).numpy().tobytes() if host.numel() else b"")
+        digest.update(host.reshape(-1).view(torch.uint8).numpy().tobytes() if host.numel() else b"")
     return digest.hexdigest()
 
 
