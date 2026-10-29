@@ -1,0 +1,624 @@
+{
+  "dev_ids_blake2b_128": "6bf2f42455e065ce309af6cd7fc79541",
+  "differences": {
+    "mean_pp": 3.5,
+    "per_seed": {
+      "17": {
+        "d_correct": 33,
+        "pp": 3.3
+      },
+      "29": {
+        "d_correct": 35,
+        "pp": 3.5
+      },
+      "43": {
+        "d_correct": 37,
+        "pp": 3.7
+      }
+    },
+    "sum_d_correct": 105,
+    "trigger_below_pp": 3.0
+  },
+  "n": 1000,
+  "outcome": "no_trigger",
+  "reasons": [],
+  "release_blake2b_128": "523d11d57a08a2491893ebe7cedc86a7",
+  "runs": {
+    "matrix_L1/s17": {
+      "dev": [
+        {
+          "correct": 739,
+          "em": 0.739,
+          "n": 1000,
+          "nll": 1.421839259186323,
+          "selectable": false,
+          "step": 0
+        },
+        {
+          "correct": 807,
+          "em": 0.807,
+          "n": 1000,
+          "nll": 1.0311644647077973,
+          "selectable": true,
+          "step": 600
+        },
+        {
+          "correct": 823,
+          "em": 0.823,
+          "n": 1000,
+          "nll": 0.943703138717835,
+          "selectable": true,
+          "step": 1200
+        },
+        {
+          "correct": 824,
+          "em": 0.824,
+          "n": 1000,
+          "nll": 0.9495666026076324,
+          "selectable": true,
+          "step": 1800
+        },
+        {
+          "correct": 826,
+          "em": 0.826,
+          "n": 1000,
+          "nll": 0.9263326606478254,
+          "selectable": true,
+          "step": 2400
+        },
+        {
+          "correct": 825,
+          "em": 0.825,
+          "n": 1000,
+          "nll": 0.9268137868623316,
+          "selectable": true,
+          "step": 3000
+        },
+        {
+          "correct": 833,
+          "em": 0.833,
+          "n": 1000,
+          "nll": 0.9150333772631065,
+          "selectable": true,
+          "step": 3600
+        },
+        {
+          "correct": 829,
+          "em": 0.829,
+          "n": 1000,
+          "nll": 0.902878239994905,
+          "selectable": true,
+          "step": 4200
+        },
+        {
+          "correct": 834,
+          "em": 0.834,
+          "n": 1000,
+          "nll": 0.9007522155927545,
+          "selectable": true,
+          "step": 4800
+        },
+        {
+          "correct": 834,
+          "em": 0.834,
+          "n": 1000,
+          "nll": 0.866040755549865,
+          "selectable": true,
+          "step": 5400
+        },
+        {
+          "correct": 827,
+          "em": 0.827,
+          "n": 1000,
+          "nll": 0.8721296286807428,
+          "selectable": true,
+          "step": 6000
+        }
+      ],
+      "selected_checkpoint_blake2b_128": "00a1535965a0f2813b4a1b552b6e2ee2",
+      "selected_step": 5400,
+      "training": {
+        "all_finite": true,
+        "clipped_fraction": 0.26883333921432495,
+        "grad_norm_max": 1.6511144638061523
+      }
+    },
+    "matrix_L1/s29": {
+      "dev": [
+        {
+          "correct": 739,
+          "em": 0.739,
+          "n": 1000,
+          "nll": 1.421839259186323,
+          "selectable": false,
+          "step": 0
+        },
+        {
+          "correct": 814,
+          "em": 0.814,
+          "n": 1000,
+          "nll": 1.0186551742857155,
+          "selectable": true,
+          "step": 600
+        },
+        {
+          "correct": 816,
+          "em": 0.816,
+          "n": 1000,
+          "nll": 0.970767930928223,
+          "selectable": true,
+          "step": 1200
+        },
+        {
+          "correct": 815,
+          "em": 0.815,
+          "n": 1000,
+          "nll": 0.951243992504229,
+          "selectable": true,
+          "step": 1800
+        },
+        {
+          "correct": 826,
+          "em": 0.826,
+          "n": 1000,
+          "nll": 0.9477125362584821,
+          "selectable": true,
+          "step": 2400
+        },
+        {
+          "correct": 826,
+          "em": 0.826,
+          "n": 1000,
+          "nll": 0.9426432093368303,
+          "selectable": true,
+          "step": 3000
+        },
+        {
+          "correct": 836,
+          "em": 0.836,
+          "n": 1000,
+          "nll": 0.9006140213844228,
+          "selectable": true,
+          "step": 3600
+        },
+        {
+          "correct": 830,
+          "em": 0.83,
+          "n": 1000,
+          "nll": 0.9109965569542056,
+          "selectable": true,
+          "step": 4200
+        },
+        {
+          "correct": 827,
+          "em": 0.827,
+          "n": 1000,
+          "nll": 0.895056042366803,
+          "selectable": true,
+          "step": 4800
+        },
+        {
+          "correct": 835,
+          "em": 0.835,
+          "n": 1000,
+          "nll": 0.901573881555255,
+          "selectable": true,
+          "step": 5400
+        },
+        {
+          "correct": 833,
+          "em": 0.833,
+          "n": 1000,
+          "nll": 0.8949670021929469,
+          "selectable": true,
+          "step": 6000
+        }
+      ],
+      "selected_checkpoint_blake2b_128": "b44f13443a4ce44e3d22d9f1ac77685d",
+      "selected_step": 6000,
+      "training": {
+        "all_finite": true,
+        "clipped_fraction": 0.2784999907016754,
+        "grad_norm_max": 1.6344783306121826
+      }
+    },
+    "matrix_L1/s43": {
+      "dev": [
+        {
+          "correct": 739,
+          "em": 0.739,
+          "n": 1000,
+          "nll": 1.421839259186323,
+          "selectable": false,
+          "step": 0
+        },
+        {
+          "correct": 807,
+          "em": 0.807,
+          "n": 1000,
+          "nll": 0.9902738805764321,
+          "selectable": true,
+          "step": 600
+        },
+        {
+          "correct": 815,
+          "em": 0.815,
+          "n": 1000,
+          "nll": 0.9810354995839334,
+          "selectable": true,
+          "step": 1200
+        },
+        {
+          "correct": 822,
+          "em": 0.822,
+          "n": 1000,
+          "nll": 0.9463909071331982,
+          "selectable": true,
+          "step": 1800
+        },
+        {
+          "correct": 830,
+          "em": 0.83,
+          "n": 1000,
+          "nll": 0.9352931658879265,
+          "selectable": true,
+          "step": 2400
+        },
+        {
+          "correct": 833,
+          "em": 0.833,
+          "n": 1000,
+          "nll": 0.9272952151365371,
+          "selectable": true,
+          "step": 3000
+        },
+        {
+          "correct": 824,
+          "em": 0.824,
+          "n": 1000,
+          "nll": 0.942419485777853,
+          "selectable": true,
+          "step": 3600
+        },
+        {
+          "correct": 826,
+          "em": 0.826,
+          "n": 1000,
+          "nll": 0.9143514652566055,
+          "selectable": true,
+          "step": 4200
+        },
+        {
+          "correct": 833,
+          "em": 0.833,
+          "n": 1000,
+          "nll": 0.9291975241150039,
+          "selectable": true,
+          "step": 4800
+        },
+        {
+          "correct": 838,
+          "em": 0.838,
+          "n": 1000,
+          "nll": 0.8870637035883728,
+          "selectable": true,
+          "step": 5400
+        },
+        {
+          "correct": 844,
+          "em": 0.844,
+          "n": 1000,
+          "nll": 0.8983697540546637,
+          "selectable": true,
+          "step": 6000
+        }
+      ],
+      "selected_checkpoint_blake2b_128": "07e1ab7460f12615735fccb180d2dc3b",
+      "selected_step": 5400,
+      "training": {
+        "all_finite": true,
+        "clipped_fraction": 0.273499995470047,
+        "grad_norm_max": 1.533983826637268
+      }
+    },
+    "soft_slot_L1/s17": {
+      "dev": [
+        {
+          "correct": 787,
+          "em": 0.787,
+          "n": 1000,
+          "nll": 1.2820603540583835,
+          "selectable": false,
+          "step": 0
+        },
+        {
+          "correct": 856,
+          "em": 0.856,
+          "n": 1000,
+          "nll": 0.860691510755465,
+          "selectable": true,
+          "step": 600
+        },
+        {
+          "correct": 857,
+          "em": 0.857,
+          "n": 1000,
+          "nll": 0.7910967660232181,
+          "selectable": true,
+          "step": 1200
+        },
+        {
+          "correct": 861,
+          "em": 0.861,
+          "n": 1000,
+          "nll": 0.8192276302180326,
+          "selectable": true,
+          "step": 1800
+        },
+        {
+          "correct": 874,
+          "em": 0.874,
+          "n": 1000,
+          "nll": 0.771062363029956,
+          "selectable": true,
+          "step": 2400
+        },
+        {
+          "correct": 867,
+          "em": 0.867,
+          "n": 1000,
+          "nll": 0.7731805868042261,
+          "selectable": true,
+          "step": 3000
+        },
+        {
+          "correct": 867,
+          "em": 0.867,
+          "n": 1000,
+          "nll": 0.7585762026674392,
+          "selectable": true,
+          "step": 3600
+        },
+        {
+          "correct": 867,
+          "em": 0.867,
+          "n": 1000,
+          "nll": 0.7749104657443768,
+          "selectable": true,
+          "step": 4200
+        },
+        {
+          "correct": 875,
+          "em": 0.875,
+          "n": 1000,
+          "nll": 0.7498923328246047,
+          "selectable": true,
+          "step": 4800
+        },
+        {
+          "correct": 867,
+          "em": 0.867,
+          "n": 1000,
+          "nll": 0.7360743877080876,
+          "selectable": true,
+          "step": 5400
+        },
+        {
+          "correct": 858,
+          "em": 0.858,
+          "n": 1000,
+          "nll": 0.791544097750806,
+          "selectable": true,
+          "step": 6000
+        }
+      ],
+      "selected_checkpoint_blake2b_128": "d71e06da709ee4c588b5f008d68c0d15",
+      "selected_step": 5400,
+      "training": {
+        "all_finite": true,
+        "clipped_fraction": 0.14550000429153442,
+        "grad_norm_max": 1.9437808990478516
+      }
+    },
+    "soft_slot_L1/s29": {
+      "dev": [
+        {
+          "correct": 787,
+          "em": 0.787,
+          "n": 1000,
+          "nll": 1.2820603540583835,
+          "selectable": false,
+          "step": 0
+        },
+        {
+          "correct": 861,
+          "em": 0.861,
+          "n": 1000,
+          "nll": 0.8733183354236808,
+          "selectable": true,
+          "step": 600
+        },
+        {
+          "correct": 847,
+          "em": 0.847,
+          "n": 1000,
+          "nll": 0.856023527664097,
+          "selectable": true,
+          "step": 1200
+        },
+        {
+          "correct": 855,
+          "em": 0.855,
+          "n": 1000,
+          "nll": 0.8083854872000088,
+          "selectable": true,
+          "step": 1800
+        },
+        {
+          "correct": 858,
+          "em": 0.858,
+          "n": 1000,
+          "nll": 0.8207000225381371,
+          "selectable": true,
+          "step": 2400
+        },
+        {
+          "correct": 861,
+          "em": 0.861,
+          "n": 1000,
+          "nll": 0.8532383933916863,
+          "selectable": true,
+          "step": 3000
+        },
+        {
+          "correct": 865,
+          "em": 0.865,
+          "n": 1000,
+          "nll": 0.7822832889181154,
+          "selectable": true,
+          "step": 3600
+        },
+        {
+          "correct": 860,
+          "em": 0.86,
+          "n": 1000,
+          "nll": 0.785672406686157,
+          "selectable": true,
+          "step": 4200
+        },
+        {
+          "correct": 856,
+          "em": 0.856,
+          "n": 1000,
+          "nll": 0.7900230307679922,
+          "selectable": true,
+          "step": 4800
+        },
+        {
+          "correct": 863,
+          "em": 0.863,
+          "n": 1000,
+          "nll": 0.7836976192976927,
+          "selectable": true,
+          "step": 5400
+        },
+        {
+          "correct": 868,
+          "em": 0.868,
+          "n": 1000,
+          "nll": 0.7601711108313611,
+          "selectable": true,
+          "step": 6000
+        }
+      ],
+      "selected_checkpoint_blake2b_128": "136226b18beb45c5ca218451e9c13ea1",
+      "selected_step": 6000,
+      "training": {
+        "all_finite": true,
+        "clipped_fraction": 0.15283332765102386,
+        "grad_norm_max": 2.000854969024658
+      }
+    },
+    "soft_slot_L1/s43": {
+      "dev": [
+        {
+          "correct": 787,
+          "em": 0.787,
+          "n": 1000,
+          "nll": 1.2820603540583835,
+          "selectable": false,
+          "step": 0
+        },
+        {
+          "correct": 855,
+          "em": 0.855,
+          "n": 1000,
+          "nll": 0.8390462680677556,
+          "selectable": true,
+          "step": 600
+        },
+        {
+          "correct": 856,
+          "em": 0.856,
+          "n": 1000,
+          "nll": 0.8249776460768898,
+          "selectable": true,
+          "step": 1200
+        },
+        {
+          "correct": 868,
+          "em": 0.868,
+          "n": 1000,
+          "nll": 0.8127172289379123,
+          "selectable": true,
+          "step": 1800
+        },
+        {
+          "correct": 859,
+          "em": 0.859,
+          "n": 1000,
+          "nll": 0.8080681149391421,
+          "selectable": true,
+          "step": 2400
+        },
+        {
+          "correct": 860,
+          "em": 0.86,
+          "n": 1000,
+          "nll": 0.8092299940784087,
+          "selectable": true,
+          "step": 3000
+        },
+        {
+          "correct": 873,
+          "em": 0.873,
+          "n": 1000,
+          "nll": 0.7999101627763775,
+          "selectable": true,
+          "step": 3600
+        },
+        {
+          "correct": 875,
+          "em": 0.875,
+          "n": 1000,
+          "nll": 0.774393162836116,
+          "selectable": true,
+          "step": 4200
+        },
+        {
+          "correct": 861,
+          "em": 0.861,
+          "n": 1000,
+          "nll": 0.7767914013425571,
+          "selectable": true,
+          "step": 4800
+        },
+        {
+          "correct": 861,
+          "em": 0.861,
+          "n": 1000,
+          "nll": 0.785533521055866,
+          "selectable": true,
+          "step": 5400
+        },
+        {
+          "correct": 858,
+          "em": 0.858,
+          "n": 1000,
+          "nll": 0.7878062770152774,
+          "selectable": true,
+          "step": 6000
+        }
+      ],
+      "selected_checkpoint_blake2b_128": "52d43da424025388a8756bacb03f3058",
+      "selected_step": 4200,
+      "training": {
+        "all_finite": true,
+        "clipped_fraction": 0.14749999344348907,
+        "grad_norm_max": 1.5668381452560425
+      }
+    }
+  },
+  "stage": "S1A-DEV",
+  "steps": 6000
+}

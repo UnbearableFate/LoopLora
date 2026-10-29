@@ -1,0 +1,13 @@
+{
+ "branch": "advance",
+ "digests": {
+  "decision": "d9f00ee8b208a9e1f84edb6ebe935616",
+  "dev": "b6e5d452089045e27b22d4d94a57aacc"
+ },
+ "files": {
+  "decision": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/s1a/decision_s1a.json",
+  "dev": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/s1a/s1a-selection.json"
+ },
+ "s1a_release_blake2b_128": "523d11d57a08a2491893ebe7cedc86a7",
+ "stage": "S1B"
+}
