@@ -150,7 +150,9 @@ def b7_pass_cohort(request, p1l, tmp_path_factory):
 # ---- confirmation windows -----------------------------------------------------------------------------------------
 
 def test_confirmation_windows_are_named_registered_and_disjoint():
-    assert CONFIRMATION_WINDOWS == {"p1l": 100000, "p1l-s": 110000, "p5l": 104000}
+    # each registered entry individually (several studies add windows to the same dict; docs/prereg/LSR.md flag 9)
+    assert (CONFIRMATION_WINDOWS["p1l"], CONFIRMATION_WINDOWS["p1l-s"], CONFIRMATION_WINDOWS["p5l"]) == (100000, 110000, 104000)
+    assert CONFIRMATION_WINDOWS["lsr"] == 106000
     assert "confirmation" not in DEFAULTS["eval"]
     ranges = sorted([(start, start + 2000) for start in CONFIRMATION_WINDOWS.values()]
                     + [(REGISTERED_RANGE["start"], REGISTERED_RANGE["start"] + REGISTERED_RANGE["count"])])

@@ -1,0 +1,123 @@
+{
+  "checkpoints": {
+    "0.6b": {
+      "backbone": null,
+      "label": "Qwen3-0.6B-Base",
+      "manifest": "/work/xg24i002/x10041/LoopLora/runs/p1l/main/r128/training-manifest.json",
+      "manifest_hash": "16abef4df207a8e38be2e79d3b2d0849",
+      "runs": {
+        "M1-L4-s17": {
+          "checkpoint_hash": "c90d23ff1a27d509ed61ae43d5185832",
+          "path": "/work/xg24i002/x10041/LoopLora/runs/p1l/main/r128/main/M1-s17/M1-L4-s17",
+          "status": "complete"
+        },
+        "M1-L4-s29": {
+          "checkpoint_hash": "59e293ee6f36f29d03413c3f580f7fa7",
+          "path": "/work/xg24i002/x10041/LoopLora/runs/p1l/main/r128/main/M1-s29/M1-L4-s29",
+          "status": "complete"
+        },
+        "M1-L4-s43": {
+          "checkpoint_hash": "37a7baf0e832e3cad35e10b7ef1d1c39",
+          "path": "/work/xg24i002/x10041/LoopLora/runs/p1l/main/r128/main/M1-s43/M1-L4-s43",
+          "status": "complete"
+        }
+      }
+    },
+    "1.7b": {
+      "backbone": {
+        "id": "Qwen/Qwen3-1.7B-Base",
+        "revision": "ea980cb0a6c2ae4b936e82123acc929f1cec04c1"
+      },
+      "label": "Qwen3-1.7B-Base",
+      "manifest": "/work/xg24i002/x10041/LoopLora-wt/core/reports/p5l/r128/training-manifest.json",
+      "manifest_hash": "d5f20c919a7eefd31dae2e8ff34a6f8d",
+      "runs": {
+        "M1-L4-s17": {
+          "checkpoint_hash": "1a6a44811f5e344b0189368a794ac585",
+          "path": "/work/xg24i002/x10041/LoopLora/runs/p5l/main/M1-L4-s17/M1-L4-s17",
+          "status": "complete"
+        },
+        "M1-L4-s29": {
+          "checkpoint_hash": "02f3a83db6af516e8501b2e85616b753",
+          "path": "/work/xg24i002/x10041/LoopLora/runs/p5l/main/M1-L4-s29/M1-L4-s29",
+          "status": "complete"
+        },
+        "M1-L4-s43": {
+          "checkpoint_hash": "4f90ab5689810fecbdfb17e2268a8701",
+          "path": "/work/xg24i002/x10041/LoopLora/runs/p5l/main/M1-L4-s43/M1-L4-s43",
+          "status": "complete"
+        }
+      }
+    }
+  },
+  "grid": "tau = 2^(k/2)",
+  "grid_k": [
+    -20,
+    -19,
+    -18,
+    -17,
+    -16,
+    -15,
+    -14,
+    -13,
+    -12,
+    -11,
+    -10,
+    -9,
+    -8,
+    -7,
+    -6,
+    -5,
+    -4,
+    -3,
+    -2,
+    -1,
+    0,
+    1,
+    2,
+    3,
+    4
+  ],
+  "margins_pp": {
+    "per_seed": 10,
+    "pooled": 8
+  },
+  "objective": "per rule R1/R3 and backbone: maximise the summed correct count on hops 4-8 over the pooled validation questions of the three seeds, over grid values with pooled hop-1 change against fixed L = 4 >= -8 pp and >= -10 pp in every seed; ties: fewer mean reads, then smaller k; no feasible value: the rule fails and its test statistics are never computed",
+  "prereg": {
+    "hash": "91235d80a38f200e3a7b3bec907c1f1e",
+    "path": "docs/prereg/LSR.md"
+  },
+  "ranges": {
+    "latency": {
+      "count": 128,
+      "seed": 4242,
+      "split": "val",
+      "start": 1000
+    },
+    "smoke": {
+      "count": 64,
+      "seed": 4242,
+      "split": "val",
+      "start": 0
+    },
+    "test": {
+      "count": 2000,
+      "seed": 4242,
+      "split": "test",
+      "start": 106000,
+      "window": "lsr"
+    },
+    "validation": {
+      "count": 2000,
+      "seed": 4242,
+      "split": "val",
+      "start": 1000
+    }
+  },
+  "rules": {
+    "R1": "||z^s - z^(s-1)|| / ||z^(s-1)|| <= tau1, first s in 1..8, s = 8 forced; cost s reads",
+    "R2": "p^s = p^(s-1) = p^(s-2) (p^0 = L = 0 prediction), s >= 2, s = 8 forced; cost s reads and s + 1 upper-layer passes",
+    "R3": "||r^s|| / ||r^0|| <= tau2 with r = U M Q z, s = 1..7, s = 8 forced; cost s + 1 reads"
+  },
+  "study": "lsr"
+}
