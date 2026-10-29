@@ -1,0 +1,33 @@
+{
+  "approval": "LSQT schedule release approved for step 3 (science jobs) on condition that every reload gate passed and the committed release is byte-identical to the runs-dir copy; reviewed against docs/prereg/LSQT.md",
+  "approved_by": "orchestrator (Opus-5.5, main agent)",
+  "conditions_checked": {
+    "byte_identical": "cmp of reports/p1l-lsqt/release.json and the runs-dir release: identical",
+    "reload_checks": "3724499, 3724500, 3724501: exit 0, config_equal, reload_identical, prediction_mismatches 0 (science config hash and prereg digest checked in the gate)"
+  },
+  "not_approved": "LT-U control: runs only if the best of the three arms reaches val EM >= 40 %, and only after orchestrator review",
+  "prereg_blake2b_128": "94ed7364da460aeec18cbd5da6b086ff",
+  "recorded_at": "2026-10-29T14:17:56+09:00",
+  "release": "reports/p1l-lsqt/release.json",
+  "release_blake2b_128": "85dbe7daede7cf633de28c09cd617485",
+  "release_committed_in": "ec91b3a7c14371a1a23f18954c3bb3803d333987",
+  "science_commit": "dd5e4c89b40a345289aa53647718da56dc3bbb12",
+  "scope": {
+    "etas": {
+      "LT-K4": null,
+      "LT-RG001": 0.01,
+      "LT-RG1": 1.0
+    },
+    "job_cap": 8,
+    "jobs": "three registered arms LT-K4, LT-RG001, LT-RG1 in parallel",
+    "projected_node_hours": 3.9,
+    "schedule": "--schedule /work/xg24i002/x10041/LoopLora/runs/p1l/lsqt/release.json",
+    "steps": {
+      "LT-K4": 17970,
+      "LT-RG001": 28005,
+      "LT-RG1": 28245
+    },
+    "walltime": "02:00:00, queue regular-g, --scale-up docs/prereg/LSQT.md"
+  },
+  "study": "LSQT"
+}

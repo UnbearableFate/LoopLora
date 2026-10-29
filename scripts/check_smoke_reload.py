@@ -16,13 +16,14 @@ import numpy as np
 import torch
 
 from looplora.infra.seeds import stable_hash
-from looplora.llm import dpfp, dpfp_run, lsq, lsq_run
+from looplora.llm import dpfp, dpfp_run, lsq, lsq_run, lsqt, lsqt_run, lsqt_release
 from looplora.llm.dpfp_release import prereg_digest
 from looplora.llm.read_fix_run import validate
 from looplora.llm.run import source_metadata
 from looplora.sym.stats import load_samples
 
-STUDIES = {'DPFP': (dpfp, dpfp_run), 'DPFP-X': (dpfp, dpfp_run), 'LSQ': (lsq, lsq_run)}
+STUDIES = {'DPFP': (dpfp, dpfp_run), 'DPFP-X': (dpfp, dpfp_run), 'LSQ': (lsq, lsq_run), 'LSQT': (lsqt, lsqt_run), 'LSQT-U': (lsqt, lsqt_run)}
+PREREG_DIGESTS = {'DPFP-X': prereg_digest, 'LSQT': lsqt_release.prereg_digest, 'LSQT-U': lsqt_release.prereg_digest}
 EPISODES = 100  # the smoke's evaluation size
 
 
@@ -51,10 +52,10 @@ def check(release_path, root, arm):
     options = dict(eta=record['store_eta']) if study == 'LSQ' else {}  # the smoke's own ridge strength (RG arms only)
     expected = normalized(module.configuration(arm, steps, E=E, smoke=True, **options))
     require(record['config'] == expected, f'{arm}: the smoke ran another config than the code builds for E{E}, {steps} steps')
-    if study == 'DPFP-X':  # the science config the runner will build at the released steps must be the frozen one
+    if study in PREREG_DIGESTS:  # the science config the runner will build at the released steps must be the frozen one
         science = stable_hash(module.configuration(arm, release['steps_by_arm'][arm], E=E))
         require(science == release['config_hashes'][arm], f'{arm}: the release holds another science config hash')
-        require(release['prereg_blake2b_128'] == prereg_digest(), f'{arm}: the registration differs from the release')
+        require(release['prereg_blake2b_128'] == PREREG_DIGESTS[study](), f'{arm}: the registration differs from the release')
     experiment = runner.load_inference(folder / 'writer.pt')
     try:
         require(normalized(experiment.config) == expected, f'{arm}: the reloaded export has another config')

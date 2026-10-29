@@ -10,6 +10,7 @@ from transformers import Qwen3Config, Qwen3ForCausalLM
 
 from looplora.infra.seeds import derive_seed
 from looplora.llm.dpfp import DPFPExperiment, configuration
+from looplora.llm import lsqt, sq2
 from looplora.llm.inject import load_tokenizer
 from looplora.llm.read_fix_run import validate
 
@@ -94,6 +95,43 @@ def test_audit_takes_an_x256_export_with_the_rank_256_memory(model, tokenizer, t
     metrics = export(tmp_path, model, tokenizer, 16, arm='X256')
     result = audit.audit_one(tmp_path, tmp_path / 'audit', 16, model=model, tokenizer=tokenizer)
     assert (result['arm'], result['rank'], result['dpfp_nu'], result['E']) == ('X256', 256, 3, 16)
+    assert result['original_matches_record']['correct'] is True and result['original']['correct'] == metrics['correct']
+    assert result['max_repeated_logit_drift'] == 0. and result['optimizer_steps'] == 0
+    assert result['zero']['nll'] != result['original']['nll'] and result['shuffle']['nll'] != result['original']['nll']
+    assert all(math.isfinite(result[name]['nll']) for name in audit.CONDITIONS)
+
+
+def export_study(folder, model, tokenizer, count, arm):
+    """A tiny exported writer of an LSQT (LT-*) or SQ2 (S-*) arm and its record, as the study's runner writes them."""
+    if arm.startswith('LT-'):
+        cfg, cls = lsqt.configuration(arm, 10), lsqt.LSQTExperiment
+    else:
+        cfg, cls = sq2.configuration(arm, 10, eta=1e-2 if arm in ('S-RE', 'S-RC') else None, w_c=2. if arm in ('S-DC', 'S-RC') else None), sq2.SQ2Experiment
+    cfg['model'].update(layer=1)
+    experiment = cls(cfg, arm, model=model, tokenizer=tokenizer)
+    try:
+        experiment.standardize()
+        with torch.no_grad():
+            experiment.adapter.B.fill_(.2)
+        torch.save(dict(read_fix_version=1, arm=arm, config=experiment.config, step=5, signature=experiment.writer_signature(),
+                        adapter=experiment.inference_state()), folder / 'writer.pt')
+        metrics = validate(experiment, folder / 'val-5', count)
+    finally:
+        experiment.close()
+    record = dict(status='complete', smoke=False, arm=arm, rank=128, job_id='fixture', git_commit='f' * 40, config=cfg,
+                  training=dict(actual_steps=5, metrics={'5': metrics}))
+    if arm.startswith('S-'):
+        record['dpfp_nu'] = 3
+    (folder / 'record.json').write_text(json.dumps(record))
+    return metrics
+
+
+@pytest.mark.parametrize('arm', ['LT-K4', 'LT-RG001', 'S-DE', 'S-RC'])
+def test_audit_takes_the_lsqt_and_sq2_exports_with_their_own_loaders(model, tokenizer, tmp_path, arm):
+    audit = script()
+    metrics = export_study(tmp_path, model, tokenizer, 16, arm)
+    result = audit.audit_one(tmp_path, tmp_path / 'audit', 16, model=model, tokenizer=tokenizer)
+    assert (result['arm'], result['rank'], result['E']) == (arm, 128, 16) and result['dpfp_nu'] == (3 if arm.startswith('S-') else None)
     assert result['original_matches_record']['correct'] is True and result['original']['correct'] == metrics['correct']
     assert result['max_repeated_logit_drift'] == 0. and result['optimizer_steps'] == 0
     assert result['zero']['nll'] != result['original']['nll'] and result['shuffle']['nll'] != result['original']['nll']

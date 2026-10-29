@@ -1,0 +1,26 @@
+{
+  "best_arm": "LT-RG001",
+  "best_rg": "LT-RG001",
+  "best_rg_band": "open",
+  "candidate": null,
+  "correct": {
+    "LT-K4": 383,
+    "LT-RG001": 461,
+    "LT-RG1": 426
+  },
+  "e8_retrain": false,
+  "outcome": "no_candidate",
+  "study": "LSQT",
+  "trained_lsq_line": "open",
+  "u_control_proposed": true,
+  "vs_d128_3_pp": {
+    "LT-K4": -22.5,
+    "LT-RG001": -14.7,
+    "LT-RG1": -18.2
+  },
+  "vs_r_r128_pp": {
+    "LT-K4": 4.8,
+    "LT-RG001": 12.6,
+    "LT-RG1": 9.1
+  }
+}

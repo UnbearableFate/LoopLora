@@ -69,8 +69,9 @@ class AdapterConfig:
             raise ValueError("store_eta must be finite and positive")
         if (self.store != "delta" or self.unit_query) and self.variant not in MEMORY_VARIANTS:
             raise ValueError("store and unit_query require a memory variant")
-        if self.store != "delta" and (self.gate != "scalar" or self.dpfp_nu):
-            raise ValueError("least-squares stores require scalar gates and no DPFP features")
+        if self.store != "delta" and (self.gate != "scalar" or (self.dpfp_nu and self.store != "ridge")):
+            # SQ2 (docs/prereg/SQ2.md) runs the ridge store on DPFP features; the sweep store stays plain.
+            raise ValueError("least-squares stores require scalar gates; only the ridge store takes DPFP features")
         if self.unit_query and self.dpfp_nu:
             raise ValueError("unit_query is part of the DPFP query map; enable one of them")
         for name in ("lambda_init", "beta_init"):

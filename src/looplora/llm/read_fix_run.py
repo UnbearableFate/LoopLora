@@ -130,11 +130,15 @@ def eligible_e8(lock,arms,rank=32):
     return 8
 
 
-def fit(experiment,out,steps,*,evaluate=True):
+def fit(experiment,out,steps,*,evaluate=True,data_seed=None,optimizer_state=None,warmup=20,time_limit=7000):
+    """The WP-L4 training loop. The keywords default to the original behaviour; SQ2's continuation passes a fresh data seed,
+    the loaded optimizer state, no warmup (constant lr) and its own wall-clock limit."""
     options=experiment.config['train']
-    seed=derive_seed(17,'llm','writer-data')
+    seed=derive_seed(17,'llm','writer-data') if data_seed is None else data_seed
     params=experiment.trainable_parameters()
     optimizer=torch.optim.AdamW(params,lr=.003,weight_decay=.01)
+    if optimizer_state is not None:
+        optimizer.load_state_dict(optimizer_state)
     primary={round(steps*k/5) for k in range(1,6)}
     # Preserve the task's matched-step OA comparison under A1's different budgets.
     matched={6580} if experiment.read_arm=='OArho' and not experiment.config['smoke'] and steps>=6580 else set()
@@ -147,7 +151,7 @@ def fit(experiment,out,steps,*,evaluate=True):
         for step in range(1,steps+1):
             begin=time.perf_counter()
             arrays,tokens=next(stream)
-            for group in optimizer.param_groups: group['lr']=.003*min(1.,step/20)
+            for group in optimizer.param_groups: group['lr']=.003*min(1.,step/warmup) if warmup else .003
             optimizer.zero_grad(set_to_none=True)
             batch=experiment.prepare(arrays,tokens=tokens)
             logits,x=experiment.score(batch,1,capture_inputs=True)
@@ -155,15 +159,19 @@ def fit(experiment,out,steps,*,evaluate=True):
             address,value=auxiliary_losses(experiment,batch,x)
             read,decor=extra_losses(experiment,batch,x)
             loss=main+address+value+read+decor
+            coefficient=experiment.coefficient_loss(batch,x) if hasattr(experiment,'coefficient_loss') else None
+            if coefficient is not None: loss=loss+coefficient.to(loss.dtype)
             if not bool(torch.isfinite(loss)): raise FloatingPointError(f'nonfinite step{step}')
             loss.backward()
             grad=torch.nn.utils.clip_grad_norm_(params,1.,error_if_nonfinite=True)
             optimizer.step(); synchronize(experiment.device)
             duration=time.perf_counter()-begin; durations.append(duration)
             if step==1 or step%50==0 or step==steps:
+                if hasattr(experiment,'observe'): experiment.observe(batch,x)
                 row=dict(step=step,loss=float(loss.detach()),main_loss=float(main.detach()),
                     address_loss=float(address.detach()),value_loss=float(value.detach()),
                     read_loss=float(read.detach()),decorrelation_loss=float(decor.detach()),
+                    **({} if coefficient is None else dict(coefficient_loss=float(coefficient.detach()))),
                     grad_norm=float(grad),clipped=bool(grad>1),step_seconds=duration,
                     lr=optimizer.param_groups[0]['lr'],data_seed=seed,
                     # Optional per-experiment columns (WP-L7: store conditioning); none for the WP-L4/L5 arms.
@@ -172,7 +180,7 @@ def fit(experiment,out,steps,*,evaluate=True):
                 print(json.dumps(dict(arm=experiment.read_arm,**row)),flush=True)
             if evaluate and step in checkpoints:
                 metrics[str(step)]=validate(experiment,out/f'val-{step}',experiment.config['eval']['episodes'])
-            if time.perf_counter()-tick>7000 and step!=steps:
+            if time.perf_counter()-tick>time_limit and step!=steps:
                 raise RuntimeError('fixed WP-L4 schedule exceeded its measured allowance')
     save_checkpoint(experiment,optimizer,out,steps)
     result=dict(actual_steps=steps,training_episodes=steps*32,training_queries=steps*128,

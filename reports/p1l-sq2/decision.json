@@ -1,0 +1,36 @@
+{
+  "advances": false,
+  "alone": {
+    "S-DC": {
+      "em_gain_pp": -2.4,
+      "meets_1_and_2": false,
+      "read_error_ratio": 0.9824729799343506
+    },
+    "S-RE": {
+      "em_gain_pp": 6.9,
+      "meets_1_and_2": false,
+      "read_error_ratio": 0.5459165669149468
+    }
+  },
+  "candidate": null,
+  "clean_floor": 0.887,
+  "conditions": {
+    "em_gain": false,
+    "read_error_halved": false,
+    "stable_decoding": true
+  },
+  "correct": {
+    "S-DC": 630,
+    "S-DE": 654,
+    "S-RC": 695,
+    "S-RE": 723
+  },
+  "em_gap_pp": 4.1,
+  "interaction_pp": -0.4,
+  "line": "learned-writer line stays stopped",
+  "non_primary_at_080": [],
+  "prediction_holds": false,
+  "primary": "S-RC against S-DE",
+  "read_error_ratio": 0.5541671747575473,
+  "study": "SQ2"
+}

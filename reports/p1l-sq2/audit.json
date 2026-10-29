@@ -1,0 +1,151 @@
+{
+  "git_commit": "1ac2ee18818bfe970dd814637984afc7336af6d1",
+  "runs": {
+    "S-DC-E16": {
+      "E": 16,
+      "arm": "S-DC",
+      "checkpoint_git_commit": "3d543b430a2533df0057647081b07d874de893db",
+      "checkpoint_job_id": "3724485.opbs",
+      "dpfp_nu": 3,
+      "episodes": 1000,
+      "eval_seed": 4242,
+      "git_commit": "1ac2ee18818bfe970dd814637984afc7336af6d1",
+      "max_repeated_logit_drift": 0.0,
+      "optimizer_steps": 0,
+      "original": {
+        "correct": 630,
+        "em": 0.63,
+        "nll": 1.9571833610534668
+      },
+      "original_matches_record": {
+        "correct": true,
+        "record_correct": 630,
+        "record_nll": 1.9571833610534668
+      },
+      "rank": 128,
+      "shuffle": {
+        "correct": 2,
+        "em": 0.002,
+        "nll": 12.669072151184082
+      },
+      "source_dirty": false,
+      "source_hash": "6e98673a30e52d40732dc64498996612",
+      "steps": 6000,
+      "zero": {
+        "correct": 0,
+        "em": 0.0,
+        "nll": 16.43410873413086
+      }
+    },
+    "S-DE-E16": {
+      "E": 16,
+      "arm": "S-DE",
+      "checkpoint_git_commit": "3d543b430a2533df0057647081b07d874de893db",
+      "checkpoint_job_id": "3724484.opbs",
+      "dpfp_nu": 3,
+      "episodes": 1000,
+      "eval_seed": 4242,
+      "git_commit": "1ac2ee18818bfe970dd814637984afc7336af6d1",
+      "max_repeated_logit_drift": 0.0,
+      "optimizer_steps": 0,
+      "original": {
+        "correct": 654,
+        "em": 0.654,
+        "nll": 1.8944404125213623
+      },
+      "original_matches_record": {
+        "correct": true,
+        "record_correct": 654,
+        "record_nll": 1.8944404125213623
+      },
+      "rank": 128,
+      "shuffle": {
+        "correct": 1,
+        "em": 0.001,
+        "nll": 12.799331665039062
+      },
+      "source_dirty": false,
+      "source_hash": "6e98673a30e52d40732dc64498996612",
+      "steps": 6000,
+      "zero": {
+        "correct": 0,
+        "em": 0.0,
+        "nll": 15.948346138000488
+      }
+    },
+    "S-RC-E16": {
+      "E": 16,
+      "arm": "S-RC",
+      "checkpoint_git_commit": "3d543b430a2533df0057647081b07d874de893db",
+      "checkpoint_job_id": "3724487.opbs",
+      "dpfp_nu": 3,
+      "episodes": 1000,
+      "eval_seed": 4242,
+      "git_commit": "1ac2ee18818bfe970dd814637984afc7336af6d1",
+      "max_repeated_logit_drift": 0.0,
+      "optimizer_steps": 0,
+      "original": {
+        "correct": 695,
+        "em": 0.695,
+        "nll": 1.6947871446609497
+      },
+      "original_matches_record": {
+        "correct": true,
+        "record_correct": 695,
+        "record_nll": 1.6947871446609497
+      },
+      "rank": 128,
+      "shuffle": {
+        "correct": 1,
+        "em": 0.001,
+        "nll": 12.876529693603516
+      },
+      "source_dirty": false,
+      "source_hash": "6e98673a30e52d40732dc64498996612",
+      "steps": 6000,
+      "zero": {
+        "correct": 0,
+        "em": 0.0,
+        "nll": 10.331427574157715
+      }
+    },
+    "S-RE-E16": {
+      "E": 16,
+      "arm": "S-RE",
+      "checkpoint_git_commit": "3d543b430a2533df0057647081b07d874de893db",
+      "checkpoint_job_id": "3724486.opbs",
+      "dpfp_nu": 3,
+      "episodes": 1000,
+      "eval_seed": 4242,
+      "git_commit": "1ac2ee18818bfe970dd814637984afc7336af6d1",
+      "max_repeated_logit_drift": 0.0,
+      "optimizer_steps": 0,
+      "original": {
+        "correct": 723,
+        "em": 0.723,
+        "nll": 1.642127275466919
+      },
+      "original_matches_record": {
+        "correct": true,
+        "record_correct": 723,
+        "record_nll": 1.642127275466919
+      },
+      "rank": 128,
+      "shuffle": {
+        "correct": 0,
+        "em": 0.0,
+        "nll": 12.727615356445312
+      },
+      "source_dirty": false,
+      "source_hash": "6e98673a30e52d40732dc64498996612",
+      "steps": 6000,
+      "zero": {
+        "correct": 1,
+        "em": 0.001,
+        "nll": 10.108259201049805
+      }
+    }
+  },
+  "source_dirty": false,
+  "source_hash": "6e98673a30e52d40732dc64498996612"
+}

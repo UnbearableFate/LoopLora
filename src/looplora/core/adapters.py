@@ -218,7 +218,7 @@ class MemoryAdapter(AdapterBase):
         store = self.cfg.store
         if store == "ridge":
             return memory.ridge_final(M0, u, valid, write, reset, K=self.K, V=self.V, lam=lam,
-                                      eta=self.cfg.store_eta, eps=self.cfg.eps)
+                                      eta=self.cfg.store_eta, eps=self.cfg.eps, **self._key_features())
         if store == "sweep":
             return memory.sweep_final(M0, u, valid, write, reset, K=self.K, V=self.V, lam=lam,
                                       eps=self.cfg.eps, sweeps=self.cfg.store_sweeps)

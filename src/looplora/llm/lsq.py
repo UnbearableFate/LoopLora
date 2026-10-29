@@ -10,6 +10,9 @@ from .lsq_release import ETA_BOUNDS,SPECS
 from .read_fix import ReadFixExperiment,configuration as read_fix_configuration
 
 SWEEPS=4
+STORE_RULES={'ridge':'ridge least squares, weights lam^(n-1-j) of the learned decay gate, float64 Cholesky solve',
+             'sweep':'the beta = 1 delta scan_final repeated 4 times (Kaczmarz), learned decay gate',
+             'delta':'the deployed decay-first delta scan_final of R, learned decay and write-strength gates, unchanged'}
 
 
 def configuration(arm,steps,*,E=16,smoke=False,eta=None):
@@ -34,9 +37,7 @@ def configuration(arm,steps,*,E=16,smoke=False,eta=None):
         cfg['model'].update(store='sweep',store_sweeps=SWEEPS)
     cfg['lsq']=dict(arm=arm,base_arm='R',rank=rank,store=store,eta=None if eta is None else float(eta),
         sweeps=SWEEPS if store=='sweep' else None,
-        store_rule={'ridge':'ridge least squares, weights lam^(n-1-j) of the learned decay gate, float64 Cholesky solve',
-                    'sweep':'the beta = 1 delta scan_final repeated 4 times (Kaczmarz), learned decay gate',
-                    'delta':'the deployed decay-first delta scan_final of R, learned decay and write-strength gates, unchanged'}[store],
+        store_rule=STORE_RULES[store],
         query='unit L2 normalization of Q z at read (eps 1e-6)',parameter_free=True)
     return cfg
 

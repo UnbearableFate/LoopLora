@@ -13,7 +13,7 @@ from pathlib import Path
 import pytest
 
 from looplora.infra.seeds import stable_hash
-from looplora.llm import dpfp_release, lsq_release, release
+from looplora.llm import dpfp_release, lsq_release, lsqt_release, release, sq2_release
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -27,11 +27,14 @@ def load_script(name):
 
 prepare_lsq = load_script('prepare_lsq_release')
 prepare_dpfp = load_script('prepare_dpfp_release')
+prepare_sq2 = load_script('prepare_sq2_release')
 
 COMMIT = 'a' * 40
+NUMERICS = dict(file_blake2b_128='c' * 32, eta=1e-2, w_c=4.0)
 EVALS = (0.9, 0.91, 0.89, 1.07, 0.9)  # seconds of the five 100-episode smoke evaluations
 SENTINEL = 987654  # a smoke "score": it must never reach a release
-STEP = {arm: 0.15 + 0.01 * i for i, arm in enumerate(lsq_release.ARMS + dpfp_release.ARMS + dpfp_release.XARMS)}  # seconds per training step
+STEP = {arm: 0.15 + 0.01 * i for i, arm in enumerate(
+    lsq_release.ARMS + dpfp_release.ARMS + dpfp_release.XARMS + lsqt_release.ARMS + sq2_release.ARMS + (lsqt_release.CONTROL,))}  # seconds per training step
 
 STORAGE_BOTH = ['L32-K4', 'L32-RG', 'L128-K4', 'L128-RG']
 MIXED = ['L32-U', 'L128-K4', 'L128-RG']
@@ -50,7 +53,16 @@ def smoke_record(study, arm, *, steps=2400, E=16, commit=COMMIT, tweak=None):
     config = dict(smoke=True, task=dict(E=E), eval=dict(episodes=100))
     record = dict(status='complete', smoke=True, arm=arm, source_dirty=False, git_commit=commit, source_hash='0' * 32,
                   job_id='5.opbs', host='mg0001')
-    if study == 'LSQ':
+    if study == 'LSQT':
+        store, eta = lsqt_release.SPECS[arm]
+        config['lsqt'] = dict(arm=arm)
+        record.update(rank=128, store=store, store_eta=eta)
+    elif study == 'SQ2':
+        store, coefficient = sq2_release.SPECS[arm]
+        config['sq2'] = dict(arm=arm, coefficient=coefficient, numerics=NUMERICS['file_blake2b_128'])
+        record.update(rank=128, dpfp_nu=3, store=store, store_eta=NUMERICS['eta'] if store == 'ridge' else None,
+                      coefficient_weight=NUMERICS['w_c'] if coefficient else None, parent=dict(config_hash=sq2_release.PARENT['config_hash']))
+    elif study == 'LSQ':
         rank, store = lsq_release.SPECS[arm]
         config['lsq'] = dict(arm=arm)
         record.update(rank=rank, store=store, store_eta=3e-3 if store == 'ridge' else None)
@@ -540,3 +552,254 @@ def test_x256_smoke_must_not_carry_a_backbone_and_dpfp_releases_are_unchanged(tm
     written = prepare_dpfp.prepare(dpfp_root, tmp_path / 'dpfp-release.json')
     assert 'config_hashes' not in written and 'prereg_blake2b_128' not in written and written['study'] == 'DPFP'
     assert written['scale_up'] == 'docs/prereg/DPFP.md'
+
+
+# ------------------------------------------------------------------------------------- LSQT (WP-L12, docs/prereg/LSQT.md)
+
+LSQT_HASHES = {arm: f'{i}{i}' * 16 for i, arm in enumerate(lsqt_release.ARMS, 1)}
+
+
+def lsqt_steps(arm):
+    return expected_steps(arm)
+
+
+def test_an_lsqt_release_names_the_three_arms_etas_hashes_and_the_runner_accepts_it(tmp_path):
+    root = write_smokes(tmp_path / 'smoke', 'LSQT', lsqt_release.ARMS)
+    out = tmp_path / 'release.json'
+    steps_only = prepare_dpfp.prepare(root, None, study='LSQT')
+    assert steps_only['steps_by_arm'] == {arm: lsqt_steps(arm) for arm in lsqt_release.ARMS} and 'config_hashes' not in steps_only
+    with pytest.raises(ValueError, match='config hashes'):
+        prepare_dpfp.prepare(root, out, study='LSQT')
+    assert not out.exists()
+    made = prepare_dpfp.prepare(root, out, study='LSQT', config_hashes=LSQT_HASHES)
+    written = json.loads(out.read_text())
+    assert written == made and (written['study'], written['E'], written['science_commit']) == ('LSQT', 16, COMMIT)
+    assert written['scale_up'] == 'docs/prereg/LSQT.md' and written['config_hashes'] == LSQT_HASHES
+    assert written['etas'] == {'LT-K4': None, 'LT-RG001': 1e-2, 'LT-RG1': 1.0}
+    assert written['prereg_blake2b_128'] == lsqt_release.prereg_digest() == '94ed7364da460aeec18cbd5da6b086ff'
+    assert (written['smoke']['steps'], written['walltime'], written['max_job_seconds']) == (2400, '02:00:00', 7200)
+    assert 'LT-U' not in written['steps_by_arm'] and set(written['steps_by_arm']) == set(lsqt_release.ARMS)
+    for arm in lsqt_release.ARMS:
+        assert lsqt_release.scheduled_steps(arm, None, written) == lsqt_steps(arm)
+        assert 1.5 * (written['steps_by_arm'][arm] * STEP[arm] + 5 * 10 * max(EVALS)) + 90 <= 7200
+    assert str(SENTINEL) not in out.read_text() and written['smoke']['quality_scores_exposed'] is False
+    with pytest.raises(FileExistsError):
+        prepare_dpfp.prepare(root, out, study='LSQT', config_hashes=LSQT_HASHES)
+    for hashes in ({'LT-K4': LSQT_HASHES['LT-K4']}, {**LSQT_HASHES, 'LT-RG1': 'short'}, {**LSQT_HASHES, 'LT-U': 'c3' * 16}):
+        with pytest.raises(ValueError, match='config_hashes'):
+            prepare_dpfp.prepare(root, tmp_path / 'other.json', study='LSQT', config_hashes=hashes)
+    with pytest.raises(ValueError, match='E8'):
+        prepare_dpfp.prepare(root, tmp_path / 'e8.json', study='LSQT', e8_decision=tmp_path / 'lock.json')
+    with pytest.raises(ValueError):  # a release that drops an arm, or names the control, is not one the runner takes
+        prepare_dpfp.check_release({**written, 'steps_by_arm': {k: v for k, v in written['steps_by_arm'].items() if k != 'LT-K4'}}, E=16)
+    with pytest.raises(ValueError):
+        prepare_dpfp.check_release({**written, 'steps_by_arm': {**written['steps_by_arm'], 'LT-U': 5000}}, E=16)
+
+
+LSQT_TWEAKS = [
+    (lambda r: r.update(rank=32), 'belongs to another arm'),
+    (lambda r: r.update(store='delta' if r['store'] != 'delta' else 'sweep'), 'belongs to another arm'),
+    (lambda r: r.update(store_eta=.5), 'belongs to another arm'),
+    (lambda r: r['config'].update(lsq=r['config']['lsqt']), 'belongs to another arm'),
+    (lambda r: r['config']['lsqt'].update(arm='LT-RG1'), 'belongs to another arm'),
+]
+
+
+@pytest.mark.parametrize('tweak, message', COMMON_TWEAKS + LSQT_TWEAKS)
+def test_an_lsqt_smoke_record_that_is_not_the_arms_ten_percent_smoke_is_refused(tmp_path, tweak, message):
+    root = write_smokes(tmp_path / 'smoke', 'LSQT', lsqt_release.ARMS, tweaks={'LT-RG001': tweak})
+    with pytest.raises(ValueError, match=message):
+        prepare_dpfp.prepare(root, tmp_path / 'release.json', study='LSQT', config_hashes=LSQT_HASHES)
+    assert not (tmp_path / 'release.json').exists()
+
+
+def test_the_lsqt_script_runs_without_torch_or_numpy_and_never_overwrites(tmp_path):
+    root = write_smokes(tmp_path / 'smoke', 'LSQT', lsqt_release.ARMS)
+    hashes = tmp_path / 'hashes.json'
+    hashes.write_text(json.dumps(dict(config_hashes=LSQT_HASHES)))
+    out = tmp_path / 'release.json'
+    code = ("import runpy, sys\nsys.modules['torch'] = None\nsys.modules['numpy'] = None\n"
+            "script = sys.argv[1]\nsys.argv = sys.argv[1:]\nrunpy.run_path(script, run_name='__main__')")
+
+    def run(*arguments):
+        return subprocess.run([sys.executable, '-c', code, str(ROOT / 'scripts' / 'prepare_dpfp_release.py'), '--study', 'LSQT', *arguments],
+                              env={**os.environ, 'PYTHONPATH': str(ROOT / 'src')}, capture_output=True, text=True, cwd=tmp_path)
+
+    only = run('--root', str(root), '--steps-only')
+    assert only.returncode == 0, only.stderr
+    assert json.loads(only.stdout.strip().splitlines()[-1]) == {arm: lsqt_steps(arm) for arm in lsqt_release.ARMS}
+    done = run('--root', str(root), '--config-hashes', str(hashes), '--out', str(out))
+    assert done.returncode == 0, done.stderr
+    printed = json.loads(done.stdout.strip().splitlines()[-1])
+    assert printed['study'] == 'LSQT' and printed['quality_scores_exposed'] is False
+    assert json.loads(out.read_text())['steps_by_arm'] == printed['steps_by_arm']
+    again = run('--root', str(root), '--config-hashes', str(hashes), '--out', str(out))
+    assert again.returncode != 0 and 'FileExistsError' in again.stderr
+
+
+# --------------------------------------------------------------------------------------- SQ2 (WP-L12, docs/prereg/SQ2.md)
+
+SQ2_HASHES = {arm: f'{i}{i}' * 16 for i, arm in enumerate(sq2_release.ARMS, 5)}
+SQ2_STEP0 = dict(study='SQ2', check='step0', arm='S-DE', passed=True, correct=608, nll=2.1291537284851074)
+
+
+def sq2_inputs(tmp_path, *, tweaks=None, step_scale=1., steps=600):
+    numerics_path = tmp_path / 'numerics.json'
+    numerics_path.write_text(json.dumps(dict(eta=NUMERICS['eta'], w_c=NUMERICS['w_c'], eta_curve=[dict(eta=1e-2, error=.1)],
+                                              gradient_ratio=dict(median=3.2), ridge_store_gradient_ratio_median=2.9)))
+    digest = sq2_release.file_digest(numerics_path)
+    NUMERICS['file_blake2b_128'] = digest
+    root = write_smokes(tmp_path / 'smoke', 'SQ2', sq2_release.ARMS, tweaks=tweaks, steps=steps)
+    if step_scale != 1.:
+        for arm in sq2_release.ARMS:
+            path = root / arm / 'record.json'
+            record = json.loads(path.read_text())
+            record['training']['steady_step_mean_seconds'] *= step_scale
+            path.write_text(json.dumps(record))
+    step0 = tmp_path / 'step0.json'
+    step0.write_text(json.dumps(SQ2_STEP0))
+    return root, numerics_path, step0
+
+
+def test_an_sq2_release_freezes_one_n_the_numerics_the_step0_check_and_the_hashes(tmp_path):
+    root, numerics, step0 = sq2_inputs(tmp_path)
+    steps_only = prepare_sq2.prepare(root, None, numerics=numerics)
+    slowest = max(STEP[arm] for arm in sq2_release.ARMS)
+    available = (3600 - 90) / 1.5 - 6 * 10 * max(EVALS)
+    fits = 5 * math.floor(available / slowest / 5)
+    expected = min(6000, fits)
+    assert expected == 6000 and set(steps_only['steps_by_arm'].values()) == {6000}  # 0.2 s a step: the cap, not the hour, decides
+    out = tmp_path / 'sub' / 'release.json'
+    with pytest.raises(ValueError, match='step-0 check'):
+        prepare_sq2.prepare(root, out, numerics=numerics, config_hashes=SQ2_HASHES)
+    made = prepare_sq2.prepare(root, out, numerics=numerics, step0=step0, config_hashes=SQ2_HASHES)
+    written = json.loads(out.read_text())
+    assert written == made and (written['study'], written['E'], written['science_commit']) == ('SQ2', 16, COMMIT)
+    assert written['steps_by_arm'] == {arm: 6000 for arm in sq2_release.ARMS}
+    assert written['primary_eval_steps_by_arm']['S-RC'] == [1200, 2400, 3600, 4800, 6000]
+    assert written['numerics']['eta'] == NUMERICS['eta'] and written['numerics']['w_c'] == NUMERICS['w_c']
+    assert written['numerics']['file_blake2b_128'] == sq2_release.file_digest(numerics)
+    assert written['step0'] == SQ2_STEP0 and written['config_hashes'] == SQ2_HASHES and written['scale_up'] is None
+    assert written['prereg_blake2b_128'] == sq2_release.prereg_digest() == '9f725a62e918ac668dd70220873038c5'
+    assert (written['smoke']['steps'], written['walltime'], written['max_job_seconds']) == (600, '01:00:00', 3600)
+    assert written['parent']['config_hash'] == sq2_release.PARENT['config_hash'] and written['parent']['digests'] == sq2_release.PARENT['digests']
+    for arm in sq2_release.ARMS:
+        assert sq2_release.scheduled_steps(arm, None, written) == 6000
+        assert written['sizing_by_arm'][arm]['expected_seconds_with_margin'] <= 3600 and written['sizing_by_arm'][arm]['evaluations'] == 6
+    assert str(SENTINEL) not in out.read_text() and written['smoke']['quality_scores_exposed'] is False
+    with pytest.raises(FileExistsError):
+        prepare_sq2.prepare(root, out, numerics=numerics, step0=step0, config_hashes=SQ2_HASHES)
+
+
+def test_n_is_the_largest_multiple_of_five_that_fits_one_hour_for_the_slowest_arm(tmp_path):
+    root, numerics, _ = sq2_inputs(tmp_path, step_scale=3.)  # 0.45 to 0.48 s a step
+    steps = prepare_sq2.prepare(root, None, numerics=numerics)['steps_by_arm']
+    slowest = 3 * max(STEP[arm] for arm in sq2_release.ARMS)
+    available = (3600 - 90) / 1.5 - 6 * 10 * max(EVALS)
+    n = 5 * math.floor(available / slowest / 5)
+    assert n < 6000 and set(steps.values()) == {n}  # the same N for every arm, from the slowest
+    assert 1.5 * (n * slowest + 6 * 10 * max(EVALS)) + 90 <= 3600 < 1.5 * ((n + 5) * slowest + 6 * 10 * max(EVALS)) + 90
+    assert release.largest_schedule(slowest, 10 * max(EVALS), evaluations=6, wall_seconds=3600) == n
+
+
+SQ2_TWEAKS = [
+    (lambda r: r.update(store='ridge' if r['store'] == 'delta' else 'delta'), 'another arm or to other numerics'),
+    (lambda r: r['config']['sq2'].update(coefficient=not r['config']['sq2']['coefficient']), 'another arm or to other numerics'),
+    (lambda r: r['config']['sq2'].update(numerics='d' * 32), 'another arm or to other numerics'),
+    (lambda r: r['config']['sq2'].update(arm='S-DE'), 'another arm or to other numerics'),
+    (lambda r: r.update(dpfp_nu=2), 'another arm or to other numerics'),
+    (lambda r: r['parent'].update(config_hash='0' * 32), 'another arm or to other numerics'),
+    (lambda r: r.update(store_eta=.5 if r['store'] == 'ridge' else 1e-2), 'another eta or w_c'),
+    (lambda r: r.update(coefficient_weight=None if r['coefficient_weight'] else 4.0), 'another eta or w_c'),
+]
+
+
+@pytest.mark.parametrize('tweak, message', COMMON_TWEAKS + SQ2_TWEAKS)
+def test_an_sq2_smoke_record_that_is_not_the_arms_smoke_of_these_numerics_is_refused(tmp_path, tweak, message):
+    # the common tweaks are written for a 2,400-step smoke (marks 480, ...): so is this one
+    root, numerics, _ = sq2_inputs(tmp_path, tweaks={'S-RC': tweak}, steps=2400)
+    with pytest.raises(ValueError, match=message):
+        prepare_sq2.prepare(root, tmp_path / 'release.json', numerics=numerics, steps=2400)
+    assert not (tmp_path / 'release.json').exists()
+
+
+def test_an_sq2_release_needs_all_four_smokes_one_commit_a_passed_step0_and_exact_hashes(tmp_path):
+    root, numerics, step0 = sq2_inputs(tmp_path)
+    out = tmp_path / 'release.json'
+    for bad in ({'S-DE': SQ2_HASHES['S-DE']}, {**SQ2_HASHES, 'S-RC': 'short'}, {**SQ2_HASHES, 'S-XX': 'e' * 32}):
+        with pytest.raises(ValueError, match='config_hashes'):
+            prepare_sq2.prepare(root, out, numerics=numerics, step0=step0, config_hashes=bad)
+    failed = tmp_path / 'failed.json'
+    failed.write_text(json.dumps({**SQ2_STEP0, 'passed': False, 'correct': 607}))
+    with pytest.raises(ValueError, match='void'):
+        prepare_sq2.prepare(root, out, numerics=numerics, step0=failed, config_hashes=SQ2_HASHES)
+    with pytest.raises(ValueError, match='step-0 check'):
+        prepare_sq2.prepare(root, out, numerics=numerics, config_hashes=SQ2_HASHES)
+    path = root / 'S-DC' / 'record.json'
+    record = json.loads(path.read_text())
+    record['git_commit'] = 'b' * 40
+    path.write_text(json.dumps(record))
+    with pytest.raises(ValueError, match='different commits'):
+        prepare_sq2.prepare(root, out, numerics=numerics, step0=step0, config_hashes=SQ2_HASHES)
+    (root / 'S-DC' / 'record.json').unlink()
+    with pytest.raises(FileNotFoundError):
+        prepare_sq2.prepare(root, out, numerics=numerics, step0=step0, config_hashes=SQ2_HASHES)
+    assert not out.exists()
+    with pytest.raises(ValueError):  # a release whose arms carry different counts is not one the runner takes
+        prepare_sq2.check_release(dict(study='SQ2', E=16, steps_by_arm={**{a: 6000 for a in sq2_release.ARMS}, 'S-RC': 5000}))
+
+
+def test_the_sq2_script_runs_without_torch_or_numpy_and_never_overwrites(tmp_path):
+    root, numerics, step0 = sq2_inputs(tmp_path)
+    hashes = tmp_path / 'hashes.json'
+    hashes.write_text(json.dumps(dict(config_hashes=SQ2_HASHES)))
+    out = tmp_path / 'release.json'
+    code = ("import runpy, sys\nsys.modules['torch'] = None\nsys.modules['numpy'] = None\n"
+            "script = sys.argv[1]\nsys.argv = sys.argv[1:]\nrunpy.run_path(script, run_name='__main__')")
+
+    def run(*arguments):
+        return subprocess.run([sys.executable, '-c', code, str(ROOT / 'scripts' / 'prepare_sq2_release.py'), '--root', str(root),
+                               '--numerics', str(numerics), *arguments],
+                              env={**os.environ, 'PYTHONPATH': str(ROOT / 'src')}, capture_output=True, text=True, cwd=tmp_path)
+
+    only = run('--steps-only')
+    assert only.returncode == 0, only.stderr
+    assert json.loads(only.stdout.strip().splitlines()[-1]) == {arm: 6000 for arm in sq2_release.ARMS}
+    done = run('--step0', str(step0), '--config-hashes', str(hashes), '--out', str(out))
+    assert done.returncode == 0, done.stderr
+    printed = json.loads(done.stdout.strip().splitlines()[-1])
+    assert printed['study'] == 'SQ2' and printed['quality_scores_exposed'] is False and (printed['eta'], printed['w_c']) == (1e-2, 4.0)
+    assert json.loads(out.read_text())['steps_by_arm'] == printed['steps_by_arm']
+    again = run('--step0', str(step0), '--config-hashes', str(hashes), '--out', str(out))
+    assert again.returncode != 0 and 'FileExistsError' in again.stderr
+
+
+# ------------------------------------------------------------------- LSQT-U: the conditional control, released alone
+
+def test_the_lsqt_u_release_names_the_control_alone_and_the_runner_accepts_it(tmp_path):
+    root = write_smokes(tmp_path / 'smoke', 'LSQT', (lsqt_release.CONTROL,))
+    out = tmp_path / 'release.json'
+    hashes = {'LT-U': 'ab' * 16}
+    steps_only = prepare_dpfp.prepare(root, None, study='LSQT-U')
+    assert steps_only['steps_by_arm'] == {'LT-U': expected_steps('LT-U')} and steps_only['study'] == 'LSQT-U'
+    with pytest.raises(ValueError, match='config hashes'):
+        prepare_dpfp.prepare(root, out, study='LSQT-U')
+    made = prepare_dpfp.prepare(root, out, study='LSQT-U', config_hashes=hashes)
+    written = json.loads(out.read_text())
+    assert written == made and (written['study'], written['E'], written['science_commit']) == ('LSQT-U', 16, COMMIT)
+    assert written['scale_up'] == 'docs/prereg/LSQT.md' and written['etas'] == {'LT-U': None} and written['config_hashes'] == hashes
+    assert written['prereg_blake2b_128'] == lsqt_release.prereg_digest() and (written['walltime'], written['max_job_seconds']) == ('02:00:00', 7200)
+    assert lsqt_release.scheduled_steps('LT-U', None, written) == expected_steps('LT-U')
+    assert 1.5 * (written['steps_by_arm']['LT-U'] * STEP['LT-U'] + 5 * 10 * max(EVALS)) + 90 <= 7200
+    with pytest.raises(FileExistsError):
+        prepare_dpfp.prepare(root, out, study='LSQT-U', config_hashes=hashes)
+    for bad in ({}, {'LT-K4': 'ab' * 16}, {'LT-U': 'short'}, {**hashes, 'LT-K4': 'cd' * 16}):
+        with pytest.raises(ValueError, match='config_hashes'):
+            prepare_dpfp.prepare(root, tmp_path / 'other.json', study='LSQT-U', config_hashes=bad)
+    with pytest.raises(ValueError):  # the three-arm LSQT release does not take the control, nor the control's release the three arms
+        prepare_dpfp.check_release({**written, 'study': 'LSQT'}, E=16)
+    with pytest.raises(ValueError):
+        prepare_dpfp.check_release({**written, 'steps_by_arm': {**written['steps_by_arm'], 'LT-K4': 5000}}, E=16)
+    wrong = write_smokes(tmp_path / 'wrong', 'LSQT', (lsqt_release.CONTROL,), tweaks={'LT-U': lambda r: r.update(store='ridge')})
+    with pytest.raises(ValueError, match='belongs to another arm'):
+        prepare_dpfp.prepare(wrong, None, study='LSQT-U')

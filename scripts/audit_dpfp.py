@@ -1,6 +1,6 @@
-"""WP-L5 no-training audit of final DPFP checkpoints (docs/prereg/DPFP.md, descriptive diagnostics); compute only.
+"""WP-L5 no-training audit of final DPFP, LSQT (LT-*) and SQ2 (S-*) checkpoints (descriptive diagnostics); compute only.
 
-For each arm folder (record.json, writer.pt) it reloads the export with `dpfp_run.load_inference` and scores the 1,000 validation
+For each arm folder (record.json, writer.pt) it reloads the export with the study's own `load_inference` and scores the 1,000 validation
 episodes of the arm's own evaluation (eval seed 4242, one query each, as `read_fix_run.validate`) with the deployed memory
 (original), a zeroed memory and the memory of another episode (shuffle: a one-step roll of a seeded permutation, so no episode keeps
 its own memory). Reports EM and NLL per condition and whether the original reproduces the final validation of the record.
@@ -17,7 +17,7 @@ from torch.nn import functional as F
 
 from looplora.data.relations import generate
 from looplora.infra.seeds import derive_seed
-from looplora.llm.dpfp_run import load_inference
+from looplora.llm import dpfp_run, lsqt_run, sq2_run
 from looplora.llm.evaluate import _slice
 from looplora.llm.read_fix import controlled_score
 from looplora.llm.run import _write_json, source_metadata
@@ -27,13 +27,19 @@ from looplora.sym.evaluate import stratify_queries
 CONDITIONS = ('original', 'zero', 'shuffle')
 
 
+def load_inference(path, *, model=None, tokenizer=None, arm=''):
+    """The loader of the arm's study: LT-* from lsqt_run, S-* from sq2_run, the DPFP arms from dpfp_run."""
+    runner = lsqt_run if arm.startswith('LT-') else sq2_run if arm.startswith('S-') else dpfp_run
+    return runner.load_inference(path, model=model, tokenizer=tokenizer)
+
+
 @torch.no_grad()
 def audit_one(folder, out, count=1000, *, model=None, tokenizer=None):
     folder, out = Path(folder), Path(out)
     out.mkdir(parents=True, exist_ok=False)
     record = json.loads((folder / 'record.json').read_text())
     assert record['status'] == 'complete' and not record.get('smoke')
-    experiment = load_inference(folder / 'writer.pt', model=model, tokenizer=tokenizer)
+    experiment = load_inference(folder / 'writer.pt', model=model, tokenizer=tokenizer, arm=record['arm'])
     try:
         spec = make_task_spec(experiment.config)
         arrays = stratify_queries(generate(spec, 'val', 0, count, 4242), spec, [1], 4242)
@@ -58,7 +64,7 @@ def audit_one(folder, out, count=1000, *, model=None, tokenizer=None):
             for name, logits in scores.items():
                 correct[name].append((logits.argmax(-1) == batch.answer_ids).flatten().cpu().numpy())
                 nll[name].append(F.cross_entropy(logits.float().flatten(0, 1), batch.answer_ids.flatten(), reduction='none').cpu().numpy())
-        result = dict(**source_metadata(), arm=record['arm'], E=record['config']['task']['E'], rank=record['rank'], dpfp_nu=record['dpfp_nu'],
+        result = dict(**source_metadata(), arm=record['arm'], E=record['config']['task']['E'], rank=record['rank'], dpfp_nu=record.get('dpfp_nu'),
                       checkpoint_job_id=record['job_id'], checkpoint_git_commit=record['git_commit'], steps=record['training']['actual_steps'],
                       episodes=count, eval_seed=4242, optimizer_steps=0, max_repeated_logit_drift=drift)
         for name in CONDITIONS:

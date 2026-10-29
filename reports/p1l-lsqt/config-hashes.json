@@ -1,0 +1,12 @@
+{
+  "config_hashes": {
+    "LT-K4": "aa7bf01ce8ea390c9aef2d0ac7460dff",
+    "LT-RG001": "237eacbabdb5832bb0a68cd8fde4ef2f",
+    "LT-RG1": "e16683323e335a9451fed6bc47bc0679"
+  },
+  "steps_by_arm": {
+    "LT-K4": 17970,
+    "LT-RG001": 28005,
+    "LT-RG1": 28245
+  }
+}
