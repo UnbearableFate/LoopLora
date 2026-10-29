@@ -1,0 +1,33 @@
+{
+ "name": "s1b-a1-confirm",
+ "queue": "regular-g",
+ "nodes": 1,
+ "walltime": "01:30:00",
+ "scale_up": null,
+ "source": {
+  "kind": "commit",
+  "ref": "258f5f5a24eae684f640a9fd62679bb643470a76"
+ },
+ "argv": [
+  "-m",
+  "looplora.llm.s1b_run",
+  "--mode",
+  "evaluate",
+  "--set",
+  "confirmation",
+  "--manifest",
+  "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/manifest.lock.json",
+  "--release",
+  "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/release.json",
+  "--selection",
+  "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/dev-selection/selection.json",
+  "--entries",
+  "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/selected-entries.json",
+  "--open-root",
+  "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/open-root",
+  "--out",
+  "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/confirmation"
+ ],
+ "log": "/work/xg24i002/x10041/LoopLora/logs/pbs/s1b-a1-confirm-20261030-052205-2428093.log",
+ "submitted": "2026-10-30T05:22:05.470156"
+}
