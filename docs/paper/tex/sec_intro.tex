@@ -29,7 +29,7 @@ In a frozen language model at rank 128, one shared module read four times beats 
 The four-unshared-reads reader B8 fails its registered gate at both sizes; a copy of B8 started from the shared solution keeps that solution, and the verdict stays.  % LP9 LP16 BW1
 \item Learned writing is the weak point.
 In the symbolic task a learned writer gives a smaller, seed-dependent benefit, and a factorized writer gives a stronger walk-specific effect but loses single-hop accuracy.  % S3 S9
-In the language model, no learned writer reaches the registered 0.80 gate, including the DPFP and DPFP-X screens; each registered decision is to stop.  % LL9 DP1 DP4
+In the language model, no learned writer reaches the registered 0.80 gate, including the DPFP, DPFP-X, ridge-storage (SQ2) and trained least-squares (LSQT) screens; each registered decision keeps the learned-writer line stopped, and the trained least-squares line stays open in a band that neither closes nor triggers it.  % LL9 DP1 DP4 SQ1 LQ1
 A parser into a fixed table of the oracle's own codes drives the frozen reader at the oracle's level, but it is not a learned writer.  % CT1 CT2
 We therefore make no learned-writer and no end-to-end claim.
 \item The oracle result is bounded.

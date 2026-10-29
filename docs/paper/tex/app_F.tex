@@ -330,7 +330,7 @@ rank32 and rank128, 12.0\% and 33.5\%, were not rerun). No arm reaches the 80\% 
 D128-3 60.8\%. The best arm is above the 50\% trigger, so D128-3 was retrained once at E=8 under the registered rule and  % DP1
 reached 73.0\%, again below 0.80. The registered decision is stop: no writer is selected, the paper reports a negative result,  % DP1
 and no further writer screen follows; P1L-D, which would have run the P1-L learned condition for a selected writer, was not registered and
-was not run (the LSQ screen ran no arm, Section 8.3). No learned writer reaches the WP-L4 gate in this  % DP1 PD1 RX1
+was not run (the LSQ screen triggered by RFX ran no arm, Section 8.3; the later, separately registered SQ2 and LSQT screens are in Appendix~\ref{app:I}). No learned writer reaches the WP-L4 gate in this  % DP1 PD1 RX1
 project. DPFP does raise the EM (by 27.0 pp at rank32 and by 24.5 and 27.3 pp at rank128 over the references), lowers the normalized read
 error (0.39, 0.43 and 0.36 against 0.67 and 0.63) and raises the read-value head accuracy (30.2\%, 46.0\% and 51.0\% against 8.8\% and 19.7\%),
 but the clean/\allowbreak{}read gap narrows without closing, and the key overlap of the learned projections in the original space is not lower than R’s.
@@ -447,8 +447,7 @@ Mechanism evidence & Where and how does the walk happen? & Per-step readouts are
 
 \textbf{Negative interventions and the exact gate each did not meet.} The matrix lists each repair or test that failed its registered criterion. Each
 row is one study under its own conditions (one training seed or three, one optimizer, a fixed budget). The rows record which criterion was not met;
-they do not show that learned writing, an exact store, unshared reads or composition at rank32 is impossible. Not run: the LSQ arms (none was
-triggered), P1L-D and P1L-S; a warm start of B8 from M1-L4 kept the shared solution (Appendix~\ref{app:I}).
+they do not show that learned writing, an exact store, unshared reads or composition at rank32 is impossible. Not triggered: the LSQ arms of the RFX rule. Not run: P1L-D and P1L-S. A warm start of B8 from M1-L4 kept the shared solution (Appendix~\ref{app:I}).
 
 
 {\footnotesize

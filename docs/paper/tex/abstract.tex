@@ -7,7 +7,7 @@ At its trained depth the shared reader reaches hop 3; run deeper, the same check
 A label-free per-question stop raises hops 4 to 8 over the trained depth by +3.90 pp (0.6B) and +5.68 pp (1.7B), at the cost of hop 2 ($-10.83$ and $-12.27$ pp) and of extra reads, and no efficiency claim is made.  % LS1 LS3
 Learned writing is the weak point.
 In the symbolic task a learned writer gives a smaller, seed-dependent benefit, and a factorized writer keeps a walk-specific depth effect but fails to preserve single-hop accuracy.  % S3 S9
-In the language model, the completed validation screens, including the registered DPFP and DPFP-X screens, select no learned writer, despite informative input probes and a usable supplied-answer-code output path.  % LL2 LL3 LL9 DP1 DP4
+In the language model, the completed validation screens, including the registered DPFP, DPFP-X, ridge-storage (SQ2) and trained least-squares (LSQT) screens, select no learned writer, despite informative input probes and a usable supplied-answer-code output path; the best cells reach 72.3\% (SQ2) and 46.1\% (LSQT) against the 0.80 gate.  % LL2 LL3 LL9 DP1 DP4 SQ1 LQ1
 A parser into a fixed table of the oracle's own codes drives the frozen reader at the oracle's level (validation, one seed), but it is not a learned writer and is not compared with the DPFP results.  % CT1 CT2
 Per-step readouts are decoding only and bridge patching gives no causal claim; at rank 32 the readers did not learn to use the oracle memory.  % LP5 PC1 LP7
 The comparison is against a single read at the same rank, extra latency is reported as a cost, and no efficiency advantage over a larger-rank single read is claimed.  % FR1

@@ -1,0 +1,63 @@
+## SQ2 (G5): D128-3 continued 6,000 steps with ridge storage on the DPFP features and the coefficient loss; validation [0,1000), eval seed 4242, one seed (17)
+
+Registered decision: the primary contrast S-RC against S-DE does not advance; the learned-writer line stays stopped; no cell reaches 0.80.
+Primary contrast: EM gap +4.1 pp (needs >= +10.0), read error ratio 0.554 (needs <= 0.500), stable decoding met (S-RC clean-value head minimum 91.6%, floor 88.7%).
+
+| arm | storage | coefficient loss | correct of 1,000 | val EM % | normalized read error | clean-value head % | read-value head % |
+| --- | --- | --- | ---: | ---: | ---: | ---: | ---: |
+| S-DE | delta | no | 654 | 65.4 | 0.359 | 93.7 | 54.6 |
+| S-DC | delta | yes | 630 | 63.0 | 0.353 | 92.9 | 50.4 |
+| S-RE | ridge (DPFP features) | no | 723 | 72.3 | 0.196 | 93.6 | 66.2 |
+| S-RC | ridge (DPFP features) | yes | 695 | 69.5 | 0.199 | 92.9 | 66.4 |
+| D128-3 (parent, 22,370 steps) | delta | no | 608 | 60.8 | 0.363 | 90.6 | 51.0 |
+
+Single changes against S-DE: S-DC -2.4 pp (read error ratio 0.982); S-RE +6.9 pp (ratio 0.546); S-RC against S-RE -2.8 pp.
+Interaction (S-RC - S-RE) - (S-DC - S-DE): -0.4 pp (descriptive; standard error of the double difference about 4.4 pp).
+Step 0 S-DE: 608 correct, 60.8%, read error 0.363; gain over 6,000 steps +4.6 pp
+Step 0 S-DC: 608 correct, 60.8%, read error 0.363; gain over 6,000 steps +2.2 pp
+Step 0 S-RE: 687 correct, 68.7%, read error 0.312; gain over 6,000 steps +3.6 pp
+Step 0 S-RC: 687 correct, 68.7%, read error 0.312; gain over 6,000 steps +0.8 pp
+
+| arm | 0 | 1200 | 2400 | 3600 | 4800 | 6000 |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| S-DE EM % | 60.8 | 61.5 | 62.7 | 61.5 | 63.6 | 65.4 |
+| S-DC EM % | 60.8 | 61.1 | 63.6 | 62.3 | 64.4 | 63.0 |
+| S-RE EM % | 68.7 | 64.2 | 67.1 | 70.7 | 69.3 | 72.3 |
+| S-RC EM % | 68.7 | 63.9 | 66.8 | 68.5 | 68.2 | 69.5 |
+| S-DE read error | 0.363 | 0.390 | 0.364 | 0.370 | 0.361 | 0.359 |
+| S-DC read error | 0.363 | 0.388 | 0.385 | 0.364 | 0.364 | 0.353 |
+| S-RE read error | 0.312 | 0.274 | 0.242 | 0.202 | 0.216 | 0.196 |
+| S-RC read error | 0.312 | 0.304 | 0.226 | 0.217 | 0.215 | 0.199 |
+
+Gradient clip active at logged steps: S-DE 121 of 121, S-DC 121 of 121, S-RE 121 of 121, S-RC 121 of 121
+Zero / shuffled memory correct of 1,000 (original, zero, shuffled): S-DE 654/0/1; S-DC 630/0/2; S-RE 723/1/0; S-RC 695/0/1
+State bytes per episode: ridge arms 393216, delta arms 393216; inference parameters 475,138 in every arm
+
+## LSQT (G5): trained least-squares stores at r = 128 from scratch (unit query); validation [0,1000), eval seed 4242, one seed (17)
+
+Registered decision: no arm reaches 0.80; best ridge arm LT-RG001 46.1%, band open (40% to < 48.5%); trained-LSQ line open; U control proposed.
+
+| arm | store | steps | correct of 1,000 | val EM % | normalized read error | clean-value head % | read-value head % | minus R-r128 (pp) | minus D128-3 (pp) |
+| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| LT-K4 | four Kaczmarz sweeps | 17970 | 383 | 38.3 | 0.554 | 92.3 | 27.4 | +4.8 | -22.5 |
+| LT-RG001 | ridge, eta 0.01 | 28005 | 461 | 46.1 | 0.512 | 93.9 | 26.5 | +12.6 | -14.7 |
+| LT-RG1 | ridge, eta 1 | 28245 | 426 | 42.6 | 0.499 | 95.9 | 22.3 | +9.1 | -18.2 |
+| R-r128 (WP-L4, not rerun) | delta | 24645 | 335 | 33.5 | 0.631 | 93.3 | 19.7 |  |  |
+| D128-3 (DPFP) | delta | 22370 | 608 | 60.8 | 0.363 | 90.6 | 51.0 |  |  |
+
+Registered prediction (best ridge arm at least 50% with read error at most 0.35): did not hold (46.1%, 0.512).
+Ridge minus K4: LT-RG001 +7.8 pp, LT-RG1 +4.3 pp
+
+| arm | 20% | 40% | 60% | 80% | 100% |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| LT-K4 EM % | 14.9 | 25.9 | 30.4 | 37.6 | 38.3 |
+| LT-RG001 EM % | 23.6 | 35.7 | 42.1 | 46.9 | 46.1 |
+| LT-RG1 EM % | 23.0 | 30.1 | 35.7 | 36.6 | 42.6 |
+| LT-K4 read error | 0.635 | 0.617 | 0.597 | 0.572 | 0.554 |
+| LT-RG001 read error | 0.619 | 0.604 | 0.418 | 0.350 | 0.512 |
+| LT-RG1 read error | 0.366 | 0.398 | 0.507 | 0.519 | 0.499 |
+
+Gram reconstruction relative error at the final checkpoint: LT-K4 1.1e-07, LT-RG001 5.7e-08, LT-RG1 4.4e-08
+Zero / shuffled memory correct of 1,000 (original, zero, shuffled): LT-K4 383/1/2; LT-RG001 461/2/4; LT-RG1 426/1/4
+Gradient clip active at logged steps: LT-K4 361 of 361, LT-RG001 562 of 562, LT-RG1 566 of 566
+State bytes per episode: 65536; inference parameters 475,138 in every arm
