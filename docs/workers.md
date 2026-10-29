@@ -17,8 +17,8 @@ wake-ups cancelled).
 | (on demand) | wk-core, wk-data, wk-theory | — | no pending work |
 | rv-fable | external reviewer, Claude Fable 5.1 (max), herdr tab w1:t17 (user request 2026-10-27) | — | done (c370e22); tab closed after the report |
 | rv-astra | external reviewer, Codex GPT-6-Astra (max, web search), herdr tab w1:t18 (user request 2026-10-27) | — | done 08:18 (6179f3a); codex closed, tab closed |
-| rv-fable (round 2) | external reviewer, Claude Fable 5.1 (max), herdr tab w1:t19 (user request 2026-10-29) | — | active: `docs/review/brief_2026-10-29.md` → `docs/review/rv-fable_2026-10-29.md` |
-| rv-astra (round 2) | external reviewer, Codex GPT-6-Astra (max, web search), herdr tab w1:t1A (user request 2026-10-29) | — | active: same brief → `docs/review/rv-astra_2026-10-29.md` |
+| rv-fable (round 2) | external reviewer, Claude Fable 5.1 (max), herdr tab w1:t19 (user request 2026-10-29) | — | done (9f04490); tab closed; integrated in `plan/followup_2026-10-29.md` |
+| rv-astra (round 2) | external reviewer, Codex GPT-6-Astra (max, web search), herdr tab w1:t1A (user request 2026-10-29) | — | done (e198ad7); tab closed; integrated in `plan/followup_2026-10-29.md` |
 
 Tasks follow `plan/followup_2026-10-27.md`; rules shared by all subagent tasks: `docs/tasks/_common_rules.md`.
 
