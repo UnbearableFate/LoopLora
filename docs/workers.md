@@ -141,6 +141,7 @@ the orchestrator skips it (esc) and leaves updating to the user.
 | master test after the S0 merge (jobs 3728584 and 3728585 at 2f7abbc, split in two debug-g jobs: 3257 passed, 1 skipped) | orchestrator | 2f7abbc |
 | S1B cross-review (rv-code and rv-opus at wp/loop 67deeee) and the fix list in WP-L14 | orchestrator | cba968b |
 | WP-L13 SLOT-LOOP-v1 S1A (release 523d11d5; six runs; dev no_trigger, re-run reproduced; confirmation ADVANCE, +3.73 pp [+2.70, +4.82]) | wk-slot | 650dc3e |
+| master test after the S1A merge (jobs 3729456, 3729457, 3729458 at 650dc3e, three debug-g shards: 3270 passed, 1 skipped) | orchestrator | 650dc3e |
 | Merged master full test suite after DPFP-X (job 3723646, exit 0, 2717 passed, 1 expected skip) | orchestrator | e86bdfe |
 | Merged master full test suite after P5L (job 3722062, exit 0, 2676 passed, 1 expected skip) | orchestrator | c6b5275 |
 | Merged master full test suite (job 3721356, exit 0, 1 expected skip) | orchestrator | d4de948 |
