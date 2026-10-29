@@ -1,0 +1,115 @@
+{
+  "git_commit": "5c3cc46f01afa2b92b6c8c3ba775b3e1fee60660",
+  "runs": {
+    "LT-K4-E16": {
+      "E": 16,
+      "arm": "LT-K4",
+      "checkpoint_git_commit": "dd5e4c89b40a345289aa53647718da56dc3bbb12",
+      "checkpoint_job_id": "3724516.opbs",
+      "dpfp_nu": null,
+      "episodes": 1000,
+      "eval_seed": 4242,
+      "git_commit": "5c3cc46f01afa2b92b6c8c3ba775b3e1fee60660",
+      "max_repeated_logit_drift": 0.0,
+      "optimizer_steps": 0,
+      "original": {
+        "correct": 383,
+        "em": 0.383,
+        "nll": 3.1867005825042725
+      },
+      "original_matches_record": {
+        "correct": true,
+        "record_correct": 383,
+        "record_nll": 3.1867005825042725
+      },
+      "rank": 128,
+      "shuffle": {
+        "correct": 2,
+        "em": 0.002,
+        "nll": 12.037919998168945
+      },
+      "source_dirty": false,
+      "source_hash": "3722e40e6651d1005e1dc0a505bf4c98",
+      "steps": 17970,
+      "zero": {
+        "correct": 1,
+        "em": 0.001,
+        "nll": 8.717669486999512
+      }
+    },
+    "LT-RG001-E16": {
+      "E": 16,
+      "arm": "LT-RG001",
+      "checkpoint_git_commit": "dd5e4c89b40a345289aa53647718da56dc3bbb12",
+      "checkpoint_job_id": "3724517.opbs",
+      "dpfp_nu": null,
+      "episodes": 1000,
+      "eval_seed": 4242,
+      "git_commit": "5c3cc46f01afa2b92b6c8c3ba775b3e1fee60660",
+      "max_repeated_logit_drift": 0.0,
+      "optimizer_steps": 0,
+      "original": {
+        "correct": 461,
+        "em": 0.461,
+        "nll": 2.7908499240875244
+      },
+      "original_matches_record": {
+        "correct": true,
+        "record_correct": 461,
+        "record_nll": 2.7908499240875244
+      },
+      "rank": 128,
+      "shuffle": {
+        "correct": 4,
+        "em": 0.004,
+        "nll": 12.301966667175293
+      },
+      "source_dirty": false,
+      "source_hash": "3722e40e6651d1005e1dc0a505bf4c98",
+      "steps": 28005,
+      "zero": {
+        "correct": 2,
+        "em": 0.002,
+        "nll": 9.485268592834473
+      }
+    },
+    "LT-RG1-E16": {
+      "E": 16,
+      "arm": "LT-RG1",
+      "checkpoint_git_commit": "dd5e4c89b40a345289aa53647718da56dc3bbb12",
+      "checkpoint_job_id": "3724518.opbs",
+      "dpfp_nu": null,
+      "episodes": 1000,
+      "eval_seed": 4242,
+      "git_commit": "5c3cc46f01afa2b92b6c8c3ba775b3e1fee60660",
+      "max_repeated_logit_drift": 0.0,
+      "optimizer_steps": 0,
+      "original": {
+        "correct": 426,
+        "em": 0.426,
+        "nll": 2.906630277633667
+      },
+      "original_matches_record": {
+        "correct": true,
+        "record_correct": 426,
+        "record_nll": 2.906630277633667
+      },
+      "rank": 128,
+      "shuffle": {
+        "correct": 4,
+        "em": 0.004,
+        "nll": 11.820183753967285
+      },
+      "source_dirty": false,
+      "source_hash": "3722e40e6651d1005e1dc0a505bf4c98",
+      "steps": 28245,
+      "zero": {
+        "correct": 1,
+        "em": 0.001,
+        "nll": 9.62728214263916
+      }
+    }
+  },
+  "source_dirty": false,
+  "source_hash": "3722e40e6651d1005e1dc0a505bf4c98"
+}
