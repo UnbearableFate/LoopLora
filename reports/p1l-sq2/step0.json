@@ -1,0 +1,18 @@
+{
+  "arm": "S-DE",
+  "check": "step0",
+  "checked_at_commit": "dd5e4c89b40a345289aa53647718da56dc3bbb12",
+  "correct": 608,
+  "job_id": "3724338.opbs",
+  "nll": 2.1291537284851074,
+  "nll_bit_identical": true,
+  "parent_correct": 608,
+  "parent_digests": {
+    "checkpoint.pt": "b6acff8b772a692311e630293add553f",
+    "writer.pt": "31d98c01c604c05a54bc20e4b4c4f436"
+  },
+  "parent_nll": 2.1291537284851074,
+  "passed": true,
+  "predictions_identical": true,
+  "study": "SQ2"
+}

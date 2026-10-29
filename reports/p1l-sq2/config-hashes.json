@@ -1,0 +1,14 @@
+{
+  "config_hashes": {
+    "S-DC": "497c7994c2cb8faa8f9214a69b9b7a29",
+    "S-DE": "c4a6f8291c4a96683577fde974e7ce5f",
+    "S-RC": "b8f6c8bb5b8ce045f28df8f15acbaccb",
+    "S-RE": "1bfb72b7d87bc0aff743c1e018e8680e"
+  },
+  "steps_by_arm": {
+    "S-DC": 6000,
+    "S-DE": 6000,
+    "S-RC": 6000,
+    "S-RE": 6000
+  }
+}
