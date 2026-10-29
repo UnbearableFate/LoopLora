@@ -148,3 +148,16 @@ Fix items 7-11 together with items 1-6, in one pass, before `STOP: fixed <full h
 - the calibration audit;
 - smoke, the LR pilot and the wave-1 ready release;
 - then `STOP: release <full hash>`.
+
+## S1B verdict (06:55): S2 is not entered
+S1B's frozen verdict is **NOT ADVANCED**, with S2 primary none.
+- **Verdict:** `reports/slot-loop-v1/s1b/a1/confirmation-analysis/verdict.json` on master `2a27f57`, blake2b-128 `dca8d4e9`.
+- **Why:** S4-S1 is +2.575 pp and M4-M1 is +2.092 pp. Both intervals lie above zero, but both are below the registered +3 pp. So neither backend has a confirmed loop gain.
+- **Rule:** under S2 §1 and `s2_rules.backends()`, no S1B-qualified backend means no S2. The plan says the same in §8.3.
+
+**Consequences:**
+- There is no S2 branch record, preflight, lock, calibration, pilot or release. Do not run any S2 job.
+- The S2 code stays on wp/slot at `b98bbe0`, reviewed once and tested (135 S2 + 380 inherited tests). It is not merged into master, because no stage uses it. A later study that enters S2 must start from a new registration and re-check this code against it.
+- S3 needs H2 from S2, so it is not entered.
+
+wk-slot stays idle. Do not change wp/slot.
