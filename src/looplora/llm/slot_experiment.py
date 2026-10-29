@@ -20,7 +20,7 @@ from . import dpfp_run, slot_data, sq2
 from .evaluate import _slice
 from .run import source_metadata
 from .slot_read import ReadSpec, attach_slot_reader, bind_batch, final_query, final_read
-from .slot_rules import BUFFERS, FROZEN, TRAINABLE
+from .slot_rules import BUFFERS, TRAINABLE
 from .train import make_task_spec, synchronize
 from .writer_fix import true_fact_indices
 

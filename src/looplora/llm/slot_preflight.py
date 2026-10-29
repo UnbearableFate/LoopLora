@@ -18,12 +18,11 @@ from looplora.core.memory_backend import (CapacityError, HardSlotBackend, Matrix
                                           build_slots, persistent_bytes, select_rows, state_digest)
 from looplora.data.relations import generate
 from looplora.sym.evaluate import stratify_queries
-from . import slot_data
 from .evaluate import _slice
 from .read_fix import store_read
 from .slot_experiment import (CHUNK, digest_report, evaluate, freeze_for_s1a, gradient_report, support_digest, tensor_digests,
                               trainable_report)
-from .slot_read import ReadSpec, bind_batch, final_query, final_read
+from .slot_read import ReadSpec, bind_batch, final_query
 from .slot_rules import TRAINABLE
 from .train import make_task_spec
 from .writer_fix import gather_positions

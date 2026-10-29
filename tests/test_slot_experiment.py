@@ -18,10 +18,9 @@ import torch
 from torch.nn import functional as F
 
 import slot_golden
-from looplora.core.memory_backend import (HardSlotBackend, MatrixBackend, MatrixState, MemoryRead, SoftSlotBackend, build_slots,
-                                          select_rows)
+from looplora.core.memory_backend import (HardSlotBackend, MatrixBackend, MatrixState, MemoryRead, SoftSlotBackend, build_slots)
 from looplora.infra.seeds import derive_seed
-from looplora.llm import slot_data, slot_experiment, slot_preflight, slot_rules, slot_run
+from looplora.llm import slot_data, slot_preflight, slot_rules, slot_run
 from looplora.llm.batching import repeat_snapshot
 from looplora.llm.evaluate import _slice
 from looplora.llm.inject import load_tokenizer
