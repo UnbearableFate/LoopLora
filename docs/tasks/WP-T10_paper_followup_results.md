@@ -145,3 +145,44 @@ Sources:
 4. **Latency.** Timings from different scales and jobs are not compared with each other.
 
 Report: append to `docs/reports/WP-T10.md`. Done line: `WP-T10 part 4 done`.
+
+## Part 5 (now): DPFP-X descriptive rows next to DPFP
+First merge master into wp/paper. Use master `e86bdfe` or later; it carries wp/llm with the DPFP-X records.
+Sources:
+- `docs/reports/DPFP-X.md`
+- `reports/p1l-dpfp-x/`:
+  - `decision.json`, `audit.json` and `release.json`;
+  - `arms/{X256,X17}/record.json` and `val-*/metrics.json`.
+- `docs/prereg/DPFP-X.md`, registered on master `21254c9`.
+- The tables are printed by `python3 scripts/analyze_dpfp_x.py` (stdlib).
+
+The registered consequence for the paper is: "Neither reaches 0.80: the learned-writer line stays stopped. The paper adds both
+arms as descriptive rows next to DPFP."
+
+1. **Evidence ledger.** Add DPFP-X rows to `docs/paper/evidence_llm.md` in the DPFP section, in the format of DP1–DP3,
+   with the next free IDs. Read every number from the records or `decision.json`.
+   - **Registered (not supported):** neither arm passes the writer gate (val EM ≥ 0.80).
+     - X256 (Qwen3-0.6B-Base, r = 256, ν = 3): 662 of 1,000, 66.2 %. No writer at r = 256, and no E = 8 retrain.
+     - X17 (Qwen3-1.7B-Base @ `ea980cb0…`, r = 128, ν = 3): 593 of 1,000, 59.3 %. Its difference to D128-3 (608) is −1.5 pp,
+       which the registered rule calls not distinguished (threshold 5 pp, standard error of a difference about 2.2 pp).
+   - **Descriptive:**
+     - the five-checkpoint curves and the matched-fraction differences to D128-3;
+     - both curves still rising at the final checkpoint (+3.5 and +2.3 pp over the last interval, against +0.6 for D128-3);
+     - read error, read-value and clean-value heads;
+     - the zero/shuffled-memory audit (≤ 0.4 %);
+     - inference parameters (1,114,114 and 606,210);
+     - cost (3.05 node·h).
+   - **Limits:** one seed, one learning rate, a fixed budget, no longer run, validation data only.
+     - X256's higher EM is not accompanied by a lower read error or a better read-value head than D128-3. The report
+       does not explain it; do not explain it either.
+     - X17 differs from D128-3 in the backbone only, so the comparison is a diagnostic, not a scaling test.
+2. **Must-not-say list.** Add:
+   - that rank 256 or the 1.7B backbone fixes the learned writer;
+   - any extrapolation of the still-rising curves;
+   - a scaling claim from X17;
+   - any learned-writer or end-to-end claim at either rank or backbone.
+3. **Draft §8.5.** Add one or two sentences next to the DPFP paragraph, plus the summary-table rows that cite DP1–DP3,
+   and keep every stop statement. The abstract, §1 and §9 already say that no learned writer is selected; change them
+   only if they would otherwise be inaccurate.
+
+Report: append to `docs/reports/WP-T10.md`. Done line: `WP-T10 part 5 done`.
