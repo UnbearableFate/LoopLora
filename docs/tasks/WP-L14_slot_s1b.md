@@ -1,4 +1,4 @@
-# WP-L14: SLOT-LOOP-v1 S1B: storage effect against loop effect (2026-10-29 22:35 JST)
+# WP-L14: SLOT-LOOP-v1 S1B: storage effect against loop effect (2026-10-29 22:25 JST)
 
 **Worker.** wk-loop is a codex worker (GPT-6.1-sol, reasoning effort high). It works in worktree `LoopLora-wt/loop` on branch `wp/loop`, which starts from master 2f7abbc: the S0 code and results. It runs in parallel with wk-slot, which runs S1A on `wp/slot`.
 
