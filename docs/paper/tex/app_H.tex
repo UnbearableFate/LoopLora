@@ -1,0 +1,216 @@
+% Generated once by scripts/paper_md2tex.py from docs/paper/draft.md; edit this file from now on.
+\section{Related work in full}\label{app:H}
+\noindent Record section 2.
+\subsection*{2. Related work and boundaries}\addcontentsline{toc}{subsection}{2. Related work and boundaries}
+
+\href{https://arxiv.org/abs/2106.09685}{LoRA} supplies the starting parameterization: a frozen
+base projection plus a trained low-rank branch. Our question concerns context-conditioned
+computation inside that branch. It does not depend on presenting recurrence itself as a
+new addition to low-rank adaptation. The dated literature audit
+is the scope record for the comparisons below; we retain its access limitations rather
+than turning an incomplete search into a priority claim.
+
+Associative fast weights are the closest antecedent to the memory access pattern.
+\href{https://arxiv.org/html/1610.06258v3}{Ba et al.} already use an evolving inner state to
+read fixed fast weights repeatedly, with sustained input during the inner loop. Their
+construction makes clear that repeated access to a fixed matrix predates this adapter
+study. \href{https://proceedings.mlr.press/v139/schlag21a.html}{Schlag et al.} connect linear
+attention to fast-weight programming and motivate delta-style updates that correct
+stored key-value associations. We use that lineage to separate the slow parameters
+that learn a representation from the online matrix that stores the current context.
+
+\href{https://arxiv.org/html/2605.12357v2}{\ensuremath{\delta}-mem} combines associative online state with
+low-rank corrections to a frozen language model. Its old-state read provides a useful
+comparison with our separation between writing the context and spending several reader
+updates on the resulting snapshot. The relevant distinction is the read schedule and
+query evolution, not a claim that associative memory or context-dependent low-rank
+corrections are new. Matching these schedules also requires specifying the writer’s
+decay/\allowbreak{}update order, because nominally similar delta rules can retain different states.
+
+Looped models investigate where repeated computation should occur.
+\href{https://arxiv.org/abs/2608.18230}{MixerLoop} repeats a delta-network mixer while applying
+its dense feed-forward component once; the literature audit distinguishes its repeated
+mixer updates from the fixed-memory reader considered here. \href{https://arxiv.org/abs/2503.07903}{MemReasoner}
+is a close memory-and-composition neighbor, with an end-to-end trained memory-augmented
+language model. These comparisons motivate describing the exact object being iterated:
+a low-dimensional query, a whole hidden state, or an update that also rewrites memory.
+They do not justify transferring a result between those objects without an equivalence
+argument.
+
+\href{https://arxiv.org/abs/1909.01377}{Deep equilibrium models} motivate another distinct
+question: finding and differentiating through a fixed point. Our finite-depth reader
+need not be a contraction to be useful, and a fixed-point error certificate would not
+by itself establish correct task predictions. RecLoRA remains a related-work item whose
+full-text architectural comparison is \textbf{TODO}: the committed audit could not verify its
+page-level claims. We consequently make no claim about absent nonlinearities, routing,
+or token mixing in that work, and do not use its unverified publication status in the
+argument. The contribution sought here is a reproducible composition-and-budget study
+with explicit writer controls and conditional analysis.
+
+\subsubsection*{Latent recurrence, sharing, and stopping}
+
+The \href{https://arxiv.org/html/2507.06203v2}{latent-reasoning survey} distinguishes
+vertical activation recurrence at fixed token/\allowbreak{}time from evolution across sequence
+history. Our reader uses the former axis while the writer updates memory across
+tokens. \href{https://arxiv.org/html/2502.05171v2}{Huginn} supplies precedents for shared
+Transformer recurrence, reinjected input, heavy-tailed training-depth sampling,
+and heuristic prediction-KL exits. \href{https://arxiv.org/html/2412.06769v4}{Coconut}
+instead adds latent sequence positions by reusing hidden states as input embeddings;
+its default fixed latent length should not be confused with guaranteed adaptive
+halting. These are different placements of latent computation, with different caches
+and training objectives.
+
+\href{https://arxiv.org/pdf/2510.25741v6}{Ouro} learns exit allocation for shared Transformer
+loops and reports degradation beyond trained depth. That is a precedent for studying
+nonmonotone depth, not a diagnosis of this reader’s failure mechanism.
+\href{https://arxiv.org/html/2410.20672v3}{Relaxed Recursive Transformers} use depth-specific
+LoRA to relax full-block sharing and train all model parameters; their oracle-exit
+batching simulations do not establish this adapter’s measured efficiency.
+\href{https://arxiv.org/html/2507.10524v3}{Mixture-of-Recursions} adds learned token-level
+depth routing, including a variant that reuses first-recursion KV for later queries.
+Consequently fixed context alone is not a unique distinction. Our specified compact
+delta state, low-dimensional reader, and separate write schedule define the comparison.
+
+Degradation from extra iterations is a known failure of recurrent depth, separate from this
+adapter. \href{https://arxiv.org/abs/2202.05826}{Bansal et al.} report that recurrent networks can
+lose accuracy when iterated beyond their training depth (“overthinking”), and reduce it with a
+recall path that reinjects the input together with progressive training. The reader’s
+reinjected u is analogous to a recall path, and no progressive or stay objective is trained
+here. \href{https://arxiv.org/abs/2511.08577}{Think-at-Hard} reports that extra loop iterations can
+turn correct tokens into errors in looped language models, and
+\href{https://arxiv.org/abs/2604.07822}{Kohli et al.} report that recurrent-depth transformers can
+compose knowledge, need more recurrence for deeper compositions, and overthink under excessive
+recurrence. We therefore read the loss of short-hop accuracy at larger L (Sections 5.1 and 7)
+as an instance of a known failure in a new setting, not as a defect specific to this reader,
+and we do not test the remedies those works propose.  % S7 JS1
+
+\href{https://arxiv.org/html/2605.26733v1}{STARS} already combines sampled depth with
+Jacobian-vector regularization of looped dynamics. Its practical sampled-state proxy
+is not a certified spectral radius or global contraction constant.
+\href{https://arxiv.org/html/2608.08113v1}{ReLIT} combines a frozen-backbone anchor with
+recursive full-sequence answer/\allowbreak{}scratchpad updates and ACT halting. These precedents
+narrow any claim about reinjection, frozen-backbone latent recurrence, or stabilization.
+They motivate the JS protocol; its separate adapter results are
+reported in Section 7.
+
+\subsubsection*{Multi-hop composition, regression memories, and retrieval in weights}
+
+The works in this subsection were added after two external literature reviews
+(rv-fable and rv-astra)
+opened their primary pages. We cite only what their abstracts and the review notes support,
+re-read no full text for this manuscript, and draw no priority claim from them.
+
+Latent multi-hop composition in language models has a substantial literature.
+\href{https://arxiv.org/abs/2402.16837}{Yang et al. (2024)} look for and intervene on the bridge
+entity of two-hop queries, and \href{https://arxiv.org/abs/2411.16679}{Yang et al. (2025)} remove
+shortcuts and find relation-dependent composition.
+\href{https://arxiv.org/abs/2411.16353}{Balesni et al.} report both failures and successes of
+latent two-hop reasoning across synthetic and natural settings.
+\href{https://arxiv.org/abs/2406.12775}{Biran et al.} report that the bridge is resolved early and
+the second hop starts too late in the layer stack,
+\href{https://arxiv.org/abs/2502.10835}{Yu et al.} let early layers read later-layer states, and
+\href{https://arxiv.org/abs/2601.03542}{Liu et al.} report that later-hop answers can be decodable
+before the bridge. \href{https://arxiv.org/abs/2502.13913}{Guo et al.} find in-context two-hop
+reasoning with distractors near guessing before fine-tuning. For out-of-distribution
+composition, \href{https://arxiv.org/abs/2608.07261}{Zhang et al.} report failure when upper layers
+map facts to outputs instead of reasoning, and that recurrent-style training that reuses
+circuitry helped there; \href{https://arxiv.org/abs/2509.24653}{Lin et al.} report that identity
+supervision on bridges enables unseen compositions, and
+\href{https://arxiv.org/abs/2405.15071}{Wang et al.} that composition does not generalize out of
+distribution without grokking. Our setting differs: facts reach the reader only through a
+fixed-size adapter memory, and hops are spent in a reader loop rather than in layer depth.
+These studies therefore bound what we may claim without predicting our results. In particular,
+Zhang et al. make it unsafe to read B8’s in-distribution advantage over the shared reader
+(Section 6; B8 is also not parameter-matched) as evidence for the unshared design, because that advantage is measured on trained
+hops and names; and the paper reports only a descriptive scope row on unseen-pool names of its
+closed vocabulary (Section 9), not a test of composition over new names or codes.
+% B3 B6 UN2 UN3
+
+Associative memory can also be viewed as regression at test time.
+\href{https://arxiv.org/abs/2501.12352}{Wang et al.} treat a delta-rule write as one gradient step
+on a recall loss, with least squares as the exact minimizer.
+\href{https://arxiv.org/abs/2406.06484}{Yang et al.} parallelize delta-rule linear transformers over
+sequence length, and \href{https://arxiv.org/abs/2501.00663}{Titans},
+\href{https://arxiv.org/abs/2505.23735}{ATLAS}, and \href{https://arxiv.org/abs/2407.04620}{TTT layers}
+train the memory itself at test time, ATLAS over a window of past tokens rather than only the
+latest one. Our writer is the one-step delta update, which need not reach the regression
+solution when keys are correlated (cf. Proposition 11). Whether that gap contributes to the
+deployed-read distortion in Section 8.3 is untested, because the audit identifies no unique
+cause, and we study none of these alternative writers.  % LL7 LL9
+
+Slot and lookup memories give each stored item its own address.
+\href{https://arxiv.org/abs/1503.08895}{End-to-end memory networks} learn several memory hops over
+stored items, and \href{https://aclanthology.org/D16-1147/}{key-value memory networks} separate the
+addressing representation from the returned one, so multi-hop reading of a memory and
+key-value separation are long established and we claim neither.
+\href{https://arxiv.org/abs/2008.02217}{Hopfield networks} retrieve stored patterns in a single
+softmax step, \href{https://arxiv.org/abs/2412.09764}{memory layers} scale trainable key-value
+lookup inside language models, and \href{https://arxiv.org/abs/2405.06394}{Memory Mosaics} compose
+networks of associative memories. Their state grows with the number of stored items, whereas
+the reader here uses a fixed-size delta-rule state in which facts superpose. No slot-memory
+baseline is run, and no result here bears on how a slot memory would behave.
+
+Facts can also live in, or be written into, parameters.
+\href{https://arxiv.org/abs/2012.14913}{Geva et al.} interpret feed-forward layers as key-value
+memories; \href{https://arxiv.org/abs/2202.05262}{ROME} edits a factual association with a
+rank-one update and \href{https://arxiv.org/abs/2210.07229}{MEMIT} scales such edits to many facts,
+a linear associative write into persistent weights rather than into a resettable per-episode
+state. \href{https://arxiv.org/abs/2403.11901}{Larimar} attaches an episodic memory with one-shot
+writes to a language model; \href{https://arxiv.org/abs/2506.06266}{Cartridges} and
+\href{https://arxiv.org/abs/2411.09289}{StreamAdapter} compress a context into a trained
+key-value cache and a parameter update, respectively, Cartridges by training on each context,
+whereas the writers studied here are single-pass delta updates. Three 2026 reports on
+memories for frozen language models locate the bottleneck in reading or extraction rather
+than in storage (\href{https://arxiv.org/abs/2608.17050}{Frozen Memory Is Not Enough},
+\href{https://arxiv.org/abs/2601.15324}{Prometheus Mind}, and a workshop paper on
+\href{https://neurips.cc/virtual/2026/170472}{a hidden-state memory layer}). That is compatible
+with, but does not confirm, the read-distortion measurements of Section 8.3, whose cause the
+audit leaves unidentified.  % LL7 LL9
+
+Two further external reviews (rv-fable and rv-astra, 2026-10-29) added the works
+below. We cite their abstract pages as the reviewers recorded them, did not re-open the pages for this manuscript, and claim no priority from any of them.
+We study none of the writers, objectives or architectures named here; our writers are the one-step delta writer, its DPFP-feature variant and the oracle writers.
+\href{https://arxiv.org/abs/2601.15313}{Zahn et al.} report that semantic keys overlap and recall falls near chance after a few related facts, while identifier keys do
+not, a setting close to the key-overlap questions of Section 8.3. Several works read the delta rule as online regression or filtering:
+\href{https://arxiv.org/abs/2605.11196}{Pandey and Singh} use online ridge by Sherman-Morrison as approximate key orthogonalization;
+\href{https://arxiv.org/abs/2511.21016}{Gated KalmaNet} shows a full-covariance Kalman update to be online ridge regression with fading memory;
+\href{https://arxiv.org/abs/2602.10743}{Kalman Linear Attention} filters in information form, scan-parallel;
+\href{https://arxiv.org/abs/2609.07816}{Kalman Delta Networks} use a per-channel Kalman gain whose isotropic case is the delta rule;
+\href{https://arxiv.org/abs/2604.21100}{Preconditioned DeltaNet} reads the delta rule as a first-order regression step and adds preconditioning;
+\href{https://arxiv.org/abs/2407.14207}{Longhorn} derives a state-space update as closed-form online recall;
+\href{https://arxiv.org/abs/2506.05233}{MesaNet} optimizes a local regression at test time; and
+\href{https://arxiv.org/abs/2606.08804}{Q-Delta} studies keys transformed by subsequent updates. Other works change the objective, the retention or the update:
+\href{https://arxiv.org/abs/2504.13173}{It’s All Connected} (attentional-bias objectives and retention gates),
+\href{https://arxiv.org/abs/2512.24695}{Nested Learning} (a self-modifying model with continuum memory),
+\href{https://arxiv.org/abs/2512.23675}{End-to-End Test-Time Training} (a meta-learned initialization),
+\href{https://arxiv.org/abs/2505.23884}{Test-Time Training Done Right} (whole-chunk updates),
+\href{https://arxiv.org/abs/2404.07143}{Infini-attention} (compressive memory with a delta-style update),
+\href{https://arxiv.org/abs/2605.22791}{Gated DeltaNet-2} (separate erase and write gates),
+\href{https://arxiv.org/abs/2610.02816}{Gated Slot Attention-2} (two-sided association correction through slots),
+\href{https://arxiv.org/abs/2502.10297}{DeltaProduct} and \href{https://arxiv.org/abs/2607.07386}{Sparse Delta Memory} (richer updates or larger states).
+\href{https://arxiv.org/abs/2402.13449}{CAMELoT} attaches a training-free associative memory to a frozen language model, as a neighbor of the frozen-backbone
+setting here. These are different writers from those tested, and the learned-writer stop of Section 8.5 applies only to the writers it tested.
+
+For looped and latent reasoning, \href{https://arxiv.org/abs/2607.00341}{DiscoLoop} reports that a bridge can be decodable yet misaligned for the next loop and mixes
+decoded embeddings with continuous states; \href{https://arxiv.org/abs/2606.31779}{Fan, Svete and Lee} (called LOTUS in rv-astra) supervise looped transformers per position;
+\href{https://arxiv.org/abs/2603.21676}{Chen} trains with final-only supervision, a near-identity gate and depth extrapolation, where intermediate supervision hurt;
+\href{https://arxiv.org/abs/2606.29983}{Kuo et al.} report that a randomized loop count stabilizes extrapolation; and
+\href{https://arxiv.org/abs/2502.21074}{CODI} and \href{https://arxiv.org/abs/2610.10623}{Recurrent Self-Improvement} distill explicit reasoning into latent reasoning or
+use deeper teachers. \href{https://arxiv.org/abs/2402.09268}{Sanford et al.} show that logarithmic depth suffices for k-hop problems, so one hop per read is a design
+choice of this adapter and not a bound. \href{https://arxiv.org/abs/2602.00449}{Liang and Pan} warn that decodable intermediate states do not establish a complete serial
+algorithm, which is the boundary the per-step readouts of Section 8.5 respect: they are decoding only. \href{https://arxiv.org/abs/2607.19390}{The orthogonalized read as a training scaffold}  % LP5
+is reported as a removable training aid and not an inference rescue; whether sharing acts as such a scaffold for B8 is untested here. None of these
+training objectives, stopping rules or distillation methods is used in this paper.
+
+\subsubsection*{Verbalizable directions and the readout boundary}
+
+\href{https://transformer-circuits.pub/2026/workspace/index.html}{Verbalizable Representations Form a Global Workspace in Language Models}
+defines J-lens using averaged transport from intermediate residuals toward final-layer
+representations and vocabulary readout. Its sparse J-space construction is generally
+a union of cones from an overcomplete frame, not the adapter’s fixed col(B) or a single
+rank-r subspace. It motivates asking whether intermediate reader states expose the
+expected entities, while separating readability from causal use. The downstream
+transport Jacobian and the reader’s recurrent transition Jacobian are different
+objects. The expanded primary-source audit
+records versions, access limits, and these distinctions; it supports no new priority claim.
+

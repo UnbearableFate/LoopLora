@@ -1,0 +1,47 @@
+\section{Costs, memory load, stopping, and the other registered studies}
+\label{sec:other}
+
+\paragraph{Costs.}
+The primary comparison is a single read at the same rank, with added latency reported as a cost, and no efficiency advantage over a larger-rank single read is claimed.  % FR1
+Earlier P2-S and P2-S-F1 comparisons with larger single reads remain historical evidence, including the original practical-gate failure.
+They supply no efficiency claim for this paper.  % B1 B5 B7 FR1
+The joint M1 point has 13,314 trained parameters and 4,096 persistent FP32 bytes per episode, against 114,690 parameters and 65,536 bytes for B6 at rank 128.  % B7
+A reader may therefore be attractive under a strict state allocation even when it does not win the measured latency comparison.
+That is a conditional design choice, not a practical advantage established for the full request path, because the reported timings exclude the context writer and other preparation.  % B7 B8
+
+\paragraph{Memory load.}
+At rank 32 the reachable-hop L4$-$L1 benefit shrinks from E12 to E36 under the registered load and layout changes, while the multi-read capability criterion still holds at the tested training loads.  % IS1 IS2
+The largest tested load is not an identified failure boundary.
+
+\paragraph{Stopping and overshoot.}
+Post-hoc learned halting fails hop 1 preservation in the six primary frozen-reader families.
+A hop-1-constrained threshold gives one registered pass, for random-oracle writing, after about two executed updates and with no latency gain.  % HL1 CV1 CV3
+Stay training and a sticky gate do not remove the overshoot, and fixed-depth training remains the remedy found.  % TS1
+Training-time terminal-Jacobian regularization reduces overshoot without meeting the registered removal criterion, and it decreases longer-walk accuracy.  % JS1 JS3
+
+Table~\ref{tab:other} gives these studies with the registered criterion each rests on; the full results are in Appendix~\ref{app:E}.
+
+
+{\small
+\setlength{\tabcolsep}{3pt}
+\begin{longtable}{W{469}{6}W{469}{6}W{63}{6}}
+\caption{Other registered results and their criteria (wording of the claim contract, Appendix~\ref{app:C}).}\label{tab:other}\\
+\toprule
+Result & Gate or criterion & Rows \\
+\midrule \endfirsthead
+\toprule
+Result & Gate or criterion & Rows \\
+\midrule \endhead
+Same-rank policy: several reads against a single read at the same rank, with latency reported as a cost and no efficiency claim over larger-rank single reads & None: a policy and a static count, not an accuracy result & FR1 \\ \addlinespace[3pt]  % FR1
+Memory load: the depth benefit shrinks from E12 to E36 for fixed checkpoints, while M1@4 and B8@4 keep exceeding B4@1 at the trained loads; updated-path diagnostics are partial; key interference is identified for oracle\_random only (IVD) & IS-E1 (a negative DeltaD with CI<0 is consistent with Prop.4), IS-E2 (C(E)\ensuremath{\geq}3 pp, CI>0); IS3 and IS4 descriptive; IVD (IV1, IV2) is a separate study with its own gate & IS1-IS4, IV1, IV2 \\ \addlinespace[3pt]  % IS1 IS2 IS3 IS4 IV1 IV2
+Historical larger single reads: under joint writing B6/r128 and both B7 reads score above shared M1 (claim B1, that a larger single read could not replace it, is not supported); under random-oracle and factorized writing M1 outperforms them; the P2-S practical criterion fails; the factorized latency frontier is unmeasured & P2-S Gate 3: the capability claim needs E1/E2 positive at every tested size and writer; the practical claim also needs a latency win (E4), which fails. P2-S-F1 F-E3: the joint\_fact capability claim needs every contrast with CI>0 & B1, B2, B5, B7, B8 (open) \\ \addlinespace[3pt]  % B1 B2 B5 B7 B8
+Sharing: step-specific B8 exceeds shared M1-L4 at matched training depth, but not on every hop; fixed-depth training improves shared M1 & P2-S-F1 decision rule: B8 is carried into P1-L if F-E1>0 (CI) for joint and joint\_fact, and fixed-depth training if F-E2>0 (CI); no gate on hop-wise superiority & B3, B4, B6, B9 \\ \addlinespace[3pt]  % B3 B4 B6 B9
+Post-hoc stopping pilots: label-free rules trade long-hop gain for hop1 loss and give no speedup & Screening only; no gate & H1-H6 \\ \addlinespace[3pt]  % H1 H2 H3 H4 H5 H6
+Learned post-hoc halting does not repair hop1 preservation in six primary frozen-reader families & Combined criterion: H\ensuremath{\geq}\ensuremath{-}1 pp (point), D\ensuremath{\geq}3 pp with CI>0, W with CI>0; every per-seed H also fails & HL1-HL5 \\ \addlinespace[3pt]  % HL1 HL2 HL3 HL4 HL5
+Terminal-Jacobian regularization reduces overshoot, does not meet the removal criterion, and costs longer-walk accuracy & Removal needs DeltaS>0 with CI>0 and S(RS+J)\ensuremath{\geq}\ensuremath{-}1 pp; fails for both writers & JS1-JS6 \\ \addlinespace[3pt]  % JS1 JS2 JS3 JS4 JS5 JS6
+A halting head with the correctness label and a hop-1-constrained validation threshold repairs overshoot for oracle\_random on frozen readers; no other CVH arm passes; no CVH arm has a latency claim & Gain \ensuremath{\geq}3 pp with CI>0, hop-1 change \ensuremath{\geq}\ensuremath{-}1 pp, mean executed updates \ensuremath{\leq}8; a latency claim only where wall time is below fixed L16 and the arm passes (it does not hold for the passing arm) & CV1-CV4 \\ \addlinespace[3pt]  % CV1 CV2 CV3 CV4
+Stay training (T1) and a content-gated sticky update (T2) do not remove the overshoot under this protocol; fixed-depth training remains the remedy found & An arm passes only for both writers: absolute L16\ensuremath{-}L4 difference \ensuremath{\leq}1 pp on hops1-3, hops4-8 at L8 at least \ensuremath{-}1 pp against T0, and gain \ensuremath{\geq}3 pp with CI>0 over B4; no arm passes & TS1-TS2 \\ \addlinespace[3pt]  % TS1 TS2
+The depth gain on hops2-3 is also present on unseen-pool entities (256 further names of the same vocabulary); no claim beyond the closed vocabulary or for new entity codes & Descriptive wording rule: unseen-pool gain \ensuremath{\geq}3 pp with CI>0 (all six results meet it); Part A also reproduces the 18 committed M1 depth-contrast rows & UN1-UN4 \\ \addlinespace[3pt]  % UN1 UN2 UN3 UN4
+\bottomrule
+\end{longtable}
+}

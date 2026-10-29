@@ -1,0 +1,157 @@
+% Generated once by scripts/paper_md2tex.py from docs/paper/draft.md; edit this file from now on.
+\section{Method and theory in full}\label{app:D}
+\noindent Record sections 3 and 4 of the manuscript; section numbers below follow the record numbering.
+\subsection*{3. Method: one write schedule, repeated low-dimensional reads}\addcontentsline{toc}{subsection}{3. Method: one write schedule, repeated low-dimensional reads}
+
+Let a frozen linear projection map an input x to Wx+b. Its adapter first forms u=Ax,
+where A has output dimension r. A memory matrix M has shape r\_mem\ensuremath{\times}r\_mem. With column-vector
+notation, the shared reader is
+
+\[
+z^{(0)}=u,\qquad
+z^{(s+1)}=u+\rho\,\phi(Rz^{(s)}+UMQz^{(s)}),\qquad
+y=Wx+b+\alpha Bz^{(L)}.
+\]
+
+The same M is used throughout the inner loop. Q maps the current state to a memory
+query, U maps its read back into the reader coordinates, and B supplies the output
+bottleneck. The input is reinjected at every update. Increasing L therefore changes
+the reader computation while leaving the base-projection schedule unchanged. Setting
+L to zero gives the ordinary low-rank branch; this identity specifies a limiting case,
+not an empirical claim that different trained readers coincide.
+
+The memory writer uses a normalized key k and value v derived from the designated
+writer inputs. The unfactorized learned writer takes
+\(k=Ku/\max(\|Ku\|_2,\epsilon)\) and \(v=Vu\), with a positive norm clamp and
+learned scalar sigmoid gates; factorization instead separates its head/\allowbreak{}relation
+and tail projections. Oracle conditions specify their codes and gate values
+directly. For an eligible write, the decay-first update is
+
+\[
+\bar M=\lambda M,\qquad
+M^+=\bar M+\beta(v-\bar Mk)k^T.
+\]
+
+Reading precedes the current token’s write. Padding neither reads nor writes, reset
+clears the state before use, and a skipped write does not trigger decay. In the memory-QA
+protocol, support facts populate the state and questions read without writing. Separate
+questions and evaluation depths fork from the same completed context snapshot. These
+semantics define which information remains fixed when a reader is evaluated at a
+different depth; the binding specification is notation.md.
+
+We use M1 for ReLU and M1-lin for identity activation. B5 holds its initial memory query
+fixed and caches the resulting read while allowing internal iterations; B3 removes the
+memory path. B6 spends budget on larger rank in a single step, and B7 enlarges the
+memory dimension while retaining the smaller reader dimension. B8 replaces shared
+R/\allowbreak{}U/\allowbreak{}Q with step-specific matrices and is trained for a fixed unrolled depth. It is a
+separate architecture comparison, not a reader that can be extended by reusing a
+uniquely defined next shared step. It is also not parameter-matched to the shared
+readers: the extra step matrices add 3(r\ensuremath{^2}+2r\ensuremath{\cdot}r\_mem) parameters, that is 9,216 at
+r=r\_mem=32 and 147,456 at r=r\_mem=128, or +8.9\% (rank32) and +31.0\% (rank128) of the
+language-model adapter and +69.2\% of the symbolic unfactorized joint model.  % FR1
+
+Writer conditions determine which cross-reader comparisons hold memory representations
+fixed. Oracle writing uses specified entity codes. A T1-pretrained frozen writer is  % S2
+shared across the reader variants for its seed. Under joint writing, however, each  % S5 S9
+reader variant trains its own writer, so a contrast with B5 or B3 compares learned
+systems rather than isolating query evolution under an identical learned writer.
+ The factorized learned conditions restrict  % S2 S3 S5 S9
+keys and the initial query/\allowbreak{}input projection to head/\allowbreak{}relation information and values
+to the tail input. Later reader queries can incorporate previously read values.  % S9 S9
+This removes
+the direct head-subtraction statistic analyzed in Proposition 10. This is a structural
+restriction on an identified shortcut, not a universal guarantee about learned algorithms.
+
+The symbolic primary layout contains 12 edges in chains of lengths 8 and 4, with
+64-dimensional entity representations and rho=0.25; the primary reader and memory
+dimensions are both 32. Readers train on hops1-3, with  % S1 S3 S9
+mixed depths \{1,2,4\} unless a fixed-depth comparison is explicitly named.  % S1 S9 B3
+These task conditions are part of every claim below. We separately account for trained
+parameters, persistent state, prepared-query latency, and training protocol, because
+matching one does not match the others.
+
+
+\subsection*{4. Theory: useful computation without unconditional guarantees}\addcontentsline{toc}{subsection}{4. Theory: useful computation without unconditional guarantees}
+
+\textbf{Fixed subspace, variable computation (Proposition 1).} At fixed memory and depth,
+the branch has the form alpha B f(Ax), so its output lies in col(B), and its local
+input-Jacobian rank is bounded by r wherever differentiable. Equal Ax implies equal
+branch outputs only when the other inputs, including M and L, are fixed. Nothing in
+this statement prevents f from changing with reader depth. Nor is it a global rank
+bound on a stacked sequence map through history-dependent memories. Thus a depth
+comparison can measure different computation inside the same bottleneck without
+claiming an expanded output subspace.
+
+\textbf{Composition order (Proposition 2).} For an identity activation, shared matrices,
+constant reinjection, and a fixed snapshot, define T=rho(R+UMQ). The exact state is
+\(z^{(L)}=\sum_{j=0}^{L}T^j u\). Additional steps permit higher-order products involving
+memory. When the recurrent and memory terms do not commute, these are ordered matrix
+products, not a scalar binomial expansion. At fixed M and L the map is still linear
+and may be precomputed at a preparation/\allowbreak{}storage cost; the identity therefore supplies
+neither an irreducible serial-computation lower bound nor an accuracy guarantee.
+
+\textbf{An existence construction for chain following (Proposition 3).} Suppose all episode
+entity codes in disjoint directed chains are orthonormal across the entire episode
+(so their number does not exceed r), memory starts at zero, and each edge is written
+once with exact unit gates. Suppose the linear reader implements an aligned
+successor map with effective gain greater than one, maps terminals to zero, and has
+no leakage onto competing codes. With a
+matching code decoder, successive visited nodes receive increasing weights and the
+terminal remains the prediction after enough steps. This aligned chain transition is
+nilpotent on the entity-code span, so finite stabilization is possible even without Euclidean contraction;
+acyclic data alone do not make an arbitrary learned transition nilpotent.
+Exact storage alone does not ensure the required gain, query/\allowbreak{}value alignment, or decoder;
+the theorem does not state that optimization must find this construction.
+
+\textbf{Interference and information access (Propositions 4 and 5).} Nonorthogonal delta
+writes can alter previously stored associations. A telescoping bound on differences
+of operator powers permits memory error to be amplified with depth, while allowing
+special cases with no growth. Separately, a one-read or fixed-query reader observes
+the context only through MQu, given its fixed input and side information. Episodes
+with identical observations must receive identical predictions. A chain-specific
+Bayes ceiling needs the additional aligned first-hop and side-information assumptions;
+it is not an impossibility theorem for every learned query or larger one-read model.
+
+\textbf{Fixed-point error versus answers (Proposition 7).} For
+\(F(z)=u+\rho\phi((R+UMQ)z)\), a valid global Lipschitz constant c<1 gives a unique
+fixed point and \(\|z-z^*\|\le\|F(z)-z\|/(1-c)\). One sufficient upper bound is
+\(\bar c=|\rho|L_\phi(\|R\|+\|U\|\|M\|\|Q\|)\).
+A bound above one is inconclusive about actual contraction. Even a valid state-error
+bound needs decoder-margin and task assumptions before it can say anything about a
+label, and label stability alone is not correctness. Residual thresholds without a
+certificate are empirical stopping policies.
+
+The JS penalty is motivated by a different sufficient condition: for a smooth map
+at an actual fixed point, transition spectral radius below one implies local
+asymptotic stability. A finite last-read state need not be fixed, pointwise radii
+do not control all transient products, and ReLU boundaries need additional care.
+Thus the preregistered stability study tests a regularizer rather
+than certifying a fixed point. Its reached-state radii and reduced overshoot do not
+verify Proposition 3’s exact terminal-annihilation construction or establish a
+contraction or correctness certificate. The failed sufficient  % JS1 JS6
+bounds from P4 establish no state-divergence claim.  % H3
+
+\textbf{Writer information and the final decoder (Propositions 10 and 11).} Under specified
+common unit keys, constant gates, and zero initial memory, the writer admits an exact
+exponentially weighted value expression. Difference values of the form
+\(D(e_{tail}-e_{head})\) can expose endpoint statistics when the weighting error is
+controlled relative to the decoder’s endpoint margins; common keys alone are
+insufficient. Tail-only factorization removes the direct head-subtraction term but
+leaves other global statistics possible. More generally, an exact delta read is a
+signed combination of written values whose coefficients depend on later-write key
+erasure. Its interference depends on the value Gram matrix as well as key alignment.
+Normalized addressing objectives do not set raw query magnitude, and an auxiliary
+value decoder need not agree with the actual reader or downstream model. These are
+conditional explanations and diagnostic requirements, not fitted causes of the
+symbolic or language-model outcomes.
+
+The remaining propositions set additional boundaries. The bias-free ReLU transmission
+obstruction concerns an exact through-map on a positively spanning code set, not
+universal classification failure of the residual reader (Prop.6). Exact elimination
+of a high-dimensional recurrence requires its entire update to remain in a fixed
+output subspace (Prop.8). The pure zero-output-factor double-BA dead start concerns
+that branch’s first derivative, not every V2 initialization (Prop.9). We use none of
+these identities as evidence of a measured elimination speedup or a universal ranking
+between linear and nonlinear readers. Full assumptions, proofs, and counterexamples
+are in theory.md; Appendix A gives proof sketches.
+

@@ -1,0 +1,82 @@
+\section{Learned writers are the weak point}
+\label{sec:writers}
+
+\subsection{Symbolic learned writers}
+
+The unfactorized joint rank-32 reader M1 passes the registered gate with a much smaller effect than the oracle: $D=+8.292$ pp [7.383, 9.292] and $W=+2.492$ pp [1.244, 3.733].  % S3
+Its mean advantage over B5 is +7.767 pp [6.516, 9.050], but the three seed effects are +9.300, $-17.700$ and +31.700 pp.  % S3
+The pooled interval is therefore compatible with a failed training seed, and it does not establish improvement for a population of new seeds.  % S3
+The joint linear reader fails the primary depth gate, with specificity $-0.408$ pp [$-1.475$, 0.753].  % S4
+Unfactorized frozen T1 writers fail the replication-specificity criterion for both readers, and the M1 replication interval includes zero.  % S5
+This does not show that joint training is necessary for every composable writer: factorized frozen writers give positive depth and specificity effects under the tested protocol.  % S5 S9
+Even matched factorized T1 sources with validation accuracy above 91\% do not certify the full gate after freezing; the resulting readers keep positive depth effects but fail hop 1 preservation.  % S12 S9
+
+Factorization separates composition evidence from overall utility.
+On the reused confirmation set C777, joint\_fact M1 has $D=+22.975$ pp [22.017, 23.975] and $W=+20.158$ pp [19.058, 21.192], but $H=-35.617$ pp [$-37.217$, $-33.933$] on hop 1.  % S9
+All four factorized writer and reader conditions fail the complete depth gate because of the hop 1 loss, although their reach, specificity and control contrasts pass.  % S9
+At L4, joint\_fact M1's reachable-hop contrast against the unfactorized joint system is $-19.108$ pp [$-20.534$, $-17.600$], despite a larger depth contrast.  % S10
+Improving a contrast from a weaker L1 baseline is not the same as improving the deployed L4 system.
+The larger-rank follow-up gives stronger joint-code effects in its tested regimes: rank-64 M1 has $D=+30.533$ pp [29.225, 31.900] and a pooled B5 contrast of +24.017 pp [22.575, 25.575] (seeds +22.575, +25.075, +24.400).  % S8
+Rank and training steps are confounded there (20,000 steps against 15,000), it has no replication, and it reuses the C777 set, so it is not an independent confirmation.  % S8
+
+\subsection{Language-model writer screens}
+
+In one frozen language-model module, validation screens (training seed 17, validation seed 4242) tested learned writers against the WP-L4 gate: validation EM of at least 0.80.
+The screens select no learned writer.  % LL9
+Input information is recoverable at the adapter's input positions (tail-token probe 97.6\%, question-final start 99.4\%, relation 100.0\%), and a supplied-answer-code control reaches 98.7\% EM, so the frozen output path is usable.  % LL2 LL3
+The deployed read is the problem.
+For the audited W5 arm, the clean-value head reads 85.4\% while the read-value head reads 10.5\%, and zero- or shuffled-memory interventions show sensitivity to the memory channel without localizing the failure.  % LL7 LL10
+The final rank-128 arms reached at best 33.5\% (R), 29.9\% (W5) and, for the ineligible value/output ceiling OA, 84.0\%.  % LL9
+A read-failure factorial (RFX) on frozen checkpoints found that only an exact store together with the true key rescues the read, and the true key is a label, not deployable; the exact store with the deployed or unit query does not.  % RX1
+The verdict does not separate store from query, and no trained least-squares arm ran.  % RX1
+
+\paragraph{DPFP.}
+A registered screen replaced the keys and queries of the WP-L4 learned writer by DPFP features: three arms (D32-3 at rank 32, D128-1 and D128-3 at rank 128), one seed, 1,000 validation episodes each.  % DP1
+No arm reaches the 80\% gate: D32-3 reaches 39.0\%, D128-1 58.0\% and D128-3 60.8\%.  % DP1
+The best arm is above the 50\% trigger, so D128-3 was retrained once at E=8 under the registered rule and reached 73.0\%, again below 0.80.  % DP1
+The registered decision is stop: no writer is selected, no further writer screen follows, and P1L-D (the P1-L learned condition for a selected writer) was not registered and was not run.  % DP1 PD1
+DPFP does raise EM (by 27.0 pp at rank 32 and by 24.5 and 27.3 pp at rank 128 over the WP-L4 references), lowers the normalized read error (0.39, 0.43 and 0.36 against 0.67 and 0.63) and raises the read-value head accuracy (30.2\%, 46.0\% and 51.0\% against 8.8\% and 19.7\%), but the clean-to-read gap narrows without closing.  % DP2
+DPFP changes the feature geometry and the query normalization together (Amendment A1), so neither these gains nor the 12.2 pp gain of the E=8 retrain, which also halves the memory load, is attributed to decorrelation alone.  % DP1 DP2
+A zero- or shuffled-memory audit leaves at most 0.2\% EM for every arm, which shows that the answers depend on the episode's own memory, not that the read is accurate.  % DP3
+The result is one seed, one learning rate and fixed budgets, and it is not a proof that learned writing in a language model is impossible.  % DP1
+
+\paragraph{DPFP-X.}
+A follow-up registered after this stop trained the best DPFP design at rank 256 on Qwen3-0.6B-Base (X256) and at rank 128 on Qwen3-1.7B-Base (X17), everything else as D128-3.
+Neither arm reaches 0.80 (X256 66.2\%, X17 59.3\%), so the learned-writer line stays stopped and both arms are descriptive rows next to DPFP.  % DP4
+X17 differs from D128-3 (60.8\%) by $-1.5$ pp, which the registered rule calls not distinguished, and it is a diagnostic and not a scaling test.  % DP4 DP5
+Both curves were still rising at the final checkpoint (+3.5 and +2.3 pp over the last interval), but the study has no longer run and nothing is extrapolated.  % DP5
+X256's higher EM is not accompanied by a lower read error or a better read-value head than D128-3's, and the paper gives no explanation for it.  % DP6
+The zero- and shuffled-memory audit again leaves at most 0.4\% EM.  % DP7
+
+\subsection{Negative interventions and the gate each did not meet}
+\label{sec:negmatrix}
+
+Table~\ref{tab:neg} lists each repair or test that failed its registered criterion.
+Each row is one study under its own conditions (one training seed or three, one optimizer, a fixed budget).
+The rows record which criterion was not met.
+They do not show that learned writing, an exact store, unshared reads or composition at rank 32 is impossible.
+Not run: the LSQ arms (none was triggered), P1L-D and P1L-S.
+A warm start of B8 from M1-L4 has not been tested.
+
+\begin{table}[htbp]
+\centering\footnotesize
+\setlength{\tabcolsep}{3pt}
+\caption{Negative interventions and the registered criterion each did not meet.  % LL9 RX1 WL1 DP1 DP4 LP7 LP9 LP16 PC1
+}
+\label{tab:neg}
+\begin{tabular}{@{}W{160}{10}W{190}{10}W{240}{10}W{300}{10}W{110}{10}@{}}
+\toprule
+Intervention & Conditions & Result & Criterion not met & Rows \\
+\midrule
+Learned writers of the WP-L4 screen (R, W5, read-supervision variants) & Qwen3-0.6B-Base, ranks 32 and 128, one seed, 1,000 validation episodes & Best eligible arm 33.5\% (R, rank 128) & Validation EM $\geq$ 0.80 (and the 0.50 trigger of the E=8 retraining) & LL9 \\
+Read-failure factorial (RFX) & Frozen R/r128, R/r32 and W5/r32 checkpoints, evaluation only & Only an exact store with the true key (a label) rescues the read; the exact store with the deployed or unit query gives 38.8\% and 38.75\% against 33.8\% at R/r128 & Rescue: normalized read error $\leq$ 0.5 of the baseline and EM gain $\geq$ 10 pp & RX1 \\
+Oracle codes at rank 32 (WP-L6) & M1-L4, $r=r_{\mathrm{mem}}=32$, one seed, 5,666 steps & Hop 1 EM 0.1\% (O-rot) and 11.8\% (O-shared) & Hop 1 full-vocabulary EM $\geq$ 30\% at L=4 & WL1 \\
+DPFP writer & Ranks 32 and 128, E=16, E=8 retrain of the best arm, one seed & 39.0\%, 58.0\% and 60.8\% at E=16; 73.0\% at E=8 & Validation EM $\geq$ 0.80 & DP1 \\
+DPFP-X writer & X256: Qwen3-0.6B-Base, $r=256$; X17: Qwen3-1.7B-Base, $r=128$; one seed & 66.2\% and 59.3\% & Validation EM $\geq$ 0.80 & DP4 \\
+Oracle readers at rank 32 & B4, B8 and M1-L4 on the oracle memory, three seeds & Hop 1 EM at most 0.15\%; the memory-use check fails & Amendment B7 rule 1: each reader's hop 1 EM above B3-L4@4 with a 97.5\% interval above 0 (lower bounds 0.000 for B4, $-0.050$ for B8) & LP7 \\
+B8 (four unshared reads) at 0.6B & Rank 128, three seeds & B8@4$-$B4@1 on hops 2 to 3: +0.983 pp [0.267, 1.717] & G1-L point estimate $\geq$ 3 pp (its hop 1 and typed conditions held) & LP9 \\
+B8 at 1.7B & Rank 128, three seeds & +1.033 pp [0.292, 1.800]; hop 1 $-1.717$ pp & G1-L point estimate $\geq$ 3 pp; hop 1 point estimate $\geq -1$ pp & LP16 \\
+Bridge patching & Rank 128, 0.6B, L=4, state after the first read at the final question position & +0.391 pp [$-0.130$, 0.781] (M1-L4), 0.000 pp (B8) & Shift $\geq$ 10 pp, 95\% interval above 0, positive in every seed & PC1 \\
+\bottomrule
+\end{tabular}
+\end{table}

@@ -1,0 +1,76 @@
+% Manuscript of record (WP-T11 Part B). Build: tectonic -X compile docs/paper/tex/paper.tex
+% Evidence tags are kept as comments (% LP7) next to their sentences; scripts/check_paper_tex.py resolves them against the ledgers.
+\documentclass[10pt,a4paper]{article}
+\usepackage{fontspec}
+\usepackage{unicode-math}
+\setmainfont{texgyrepagella}[Extension=.otf,UprightFont=*-regular,BoldFont=*-bold,ItalicFont=*-italic,BoldItalicFont=*-bolditalic]
+\setmathfont{texgyrepagella-math.otf}
+\setmonofont{texgyrecursor}[Extension=.otf,UprightFont=*-regular,BoldFont=*-bold,ItalicFont=*-italic,BoldItalicFont=*-bolditalic,Scale=0.88]
+\usepackage[margin=2.4cm]{geometry}
+\usepackage{microtype,booktabs,longtable,array,graphicx,xcolor,enumitem,pdflscape,caption,amsmath,multirow}
+\usepackage[colorlinks=true,linkcolor=blue!50!black,urlcolor=blue!50!black,citecolor=blue!50!black]{hyperref}
+\usepackage{url}
+\graphicspath{{../figures/}}
+\captionsetup{font=small,labelfont=bf,justification=raggedright,singlelinecheck=false}
+\setlength{\parskip}{0.4em}
+\setlength{\parindent}{0pt}
+\setlength{\emergencystretch}{3em}
+\sloppy
+\usepackage{xurl}
+\renewcommand{\arraystretch}{1.12}
+\newcommand{\mi}{\ensuremath{-}}
+\newcolumntype{W}[2]{>{\raggedright\arraybackslash}p{\dimexpr(\linewidth-#2\tabcolsep)*#1/1000\relax}}
+\setcounter{tocdepth}{2}
+\input{g1_tables.tex}
+
+\title{Iterative Queries in a Low-Rank Memory Adapter:\\Composition, Writer Dependence, and Budget Limits}
+\author{}
+\date{Manuscript revised after the second round of external review (2026-10-29)}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+\input{abstract.tex}
+\end{abstract}
+
+\noindent\small\emph{Reading guide.}
+Sections 1 to 8 give the question, the setting, the main results and the limits.
+Every principal claim, with its comparator, writer, split and gate, is in Appendix~\ref{app:C}.
+The appendices hold the method and theory in full, every symbolic and language-model study, and the full related work.
+Numerical and claim authority is the pair of evidence ledgers (\texttt{evidence\_symbolic.md}, \texttt{evidence\_llm.md}); the ledger wins over any shortened wording here.
+Section numbers inside Appendices D to H follow the numbering of the record from which they were taken.
+\normalsize
+
+\tableofcontents
+
+\input{sec_intro.tex}
+\input{sec_setting.tex}
+\input{sec_oracle.tex}
+\input{sec_writers.tex}
+\input{sec_mechanism.tex}
+\input{sec_other.tex}
+\input{sec_limits.tex}
+\input{sec_related.tex}
+\input{sec_conclusion.tex}
+
+\appendix
+\input{app_A.tex}
+\input{app_B.tex}
+\input{app_C.tex}
+\input{app_D.tex}
+\input{app_E.tex}
+\input{app_F.tex}
+\input{app_G.tex}
+\input{app_H.tex}
+
+\section*{References and source records}
+\addcontentsline{toc}{section}{References and source records}
+Project source records: the dated literature audit (\texttt{docs/reports/lit\_check.md}), the symbolic and LLM evidence ledgers, the binding notation (\texttt{docs/notation.md}) and the full theory (\texttt{docs/theory.md}).
+The unresolved RecLoRA comparison remains a TODO.
+\nocite{*}
+{\small
+\bibliographystyle{plain}
+\bibliography{refs}
+}
+\end{document}

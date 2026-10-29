@@ -1,0 +1,36 @@
+\section{Related work and boundaries}
+\label{sec:related}
+
+This section gives the closest comparisons and what each does and does not bear on; Appendix~\ref{app:H} has the full text.
+The dated literature audit (\texttt{docs/reports/lit\_check.md}) is the scope record, and we keep its access limitations rather than turn an incomplete search into a priority claim.
+Associative memory, key-value separation, multi-hop memory reading and recursive sharing are established ingredients, and we claim none of them as new.
+
+\paragraph{Low-rank adaptation and fast weights.}
+\href{https://arxiv.org/abs/2106.09685}{LoRA} supplies the parameterization: a frozen base projection plus a trained low-rank branch.
+\href{https://arxiv.org/html/1610.06258v3}{Ba et al.} already read fixed fast weights repeatedly with an evolving inner state, and \href{https://proceedings.mlr.press/v139/schlag21a.html}{Schlag et al.} connect linear attention to fast-weight programming and delta-style updates.
+\href{https://arxiv.org/html/2605.12357v2}{$\delta$-mem} combines associative online state with low-rank corrections to a frozen language model; the distinction is the read schedule and query evolution, not associative memory itself.
+
+\paragraph{Looped and recurrent-depth models.}
+\href{https://arxiv.org/abs/2608.18230}{MixerLoop} repeats a delta-network mixer, and \href{https://arxiv.org/abs/2503.07903}{MemReasoner} is a close memory-and-composition neighbor with an end-to-end trained memory-augmented model.
+\href{https://arxiv.org/html/2502.05171v2}{Huginn}, \href{https://arxiv.org/pdf/2510.25741v6}{Ouro}, \href{https://arxiv.org/html/2410.20672v3}{Relaxed Recursive Transformers} and \href{https://arxiv.org/html/2507.10524v3}{Mixture-of-Recursions} place and train repeated computation differently.
+The loss of short-hop accuracy at larger $L$ is a known failure of recurrent depth (\href{https://arxiv.org/abs/2202.05826}{Bansal et al.}, \href{https://arxiv.org/abs/2511.08577}{Think-at-Hard}, \href{https://arxiv.org/abs/2604.07822}{Kohli et al.}), so we read it as an instance in a new setting and do not test the remedies those works propose.  % S7 JS1
+\href{https://arxiv.org/html/2605.26733v1}{STARS} and \href{https://arxiv.org/html/2608.08113v1}{ReLIT} narrow any claim about reinjection, frozen-backbone recurrence or stabilization.
+
+\paragraph{Latent multi-hop composition in language models.}
+\href{https://arxiv.org/abs/2402.16837}{Yang et al. (2024)}, \href{https://arxiv.org/abs/2411.16679}{Yang et al. (2025)}, \href{https://arxiv.org/abs/2411.16353}{Balesni et al.}, \href{https://arxiv.org/abs/2406.12775}{Biran et al.}, \href{https://arxiv.org/abs/2502.10835}{Yu et al.} and \href{https://arxiv.org/abs/2601.03542}{Liu et al.} study bridge entities and layer order in two-hop queries; \href{https://arxiv.org/abs/2608.07261}{Zhang et al.}, \href{https://arxiv.org/abs/2509.24653}{Lin et al.} and \href{https://arxiv.org/abs/2405.15071}{Wang et al.} study out-of-distribution composition.
+In our setting facts reach the reader only through a fixed-size adapter memory and hops are spent in a reader loop, so these studies bound what we may claim without predicting our results.
+In particular they make it unsafe to read B8's in-distribution advantage over the shared reader as evidence for the unshared design, and the paper reports only a descriptive scope row on unseen-pool names.  % B3 B6 UN2 UN3
+
+\paragraph{Regression memories, writers and retrieval in weights.}
+A delta-rule write is one gradient step on a recall loss (\href{https://arxiv.org/abs/2501.12352}{Wang et al.}), and \href{https://arxiv.org/abs/2501.00663}{Titans}, \href{https://arxiv.org/abs/2505.23735}{ATLAS} and \href{https://arxiv.org/abs/2407.04620}{TTT layers} train the memory itself at test time.
+Our writer is the one-step delta update; whether that gap contributes to the deployed-read distortion is untested, and we study none of these alternative writers.  % LL7 LL9
+Slot and lookup memories, parameter edits and episodic memories for frozen models (Appendix~\ref{app:H}) give each item its own address or write into weights; no slot-memory baseline is run.
+Two further reviews added works on writers as online regression or filtering, on retention and update rules, and on looped supervision and distillation (Appendix~\ref{app:H}).
+We cite their abstract pages as the reviewers recorded them, did not re-open the pages, claim no priority, and study none of the writers, objectives or architectures named there.
+\href{https://arxiv.org/abs/2601.15313}{Zahn et al.} report that semantic keys overlap and recall falls near chance after a few related facts, a setting close to the key-overlap questions of the writer screens.
+\href{https://arxiv.org/abs/2402.09268}{Sanford et al.} show that logarithmic depth suffices for $k$-hop problems, so one hop per read is a design choice of this adapter and not a bound.
+\href{https://arxiv.org/abs/2602.00449}{Liang and Pan} warn that decodable intermediate states do not establish a complete serial algorithm, which is the boundary the per-step readouts respect.  % LP5
+
+\paragraph{Verbalizable directions and the readout boundary.}
+The \href{https://transformer-circuits.pub/2026/workspace/index.html}{J-lens} reads intermediate residuals through averaged transport to the final layer.
+It motivates asking whether reader states expose the expected entities while separating readability from causal use; our readouts are a proxy that differs from it, and they support no new priority claim.  % LP5
