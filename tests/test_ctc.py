@@ -251,6 +251,9 @@ def test_perfect_hard_lookup_reproduces_the_oracle_readers_logits_bitwise(model,
     cfg, arrays, tokens, _ = tiny_batch(tokenizer, names)
     experiment = LLMExperiment(cfg, model=model, tokenizer=tokenizer)
     try:
+        generator = torch.Generator(device="cuda").manual_seed(5)
+        for parameter in experiment.adapter.parameters():  # an untrained adapter ignores its memory; make it read
+            parameter.data.copy_(torch.randn(parameter.shape, generator=generator, device="cuda"))
         ctc.freeze_reader(experiment)
         with torch.no_grad():
             prepared = experiment.prepare(arrays)
