@@ -1,7 +1,7 @@
 # WP-L13 state: SLOT-LOOP-v1 (S0, S1A), step 2: review round 1 fixes
 
 Branch `wp/slot` (worktree `LoopLora-wt/slot`), master `c0bbbd5` merged after handover at `ccdcc96`; not merged into master, not pushed. Task: `docs/tasks/WP-L13_slot_loop.md`; registration `docs/prereg/SLOT-LOOP-v1.md` (blake2b-128 `56e8c611c01e0ef9b7ae32db97b0e334`, registered on master at `5f04a5c`, unchanged); results will go to `docs/reports/SLOT-LOOP-v1.md`.
-**Status: review rounds closed by the user; preflight → lock → S0 → decision authorized.** All four round-2 fixes are complete and 268 affected tests passed. Master 8632497 merged; reviewed src unchanged. Written stage budgets are superseded by the user’s per-job cap of 16 node·h. S1A follow-ups remain deferred. Earlier compute results below cover the pre-review implementation. No real preflight, manifest lock, S0 or S1A science run has started. After validation, STOP for the orchestrator’s cross-review before those steps.
+**Status: real-parent preflight passed; manifest lock created after all gates passed; ready for S0.** All four round-2 fixes are complete and 268 affected tests passed. Master 8632497 merged; reviewed src unchanged. Written stage budgets are superseded by the user’s per-job cap of 16 node·h. S1A follow-ups remain deferred. Earlier compute results below cover the pre-review implementation. No real preflight, manifest lock, S0 or S1A science run has started. After validation, STOP for the orchestrator’s cross-review before those steps.
 
 ## What the code does
 New files only, except four typed-dispatch edits (below). Every new option is off in the old paths.
@@ -185,6 +185,10 @@ Preflight outputs are new absolute paths under `/work/xg24i002/x10041/LoopLora/r
 
 | job | stage | snapshot | requested resources | outcome | actual node·h |
 | --- | --- | --- | --- | --- | --- |
-| 3728339.opbs | real-parent preflight | `7febf58c3440483fe081e99c263f68ad62512b10` | debug-g, 1 node × 00:20:00 | submitted, waiting for watcher | pending |
+| 3728339.opbs | real-parent preflight | `7febf58c3440483fe081e99c263f68ad62512b10` | debug-g, 1 node × 00:20:00 | all nine checks passed on mg0031, 53 s, exit 0 | 0.014722 |
 
 Preflight log: `/work/xg24i002/x10041/LoopLora/logs/pbs/slot-preflight-20261029-215406-3324539.log`. `REVIEW_COMMIT=7febf58c3440483fe081e99c263f68ad62512b10`. Runbook step 1 submitted exactly with resolved full commit and absolute config/output paths. Prior cumulative runtime: 0.701333 node·h. Next: inspect job log, preflight.json and identity.json; on complete success, run the metadata lock command, commit the lock/inventory/preflight on wp/slot, then submit S0 on that lock commit. Any failed required check stops before calibration/dev.
+
+
+Preflight accepted: job 3728339 ran 21:54:33–21:55:26 JST on mg0031, 53 / 3,600 = 0.014722 node·h; cumulative measured 0.716056 node·h (stage caps superseded). Native S-RE replay is bitwise equal to archived per-sample results: 723/1,000, NLL 1.642127275466919. D128-3 replay is also bitwise: 608/1,000, NLL 2.1291537284851074. Matrix equals Native on all 1,000 old episodes, 64 S0 smoke episodes at L=1/2/4 and the 64 four-question train-shaped smoke episodes, with zero unequal logits and max absolute difference 0.0. The four reader gradients are bitwise equal with max differences 0.0. All owner/mask, isolation, feature, frozen-set, bytes and capacity checks passed. Slots: 57,368 B/episode; matrix: 393,216 B/episode. Source blake2b-128: `fe548da4c06d77b7f4a8ae65349650f9`.
+Lock command completed successfully with the shared venv interpreter: re-derived registry/disjointness, verified stage configs, registered prereg digest, actual parent file inventory and source digest against the preflight. It generated `reports/slot-loop-v1/manifest.lock.json` and `checkpoint_inventory.json`; exact preflight and identity reports are copied to `reports/slot-loop-v1/preflight/`. These are committed locally on wp/slot before any S0 calibration or dev execution, per the user authorization. No src changes.
