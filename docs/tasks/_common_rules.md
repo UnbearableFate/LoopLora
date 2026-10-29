@@ -4,7 +4,8 @@
   login node only: edit files and run static checks (`python3 -m py_compile`, `pyflakes`/`ruff` if present).
   Never import torch, run pytest, train or evaluate on a login node. Compute work goes through
   `scripts/submit.py` (see `docs/reports/P1L-state.md` for the pattern) and only in step 2.
-- Each job ≤ 1 node × 1 h by default; ≤ 2 h only with `--scale-up <prereg>` where that prereg allows it. Walltime =
+- Each job ≤ 16 node·h, nodes × walltime (user, 2026-10-29: "不必在意文档中描述的预算, 保持每单个run在16 node * h即可";
+  `scripts/submit.py` enforces it). Budgets written in plans and preregs no longer cap jobs or stages. Walltime =
   measured × 1.5. Record node·h per job.
 - Dependencies through uv; do not change `pyproject.toml`/`uv.lock` without saying why in your report.
 - Hashes: blake2b only, never SHA-256. Seeds via `derive_seed(base, label…)`.
@@ -26,7 +27,7 @@
   The orchestrator arms a watcher and messages you once every listed job has left the queue. Then read the logs and
   outputs: exit status 0 alone is not success.
 - End your turn with a line starting `STOP:` for anything the orchestrator decides: a lock commit, a failure that the
-  prereg and its clarifications do not cover, any deviation from a registered rule, more than 8 nodes × 1 h per job
-  (2 h only with `--scale-up` where the prereg allows it).
+  prereg and its clarifications do not cover, any deviation from a registered rule (registered budget caps excepted: they no
+  longer bind), a job above 16 node·h.
 - Keep at most 6 of your jobs queued or running at once; four workers share the project's 16 running jobs.
 - Record every job (ID, node·h, outcome) in your WP report as you go, and commit on your branch.
