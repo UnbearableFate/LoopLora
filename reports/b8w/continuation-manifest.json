@@ -1,0 +1,85 @@
+{
+  "data_start_step": 17000,
+  "jobs": {
+    "shared-s17": {
+      "checkpoint_hash": "ed12a3181837a00cf9c171c5b9851e93",
+      "config_hash": "855953e4aa831b8566797b86b6f72606",
+      "converted": null,
+      "job_id": "3724077.opbs",
+      "source": "70bb12c7a46833f5e436582ae6434d5a47485135",
+      "start_checkpoint_hash": "c90d23ff1a27d509ed61ae43d5185832",
+      "train_seconds": 411.62467879500764
+    },
+    "shared-s29": {
+      "checkpoint_hash": "1349181d3f24940ce339eb7fcbfa2bca",
+      "config_hash": "2ba3b98d405d3952860206e5f0084296",
+      "converted": null,
+      "job_id": "3724078.opbs",
+      "source": "70bb12c7a46833f5e436582ae6434d5a47485135",
+      "start_checkpoint_hash": "59e293ee6f36f29d03413c3f580f7fa7",
+      "train_seconds": 407.66041417900124
+    },
+    "shared-s43": {
+      "checkpoint_hash": "7e2da237235c231e4eb3e58b95405d87",
+      "config_hash": "3664694471b5df94c39162e9055d3d5e",
+      "converted": null,
+      "job_id": "3724079.opbs",
+      "source": "70bb12c7a46833f5e436582ae6434d5a47485135",
+      "start_checkpoint_hash": "37a7baf0e832e3cad35e10b7ef1d1c39",
+      "train_seconds": 397.72118108699215
+    },
+    "untied-s17": {
+      "checkpoint_hash": "129718105a12232f6bf0dbb2cc1f6fb8",
+      "config_hash": "4e98f40f5a09972415870764ee39fb4c",
+      "converted": "/work/xg24i002/x10041/LoopLora/runs/b8w/main/s17/converted.pt",
+      "job_id": "3724077.opbs",
+      "source": "70bb12c7a46833f5e436582ae6434d5a47485135",
+      "start_checkpoint_hash": "1f0c56aef7cf70e76c5ac70f2a3295f6",
+      "train_seconds": 414.80615158900036
+    },
+    "untied-s29": {
+      "checkpoint_hash": "a0c052c7b37c98905b3f0653d98374a7",
+      "config_hash": "8b33b30a4877d9f4e958e826a7fd4d20",
+      "converted": "/work/xg24i002/x10041/LoopLora/runs/b8w/main/s29/converted.pt",
+      "job_id": "3724078.opbs",
+      "source": "70bb12c7a46833f5e436582ae6434d5a47485135",
+      "start_checkpoint_hash": "6f62abbe0bab2dd1e61968f1376ad600",
+      "train_seconds": 413.25373339299404
+    },
+    "untied-s43": {
+      "checkpoint_hash": "dae90285cc5f5a3b11fe9354b1c1dfef",
+      "config_hash": "f8a9e1b0578de19aa1cba67b47d595b6",
+      "converted": "/work/xg24i002/x10041/LoopLora/runs/b8w/main/s43/converted.pt",
+      "job_id": "3724079.opbs",
+      "source": "70bb12c7a46833f5e436582ae6434d5a47485135",
+      "start_checkpoint_hash": "9c623e91f54b28561d76bbf75ac00ee0",
+      "train_seconds": 412.5217311900051
+    }
+  },
+  "lock": {
+    "hash": "998ecf829fa6cc1f46a0efb1a9e35e25",
+    "path": "reports/b8w/checkpoint-lock.json"
+  },
+  "lr": 0.003,
+  "runs": {
+    "B4-s17": "/work/xg24i002/x10041/LoopLora/runs/p1l/main/r128/main/B4-s17/B4-s17",
+    "B4-s29": "/work/xg24i002/x10041/LoopLora/runs/p1l/main/r128/main/B4-s29/B4-s29",
+    "B4-s43": "/work/xg24i002/x10041/LoopLora/runs/p1l/main/r128/main/B4-s43/B4-s43",
+    "B8-s17": "/work/xg24i002/x10041/LoopLora/runs/p1l/main/r128/main/B8-s17/B8-s17",
+    "B8-s29": "/work/xg24i002/x10041/LoopLora/runs/p1l/main/r128/main/B8-s29/B8-s29",
+    "B8-s43": "/work/xg24i002/x10041/LoopLora/runs/p1l/main/r128/main/B8-s43/B8-s43",
+    "shared-s17": "/work/xg24i002/x10041/LoopLora/runs/b8w/main/s17/shared",
+    "shared-s29": "/work/xg24i002/x10041/LoopLora/runs/b8w/main/s29/shared",
+    "shared-s43": "/work/xg24i002/x10041/LoopLora/runs/b8w/main/s43/shared",
+    "start-s17": "/work/xg24i002/x10041/LoopLora/runs/p1l/main/r128/main/M1-s17/M1-L4-s17",
+    "start-s29": "/work/xg24i002/x10041/LoopLora/runs/p1l/main/r128/main/M1-s29/M1-L4-s29",
+    "start-s43": "/work/xg24i002/x10041/LoopLora/runs/p1l/main/r128/main/M1-s43/M1-L4-s43",
+    "untied-s17": "/work/xg24i002/x10041/LoopLora/runs/b8w/main/s17/untied",
+    "untied-s29": "/work/xg24i002/x10041/LoopLora/runs/b8w/main/s29/untied",
+    "untied-s43": "/work/xg24i002/x10041/LoopLora/runs/b8w/main/s43/untied"
+  },
+  "steps": 2000,
+  "study": "b8w",
+  "training_source": "70bb12c7a46833f5e436582ae6434d5a47485135",
+  "window": "b8w"
+}

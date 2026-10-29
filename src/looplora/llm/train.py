@@ -19,7 +19,7 @@ from looplora.core.config import AdapterConfig, validate_steps
 from looplora.data.relations import TaskSpec
 from looplora.infra.seeds import derive_seed
 from .batching import PreparedBatch, repeat_snapshot, tokenize_batch
-from .config import ORACLE_WRITERS
+from .config import ORACLE_WRITERS, resolve_config
 from .inject import (AdapterBank, attach_adapters, backbone_pin,
                      configure_numerics, detach_adapters, load_model, load_tokenizer)
 from .protocols import SupportSnapshot, answer_scores, encode_support
@@ -314,8 +314,10 @@ def _fit(experiment: LLMExperiment, out: Path) -> dict[str, Any]:
     final_loss, train_tokens = None, 0
     synchronize(experiment.device)
     started = time.perf_counter()
+    # A continued run (docs/prereg/B8W.md) reads the training stream from `data_start_step`; absent = 0, the original call.
+    data_start = options.get("data_start_step", 0)
     with (out / "train_log.jsonl").open("w") as log, BatchStream(
-        spec, "train", options["batch_size"], data_seed, steps,
+        spec, "train", options["batch_size"], data_seed, data_start + steps, start_step=data_start,
         tokenizer=experiment.tokenizer, workers=options.get("prefetch_workers", 0),
         include_support=not experiment.oracle,
     ) as batches:
@@ -366,6 +368,8 @@ def _fit(experiment: LLMExperiment, out: Path) -> dict[str, Any]:
                "trainable_parameters": sum(p.numel() for p in params)}
     if writer_params:
         summary["writer_trainable_parameters"] = sum(p.numel() for p in writer_params)
+    if data_start:
+        summary["data_start_step"] = data_start
     return summary
 
 
@@ -398,6 +402,32 @@ def train(config: dict[str, Any], out: Path, *, model=None, tokenizer=None):
         experiment.close()
         raise
     return experiment, summary
+
+
+def continue_training(experiment: LLMExperiment, out: Path, train_options: dict[str, Any], *, name: str,
+                      continued_from: dict[str, Any]):
+    """Continue training a loaded experiment (docs/prereg/B8W.md): fresh optimizer and warmup, `train_options` replace the
+    stored train block (steps, lr, data_start_step, ...), the stream is the original one read from data_start_step.
+    Writes train_log.jsonl and a format-1 checkpoint whose summary names what it continued from."""
+    out = Path(out)
+    out.mkdir(parents=True, exist_ok=True)
+    if any((out / file).exists() for file in ("checkpoint.pt", "train_log.jsonl", "writer.pt")):
+        raise FileExistsError(f"training output already exists: {out}")
+    resolved = copy.deepcopy(experiment.config)
+    resolved["name"] = name
+    resolved["train"] = {**resolved["train"], **train_options}
+    resolved = resolve_config(resolved)
+    experiment.config = resolved
+    summary = _fit(experiment, out)
+    summary["continued_from"] = copy.deepcopy(continued_from)
+    writer = {"writer": experiment.writer_state(), "signature": experiment.writer_signature()}
+    if experiment.writer is not None:
+        torch.save({**writer, "config": resolved}, out / "writer.pt")
+    summary["writer_checkpoint"] = str(out / "writer.pt") if experiment.writer is not None else None
+    adapter = {key: value.detach().cpu().clone() for key, value in experiment.adapter.state_dict().items()}
+    torch.save({"format_version": 1, "config": resolved, "adapter": adapter, **writer, "summary": summary},
+               out / "checkpoint.pt")
+    return summary
 
 
 def load_checkpoint(path, model=None, tokenizer=None, device=None) -> LLMExperiment:

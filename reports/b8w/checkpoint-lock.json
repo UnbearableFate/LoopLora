@@ -1,0 +1,127 @@
+{
+  "batch_size": 64,
+  "checkpoints": {
+    "B4-s17": {
+      "config_hash": "be4343ffeedc1474f63dcd2354fa4cc7",
+      "hash": "acfa784892a1dd2fd2e31a7d04ff86ae",
+      "lr": 0.003,
+      "path": "/work/xg24i002/x10041/LoopLora/runs/p1l/main/r128/main/B4-s17/B4-s17/checkpoint.pt",
+      "steps": 17000,
+      "training_source": "1d1bbfd6958bfac2cd35054a24abeebcfdb7da1b"
+    },
+    "B4-s29": {
+      "config_hash": "c215ddc72e6107f89fd3d9635304df9a",
+      "hash": "558ceca24cb0fa24af967d8c3fc4e3b8",
+      "lr": 0.003,
+      "path": "/work/xg24i002/x10041/LoopLora/runs/p1l/main/r128/main/B4-s29/B4-s29/checkpoint.pt",
+      "steps": 17000,
+      "training_source": "1d1bbfd6958bfac2cd35054a24abeebcfdb7da1b"
+    },
+    "B4-s43": {
+      "config_hash": "72cc3bbbb5773edd749934d171bc36ed",
+      "hash": "682626adf4ae6e14123ca5c1a6e77b2a",
+      "lr": 0.003,
+      "path": "/work/xg24i002/x10041/LoopLora/runs/p1l/main/r128/main/B4-s43/B4-s43/checkpoint.pt",
+      "steps": 17000,
+      "training_source": "1d1bbfd6958bfac2cd35054a24abeebcfdb7da1b"
+    },
+    "B8-s17": {
+      "config_hash": "97174328c2defbc8708330296fe21113",
+      "hash": "243dfcee7710792d8452745e6bd06b35",
+      "lr": 0.003,
+      "path": "/work/xg24i002/x10041/LoopLora/runs/p1l/main/r128/main/B8-s17/B8-s17/checkpoint.pt",
+      "steps": 17000,
+      "training_source": "1d1bbfd6958bfac2cd35054a24abeebcfdb7da1b"
+    },
+    "B8-s29": {
+      "config_hash": "2f5acd6bd4f6e2d67d723b4aa0d6d1cc",
+      "hash": "d599783f6fadab6beaf6a5a448777c2e",
+      "lr": 0.003,
+      "path": "/work/xg24i002/x10041/LoopLora/runs/p1l/main/r128/main/B8-s29/B8-s29/checkpoint.pt",
+      "steps": 17000,
+      "training_source": "1d1bbfd6958bfac2cd35054a24abeebcfdb7da1b"
+    },
+    "B8-s43": {
+      "config_hash": "7e60777e32e36d74a4844f7960dadaff",
+      "hash": "743d5021d223466361a6ae5a9a794f0d",
+      "lr": 0.003,
+      "path": "/work/xg24i002/x10041/LoopLora/runs/p1l/main/r128/main/B8-s43/B8-s43/checkpoint.pt",
+      "steps": 17000,
+      "training_source": "1d1bbfd6958bfac2cd35054a24abeebcfdb7da1b"
+    },
+    "M1-L4-s17": {
+      "config_hash": "8b56ec347c3f0be8f1c2f95a5237ebfa",
+      "hash": "c90d23ff1a27d509ed61ae43d5185832",
+      "lr": 0.003,
+      "path": "/work/xg24i002/x10041/LoopLora/runs/p1l/main/r128/main/M1-s17/M1-L4-s17/checkpoint.pt",
+      "steps": 17000,
+      "training_source": "1d1bbfd6958bfac2cd35054a24abeebcfdb7da1b"
+    },
+    "M1-L4-s29": {
+      "config_hash": "a4adcccd53043d1af222c41a69a4a1c1",
+      "hash": "59e293ee6f36f29d03413c3f580f7fa7",
+      "lr": 0.003,
+      "path": "/work/xg24i002/x10041/LoopLora/runs/p1l/main/r128/main/M1-s29/M1-L4-s29/checkpoint.pt",
+      "steps": 17000,
+      "training_source": "1d1bbfd6958bfac2cd35054a24abeebcfdb7da1b"
+    },
+    "M1-L4-s43": {
+      "config_hash": "2a6e14e563901dded61c510a81004810",
+      "hash": "37a7baf0e832e3cad35e10b7ef1d1c39",
+      "lr": 0.003,
+      "path": "/work/xg24i002/x10041/LoopLora/runs/p1l/main/r128/main/M1-s43/M1-L4-s43/checkpoint.pt",
+      "steps": 17000,
+      "training_source": "1d1bbfd6958bfac2cd35054a24abeebcfdb7da1b"
+    }
+  },
+  "confidence": 0.95,
+  "continuation_source": "the commit that adds this lock, or a later head that changes no file under src/looplora, scripts/run_b8w.py or the configs (the job names which)",
+  "data_start_step": 17000,
+  "decision": "untied@4 - shared@4, hops 2 and 3: keeps iff every seed >= -2 pp and the pooled 95% CI lower bound > -2 pp",
+  "depths": [
+    4
+  ],
+  "episodes": 2000,
+  "eval_seed": 4242,
+  "lr": 0.003,
+  "noninferiority": 0.02,
+  "oracle_hash": "db99a779aebd647bc72caf4aabba2c48",
+  "p1l_lr_lock_hash": "92ac8eac57be3cf613a411a78a4400ad",
+  "p1l_run_manifest": "reports/p1l/r128/run-manifest.json",
+  "p1l_run_manifest_hash": "3770aaced48bb1de4193d332b74c7884",
+  "prereg": "docs/prereg/B8W.md",
+  "prereg_hash": "7414b6e0118d8d53a913467d6e7848b2",
+  "seeds": [
+    17,
+    29,
+    43
+  ],
+  "smoke": {
+    "gate": {
+      "argmax_equal": true,
+      "control_equal": true,
+      "control_max_abs_difference": 0.0,
+      "converted_checkpoint_hash": "1f0c56aef7cf70e76c5ac70f2a3295f6",
+      "depth": 4,
+      "episodes": 64,
+      "logits_dtype": "torch.bfloat16",
+      "logits_equal": true,
+      "max_abs_difference": 0.0,
+      "passed": true,
+      "read_dtype": "torch.float32",
+      "seed": 17,
+      "split": "val",
+      "start_checkpoint_hash": "c90d23ff1a27d509ed61ae43d5185832",
+      "tolerance": 0.0
+    },
+    "job": "3723983",
+    "seed": 17,
+    "steps_per_arm": 100
+  },
+  "status": "locked",
+  "steps": 2000,
+  "study": "b8w",
+  "warmup_steps": 20,
+  "window": "b8w",
+  "window_start": 108000
+}

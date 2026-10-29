@@ -1,0 +1,19 @@
+{
+  "runs": {
+    "B4-s17": "/work/xg24i002/x10041/LoopLora/runs/b8w/confirmation/B4-s17",
+    "B4-s29": "/work/xg24i002/x10041/LoopLora/runs/b8w/confirmation/B4-s29",
+    "B4-s43": "/work/xg24i002/x10041/LoopLora/runs/b8w/confirmation/B4-s43",
+    "B8-s17": "/work/xg24i002/x10041/LoopLora/runs/b8w/confirmation/B8-s17",
+    "B8-s29": "/work/xg24i002/x10041/LoopLora/runs/b8w/confirmation/B8-s29",
+    "B8-s43": "/work/xg24i002/x10041/LoopLora/runs/b8w/confirmation/B8-s43",
+    "shared-s17": "/work/xg24i002/x10041/LoopLora/runs/b8w/confirmation/shared-s17",
+    "shared-s29": "/work/xg24i002/x10041/LoopLora/runs/b8w/confirmation/shared-s29",
+    "shared-s43": "/work/xg24i002/x10041/LoopLora/runs/b8w/confirmation/shared-s43",
+    "start-s17": "/work/xg24i002/x10041/LoopLora/runs/b8w/confirmation/start-s17",
+    "start-s29": "/work/xg24i002/x10041/LoopLora/runs/b8w/confirmation/start-s29",
+    "start-s43": "/work/xg24i002/x10041/LoopLora/runs/b8w/confirmation/start-s43",
+    "untied-s17": "/work/xg24i002/x10041/LoopLora/runs/b8w/confirmation/untied-s17",
+    "untied-s29": "/work/xg24i002/x10041/LoopLora/runs/b8w/confirmation/untied-s29",
+    "untied-s43": "/work/xg24i002/x10041/LoopLora/runs/b8w/confirmation/untied-s43"
+  }
+}
