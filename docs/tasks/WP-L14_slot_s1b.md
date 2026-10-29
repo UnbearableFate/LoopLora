@@ -183,7 +183,7 @@ The A1 ready release `d1ccbb7ff4c31fa53abfd7a3cc9ad572` is approved: `reports/sl
 
 ## Verdict accepted (06:55): S1B is done; write the study report
 `STOP: verdict d5c6b64` is accepted.
-- **Check.** The archived `verdict.json` (`dca8d4e9`) and `verdict.md` equal the persistent copies. The orchestrator recomputed the three point estimates from the 24 trained-depth confirmation files with numpy, outside the project code, and got the same values.
+- **Check.** The archived `verdict.json` (`dca8d4e9`) and `verdict.md` equal the persistent copies. The orchestrator recomputed the three point estimates from the 12 trained-depth confirmation files with numpy, outside the project code, and got the same values.
 - **Merge.** wp/loop is merged into master as `2a27f57`. The master test runs as jobs 3731406-3731408.
 - **Registered consequences:**
   - no backend qualifies, so S2 is not entered (S1B §5, plan §8.3);
