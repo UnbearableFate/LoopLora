@@ -1,0 +1,43 @@
+{
+  "git_commit": "a0eaddde8a0d1ad031a5972eef42489971313dcd",
+  "runs": {
+    "LT-U-E16": {
+      "E": 16,
+      "arm": "LT-U",
+      "checkpoint_git_commit": "c07452bfb04af2e95f3abb07629d5654041b1842",
+      "checkpoint_job_id": "3725694.opbs",
+      "dpfp_nu": null,
+      "episodes": 1000,
+      "eval_seed": 4242,
+      "git_commit": "a0eaddde8a0d1ad031a5972eef42489971313dcd",
+      "max_repeated_logit_drift": 0.0,
+      "optimizer_steps": 0,
+      "original": {
+        "correct": 360,
+        "em": 0.36,
+        "nll": 3.3818163871765137
+      },
+      "original_matches_record": {
+        "correct": true,
+        "record_correct": 360,
+        "record_nll": 3.3818163871765137
+      },
+      "rank": 128,
+      "shuffle": {
+        "correct": 0,
+        "em": 0.0,
+        "nll": 10.795366287231445
+      },
+      "source_dirty": false,
+      "source_hash": "327ae5f213b940290577f1da5ad07dd5",
+      "steps": 24560,
+      "zero": {
+        "correct": 2,
+        "em": 0.002,
+        "nll": 8.697364807128906
+      }
+    }
+  },
+  "source_dirty": false,
+  "source_hash": "327ae5f213b940290577f1da5ad07dd5"
+}
