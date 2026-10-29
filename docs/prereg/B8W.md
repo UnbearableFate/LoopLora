@@ -1,9 +1,11 @@
-# Study B8W — B8 warm start from M1-L4: is sharing an optimization scaffold? (G3; DRAFT v1, 2026-10-29)
+# Study B8W — B8 warm start from M1-L4: is sharing an optimization scaffold? (G3), pre-registered
 
-Status: **draft**, written by sn-p1l (Claude Sonnet 5.5) for the orchestrator's review (`docs/tasks/WP-L10_b8_warm_start.md`,
-`plan/followup_2026-10-29.md` G3; astra proposal 3, fable R2). It is not registered. Nothing below depends on a B8W
-result: none exists, no compute job was submitted and no test episode was generated or read. Everything quoted comes
-from P1-L records and training logs (training data, no test data) and from the code at master `e43ccda`.
+Registered 2026-10-29 13:08 JST by the orchestrator, before any B8W code, run or test episode. The user approved G1–G4 on
+2026-10-29 13:00 JST ("OK,启动接下来的G1-G4"). Drafted by sn-p1l (Claude Sonnet 5.5; wp/p1l `548cf1b`) from
+`docs/tasks/WP-L10_b8_warm_start.md` and `plan/followup_2026-10-29.md` G3 (astra proposal 3, fable R2). Nothing below
+depends on a B8W result. The draft quotes P1-L records and training logs only (training data, no test data) and the code at
+master `e43ccda`. The orchestrator's decisions are in "Decisions at registration" at the end; they override the draft's
+flags where they differ.
 
 ## Question and what the answer can and cannot say
 `UnsharedAdapter` (B8, four unshared reads) contains `IterativeQueryAdapter` (M1-L4, one shared read iterated four times):
@@ -178,3 +180,19 @@ With N = 3,000 the total is about 1.45 and with N = 4,000 about 1.7 (2.0 with on
    can make that test assert the registered windows individually.
 8. **Per-seed noise**: the "every seed" condition is on point estimates of three single-seed contrasts; the simplest
    failure mode is one seed missing the −2 pp bar by sampling noise alone (order 0.5% per seed under Δ = 0).
+
+## Decisions at registration (orchestrator)
+1. **N = 2,000 continuation steps** is accepted with the draft's reasons. It is fixed and is not adapted to any result.
+2. Flags 1–6 and 8 are accepted as written:
+   - 95 % intervals (k = 1), with 97.5 % also reported;
+   - the continued P1-L stream through the optional `train.data_start_step`, with its off path tested bitwise;
+   - B4@1 and the original B8@4 re-evaluated on the new range;
+   - primary-only evaluation at L = 4;
+   - the warmup restarted with the fresh optimizer;
+   - the narrow wording of "keeps";
+   - the per-seed point-estimate condition.
+3. **Flag 7 (window merge hazard).** In `tests/test_p1ls_pipeline.py` and every new test, assert each registered
+   `CONFIRMATION_WINDOWS` entry individually: `p1l` 100000, `p1l-s` 110000, `p5l` 104000, and this study's `b8w` 108000.
+   Do not compare the whole dict.
+   - WP-L9 (`lsr` 106000) gets the same instruction, so the branches conflict only on the dict literal.
+   - The orchestrator resolves that conflict at merge time by keeping every entry.
