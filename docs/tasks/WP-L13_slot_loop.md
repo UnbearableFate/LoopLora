@@ -221,3 +221,34 @@ The user lifted the written budgets: "不必在意文档中描述的预算, 保�
   - node·h recorded per job in the state file;
   - the release review and every other gate.
 - **The prereg file:** do not edit it, because its blake2b is bound in code. This section and the plan's execution record replace its budget section.
+
+## Review round 3: last fixes before the preflight (2026-10-29 21:55 JST)
+**Reviews.** Two reviewers checked the round-2 fixes (`8c28334`):
+- rv-code: `docs/review/static_2026-10-29/round3-rv-code.md`, 0 High, 1 Medium.
+- rv-opus: `docs/review/static_2026-10-29/round3-rv-opus.md`, 0 High, 0 Medium, 1 Low.
+
+Both say the preflight may start. Fixes 1-3 are done, and fix 4 is done for the S0 steps. The two items below come first, because item 1 changes `src/`. Merge master first: it has the budget change (section "Budget") and the new `scripts/submit.py`.
+
+1. **The release is not bound by digest** (rv-opus R3-1).
+   - Failure: a release rebuilt at a new path, with an edited analysis script, passes the token and stage `S1A`. Each training record stores `release_blake2b_128`, but nothing reads it.
+   - Fix:
+     - the open record carries `release_blake2b_128`;
+     - stage `S1A-DEV` requires the six training records to share one `release_blake2b_128`;
+     - `load_open_token` and `s1a_provenance` refuse unless the digest of the `--release` file equals the open record's.
+   - Test: the rebuilt-release case is refused at evaluation and at analysis. The test must fail before the fix.
+2. **The S1A runbook commands cannot run as written** (rv-code R3-C1; rv-opus noted the same).
+   - Rewrite every S1A command in the state file the way the S0 steps now read: smoke, pilot, release builder, reload checks, arm runs, dev analysis, sealed evaluation and S1A analysis. Each needs:
+     - resolved commit variables;
+     - the complete `submit.py` options;
+     - absolute quoted paths under `$R`;
+     - variables or loops instead of placeholders such as `C`, `LOCK`, `ARM` and `R/...`.
+   - Extend the runbook test to every submission command in the state file, checked at the `submit.py` parser and the target CLI's parser.
+   - The test must pick out the command itself, not the first backticked span. Step 1's red failure came from the token `debug-g` (rv-code).
+   - Correct the state file's claim that every red test failed for its intended defect, and add the release to the token summary (rv-opus, line 80).
+
+Then:
+1. Run the changed test files on compute.
+2. Update the state file.
+3. End with `STOP: review <hash>`.
+
+Both reviewers check `8c28334..<hash>`, and then the preflight starts.
