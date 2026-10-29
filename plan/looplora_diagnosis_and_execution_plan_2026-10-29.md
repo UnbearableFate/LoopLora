@@ -67,6 +67,18 @@
   - **release 与成本**：release 523d11d5，N = 6000，LR 为 Matrix 1e-3、SoftSlot 3e-3。6 个 run 每个 16.5–18.4 min，合计 1.75 node·h。
   - **S1B 分支**：由此为 advance，即 M1、M4、S1、S4，共享冻结的 A。
   - **S1B 进度**：交叉评审（rv-code 1H 4M，rv-opus 1H 1M 4L）的九项修复已完成；179 项测试通过；preflight 通过，lock bd4e24f（src bb60b89c）。wk-loop 接着做校准、smoke、pilot 和 release。
+- **2026-10-30 01:16 JST** S1B 校准触发登记决定 3 的停止条件：校准后 Matrix-L1 的 hop-1 EM 为 5.1 %，低于 10 %。
+  - **诊断**（job 3729676，只用 calibration 和非密封的 T1 数据）：
+    - S1B 评估路径在 T1 上与记录逐样本一致（733/1000），排除代码错误。
+    - T2 上 oracle read 有 79.5 % EM，说明 writer 的 value 和上层通路都能迁移。
+    - 失败点在 query：用 chain-end 问法时，最后 token 的 key top-1 只有 14.8 %（T1 为 89.4 %）；同样的图换成 T1 问法后升到 59.5 %，EM 升到 31.5 %。
+    - 结论：问法让未训练的 Q 失准。这是 (b) prompt/位置不匹配，wk-loop 的结论相同。
+  - **登记修正 A1**（`docs/prereg/SLOT-LOOP-v1-S1B-A1.md`，blake2b-128 `341d3c71f9334a1384a102b097e7ad75`）：
+    - 解除此次停止；
+    - 读取设置改用 S1A 的 release（Matrix g 1；SoftSlot g 1、τ 0.1），因为 query 失效时 NLL 规则会选出最"平"的 τ = 0.3，对 SoftSlot 不利；
+    - N 由 6000 改为 18,000。理由：P1-L 的 M1-L4 在此布局上训练到 17,000 步仍在提升；按 dev NLL 选 checkpoint，加长步数只增加计算量。
+    - 其余设计不变。A1 改动 src，需要重做 preflight 和 lock。
+  - wk-slot 在 wp/slot 上并行起草 S2 增补（WP-L15，只写文档，不看 S1B 的结果）。
 
 ---
 
