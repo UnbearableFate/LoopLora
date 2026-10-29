@@ -1,7 +1,7 @@
 # WP-L13 state: SLOT-LOOP-v1, S1A selected; confirmation sealed
 
 Branch `wp/slot` (worktree `LoopLora-wt/slot`), master merged through `8632497` after handover at `ccdcc96`; not merged into master, not pushed. Task: `docs/tasks/WP-L13_slot_loop.md`; registration `docs/prereg/SLOT-LOOP-v1.md` (blake2b-128 `56e8c611c01e0ef9b7ae32db97b0e334`, registered on master at `5f04a5c`, unchanged); S0 results are in `docs/reports/SLOT-LOOP-v1.md`.
-**Status: independent dev re-run reproduced selection; orchestrator opening record verified.** Nine exact entries prepared for authorized confirmation and unseen evaluation. Frozen analysis follows both sets; no code, checkpoint, read-setting or threshold changes.
+**Status: authorized confirmation and unseen evaluation complete; frozen S1A analysis submitted.** Both sets contain all nine 2000-episode files with verified printed digests; no scores or verdict read before the frozen analysis.
 
 ## What the code does
 New files only, except four typed-dispatch edits (below). Every new option is off in the old paths.
@@ -415,3 +415,9 @@ Measured maximum 1000-episode dev evaluation across the trained runs is 7.002737
 | 3729314.opbs | unseen | 1 × 00:04:00 | submitted, watcher pending | pending |
 
 Both jobs use science commit 1523b19c7949673ddcd1d89cc1e5fe518736805c and exact ready/open/entries artifacts. Full log/spec paths are in reports/slot-loop-v1/s1a-evaluation-jobs.json. Worker cumulative remains 2.727167 node·h pending these jobs; adding the independent re-run gives 2.728833. Next: inspect completion, nine file counts and printed digests, then run the frozen S1A analysis. Metrics and registered verdict are read only after the frozen analysis; no adaptive choice or further training.
+
+
+
+Both evaluation jobs accepted: confirmation 3729313 on mg0036, 00:22:25–00:24:46 (141 s = 0.039167 node·h); unseen 3729314 on mg0009, 00:22:27–00:24:47 (140 s = 0.038889). Each used the science commit and exact opening/release/entries; nine expected labels, every printed count 2000, exact nine-file directory contents, all printed blake2b hashes match files and exit markers are 0. No metric inspection or adaptive choice; the frozen analysis validates sample-level IDs/provenance/finite arrays.
+Frozen S1A analysis job 3729369.opbs uses science commit 1523b19c7949673ddcd1d89cc1e5fe518736805c, one node debug-g 00:01:00. Inputs: $R/manifest.lock.json, $R/open-root/reports/slot-loop-v1/s1a-open.json, $R/s1a-release.json and $R/s1a-evaluation; persistent output $R/s1a-summary. Log: /work/xg24i002/x10041/LoopLora/logs/pbs/slot-s1a-analysis-20261030-002658-3876138.log. The analysis requires script/open/release digest consistency, exact checkpoint/read provenance, locked n/ids and the fixed 10000-draw paired interval before issuing the registered verdict.
+Evaluation cost 281/3600 = 0.078056 node·h. Worker cumulative 2.805222; including independent rerun job 3729280, 2.806889 node·h before this analysis. Next: inspect the frozen verdict and source index, archive the samples/summary, write the decision record and final report, account actual analysis runtime and STOP: S1A done. No additional experiment or stage authorized by this completion.
