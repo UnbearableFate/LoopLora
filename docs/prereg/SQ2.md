@@ -133,3 +133,9 @@ Node·h is recorded per job. Executed by sn-llm (Sonnet-5.5) on wp/llm; reports 
 5. **Stops.** Step 2 ends with the release committed (N, η, w_c, checkpoint digests, the science commit, config hashes, this
    file's blake2b and the step-0 check). STOP there. Step 3 runs the four arms in parallel, then the audit and the decision,
    and STOPs.
+
+## Clarification C1 (2026-10-29 13:43 JST, before the numerics job has run; from sn-llm's step-2 question)
+- "Rounded to the nearest power of two" means rounding on the log2 scale: w_c = 2^round(log2(median ratio)), then clipped
+  to [1/16, 16]. Between 2^n and 2^(n+1) the boundary is 2^n·√2.
+- The reason is that the ratio of gradient norms is multiplicative.
+- This is fixed before any numerics output exists. The release records the median ratio and w_c under this rule only.
