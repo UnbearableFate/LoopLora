@@ -15,7 +15,7 @@ from transformers import Qwen3Config, Qwen3ForCausalLM
 from looplora.infra.seeds import derive_seed, stable_hash
 from looplora.llm import dpfp_run, inject, read_fix
 from looplora.llm.dpfp import DPFPExperiment, configuration
-from looplora.llm.dpfp_release import (ARMS, BACKBONE_17B, XARMS, XSPECS, arm_spec, prereg_digest, scheduled_steps,
+from looplora.llm.dpfp_release import (ARMS, BACKBONE_17B, SPECS, XARMS, XSPECS, arm_spec, prereg_digest, scheduled_steps,
                                        study_of)
 from looplora.llm.dpfp_run import choose_x, load_inference
 from looplora.llm.inject import MODEL_ID, MODEL_REVISION, load_tokenizer
@@ -23,6 +23,53 @@ from looplora.llm.read_fix_run import fit, validate
 
 ROOT = Path(__file__).resolve().parents[1]
 REVISION = '0123456789abcdef0123456789abcdef01234567'
+
+
+# stable_hash of read_fix.configuration(arm, 1000, E=E, smoke=smoke, rank=rank) for every WP-L4 run and of
+# dpfp.configuration(arm, 1000, E=E, smoke=smoke) for the three DPFP arms, computed on compute at master 21254c9 (job hash-master,
+# before any DPFP-X code); keys 'rank|arm|E|smoke' and 'arm|E|smoke'.
+MASTER_HASHES = {
+    '128|OA|16|0': '44b31e75fe9685da2972cc25bd89d1a3',
+    '128|OA|16|1': 'df55ea9104a4d6b6c2650afdacd2d492',
+    '128|OA|8|0': '78847186d697688002e571421869e54a',
+    '128|OA|8|1': '79bcec5c9d7b115800d8dca494048040',
+    '128|R|16|0': 'ac367fc9fc9682eed3fe851c510a85c0',
+    '128|R|16|1': 'd0365ac2af33fbb62c83b7a04ac6a87d',
+    '128|R|8|0': 'bfdfe0420efeca162a18beb331ca3eba',
+    '128|R|8|1': '0bd109405f8a627b8ecd04e2d38155e5',
+    '128|W5|16|0': '1cbfc9cb9e63b52fb34d31bc00318af8',
+    '128|W5|16|1': 'f9414868484b2222fe9f3252d5a8f1ed',
+    '128|W5|8|0': '2f197f980c18eecb32291ef7a92fb713',
+    '128|W5|8|1': 'c98964444e6b80578c20843af07b180c',
+    '32|OArho|16|0': '5df3aea5f17014a296b96baccf7b6d0b',
+    '32|OArho|16|1': '6f59f1004f36e049fa3366f4d32b52c7',
+    '32|OArho|8|0': 'f014ef8d314889633aad743ed17f99a2',
+    '32|OArho|8|1': '000871448c78c56f0ac3a57f2612a80f',
+    '32|RK|16|0': '52fe4e578420fb5c7601fbf4de348779',
+    '32|RK|16|1': '80eaa2da23f0be29ee7ce7f4d5ca1768',
+    '32|RK|8|0': '94ba78d8fcdf7fa386fded68c8dfd25b',
+    '32|RK|8|1': 'e68cf4014df0270df5ceca6ab3b6bea5',
+    '32|Rrho|16|0': '309c764fa6584b4515f1cd8477f74f23',
+    '32|Rrho|16|1': '1e3868bdda56ae85a7156d4cabdea4ef',
+    '32|Rrho|8|0': '259329e61b482a0a766406ef2cffac14',
+    '32|Rrho|8|1': '392991bcce7e729a11dbc48fc9c0f84e',
+    '32|R|16|0': '6d590142a8acd83a585413996a4f86b2',
+    '32|R|16|1': '3b73919862bd89c37394b1d2181b4a7e',
+    '32|R|8|0': '20fe17460f41864e059db6d20687aba5',
+    '32|R|8|1': '93e53dddbc9739f0ab48c5526e7c7b17',
+    'D128-1|16|0': 'b2956ee72210fa4ce14b75234a81d875',
+    'D128-1|16|1': 'b3366318d217c04b09367ae9ce3c6004',
+    'D128-1|8|0': '38f29bb826caecc768325992761c423c',
+    'D128-1|8|1': 'afbd2cbbaf8812394e7eb88b878749d8',
+    'D128-3|16|0': '92331e45231460a33e12bfe01262a71c',
+    'D128-3|16|1': '809ceae53283fa3f53483ff8356d30b8',
+    'D128-3|8|0': 'f22bb4d5dcbf88a7d813409607a1a906',
+    'D128-3|8|1': '7b7edef5555123c03b2d2ff9c2a26c89',
+    'D32-3|16|0': '71d5939530a0c41ac25605d95fdf8101',
+    'D32-3|16|1': 'cad118caf1e56df452d796064e5eebd0',
+    'D32-3|8|0': '27e4c1a5a82fc1f9ae5377f3d3557da2',
+    'D32-3|8|1': '6c74f073d882ae236ebe02ff539fc2fc',
+}
 
 
 def recorded(path):
@@ -59,7 +106,20 @@ def test_the_three_dpfp_configs_still_build_the_recorded_configs_and_hashes(arm)
     assert stable_hash(cfg) == record['config_hash']
 
 
-def test_the_e8_retrain_config_and_the_wp_l4_references_keep_their_hashes():
+def test_every_wp_l4_and_dpfp_config_hashes_as_it_did_at_master_before_dpfp_x():
+    for rank, arm in read_fix.RUNS:
+        for E in (8, 16):
+            for smoke in (False, True):
+                cfg = read_fix.configuration(arm, 1000, E=E, smoke=smoke, rank=rank)
+                assert stable_hash(cfg) == MASTER_HASHES[f'{rank}|{arm}|{E}|{int(smoke)}'], (rank, arm, E, smoke)
+    for arm in SPECS:
+        for E in (8, 16):
+            for smoke in (False, True):
+                assert stable_hash(configuration(arm, 1000, E=E, smoke=smoke)) == MASTER_HASHES[f'{arm}|{E}|{int(smoke)}']
+    assert len(MASTER_HASHES) == len(read_fix.RUNS) * 4 + len(SPECS) * 4
+
+
+def test_the_e8_retrain_config_and_the_wp_l4_references_keep_their_recorded_configs():
     record = recorded('reports/p1l-dpfp/arms-e8/D128-3/record.json')
     cfg = configuration('D128-3', record['config']['train']['steps'], E=8)
     assert as_json(cfg) == record['config'] and stable_hash(cfg) == record['config_hash']
@@ -67,7 +127,13 @@ def test_the_e8_retrain_config_and_the_wp_l4_references_keep_their_hashes():
         record = recorded(f'reports/p1l-dpfp/refs/{label}/record.json')
         cfg = read_fix.configuration('R', record['config']['train']['steps'], E=16, rank=rank)
         assert 'backbone' not in cfg and 'dpfp' not in cfg and 'dpfp_nu' not in cfg['model']
-        assert as_json(cfg) == record['config'] and stable_hash(cfg) == record['config_hash']
+        # These WP-L4 records predate the two config defaults `writer` and `oracle_seed` (WP-L6), so their hash cannot be
+        # compared; the configs agree on everything else and the two later keys hold their defaults. The hash itself is
+        # pinned against master by the test above.
+        later = {key: as_json(cfg).pop(key) for key in ('writer', 'oracle_seed')}
+        assert later == {'writer': 'learned', 'oracle_seed': 17}
+        rest = {key: value for key, value in as_json(cfg).items() if key not in later}
+        assert rest == record['config']
 
 
 def test_the_default_backbone_stays_the_pinned_06b_and_the_rank_guard_is_lifted_only_for_x256():
@@ -109,7 +175,10 @@ def test_x_configs_are_d128_3_with_only_the_registered_changes():
         cfg['dpfp'] = {k: v for k, v in cfg['dpfp'].items() if k not in ('arm', 'backbone', 'rank', 'key_dim')}
         for key in keys:
             del cfg['model'][key]
+        cfg['writer_fix'].pop('value_head')            # a label that follows the rank, checked below
         return cfg
+    assert [c['writer_fix']['value_head'] for c in (d, x17, x256)] == [
+        'training_only_128_to_1024_affine', 'training_only_128_to_1024_affine', 'training_only_256_to_1024_affine']
     assert strip(x17) == strip(d)                      # X17: the backbone and the arm label
     assert strip(x256, 'r') == strip(d, 'r')           # X256: the rank (and the arm label)
     base = read_fix.configuration('R', steps, rank=256, extra_runs=((256, 'R'),))
@@ -162,7 +231,7 @@ def test_x256_trains_exports_and_reloads_with_the_rank_256_memory(model, tokeniz
         assert rows[0]['read_loss'] > 0 and rows[0]['address_loss'] > 0
         exported = torch.load(tmp_path / 'writer.pt', weights_only=True)
         assert exported['arm'] == 'X256' and exported['signature']['dpfp_nu'] == 3 and exported['signature']['r_mem'] == 256
-        assert 'backbone' not in exported['signature']
+        assert (exported['signature']['model'], exported['signature']['revision']) == (MODEL_ID, MODEL_REVISION)
         with torch.no_grad():
             batch = experiment.prepare(read_fix_data(cfg))
             assert batch.snapshot.states[1].shape == (2, 256, 1536) and batch.keys.shape == (2, 16, 1536)
@@ -231,7 +300,8 @@ def test_x17_runner_loads_the_configured_backbone_and_sizes_shapes_from_it(cache
     try:
         assert experiment.model.config.hidden_size == 64
         assert (experiment.adapter.cfg.d_in, experiment.adapter.cfg.d_out) == (128, 64)
-        assert experiment.writer_signature()['backbone'] == cache
+        signature = experiment.writer_signature()
+        assert (signature['model'], signature['revision']) == (cache['id'], cache['revision'])
         assert experiment.read_arm == 'X17'
     finally:
         experiment.close()
