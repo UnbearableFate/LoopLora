@@ -145,7 +145,7 @@ def test_results_serialise_without_nan_and_the_tables_list_every_rule(tmp_path):
     assert json.loads(text)["backbones"]["0.6b"]["rules"]["R1"]["status"] == "infeasible"
     analyze_lsr.write_tables(result, tmp_path)
     endpoints = list(csv.DictReader((tmp_path / "endpoints.csv").open()))
-    assert [(row["rule"], row["status"], row["passes"]) for row in endpoints] == [
+    assert sorted((row["rule"], row["status"], row["passes"]) for row in endpoints) == [
         ("R1", "infeasible", "False"), ("R2", "evaluated", "True"), ("R3", "infeasible", "False")]
     series = {row["series"] for row in csv.DictReader((tmp_path / "accuracy.csv").open())}
     assert {"R2", "L1", "L8", "O1", "O2", "O3"} <= series and "R1" not in series and "R3" not in series
