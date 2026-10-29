@@ -1,6 +1,6 @@
 # WP-L14: S1B implementation and validation
 
-**All twelve A1 main runs completed successfully; frozen DEV selection is submitted as 3730962.opbs.** The [approved release](../../reports/slot-loop-v1/s1b/a1/release.json) remains `d1ccbb7ff4c31fa53abfd7a3cc9ad572`, from science commit `258f5f5a24eae684f640a9fd62679bb643470a76`, source/lock `d7e7ff0fb5987d5e5abfc312c82c449c` / `2309d5a8ebae91332f32bbd85e5eeb8a`. Each arm × seed 17/29/43 completed N=18,000, LR .003 with the frozen S1A reads. All twelve exit/status/release/freeze/finiteness/schedule metadata checks pass; saved-array and retained-export content audits run with DEV selection on compute. [Job ledger](../../reports/slot-loop-v1/s1b/a1/main-jobs.json) includes per-run PBS actuals: main **16.456667 node·h**, cumulative completed actual **17.412778 node·h**. DEV selection requests another **0.166667 node·h**, actual pending. Confirmation/unseen/depth-sweep/control execution remains unauthorized.
+**A1 DEV selection is complete and archived; ready for the independent rerun.** All twelve main runs and the saved-array/export audits pass. Frozen selection job **3730962.opbs** exited 0 and produced [selection.json](../../reports/slot-loop-v1/s1b/a1/dev-selection/selection.json), blake2b-128 **`e3f269db39cd9b431d27e0a5eb528d6e`**, with twelve distinct selected checkpoints. The [approved release](../../reports/slot-loop-v1/s1b/a1/release.json) remains `d1ccbb7ff4c31fa53abfd7a3cc9ad572`, science commit `258f5f5a24eae684f640a9fd62679bb643470a76`, source/lock `d7e7ff0fb5987d5e5abfc312c82c449c` / `2309d5a8ebae91332f32bbd85e5eeb8a`. All arms/seeds completed N=18,000, LR .003 with the frozen S1A reads. Actual main cost **16.456667 node·h**, DEV audit/selection **0.010000 node·h**, cumulative completed actual **17.422778 node·h** across 29 jobs. No pending worker job. Confirmation/unseen/depth-sweep/control execution awaits later authorization and opening; those data remain closed.
 
 Worker wk-loop, branch `wp/loop`, login/control plane `miyabi-g2` (aarch64), no PBS allocation. Merged master **once**, as instructed: fast-forward `2f7abbc` → `8f4bb1da18d146d5979a6ae0fe9ea5c5dac27e1f`; only the task file/worker registry changed. No push.
 
@@ -386,3 +386,39 @@ scripts/analyze_s1b.py --stage DEV
 The frozen script physically loads all 132 exports to check metadata, audits retained checkpoint/sample bytes and original NLLs, reproduces the registered nonzero-step lowest-NLL selection with 1e-6/earlier-step rule, verifies selected-file equality, complete label coverage and twelve distinct selected digests, then writes `selection.json` and `source_index.json`. Both DEV and audit outputs were absent before submission. The [job receipt](../../reports/slot-loop-v1/s1b/a1/dev-job.json), full spec and exact inline audit payload are archived under `dev-selection/`; payload digest **`5320f8838aa5b37f6f177d7f78ba9115`**. Log `/work/xg24i002/x10041/LoopLora/logs/pbs/s1b-a1-dev-20261030-050214-2397168.log`.
 
 Walltime basis: the preceding S1A six-run/66-row frozen DEV job used **7 s** in PBS history; S1B has twelve runs/132 exports plus the explicit update/sample audit and A1 extended-prefix release reconciliation. The measured A1 release/reload job took **161 s** including multiple release validations and four model instances. Allow **180 s** for this CPU artifact/metadata path, ×1.5 = **270 s**, rounded to the existing ten-minute request unit: **600 s / 0.166667 requested node·h**. Actual remains pending. No training, inference, test rerun or model loading on login; login work was bounded stdlib metadata/copy/hash inspection. No confirmation or unseen payload opened, no depth sweep/control submitted, no source edits, further merge, push, sleep or polling. After completion, inspect the audit/selection/source index, archive and update this ledger, then STOP selected for the independent rerun and orchestrator opening.
+
+### Frozen DEV selection verified: STOP selected
+
+Verified **3730962.opbs exit 0**, host **mg0003**, unchanged immutable science snapshot. Canonical `.log` and `.log.pbs` are byte-identical, the separate exit marker is 0, all twelve audit receipts say passed, and both frozen CLI and wrapper report complete. Log interval **2026-10-30 05:02:19–05:02:54 JST** is 35 s; the single finished-job PBS history query reports **36 s / 0.010000 node·h**, including allocation overhead. The inline audit took **0.389686 s** and the audit plus frozen CLI **27.760642 s**; accounting uses PBS elapsed, not those partial timings. This resolves all pending audit/selection/cost entries above. Completed cumulative actual is **(62686+36)/3600 = 17.422778 node·h**, across **29 jobs**; none pending.
+
+All **216,000** updates have finite losses/norms and positive durations; all **4,332** training-log rows exactly match saved arrays, LR/warmup and clipping flags. All **132** dev sample sets pass registered IDs/count/hops/value checks and reproduce their original correctness/NLL summaries. The frozen script then successfully checked export metadata and byte digests for all **132** scheduled candidates and original samples, exact release/config/seed/depth/read provenance, frozen-writer/support evidence, the registered nonzero-step selection, selected-file equality and twelve unique checkpoint digests. **No failed, omitted or skipped audit/run.** No tests were rerun: source/scripts/tests/configs are still identical to the tested science snapshot; the complete **191 passed / zero skips** compute result remains applicable.
+
+Archived the original compute-produced [selection.json](../../reports/slot-loop-v1/s1b/a1/dev-selection/selection.json), [source_index.json](../../reports/slot-loop-v1/s1b/a1/dev-selection/source_index.json), [main-audit.json](../../reports/slot-loop-v1/s1b/a1/dev-selection/main-audit.json), job log/exit marker and finished PBS history under `reports/slot-loop-v1/s1b/a1/dev-selection/`, each byte-identical to its persistent original. Reconciled every receipt with both the persistent and already archived run histories by BLAKE2b. Updated `dev-job.json` and `main-completion.json` to complete in both locations. The [selected-artifacts.json](../../reports/slot-loop-v1/s1b/a1/dev-selection/selected-artifacts.json) inventory binds each winning step, export/sample path and digest, selected-file size and run-record digest to the compute audit. All scheduled exports, original dev samples and selected files are retained in `a1-8457587/main/` for the independent rerun and later approved opening.
+
+| artifact | blake2b-128 |
+| --- | --- |
+| selection.json | `e3f269db39cd9b431d27e0a5eb528d6e` |
+| source_index.json | `c9e51be2a280962ab47cc6bf335b7336` |
+| main-audit.json | `689bf3d8a24a685eb94e20df413f80dd` |
+| frozen scripts/analyze_s1b.py | `78f001a232595acce6d38091f0e4895b` |
+| approved release.json | `d1ccbb7ff4c31fa53abfd7a3cc9ad572` |
+| manifest.lock.json | `2309d5a8ebae91332f32bbd85e5eeb8a` |
+
+Selected steps and descriptive **DEV-only, hops 1–3** summaries follow. These are checkpoint-selection records, not confirmation outcomes; no gain or continuation verdict is made here. Lowest NLL excludes step 0 and uses the registered 1e-6/earlier-step rule. Every chosen NLL is below its own step-0 value. The full twelve-checkpoint digest map is in the frozen selection artifact, without changes to its schema or bytes.
+
+| arm | seed | selected step | dev NLL (nats) | dev EM (%) |
+| --- | ---: | ---: | ---: | ---: |
+| M1 | 17 | 18000 | 5.618181 | 12.9333 |
+| M1 | 29 | 18000 | 5.618711 | 12.8667 |
+| M1 | 43 | 18000 | 5.617210 | 12.0333 |
+| M4 | 17 | 18000 | 5.478263 | 14.3333 |
+| M4 | 29 | 18000 | 5.506691 | 14.9667 |
+| M4 | 43 | 16200 | 5.434525 | 15.4667 |
+| S1 | 17 | 18000 | 5.510304 | 14.5667 |
+| S1 | 29 | 14400 | 5.521522 | 14.0333 |
+| S1 | 43 | 16200 | 5.511117 | 13.5000 |
+| S4 | 17 | 18000 | 5.266448 | 17.3667 |
+| S4 | 29 | 14400 | 5.282213 | 17.8000 |
+| S4 | 43 | 18000 | 5.272094 | 18.3667 |
+
+The advance branch and contrasts **S4−S1, M4−M1, S4−M4** are unchanged. Stop at this selected checkpoint map: the independent rerun and orchestrator's `s1b-open.json` are next. No opening record was created, confirmation/unseen payload opened, depth sweep/control run, additional merge/pull/push performed, or sleep/polling used. Login/control work in this finalization was bounded stdlib receipt/hash/copy inspection and report edits; all application execution occurred in the completed compute job.

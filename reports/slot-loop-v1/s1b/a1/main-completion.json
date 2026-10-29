@@ -1,4 +1,6 @@
 {
+ "audit_blake2b_128": "689bf3d8a24a685eb94e20df413f80dd",
+ "audit_job_id": "3730962.opbs",
  "checks": [
   {
    "artifacts": {
@@ -145,12 +147,14 @@
    "selected_step": 18000
   }
  ],
+ "dev_selection_status": "selected",
  "release_blake2b_128": "d1ccbb7ff4c31fa53abfd7a3cc9ad572",
  "retained_dev_bytes": 258295338,
  "retained_dev_exports": 132,
  "retained_dev_samples": 132,
- "saved_array_and_export_content_audit": "pending compute DEV job",
+ "saved_array_and_export_content_audit": "passed",
+ "selection_blake2b_128": "e3f269db39cd9b431d27e0a5eb528d6e",
  "source_commit": "258f5f5a24eae684f640a9fd62679bb643470a76",
  "stage": "S1B-A1-MAIN",
- "status": "metadata_verified"
+ "status": "complete"
 }

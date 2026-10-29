@@ -1,0 +1,136 @@
+{
+ "approval_blake2b_128": "27f254b499b302ed932e5f3260e08034",
+ "dev_sample_sets": 132,
+ "elapsed_seconds": 0.38968604800174944,
+ "finite_updates": 216000,
+ "host": "mg0003",
+ "job_id": "3730962.opbs",
+ "manifest_blake2b_128": "2309d5a8ebae91332f32bbd85e5eeb8a",
+ "payload_blake2b_128": "5320f8838aa5b37f6f177d7f78ba9115",
+ "release_blake2b_128": "d1ccbb7ff4c31fa53abfd7a3cc9ad572",
+ "runs": [
+  {
+   "dev_sample_sets": 11,
+   "label": "M1/17",
+   "record_blake2b_128": "8e224f20a351380ba67e6181072bcd7e",
+   "status": "passed",
+   "train_log_blake2b_128": "1b5957cb009cb0aa228193022dafcd31",
+   "train_log_rows": 361,
+   "train_steps_blake2b_128": "e6adad7366d5db06bea76a8097e9b86a",
+   "updates": 18000
+  },
+  {
+   "dev_sample_sets": 11,
+   "label": "M1/29",
+   "record_blake2b_128": "22a77e4347bb20a3c42a173912ad46b4",
+   "status": "passed",
+   "train_log_blake2b_128": "4857ea23c8dbdb9ee3a13ed27dd227cd",
+   "train_log_rows": 361,
+   "train_steps_blake2b_128": "65ace7e72fe2292508d64e1a44bcb831",
+   "updates": 18000
+  },
+  {
+   "dev_sample_sets": 11,
+   "label": "M1/43",
+   "record_blake2b_128": "9d21a5cb0b45cdca3f224dded30cebfa",
+   "status": "passed",
+   "train_log_blake2b_128": "4ad6e019cf7a97d6c5490389355f7a2b",
+   "train_log_rows": 361,
+   "train_steps_blake2b_128": "85702fbc81ea6473cd6895d963aef42c",
+   "updates": 18000
+  },
+  {
+   "dev_sample_sets": 11,
+   "label": "M4/17",
+   "record_blake2b_128": "ca4d233a7626e843c81c04737a713f60",
+   "status": "passed",
+   "train_log_blake2b_128": "5d1a86cdb699a31be465bfbf9f77b88a",
+   "train_log_rows": 361,
+   "train_steps_blake2b_128": "bec9b500f8963eac4ca2b648b9d08d38",
+   "updates": 18000
+  },
+  {
+   "dev_sample_sets": 11,
+   "label": "M4/29",
+   "record_blake2b_128": "a94717b6a76ac5540ce637b4632fda53",
+   "status": "passed",
+   "train_log_blake2b_128": "ad00fe86bd3338b7ba70d5efb9ccdc9b",
+   "train_log_rows": 361,
+   "train_steps_blake2b_128": "cd4673303bb2c96966fa677a0c350623",
+   "updates": 18000
+  },
+  {
+   "dev_sample_sets": 11,
+   "label": "M4/43",
+   "record_blake2b_128": "e4e020c8e498b1ea97692adac4b05d3f",
+   "status": "passed",
+   "train_log_blake2b_128": "f1ead22f4c7c721825d6751508d2ad21",
+   "train_log_rows": 361,
+   "train_steps_blake2b_128": "455085dd14d32a0ad8c5fac9f9298e5d",
+   "updates": 18000
+  },
+  {
+   "dev_sample_sets": 11,
+   "label": "S1/17",
+   "record_blake2b_128": "11d749819b757db1480bc4c1a9d51bee",
+   "status": "passed",
+   "train_log_blake2b_128": "30d152822679058149b84c43ecaa2e87",
+   "train_log_rows": 361,
+   "train_steps_blake2b_128": "fe81a440fa99ab499e1222a142dc7d42",
+   "updates": 18000
+  },
+  {
+   "dev_sample_sets": 11,
+   "label": "S1/29",
+   "record_blake2b_128": "f7c6f3b4fe6a977991b65efa83ab2a30",
+   "status": "passed",
+   "train_log_blake2b_128": "fcd10419440f753ec8c45a0143d4b1c7",
+   "train_log_rows": 361,
+   "train_steps_blake2b_128": "62038f24765160dc9d8d407e250c4316",
+   "updates": 18000
+  },
+  {
+   "dev_sample_sets": 11,
+   "label": "S1/43",
+   "record_blake2b_128": "dde120b74da5a0be452fba3867481264",
+   "status": "passed",
+   "train_log_blake2b_128": "dd3f9a66968891a5610aabaad98e31c2",
+   "train_log_rows": 361,
+   "train_steps_blake2b_128": "d306fbcb34241b307673635cc197149a",
+   "updates": 18000
+  },
+  {
+   "dev_sample_sets": 11,
+   "label": "S4/17",
+   "record_blake2b_128": "1d7d6f536ba2b37f350ddc78ef02aa0c",
+   "status": "passed",
+   "train_log_blake2b_128": "60616aa9266c32ac330ad465f6ac4801",
+   "train_log_rows": 361,
+   "train_steps_blake2b_128": "d6d278fe021e51b0451732dc083601d7",
+   "updates": 18000
+  },
+  {
+   "dev_sample_sets": 11,
+   "label": "S4/29",
+   "record_blake2b_128": "9d3adbdaa9fdf68993acb1c1774be1d7",
+   "status": "passed",
+   "train_log_blake2b_128": "c33fea0a5968fb553ba9b7b94ff42da6",
+   "train_log_rows": 361,
+   "train_steps_blake2b_128": "c9f59a61ad3057e8b5b40f6afc7fe260",
+   "updates": 18000
+  },
+  {
+   "dev_sample_sets": 11,
+   "label": "S4/43",
+   "record_blake2b_128": "aad5d66fb907097181ac51bf634e3577",
+   "status": "passed",
+   "train_log_blake2b_128": "97116cb3f2b3edaf450391ccdc2074f7",
+   "train_log_rows": 361,
+   "train_steps_blake2b_128": "e170539006176baece9961a1dfe002a0",
+   "updates": 18000
+  }
+ ],
+ "source_commit": "258f5f5a24eae684f640a9fd62679bb643470a76",
+ "stage": "S1B-A1-DEV-AUDIT",
+ "status": "complete"
+}

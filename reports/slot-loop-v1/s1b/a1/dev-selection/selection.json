@@ -1,0 +1,25 @@
+{
+ "branch": "advance",
+ "contrasts": [
+  "S4-S1",
+  "M4-M1",
+  "S4-M4"
+ ],
+ "release_blake2b_128": "d1ccbb7ff4c31fa53abfd7a3cc9ad572",
+ "selected_checkpoints": {
+  "M1/17": "ccc6effb3ec8cbd5c7d1413a7a7443bf",
+  "M1/29": "b1723115c2fb1742a3b8460e3f4395cb",
+  "M1/43": "e99b56e151f3fa85db7fb337f6265ddc",
+  "M4/17": "aa8e49d3bb9a9ab15142a029dd5d4ee1",
+  "M4/29": "5c8644809202acb95b6b1a273defa41a",
+  "M4/43": "e74fda78e2211e5b583cc97256d03760",
+  "S1/17": "0f3e7d002221df8870135b59b6207a80",
+  "S1/29": "c919668733bcd33d5e34258eca24ab70",
+  "S1/43": "f55950e835b0da7ef91c8e9eac6294ca",
+  "S4/17": "85f44ffb2253ddb7894028ffd927162d",
+  "S4/29": "bbd85b3b27941058edb92829cf041831",
+  "S4/43": "a3220bcd77b86669d592e07f80ab2594"
+ },
+ "stage": "S1B",
+ "status": "selected"
+}

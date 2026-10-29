@@ -1,19 +1,36 @@
 {
+ "actual_node_hours": 0.01,
+ "actual_node_seconds": 36,
  "audit": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/dev-audit/main-audit.json",
+ "audit_blake2b_128": "689bf3d8a24a685eb94e20df413f80dd",
+ "cumulative_actual_node_seconds": 62722,
+ "exit_status": 0,
+ "host": "mg0003",
  "job_id": "3730962.opbs",
  "log": "/work/xg24i002/x10041/LoopLora/logs/pbs/s1b-a1-dev-20261030-050214-2397168.log",
  "nodes": 1,
  "out": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/dev-selection",
  "payload_blake2b_128": "5320f8838aa5b37f6f177d7f78ba9115",
+ "pbs_history": {
+  "elapsed_seconds": 36,
+  "job_id": "3730962",
+  "job_name": "s1b-a1-dev",
+  "nodes": 1,
+  "queue": "debug-g",
+  "start_date": "10/30 05:02:17",
+  "status": "FINISH"
+ },
  "queue": "debug-g",
  "records": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/main",
  "requested_node_hours": 0.16666666666666666,
+ "selection_blake2b_128": "e3f269db39cd9b431d27e0a5eb528d6e",
  "source": {
   "kind": "commit",
   "ref": "258f5f5a24eae684f640a9fd62679bb643470a76"
  },
+ "source_index_blake2b_128": "c9e51be2a280962ab47cc6bf335b7336",
  "spec": "/work/xg24i002/x10041/LoopLora/logs/pbs/specs/s1b-a1-dev-20261030-050214-2397168.json",
  "stage": "S1B-A1-DEV",
- "status": "submitted",
+ "status": "complete",
  "walltime": "00:10:00"
 }

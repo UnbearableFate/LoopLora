@@ -1,0 +1,104 @@
+[job] host=mg0003 job=3730962.opbs spec=/work/xg24i002/x10041/LoopLora/logs/pbs/specs/s1b-a1-dev-20261030-050214-2397168.json start=2026-10-30T05:02:19+09:00
+[job] source=commit:258f5f5a24eae684f640a9fd62679bb643470a76
+[job] argv=-c import hashlib
+import json
+import os
+from pathlib import Path
+import subprocess
+import sys
+import time
+
+import numpy as np
+from looplora.llm.s1b_analysis import validate_samples
+
+root = Path('/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587')
+digest = lambda p: hashlib.blake2b(Path(p).read_bytes(), digest_size=16).hexdigest()
+load = lambda p: json.loads(Path(p).read_text())
+tick = time.perf_counter()
+ledger = load(root / 'main-jobs.json')
+lock = load(root / 'manifest.lock.json')
+release = load(root / 'release.json')
+assert ledger['status'] == 'complete'
+assert digest(root / 'release.json') == 'd1ccbb7ff4c31fa53abfd7a3cc9ad572'
+assert digest(root / 'approval.json') == '27f254b499b302ed932e5f3260e08034'
+assert digest('scripts/analyze_s1b.py') == '78f001a232595acce6d38091f0e4895b'
+assert not (root / 'dev-selection').exists()
+assert not (root / 'dev-audit/main-audit.json').exists()
+receipts = []
+for job in ledger['jobs']:
+    path = Path(job['out'])
+    record = load(path / 'record.json')
+    assert digest(path / 'record.json') == job['record_blake2b_128']
+    assert record['stream_seed'] == lock['manifest']['train_streams'][str(job['seed'])]['base_seed']
+    with np.load(path / 'train_steps.npz', allow_pickle=False) as saved:
+        assert set(saved.files) == {'loss', 'grad_norm', 'step_seconds'}
+        arrays = {name: saved[name] for name in saved.files}
+    for name, value in arrays.items():
+        assert value.shape == (18000,) and np.isfinite(value).all(), (job['label'], name)
+    assert (arrays['grad_norm'] >= 0).all() and (arrays['step_seconds'] > 0).all()
+    assert float(np.mean(arrays['grad_norm'] > 1.)) == record['clipped_fraction']
+    assert float(np.mean(arrays['step_seconds'][10:])) == record['step_seconds']
+    logs = [json.loads(line) for line in (path / 'train_log.jsonl').read_text().splitlines()]
+    assert [row['step'] for row in logs] == [1, *range(50, 18001, 50)]
+    for row in logs:
+        i = row['step'] - 1
+        assert row['loss'] == float(arrays['loss'][i])
+        assert row['grad_norm'] == float(arrays['grad_norm'][i])
+        assert row['seconds'] == float(arrays['step_seconds'][i])
+        assert row['clipped'] == bool(arrays['grad_norm'][i] > 1.)
+        assert row['lr'] == record['lr'] * min(1., row['step'] / 20)
+    for row in record['dev']:
+        with np.load(path / row['checkpoint']['samples'], allow_pickle=False) as samples:
+            validate_samples(samples, lock['manifest']['ids']['dev'], hops=(1, 2, 3))
+            correct = samples['correct']
+            nll = samples['nll'].astype(np.float64)
+            assert np.array_equal(correct, samples['prediction'] == samples['answer'])
+            assert row['em'] == float(correct.mean())
+            assert row['nll'] == float(nll.mean())
+            for i, hop in enumerate((1, 2, 3)):
+                h = row['per_hop'][str(hop)]
+                assert h['correct'] == int(correct[:, i].sum())
+                assert h['em'] == float(correct[:, i].mean())
+                assert h['nll'] == float(nll[:, i].mean())
+    receipts.append(dict(label=job['label'], status='passed', updates=18000,
+        train_log_rows=len(logs), dev_sample_sets=11,
+        record_blake2b_128=digest(path / 'record.json'),
+        train_steps_blake2b_128=digest(path / 'train_steps.npz'),
+        train_log_blake2b_128=digest(path / 'train_log.jsonl')))
+    print(json.dumps(receipts[-1]), flush=True)
+audit = dict(stage='S1B-A1-DEV-AUDIT', status='complete', job_id=os.environ['PBS_JOBID'],
+    host=os.uname().nodename, source_commit=ledger['source_commit'],
+    release_blake2b_128=digest(root / 'release.json'),
+    manifest_blake2b_128=digest(root / 'manifest.lock.json'),
+    approval_blake2b_128=digest(root / 'approval.json'),
+    payload_blake2b_128=digest(root / 'dev-audit/payload.py'),
+    elapsed_seconds=time.perf_counter() - tick, runs=receipts,
+    finite_updates=216000, dev_sample_sets=132)
+(root / 'dev-audit/main-audit.json').write_text(json.dumps(audit, indent=1, sort_keys=True, allow_nan=False) + '\n')
+subprocess.run([sys.executable, 'scripts/analyze_s1b.py', '--stage', 'DEV',
+    '--manifest', str(root / 'manifest.lock.json'), '--release', str(root / 'release.json'),
+    '--records', str(root / 'main'), '--out', str(root / 'dev-selection')], check=True)
+selection = load(root / 'dev-selection/selection.json')
+assert selection['status'] == 'selected' and len(selection['selected_checkpoints']) == 12
+assert selection['release_blake2b_128'] == digest(root / 'release.json')
+print(json.dumps(dict(status='complete', stage='S1B-A1-DEV',
+    audit_blake2b_128=digest(root / 'dev-audit/main-audit.json'),
+    selection_blake2b_128=digest(root / 'dev-selection/selection.json'),
+    total_seconds=time.perf_counter() - tick)), flush=True)
+
+[job] torch 2.14.0+cu132 cuda True
+{"label": "M1/17", "status": "passed", "updates": 18000, "train_log_rows": 361, "dev_sample_sets": 11, "record_blake2b_128": "8e224f20a351380ba67e6181072bcd7e", "train_steps_blake2b_128": "e6adad7366d5db06bea76a8097e9b86a", "train_log_blake2b_128": "1b5957cb009cb0aa228193022dafcd31"}
+{"label": "M1/29", "status": "passed", "updates": 18000, "train_log_rows": 361, "dev_sample_sets": 11, "record_blake2b_128": "22a77e4347bb20a3c42a173912ad46b4", "train_steps_blake2b_128": "65ace7e72fe2292508d64e1a44bcb831", "train_log_blake2b_128": "4857ea23c8dbdb9ee3a13ed27dd227cd"}
+{"label": "M1/43", "status": "passed", "updates": 18000, "train_log_rows": 361, "dev_sample_sets": 11, "record_blake2b_128": "9d21a5cb0b45cdca3f224dded30cebfa", "train_steps_blake2b_128": "85702fbc81ea6473cd6895d963aef42c", "train_log_blake2b_128": "4ad6e019cf7a97d6c5490389355f7a2b"}
+{"label": "M4/17", "status": "passed", "updates": 18000, "train_log_rows": 361, "dev_sample_sets": 11, "record_blake2b_128": "ca4d233a7626e843c81c04737a713f60", "train_steps_blake2b_128": "bec9b500f8963eac4ca2b648b9d08d38", "train_log_blake2b_128": "5d1a86cdb699a31be465bfbf9f77b88a"}
+{"label": "M4/29", "status": "passed", "updates": 18000, "train_log_rows": 361, "dev_sample_sets": 11, "record_blake2b_128": "a94717b6a76ac5540ce637b4632fda53", "train_steps_blake2b_128": "cd4673303bb2c96966fa677a0c350623", "train_log_blake2b_128": "ad00fe86bd3338b7ba70d5efb9ccdc9b"}
+{"label": "M4/43", "status": "passed", "updates": 18000, "train_log_rows": 361, "dev_sample_sets": 11, "record_blake2b_128": "e4e020c8e498b1ea97692adac4b05d3f", "train_steps_blake2b_128": "455085dd14d32a0ad8c5fac9f9298e5d", "train_log_blake2b_128": "f1ead22f4c7c721825d6751508d2ad21"}
+{"label": "S1/17", "status": "passed", "updates": 18000, "train_log_rows": 361, "dev_sample_sets": 11, "record_blake2b_128": "11d749819b757db1480bc4c1a9d51bee", "train_steps_blake2b_128": "fe81a440fa99ab499e1222a142dc7d42", "train_log_blake2b_128": "30d152822679058149b84c43ecaa2e87"}
+{"label": "S1/29", "status": "passed", "updates": 18000, "train_log_rows": 361, "dev_sample_sets": 11, "record_blake2b_128": "f7c6f3b4fe6a977991b65efa83ab2a30", "train_steps_blake2b_128": "62038f24765160dc9d8d407e250c4316", "train_log_blake2b_128": "fcd10419440f753ec8c45a0143d4b1c7"}
+{"label": "S1/43", "status": "passed", "updates": 18000, "train_log_rows": 361, "dev_sample_sets": 11, "record_blake2b_128": "dde120b74da5a0be452fba3867481264", "train_steps_blake2b_128": "d306fbcb34241b307673635cc197149a", "train_log_blake2b_128": "dd3f9a66968891a5610aabaad98e31c2"}
+{"label": "S4/17", "status": "passed", "updates": 18000, "train_log_rows": 361, "dev_sample_sets": 11, "record_blake2b_128": "1d7d6f536ba2b37f350ddc78ef02aa0c", "train_steps_blake2b_128": "d6d278fe021e51b0451732dc083601d7", "train_log_blake2b_128": "60616aa9266c32ac330ad465f6ac4801"}
+{"label": "S4/29", "status": "passed", "updates": 18000, "train_log_rows": 361, "dev_sample_sets": 11, "record_blake2b_128": "9d3adbdaa9fdf68993acb1c1774be1d7", "train_steps_blake2b_128": "c9f59a61ad3057e8b5b40f6afc7fe260", "train_log_blake2b_128": "c33fea0a5968fb553ba9b7b94ff42da6"}
+{"label": "S4/43", "status": "passed", "updates": 18000, "train_log_rows": 361, "dev_sample_sets": 11, "record_blake2b_128": "aad5d66fb907097181ac51bf634e3577", "train_steps_blake2b_128": "e170539006176baece9961a1dfe002a0", "train_log_blake2b_128": "97116cb3f2b3edaf450391ccdc2074f7"}
+{"stage": "DEV", "status": "complete", "digest": "e3f269db39cd9b431d27e0a5eb528d6e"}
+{"status": "complete", "stage": "S1B-A1-DEV", "audit_blake2b_128": "689bf3d8a24a685eb94e20df413f80dd", "selection_blake2b_128": "e3f269db39cd9b431d27e0a5eb528d6e", "total_seconds": 27.760641758999554}
+[job] exit=0 end=2026-10-30T05:02:54+09:00
