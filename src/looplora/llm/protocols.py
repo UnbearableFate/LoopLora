@@ -13,10 +13,12 @@ from torch import Tensor
 from torch.nn import functional as F
 from transformers import DynamicCache
 
+from looplora.core.memory_backend import MemoryRead
+
 
 @dataclass(frozen=True)
 class SupportSnapshot:
-    states: dict[int, Tensor]
+    states: dict[int, Tensor | MemoryRead]  # a MemoryRead only on the slot/explicit-backend path
     past_key_values: tuple[tuple[Tensor, Tensor], ...] | None
     attention_mask: Tensor
     protocol: str

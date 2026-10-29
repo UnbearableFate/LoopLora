@@ -10,6 +10,7 @@ import torch
 from torch import Tensor, nn
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
+from looplora.core.memory_backend import MemoryRead
 from looplora.infra.seeds import derive_seed
 
 if TYPE_CHECKING:
@@ -107,7 +108,9 @@ class AdapterBank:
         try:
             for layer, module in self.modules.items():
                 state = states[layer]
-                if state.dtype != torch.float32:
+                if isinstance(state, MemoryRead):
+                    state.check_fp32()
+                elif state.dtype != torch.float32:
                     raise ValueError("LLM adapter memory must be fp32")
                 module.context = MemoryContext(
                     state=state.clone(), loop_steps=loop_steps, valid=valid,
