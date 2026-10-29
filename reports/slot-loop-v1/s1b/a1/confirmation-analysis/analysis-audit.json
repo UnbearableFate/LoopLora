@@ -1,0 +1,21 @@
+{
+ "confirmation_sample_sets": 30,
+ "dev_sample_sets": 30,
+ "frozen_confirmation_seconds": 41.68618234799942,
+ "host": "mg0033",
+ "job_id": "3731365.opbs",
+ "open_record_blake2b_128": "b698f7ce5e31b2b43da5c210134588b0",
+ "outputs": {
+  "confirmation-analysis/source_index.json": "1376bcbffa6d6268f26515ad3aad4a61",
+  "confirmation-analysis/verdict.json": "dca8d4e9777a8aefb85b79d8a8cdd758",
+  "confirmation-analysis/verdict.md": "91753653761539da9c37616a1da8ecdb",
+  "descriptive-dev/audit.json": "b629db72532e3caddb84662f80daf8f6",
+  "descriptive-dev/summary.json": "e162aed7a79407ed24cdf7fe168d8089"
+ },
+ "payload_blake2b_128": "071d94cd3cd42d99bffde3dbb9635b37",
+ "release_blake2b_128": "d1ccbb7ff4c31fa53abfd7a3cc9ad572",
+ "source_commit": "258f5f5a24eae684f640a9fd62679bb643470a76",
+ "stage": "S1B-A1-FINAL-ANALYSIS",
+ "status": "complete",
+ "total_seconds": 51.142172294988995
+}

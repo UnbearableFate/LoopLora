@@ -1,0 +1,7 @@
+[job] host=mg0804 job=3731052.opbs spec=/work/xg24i002/x10041/LoopLora/logs/pbs/specs/s1b-a1-devdepth-20261030-052205-2428102.json start=2026-10-30T05:42:28+09:00
+[job] source=commit:258f5f5a24eae684f640a9fd62679bb643470a76
+[job] argv=-m looplora.llm.s1b_run --mode evaluate --set dev --manifest /work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/manifest.lock.json --release /work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/release.json --selection /work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/dev-selection/selection.json --entries /work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/selected-entries.json --open-root /work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/open-root --out /work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/dev-depth-sweep
+[job] torch 2.14.0+cu132 cuda True
+`torch_dtype` is deprecated! Use `dtype` instead!
+{"mode": "evaluate", "status": "complete", "out": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/dev-depth-sweep"}
+[job] exit=0 end=2026-10-30T05:52:45+09:00

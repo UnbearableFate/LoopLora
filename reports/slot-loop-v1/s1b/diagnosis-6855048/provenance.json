@@ -1,0 +1,120 @@
+{
+ "actual_cumulative_node_hours": 0.43222222222222223,
+ "archive": {
+  "artifacts.json": {
+   "blake2b_128": "c83d7caec4e2fb95acad1a407f9a0977",
+   "bytes": 1344,
+   "source": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/diagnosis-6855048/artifacts.json"
+  },
+  "calibration.input.json": {
+   "blake2b_128": "6e4f7346376cb010820a84832f6d7d91",
+   "bytes": 8189,
+   "source": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/diagnosis-6855048/calibration.input.json"
+  },
+  "diagnosis.json": {
+   "blake2b_128": "2ad225aa70f09940ff68b56c214ae0d3",
+   "bytes": 171639,
+   "source": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/diagnosis-6855048/diagnosis.json"
+  },
+  "job.log": {
+   "blake2b_128": "38e17921c4320a5cf6aaeefddcaaa83d",
+   "bytes": 807,
+   "source": "/work/xg24i002/x10041/LoopLora/logs/pbs/s1b-diagnosis-20261030-010221-630526.log"
+  },
+  "job.spec.json": {
+   "blake2b_128": "5644511c489592f22396800082dca2ce",
+   "bytes": 672,
+   "source": "/work/xg24i002/x10041/LoopLora/logs/pbs/specs/s1b-diagnosis-20261030-010221-630526.json"
+  },
+  "prompts.md": {
+   "blake2b_128": "63bde55472147b9957b4a5d3135abc18",
+   "bytes": 31328,
+   "source": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/diagnosis-6855048/prompts.md"
+  },
+  "t1-reference.input.json": {
+   "blake2b_128": "800e2ac58001e3f3d77975d9a1691f03",
+   "bytes": 4922,
+   "source": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/diagnosis-6855048/t1-reference.input.json"
+  }
+ },
+ "exit": 0,
+ "host": "mg0009",
+ "job_id": "3729676.opbs",
+ "node_hours": 0.0525,
+ "output_root": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/diagnosis-6855048",
+ "retained_npz": {
+  "calibration-reproduction-M1.npz": {
+   "blake2b_128": "61d7ea6a4062abf18e477a9f2cd2d4bc",
+   "path": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/diagnosis-6855048/calibration-reproduction-M1.npz"
+  },
+  "calibration-reproduction-S1.npz": {
+   "blake2b_128": "f17dcaca5b64830c10a853b5cca0f403",
+   "path": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/diagnosis-6855048/calibration-reproduction-S1.npz"
+  },
+  "t1-matrix.npz": {
+   "blake2b_128": "c92a825e34b546578a4ab2fbf07eb824",
+   "path": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/diagnosis-6855048/t1-matrix.npz"
+  },
+  "t1-memory_off.npz": {
+   "blake2b_128": "123ddfc7543cb0ed8466b1b82934c2d8",
+   "path": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/diagnosis-6855048/t1-memory_off.npz"
+  },
+  "t1-oracle_all.npz": {
+   "blake2b_128": "af6ef62596612669aa3fb2c2237b4168",
+   "path": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/diagnosis-6855048/t1-oracle_all.npz"
+  },
+  "t1-oracle_final.npz": {
+   "blake2b_128": "cf24eaae6ce24bfd6538e68792450bc7",
+   "path": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/diagnosis-6855048/t1-oracle_final.npz"
+  },
+  "t1-soft.npz": {
+   "blake2b_128": "c6779de7254352c6b59e2198d11d00a5",
+   "path": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/diagnosis-6855048/t1-soft.npz"
+  },
+  "t2-matrix.npz": {
+   "blake2b_128": "d0589460b1cb763e7d70d8eba389205d",
+   "path": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/diagnosis-6855048/t2-matrix.npz"
+  },
+  "t2-memory_off.npz": {
+   "blake2b_128": "29d2f956780c09fa1dcfd0e716e93e5b",
+   "path": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/diagnosis-6855048/t2-memory_off.npz"
+  },
+  "t2-oracle_all.npz": {
+   "blake2b_128": "5629fd1a194c7b5f7ffbe26a4094a503",
+   "path": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/diagnosis-6855048/t2-oracle_all.npz"
+  },
+  "t2-oracle_final.npz": {
+   "blake2b_128": "78a8f9c987b069a02dfc8e2ae518e716",
+   "path": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/diagnosis-6855048/t2-oracle_final.npz"
+  },
+  "t2-soft.npz": {
+   "blake2b_128": "599b62f622242bf2a3d03ca39f6b5f60",
+   "path": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/diagnosis-6855048/t2-soft.npz"
+  },
+  "t2_t1_wording-matrix.npz": {
+   "blake2b_128": "f049e39989ed8a8f28aa3bf3e1a30db6",
+   "path": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/diagnosis-6855048/t2_t1_wording-matrix.npz"
+  },
+  "t2_t1_wording-memory_off.npz": {
+   "blake2b_128": "e9a587bbe422fc8e74cfa60b40441d67",
+   "path": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/diagnosis-6855048/t2_t1_wording-memory_off.npz"
+  },
+  "t2_t1_wording-oracle_all.npz": {
+   "blake2b_128": "055751cd4a3fe2306a306370b7987e7f",
+   "path": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/diagnosis-6855048/t2_t1_wording-oracle_all.npz"
+  },
+  "t2_t1_wording-oracle_final.npz": {
+   "blake2b_128": "699a6c11fefae062a61e61ac1271b3b0",
+   "path": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/diagnosis-6855048/t2_t1_wording-oracle_final.npz"
+  },
+  "t2_t1_wording-soft.npz": {
+   "blake2b_128": "6f812e8f6ff57328a2b5dcc4532d1a5e",
+   "path": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/diagnosis-6855048/t2_t1_wording-soft.npz"
+  }
+ },
+ "script_blake2b_128": "c84e3d88970dbfb9879241b3a6803aa3",
+ "snapshot": "685504858921ff3dc2b6f5bf29051ca15aaee6a1",
+ "source_blake2b_128": "bb60b89c78ee840a940c5ec855455604",
+ "stage": "S1B-DIAGNOSIS",
+ "wall_seconds": 189
+}

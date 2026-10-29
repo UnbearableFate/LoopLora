@@ -1,0 +1,36 @@
+{
+ "command": [
+  "qstat",
+  "-ll",
+  "-H",
+  "3731051",
+  "3731052"
+ ],
+ "count": 2,
+ "jobs": [
+  {
+   "elapsed_seconds": 1181,
+   "job_id": "3731051",
+   "job_name": "s1b-a1-confirm",
+   "nodes": 1,
+   "queue": "small-g",
+   "start_date": "10/30 06:21:09",
+   "status": "FINISH"
+  },
+  {
+   "elapsed_seconds": 617,
+   "job_id": "3731052",
+   "job_name": "s1b-a1-devdepth",
+   "nodes": 1,
+   "queue": "small-g",
+   "start_date": "10/30 05:42:26",
+   "status": "FINISH"
+  }
+ ],
+ "notices": [
+  "Miyabi scheduled stop time: 2026/11/25(Wed) 09:00:00 (Remain: 26days 02:14:39)"
+ ],
+ "ok": true,
+ "schema_version": 1,
+ "source_count": 2
+}

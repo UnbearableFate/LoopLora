@@ -1,0 +1,254 @@
+{
+ "M1/0.0003/record.json": {
+  "blake2b_128": "82664c91b50e8b8ac686d355c6104462",
+  "bytes": 3705,
+  "source": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/pilot/M1/0.0003/record.json"
+ },
+ "M1/0.0003/selected.pt": {
+  "blake2b_128": "bcf4e54f43c170ab166d202dc48e3f83",
+  "bytes": 1925702,
+  "role": "Pilot only; never a main-run initializer",
+  "source": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/pilot/M1/0.0003/selected.pt"
+ },
+ "M1/0.0003/train_log.jsonl": {
+  "blake2b_128": "338c83f611926e2345aac3ae3f9f7c70",
+  "bytes": 695,
+  "source": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/pilot/M1/0.0003/train_log.jsonl"
+ },
+ "M1/0.0003/train_steps.npz": {
+  "blake2b_128": "ea6308f1425613e7d22d7311569a932d",
+  "bytes": 3357,
+  "source": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/pilot/M1/0.0003/train_steps.npz"
+ },
+ "M1/0.001/record.json": {
+  "blake2b_128": "69f5ee24d8a34a3d36e03560ed05041b",
+  "bytes": 3707,
+  "source": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/pilot/M1/0.001/record.json"
+ },
+ "M1/0.001/selected.pt": {
+  "blake2b_128": "61d341ac184057e5d6c9d154b5d6e851",
+  "bytes": 1925702,
+  "role": "Pilot only; never a main-run initializer",
+  "source": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/pilot/M1/0.001/selected.pt"
+ },
+ "M1/0.001/train_log.jsonl": {
+  "blake2b_128": "aac38be624e3b5112947c3c19154ccbb",
+  "bytes": 676,
+  "source": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/pilot/M1/0.001/train_log.jsonl"
+ },
+ "M1/0.001/train_steps.npz": {
+  "blake2b_128": "4fa14e082631e48b6783ef2775c38b43",
+  "bytes": 3331,
+  "source": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/pilot/M1/0.001/train_steps.npz"
+ },
+ "M1/0.003/record.json": {
+  "blake2b_128": "06cac938988e6191a3bd2654c58e49ce",
+  "bytes": 3710,
+  "source": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/pilot/M1/0.003/record.json"
+ },
+ "M1/0.003/selected.pt": {
+  "blake2b_128": "acaaf05127c110aa70dd3a8f17fb9f79",
+  "bytes": 1925702,
+  "role": "Pilot only; never a main-run initializer",
+  "source": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/pilot/M1/0.003/selected.pt"
+ },
+ "M1/0.003/train_log.jsonl": {
+  "blake2b_128": "3130c22be82f46d16fec47cd73d17bcf",
+  "bytes": 691,
+  "source": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/pilot/M1/0.003/train_log.jsonl"
+ },
+ "M1/0.003/train_steps.npz": {
+  "blake2b_128": "7006bb403d4eb08ebf1c583b5074ef53",
+  "bytes": 3320,
+  "source": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/pilot/M1/0.003/train_steps.npz"
+ },
+ "M4/0.0003/record.json": {
+  "blake2b_128": "a9258104d3c8826c57c3e088ef300fb5",
+  "bytes": 3669,
+  "source": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/pilot/M4/0.0003/record.json"
+ },
+ "M4/0.0003/selected.pt": {
+  "blake2b_128": "10de22cf57c9c4ab0f8d6c2cdd0cb4b8",
+  "bytes": 1925702,
+  "role": "Pilot only; never a main-run initializer",
+  "source": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/pilot/M4/0.0003/selected.pt"
+ },
+ "M4/0.0003/train_log.jsonl": {
+  "blake2b_128": "2fec7e2e100d4ee15115338589a991cf",
+  "bytes": 698,
+  "source": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/pilot/M4/0.0003/train_log.jsonl"
+ },
+ "M4/0.0003/train_steps.npz": {
+  "blake2b_128": "e1f51f6aed0d0d007ac284ad1b22112d",
+  "bytes": 3381,
+  "source": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/pilot/M4/0.0003/train_steps.npz"
+ },
+ "M4/0.001/record.json": {
+  "blake2b_128": "1aa5caa89935823f0c5a388501305a93",
+  "bytes": 3687,
+  "source": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/pilot/M4/0.001/record.json"
+ },
+ "M4/0.001/selected.pt": {
+  "blake2b_128": "8dd2b5a51e3cd8f4327472fc0590d813",
+  "bytes": 1925702,
+  "role": "Pilot only; never a main-run initializer",
+  "source": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/pilot/M4/0.001/selected.pt"
+ },
+ "M4/0.001/train_log.jsonl": {
+  "blake2b_128": "9b955f2798fecf74e3441a2e7c0376ed",
+  "bytes": 674,
+  "source": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/pilot/M4/0.001/train_log.jsonl"
+ },
+ "M4/0.001/train_steps.npz": {
+  "blake2b_128": "e629d90d601dc51f2356263e964f581c",
+  "bytes": 3401,
+  "source": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/pilot/M4/0.001/train_steps.npz"
+ },
+ "M4/0.003/record.json": {
+  "blake2b_128": "52f3cdb43b9e6c104024ebe81bb98a3a",
+  "bytes": 3675,
+  "source": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/pilot/M4/0.003/record.json"
+ },
+ "M4/0.003/selected.pt": {
+  "blake2b_128": "e37277c68ff70b7bc9a0ef21bf7b9420",
+  "bytes": 1925702,
+  "role": "Pilot only; never a main-run initializer",
+  "source": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/pilot/M4/0.003/selected.pt"
+ },
+ "M4/0.003/train_log.jsonl": {
+  "blake2b_128": "0c0536d77c19ca65d98d3d8359e8a6c4",
+  "bytes": 693,
+  "source": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/pilot/M4/0.003/train_log.jsonl"
+ },
+ "M4/0.003/train_steps.npz": {
+  "blake2b_128": "06c10f4fcba393e421bf90b881dc4aff",
+  "bytes": 3398,
+  "source": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/pilot/M4/0.003/train_steps.npz"
+ },
+ "S1/0.0003/record.json": {
+  "blake2b_128": "075d2e7d07dd5f7183d846b4ae2ad5da",
+  "bytes": 3709,
+  "source": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/pilot/S1/0.0003/record.json"
+ },
+ "S1/0.0003/selected.pt": {
+  "blake2b_128": "dffbc2dd1b000925722fe133246132f5",
+  "bytes": 1925702,
+  "role": "Pilot only; never a main-run initializer",
+  "source": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/pilot/S1/0.0003/selected.pt"
+ },
+ "S1/0.0003/train_log.jsonl": {
+  "blake2b_128": "4774f56d417fcfbae4b863e85ec84ec8",
+  "bytes": 698,
+  "source": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/pilot/S1/0.0003/train_log.jsonl"
+ },
+ "S1/0.0003/train_steps.npz": {
+  "blake2b_128": "2ff14c9c2a31ccf51913362789c0c759",
+  "bytes": 3348,
+  "source": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/pilot/S1/0.0003/train_steps.npz"
+ },
+ "S1/0.001/record.json": {
+  "blake2b_128": "68f1e85d9c6f8e8dd983cc5a4e74102c",
+  "bytes": 3709,
+  "source": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/pilot/S1/0.001/record.json"
+ },
+ "S1/0.001/selected.pt": {
+  "blake2b_128": "b11b2773abd3e4315f50d2be813d1240",
+  "bytes": 1925702,
+  "role": "Pilot only; never a main-run initializer",
+  "source": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/pilot/S1/0.001/selected.pt"
+ },
+ "S1/0.001/train_log.jsonl": {
+  "blake2b_128": "a858f61e362f990a7149c294dbb003c1",
+  "bytes": 676,
+  "source": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/pilot/S1/0.001/train_log.jsonl"
+ },
+ "S1/0.001/train_steps.npz": {
+  "blake2b_128": "9513d25c4a5e12050eb0fc30a4f02c92",
+  "bytes": 3347,
+  "source": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/pilot/S1/0.001/train_steps.npz"
+ },
+ "S1/0.003/record.json": {
+  "blake2b_128": "f3de5b090bf43bf55427b26010dec3f9",
+  "bytes": 3707,
+  "source": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/pilot/S1/0.003/record.json"
+ },
+ "S1/0.003/selected.pt": {
+  "blake2b_128": "12980e0293709f0cd759107abe543dc4",
+  "bytes": 1925702,
+  "role": "Pilot only; never a main-run initializer",
+  "source": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/pilot/S1/0.003/selected.pt"
+ },
+ "S1/0.003/train_log.jsonl": {
+  "blake2b_128": "5ef390b6d568279c68612140cbf01c5e",
+  "bytes": 694,
+  "source": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/pilot/S1/0.003/train_log.jsonl"
+ },
+ "S1/0.003/train_steps.npz": {
+  "blake2b_128": "07b397f6231afdd185f4d987db7479da",
+  "bytes": 3343,
+  "source": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/pilot/S1/0.003/train_steps.npz"
+ },
+ "S4/0.0003/record.json": {
+  "blake2b_128": "b12824277f80d9a23aaac752ef5e99e4",
+  "bytes": 3680,
+  "source": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/pilot/S4/0.0003/record.json"
+ },
+ "S4/0.0003/selected.pt": {
+  "blake2b_128": "8829588b11a254afc0dc92d00ba661a0",
+  "bytes": 1925702,
+  "role": "Pilot only; never a main-run initializer",
+  "source": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/pilot/S4/0.0003/selected.pt"
+ },
+ "S4/0.0003/train_log.jsonl": {
+  "blake2b_128": "436ddc1e3dbacd841841695312bcfa97",
+  "bytes": 696,
+  "source": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/pilot/S4/0.0003/train_log.jsonl"
+ },
+ "S4/0.0003/train_steps.npz": {
+  "blake2b_128": "a05cf12f6d0ae297c5d9c63b2528da91",
+  "bytes": 3387,
+  "source": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/pilot/S4/0.0003/train_steps.npz"
+ },
+ "S4/0.001/record.json": {
+  "blake2b_128": "19acc92aca0d55b874b48fad58eaf389",
+  "bytes": 3674,
+  "source": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/pilot/S4/0.001/record.json"
+ },
+ "S4/0.001/selected.pt": {
+  "blake2b_128": "665741ec2ed540347950952f339f648f",
+  "bytes": 1925702,
+  "role": "Pilot only; never a main-run initializer",
+  "source": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/pilot/S4/0.001/selected.pt"
+ },
+ "S4/0.001/train_log.jsonl": {
+  "blake2b_128": "8340318cfc41983d7da33be681da552e",
+  "bytes": 670,
+  "source": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/pilot/S4/0.001/train_log.jsonl"
+ },
+ "S4/0.001/train_steps.npz": {
+  "blake2b_128": "e5b1ad60f081675a4481376d76a16559",
+  "bytes": 3427,
+  "source": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/pilot/S4/0.001/train_steps.npz"
+ },
+ "S4/0.003/record.json": {
+  "blake2b_128": "5951fd6e76c454b7f1ac66cabfb1a1c6",
+  "bytes": 3674,
+  "source": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/pilot/S4/0.003/record.json"
+ },
+ "S4/0.003/selected.pt": {
+  "blake2b_128": "e4b609a0075a9f81aa0a6b7ecdb8b7ed",
+  "bytes": 1925702,
+  "role": "Pilot only; never a main-run initializer",
+  "source": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/pilot/S4/0.003/selected.pt"
+ },
+ "S4/0.003/train_log.jsonl": {
+  "blake2b_128": "28d73e4ce3e9892ac6929e253b0cf19f",
+  "bytes": 692,
+  "source": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/pilot/S4/0.003/train_log.jsonl"
+ },
+ "S4/0.003/train_steps.npz": {
+  "blake2b_128": "2f213cdcebdd8860c8c151403ccf9da7",
+  "bytes": 3422,
+  "source": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/pilot/S4/0.003/train_steps.npz"
+ }
+}

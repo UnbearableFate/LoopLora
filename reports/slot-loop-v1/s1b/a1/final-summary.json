@@ -1,0 +1,51 @@
+{
+ "analysis_audit_blake2b_128": "0f402ed3e66a70311ea10af68914ee1d",
+ "completed_worker_jobs": 32,
+ "confirmation_sample_sets": 30,
+ "content_audit": "passed all 60 sample files on compute",
+ "descriptive_dev_sample_sets": 30,
+ "dev_audit_blake2b_128": "b629db72532e3caddb84662f80daf8f6",
+ "dev_summary_blake2b_128": "e162aed7a79407ed24cdf7fe168d8089",
+ "independent_rerun_actual_node_seconds": 34,
+ "known_combined_actual_node_hours": 17.95138888888889,
+ "known_combined_actual_node_seconds": 64625,
+ "main_runs": 12,
+ "main_updates_per_run": 18000,
+ "mechanism_controls": {
+  "reason": "neither backend has a confirmed loop gain",
+  "status": "not triggered"
+ },
+ "open_record_blake2b_128": "b698f7ce5e31b2b43da5c210134588b0",
+ "pending_worker_jobs": [],
+ "release_blake2b_128": "d1ccbb7ff4c31fa53abfd7a3cc9ad572",
+ "s2_primary": null,
+ "selected_checkpoints": {
+  "M1/17": "ccc6effb3ec8cbd5c7d1413a7a7443bf",
+  "M1/29": "b1723115c2fb1742a3b8460e3f4395cb",
+  "M1/43": "e99b56e151f3fa85db7fb337f6265ddc",
+  "M4/17": "aa8e49d3bb9a9ab15142a029dd5d4ee1",
+  "M4/29": "5c8644809202acb95b6b1a273defa41a",
+  "M4/43": "e74fda78e2211e5b583cc97256d03760",
+  "S1/17": "0f3e7d002221df8870135b59b6207a80",
+  "S1/29": "c919668733bcd33d5e34258eca24ab70",
+  "S1/43": "f55950e835b0da7ef91c8e9eac6294ca",
+  "S4/17": "85f44ffb2253ddb7894028ffd927162d",
+  "S4/29": "bbd85b3b27941058edb92829cf041831",
+  "S4/43": "a3220bcd77b86669d592e07f80ab2594"
+ },
+ "selection_blake2b_128": "e3f269db39cd9b431d27e0a5eb528d6e",
+ "source_commit": "258f5f5a24eae684f640a9fd62679bb643470a76",
+ "source_index_blake2b_128": "1376bcbffa6d6268f26515ad3aad4a61",
+ "stage": "S1B-A1",
+ "status": "complete",
+ "unseen": {
+  "reason": "approved release unseen false",
+  "status": "not run"
+ },
+ "verdict": "NOT ADVANCED",
+ "verdict_blake2b_128": "dca8d4e9777a8aefb85b79d8a8cdd758",
+ "verdict_json": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/confirmation-analysis/verdict.json",
+ "verdict_markdown_blake2b_128": "91753653761539da9c37616a1da8ecdb",
+ "worker_actual_node_hours": 17.941944444444445,
+ "worker_actual_node_seconds": 64591
+}

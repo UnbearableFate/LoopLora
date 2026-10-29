@@ -1,0 +1,218 @@
+{
+ "config_hash": "ebc66636a015c59d0eedbf57c01ffe83",
+ "eval_seconds": 8.320275826001307,
+ "git_commit": "1523b19c7949673ddcd1d89cc1e5fe518736805c",
+ "gpu": "NVIDIA GH200 120GB",
+ "host": "mg0019",
+ "job_id": "3728825.opbs",
+ "load_seconds": 1.3686592420126544,
+ "lr": {
+  "matrix_L1": 0.001,
+  "soft_slot_L1": 0.003
+ },
+ "runs": [
+  {
+   "all_finite": true,
+   "arm": "matrix_L1",
+   "clipped_fraction": 0.08500000089406967,
+   "final": {
+    "correct": 786,
+    "em": 0.786,
+    "loss_float32": 1.1617934703826904,
+    "n": 1000,
+    "nll": 1.1617933754496044,
+    "seconds": 6.367145890995744,
+    "selectable": true,
+    "step": 200
+   },
+   "loss": {
+    "first": 1.476405143737793,
+    "last": 1.2713114023208618
+   },
+   "lr": 0.0003,
+   "nll": 1.1617933754496044,
+   "step0": {
+    "correct": 733,
+    "em": 0.733,
+    "loss_float32": 1.4211350679397583,
+    "n": 1000,
+    "nll": 1.4211350753479493,
+    "seconds": 8.320275826001307,
+    "selectable": false,
+    "step": 0
+   },
+   "step_seconds_mean": 0.15412804392184817
+  },
+  {
+   "all_finite": true,
+   "arm": "matrix_L1",
+   "clipped_fraction": 0.10499999672174454,
+   "final": {
+    "correct": 783,
+    "em": 0.783,
+    "loss_float32": 1.1394997835159302,
+    "n": 1000,
+    "nll": 1.1394997931008402,
+    "seconds": 6.327206523987115,
+    "selectable": true,
+    "step": 200
+   },
+   "loss": {
+    "first": 1.4669727087020874,
+    "last": 1.2033342123031616
+   },
+   "lr": 0.001,
+   "nll": 1.1394997931008402,
+   "step0": {
+    "correct": 733,
+    "em": 0.733,
+    "loss_float32": 1.4211350679397583,
+    "n": 1000,
+    "nll": 1.4211350753479493,
+    "seconds": 6.237677383003756,
+    "selectable": false,
+    "step": 0
+   },
+   "step_seconds_mean": 0.14898944385793966
+  },
+  {
+   "all_finite": true,
+   "arm": "matrix_L1",
+   "clipped_fraction": 0.14000000059604645,
+   "final": {
+    "correct": 788,
+    "em": 0.788,
+    "loss_float32": 1.1629643440246582,
+    "n": 1000,
+    "nll": 1.162964403582533,
+    "seconds": 6.374927351003862,
+    "selectable": true,
+    "step": 200
+   },
+   "loss": {
+    "first": 1.4426510334014893,
+    "last": 1.2424492835998535
+   },
+   "lr": 0.003,
+   "nll": 1.162964403582533,
+   "step0": {
+    "correct": 733,
+    "em": 0.733,
+    "loss_float32": 1.4211350679397583,
+    "n": 1000,
+    "nll": 1.4211350753479493,
+    "seconds": 6.148367161003989,
+    "selectable": false,
+    "step": 0
+   },
+   "step_seconds_mean": 0.1493488788368076
+  },
+  {
+   "all_finite": true,
+   "arm": "soft_slot_L1",
+   "clipped_fraction": 0.14000000059604645,
+   "final": {
+    "correct": 835,
+    "em": 0.835,
+    "loss_float32": 1.0363093614578247,
+    "n": 1000,
+    "nll": 1.0363093112795176,
+    "seconds": 6.678535980987363,
+    "selectable": true,
+    "step": 200
+   },
+   "loss": {
+    "first": 1.4513816833496094,
+    "last": 1.050670862197876
+   },
+   "lr": 0.0003,
+   "nll": 1.0363093112795176,
+   "step0": {
+    "correct": 770,
+    "em": 0.77,
+    "loss_float32": 1.3485817909240723,
+    "n": 1000,
+    "nll": 1.3485817817547212,
+    "seconds": 6.338721595995594,
+    "selectable": false,
+    "step": 0
+   },
+   "step_seconds_mean": 0.15895594373739041
+  },
+  {
+   "all_finite": true,
+   "arm": "soft_slot_L1",
+   "clipped_fraction": 0.14000000059604645,
+   "final": {
+    "correct": 838,
+    "em": 0.838,
+    "loss_float32": 0.9700886011123657,
+    "n": 1000,
+    "nll": 0.9700885803040583,
+    "seconds": 6.828715523995925,
+    "selectable": true,
+    "step": 200
+   },
+   "loss": {
+    "first": 1.437288522720337,
+    "last": 0.9853871464729309
+   },
+   "lr": 0.001,
+   "nll": 0.9700885803040583,
+   "step0": {
+    "correct": 770,
+    "em": 0.77,
+    "loss_float32": 1.3485817909240723,
+    "n": 1000,
+    "nll": 1.3485817817547212,
+    "seconds": 6.316362829995342,
+    "selectable": false,
+    "step": 0
+   },
+   "step_seconds_mean": 0.15877929268470709
+  },
+  {
+   "all_finite": true,
+   "arm": "soft_slot_L1",
+   "clipped_fraction": 0.13499999046325684,
+   "final": {
+    "correct": 830,
+    "em": 0.83,
+    "loss_float32": 0.9458480477333069,
+    "n": 1000,
+    "nll": 0.9458480412933932,
+    "seconds": 6.733813408005517,
+    "selectable": true,
+    "step": 200
+   },
+   "loss": {
+    "first": 1.4034698009490967,
+    "last": 1.037561058998108
+   },
+   "lr": 0.003,
+   "nll": 0.9458480412933932,
+   "step0": {
+    "correct": 770,
+    "em": 0.77,
+    "loss_float32": 1.3485817909240723,
+    "n": 1000,
+    "nll": 1.3485817817547212,
+    "seconds": 6.312266963999718,
+    "selectable": false,
+    "step": 0
+   },
+   "step_seconds_mean": 0.15829128904190023
+  }
+ ],
+ "shard_ids_blake2b_128": "a1504d873fa0a4ffed25b44eeb91e667",
+ "source_dirty": false,
+ "source_hash": "18fbe14506083092a63669e464941283",
+ "stage": "S1A-pilot",
+ "step_seconds": 0.15895594373739041,
+ "steps": 6000,
+ "stop": null,
+ "timing_candidates": "finite completed candidates only",
+ "torch": "2.14.0+cu132",
+ "version": 1,
+ "walltime_seconds": 1800
+}

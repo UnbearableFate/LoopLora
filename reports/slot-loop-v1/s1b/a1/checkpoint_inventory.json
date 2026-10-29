@@ -1,0 +1,19 @@
+{
+ "amendment_blake2b_128": "341d3c71f9334a1384a102b097e7ad75",
+ "parents": {
+  "S-RE": {
+   "files": {
+    "checkpoint.pt": "455bf733b9acccc7a38cfd51aa8a1ede",
+    "record.json": "816570a0882ed6952b4f851b67d4ef9f",
+    "training.json": "b918151ab8fa5c7d03ab9e767954cd4a",
+    "val-6000/samples.npz": "1bd24adac61f0ce147a159fac30bf56b",
+    "writer.pt": "3994a5631021de03b2039974ac934e56"
+   },
+   "loader": "looplora.llm.sq2.load_inference",
+   "path": "/work/xg24i002/x10041/LoopLora/runs/p1l/sq2/arms/S-RE",
+   "role": "Identical unadapted S1B parent; optimizer and training-only head unused"
+  }
+ },
+ "source_blake2b_128": "d7e7ff0fb5987d5e5abfc312c82c449c",
+ "stage": "S1B"
+}

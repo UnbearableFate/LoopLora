@@ -1,0 +1,8562 @@
+{
+ "adapter_unchanged": true,
+ "calibration_blake2b_128": "6e4f7346376cb010820a84832f6d7d91",
+ "calibration_reproduction": {
+  "matrix": {
+   "actual": {
+    "em": 0.0390625,
+    "n": 2048,
+    "nll": 10.523083506225325,
+    "per_hop": {
+     "1": {
+      "correct": 104,
+      "em": 0.05078125,
+      "nll": 9.898808733679743
+     },
+     "2": {
+      "correct": 72,
+      "em": 0.03515625,
+      "nll": 10.821176960428602
+     },
+     "3": {
+      "correct": 64,
+      "em": 0.03125,
+      "nll": 10.849264824567626
+     }
+    }
+   },
+   "matches": true,
+   "recorded": {
+    "em": 0.0390625,
+    "gain": 1.0,
+    "kind": "matrix",
+    "n": 2048,
+    "nll": 10.523083506225325,
+    "per_hop": {
+     "1": {
+      "correct": 104,
+      "em": 0.05078125,
+      "nll": 9.898808733679743
+     },
+     "2": {
+      "correct": 72,
+      "em": 0.03515625,
+      "nll": 10.821176960428602
+     },
+     "3": {
+      "correct": 64,
+      "em": 0.03125,
+      "nll": 10.849264824567626
+     }
+    },
+    "seconds": 13.519732685133931,
+    "tau": null
+   }
+  },
+  "soft": {
+   "actual": {
+    "em": 0.009440104166666666,
+    "n": 2048,
+    "nll": 8.695988856251157,
+    "per_hop": {
+     "1": {
+      "correct": 26,
+      "em": 0.0126953125,
+      "nll": 8.523176905902801
+     },
+     "2": {
+      "correct": 18,
+      "em": 0.0087890625,
+      "nll": 8.735439430703991
+     },
+     "3": {
+      "correct": 14,
+      "em": 0.0068359375,
+      "nll": 8.82935023214668
+     }
+    }
+   },
+   "matches": true,
+   "recorded": {
+    "em": 0.009440104166666666,
+    "gain": 1.0,
+    "kind": "soft",
+    "n": 2048,
+    "nll": 8.695988856251157,
+    "per_hop": {
+     "1": {
+      "correct": 26,
+      "em": 0.0126953125,
+      "nll": 8.523176905902801
+     },
+     "2": {
+      "correct": 18,
+      "em": 0.0087890625,
+      "nll": 8.735439430703991
+     },
+     "3": {
+      "correct": 14,
+      "em": 0.0068359375,
+      "nll": 8.82935023214668
+     }
+    },
+    "seconds": 14.356616694873082,
+    "tau": 0.3
+   }
+  }
+ },
+ "git_commit": "685504858921ff3dc2b6f5bf29051ca15aaee6a1",
+ "host": "mg0009",
+ "job_id": "3729676.opbs",
+ "lock_blake2b_128": "a91da220da5fee75d5b26f923116083f",
+ "memory_off_definition": "Zero m at every valid token; identical L1 reader R/U/B path retained",
+ "oracle_all_definition": "Additional diagnostic: true written next value at every valid token, gain 1",
+ "oracle_final_definition": "S0 clean_final: true written next value at final valid token, native Matrix g=1 at earlier tokens",
+ "prompt_intervention": "T1 wording on identical T2 hop-1 calibration supports/queries/targets, diagnostic only",
+ "scope": "S1B calibration and non-sealed S1A T1 pilot reference only; no optimization",
+ "script_blake2b_128": "c84e3d88970dbfb9879241b3a6803aa3",
+ "seconds": 171.6429127339943,
+ "source_blake2b_128": "bb60b89c78ee840a940c5ec855455604",
+ "source_dirty": false,
+ "source_hash": "e33ca2c2aa17d4ed00cf211e8280539e",
+ "stage": "S1B-DIAGNOSIS",
+ "status": "complete",
+ "t1": {
+  "conditions": {
+   "matrix": {
+    "correct": 733,
+    "em": 0.733,
+    "n": 1000,
+    "nll": 1.4211350753479493,
+    "read_positions": {
+     "all_valid_key_top1": 0.1948125,
+     "all_valid_margin": {
+      "mean": -0.10713827159354695,
+      "median": -0.10930317267775536,
+      "n": 16000,
+      "p10": -0.31452893018722533,
+      "p90": 0.07671917676925666
+     },
+     "by_token_offset_from_answer": {
+      "-1": {
+       "key_top1": 0.894,
+       "margin": {
+        "mean": 0.24693415255844592,
+        "median": 0.22771237790584564,
+        "n": 1000,
+        "p10": -0.0063095986843109105,
+        "p90": 0.5293252468109131
+       },
+       "n": 1000
+      },
+      "-10": {
+       "key_top1": 0.099,
+       "margin": {
+        "mean": -0.15533322364091873,
+        "median": -0.1562616378068924,
+        "n": 1000,
+        "p10": -0.3196972072124481,
+        "p90": -0.0015094250440597385
+       },
+       "n": 1000
+      },
+      "-11": {
+       "key_top1": 0.076,
+       "margin": {
+        "mean": -0.2040368130095303,
+        "median": -0.20939971506595612,
+        "n": 1000,
+        "p10": -0.3838766872882843,
+        "p90": -0.02991055846214287
+       },
+       "n": 1000
+      },
+      "-12": {
+       "key_top1": 0.059,
+       "margin": {
+        "mean": -0.18962622470408677,
+        "median": -0.19914867728948593,
+        "n": 1000,
+        "p10": -0.32155203223228457,
+        "p90": -0.03999370113015172
+       },
+       "n": 1000
+      },
+      "-13": {
+       "key_top1": 0.055,
+       "margin": {
+        "mean": -0.22935722538083791,
+        "median": -0.22309653460979462,
+        "n": 1000,
+        "p10": -0.42877261340618134,
+        "p90": -0.06380652040243139
+       },
+       "n": 1000
+      },
+      "-14": {
+       "key_top1": 0.057,
+       "margin": {
+        "mean": -0.18583915081433952,
+        "median": -0.1746596023440361,
+        "n": 1000,
+        "p10": -0.35049921870231626,
+        "p90": -0.0504212688654661
+       },
+       "n": 1000
+      },
+      "-15": {
+       "key_top1": 0.06,
+       "margin": {
+        "mean": -0.08300325436890126,
+        "median": -0.08433764427900314,
+        "n": 1000,
+        "p10": -0.14670547544956206,
+        "p90": -0.016886999458074568
+       },
+       "n": 1000
+      },
+      "-16": {
+       "key_top1": 0.061,
+       "margin": {
+        "mean": -0.04049391293805093,
+        "median": -0.03858916275203228,
+        "n": 1000,
+        "p10": -0.07520925998687744,
+        "p90": -0.008888024277985096
+       },
+       "n": 1000
+      },
+      "-2": {
+       "key_top1": 0.453,
+       "margin": {
+        "mean": -0.004003388129174709,
+        "median": -0.0038419589400291443,
+        "n": 1000,
+        "p10": -0.043507061898708344,
+        "p90": 0.0370368242263794
+       },
+       "n": 1000
+      },
+      "-3": {
+       "key_top1": 0.257,
+       "margin": {
+        "mean": -0.07233344124257565,
+        "median": -0.07549650967121124,
+        "n": 1000,
+        "p10": -0.2357747584581375,
+        "p90": 0.1000376969575882
+       },
+       "n": 1000
+      },
+      "-4": {
+       "key_top1": 0.259,
+       "margin": {
+        "mean": -0.11219955959543586,
+        "median": -0.1169600784778595,
+        "n": 1000,
+        "p10": -0.3597091495990753,
+        "p90": 0.12299592047929776
+       },
+       "n": 1000
+      },
+      "-5": {
+       "key_top1": 0.183,
+       "margin": {
+        "mean": -0.10222423822619021,
+        "median": -0.11440610885620117,
+        "n": 1000,
+        "p10": -0.2507559359073639,
+        "p90": 0.07890448868274691
+       },
+       "n": 1000
+      },
+      "-6": {
+       "key_top1": 0.258,
+       "margin": {
+        "mean": -0.06897795415110886,
+        "median": -0.0743459165096283,
+        "n": 1000,
+        "p10": -0.22026896178722383,
+        "p90": 0.09910789877176288
+       },
+       "n": 1000
+      },
+      "-7": {
+       "key_top1": 0.123,
+       "margin": {
+        "mean": -0.18200600787624716,
+        "median": -0.1850893348455429,
+        "n": 1000,
+        "p10": -0.3791319668292999,
+        "p90": 0.02193246781826021
+       },
+       "n": 1000
+      },
+      "-8": {
+       "key_top1": 0.104,
+       "margin": {
+        "mean": -0.19875194485485553,
+        "median": -0.20710445940494537,
+        "n": 1000,
+        "p10": -0.3862570762634277,
+        "p90": 0.0032143741846084694
+       },
+       "n": 1000
+      },
+      "-9": {
+       "key_top1": 0.119,
+       "margin": {
+        "mean": -0.13296015912294387,
+        "median": -0.13826993107795715,
+        "n": 1000,
+        "p10": -0.2808885723352432,
+        "p90": 0.015057139098644269
+       },
+       "n": 1000
+      }
+     },
+     "final_key_top1": 0.894,
+     "final_margin": {
+      "mean": 0.24693415255844592,
+      "median": 0.22771237790584564,
+      "n": 1000,
+      "p10": -0.0063095986843109105,
+      "p90": 0.5293252468109131
+     },
+     "final_read_relative_error": {
+      "mean": 0.17856789514049887,
+      "median": 0.1399587243795395,
+      "n": 1000,
+      "p10": 0.04996527284383774,
+      "p90": 0.35651296079158784
+     }
+    }
+   },
+   "memory_off": {
+    "correct": 3,
+    "em": 0.003,
+    "n": 1000,
+    "nll": 9.966578528642655
+   },
+   "oracle_all": {
+    "correct": 908,
+    "em": 0.908,
+    "n": 1000,
+    "nll": 0.48930563556126433
+   },
+   "oracle_final": {
+    "correct": 924,
+    "em": 0.924,
+    "n": 1000,
+    "nll": 0.35742593604874856
+   },
+   "soft": {
+    "correct": 770,
+    "em": 0.77,
+    "n": 1000,
+    "nll": 1.3485817817547212,
+    "read_positions": {
+     "all_valid_key_top1": 0.1948125,
+     "all_valid_margin": {
+      "mean": -0.10713827159354695,
+      "median": -0.10930317267775536,
+      "n": 16000,
+      "p10": -0.31452893018722533,
+      "p90": 0.07671917676925666
+     },
+     "by_token_offset_from_answer": {
+      "-1": {
+       "key_top1": 0.894,
+       "margin": {
+        "mean": 0.24693415255844592,
+        "median": 0.22771237790584564,
+        "n": 1000,
+        "p10": -0.0063095986843109105,
+        "p90": 0.5293252468109131
+       },
+       "n": 1000
+      },
+      "-10": {
+       "key_top1": 0.099,
+       "margin": {
+        "mean": -0.15533322364091873,
+        "median": -0.1562616378068924,
+        "n": 1000,
+        "p10": -0.3196972072124481,
+        "p90": -0.0015094250440597385
+       },
+       "n": 1000
+      },
+      "-11": {
+       "key_top1": 0.076,
+       "margin": {
+        "mean": -0.2040368130095303,
+        "median": -0.20939971506595612,
+        "n": 1000,
+        "p10": -0.3838766872882843,
+        "p90": -0.02991055846214287
+       },
+       "n": 1000
+      },
+      "-12": {
+       "key_top1": 0.059,
+       "margin": {
+        "mean": -0.18962622470408677,
+        "median": -0.19914867728948593,
+        "n": 1000,
+        "p10": -0.32155203223228457,
+        "p90": -0.03999370113015172
+       },
+       "n": 1000
+      },
+      "-13": {
+       "key_top1": 0.055,
+       "margin": {
+        "mean": -0.22935722538083791,
+        "median": -0.22309653460979462,
+        "n": 1000,
+        "p10": -0.42877261340618134,
+        "p90": -0.06380652040243139
+       },
+       "n": 1000
+      },
+      "-14": {
+       "key_top1": 0.057,
+       "margin": {
+        "mean": -0.18583915081433952,
+        "median": -0.1746596023440361,
+        "n": 1000,
+        "p10": -0.35049921870231626,
+        "p90": -0.0504212688654661
+       },
+       "n": 1000
+      },
+      "-15": {
+       "key_top1": 0.06,
+       "margin": {
+        "mean": -0.08300325436890126,
+        "median": -0.08433764427900314,
+        "n": 1000,
+        "p10": -0.14670547544956206,
+        "p90": -0.016886999458074568
+       },
+       "n": 1000
+      },
+      "-16": {
+       "key_top1": 0.061,
+       "margin": {
+        "mean": -0.04049391293805093,
+        "median": -0.03858916275203228,
+        "n": 1000,
+        "p10": -0.07520925998687744,
+        "p90": -0.008888024277985096
+       },
+       "n": 1000
+      },
+      "-2": {
+       "key_top1": 0.453,
+       "margin": {
+        "mean": -0.004003388129174709,
+        "median": -0.0038419589400291443,
+        "n": 1000,
+        "p10": -0.043507061898708344,
+        "p90": 0.0370368242263794
+       },
+       "n": 1000
+      },
+      "-3": {
+       "key_top1": 0.257,
+       "margin": {
+        "mean": -0.07233344124257565,
+        "median": -0.07549650967121124,
+        "n": 1000,
+        "p10": -0.2357747584581375,
+        "p90": 0.1000376969575882
+       },
+       "n": 1000
+      },
+      "-4": {
+       "key_top1": 0.259,
+       "margin": {
+        "mean": -0.11219955959543586,
+        "median": -0.1169600784778595,
+        "n": 1000,
+        "p10": -0.3597091495990753,
+        "p90": 0.12299592047929776
+       },
+       "n": 1000
+      },
+      "-5": {
+       "key_top1": 0.183,
+       "margin": {
+        "mean": -0.10222423822619021,
+        "median": -0.11440610885620117,
+        "n": 1000,
+        "p10": -0.2507559359073639,
+        "p90": 0.07890448868274691
+       },
+       "n": 1000
+      },
+      "-6": {
+       "key_top1": 0.258,
+       "margin": {
+        "mean": -0.06897795415110886,
+        "median": -0.0743459165096283,
+        "n": 1000,
+        "p10": -0.22026896178722383,
+        "p90": 0.09910789877176288
+       },
+       "n": 1000
+      },
+      "-7": {
+       "key_top1": 0.123,
+       "margin": {
+        "mean": -0.18200600787624716,
+        "median": -0.1850893348455429,
+        "n": 1000,
+        "p10": -0.3791319668292999,
+        "p90": 0.02193246781826021
+       },
+       "n": 1000
+      },
+      "-8": {
+       "key_top1": 0.104,
+       "margin": {
+        "mean": -0.19875194485485553,
+        "median": -0.20710445940494537,
+        "n": 1000,
+        "p10": -0.3862570762634277,
+        "p90": 0.0032143741846084694
+       },
+       "n": 1000
+      },
+      "-9": {
+       "key_top1": 0.119,
+       "margin": {
+        "mean": -0.13296015912294387,
+        "median": -0.13826993107795715,
+        "n": 1000,
+        "p10": -0.2808885723352432,
+        "p90": 0.015057139098644269
+       },
+       "n": 1000
+      }
+     },
+     "final_key_top1": 0.894,
+     "final_margin": {
+      "mean": 0.24693415255844592,
+      "median": 0.22771237790584564,
+      "n": 1000,
+      "p10": -0.0063095986843109105,
+      "p90": 0.5293252468109131
+     },
+     "final_read_relative_error": {
+      "mean": 0.0772243506395107,
+      "median": 0.013762251008301973,
+      "n": 1000,
+      "p10": 0.00016968130657915028,
+      "p90": 0.23382633626461036
+     }
+    }
+   },
+   "true_written_value_head": {
+    "em": 0.934,
+    "n": 1000,
+    "nll": 0.5316519023914508,
+    "role": "Descriptive training-only S-RE value head; never used in model forward/read"
+   }
+  },
+  "prompts": [
+   {
+    "answer_position": 15,
+    "answer_position_token": ":",
+    "condition": "matrix",
+    "episode_id": 1340232750529134996,
+    "fact_positions": [
+     {
+      "fact_index": 0,
+      "fact_text": "April visits Teresa.\n",
+      "positions": [
+       3,
+       1,
+       2
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 1,
+      "fact_text": "Allison visits Curt.\n",
+      "positions": [
+       8,
+       6,
+       7
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 2,
+      "fact_text": "Ole visits Dante.\n",
+      "positions": [
+       13,
+       11,
+       12
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 3,
+      "fact_text": "Pompeo helps Esther.\n",
+      "positions": [
+       20,
+       18,
+       19
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 4,
+      "fact_text": "Allison trusts Gerard.\n",
+      "positions": [
+       25,
+       23,
+       24
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 5,
+      "fact_text": "Urban visits Rene.\n",
+      "positions": [
+       29,
+       27,
+       28
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 6,
+      "fact_text": "Tobias knows Rose.\n",
+      "positions": [
+       35,
+       33,
+       34
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 7,
+      "fact_text": "Cole knows Burnett.\n",
+      "positions": [
+       39,
+       37,
+       38
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 8,
+      "fact_text": "Braun knows Edmund.\n",
+      "positions": [
+       45,
+       43,
+       44
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 9,
+      "fact_text": "Allison helps Andy.\n",
+      "positions": [
+       50,
+       48,
+       49
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 10,
+      "fact_text": "Deep visits Chelsea.\n",
+      "positions": [
+       54,
+       52,
+       53
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 11,
+      "fact_text": "Whitney helps Michel.\n",
+      "positions": [
+       60,
+       58,
+       59
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 12,
+      "fact_text": "Braun visits Carter.\n",
+      "positions": [
+       66,
+       64,
+       65
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 13,
+      "fact_text": "April trusts Paige.\n",
+      "positions": [
+       70,
+       68,
+       69
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 14,
+      "fact_text": "Sole knows Logan.\n",
+      "positions": [
+       75,
+       73,
+       74
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 15,
+      "fact_text": "Allison knows Doctor.\n",
+      "positions": [
+       80,
+       78,
+       79
+      ],
+      "write_token": ".\n"
+     }
+    ],
+    "protocol": "memory_only: support encoded separately; only question reaches read forward",
+    "question_text": "Which person is linked from Cole by the relation 'knows'?\nAnswer:",
+    "question_token_ids": [
+     23085,
+     1697,
+     374,
+     10592,
+     504,
+     23407,
+     553,
+     279,
+     12687,
+     364,
+     32034,
+     82,
+     6,
+     5267,
+     16141,
+     25
+    ],
+    "question_tokens": [
+     "Which",
+     " person",
+     " is",
+     " linked",
+     " from",
+     " Cole",
+     " by",
+     " the",
+     " relation",
+     " '",
+     "know",
+     "s",
+     "'",
+     "?\n",
+     "Answer",
+     ":"
+    ],
+    "support_text": "April visits Teresa.\nAllison visits Curt.\nOle visits Dante.\nPompeo helps Esther.\nAllison trusts Gerard.\nUrban visits Rene.\nTobias knows Rose.\nCole knows Burnett.\nBraun knows Edmund.\nAllison helps Andy.\nDeep visits Chelsea.\nWhitney helps Michel.\nBraun visits Carter.\nApril trusts Paige.\nSole knows Logan.\nAllison knows Doctor.\n",
+    "target_entity": 74,
+    "target_text": " Burnett",
+    "target_tokens": [
+     98894
+    ],
+    "top5": [
+     {
+      "logit": 16.375,
+      "probability": 0.30796337127685547,
+      "token": " Dalton",
+      "token_id": 71454
+     },
+     {
+      "logit": 15.125,
+      "probability": 0.08823297917842865,
+      "token": " Lucas",
+      "token_id": 31003
+     },
+     {
+      "logit": 15.0,
+      "probability": 0.07786533236503601,
+      "token": " Russell",
+      "token_id": 24909
+     },
+     {
+      "logit": 14.875,
+      "probability": 0.06871591508388519,
+      "token": " Logan",
+      "token_id": 43046
+     },
+     {
+      "logit": 14.1875,
+      "probability": 0.03455253317952156,
+      "token": " Neil",
+      "token_id": 33121
+     }
+    ]
+   },
+   {
+    "answer_position": 15,
+    "answer_position_token": ":",
+    "condition": "matrix",
+    "episode_id": 3897341016785275333,
+    "fact_positions": [
+     {
+      "fact_index": 0,
+      "fact_text": "Daly trusts Teresa.\n",
+      "positions": [
+       4,
+       2,
+       3
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 1,
+      "fact_text": "Bert visits Rena.\n",
+      "positions": [
+       9,
+       7,
+       8
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 2,
+      "fact_text": "Hugh trusts Jerry.\n",
+      "positions": [
+       13,
+       11,
+       12
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 3,
+      "fact_text": "Anthony knows Gray.\n",
+      "positions": [
+       17,
+       15,
+       16
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 4,
+      "fact_text": "Roy visits Ludwig.\n",
+      "positions": [
+       21,
+       19,
+       20
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 5,
+      "fact_text": "Gilbert trusts Matthew.\n",
+      "positions": [
+       26,
+       24,
+       25
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 6,
+      "fact_text": "Colin helps Chung.\n",
+      "positions": [
+       31,
+       29,
+       30
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 7,
+      "fact_text": "Good visits Hunter.\n",
+      "positions": [
+       35,
+       33,
+       34
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 8,
+      "fact_text": "Bert trusts Cameron.\n",
+      "positions": [
+       40,
+       38,
+       39
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 9,
+      "fact_text": "Anthony trusts Till.\n",
+      "positions": [
+       44,
+       42,
+       43
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 10,
+      "fact_text": "Drew helps Stephen.\n",
+      "positions": [
+       49,
+       47,
+       48
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 11,
+      "fact_text": "Georg helps Peter.\n",
+      "positions": [
+       54,
+       52,
+       53
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 12,
+      "fact_text": "Anthony visits Glenn.\n",
+      "positions": [
+       58,
+       56,
+       57
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 13,
+      "fact_text": "Anthony helps Felix.\n",
+      "positions": [
+       62,
+       60,
+       61
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 14,
+      "fact_text": "Megan visits Romeo.\n",
+      "positions": [
+       67,
+       65,
+       66
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 15,
+      "fact_text": "Hugh knows Michel.\n",
+      "positions": [
+       71,
+       69,
+       70
+      ],
+      "write_token": ".\n"
+     }
+    ],
+    "protocol": "memory_only: support encoded separately; only question reaches read forward",
+    "question_text": "Which person is linked from Megan by the relation 'visits'?\nAnswer:",
+    "question_token_ids": [
+     23085,
+     1697,
+     374,
+     10592,
+     504,
+     54529,
+     553,
+     279,
+     12687,
+     364,
+     2682,
+     1199,
+     6,
+     5267,
+     16141,
+     25
+    ],
+    "question_tokens": [
+     "Which",
+     " person",
+     " is",
+     " linked",
+     " from",
+     " Megan",
+     " by",
+     " the",
+     " relation",
+     " '",
+     "vis",
+     "its",
+     "'",
+     "?\n",
+     "Answer",
+     ":"
+    ],
+    "support_text": "Daly trusts Teresa.\nBert visits Rena.\nHugh trusts Jerry.\nAnthony knows Gray.\nRoy visits Ludwig.\nGilbert trusts Matthew.\nColin helps Chung.\nGood visits Hunter.\nBert trusts Cameron.\nAnthony trusts Till.\nDrew helps Stephen.\nGeorg helps Peter.\nAnthony visits Glenn.\nAnthony helps Felix.\nMegan visits Romeo.\nHugh knows Michel.\n",
+    "target_entity": 202,
+    "target_text": " Romeo",
+    "target_tokens": [
+     70192
+    ],
+    "top5": [
+     {
+      "logit": 18.5,
+      "probability": 0.4506467580795288,
+      "token": " Romeo",
+      "token_id": 70192
+     },
+     {
+      "logit": 18.25,
+      "probability": 0.3509640693664551,
+      "token": " Ariel",
+      "token_id": 75826
+     },
+     {
+      "logit": 16.375,
+      "probability": 0.05382208153605461,
+      "token": " Jaime",
+      "token_id": 77723
+     },
+     {
+      "logit": 16.25,
+      "probability": 0.04749782010912895,
+      "token": " Elijah",
+      "token_id": 82592
+     },
+     {
+      "logit": 15.0,
+      "probability": 0.013608354143798351,
+      "token": " Ronaldo",
+      "token_id": 64415
+     }
+    ]
+   },
+   {
+    "answer_position": 15,
+    "answer_position_token": ":",
+    "condition": "matrix",
+    "episode_id": 3318731652019559225,
+    "fact_positions": [
+     {
+      "fact_index": 0,
+      "fact_text": "Norman visits Gibson.\n",
+      "positions": [
+       4,
+       2,
+       3
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 1,
+      "fact_text": "Edmund trusts Josh.\n",
+      "positions": [
+       9,
+       7,
+       8
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 2,
+      "fact_text": "Norman knows Tommy.\n",
+      "positions": [
+       14,
+       12,
+       13
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 3,
+      "fact_text": "Pavel helps Bruce.\n",
+      "positions": [
+       19,
+       17,
+       18
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 4,
+      "fact_text": "Gould helps Harold.\n",
+      "positions": [
+       24,
+       22,
+       23
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 5,
+      "fact_text": "Edmund visits Terry.\n",
+      "positions": [
+       29,
+       27,
+       28
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 6,
+      "fact_text": "Carson knows Gates.\n",
+      "positions": [
+       34,
+       32,
+       33
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 7,
+      "fact_text": "Carson trusts Joshua.\n",
+      "positions": [
+       39,
+       37,
+       38
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 8,
+      "fact_text": "Randy visits Benton.\n",
+      "positions": [
+       44,
+       42,
+       43
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 9,
+      "fact_text": "Carson helps Dar.\n",
+      "positions": [
+       49,
+       47,
+       48
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 10,
+      "fact_text": "Garrison trusts Malik.\n",
+      "positions": [
+       54,
+       52,
+       53
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 11,
+      "fact_text": "Edmund helps Manuel.\n",
+      "positions": [
+       59,
+       57,
+       58
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 12,
+      "fact_text": "Farmer knows Kirk.\n",
+      "positions": [
+       64,
+       62,
+       63
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 13,
+      "fact_text": "Clifford visits Wolfgang.\n",
+      "positions": [
+       70,
+       68,
+       69
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 14,
+      "fact_text": "Edmund knows Morgan.\n",
+      "positions": [
+       75,
+       73,
+       74
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 15,
+      "fact_text": "Billy knows Nora.\n",
+      "positions": [
+       79,
+       77,
+       78
+      ],
+      "write_token": ".\n"
+     }
+    ],
+    "protocol": "memory_only: support encoded separately; only question reaches read forward",
+    "question_text": "Which person is linked from Clifford by the relation 'visits'?\nAnswer:",
+    "question_token_ids": [
+     23085,
+     1697,
+     374,
+     10592,
+     504,
+     85683,
+     553,
+     279,
+     12687,
+     364,
+     2682,
+     1199,
+     6,
+     5267,
+     16141,
+     25
+    ],
+    "question_tokens": [
+     "Which",
+     " person",
+     " is",
+     " linked",
+     " from",
+     " Clifford",
+     " by",
+     " the",
+     " relation",
+     " '",
+     "vis",
+     "its",
+     "'",
+     "?\n",
+     "Answer",
+     ":"
+    ],
+    "support_text": "Norman visits Gibson.\nEdmund trusts Josh.\nNorman knows Tommy.\nPavel helps Bruce.\nGould helps Harold.\nEdmund visits Terry.\nCarson knows Gates.\nCarson trusts Joshua.\nRandy visits Benton.\nCarson helps Dar.\nGarrison trusts Malik.\nEdmund helps Manuel.\nFarmer knows Kirk.\nClifford visits Wolfgang.\nEdmund knows Morgan.\nBilly knows Nora.\n",
+    "target_entity": 118,
+    "target_text": " Wolfgang",
+    "target_tokens": [
+     86498
+    ],
+    "top5": [
+     {
+      "logit": 19.5,
+      "probability": 0.8794119358062744,
+      "token": " Wolfgang",
+      "token_id": 86498
+     },
+     {
+      "logit": 16.75,
+      "probability": 0.05621892213821411,
+      "token": " Werner",
+      "token_id": 79735
+     },
+     {
+      "logit": 14.75,
+      "probability": 0.007608403917402029,
+      "token": " Urs",
+      "token_id": 70038
+     },
+     {
+      "logit": 14.375,
+      "probability": 0.005229174625128508,
+      "token": " Roland",
+      "token_id": 57806
+     },
+     {
+      "logit": 14.25,
+      "probability": 0.004614729899913073,
+      "token": " Viktor",
+      "token_id": 76016
+     }
+    ]
+   },
+   {
+    "answer_position": 15,
+    "answer_position_token": ":",
+    "condition": "matrix",
+    "episode_id": 8789847747578686652,
+    "fact_positions": [
+     {
+      "fact_index": 0,
+      "fact_text": "Eric visits Christine.\n",
+      "positions": [
+       3,
+       1,
+       2
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 1,
+      "fact_text": "Georg knows Lucky.\n",
+      "positions": [
+       8,
+       6,
+       7
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 2,
+      "fact_text": "Burke helps Johnny.\n",
+      "positions": [
+       13,
+       11,
+       12
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 3,
+      "fact_text": "Bauer knows Wayne.\n",
+      "positions": [
+       18,
+       16,
+       17
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 4,
+      "fact_text": "Matthias knows Giovanni.\n",
+      "positions": [
+       24,
+       22,
+       23
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 5,
+      "fact_text": "Chloe trusts Andres.\n",
+      "positions": [
+       29,
+       27,
+       28
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 6,
+      "fact_text": "Michelle knows Matthew.\n",
+      "positions": [
+       33,
+       31,
+       32
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 7,
+      "fact_text": "Stacy helps Paige.\n",
+      "positions": [
+       38,
+       36,
+       37
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 8,
+      "fact_text": "Steven trusts Day.\n",
+      "positions": [
+       42,
+       40,
+       41
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 9,
+      "fact_text": "Matthias helps Berger.\n",
+      "positions": [
+       48,
+       46,
+       47
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 10,
+      "fact_text": "Betty helps Cannon.\n",
+      "positions": [
+       53,
+       51,
+       52
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 11,
+      "fact_text": "Oswald helps Fernando.\n",
+      "positions": [
+       59,
+       57,
+       58
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 12,
+      "fact_text": "Sue visits Gerard.\n",
+      "positions": [
+       64,
+       62,
+       63
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 13,
+      "fact_text": "Mona trusts Falk.\n",
+      "positions": [
+       69,
+       67,
+       68
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 14,
+      "fact_text": "Georg visits Stewart.\n",
+      "positions": [
+       74,
+       72,
+       73
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 15,
+      "fact_text": "Georg trusts Parker.\n",
+      "positions": [
+       79,
+       77,
+       78
+      ],
+      "write_token": ".\n"
+     }
+    ],
+    "protocol": "memory_only: support encoded separately; only question reaches read forward",
+    "question_text": "Which person is linked from Eric by the relation 'visits'?\nAnswer:",
+    "question_token_ids": [
+     23085,
+     1697,
+     374,
+     10592,
+     504,
+     16247,
+     553,
+     279,
+     12687,
+     364,
+     2682,
+     1199,
+     6,
+     5267,
+     16141,
+     25
+    ],
+    "question_tokens": [
+     "Which",
+     " person",
+     " is",
+     " linked",
+     " from",
+     " Eric",
+     " by",
+     " the",
+     " relation",
+     " '",
+     "vis",
+     "its",
+     "'",
+     "?\n",
+     "Answer",
+     ":"
+    ],
+    "support_text": "Eric visits Christine.\nGeorg knows Lucky.\nBurke helps Johnny.\nBauer knows Wayne.\nMatthias knows Giovanni.\nChloe trusts Andres.\nMichelle knows Matthew.\nStacy helps Paige.\nSteven trusts Day.\nMatthias helps Berger.\nBetty helps Cannon.\nOswald helps Fernando.\nSue visits Gerard.\nMona trusts Falk.\nGeorg visits Stewart.\nGeorg trusts Parker.\n",
+    "target_entity": 161,
+    "target_text": " Christine",
+    "target_tokens": [
+     45893
+    ],
+    "top5": [
+     {
+      "logit": 17.625,
+      "probability": 0.23405569791793823,
+      "token": " Christine",
+      "token_id": 45893
+     },
+     {
+      "logit": 17.375,
+      "probability": 0.18228276073932648,
+      "token": " Cynthia",
+      "token_id": 74571
+     },
+     {
+      "logit": 17.0,
+      "probability": 0.12528099119663239,
+      "token": " Cindy",
+      "token_id": 69331
+     },
+     {
+      "logit": 16.375,
+      "probability": 0.06705808639526367,
+      "token": " Cathy",
+      "token_id": 81348
+     },
+     {
+      "logit": 16.25,
+      "probability": 0.05917854979634285,
+      "token": " Iris",
+      "token_id": 65721
+     }
+    ]
+   },
+   {
+    "answer_position": 15,
+    "answer_position_token": ":",
+    "condition": "matrix",
+    "episode_id": 5368454428460118048,
+    "fact_positions": [
+     {
+      "fact_index": 0,
+      "fact_text": "Suzanne visits Adolf.\n",
+      "positions": [
+       5,
+       3,
+       4
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 1,
+      "fact_text": "Shirley trusts Kirk.\n",
+      "positions": [
+       11,
+       9,
+       10
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 2,
+      "fact_text": "Johnny visits Mara.\n",
+      "positions": [
+       15,
+       13,
+       14
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 3,
+      "fact_text": "Silva helps Chambers.\n",
+      "positions": [
+       20,
+       18,
+       19
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 4,
+      "fact_text": "Glenn trusts Clay.\n",
+      "positions": [
+       25,
+       23,
+       24
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 5,
+      "fact_text": "Shirley visits April.\n",
+      "positions": [
+       31,
+       29,
+       30
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 6,
+      "fact_text": "Suzanne knows Wayne.\n",
+      "positions": [
+       37,
+       35,
+       36
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 7,
+      "fact_text": "Amber knows Buch.\n",
+      "positions": [
+       42,
+       40,
+       41
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 8,
+      "fact_text": "Mohamed trusts Edmund.\n",
+      "positions": [
+       47,
+       45,
+       46
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 9,
+      "fact_text": "Adler visits Bennett.\n",
+      "positions": [
+       52,
+       50,
+       51
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 10,
+      "fact_text": "Shirley knows Malik.\n",
+      "positions": [
+       58,
+       56,
+       57
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 11,
+      "fact_text": "Amber visits Baxter.\n",
+      "positions": [
+       63,
+       61,
+       62
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 12,
+      "fact_text": "Shirley helps Frost.\n",
+      "positions": [
+       69,
+       67,
+       68
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 13,
+      "fact_text": "Gaines trusts Roberto.\n",
+      "positions": [
+       74,
+       72,
+       73
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 14,
+      "fact_text": "Gates knows Foley.\n",
+      "positions": [
+       79,
+       77,
+       78
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 15,
+      "fact_text": "Leonardo helps Frank.\n",
+      "positions": [
+       84,
+       82,
+       83
+      ],
+      "write_token": ".\n"
+     }
+    ],
+    "protocol": "memory_only: support encoded separately; only question reaches read forward",
+    "question_text": "Which person is linked from Gaines by the relation 'trusts'?\nAnswer:",
+    "question_token_ids": [
+     23085,
+     1697,
+     374,
+     10592,
+     504,
+     82679,
+     553,
+     279,
+     12687,
+     364,
+     56655,
+     82,
+     6,
+     5267,
+     16141,
+     25
+    ],
+    "question_tokens": [
+     "Which",
+     " person",
+     " is",
+     " linked",
+     " from",
+     " Gaines",
+     " by",
+     " the",
+     " relation",
+     " '",
+     "trust",
+     "s",
+     "'",
+     "?\n",
+     "Answer",
+     ":"
+    ],
+    "support_text": "Suzanne visits Adolf.\nShirley trusts Kirk.\nJohnny visits Mara.\nSilva helps Chambers.\nGlenn trusts Clay.\nShirley visits April.\nSuzanne knows Wayne.\nAmber knows Buch.\nMohamed trusts Edmund.\nAdler visits Bennett.\nShirley knows Malik.\nAmber visits Baxter.\nShirley helps Frost.\nGaines trusts Roberto.\nGates knows Foley.\nLeonardo helps Frank.\n",
+    "target_entity": 332,
+    "target_text": " Roberto",
+    "target_tokens": [
+     54083
+    ],
+    "top5": [
+     {
+      "logit": 16.75,
+      "probability": 0.38636767864227295,
+      "token": " Roberto",
+      "token_id": 54083
+     },
+     {
+      "logit": 15.375,
+      "probability": 0.09768904000520706,
+      "token": " Paulo",
+      "token_id": 36926
+     },
+     {
+      "logit": 14.75,
+      "probability": 0.05228917673230171,
+      "token": " Paolo",
+      "token_id": 83369
+     },
+     {
+      "logit": 14.5625,
+      "probability": 0.0433492474257946,
+      "token": " Philippe",
+      "token_id": 66854
+     },
+     {
+      "logit": 14.25,
+      "probability": 0.03171498700976372,
+      "token": " Rafael",
+      "token_id": 54400
+     }
+    ]
+   },
+   {
+    "answer_position": 15,
+    "answer_position_token": ":",
+    "condition": "soft",
+    "episode_id": 1340232750529134996,
+    "fact_positions": [
+     {
+      "fact_index": 0,
+      "fact_text": "April visits Teresa.\n",
+      "positions": [
+       3,
+       1,
+       2
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 1,
+      "fact_text": "Allison visits Curt.\n",
+      "positions": [
+       8,
+       6,
+       7
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 2,
+      "fact_text": "Ole visits Dante.\n",
+      "positions": [
+       13,
+       11,
+       12
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 3,
+      "fact_text": "Pompeo helps Esther.\n",
+      "positions": [
+       20,
+       18,
+       19
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 4,
+      "fact_text": "Allison trusts Gerard.\n",
+      "positions": [
+       25,
+       23,
+       24
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 5,
+      "fact_text": "Urban visits Rene.\n",
+      "positions": [
+       29,
+       27,
+       28
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 6,
+      "fact_text": "Tobias knows Rose.\n",
+      "positions": [
+       35,
+       33,
+       34
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 7,
+      "fact_text": "Cole knows Burnett.\n",
+      "positions": [
+       39,
+       37,
+       38
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 8,
+      "fact_text": "Braun knows Edmund.\n",
+      "positions": [
+       45,
+       43,
+       44
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 9,
+      "fact_text": "Allison helps Andy.\n",
+      "positions": [
+       50,
+       48,
+       49
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 10,
+      "fact_text": "Deep visits Chelsea.\n",
+      "positions": [
+       54,
+       52,
+       53
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 11,
+      "fact_text": "Whitney helps Michel.\n",
+      "positions": [
+       60,
+       58,
+       59
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 12,
+      "fact_text": "Braun visits Carter.\n",
+      "positions": [
+       66,
+       64,
+       65
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 13,
+      "fact_text": "April trusts Paige.\n",
+      "positions": [
+       70,
+       68,
+       69
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 14,
+      "fact_text": "Sole knows Logan.\n",
+      "positions": [
+       75,
+       73,
+       74
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 15,
+      "fact_text": "Allison knows Doctor.\n",
+      "positions": [
+       80,
+       78,
+       79
+      ],
+      "write_token": ".\n"
+     }
+    ],
+    "protocol": "memory_only: support encoded separately; only question reaches read forward",
+    "question_text": "Which person is linked from Cole by the relation 'knows'?\nAnswer:",
+    "question_token_ids": [
+     23085,
+     1697,
+     374,
+     10592,
+     504,
+     23407,
+     553,
+     279,
+     12687,
+     364,
+     32034,
+     82,
+     6,
+     5267,
+     16141,
+     25
+    ],
+    "question_tokens": [
+     "Which",
+     " person",
+     " is",
+     " linked",
+     " from",
+     " Cole",
+     " by",
+     " the",
+     " relation",
+     " '",
+     "know",
+     "s",
+     "'",
+     "?\n",
+     "Answer",
+     ":"
+    ],
+    "support_text": "April visits Teresa.\nAllison visits Curt.\nOle visits Dante.\nPompeo helps Esther.\nAllison trusts Gerard.\nUrban visits Rene.\nTobias knows Rose.\nCole knows Burnett.\nBraun knows Edmund.\nAllison helps Andy.\nDeep visits Chelsea.\nWhitney helps Michel.\nBraun visits Carter.\nApril trusts Paige.\nSole knows Logan.\nAllison knows Doctor.\n",
+    "target_entity": 74,
+    "target_text": " Burnett",
+    "target_tokens": [
+     98894
+    ],
+    "top5": [
+     {
+      "logit": 16.625,
+      "probability": 0.5313696265220642,
+      "token": " Logan",
+      "token_id": 43046
+     },
+     {
+      "logit": 15.0,
+      "probability": 0.10463286936283112,
+      "token": " Dalton",
+      "token_id": 71454
+     },
+     {
+      "logit": 14.9375,
+      "probability": 0.0982934907078743,
+      "token": " Russell",
+      "token_id": 24909
+     },
+     {
+      "logit": 14.125,
+      "probability": 0.04361746832728386,
+      "token": " Lucas",
+      "token_id": 31003
+     },
+     {
+      "logit": 13.25,
+      "probability": 0.01818246580660343,
+      "token": " Burke",
+      "token_id": 49623
+     }
+    ]
+   },
+   {
+    "answer_position": 15,
+    "answer_position_token": ":",
+    "condition": "soft",
+    "episode_id": 3897341016785275333,
+    "fact_positions": [
+     {
+      "fact_index": 0,
+      "fact_text": "Daly trusts Teresa.\n",
+      "positions": [
+       4,
+       2,
+       3
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 1,
+      "fact_text": "Bert visits Rena.\n",
+      "positions": [
+       9,
+       7,
+       8
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 2,
+      "fact_text": "Hugh trusts Jerry.\n",
+      "positions": [
+       13,
+       11,
+       12
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 3,
+      "fact_text": "Anthony knows Gray.\n",
+      "positions": [
+       17,
+       15,
+       16
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 4,
+      "fact_text": "Roy visits Ludwig.\n",
+      "positions": [
+       21,
+       19,
+       20
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 5,
+      "fact_text": "Gilbert trusts Matthew.\n",
+      "positions": [
+       26,
+       24,
+       25
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 6,
+      "fact_text": "Colin helps Chung.\n",
+      "positions": [
+       31,
+       29,
+       30
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 7,
+      "fact_text": "Good visits Hunter.\n",
+      "positions": [
+       35,
+       33,
+       34
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 8,
+      "fact_text": "Bert trusts Cameron.\n",
+      "positions": [
+       40,
+       38,
+       39
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 9,
+      "fact_text": "Anthony trusts Till.\n",
+      "positions": [
+       44,
+       42,
+       43
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 10,
+      "fact_text": "Drew helps Stephen.\n",
+      "positions": [
+       49,
+       47,
+       48
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 11,
+      "fact_text": "Georg helps Peter.\n",
+      "positions": [
+       54,
+       52,
+       53
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 12,
+      "fact_text": "Anthony visits Glenn.\n",
+      "positions": [
+       58,
+       56,
+       57
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 13,
+      "fact_text": "Anthony helps Felix.\n",
+      "positions": [
+       62,
+       60,
+       61
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 14,
+      "fact_text": "Megan visits Romeo.\n",
+      "positions": [
+       67,
+       65,
+       66
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 15,
+      "fact_text": "Hugh knows Michel.\n",
+      "positions": [
+       71,
+       69,
+       70
+      ],
+      "write_token": ".\n"
+     }
+    ],
+    "protocol": "memory_only: support encoded separately; only question reaches read forward",
+    "question_text": "Which person is linked from Megan by the relation 'visits'?\nAnswer:",
+    "question_token_ids": [
+     23085,
+     1697,
+     374,
+     10592,
+     504,
+     54529,
+     553,
+     279,
+     12687,
+     364,
+     2682,
+     1199,
+     6,
+     5267,
+     16141,
+     25
+    ],
+    "question_tokens": [
+     "Which",
+     " person",
+     " is",
+     " linked",
+     " from",
+     " Megan",
+     " by",
+     " the",
+     " relation",
+     " '",
+     "vis",
+     "its",
+     "'",
+     "?\n",
+     "Answer",
+     ":"
+    ],
+    "support_text": "Daly trusts Teresa.\nBert visits Rena.\nHugh trusts Jerry.\nAnthony knows Gray.\nRoy visits Ludwig.\nGilbert trusts Matthew.\nColin helps Chung.\nGood visits Hunter.\nBert trusts Cameron.\nAnthony trusts Till.\nDrew helps Stephen.\nGeorg helps Peter.\nAnthony visits Glenn.\nAnthony helps Felix.\nMegan visits Romeo.\nHugh knows Michel.\n",
+    "target_entity": 202,
+    "target_text": " Romeo",
+    "target_tokens": [
+     70192
+    ],
+    "top5": [
+     {
+      "logit": 17.75,
+      "probability": 0.4174540042877197,
+      "token": " Romeo",
+      "token_id": 70192
+     },
+     {
+      "logit": 17.625,
+      "probability": 0.3684018850326538,
+      "token": " Ariel",
+      "token_id": 75826
+     },
+     {
+      "logit": 16.25,
+      "probability": 0.09314657747745514,
+      "token": " Elijah",
+      "token_id": 82592
+     },
+     {
+      "logit": 15.125,
+      "probability": 0.030240267515182495,
+      "token": " Jaime",
+      "token_id": 77723
+     },
+     {
+      "logit": 14.5,
+      "probability": 0.01618644781410694,
+      "token": " Ronaldo",
+      "token_id": 64415
+     }
+    ]
+   },
+   {
+    "answer_position": 15,
+    "answer_position_token": ":",
+    "condition": "soft",
+    "episode_id": 3318731652019559225,
+    "fact_positions": [
+     {
+      "fact_index": 0,
+      "fact_text": "Norman visits Gibson.\n",
+      "positions": [
+       4,
+       2,
+       3
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 1,
+      "fact_text": "Edmund trusts Josh.\n",
+      "positions": [
+       9,
+       7,
+       8
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 2,
+      "fact_text": "Norman knows Tommy.\n",
+      "positions": [
+       14,
+       12,
+       13
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 3,
+      "fact_text": "Pavel helps Bruce.\n",
+      "positions": [
+       19,
+       17,
+       18
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 4,
+      "fact_text": "Gould helps Harold.\n",
+      "positions": [
+       24,
+       22,
+       23
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 5,
+      "fact_text": "Edmund visits Terry.\n",
+      "positions": [
+       29,
+       27,
+       28
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 6,
+      "fact_text": "Carson knows Gates.\n",
+      "positions": [
+       34,
+       32,
+       33
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 7,
+      "fact_text": "Carson trusts Joshua.\n",
+      "positions": [
+       39,
+       37,
+       38
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 8,
+      "fact_text": "Randy visits Benton.\n",
+      "positions": [
+       44,
+       42,
+       43
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 9,
+      "fact_text": "Carson helps Dar.\n",
+      "positions": [
+       49,
+       47,
+       48
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 10,
+      "fact_text": "Garrison trusts Malik.\n",
+      "positions": [
+       54,
+       52,
+       53
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 11,
+      "fact_text": "Edmund helps Manuel.\n",
+      "positions": [
+       59,
+       57,
+       58
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 12,
+      "fact_text": "Farmer knows Kirk.\n",
+      "positions": [
+       64,
+       62,
+       63
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 13,
+      "fact_text": "Clifford visits Wolfgang.\n",
+      "positions": [
+       70,
+       68,
+       69
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 14,
+      "fact_text": "Edmund knows Morgan.\n",
+      "positions": [
+       75,
+       73,
+       74
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 15,
+      "fact_text": "Billy knows Nora.\n",
+      "positions": [
+       79,
+       77,
+       78
+      ],
+      "write_token": ".\n"
+     }
+    ],
+    "protocol": "memory_only: support encoded separately; only question reaches read forward",
+    "question_text": "Which person is linked from Clifford by the relation 'visits'?\nAnswer:",
+    "question_token_ids": [
+     23085,
+     1697,
+     374,
+     10592,
+     504,
+     85683,
+     553,
+     279,
+     12687,
+     364,
+     2682,
+     1199,
+     6,
+     5267,
+     16141,
+     25
+    ],
+    "question_tokens": [
+     "Which",
+     " person",
+     " is",
+     " linked",
+     " from",
+     " Clifford",
+     " by",
+     " the",
+     " relation",
+     " '",
+     "vis",
+     "its",
+     "'",
+     "?\n",
+     "Answer",
+     ":"
+    ],
+    "support_text": "Norman visits Gibson.\nEdmund trusts Josh.\nNorman knows Tommy.\nPavel helps Bruce.\nGould helps Harold.\nEdmund visits Terry.\nCarson knows Gates.\nCarson trusts Joshua.\nRandy visits Benton.\nCarson helps Dar.\nGarrison trusts Malik.\nEdmund helps Manuel.\nFarmer knows Kirk.\nClifford visits Wolfgang.\nEdmund knows Morgan.\nBilly knows Nora.\n",
+    "target_entity": 118,
+    "target_text": " Wolfgang",
+    "target_tokens": [
+     86498
+    ],
+    "top5": [
+     {
+      "logit": 19.875,
+      "probability": 0.9652981162071228,
+      "token": " Wolfgang",
+      "token_id": 86498
+     },
+     {
+      "logit": 15.25,
+      "probability": 0.009463449008762836,
+      "token": " Werner",
+      "token_id": 79735
+     },
+     {
+      "logit": 14.3125,
+      "probability": 0.003705939743667841,
+      "token": " Roland",
+      "token_id": 57806
+     },
+     {
+      "logit": 13.6875,
+      "probability": 0.001983646536245942,
+      "token": " Viktor",
+      "token_id": 76016
+     },
+     {
+      "logit": 13.375,
+      "probability": 0.0014512669295072556,
+      "token": " Tomas",
+      "token_id": 87936
+     }
+    ]
+   },
+   {
+    "answer_position": 15,
+    "answer_position_token": ":",
+    "condition": "soft",
+    "episode_id": 8789847747578686652,
+    "fact_positions": [
+     {
+      "fact_index": 0,
+      "fact_text": "Eric visits Christine.\n",
+      "positions": [
+       3,
+       1,
+       2
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 1,
+      "fact_text": "Georg knows Lucky.\n",
+      "positions": [
+       8,
+       6,
+       7
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 2,
+      "fact_text": "Burke helps Johnny.\n",
+      "positions": [
+       13,
+       11,
+       12
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 3,
+      "fact_text": "Bauer knows Wayne.\n",
+      "positions": [
+       18,
+       16,
+       17
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 4,
+      "fact_text": "Matthias knows Giovanni.\n",
+      "positions": [
+       24,
+       22,
+       23
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 5,
+      "fact_text": "Chloe trusts Andres.\n",
+      "positions": [
+       29,
+       27,
+       28
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 6,
+      "fact_text": "Michelle knows Matthew.\n",
+      "positions": [
+       33,
+       31,
+       32
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 7,
+      "fact_text": "Stacy helps Paige.\n",
+      "positions": [
+       38,
+       36,
+       37
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 8,
+      "fact_text": "Steven trusts Day.\n",
+      "positions": [
+       42,
+       40,
+       41
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 9,
+      "fact_text": "Matthias helps Berger.\n",
+      "positions": [
+       48,
+       46,
+       47
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 10,
+      "fact_text": "Betty helps Cannon.\n",
+      "positions": [
+       53,
+       51,
+       52
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 11,
+      "fact_text": "Oswald helps Fernando.\n",
+      "positions": [
+       59,
+       57,
+       58
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 12,
+      "fact_text": "Sue visits Gerard.\n",
+      "positions": [
+       64,
+       62,
+       63
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 13,
+      "fact_text": "Mona trusts Falk.\n",
+      "positions": [
+       69,
+       67,
+       68
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 14,
+      "fact_text": "Georg visits Stewart.\n",
+      "positions": [
+       74,
+       72,
+       73
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 15,
+      "fact_text": "Georg trusts Parker.\n",
+      "positions": [
+       79,
+       77,
+       78
+      ],
+      "write_token": ".\n"
+     }
+    ],
+    "protocol": "memory_only: support encoded separately; only question reaches read forward",
+    "question_text": "Which person is linked from Eric by the relation 'visits'?\nAnswer:",
+    "question_token_ids": [
+     23085,
+     1697,
+     374,
+     10592,
+     504,
+     16247,
+     553,
+     279,
+     12687,
+     364,
+     2682,
+     1199,
+     6,
+     5267,
+     16141,
+     25
+    ],
+    "question_tokens": [
+     "Which",
+     " person",
+     " is",
+     " linked",
+     " from",
+     " Eric",
+     " by",
+     " the",
+     " relation",
+     " '",
+     "vis",
+     "its",
+     "'",
+     "?\n",
+     "Answer",
+     ":"
+    ],
+    "support_text": "Eric visits Christine.\nGeorg knows Lucky.\nBurke helps Johnny.\nBauer knows Wayne.\nMatthias knows Giovanni.\nChloe trusts Andres.\nMichelle knows Matthew.\nStacy helps Paige.\nSteven trusts Day.\nMatthias helps Berger.\nBetty helps Cannon.\nOswald helps Fernando.\nSue visits Gerard.\nMona trusts Falk.\nGeorg visits Stewart.\nGeorg trusts Parker.\n",
+    "target_entity": 161,
+    "target_text": " Christine",
+    "target_tokens": [
+     45893
+    ],
+    "top5": [
+     {
+      "logit": 18.625,
+      "probability": 0.4588667154312134,
+      "token": " Christine",
+      "token_id": 45893
+     },
+     {
+      "logit": 17.125,
+      "probability": 0.10238700360059738,
+      "token": " Cynthia",
+      "token_id": 74571
+     },
+     {
+      "logit": 17.0,
+      "probability": 0.09035621583461761,
+      "token": " Iris",
+      "token_id": 65721
+     },
+     {
+      "logit": 16.75,
+      "probability": 0.07036948949098587,
+      "token": " Cindy",
+      "token_id": 69331
+     },
+     {
+      "logit": 16.375,
+      "probability": 0.048364195972681046,
+      "token": " Cathy",
+      "token_id": 81348
+     }
+    ]
+   },
+   {
+    "answer_position": 15,
+    "answer_position_token": ":",
+    "condition": "soft",
+    "episode_id": 5368454428460118048,
+    "fact_positions": [
+     {
+      "fact_index": 0,
+      "fact_text": "Suzanne visits Adolf.\n",
+      "positions": [
+       5,
+       3,
+       4
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 1,
+      "fact_text": "Shirley trusts Kirk.\n",
+      "positions": [
+       11,
+       9,
+       10
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 2,
+      "fact_text": "Johnny visits Mara.\n",
+      "positions": [
+       15,
+       13,
+       14
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 3,
+      "fact_text": "Silva helps Chambers.\n",
+      "positions": [
+       20,
+       18,
+       19
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 4,
+      "fact_text": "Glenn trusts Clay.\n",
+      "positions": [
+       25,
+       23,
+       24
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 5,
+      "fact_text": "Shirley visits April.\n",
+      "positions": [
+       31,
+       29,
+       30
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 6,
+      "fact_text": "Suzanne knows Wayne.\n",
+      "positions": [
+       37,
+       35,
+       36
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 7,
+      "fact_text": "Amber knows Buch.\n",
+      "positions": [
+       42,
+       40,
+       41
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 8,
+      "fact_text": "Mohamed trusts Edmund.\n",
+      "positions": [
+       47,
+       45,
+       46
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 9,
+      "fact_text": "Adler visits Bennett.\n",
+      "positions": [
+       52,
+       50,
+       51
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 10,
+      "fact_text": "Shirley knows Malik.\n",
+      "positions": [
+       58,
+       56,
+       57
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 11,
+      "fact_text": "Amber visits Baxter.\n",
+      "positions": [
+       63,
+       61,
+       62
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 12,
+      "fact_text": "Shirley helps Frost.\n",
+      "positions": [
+       69,
+       67,
+       68
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 13,
+      "fact_text": "Gaines trusts Roberto.\n",
+      "positions": [
+       74,
+       72,
+       73
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 14,
+      "fact_text": "Gates knows Foley.\n",
+      "positions": [
+       79,
+       77,
+       78
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 15,
+      "fact_text": "Leonardo helps Frank.\n",
+      "positions": [
+       84,
+       82,
+       83
+      ],
+      "write_token": ".\n"
+     }
+    ],
+    "protocol": "memory_only: support encoded separately; only question reaches read forward",
+    "question_text": "Which person is linked from Gaines by the relation 'trusts'?\nAnswer:",
+    "question_token_ids": [
+     23085,
+     1697,
+     374,
+     10592,
+     504,
+     82679,
+     553,
+     279,
+     12687,
+     364,
+     56655,
+     82,
+     6,
+     5267,
+     16141,
+     25
+    ],
+    "question_tokens": [
+     "Which",
+     " person",
+     " is",
+     " linked",
+     " from",
+     " Gaines",
+     " by",
+     " the",
+     " relation",
+     " '",
+     "trust",
+     "s",
+     "'",
+     "?\n",
+     "Answer",
+     ":"
+    ],
+    "support_text": "Suzanne visits Adolf.\nShirley trusts Kirk.\nJohnny visits Mara.\nSilva helps Chambers.\nGlenn trusts Clay.\nShirley visits April.\nSuzanne knows Wayne.\nAmber knows Buch.\nMohamed trusts Edmund.\nAdler visits Bennett.\nShirley knows Malik.\nAmber visits Baxter.\nShirley helps Frost.\nGaines trusts Roberto.\nGates knows Foley.\nLeonardo helps Frank.\n",
+    "target_entity": 332,
+    "target_text": " Roberto",
+    "target_tokens": [
+     54083
+    ],
+    "top5": [
+     {
+      "logit": 17.5,
+      "probability": 0.525161862373352,
+      "token": " Roberto",
+      "token_id": 54083
+     },
+     {
+      "logit": 16.125,
+      "probability": 0.1327817291021347,
+      "token": " Paulo",
+      "token_id": 36926
+     },
+     {
+      "logit": 15.5,
+      "probability": 0.07107293605804443,
+      "token": " Rafael",
+      "token_id": 54400
+     },
+     {
+      "logit": 15.125,
+      "probability": 0.04884766414761543,
+      "token": " Sergio",
+      "token_id": 65194
+     },
+     {
+      "logit": 15.0,
+      "probability": 0.04310791566967964,
+      "token": " Philippe",
+      "token_id": 66854
+     }
+    ]
+   }
+  ],
+  "seconds": 21.103038645000197
+ },
+ "t1_reference_blake2b_128": "800e2ac58001e3f3d77975d9a1691f03",
+ "t1_replay": {
+  "actual": {
+   "correct": 733,
+   "em": 0.733,
+   "n": 1000,
+   "nll": 1.4211350753479493
+  },
+  "inherited_per_sample_bitwise": {
+   "matrix": true,
+   "native": true
+  },
+  "matches_recorded": true,
+  "nll_gap": 0.0,
+  "recorded": {
+   "correct": 733,
+   "em": 0.733,
+   "loss_float32": 1.4211350679397583,
+   "n": 1000,
+   "nll": 1.4211350753479493,
+   "seconds": 8.320275826001307,
+   "selectable": false,
+   "step": 0
+  }
+ },
+ "t2": {
+  "conditions": {
+   "matrix": {
+    "correct": 104,
+    "em": 0.05078125,
+    "n": 2048,
+    "nll": 9.898943291871547,
+    "read_positions": {
+     "all_valid_key_top1": 0.09359846443965517,
+     "all_valid_margin": {
+      "mean": -0.16633426828289447,
+      "median": -0.16479608416557312,
+      "n": 59392,
+      "p10": -0.33485432267189025,
+      "p90": -0.004355701431632041
+     },
+     "by_token_offset_from_answer": {
+      "-1": {
+       "key_top1": 0.14794921875,
+       "margin": {
+        "mean": -0.1774653842803673,
+        "median": -0.1845928579568863,
+        "n": 2048,
+        "p10": -0.3866872161626816,
+        "p90": 0.04625101387500763
+       },
+       "n": 2048
+      },
+      "-10": {
+       "key_top1": 0.05224609375,
+       "margin": {
+        "mean": -0.20651483648543945,
+        "median": -0.21935809403657913,
+        "n": 2048,
+        "p10": -0.3496864318847656,
+        "p90": -0.04249920397996904
+       },
+       "n": 2048
+      },
+      "-11": {
+       "key_top1": 0.0546875,
+       "margin": {
+        "mean": -0.22151179461434367,
+        "median": -0.2311793714761734,
+        "n": 2048,
+        "p10": -0.3800652652978897,
+        "p90": -0.04693842083215714
+       },
+       "n": 2048
+      },
+      "-12": {
+       "key_top1": 0.06591796875,
+       "margin": {
+        "mean": -0.21545942231023218,
+        "median": -0.22155262529850006,
+        "n": 2048,
+        "p10": -0.3872790992259979,
+        "p90": -0.03420704603195197
+       },
+       "n": 2048
+      },
+      "-13": {
+       "key_top1": 0.06591796875,
+       "margin": {
+        "mean": -0.2342180615887628,
+        "median": -0.2463064342737198,
+        "n": 2048,
+        "p10": -0.41222546696662904,
+        "p90": -0.03503593802452091
+       },
+       "n": 2048
+      },
+      "-14": {
+       "key_top1": 0.0712890625,
+       "margin": {
+        "mean": -0.19946263439305767,
+        "median": -0.20700948685407639,
+        "n": 2048,
+        "p10": -0.3585189014673233,
+        "p90": -0.031820677220821394
+       },
+       "n": 2048
+      },
+      "-15": {
+       "key_top1": 0.05859375,
+       "margin": {
+        "mean": -0.16745678687948384,
+        "median": -0.17181429266929626,
+        "n": 2048,
+        "p10": -0.29791461825370785,
+        "p90": -0.033726133406162276
+       },
+       "n": 2048
+      },
+      "-16": {
+       "key_top1": 0.06201171875,
+       "margin": {
+        "mean": -0.16803352143688244,
+        "median": -0.17069293558597565,
+        "n": 2048,
+        "p10": -0.2961781859397888,
+        "p90": -0.034243320673704156
+       },
+       "n": 2048
+      },
+      "-17": {
+       "key_top1": 0.0732421875,
+       "margin": {
+        "mean": -0.16189321634010412,
+        "median": -0.16403944790363312,
+        "n": 2048,
+        "p10": -0.2965473383665085,
+        "p90": -0.027041819691658035
+       },
+       "n": 2048
+      },
+      "-18": {
+       "key_top1": 0.08544921875,
+       "margin": {
+        "mean": -0.1909065715590259,
+        "median": -0.20046214014291763,
+        "n": 2048,
+        "p10": -0.35250782668590547,
+        "p90": -0.012229935824871065
+       },
+       "n": 2048
+      },
+      "-19": {
+       "key_top1": 0.076171875,
+       "margin": {
+        "mean": -0.16375234786755755,
+        "median": -0.1666499227285385,
+        "n": 2048,
+        "p10": -0.30438139736652375,
+        "p90": -0.02215057313442232
+       },
+       "n": 2048
+      },
+      "-2": {
+       "key_top1": 0.1240234375,
+       "margin": {
+        "mean": -0.08993326446943684,
+        "median": -0.09254450350999832,
+        "n": 2048,
+        "p10": -0.18787068873643875,
+        "p90": 0.013740178942680358
+       },
+       "n": 2048
+      },
+      "-20": {
+       "key_top1": 0.08154296875,
+       "margin": {
+        "mean": -0.16720093785625068,
+        "median": -0.1709490418434143,
+        "n": 2048,
+        "p10": -0.3109589576721191,
+        "p90": -0.017346790432929995
+       },
+       "n": 2048
+      },
+      "-21": {
+       "key_top1": 0.0771484375,
+       "margin": {
+        "mean": -0.17558461532826186,
+        "median": -0.18291454762220383,
+        "n": 2048,
+        "p10": -0.3224826753139496,
+        "p90": -0.0193681910634041
+       },
+       "n": 2048
+      },
+      "-22": {
+       "key_top1": 0.078125,
+       "margin": {
+        "mean": -0.17190906237374293,
+        "median": -0.17662715166807175,
+        "n": 2048,
+        "p10": -0.3136149048805237,
+        "p90": -0.0204733967781067
+       },
+       "n": 2048
+      },
+      "-23": {
+       "key_top1": 0.08056640625,
+       "margin": {
+        "mean": -0.17085874002623314,
+        "median": -0.17484097927808762,
+        "n": 2048,
+        "p10": -0.3104291170835495,
+        "p90": -0.017444725334644317
+       },
+       "n": 2048
+      },
+      "-24": {
+       "key_top1": 0.10009765625,
+       "margin": {
+        "mean": -0.14371410574131005,
+        "median": -0.14691874384880066,
+        "n": 2048,
+        "p10": -0.2777394324541092,
+        "p90": 0.00013501793146129527
+       },
+       "n": 2048
+      },
+      "-25": {
+       "key_top1": 0.13134765625,
+       "margin": {
+        "mean": -0.13603650884033414,
+        "median": -0.1402042955160141,
+        "n": 2048,
+        "p10": -0.28422456085681913,
+        "p90": 0.018243500590324396
+       },
+       "n": 2048
+      },
+      "-26": {
+       "key_top1": 0.14208984375,
+       "margin": {
+        "mean": -0.12147025334161299,
+        "median": -0.12469526380300522,
+        "n": 2048,
+        "p10": -0.2642130732536316,
+        "p90": 0.027536478638648988
+       },
+       "n": 2048
+      },
+      "-27": {
+       "key_top1": 0.16162109375,
+       "margin": {
+        "mean": -0.10176361368576181,
+        "median": -0.10299493372440338,
+        "n": 2048,
+        "p10": -0.23702526688575742,
+        "p90": 0.03345407545566558
+       },
+       "n": 2048
+      },
+      "-28": {
+       "key_top1": 0.10791015625,
+       "margin": {
+        "mean": -0.09081022652389947,
+        "median": -0.09400923922657967,
+        "n": 2048,
+        "p10": -0.1778307408094406,
+        "p90": 0.003183944523334498
+       },
+       "n": 2048
+      },
+      "-29": {
+       "key_top1": 0.08447265625,
+       "margin": {
+        "mean": -0.04111708377877221,
+        "median": -0.039271920919418335,
+        "n": 2048,
+        "p10": -0.08301289081573486,
+        "p90": -0.0024669025093317174
+       },
+       "n": 2048
+      },
+      "-3": {
+       "key_top1": 0.10498046875,
+       "margin": {
+        "mean": -0.16556544066770584,
+        "median": -0.17519959807395935,
+        "n": 2048,
+        "p10": -0.32667500972747804,
+        "p90": 0.006828244030475617
+       },
+       "n": 2048
+      },
+      "-4": {
+       "key_top1": 0.1005859375,
+       "margin": {
+        "mean": -0.20557674167866935,
+        "median": -0.21296481788158417,
+        "n": 2048,
+        "p10": -0.40005173087120055,
+        "p90": 9.100139141081826e-05
+       },
+       "n": 2048
+      },
+      "-5": {
+       "key_top1": 0.13916015625,
+       "margin": {
+        "mean": -0.15879826803939068,
+        "median": -0.16466207057237625,
+        "n": 2048,
+        "p10": -0.33605676591396333,
+        "p90": 0.028503572940826363
+       },
+       "n": 2048
+      },
+      "-6": {
+       "key_top1": 0.11181640625,
+       "margin": {
+        "mean": -0.14619879920064704,
+        "median": -0.1530996337532997,
+        "n": 2048,
+        "p10": -0.28898538947105407,
+        "p90": 0.009447611868381466
+       },
+       "n": 2048
+      },
+      "-7": {
+       "key_top1": 0.10546875,
+       "margin": {
+        "mean": -0.1834846147794451,
+        "median": -0.18944957107305527,
+        "n": 2048,
+        "p10": -0.3546322673559189,
+        "p90": 0.008483397960662812
+       },
+       "n": 2048
+      },
+      "-8": {
+       "key_top1": 0.09375,
+       "margin": {
+        "mean": -0.20332216498536582,
+        "median": -0.21153536438941956,
+        "n": 2048,
+        "p10": -0.38396051824092864,
+        "p90": -0.004942610859870946
+       },
+       "n": 2048
+      },
+      "-9": {
+       "key_top1": 0.076171875,
+       "margin": {
+        "mean": -0.2436747611318424,
+        "median": -0.25085730850696564,
+        "n": 2048,
+        "p10": -0.434689399600029,
+        "p90": -0.03690840601921089
+       },
+       "n": 2048
+      }
+     },
+     "final_key_top1": 0.14794921875,
+     "final_margin": {
+      "mean": -0.1774653842803673,
+      "median": -0.1845928579568863,
+      "n": 2048,
+      "p10": -0.3866872161626816,
+      "p90": 0.04625101387500763
+     },
+     "final_read_relative_error": {
+      "mean": 0.5753411544083065,
+      "median": 0.5071280598640442,
+      "n": 2048,
+      "p10": 0.26177854239940646,
+      "p90": 0.9542734980583191
+     }
+    }
+   },
+   "memory_off": {
+    "correct": 4,
+    "em": 0.001953125,
+    "n": 2048,
+    "nll": 13.263071880326606
+   },
+   "oracle_all": {
+    "correct": 1595,
+    "em": 0.77880859375,
+    "n": 2048,
+    "nll": 0.9376816837586723
+   },
+   "oracle_final": {
+    "correct": 1628,
+    "em": 0.794921875,
+    "n": 2048,
+    "nll": 0.8337625360995862
+   },
+   "soft": {
+    "correct": 26,
+    "em": 0.0126953125,
+    "n": 2048,
+    "nll": 8.522725247283233,
+    "read_positions": {
+     "all_valid_key_top1": 0.09359846443965517,
+     "all_valid_margin": {
+      "mean": -0.16633426828289447,
+      "median": -0.16479608416557312,
+      "n": 59392,
+      "p10": -0.33485432267189025,
+      "p90": -0.004355701431632041
+     },
+     "by_token_offset_from_answer": {
+      "-1": {
+       "key_top1": 0.14794921875,
+       "margin": {
+        "mean": -0.1774653842803673,
+        "median": -0.1845928579568863,
+        "n": 2048,
+        "p10": -0.3866872161626816,
+        "p90": 0.04625101387500763
+       },
+       "n": 2048
+      },
+      "-10": {
+       "key_top1": 0.05224609375,
+       "margin": {
+        "mean": -0.20651483648543945,
+        "median": -0.21935809403657913,
+        "n": 2048,
+        "p10": -0.3496864318847656,
+        "p90": -0.04249920397996904
+       },
+       "n": 2048
+      },
+      "-11": {
+       "key_top1": 0.0546875,
+       "margin": {
+        "mean": -0.22151179461434367,
+        "median": -0.2311793714761734,
+        "n": 2048,
+        "p10": -0.3800652652978897,
+        "p90": -0.04693842083215714
+       },
+       "n": 2048
+      },
+      "-12": {
+       "key_top1": 0.06591796875,
+       "margin": {
+        "mean": -0.21545942231023218,
+        "median": -0.22155262529850006,
+        "n": 2048,
+        "p10": -0.3872790992259979,
+        "p90": -0.03420704603195197
+       },
+       "n": 2048
+      },
+      "-13": {
+       "key_top1": 0.06591796875,
+       "margin": {
+        "mean": -0.2342180615887628,
+        "median": -0.2463064342737198,
+        "n": 2048,
+        "p10": -0.41222546696662904,
+        "p90": -0.03503593802452091
+       },
+       "n": 2048
+      },
+      "-14": {
+       "key_top1": 0.0712890625,
+       "margin": {
+        "mean": -0.19946263439305767,
+        "median": -0.20700948685407639,
+        "n": 2048,
+        "p10": -0.3585189014673233,
+        "p90": -0.031820677220821394
+       },
+       "n": 2048
+      },
+      "-15": {
+       "key_top1": 0.05859375,
+       "margin": {
+        "mean": -0.16745678687948384,
+        "median": -0.17181429266929626,
+        "n": 2048,
+        "p10": -0.29791461825370785,
+        "p90": -0.033726133406162276
+       },
+       "n": 2048
+      },
+      "-16": {
+       "key_top1": 0.06201171875,
+       "margin": {
+        "mean": -0.16803352143688244,
+        "median": -0.17069293558597565,
+        "n": 2048,
+        "p10": -0.2961781859397888,
+        "p90": -0.034243320673704156
+       },
+       "n": 2048
+      },
+      "-17": {
+       "key_top1": 0.0732421875,
+       "margin": {
+        "mean": -0.16189321634010412,
+        "median": -0.16403944790363312,
+        "n": 2048,
+        "p10": -0.2965473383665085,
+        "p90": -0.027041819691658035
+       },
+       "n": 2048
+      },
+      "-18": {
+       "key_top1": 0.08544921875,
+       "margin": {
+        "mean": -0.1909065715590259,
+        "median": -0.20046214014291763,
+        "n": 2048,
+        "p10": -0.35250782668590547,
+        "p90": -0.012229935824871065
+       },
+       "n": 2048
+      },
+      "-19": {
+       "key_top1": 0.076171875,
+       "margin": {
+        "mean": -0.16375234786755755,
+        "median": -0.1666499227285385,
+        "n": 2048,
+        "p10": -0.30438139736652375,
+        "p90": -0.02215057313442232
+       },
+       "n": 2048
+      },
+      "-2": {
+       "key_top1": 0.1240234375,
+       "margin": {
+        "mean": -0.08993326446943684,
+        "median": -0.09254450350999832,
+        "n": 2048,
+        "p10": -0.18787068873643875,
+        "p90": 0.013740178942680358
+       },
+       "n": 2048
+      },
+      "-20": {
+       "key_top1": 0.08154296875,
+       "margin": {
+        "mean": -0.16720093785625068,
+        "median": -0.1709490418434143,
+        "n": 2048,
+        "p10": -0.3109589576721191,
+        "p90": -0.017346790432929995
+       },
+       "n": 2048
+      },
+      "-21": {
+       "key_top1": 0.0771484375,
+       "margin": {
+        "mean": -0.17558461532826186,
+        "median": -0.18291454762220383,
+        "n": 2048,
+        "p10": -0.3224826753139496,
+        "p90": -0.0193681910634041
+       },
+       "n": 2048
+      },
+      "-22": {
+       "key_top1": 0.078125,
+       "margin": {
+        "mean": -0.17190906237374293,
+        "median": -0.17662715166807175,
+        "n": 2048,
+        "p10": -0.3136149048805237,
+        "p90": -0.0204733967781067
+       },
+       "n": 2048
+      },
+      "-23": {
+       "key_top1": 0.08056640625,
+       "margin": {
+        "mean": -0.17085874002623314,
+        "median": -0.17484097927808762,
+        "n": 2048,
+        "p10": -0.3104291170835495,
+        "p90": -0.017444725334644317
+       },
+       "n": 2048
+      },
+      "-24": {
+       "key_top1": 0.10009765625,
+       "margin": {
+        "mean": -0.14371410574131005,
+        "median": -0.14691874384880066,
+        "n": 2048,
+        "p10": -0.2777394324541092,
+        "p90": 0.00013501793146129527
+       },
+       "n": 2048
+      },
+      "-25": {
+       "key_top1": 0.13134765625,
+       "margin": {
+        "mean": -0.13603650884033414,
+        "median": -0.1402042955160141,
+        "n": 2048,
+        "p10": -0.28422456085681913,
+        "p90": 0.018243500590324396
+       },
+       "n": 2048
+      },
+      "-26": {
+       "key_top1": 0.14208984375,
+       "margin": {
+        "mean": -0.12147025334161299,
+        "median": -0.12469526380300522,
+        "n": 2048,
+        "p10": -0.2642130732536316,
+        "p90": 0.027536478638648988
+       },
+       "n": 2048
+      },
+      "-27": {
+       "key_top1": 0.16162109375,
+       "margin": {
+        "mean": -0.10176361368576181,
+        "median": -0.10299493372440338,
+        "n": 2048,
+        "p10": -0.23702526688575742,
+        "p90": 0.03345407545566558
+       },
+       "n": 2048
+      },
+      "-28": {
+       "key_top1": 0.10791015625,
+       "margin": {
+        "mean": -0.09081022652389947,
+        "median": -0.09400923922657967,
+        "n": 2048,
+        "p10": -0.1778307408094406,
+        "p90": 0.003183944523334498
+       },
+       "n": 2048
+      },
+      "-29": {
+       "key_top1": 0.08447265625,
+       "margin": {
+        "mean": -0.04111708377877221,
+        "median": -0.039271920919418335,
+        "n": 2048,
+        "p10": -0.08301289081573486,
+        "p90": -0.0024669025093317174
+       },
+       "n": 2048
+      },
+      "-3": {
+       "key_top1": 0.10498046875,
+       "margin": {
+        "mean": -0.16556544066770584,
+        "median": -0.17519959807395935,
+        "n": 2048,
+        "p10": -0.32667500972747804,
+        "p90": 0.006828244030475617
+       },
+       "n": 2048
+      },
+      "-4": {
+       "key_top1": 0.1005859375,
+       "margin": {
+        "mean": -0.20557674167866935,
+        "median": -0.21296481788158417,
+        "n": 2048,
+        "p10": -0.40005173087120055,
+        "p90": 9.100139141081826e-05
+       },
+       "n": 2048
+      },
+      "-5": {
+       "key_top1": 0.13916015625,
+       "margin": {
+        "mean": -0.15879826803939068,
+        "median": -0.16466207057237625,
+        "n": 2048,
+        "p10": -0.33605676591396333,
+        "p90": 0.028503572940826363
+       },
+       "n": 2048
+      },
+      "-6": {
+       "key_top1": 0.11181640625,
+       "margin": {
+        "mean": -0.14619879920064704,
+        "median": -0.1530996337532997,
+        "n": 2048,
+        "p10": -0.28898538947105407,
+        "p90": 0.009447611868381466
+       },
+       "n": 2048
+      },
+      "-7": {
+       "key_top1": 0.10546875,
+       "margin": {
+        "mean": -0.1834846147794451,
+        "median": -0.18944957107305527,
+        "n": 2048,
+        "p10": -0.3546322673559189,
+        "p90": 0.008483397960662812
+       },
+       "n": 2048
+      },
+      "-8": {
+       "key_top1": 0.09375,
+       "margin": {
+        "mean": -0.20332216498536582,
+        "median": -0.21153536438941956,
+        "n": 2048,
+        "p10": -0.38396051824092864,
+        "p90": -0.004942610859870946
+       },
+       "n": 2048
+      },
+      "-9": {
+       "key_top1": 0.076171875,
+       "margin": {
+        "mean": -0.2436747611318424,
+        "median": -0.25085730850696564,
+        "n": 2048,
+        "p10": -0.434689399600029,
+        "p90": -0.03690840601921089
+       },
+       "n": 2048
+      }
+     },
+     "final_key_top1": 0.14794921875,
+     "final_margin": {
+      "mean": -0.1774653842803673,
+      "median": -0.1845928579568863,
+      "n": 2048,
+      "p10": -0.3866872161626816,
+      "p90": 0.04625101387500763
+     },
+     "final_read_relative_error": {
+      "mean": 0.47014226773535484,
+      "median": 0.3973020613193512,
+      "n": 2048,
+      "p10": 0.22431327253580094,
+      "p90": 0.7981496155261993
+     }
+    }
+   },
+   "true_written_value_head": {
+    "em": 0.83642578125,
+    "n": 2048,
+    "nll": 2.142059089562389,
+    "role": "Descriptive training-only S-RE value head; never used in model forward/read"
+   }
+  },
+  "prompts": [
+   {
+    "answer_position": 28,
+    "answer_position_token": ":",
+    "condition": "matrix",
+    "episode_id": 1287256782801180009,
+    "fact_positions": [
+     {
+      "fact_index": 0,
+      "fact_text": "Caldwell knows Nigel.\n",
+      "positions": [
+       5,
+       3,
+       4
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 1,
+      "fact_text": "Julie knows Joshua.\n",
+      "positions": [
+       10,
+       8,
+       9
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 2,
+      "fact_text": "Barry knows Shane.\n",
+      "positions": [
+       15,
+       13,
+       14
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 3,
+      "fact_text": "Shane knows Caldwell.\n",
+      "positions": [
+       20,
+       18,
+       19
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 4,
+      "fact_text": "Todd knows Anthony.\n",
+      "positions": [
+       24,
+       22,
+       23
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 5,
+      "fact_text": "Joshua knows Barry.\n",
+      "positions": [
+       29,
+       27,
+       28
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 6,
+      "fact_text": "Hannah knows Ron.\n",
+      "positions": [
+       34,
+       32,
+       33
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 7,
+      "fact_text": "Anthony knows Julie.\n",
+      "positions": [
+       38,
+       36,
+       37
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 8,
+      "fact_text": "Chase knows Todd.\n",
+      "positions": [
+       43,
+       41,
+       42
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 9,
+      "fact_text": "Chan knows Jo.\n",
+      "positions": [
+       47,
+       45,
+       46
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 10,
+      "fact_text": "Ron knows Chan.\n",
+      "positions": [
+       51,
+       49,
+       50
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 11,
+      "fact_text": "Jo knows Felix.\n",
+      "positions": [
+       55,
+       53,
+       54
+      ],
+      "write_token": ".\n"
+     }
+    ],
+    "protocol": "memory_only: support encoded separately; only question reaches read forward",
+    "question_text": "Starting from Caldwell, keep following the relation 'knows' until there is no further fact for that relation. Which person is reached?\nAnswer:",
+    "question_token_ids": [
+     24617,
+     504,
+     81224,
+     11,
+     2506,
+     2701,
+     279,
+     12687,
+     364,
+     32034,
+     82,
+     6,
+     3080,
+     1052,
+     374,
+     902,
+     4623,
+     2097,
+     369,
+     429,
+     12687,
+     13,
+     15920,
+     1697,
+     374,
+     8643,
+     5267,
+     16141,
+     25
+    ],
+    "question_tokens": [
+     "Starting",
+     " from",
+     " Caldwell",
+     ",",
+     " keep",
+     " following",
+     " the",
+     " relation",
+     " '",
+     "know",
+     "s",
+     "'",
+     " until",
+     " there",
+     " is",
+     " no",
+     " further",
+     " fact",
+     " for",
+     " that",
+     " relation",
+     ".",
+     " Which",
+     " person",
+     " is",
+     " reached",
+     "?\n",
+     "Answer",
+     ":"
+    ],
+    "support_text": "Caldwell knows Nigel.\nJulie knows Joshua.\nBarry knows Shane.\nShane knows Caldwell.\nTodd knows Anthony.\nJoshua knows Barry.\nHannah knows Ron.\nAnthony knows Julie.\nChase knows Todd.\nChan knows Jo.\nRon knows Chan.\nJo knows Felix.\n",
+    "target_entity": 373,
+    "target_text": " Nigel",
+    "target_tokens": [
+     65816
+    ],
+    "top5": [
+     {
+      "logit": 17.125,
+      "probability": 0.2127024382352829,
+      "token": " Jo",
+      "token_id": 10946
+     },
+     {
+      "logit": 16.625,
+      "probability": 0.12901054322719574,
+      "token": " Ann",
+      "token_id": 9305
+     },
+     {
+      "logit": 16.125,
+      "probability": 0.07824885100126266,
+      "token": " Chan",
+      "token_id": 41302
+     },
+     {
+      "logit": 16.0,
+      "probability": 0.06905437260866165,
+      "token": " Joan",
+      "token_id": 50106
+     },
+     {
+      "logit": 15.875,
+      "probability": 0.06094026565551758,
+      "token": " Allen",
+      "token_id": 20060
+     }
+    ]
+   },
+   {
+    "answer_position": 28,
+    "answer_position_token": ":",
+    "condition": "matrix",
+    "episode_id": 8111687887098378937,
+    "fact_positions": [
+     {
+      "fact_index": 0,
+      "fact_text": "Conte knows Allen.\n",
+      "positions": [
+       4,
+       2,
+       3
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 1,
+      "fact_text": "Connor knows Conte.\n",
+      "positions": [
+       8,
+       6,
+       7
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 2,
+      "fact_text": "Mark knows Harm.\n",
+      "positions": [
+       12,
+       10,
+       11
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 3,
+      "fact_text": "Matthias knows Paige.\n",
+      "positions": [
+       18,
+       16,
+       17
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 4,
+      "fact_text": "Marine knows Christopher.\n",
+      "positions": [
+       23,
+       21,
+       22
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 5,
+      "fact_text": "Harm knows Boris.\n",
+      "positions": [
+       28,
+       26,
+       27
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 6,
+      "fact_text": "Boris knows Marine.\n",
+      "positions": [
+       33,
+       31,
+       32
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 7,
+      "fact_text": "Kathy knows Hugo.\n",
+      "positions": [
+       38,
+       36,
+       37
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 8,
+      "fact_text": "Hugo knows Mark.\n",
+      "positions": [
+       43,
+       41,
+       42
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 9,
+      "fact_text": "Christopher knows Bruce.\n",
+      "positions": [
+       47,
+       45,
+       46
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 10,
+      "fact_text": "Carolina knows Kathy.\n",
+      "positions": [
+       52,
+       50,
+       51
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 11,
+      "fact_text": "Paige knows Connor.\n",
+      "positions": [
+       57,
+       55,
+       56
+      ],
+      "write_token": ".\n"
+     }
+    ],
+    "protocol": "memory_only: support encoded separately; only question reaches read forward",
+    "question_text": "Starting from Conte, keep following the relation 'knows' until there is no further fact for that relation. Which person is reached?\nAnswer:",
+    "question_token_ids": [
+     24617,
+     504,
+     93378,
+     11,
+     2506,
+     2701,
+     279,
+     12687,
+     364,
+     32034,
+     82,
+     6,
+     3080,
+     1052,
+     374,
+     902,
+     4623,
+     2097,
+     369,
+     429,
+     12687,
+     13,
+     15920,
+     1697,
+     374,
+     8643,
+     5267,
+     16141,
+     25
+    ],
+    "question_tokens": [
+     "Starting",
+     " from",
+     " Conte",
+     ",",
+     " keep",
+     " following",
+     " the",
+     " relation",
+     " '",
+     "know",
+     "s",
+     "'",
+     " until",
+     " there",
+     " is",
+     " no",
+     " further",
+     " fact",
+     " for",
+     " that",
+     " relation",
+     ".",
+     " Which",
+     " person",
+     " is",
+     " reached",
+     "?\n",
+     "Answer",
+     ":"
+    ],
+    "support_text": "Conte knows Allen.\nConnor knows Conte.\nMark knows Harm.\nMatthias knows Paige.\nMarine knows Christopher.\nHarm knows Boris.\nBoris knows Marine.\nKathy knows Hugo.\nHugo knows Mark.\nChristopher knows Bruce.\nCarolina knows Kathy.\nPaige knows Connor.\n",
+    "target_entity": 225,
+    "target_text": " Allen",
+    "target_tokens": [
+     20060
+    ],
+    "top5": [
+     {
+      "logit": 17.5,
+      "probability": 0.1743539422750473,
+      "token": " Norman",
+      "token_id": 40068
+     },
+     {
+      "logit": 17.25,
+      "probability": 0.1357869952917099,
+      "token": " Peter",
+      "token_id": 11044
+     },
+     {
+      "logit": 16.5,
+      "probability": 0.06414123624563217,
+      "token": " Allen",
+      "token_id": 20060
+     },
+     {
+      "logit": 16.375,
+      "probability": 0.05660444125533104,
+      "token": " Alexander",
+      "token_id": 20042
+     },
+     {
+      "logit": 16.25,
+      "probability": 0.049953240901231766,
+      "token": " Booker",
+      "token_id": 64995
+     }
+    ]
+   },
+   {
+    "answer_position": 28,
+    "answer_position_token": ":",
+    "condition": "matrix",
+    "episode_id": 7494498776518826428,
+    "fact_positions": [
+     {
+      "fact_index": 0,
+      "fact_text": "Barber knows Lynn.\n",
+      "positions": [
+       4,
+       2,
+       3
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 1,
+      "fact_text": "Drake knows Bray.\n",
+      "positions": [
+       9,
+       7,
+       8
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 2,
+      "fact_text": "Sandra knows Corey.\n",
+      "positions": [
+       14,
+       12,
+       13
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 3,
+      "fact_text": "Cord knows Esther.\n",
+      "positions": [
+       19,
+       17,
+       18
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 4,
+      "fact_text": "Chan knows Kristen.\n",
+      "positions": [
+       23,
+       21,
+       22
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 5,
+      "fact_text": "Dale knows Susan.\n",
+      "positions": [
+       28,
+       26,
+       27
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 6,
+      "fact_text": "Esther knows Barber.\n",
+      "positions": [
+       33,
+       31,
+       32
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 7,
+      "fact_text": "Ella knows Dale.\n",
+      "positions": [
+       38,
+       36,
+       37
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 8,
+      "fact_text": "Kristen knows Sandra.\n",
+      "positions": [
+       43,
+       41,
+       42
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 9,
+      "fact_text": "Kata knows Cord.\n",
+      "positions": [
+       48,
+       46,
+       47
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 10,
+      "fact_text": "Corey knows Kata.\n",
+      "positions": [
+       53,
+       51,
+       52
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 11,
+      "fact_text": "Susan knows Drake.\n",
+      "positions": [
+       57,
+       55,
+       56
+      ],
+      "write_token": ".\n"
+     }
+    ],
+    "protocol": "memory_only: support encoded separately; only question reaches read forward",
+    "question_text": "Starting from Barber, keep following the relation 'knows' until there is no further fact for that relation. Which person is reached?\nAnswer:",
+    "question_token_ids": [
+     24617,
+     504,
+     68135,
+     11,
+     2506,
+     2701,
+     279,
+     12687,
+     364,
+     32034,
+     82,
+     6,
+     3080,
+     1052,
+     374,
+     902,
+     4623,
+     2097,
+     369,
+     429,
+     12687,
+     13,
+     15920,
+     1697,
+     374,
+     8643,
+     5267,
+     16141,
+     25
+    ],
+    "question_tokens": [
+     "Starting",
+     " from",
+     " Barber",
+     ",",
+     " keep",
+     " following",
+     " the",
+     " relation",
+     " '",
+     "know",
+     "s",
+     "'",
+     " until",
+     " there",
+     " is",
+     " no",
+     " further",
+     " fact",
+     " for",
+     " that",
+     " relation",
+     ".",
+     " Which",
+     " person",
+     " is",
+     " reached",
+     "?\n",
+     "Answer",
+     ":"
+    ],
+    "support_text": "Barber knows Lynn.\nDrake knows Bray.\nSandra knows Corey.\nCord knows Esther.\nChan knows Kristen.\nDale knows Susan.\nEsther knows Barber.\nElla knows Dale.\nKristen knows Sandra.\nKata knows Cord.\nCorey knows Kata.\nSusan knows Drake.\n",
+    "target_entity": 240,
+    "target_text": " Lynn",
+    "target_tokens": [
+     44538
+    ],
+    "top5": [
+     {
+      "logit": 20.5,
+      "probability": 0.6347130537033081,
+      "token": " Caroline",
+      "token_id": 53391
+     },
+     {
+      "logit": 18.375,
+      "probability": 0.0758056715130806,
+      "token": " Brittany",
+      "token_id": 88154
+     },
+     {
+      "logit": 18.375,
+      "probability": 0.0758056715130806,
+      "token": " Leah",
+      "token_id": 66861
+     },
+     {
+      "logit": 17.0,
+      "probability": 0.019166674464941025,
+      "token": " Alison",
+      "token_id": 66363
+     },
+     {
+      "logit": 16.875,
+      "probability": 0.016914531588554382,
+      "token": " Christian",
+      "token_id": 8876
+     }
+    ]
+   },
+   {
+    "answer_position": 28,
+    "answer_position_token": ":",
+    "condition": "matrix",
+    "episode_id": 6244493409239580883,
+    "fact_positions": [
+     {
+      "fact_index": 0,
+      "fact_text": "Julie knows Sydney.\n",
+      "positions": [
+       4,
+       2,
+       3
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 1,
+      "fact_text": "Harm knows Julie.\n",
+      "positions": [
+       9,
+       7,
+       8
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 2,
+      "fact_text": "Hardy knows Otto.\n",
+      "positions": [
+       14,
+       12,
+       13
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 3,
+      "fact_text": "Bowman knows Lore.\n",
+      "positions": [
+       19,
+       17,
+       18
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 4,
+      "fact_text": "Otto knows Olivier.\n",
+      "positions": [
+       24,
+       22,
+       23
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 5,
+      "fact_text": "Christine knows Gala.\n",
+      "positions": [
+       29,
+       27,
+       28
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 6,
+      "fact_text": "Claude knows Christine.\n",
+      "positions": [
+       34,
+       32,
+       33
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 7,
+      "fact_text": "Rosie knows Patty.\n",
+      "positions": [
+       39,
+       37,
+       38
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 8,
+      "fact_text": "Sydney knows Rosie.\n",
+      "positions": [
+       44,
+       42,
+       43
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 9,
+      "fact_text": "Olivier knows Bowman.\n",
+      "positions": [
+       50,
+       48,
+       49
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 10,
+      "fact_text": "Lore knows Chambers.\n",
+      "positions": [
+       55,
+       53,
+       54
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 11,
+      "fact_text": "Gala knows Hardy.\n",
+      "positions": [
+       60,
+       58,
+       59
+      ],
+      "write_token": ".\n"
+     }
+    ],
+    "protocol": "memory_only: support encoded separately; only question reaches read forward",
+    "question_text": "Starting from Rosie, keep following the relation 'knows' until there is no further fact for that relation. Which person is reached?\nAnswer:",
+    "question_token_ids": [
+     24617,
+     504,
+     96767,
+     11,
+     2506,
+     2701,
+     279,
+     12687,
+     364,
+     32034,
+     82,
+     6,
+     3080,
+     1052,
+     374,
+     902,
+     4623,
+     2097,
+     369,
+     429,
+     12687,
+     13,
+     15920,
+     1697,
+     374,
+     8643,
+     5267,
+     16141,
+     25
+    ],
+    "question_tokens": [
+     "Starting",
+     " from",
+     " Rosie",
+     ",",
+     " keep",
+     " following",
+     " the",
+     " relation",
+     " '",
+     "know",
+     "s",
+     "'",
+     " until",
+     " there",
+     " is",
+     " no",
+     " further",
+     " fact",
+     " for",
+     " that",
+     " relation",
+     ".",
+     " Which",
+     " person",
+     " is",
+     " reached",
+     "?\n",
+     "Answer",
+     ":"
+    ],
+    "support_text": "Julie knows Sydney.\nHarm knows Julie.\nHardy knows Otto.\nBowman knows Lore.\nOtto knows Olivier.\nChristine knows Gala.\nClaude knows Christine.\nRosie knows Patty.\nSydney knows Rosie.\nOlivier knows Bowman.\nLore knows Chambers.\nGala knows Hardy.\n",
+    "target_entity": 429,
+    "target_text": " Patty",
+    "target_tokens": [
+     88245
+    ],
+    "top5": [
+     {
+      "logit": 17.375,
+      "probability": 0.27740567922592163,
+      "token": " Martha",
+      "token_id": 50870
+     },
+     {
+      "logit": 16.25,
+      "probability": 0.09006045013666153,
+      "token": " Paula",
+      "token_id": 61153
+     },
+     {
+      "logit": 15.875,
+      "probability": 0.061897579580545425,
+      "token": " Markus",
+      "token_id": 75840
+     },
+     {
+      "logit": 15.875,
+      "probability": 0.061897579580545425,
+      "token": " Ellen",
+      "token_id": 46585
+     },
+     {
+      "logit": 15.8125,
+      "probability": 0.05814739316701889,
+      "token": " Charlotte",
+      "token_id": 28373
+     }
+    ]
+   },
+   {
+    "answer_position": 28,
+    "answer_position_token": ":",
+    "condition": "matrix",
+    "episode_id": 3285038830464699338,
+    "fact_positions": [
+     {
+      "fact_index": 0,
+      "fact_text": "Mona knows Viktor.\n",
+      "positions": [
+       4,
+       2,
+       3
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 1,
+      "fact_text": "Joel knows Leonard.\n",
+      "positions": [
+       9,
+       7,
+       8
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 2,
+      "fact_text": "Ole knows Gene.\n",
+      "positions": [
+       14,
+       12,
+       13
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 3,
+      "fact_text": "Viktor knows De.\n",
+      "positions": [
+       20,
+       18,
+       19
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 4,
+      "fact_text": "Gandhi knows Ole.\n",
+      "positions": [
+       26,
+       24,
+       25
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 5,
+      "fact_text": "Abdullah knows Scott.\n",
+      "positions": [
+       32,
+       30,
+       31
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 6,
+      "fact_text": "Xavier knows Mona.\n",
+      "positions": [
+       37,
+       35,
+       36
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 7,
+      "fact_text": "Damon knows Castillo.\n",
+      "positions": [
+       42,
+       40,
+       41
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 8,
+      "fact_text": "Lisa knows Damon.\n",
+      "positions": [
+       46,
+       44,
+       45
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 9,
+      "fact_text": "Scott knows Lisa.\n",
+      "positions": [
+       50,
+       48,
+       49
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 10,
+      "fact_text": "Gene knows Joel.\n",
+      "positions": [
+       54,
+       52,
+       53
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 11,
+      "fact_text": "De knows Abdullah.\n",
+      "positions": [
+       58,
+       56,
+       57
+      ],
+      "write_token": ".\n"
+     }
+    ],
+    "protocol": "memory_only: support encoded separately; only question reaches read forward",
+    "question_text": "Starting from Joel, keep following the relation 'knows' until there is no further fact for that relation. Which person is reached?\nAnswer:",
+    "question_token_ids": [
+     24617,
+     504,
+     38347,
+     11,
+     2506,
+     2701,
+     279,
+     12687,
+     364,
+     32034,
+     82,
+     6,
+     3080,
+     1052,
+     374,
+     902,
+     4623,
+     2097,
+     369,
+     429,
+     12687,
+     13,
+     15920,
+     1697,
+     374,
+     8643,
+     5267,
+     16141,
+     25
+    ],
+    "question_tokens": [
+     "Starting",
+     " from",
+     " Joel",
+     ",",
+     " keep",
+     " following",
+     " the",
+     " relation",
+     " '",
+     "know",
+     "s",
+     "'",
+     " until",
+     " there",
+     " is",
+     " no",
+     " further",
+     " fact",
+     " for",
+     " that",
+     " relation",
+     ".",
+     " Which",
+     " person",
+     " is",
+     " reached",
+     "?\n",
+     "Answer",
+     ":"
+    ],
+    "support_text": "Mona knows Viktor.\nJoel knows Leonard.\nOle knows Gene.\nViktor knows De.\nGandhi knows Ole.\nAbdullah knows Scott.\nXavier knows Mona.\nDamon knows Castillo.\nLisa knows Damon.\nScott knows Lisa.\nGene knows Joel.\nDe knows Abdullah.\n",
+    "target_entity": 304,
+    "target_text": " Leonard",
+    "target_tokens": [
+     40854
+    ],
+    "top5": [
+     {
+      "logit": 15.6875,
+      "probability": 0.35250774025917053,
+      "token": " De",
+      "token_id": 1581
+     },
+     {
+      "logit": 14.3125,
+      "probability": 0.08912792056798935,
+      "token": " Dar",
+      "token_id": 15017
+     },
+     {
+      "logit": 14.25,
+      "probability": 0.08372792601585388,
+      "token": " Noah",
+      "token_id": 41984
+     },
+     {
+      "logit": 14.0625,
+      "probability": 0.06941289454698563,
+      "token": " Bir",
+      "token_id": 36819
+     },
+     {
+      "logit": 13.4375,
+      "probability": 0.03715404495596886,
+      "token": " Isaac",
+      "token_id": 41508
+     }
+    ]
+   },
+   {
+    "answer_position": 28,
+    "answer_position_token": ":",
+    "condition": "soft",
+    "episode_id": 1287256782801180009,
+    "fact_positions": [
+     {
+      "fact_index": 0,
+      "fact_text": "Caldwell knows Nigel.\n",
+      "positions": [
+       5,
+       3,
+       4
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 1,
+      "fact_text": "Julie knows Joshua.\n",
+      "positions": [
+       10,
+       8,
+       9
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 2,
+      "fact_text": "Barry knows Shane.\n",
+      "positions": [
+       15,
+       13,
+       14
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 3,
+      "fact_text": "Shane knows Caldwell.\n",
+      "positions": [
+       20,
+       18,
+       19
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 4,
+      "fact_text": "Todd knows Anthony.\n",
+      "positions": [
+       24,
+       22,
+       23
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 5,
+      "fact_text": "Joshua knows Barry.\n",
+      "positions": [
+       29,
+       27,
+       28
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 6,
+      "fact_text": "Hannah knows Ron.\n",
+      "positions": [
+       34,
+       32,
+       33
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 7,
+      "fact_text": "Anthony knows Julie.\n",
+      "positions": [
+       38,
+       36,
+       37
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 8,
+      "fact_text": "Chase knows Todd.\n",
+      "positions": [
+       43,
+       41,
+       42
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 9,
+      "fact_text": "Chan knows Jo.\n",
+      "positions": [
+       47,
+       45,
+       46
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 10,
+      "fact_text": "Ron knows Chan.\n",
+      "positions": [
+       51,
+       49,
+       50
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 11,
+      "fact_text": "Jo knows Felix.\n",
+      "positions": [
+       55,
+       53,
+       54
+      ],
+      "write_token": ".\n"
+     }
+    ],
+    "protocol": "memory_only: support encoded separately; only question reaches read forward",
+    "question_text": "Starting from Caldwell, keep following the relation 'knows' until there is no further fact for that relation. Which person is reached?\nAnswer:",
+    "question_token_ids": [
+     24617,
+     504,
+     81224,
+     11,
+     2506,
+     2701,
+     279,
+     12687,
+     364,
+     32034,
+     82,
+     6,
+     3080,
+     1052,
+     374,
+     902,
+     4623,
+     2097,
+     369,
+     429,
+     12687,
+     13,
+     15920,
+     1697,
+     374,
+     8643,
+     5267,
+     16141,
+     25
+    ],
+    "question_tokens": [
+     "Starting",
+     " from",
+     " Caldwell",
+     ",",
+     " keep",
+     " following",
+     " the",
+     " relation",
+     " '",
+     "know",
+     "s",
+     "'",
+     " until",
+     " there",
+     " is",
+     " no",
+     " further",
+     " fact",
+     " for",
+     " that",
+     " relation",
+     ".",
+     " Which",
+     " person",
+     " is",
+     " reached",
+     "?\n",
+     "Answer",
+     ":"
+    ],
+    "support_text": "Caldwell knows Nigel.\nJulie knows Joshua.\nBarry knows Shane.\nShane knows Caldwell.\nTodd knows Anthony.\nJoshua knows Barry.\nHannah knows Ron.\nAnthony knows Julie.\nChase knows Todd.\nChan knows Jo.\nRon knows Chan.\nJo knows Felix.\n",
+    "target_entity": 373,
+    "target_text": " Nigel",
+    "target_tokens": [
+     65816
+    ],
+    "top5": [
+     {
+      "logit": 16.25,
+      "probability": 0.16788096725940704,
+      "token": " Josh",
+      "token_id": 18246
+     },
+     {
+      "logit": 15.125,
+      "probability": 0.05450296774506569,
+      "token": " John",
+      "token_id": 3757
+     },
+     {
+      "logit": 15.0,
+      "probability": 0.04809870198369026,
+      "token": " Ron",
+      "token_id": 14325
+     },
+     {
+      "logit": 14.9375,
+      "probability": 0.04518454894423485,
+      "token": " Neil",
+      "token_id": 33121
+     },
+     {
+      "logit": 14.9375,
+      "probability": 0.04518454894423485,
+      "token": " Jonathan",
+      "token_id": 23269
+     }
+    ]
+   },
+   {
+    "answer_position": 28,
+    "answer_position_token": ":",
+    "condition": "soft",
+    "episode_id": 8111687887098378937,
+    "fact_positions": [
+     {
+      "fact_index": 0,
+      "fact_text": "Conte knows Allen.\n",
+      "positions": [
+       4,
+       2,
+       3
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 1,
+      "fact_text": "Connor knows Conte.\n",
+      "positions": [
+       8,
+       6,
+       7
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 2,
+      "fact_text": "Mark knows Harm.\n",
+      "positions": [
+       12,
+       10,
+       11
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 3,
+      "fact_text": "Matthias knows Paige.\n",
+      "positions": [
+       18,
+       16,
+       17
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 4,
+      "fact_text": "Marine knows Christopher.\n",
+      "positions": [
+       23,
+       21,
+       22
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 5,
+      "fact_text": "Harm knows Boris.\n",
+      "positions": [
+       28,
+       26,
+       27
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 6,
+      "fact_text": "Boris knows Marine.\n",
+      "positions": [
+       33,
+       31,
+       32
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 7,
+      "fact_text": "Kathy knows Hugo.\n",
+      "positions": [
+       38,
+       36,
+       37
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 8,
+      "fact_text": "Hugo knows Mark.\n",
+      "positions": [
+       43,
+       41,
+       42
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 9,
+      "fact_text": "Christopher knows Bruce.\n",
+      "positions": [
+       47,
+       45,
+       46
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 10,
+      "fact_text": "Carolina knows Kathy.\n",
+      "positions": [
+       52,
+       50,
+       51
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 11,
+      "fact_text": "Paige knows Connor.\n",
+      "positions": [
+       57,
+       55,
+       56
+      ],
+      "write_token": ".\n"
+     }
+    ],
+    "protocol": "memory_only: support encoded separately; only question reaches read forward",
+    "question_text": "Starting from Conte, keep following the relation 'knows' until there is no further fact for that relation. Which person is reached?\nAnswer:",
+    "question_token_ids": [
+     24617,
+     504,
+     93378,
+     11,
+     2506,
+     2701,
+     279,
+     12687,
+     364,
+     32034,
+     82,
+     6,
+     3080,
+     1052,
+     374,
+     902,
+     4623,
+     2097,
+     369,
+     429,
+     12687,
+     13,
+     15920,
+     1697,
+     374,
+     8643,
+     5267,
+     16141,
+     25
+    ],
+    "question_tokens": [
+     "Starting",
+     " from",
+     " Conte",
+     ",",
+     " keep",
+     " following",
+     " the",
+     " relation",
+     " '",
+     "know",
+     "s",
+     "'",
+     " until",
+     " there",
+     " is",
+     " no",
+     " further",
+     " fact",
+     " for",
+     " that",
+     " relation",
+     ".",
+     " Which",
+     " person",
+     " is",
+     " reached",
+     "?\n",
+     "Answer",
+     ":"
+    ],
+    "support_text": "Conte knows Allen.\nConnor knows Conte.\nMark knows Harm.\nMatthias knows Paige.\nMarine knows Christopher.\nHarm knows Boris.\nBoris knows Marine.\nKathy knows Hugo.\nHugo knows Mark.\nChristopher knows Bruce.\nCarolina knows Kathy.\nPaige knows Connor.\n",
+    "target_entity": 225,
+    "target_text": " Allen",
+    "target_tokens": [
+     20060
+    ],
+    "top5": [
+     {
+      "logit": 14.5,
+      "probability": 0.05270662531256676,
+      "token": " Hugo",
+      "token_id": 51094
+     },
+     {
+      "logit": 14.4375,
+      "probability": 0.04951329156756401,
+      "token": " Peter",
+      "token_id": 11044
+     },
+     {
+      "logit": 14.25,
+      "probability": 0.04104796051979065,
+      "token": " Maggie",
+      "token_id": 61695
+     },
+     {
+      "logit": 14.25,
+      "probability": 0.04104796051979065,
+      "token": " Bryan",
+      "token_id": 36353
+     },
+     {
+      "logit": 14.0625,
+      "probability": 0.03402995318174362,
+      "token": " Victor",
+      "token_id": 32312
+     }
+    ]
+   },
+   {
+    "answer_position": 28,
+    "answer_position_token": ":",
+    "condition": "soft",
+    "episode_id": 7494498776518826428,
+    "fact_positions": [
+     {
+      "fact_index": 0,
+      "fact_text": "Barber knows Lynn.\n",
+      "positions": [
+       4,
+       2,
+       3
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 1,
+      "fact_text": "Drake knows Bray.\n",
+      "positions": [
+       9,
+       7,
+       8
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 2,
+      "fact_text": "Sandra knows Corey.\n",
+      "positions": [
+       14,
+       12,
+       13
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 3,
+      "fact_text": "Cord knows Esther.\n",
+      "positions": [
+       19,
+       17,
+       18
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 4,
+      "fact_text": "Chan knows Kristen.\n",
+      "positions": [
+       23,
+       21,
+       22
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 5,
+      "fact_text": "Dale knows Susan.\n",
+      "positions": [
+       28,
+       26,
+       27
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 6,
+      "fact_text": "Esther knows Barber.\n",
+      "positions": [
+       33,
+       31,
+       32
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 7,
+      "fact_text": "Ella knows Dale.\n",
+      "positions": [
+       38,
+       36,
+       37
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 8,
+      "fact_text": "Kristen knows Sandra.\n",
+      "positions": [
+       43,
+       41,
+       42
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 9,
+      "fact_text": "Kata knows Cord.\n",
+      "positions": [
+       48,
+       46,
+       47
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 10,
+      "fact_text": "Corey knows Kata.\n",
+      "positions": [
+       53,
+       51,
+       52
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 11,
+      "fact_text": "Susan knows Drake.\n",
+      "positions": [
+       57,
+       55,
+       56
+      ],
+      "write_token": ".\n"
+     }
+    ],
+    "protocol": "memory_only: support encoded separately; only question reaches read forward",
+    "question_text": "Starting from Barber, keep following the relation 'knows' until there is no further fact for that relation. Which person is reached?\nAnswer:",
+    "question_token_ids": [
+     24617,
+     504,
+     68135,
+     11,
+     2506,
+     2701,
+     279,
+     12687,
+     364,
+     32034,
+     82,
+     6,
+     3080,
+     1052,
+     374,
+     902,
+     4623,
+     2097,
+     369,
+     429,
+     12687,
+     13,
+     15920,
+     1697,
+     374,
+     8643,
+     5267,
+     16141,
+     25
+    ],
+    "question_tokens": [
+     "Starting",
+     " from",
+     " Barber",
+     ",",
+     " keep",
+     " following",
+     " the",
+     " relation",
+     " '",
+     "know",
+     "s",
+     "'",
+     " until",
+     " there",
+     " is",
+     " no",
+     " further",
+     " fact",
+     " for",
+     " that",
+     " relation",
+     ".",
+     " Which",
+     " person",
+     " is",
+     " reached",
+     "?\n",
+     "Answer",
+     ":"
+    ],
+    "support_text": "Barber knows Lynn.\nDrake knows Bray.\nSandra knows Corey.\nCord knows Esther.\nChan knows Kristen.\nDale knows Susan.\nEsther knows Barber.\nElla knows Dale.\nKristen knows Sandra.\nKata knows Cord.\nCorey knows Kata.\nSusan knows Drake.\n",
+    "target_entity": 240,
+    "target_text": " Lynn",
+    "target_tokens": [
+     44538
+    ],
+    "top5": [
+     {
+      "logit": 15.9375,
+      "probability": 0.1321626752614975,
+      "token": " Caroline",
+      "token_id": 53391
+     },
+     {
+      "logit": 15.5625,
+      "probability": 0.09083399176597595,
+      "token": " Leah",
+      "token_id": 66861
+     },
+     {
+      "logit": 15.3125,
+      "probability": 0.07074158638715744,
+      "token": " Ariel",
+      "token_id": 75826
+     },
+     {
+      "logit": 15.0,
+      "probability": 0.051755648106336594,
+      "token": " Alison",
+      "token_id": 66363
+     },
+     {
+      "logit": 14.25,
+      "probability": 0.024447636678814888,
+      "token": " Tara",
+      "token_id": 69697
+     }
+    ]
+   },
+   {
+    "answer_position": 28,
+    "answer_position_token": ":",
+    "condition": "soft",
+    "episode_id": 6244493409239580883,
+    "fact_positions": [
+     {
+      "fact_index": 0,
+      "fact_text": "Julie knows Sydney.\n",
+      "positions": [
+       4,
+       2,
+       3
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 1,
+      "fact_text": "Harm knows Julie.\n",
+      "positions": [
+       9,
+       7,
+       8
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 2,
+      "fact_text": "Hardy knows Otto.\n",
+      "positions": [
+       14,
+       12,
+       13
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 3,
+      "fact_text": "Bowman knows Lore.\n",
+      "positions": [
+       19,
+       17,
+       18
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 4,
+      "fact_text": "Otto knows Olivier.\n",
+      "positions": [
+       24,
+       22,
+       23
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 5,
+      "fact_text": "Christine knows Gala.\n",
+      "positions": [
+       29,
+       27,
+       28
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 6,
+      "fact_text": "Claude knows Christine.\n",
+      "positions": [
+       34,
+       32,
+       33
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 7,
+      "fact_text": "Rosie knows Patty.\n",
+      "positions": [
+       39,
+       37,
+       38
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 8,
+      "fact_text": "Sydney knows Rosie.\n",
+      "positions": [
+       44,
+       42,
+       43
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 9,
+      "fact_text": "Olivier knows Bowman.\n",
+      "positions": [
+       50,
+       48,
+       49
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 10,
+      "fact_text": "Lore knows Chambers.\n",
+      "positions": [
+       55,
+       53,
+       54
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 11,
+      "fact_text": "Gala knows Hardy.\n",
+      "positions": [
+       60,
+       58,
+       59
+      ],
+      "write_token": ".\n"
+     }
+    ],
+    "protocol": "memory_only: support encoded separately; only question reaches read forward",
+    "question_text": "Starting from Rosie, keep following the relation 'knows' until there is no further fact for that relation. Which person is reached?\nAnswer:",
+    "question_token_ids": [
+     24617,
+     504,
+     96767,
+     11,
+     2506,
+     2701,
+     279,
+     12687,
+     364,
+     32034,
+     82,
+     6,
+     3080,
+     1052,
+     374,
+     902,
+     4623,
+     2097,
+     369,
+     429,
+     12687,
+     13,
+     15920,
+     1697,
+     374,
+     8643,
+     5267,
+     16141,
+     25
+    ],
+    "question_tokens": [
+     "Starting",
+     " from",
+     " Rosie",
+     ",",
+     " keep",
+     " following",
+     " the",
+     " relation",
+     " '",
+     "know",
+     "s",
+     "'",
+     " until",
+     " there",
+     " is",
+     " no",
+     " further",
+     " fact",
+     " for",
+     " that",
+     " relation",
+     ".",
+     " Which",
+     " person",
+     " is",
+     " reached",
+     "?\n",
+     "Answer",
+     ":"
+    ],
+    "support_text": "Julie knows Sydney.\nHarm knows Julie.\nHardy knows Otto.\nBowman knows Lore.\nOtto knows Olivier.\nChristine knows Gala.\nClaude knows Christine.\nRosie knows Patty.\nSydney knows Rosie.\nOlivier knows Bowman.\nLore knows Chambers.\nGala knows Hardy.\n",
+    "target_entity": 429,
+    "target_text": " Patty",
+    "target_tokens": [
+     88245
+    ],
+    "top5": [
+     {
+      "logit": 16.25,
+      "probability": 0.088618703186512,
+      "token": " Charlotte",
+      "token_id": 28373
+     },
+     {
+      "logit": 16.125,
+      "probability": 0.07820573449134827,
+      "token": " Lauren",
+      "token_id": 42360
+     },
+     {
+      "logit": 15.9375,
+      "probability": 0.0648348331451416,
+      "token": " Alison",
+      "token_id": 66363
+     },
+     {
+      "logit": 15.75,
+      "probability": 0.05374996364116669,
+      "token": " Michelle",
+      "token_id": 32026
+     },
+     {
+      "logit": 15.375,
+      "probability": 0.0369417741894722,
+      "token": " Chelsea",
+      "token_id": 26518
+     }
+    ]
+   },
+   {
+    "answer_position": 28,
+    "answer_position_token": ":",
+    "condition": "soft",
+    "episode_id": 3285038830464699338,
+    "fact_positions": [
+     {
+      "fact_index": 0,
+      "fact_text": "Mona knows Viktor.\n",
+      "positions": [
+       4,
+       2,
+       3
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 1,
+      "fact_text": "Joel knows Leonard.\n",
+      "positions": [
+       9,
+       7,
+       8
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 2,
+      "fact_text": "Ole knows Gene.\n",
+      "positions": [
+       14,
+       12,
+       13
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 3,
+      "fact_text": "Viktor knows De.\n",
+      "positions": [
+       20,
+       18,
+       19
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 4,
+      "fact_text": "Gandhi knows Ole.\n",
+      "positions": [
+       26,
+       24,
+       25
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 5,
+      "fact_text": "Abdullah knows Scott.\n",
+      "positions": [
+       32,
+       30,
+       31
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 6,
+      "fact_text": "Xavier knows Mona.\n",
+      "positions": [
+       37,
+       35,
+       36
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 7,
+      "fact_text": "Damon knows Castillo.\n",
+      "positions": [
+       42,
+       40,
+       41
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 8,
+      "fact_text": "Lisa knows Damon.\n",
+      "positions": [
+       46,
+       44,
+       45
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 9,
+      "fact_text": "Scott knows Lisa.\n",
+      "positions": [
+       50,
+       48,
+       49
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 10,
+      "fact_text": "Gene knows Joel.\n",
+      "positions": [
+       54,
+       52,
+       53
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 11,
+      "fact_text": "De knows Abdullah.\n",
+      "positions": [
+       58,
+       56,
+       57
+      ],
+      "write_token": ".\n"
+     }
+    ],
+    "protocol": "memory_only: support encoded separately; only question reaches read forward",
+    "question_text": "Starting from Joel, keep following the relation 'knows' until there is no further fact for that relation. Which person is reached?\nAnswer:",
+    "question_token_ids": [
+     24617,
+     504,
+     38347,
+     11,
+     2506,
+     2701,
+     279,
+     12687,
+     364,
+     32034,
+     82,
+     6,
+     3080,
+     1052,
+     374,
+     902,
+     4623,
+     2097,
+     369,
+     429,
+     12687,
+     13,
+     15920,
+     1697,
+     374,
+     8643,
+     5267,
+     16141,
+     25
+    ],
+    "question_tokens": [
+     "Starting",
+     " from",
+     " Joel",
+     ",",
+     " keep",
+     " following",
+     " the",
+     " relation",
+     " '",
+     "know",
+     "s",
+     "'",
+     " until",
+     " there",
+     " is",
+     " no",
+     " further",
+     " fact",
+     " for",
+     " that",
+     " relation",
+     ".",
+     " Which",
+     " person",
+     " is",
+     " reached",
+     "?\n",
+     "Answer",
+     ":"
+    ],
+    "support_text": "Mona knows Viktor.\nJoel knows Leonard.\nOle knows Gene.\nViktor knows De.\nGandhi knows Ole.\nAbdullah knows Scott.\nXavier knows Mona.\nDamon knows Castillo.\nLisa knows Damon.\nScott knows Lisa.\nGene knows Joel.\nDe knows Abdullah.\n",
+    "target_entity": 304,
+    "target_text": " Leonard",
+    "target_tokens": [
+     40854
+    ],
+    "top5": [
+     {
+      "logit": 15.5,
+      "probability": 0.14954215288162231,
+      "token": " Noah",
+      "token_id": 41984
+     },
+     {
+      "logit": 15.1875,
+      "probability": 0.10940737277269363,
+      "token": " Alec",
+      "token_id": 85016
+     },
+     {
+      "logit": 14.375,
+      "probability": 0.04854922741651535,
+      "token": " Gabriel",
+      "token_id": 38743
+     },
+     {
+      "logit": 14.3125,
+      "probability": 0.04560777544975281,
+      "token": " Christopher",
+      "token_id": 24986
+     },
+     {
+      "logit": 14.25,
+      "probability": 0.04284454509615898,
+      "token": " Seth",
+      "token_id": 44218
+     }
+    ]
+   }
+  ],
+  "seconds": 55.89014771899383
+ },
+ "t2_t1_wording": {
+  "conditions": {
+   "matrix": {
+    "correct": 645,
+    "em": 0.31494140625,
+    "n": 2048,
+    "nll": 4.749568797380334,
+    "read_positions": {
+     "all_valid_key_top1": 0.16314697265625,
+     "all_valid_margin": {
+      "mean": -0.12355924161707321,
+      "median": -0.11294272914528847,
+      "n": 32768,
+      "p10": -0.3182948470115662,
+      "p90": 0.04063043892383575
+     },
+     "by_token_offset_from_answer": {
+      "-1": {
+       "key_top1": 0.5947265625,
+       "margin": {
+        "mean": 0.04002492172730854,
+        "median": 0.04892149567604065,
+        "n": 2048,
+        "p10": -0.21133435666561126,
+        "p90": 0.2793909192085266
+       },
+       "n": 2048
+      },
+      "-10": {
+       "key_top1": 0.171875,
+       "margin": {
+        "mean": -0.13304955403873464,
+        "median": -0.1339389756321907,
+        "n": 2048,
+        "p10": -0.3185909688472748,
+        "p90": 0.05141360461711883
+       },
+       "n": 2048
+      },
+      "-11": {
+       "key_top1": 0.13232421875,
+       "margin": {
+        "mean": -0.1685809350983618,
+        "median": -0.17355089634656906,
+        "n": 2048,
+        "p10": -0.36926810145378114,
+        "p90": 0.03212925940752029
+       },
+       "n": 2048
+      },
+      "-12": {
+       "key_top1": 0.1005859375,
+       "margin": {
+        "mean": -0.14741498412331566,
+        "median": -0.15291057527065277,
+        "n": 2048,
+        "p10": -0.28736921548843386,
+        "p90": 0.00015563368797301527
+       },
+       "n": 2048
+      },
+      "-13": {
+       "key_top1": 0.09130859375,
+       "margin": {
+        "mean": -0.24168985085088934,
+        "median": -0.25884753465652466,
+        "n": 2048,
+        "p10": -0.4511926472187042,
+        "p90": -0.01022547334432603
+       },
+       "n": 2048
+      },
+      "-14": {
+       "key_top1": 0.095703125,
+       "margin": {
+        "mean": -0.20648053076547512,
+        "median": -0.21966852247714996,
+        "n": 2048,
+        "p10": -0.3910453826189041,
+        "p90": -0.004673481732606897
+       },
+       "n": 2048
+      },
+      "-15": {
+       "key_top1": 0.119140625,
+       "margin": {
+        "mean": -0.07369065345119452,
+        "median": -0.07929562032222748,
+        "n": 2048,
+        "p10": -0.14681133031845092,
+        "p90": 0.005785776674747466
+       },
+       "n": 2048
+      },
+      "-16": {
+       "key_top1": 0.0888671875,
+       "margin": {
+        "mean": -0.041180070933933166,
+        "median": -0.04006900638341904,
+        "n": 2048,
+        "p10": -0.08336609378457069,
+        "p90": -0.002895747497677806
+       },
+       "n": 2048
+      },
+      "-2": {
+       "key_top1": 0.2978515625,
+       "margin": {
+        "mean": -0.016999378429318313,
+        "median": -0.018138431012630463,
+        "n": 2048,
+        "p10": -0.061728674173355105,
+        "p90": 0.02545500248670578
+       },
+       "n": 2048
+      },
+      "-3": {
+       "key_top1": 0.19091796875,
+       "margin": {
+        "mean": -0.08225280728038342,
+        "median": -0.08804159611463547,
+        "n": 2048,
+        "p10": -0.20383979976177216,
+        "p90": 0.050920507311820976
+       },
+       "n": 2048
+      },
+      "-4": {
+       "key_top1": 0.0849609375,
+       "margin": {
+        "mean": -0.24867880210877047,
+        "median": -0.26346948742866516,
+        "n": 2048,
+        "p10": -0.4451334238052368,
+        "p90": -0.02003117799758912
+       },
+       "n": 2048
+      },
+      "-5": {
+       "key_top1": 0.10205078125,
+       "margin": {
+        "mean": -0.14457540367584443,
+        "median": -0.14934274554252625,
+        "n": 2048,
+        "p10": -0.28438768088817595,
+        "p90": 0.0009427607059478753
+       },
+       "n": 2048
+      },
+      "-6": {
+       "key_top1": 0.13037109375,
+       "margin": {
+        "mean": -0.14469659173118998,
+        "median": -0.14798125624656677,
+        "n": 2048,
+        "p10": -0.30648693442344666,
+        "p90": 0.021401265263557432
+       },
+       "n": 2048
+      },
+      "-7": {
+       "key_top1": 0.12158203125,
+       "margin": {
+        "mean": -0.13279791969034704,
+        "median": -0.13754291087388992,
+        "n": 2048,
+        "p10": -0.27455253303050997,
+        "p90": 0.018340867757797186
+       },
+       "n": 2048
+      },
+      "-8": {
+       "key_top1": 0.09814453125,
+       "margin": {
+        "mean": -0.13086438476966578,
+        "median": -0.12956742197275162,
+        "n": 2048,
+        "p10": -0.26201750338077545,
+        "p90": -0.00046363621950150304
+       },
+       "n": 2048
+      },
+      "-9": {
+       "key_top1": 0.18994140625,
+       "margin": {
+        "mean": -0.10402092065305624,
+        "median": -0.10986953973770142,
+        "n": 2048,
+        "p10": -0.25543327927589415,
+        "p90": 0.06640883088111876
+       },
+       "n": 2048
+      }
+     },
+     "final_key_top1": 0.5947265625,
+     "final_margin": {
+      "mean": 0.04002492172730854,
+      "median": 0.04892149567604065,
+      "n": 2048,
+      "p10": -0.21133435666561126,
+      "p90": 0.2793909192085266
+     },
+     "final_read_relative_error": {
+      "mean": 0.3503366659851963,
+      "median": 0.2999422699213028,
+      "n": 2048,
+      "p10": 0.11358025074005128,
+      "p90": 0.6495851695537567
+     }
+    }
+   },
+   "memory_off": {
+    "correct": 4,
+    "em": 0.001953125,
+    "n": 2048,
+    "nll": 10.070489176781848
+   },
+   "oracle_all": {
+    "correct": 1648,
+    "em": 0.8046875,
+    "n": 2048,
+    "nll": 0.8863216267182921
+   },
+   "oracle_final": {
+    "correct": 1695,
+    "em": 0.82763671875,
+    "n": 2048,
+    "nll": 0.7794457433162449
+   },
+   "soft": {
+    "correct": 200,
+    "em": 0.09765625,
+    "n": 2048,
+    "nll": 5.758765466225668,
+    "read_positions": {
+     "all_valid_key_top1": 0.16314697265625,
+     "all_valid_margin": {
+      "mean": -0.12355924161707321,
+      "median": -0.11294272914528847,
+      "n": 32768,
+      "p10": -0.3182948470115662,
+      "p90": 0.04063043892383575
+     },
+     "by_token_offset_from_answer": {
+      "-1": {
+       "key_top1": 0.5947265625,
+       "margin": {
+        "mean": 0.04002492172730854,
+        "median": 0.04892149567604065,
+        "n": 2048,
+        "p10": -0.21133435666561126,
+        "p90": 0.2793909192085266
+       },
+       "n": 2048
+      },
+      "-10": {
+       "key_top1": 0.171875,
+       "margin": {
+        "mean": -0.13304955403873464,
+        "median": -0.1339389756321907,
+        "n": 2048,
+        "p10": -0.3185909688472748,
+        "p90": 0.05141360461711883
+       },
+       "n": 2048
+      },
+      "-11": {
+       "key_top1": 0.13232421875,
+       "margin": {
+        "mean": -0.1685809350983618,
+        "median": -0.17355089634656906,
+        "n": 2048,
+        "p10": -0.36926810145378114,
+        "p90": 0.03212925940752029
+       },
+       "n": 2048
+      },
+      "-12": {
+       "key_top1": 0.1005859375,
+       "margin": {
+        "mean": -0.14741498412331566,
+        "median": -0.15291057527065277,
+        "n": 2048,
+        "p10": -0.28736921548843386,
+        "p90": 0.00015563368797301527
+       },
+       "n": 2048
+      },
+      "-13": {
+       "key_top1": 0.09130859375,
+       "margin": {
+        "mean": -0.24168985085088934,
+        "median": -0.25884753465652466,
+        "n": 2048,
+        "p10": -0.4511926472187042,
+        "p90": -0.01022547334432603
+       },
+       "n": 2048
+      },
+      "-14": {
+       "key_top1": 0.095703125,
+       "margin": {
+        "mean": -0.20648053076547512,
+        "median": -0.21966852247714996,
+        "n": 2048,
+        "p10": -0.3910453826189041,
+        "p90": -0.004673481732606897
+       },
+       "n": 2048
+      },
+      "-15": {
+       "key_top1": 0.119140625,
+       "margin": {
+        "mean": -0.07369065345119452,
+        "median": -0.07929562032222748,
+        "n": 2048,
+        "p10": -0.14681133031845092,
+        "p90": 0.005785776674747466
+       },
+       "n": 2048
+      },
+      "-16": {
+       "key_top1": 0.0888671875,
+       "margin": {
+        "mean": -0.041180070933933166,
+        "median": -0.04006900638341904,
+        "n": 2048,
+        "p10": -0.08336609378457069,
+        "p90": -0.002895747497677806
+       },
+       "n": 2048
+      },
+      "-2": {
+       "key_top1": 0.2978515625,
+       "margin": {
+        "mean": -0.016999378429318313,
+        "median": -0.018138431012630463,
+        "n": 2048,
+        "p10": -0.061728674173355105,
+        "p90": 0.02545500248670578
+       },
+       "n": 2048
+      },
+      "-3": {
+       "key_top1": 0.19091796875,
+       "margin": {
+        "mean": -0.08225280728038342,
+        "median": -0.08804159611463547,
+        "n": 2048,
+        "p10": -0.20383979976177216,
+        "p90": 0.050920507311820976
+       },
+       "n": 2048
+      },
+      "-4": {
+       "key_top1": 0.0849609375,
+       "margin": {
+        "mean": -0.24867880210877047,
+        "median": -0.26346948742866516,
+        "n": 2048,
+        "p10": -0.4451334238052368,
+        "p90": -0.02003117799758912
+       },
+       "n": 2048
+      },
+      "-5": {
+       "key_top1": 0.10205078125,
+       "margin": {
+        "mean": -0.14457540367584443,
+        "median": -0.14934274554252625,
+        "n": 2048,
+        "p10": -0.28438768088817595,
+        "p90": 0.0009427607059478753
+       },
+       "n": 2048
+      },
+      "-6": {
+       "key_top1": 0.13037109375,
+       "margin": {
+        "mean": -0.14469659173118998,
+        "median": -0.14798125624656677,
+        "n": 2048,
+        "p10": -0.30648693442344666,
+        "p90": 0.021401265263557432
+       },
+       "n": 2048
+      },
+      "-7": {
+       "key_top1": 0.12158203125,
+       "margin": {
+        "mean": -0.13279791969034704,
+        "median": -0.13754291087388992,
+        "n": 2048,
+        "p10": -0.27455253303050997,
+        "p90": 0.018340867757797186
+       },
+       "n": 2048
+      },
+      "-8": {
+       "key_top1": 0.09814453125,
+       "margin": {
+        "mean": -0.13086438476966578,
+        "median": -0.12956742197275162,
+        "n": 2048,
+        "p10": -0.26201750338077545,
+        "p90": -0.00046363621950150304
+       },
+       "n": 2048
+      },
+      "-9": {
+       "key_top1": 0.18994140625,
+       "margin": {
+        "mean": -0.10402092065305624,
+        "median": -0.10986953973770142,
+        "n": 2048,
+        "p10": -0.25543327927589415,
+        "p90": 0.06640883088111876
+       },
+       "n": 2048
+      }
+     },
+     "final_key_top1": 0.5947265625,
+     "final_margin": {
+      "mean": 0.04002492172730854,
+      "median": 0.04892149567604065,
+      "n": 2048,
+      "p10": -0.21133435666561126,
+      "p90": 0.2793909192085266
+     },
+     "final_read_relative_error": {
+      "mean": 0.35876236956755747,
+      "median": 0.31082314252853394,
+      "n": 2048,
+      "p10": 0.16823827773332597,
+      "p90": 0.6049274146556854
+     }
+    }
+   },
+   "true_written_value_head": {
+    "em": 0.83642578125,
+    "n": 2048,
+    "nll": 2.142059089562389,
+    "role": "Descriptive training-only S-RE value head; never used in model forward/read"
+   }
+  },
+  "prompts": [
+   {
+    "answer_position": 15,
+    "answer_position_token": ":",
+    "condition": "matrix",
+    "episode_id": 1287256782801180009,
+    "fact_positions": [
+     {
+      "fact_index": 0,
+      "fact_text": "Caldwell knows Nigel.\n",
+      "positions": [
+       5,
+       3,
+       4
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 1,
+      "fact_text": "Julie knows Joshua.\n",
+      "positions": [
+       10,
+       8,
+       9
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 2,
+      "fact_text": "Barry knows Shane.\n",
+      "positions": [
+       15,
+       13,
+       14
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 3,
+      "fact_text": "Shane knows Caldwell.\n",
+      "positions": [
+       20,
+       18,
+       19
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 4,
+      "fact_text": "Todd knows Anthony.\n",
+      "positions": [
+       24,
+       22,
+       23
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 5,
+      "fact_text": "Joshua knows Barry.\n",
+      "positions": [
+       29,
+       27,
+       28
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 6,
+      "fact_text": "Hannah knows Ron.\n",
+      "positions": [
+       34,
+       32,
+       33
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 7,
+      "fact_text": "Anthony knows Julie.\n",
+      "positions": [
+       38,
+       36,
+       37
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 8,
+      "fact_text": "Chase knows Todd.\n",
+      "positions": [
+       43,
+       41,
+       42
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 9,
+      "fact_text": "Chan knows Jo.\n",
+      "positions": [
+       47,
+       45,
+       46
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 10,
+      "fact_text": "Ron knows Chan.\n",
+      "positions": [
+       51,
+       49,
+       50
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 11,
+      "fact_text": "Jo knows Felix.\n",
+      "positions": [
+       55,
+       53,
+       54
+      ],
+      "write_token": ".\n"
+     }
+    ],
+    "protocol": "memory_only: support encoded separately; only question reaches read forward",
+    "question_text": "Which person is linked from Caldwell by the relation 'knows'?\nAnswer:",
+    "question_token_ids": [
+     23085,
+     1697,
+     374,
+     10592,
+     504,
+     81224,
+     553,
+     279,
+     12687,
+     364,
+     32034,
+     82,
+     6,
+     5267,
+     16141,
+     25
+    ],
+    "question_tokens": [
+     "Which",
+     " person",
+     " is",
+     " linked",
+     " from",
+     " Caldwell",
+     " by",
+     " the",
+     " relation",
+     " '",
+     "know",
+     "s",
+     "'",
+     "?\n",
+     "Answer",
+     ":"
+    ],
+    "support_text": "Caldwell knows Nigel.\nJulie knows Joshua.\nBarry knows Shane.\nShane knows Caldwell.\nTodd knows Anthony.\nJoshua knows Barry.\nHannah knows Ron.\nAnthony knows Julie.\nChase knows Todd.\nChan knows Jo.\nRon knows Chan.\nJo knows Felix.\n",
+    "target_entity": 373,
+    "target_text": " Nigel",
+    "target_tokens": [
+     65816
+    ],
+    "top5": [
+     {
+      "logit": 19.0,
+      "probability": 0.48417937755584717,
+      "token": " Nigel",
+      "token_id": 65816
+     },
+     {
+      "logit": 18.0,
+      "probability": 0.17811962962150574,
+      "token": " Hugh",
+      "token_id": 29106
+     },
+     {
+      "logit": 18.0,
+      "probability": 0.17811962962150574,
+      "token": " Philip",
+      "token_id": 25179
+     },
+     {
+      "logit": 16.875,
+      "probability": 0.05782698094844818,
+      "token": " Neil",
+      "token_id": 33121
+     },
+     {
+      "logit": 16.0,
+      "probability": 0.024105871096253395,
+      "token": " Seth",
+      "token_id": 44218
+     }
+    ]
+   },
+   {
+    "answer_position": 15,
+    "answer_position_token": ":",
+    "condition": "matrix",
+    "episode_id": 8111687887098378937,
+    "fact_positions": [
+     {
+      "fact_index": 0,
+      "fact_text": "Conte knows Allen.\n",
+      "positions": [
+       4,
+       2,
+       3
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 1,
+      "fact_text": "Connor knows Conte.\n",
+      "positions": [
+       8,
+       6,
+       7
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 2,
+      "fact_text": "Mark knows Harm.\n",
+      "positions": [
+       12,
+       10,
+       11
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 3,
+      "fact_text": "Matthias knows Paige.\n",
+      "positions": [
+       18,
+       16,
+       17
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 4,
+      "fact_text": "Marine knows Christopher.\n",
+      "positions": [
+       23,
+       21,
+       22
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 5,
+      "fact_text": "Harm knows Boris.\n",
+      "positions": [
+       28,
+       26,
+       27
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 6,
+      "fact_text": "Boris knows Marine.\n",
+      "positions": [
+       33,
+       31,
+       32
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 7,
+      "fact_text": "Kathy knows Hugo.\n",
+      "positions": [
+       38,
+       36,
+       37
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 8,
+      "fact_text": "Hugo knows Mark.\n",
+      "positions": [
+       43,
+       41,
+       42
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 9,
+      "fact_text": "Christopher knows Bruce.\n",
+      "positions": [
+       47,
+       45,
+       46
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 10,
+      "fact_text": "Carolina knows Kathy.\n",
+      "positions": [
+       52,
+       50,
+       51
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 11,
+      "fact_text": "Paige knows Connor.\n",
+      "positions": [
+       57,
+       55,
+       56
+      ],
+      "write_token": ".\n"
+     }
+    ],
+    "protocol": "memory_only: support encoded separately; only question reaches read forward",
+    "question_text": "Which person is linked from Conte by the relation 'knows'?\nAnswer:",
+    "question_token_ids": [
+     23085,
+     1697,
+     374,
+     10592,
+     504,
+     93378,
+     553,
+     279,
+     12687,
+     364,
+     32034,
+     82,
+     6,
+     5267,
+     16141,
+     25
+    ],
+    "question_tokens": [
+     "Which",
+     " person",
+     " is",
+     " linked",
+     " from",
+     " Conte",
+     " by",
+     " the",
+     " relation",
+     " '",
+     "know",
+     "s",
+     "'",
+     "?\n",
+     "Answer",
+     ":"
+    ],
+    "support_text": "Conte knows Allen.\nConnor knows Conte.\nMark knows Harm.\nMatthias knows Paige.\nMarine knows Christopher.\nHarm knows Boris.\nBoris knows Marine.\nKathy knows Hugo.\nHugo knows Mark.\nChristopher knows Bruce.\nCarolina knows Kathy.\nPaige knows Connor.\n",
+    "target_entity": 225,
+    "target_text": " Allen",
+    "target_tokens": [
+     20060
+    ],
+    "top5": [
+     {
+      "logit": 16.0,
+      "probability": 0.10013832896947861,
+      "token": " Patty",
+      "token_id": 88245
+     },
+     {
+      "logit": 15.5625,
+      "probability": 0.0646541640162468,
+      "token": " Catherine",
+      "token_id": 41563
+     },
+     {
+      "logit": 15.5625,
+      "probability": 0.0646541640162468,
+      "token": " Allen",
+      "token_id": 20060
+     },
+     {
+      "logit": 15.125,
+      "probability": 0.04174386337399483,
+      "token": " Judith",
+      "token_id": 78093
+     },
+     {
+      "logit": 15.0625,
+      "probability": 0.039214733988046646,
+      "token": " Autumn",
+      "token_id": 59802
+     }
+    ]
+   },
+   {
+    "answer_position": 15,
+    "answer_position_token": ":",
+    "condition": "matrix",
+    "episode_id": 7494498776518826428,
+    "fact_positions": [
+     {
+      "fact_index": 0,
+      "fact_text": "Barber knows Lynn.\n",
+      "positions": [
+       4,
+       2,
+       3
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 1,
+      "fact_text": "Drake knows Bray.\n",
+      "positions": [
+       9,
+       7,
+       8
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 2,
+      "fact_text": "Sandra knows Corey.\n",
+      "positions": [
+       14,
+       12,
+       13
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 3,
+      "fact_text": "Cord knows Esther.\n",
+      "positions": [
+       19,
+       17,
+       18
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 4,
+      "fact_text": "Chan knows Kristen.\n",
+      "positions": [
+       23,
+       21,
+       22
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 5,
+      "fact_text": "Dale knows Susan.\n",
+      "positions": [
+       28,
+       26,
+       27
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 6,
+      "fact_text": "Esther knows Barber.\n",
+      "positions": [
+       33,
+       31,
+       32
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 7,
+      "fact_text": "Ella knows Dale.\n",
+      "positions": [
+       38,
+       36,
+       37
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 8,
+      "fact_text": "Kristen knows Sandra.\n",
+      "positions": [
+       43,
+       41,
+       42
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 9,
+      "fact_text": "Kata knows Cord.\n",
+      "positions": [
+       48,
+       46,
+       47
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 10,
+      "fact_text": "Corey knows Kata.\n",
+      "positions": [
+       53,
+       51,
+       52
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 11,
+      "fact_text": "Susan knows Drake.\n",
+      "positions": [
+       57,
+       55,
+       56
+      ],
+      "write_token": ".\n"
+     }
+    ],
+    "protocol": "memory_only: support encoded separately; only question reaches read forward",
+    "question_text": "Which person is linked from Barber by the relation 'knows'?\nAnswer:",
+    "question_token_ids": [
+     23085,
+     1697,
+     374,
+     10592,
+     504,
+     68135,
+     553,
+     279,
+     12687,
+     364,
+     32034,
+     82,
+     6,
+     5267,
+     16141,
+     25
+    ],
+    "question_tokens": [
+     "Which",
+     " person",
+     " is",
+     " linked",
+     " from",
+     " Barber",
+     " by",
+     " the",
+     " relation",
+     " '",
+     "know",
+     "s",
+     "'",
+     "?\n",
+     "Answer",
+     ":"
+    ],
+    "support_text": "Barber knows Lynn.\nDrake knows Bray.\nSandra knows Corey.\nCord knows Esther.\nChan knows Kristen.\nDale knows Susan.\nEsther knows Barber.\nElla knows Dale.\nKristen knows Sandra.\nKata knows Cord.\nCorey knows Kata.\nSusan knows Drake.\n",
+    "target_entity": 240,
+    "target_text": " Lynn",
+    "target_tokens": [
+     44538
+    ],
+    "top5": [
+     {
+      "logit": 19.25,
+      "probability": 0.7434828877449036,
+      "token": " Raven",
+      "token_id": 45107
+     },
+     {
+      "logit": 16.125,
+      "probability": 0.03266635537147522,
+      "token": " Tiffany",
+      "token_id": 67473
+     },
+     {
+      "logit": 16.0,
+      "probability": 0.028827957808971405,
+      "token": " Barton",
+      "token_id": 69217
+     },
+     {
+      "logit": 15.25,
+      "probability": 0.013617363758385181,
+      "token": " Sophia",
+      "token_id": 70371
+     },
+     {
+      "logit": 15.125,
+      "probability": 0.012017281726002693,
+      "token": " Iris",
+      "token_id": 65721
+     }
+    ]
+   },
+   {
+    "answer_position": 15,
+    "answer_position_token": ":",
+    "condition": "matrix",
+    "episode_id": 6244493409239580883,
+    "fact_positions": [
+     {
+      "fact_index": 0,
+      "fact_text": "Julie knows Sydney.\n",
+      "positions": [
+       4,
+       2,
+       3
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 1,
+      "fact_text": "Harm knows Julie.\n",
+      "positions": [
+       9,
+       7,
+       8
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 2,
+      "fact_text": "Hardy knows Otto.\n",
+      "positions": [
+       14,
+       12,
+       13
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 3,
+      "fact_text": "Bowman knows Lore.\n",
+      "positions": [
+       19,
+       17,
+       18
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 4,
+      "fact_text": "Otto knows Olivier.\n",
+      "positions": [
+       24,
+       22,
+       23
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 5,
+      "fact_text": "Christine knows Gala.\n",
+      "positions": [
+       29,
+       27,
+       28
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 6,
+      "fact_text": "Claude knows Christine.\n",
+      "positions": [
+       34,
+       32,
+       33
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 7,
+      "fact_text": "Rosie knows Patty.\n",
+      "positions": [
+       39,
+       37,
+       38
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 8,
+      "fact_text": "Sydney knows Rosie.\n",
+      "positions": [
+       44,
+       42,
+       43
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 9,
+      "fact_text": "Olivier knows Bowman.\n",
+      "positions": [
+       50,
+       48,
+       49
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 10,
+      "fact_text": "Lore knows Chambers.\n",
+      "positions": [
+       55,
+       53,
+       54
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 11,
+      "fact_text": "Gala knows Hardy.\n",
+      "positions": [
+       60,
+       58,
+       59
+      ],
+      "write_token": ".\n"
+     }
+    ],
+    "protocol": "memory_only: support encoded separately; only question reaches read forward",
+    "question_text": "Which person is linked from Rosie by the relation 'knows'?\nAnswer:",
+    "question_token_ids": [
+     23085,
+     1697,
+     374,
+     10592,
+     504,
+     96767,
+     553,
+     279,
+     12687,
+     364,
+     32034,
+     82,
+     6,
+     5267,
+     16141,
+     25
+    ],
+    "question_tokens": [
+     "Which",
+     " person",
+     " is",
+     " linked",
+     " from",
+     " Rosie",
+     " by",
+     " the",
+     " relation",
+     " '",
+     "know",
+     "s",
+     "'",
+     "?\n",
+     "Answer",
+     ":"
+    ],
+    "support_text": "Julie knows Sydney.\nHarm knows Julie.\nHardy knows Otto.\nBowman knows Lore.\nOtto knows Olivier.\nChristine knows Gala.\nClaude knows Christine.\nRosie knows Patty.\nSydney knows Rosie.\nOlivier knows Bowman.\nLore knows Chambers.\nGala knows Hardy.\n",
+    "target_entity": 429,
+    "target_text": " Patty",
+    "target_tokens": [
+     88245
+    ],
+    "top5": [
+     {
+      "logit": 17.75,
+      "probability": 0.7351518273353577,
+      "token": " Patty",
+      "token_id": 88245
+     },
+     {
+      "logit": 13.6875,
+      "probability": 0.012648986652493477,
+      "token": " Richie",
+      "token_id": 98974
+     },
+     {
+      "logit": 13.375,
+      "probability": 0.009254195727407932,
+      "token": " Sunday",
+      "token_id": 7270
+     },
+     {
+      "logit": 13.3125,
+      "probability": 0.00869351252913475,
+      "token": " Lucky",
+      "token_id": 48567
+     },
+     {
+      "logit": 13.25,
+      "probability": 0.008166799321770668,
+      "token": " Cynthia",
+      "token_id": 74571
+     }
+    ]
+   },
+   {
+    "answer_position": 15,
+    "answer_position_token": ":",
+    "condition": "matrix",
+    "episode_id": 3285038830464699338,
+    "fact_positions": [
+     {
+      "fact_index": 0,
+      "fact_text": "Mona knows Viktor.\n",
+      "positions": [
+       4,
+       2,
+       3
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 1,
+      "fact_text": "Joel knows Leonard.\n",
+      "positions": [
+       9,
+       7,
+       8
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 2,
+      "fact_text": "Ole knows Gene.\n",
+      "positions": [
+       14,
+       12,
+       13
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 3,
+      "fact_text": "Viktor knows De.\n",
+      "positions": [
+       20,
+       18,
+       19
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 4,
+      "fact_text": "Gandhi knows Ole.\n",
+      "positions": [
+       26,
+       24,
+       25
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 5,
+      "fact_text": "Abdullah knows Scott.\n",
+      "positions": [
+       32,
+       30,
+       31
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 6,
+      "fact_text": "Xavier knows Mona.\n",
+      "positions": [
+       37,
+       35,
+       36
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 7,
+      "fact_text": "Damon knows Castillo.\n",
+      "positions": [
+       42,
+       40,
+       41
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 8,
+      "fact_text": "Lisa knows Damon.\n",
+      "positions": [
+       46,
+       44,
+       45
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 9,
+      "fact_text": "Scott knows Lisa.\n",
+      "positions": [
+       50,
+       48,
+       49
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 10,
+      "fact_text": "Gene knows Joel.\n",
+      "positions": [
+       54,
+       52,
+       53
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 11,
+      "fact_text": "De knows Abdullah.\n",
+      "positions": [
+       58,
+       56,
+       57
+      ],
+      "write_token": ".\n"
+     }
+    ],
+    "protocol": "memory_only: support encoded separately; only question reaches read forward",
+    "question_text": "Which person is linked from Joel by the relation 'knows'?\nAnswer:",
+    "question_token_ids": [
+     23085,
+     1697,
+     374,
+     10592,
+     504,
+     38347,
+     553,
+     279,
+     12687,
+     364,
+     32034,
+     82,
+     6,
+     5267,
+     16141,
+     25
+    ],
+    "question_tokens": [
+     "Which",
+     " person",
+     " is",
+     " linked",
+     " from",
+     " Joel",
+     " by",
+     " the",
+     " relation",
+     " '",
+     "know",
+     "s",
+     "'",
+     "?\n",
+     "Answer",
+     ":"
+    ],
+    "support_text": "Mona knows Viktor.\nJoel knows Leonard.\nOle knows Gene.\nViktor knows De.\nGandhi knows Ole.\nAbdullah knows Scott.\nXavier knows Mona.\nDamon knows Castillo.\nLisa knows Damon.\nScott knows Lisa.\nGene knows Joel.\nDe knows Abdullah.\n",
+    "target_entity": 304,
+    "target_text": " Leonard",
+    "target_tokens": [
+     40854
+    ],
+    "top5": [
+     {
+      "logit": 16.875,
+      "probability": 0.3150663375854492,
+      "token": " Castillo",
+      "token_id": 95683
+     },
+     {
+      "logit": 15.5625,
+      "probability": 0.08479894697666168,
+      "token": " Bolton",
+      "token_id": 61577
+     },
+     {
+      "logit": 15.25,
+      "probability": 0.062040239572525024,
+      "token": " Buchanan",
+      "token_id": 84190
+     },
+     {
+      "logit": 14.875,
+      "probability": 0.0426395945250988,
+      "token": " Clayton",
+      "token_id": 63444
+     },
+     {
+      "logit": 14.625,
+      "probability": 0.03320774808526039,
+      "token": " Bennett",
+      "token_id": 38286
+     }
+    ]
+   },
+   {
+    "answer_position": 15,
+    "answer_position_token": ":",
+    "condition": "soft",
+    "episode_id": 1287256782801180009,
+    "fact_positions": [
+     {
+      "fact_index": 0,
+      "fact_text": "Caldwell knows Nigel.\n",
+      "positions": [
+       5,
+       3,
+       4
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 1,
+      "fact_text": "Julie knows Joshua.\n",
+      "positions": [
+       10,
+       8,
+       9
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 2,
+      "fact_text": "Barry knows Shane.\n",
+      "positions": [
+       15,
+       13,
+       14
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 3,
+      "fact_text": "Shane knows Caldwell.\n",
+      "positions": [
+       20,
+       18,
+       19
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 4,
+      "fact_text": "Todd knows Anthony.\n",
+      "positions": [
+       24,
+       22,
+       23
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 5,
+      "fact_text": "Joshua knows Barry.\n",
+      "positions": [
+       29,
+       27,
+       28
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 6,
+      "fact_text": "Hannah knows Ron.\n",
+      "positions": [
+       34,
+       32,
+       33
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 7,
+      "fact_text": "Anthony knows Julie.\n",
+      "positions": [
+       38,
+       36,
+       37
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 8,
+      "fact_text": "Chase knows Todd.\n",
+      "positions": [
+       43,
+       41,
+       42
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 9,
+      "fact_text": "Chan knows Jo.\n",
+      "positions": [
+       47,
+       45,
+       46
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 10,
+      "fact_text": "Ron knows Chan.\n",
+      "positions": [
+       51,
+       49,
+       50
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 11,
+      "fact_text": "Jo knows Felix.\n",
+      "positions": [
+       55,
+       53,
+       54
+      ],
+      "write_token": ".\n"
+     }
+    ],
+    "protocol": "memory_only: support encoded separately; only question reaches read forward",
+    "question_text": "Which person is linked from Caldwell by the relation 'knows'?\nAnswer:",
+    "question_token_ids": [
+     23085,
+     1697,
+     374,
+     10592,
+     504,
+     81224,
+     553,
+     279,
+     12687,
+     364,
+     32034,
+     82,
+     6,
+     5267,
+     16141,
+     25
+    ],
+    "question_tokens": [
+     "Which",
+     " person",
+     " is",
+     " linked",
+     " from",
+     " Caldwell",
+     " by",
+     " the",
+     " relation",
+     " '",
+     "know",
+     "s",
+     "'",
+     "?\n",
+     "Answer",
+     ":"
+    ],
+    "support_text": "Caldwell knows Nigel.\nJulie knows Joshua.\nBarry knows Shane.\nShane knows Caldwell.\nTodd knows Anthony.\nJoshua knows Barry.\nHannah knows Ron.\nAnthony knows Julie.\nChase knows Todd.\nChan knows Jo.\nRon knows Chan.\nJo knows Felix.\n",
+    "target_entity": 373,
+    "target_text": " Nigel",
+    "target_tokens": [
+     65816
+    ],
+    "top5": [
+     {
+      "logit": 17.625,
+      "probability": 0.2898615598678589,
+      "token": " Nigel",
+      "token_id": 65816
+     },
+     {
+      "logit": 17.125,
+      "probability": 0.17580993473529816,
+      "token": " Philip",
+      "token_id": 25179
+     },
+     {
+      "logit": 16.625,
+      "probability": 0.10663411021232605,
+      "token": " Neil",
+      "token_id": 33121
+     },
+     {
+      "logit": 16.125,
+      "probability": 0.06467685103416443,
+      "token": " Seth",
+      "token_id": 44218
+     },
+     {
+      "logit": 16.125,
+      "probability": 0.06467685103416443,
+      "token": " Hugh",
+      "token_id": 29106
+     }
+    ]
+   },
+   {
+    "answer_position": 15,
+    "answer_position_token": ":",
+    "condition": "soft",
+    "episode_id": 8111687887098378937,
+    "fact_positions": [
+     {
+      "fact_index": 0,
+      "fact_text": "Conte knows Allen.\n",
+      "positions": [
+       4,
+       2,
+       3
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 1,
+      "fact_text": "Connor knows Conte.\n",
+      "positions": [
+       8,
+       6,
+       7
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 2,
+      "fact_text": "Mark knows Harm.\n",
+      "positions": [
+       12,
+       10,
+       11
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 3,
+      "fact_text": "Matthias knows Paige.\n",
+      "positions": [
+       18,
+       16,
+       17
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 4,
+      "fact_text": "Marine knows Christopher.\n",
+      "positions": [
+       23,
+       21,
+       22
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 5,
+      "fact_text": "Harm knows Boris.\n",
+      "positions": [
+       28,
+       26,
+       27
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 6,
+      "fact_text": "Boris knows Marine.\n",
+      "positions": [
+       33,
+       31,
+       32
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 7,
+      "fact_text": "Kathy knows Hugo.\n",
+      "positions": [
+       38,
+       36,
+       37
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 8,
+      "fact_text": "Hugo knows Mark.\n",
+      "positions": [
+       43,
+       41,
+       42
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 9,
+      "fact_text": "Christopher knows Bruce.\n",
+      "positions": [
+       47,
+       45,
+       46
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 10,
+      "fact_text": "Carolina knows Kathy.\n",
+      "positions": [
+       52,
+       50,
+       51
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 11,
+      "fact_text": "Paige knows Connor.\n",
+      "positions": [
+       57,
+       55,
+       56
+      ],
+      "write_token": ".\n"
+     }
+    ],
+    "protocol": "memory_only: support encoded separately; only question reaches read forward",
+    "question_text": "Which person is linked from Conte by the relation 'knows'?\nAnswer:",
+    "question_token_ids": [
+     23085,
+     1697,
+     374,
+     10592,
+     504,
+     93378,
+     553,
+     279,
+     12687,
+     364,
+     32034,
+     82,
+     6,
+     5267,
+     16141,
+     25
+    ],
+    "question_tokens": [
+     "Which",
+     " person",
+     " is",
+     " linked",
+     " from",
+     " Conte",
+     " by",
+     " the",
+     " relation",
+     " '",
+     "know",
+     "s",
+     "'",
+     "?\n",
+     "Answer",
+     ":"
+    ],
+    "support_text": "Conte knows Allen.\nConnor knows Conte.\nMark knows Harm.\nMatthias knows Paige.\nMarine knows Christopher.\nHarm knows Boris.\nBoris knows Marine.\nKathy knows Hugo.\nHugo knows Mark.\nChristopher knows Bruce.\nCarolina knows Kathy.\nPaige knows Connor.\n",
+    "target_entity": 225,
+    "target_text": " Allen",
+    "target_tokens": [
+     20060
+    ],
+    "top5": [
+     {
+      "logit": 14.625,
+      "probability": 0.06092899292707443,
+      "token": " Peter",
+      "token_id": 11044
+     },
+     {
+      "logit": 14.25,
+      "probability": 0.041875846683979034,
+      "token": " Ben",
+      "token_id": 7355
+     },
+     {
+      "logit": 14.125,
+      "probability": 0.03695530444383621,
+      "token": " Maggie",
+      "token_id": 61695
+     },
+     {
+      "logit": 14.0,
+      "probability": 0.03261294215917587,
+      "token": " Jenny",
+      "token_id": 51079
+     },
+     {
+      "logit": 14.0,
+      "probability": 0.03261294215917587,
+      "token": " Hunter",
+      "token_id": 23133
+     }
+    ]
+   },
+   {
+    "answer_position": 15,
+    "answer_position_token": ":",
+    "condition": "soft",
+    "episode_id": 7494498776518826428,
+    "fact_positions": [
+     {
+      "fact_index": 0,
+      "fact_text": "Barber knows Lynn.\n",
+      "positions": [
+       4,
+       2,
+       3
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 1,
+      "fact_text": "Drake knows Bray.\n",
+      "positions": [
+       9,
+       7,
+       8
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 2,
+      "fact_text": "Sandra knows Corey.\n",
+      "positions": [
+       14,
+       12,
+       13
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 3,
+      "fact_text": "Cord knows Esther.\n",
+      "positions": [
+       19,
+       17,
+       18
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 4,
+      "fact_text": "Chan knows Kristen.\n",
+      "positions": [
+       23,
+       21,
+       22
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 5,
+      "fact_text": "Dale knows Susan.\n",
+      "positions": [
+       28,
+       26,
+       27
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 6,
+      "fact_text": "Esther knows Barber.\n",
+      "positions": [
+       33,
+       31,
+       32
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 7,
+      "fact_text": "Ella knows Dale.\n",
+      "positions": [
+       38,
+       36,
+       37
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 8,
+      "fact_text": "Kristen knows Sandra.\n",
+      "positions": [
+       43,
+       41,
+       42
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 9,
+      "fact_text": "Kata knows Cord.\n",
+      "positions": [
+       48,
+       46,
+       47
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 10,
+      "fact_text": "Corey knows Kata.\n",
+      "positions": [
+       53,
+       51,
+       52
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 11,
+      "fact_text": "Susan knows Drake.\n",
+      "positions": [
+       57,
+       55,
+       56
+      ],
+      "write_token": ".\n"
+     }
+    ],
+    "protocol": "memory_only: support encoded separately; only question reaches read forward",
+    "question_text": "Which person is linked from Barber by the relation 'knows'?\nAnswer:",
+    "question_token_ids": [
+     23085,
+     1697,
+     374,
+     10592,
+     504,
+     68135,
+     553,
+     279,
+     12687,
+     364,
+     32034,
+     82,
+     6,
+     5267,
+     16141,
+     25
+    ],
+    "question_tokens": [
+     "Which",
+     " person",
+     " is",
+     " linked",
+     " from",
+     " Barber",
+     " by",
+     " the",
+     " relation",
+     " '",
+     "know",
+     "s",
+     "'",
+     "?\n",
+     "Answer",
+     ":"
+    ],
+    "support_text": "Barber knows Lynn.\nDrake knows Bray.\nSandra knows Corey.\nCord knows Esther.\nChan knows Kristen.\nDale knows Susan.\nEsther knows Barber.\nElla knows Dale.\nKristen knows Sandra.\nKata knows Cord.\nCorey knows Kata.\nSusan knows Drake.\n",
+    "target_entity": 240,
+    "target_text": " Lynn",
+    "target_tokens": [
+     44538
+    ],
+    "top5": [
+     {
+      "logit": 14.8125,
+      "probability": 0.06448592990636826,
+      "token": " Tara",
+      "token_id": 69697
+     },
+     {
+      "logit": 14.5625,
+      "probability": 0.05022169277071953,
+      "token": " Rachel",
+      "token_id": 31432
+     },
+     {
+      "logit": 14.375,
+      "probability": 0.04163524508476257,
+      "token": " Ashton",
+      "token_id": 86618
+     },
+     {
+      "logit": 14.375,
+      "probability": 0.04163524508476257,
+      "token": " Kate",
+      "token_id": 29201
+     },
+     {
+      "logit": 14.1875,
+      "probability": 0.0345168337225914,
+      "token": " Chelsea",
+      "token_id": 26518
+     }
+    ]
+   },
+   {
+    "answer_position": 15,
+    "answer_position_token": ":",
+    "condition": "soft",
+    "episode_id": 6244493409239580883,
+    "fact_positions": [
+     {
+      "fact_index": 0,
+      "fact_text": "Julie knows Sydney.\n",
+      "positions": [
+       4,
+       2,
+       3
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 1,
+      "fact_text": "Harm knows Julie.\n",
+      "positions": [
+       9,
+       7,
+       8
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 2,
+      "fact_text": "Hardy knows Otto.\n",
+      "positions": [
+       14,
+       12,
+       13
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 3,
+      "fact_text": "Bowman knows Lore.\n",
+      "positions": [
+       19,
+       17,
+       18
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 4,
+      "fact_text": "Otto knows Olivier.\n",
+      "positions": [
+       24,
+       22,
+       23
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 5,
+      "fact_text": "Christine knows Gala.\n",
+      "positions": [
+       29,
+       27,
+       28
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 6,
+      "fact_text": "Claude knows Christine.\n",
+      "positions": [
+       34,
+       32,
+       33
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 7,
+      "fact_text": "Rosie knows Patty.\n",
+      "positions": [
+       39,
+       37,
+       38
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 8,
+      "fact_text": "Sydney knows Rosie.\n",
+      "positions": [
+       44,
+       42,
+       43
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 9,
+      "fact_text": "Olivier knows Bowman.\n",
+      "positions": [
+       50,
+       48,
+       49
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 10,
+      "fact_text": "Lore knows Chambers.\n",
+      "positions": [
+       55,
+       53,
+       54
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 11,
+      "fact_text": "Gala knows Hardy.\n",
+      "positions": [
+       60,
+       58,
+       59
+      ],
+      "write_token": ".\n"
+     }
+    ],
+    "protocol": "memory_only: support encoded separately; only question reaches read forward",
+    "question_text": "Which person is linked from Rosie by the relation 'knows'?\nAnswer:",
+    "question_token_ids": [
+     23085,
+     1697,
+     374,
+     10592,
+     504,
+     96767,
+     553,
+     279,
+     12687,
+     364,
+     32034,
+     82,
+     6,
+     5267,
+     16141,
+     25
+    ],
+    "question_tokens": [
+     "Which",
+     " person",
+     " is",
+     " linked",
+     " from",
+     " Rosie",
+     " by",
+     " the",
+     " relation",
+     " '",
+     "know",
+     "s",
+     "'",
+     "?\n",
+     "Answer",
+     ":"
+    ],
+    "support_text": "Julie knows Sydney.\nHarm knows Julie.\nHardy knows Otto.\nBowman knows Lore.\nOtto knows Olivier.\nChristine knows Gala.\nClaude knows Christine.\nRosie knows Patty.\nSydney knows Rosie.\nOlivier knows Bowman.\nLore knows Chambers.\nGala knows Hardy.\n",
+    "target_entity": 429,
+    "target_text": " Patty",
+    "target_tokens": [
+     88245
+    ],
+    "top5": [
+     {
+      "logit": 13.5,
+      "probability": 0.04559038579463959,
+      "token": " Lauren",
+      "token_id": 42360
+     },
+     {
+      "logit": 13.0625,
+      "probability": 0.02943536452949047,
+      "token": " Victoria",
+      "token_id": 22417
+     },
+     {
+      "logit": 13.0625,
+      "probability": 0.02943536452949047,
+      "token": " Clinton",
+      "token_id": 8120
+     },
+     {
+      "logit": 12.8125,
+      "probability": 0.022924285382032394,
+      "token": " Nicole",
+      "token_id": 44030
+     },
+     {
+      "logit": 12.8125,
+      "probability": 0.022924285382032394,
+      "token": " Chelsea",
+      "token_id": 26518
+     }
+    ]
+   },
+   {
+    "answer_position": 15,
+    "answer_position_token": ":",
+    "condition": "soft",
+    "episode_id": 3285038830464699338,
+    "fact_positions": [
+     {
+      "fact_index": 0,
+      "fact_text": "Mona knows Viktor.\n",
+      "positions": [
+       4,
+       2,
+       3
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 1,
+      "fact_text": "Joel knows Leonard.\n",
+      "positions": [
+       9,
+       7,
+       8
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 2,
+      "fact_text": "Ole knows Gene.\n",
+      "positions": [
+       14,
+       12,
+       13
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 3,
+      "fact_text": "Viktor knows De.\n",
+      "positions": [
+       20,
+       18,
+       19
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 4,
+      "fact_text": "Gandhi knows Ole.\n",
+      "positions": [
+       26,
+       24,
+       25
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 5,
+      "fact_text": "Abdullah knows Scott.\n",
+      "positions": [
+       32,
+       30,
+       31
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 6,
+      "fact_text": "Xavier knows Mona.\n",
+      "positions": [
+       37,
+       35,
+       36
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 7,
+      "fact_text": "Damon knows Castillo.\n",
+      "positions": [
+       42,
+       40,
+       41
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 8,
+      "fact_text": "Lisa knows Damon.\n",
+      "positions": [
+       46,
+       44,
+       45
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 9,
+      "fact_text": "Scott knows Lisa.\n",
+      "positions": [
+       50,
+       48,
+       49
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 10,
+      "fact_text": "Gene knows Joel.\n",
+      "positions": [
+       54,
+       52,
+       53
+      ],
+      "write_token": ".\n"
+     },
+     {
+      "fact_index": 11,
+      "fact_text": "De knows Abdullah.\n",
+      "positions": [
+       58,
+       56,
+       57
+      ],
+      "write_token": ".\n"
+     }
+    ],
+    "protocol": "memory_only: support encoded separately; only question reaches read forward",
+    "question_text": "Which person is linked from Joel by the relation 'knows'?\nAnswer:",
+    "question_token_ids": [
+     23085,
+     1697,
+     374,
+     10592,
+     504,
+     38347,
+     553,
+     279,
+     12687,
+     364,
+     32034,
+     82,
+     6,
+     5267,
+     16141,
+     25
+    ],
+    "question_tokens": [
+     "Which",
+     " person",
+     " is",
+     " linked",
+     " from",
+     " Joel",
+     " by",
+     " the",
+     " relation",
+     " '",
+     "know",
+     "s",
+     "'",
+     "?\n",
+     "Answer",
+     ":"
+    ],
+    "support_text": "Mona knows Viktor.\nJoel knows Leonard.\nOle knows Gene.\nViktor knows De.\nGandhi knows Ole.\nAbdullah knows Scott.\nXavier knows Mona.\nDamon knows Castillo.\nLisa knows Damon.\nScott knows Lisa.\nGene knows Joel.\nDe knows Abdullah.\n",
+    "target_entity": 304,
+    "target_text": " Leonard",
+    "target_tokens": [
+     40854
+    ],
+    "top5": [
+     {
+      "logit": 13.875,
+      "probability": 0.04661485552787781,
+      "token": " Damon",
+      "token_id": 72249
+     },
+     {
+      "logit": 13.5625,
+      "probability": 0.03410416096448898,
+      "token": " Alec",
+      "token_id": 85016
+     },
+     {
+      "logit": 13.5,
+      "probability": 0.0320378914475441,
+      "token": " Seth",
+      "token_id": 44218
+     },
+     {
+      "logit": 13.1875,
+      "probability": 0.023439424112439156,
+      "token": " Corey",
+      "token_id": 54652
+     },
+     {
+      "logit": 13.1875,
+      "probability": 0.023439424112439156,
+      "token": " Rebecca",
+      "token_id": 44457
+     }
+    ]
+   }
+  ],
+  "seconds": 42.264636524996604
+ }
+}

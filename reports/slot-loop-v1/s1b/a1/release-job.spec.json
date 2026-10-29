@@ -1,0 +1,17 @@
+{
+ "name": "s1b-a1-release",
+ "queue": "debug-g",
+ "nodes": 1,
+ "walltime": "00:10:00",
+ "scale_up": null,
+ "source": {
+  "kind": "commit",
+  "ref": "258f5f5a24eae684f640a9fd62679bb643470a76"
+ },
+ "argv": [
+  "-c",
+  "import json, subprocess, sys\nfrom pathlib import Path\nfrom looplora.llm import s1b_artifacts as a, s1b_data as d\nroot=Path('/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587')\ncommon=[\"--mode\",\"release\",\"--manifest\",str(root/\"manifest.lock.json\"),\"--branch-record\",str(root/\"branch.json\"),\"--read-settings\",str(root/\"read-settings.json\"),\"--pilot\",str(root/\"pilot/pilot.json\"),\"--smoke\",str(root/\"smoke/smoke.json\"),\"--science-commit\",\"258f5f5a24eae684f640a9fd62679bb643470a76\"]\nsubprocess.run([sys.executable,\"scripts/prepare_s1b.py\",*common,\"--out\",str(root/\"candidate.json\")],check=True)\ncandidate_digest=d.old.file_digest(root/\"candidate.json\")\nassert a.read(root/\"candidate.json\")[\"status\"]==\"pending_reload\"\nreloads=[]\nfor arm in (\"M1\",\"M4\",\"S1\",\"S4\"):\n    out=root/\"reload\"/arm\n    subprocess.run([sys.executable,\"-m\",\"looplora.llm.s1b_run\",\"--mode\",\"reload-check\",\"--manifest\",str(root/\"manifest.lock.json\"),\"--release\",str(root/\"candidate.json\"),\"--export\",str(root/\"smoke\"/arm/\"selected.pt\"),\"--predictions\",str(root/\"smoke\"/arm/\"reload_samples.npz\"),\"--arm\",arm,\"--out\",str(out)],check=True)\n    reloads.extend([\"--reload\",arm+\"=\"+str(out/\"reload.json\")])\nsubprocess.run([sys.executable,\"scripts/prepare_s1b.py\",*common,*reloads,\"--out\",str(root/\"release.json\")],check=True)\nassert d.old.file_digest(root/\"candidate.json\")==candidate_digest\n_,release=a.require_release(root/\"release.json\",root/\"manifest.lock.json\")\nsmoke=a.read(root/\"smoke/smoke.json\")\nfor arm in release[\"arms\"]:\n    assert a.read(root/\"reload\"/arm/\"reload.json\")[\"export_blake2b_128\"]==smoke[\"arms\"][arm][\"selected_checkpoint_blake2b_128\"]\nassert release[\"status\"]==\"ready\" and len(release[\"config_hashes\"])==12 and release[\"steps\"]==18000\nassert all(v[\"walltime_seconds\"]<=16*3600 for v in release[\"arms\"].values())\nprint(json.dumps(dict(stage=\"S1B-A1\",status=\"ready\",reloads=4,configs=12,release_blake2b_128=d.old.file_digest(root/\"release.json\"))),flush=True)"
+ ],
+ "log": "/work/xg24i002/x10041/LoopLora/logs/pbs/s1b-a1-release-20261030-021236-1562889.log",
+ "submitted": "2026-10-30T02:12:36.914747"
+}

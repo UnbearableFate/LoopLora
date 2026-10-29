@@ -1,0 +1,32 @@
+{
+ "amendment_blake2b_128": "341d3c71f9334a1384a102b097e7ad75",
+ "branch": "advance",
+ "branch_blake2b_128": "6ded1c79c96b267aff4498c120b57b09",
+ "branch_path": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/branch.json",
+ "lock_blake2b_128": "2309d5a8ebae91332f32bbd85e5eeb8a",
+ "s1a_release_blake2b_128": "523d11d57a08a2491893ebe7cedc86a7",
+ "s1a_release_path": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/s1a/release.json",
+ "selected": {
+  "matrix": {
+   "capacity": 12,
+   "gain": 1.0,
+   "kind": "matrix",
+   "recency": false,
+   "scope": "all_valid_question",
+   "tau": null
+  },
+  "soft": {
+   "capacity": 12,
+   "gain": 1.0,
+   "kind": "soft",
+   "recency": false,
+   "scope": "all_valid_question",
+   "tau": 0.1
+  }
+ },
+ "stage": "S1B-READS",
+ "status": "complete",
+ "stopped_calibration_blake2b_128": "6e4f7346376cb010820a84832f6d7d91",
+ "stopped_calibration_path": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/stopped-calibration.json",
+ "stopped_calibration_role": "descriptive evidence; A1 clears decision 3; no calibration repeated"
+}

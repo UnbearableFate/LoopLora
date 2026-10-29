@@ -1,0 +1,114 @@
+import hashlib
+import json
+import os
+from pathlib import Path
+import subprocess
+import sys
+import time
+
+import numpy as np
+from looplora.llm import s1b_analysis as statistics, s1b_data as data
+from looplora.llm.s1b_run import load_samples
+
+root = Path('/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587')
+open_root = Path('/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/open-root')
+digest = lambda p: hashlib.blake2b(Path(p).read_bytes(), digest_size=16).hexdigest()
+read = lambda p: json.loads(Path(p).read_text())
+dump = lambda p, x: Path(p).write_text(json.dumps(x, indent=1, sort_keys=True, allow_nan=False) + '\n')
+tick = time.perf_counter()
+assert digest(root / 'release.json') == 'd1ccbb7ff4c31fa53abfd7a3cc9ad572'
+assert digest(root / 'manifest.lock.json') == '2309d5a8ebae91332f32bbd85e5eeb8a'
+assert digest(root / 'dev-selection/selection.json') == 'e3f269db39cd9b431d27e0a5eb528d6e'
+assert digest(open_root / 'reports/slot-loop-v1/s1b/open.json') == 'b698f7ce5e31b2b43da5c210134588b0'
+assert digest('scripts/analyze_s1b.py') == digest(open_root / 'scripts/analyze_s1b.py') == '78f001a232595acce6d38091f0e4895b'
+assert digest(root / 'confirmation/index.json') == '401aa6180ad213a7f75a54dd07674e4a'
+assert digest(root / 'dev-depth-sweep/index.json') == 'd520239db3acc135d660234eda04953f'
+assert not (root / 'confirmation-analysis').exists()
+assert not (root / 'descriptive-dev').exists()
+subprocess.run([sys.executable, 'scripts/analyze_s1b.py', '--stage', 'CONFIRMATION',
+    '--manifest', str(root / 'manifest.lock.json'), '--release', str(root / 'release.json'),
+    '--selection', str(root / 'dev-selection/selection.json'), '--open-root', str(open_root),
+    '--records', str(root / 'confirmation'), '--out', str(root / 'confirmation-analysis')], check=True)
+frozen_seconds = time.perf_counter() - tick
+verdict = read(root / 'confirmation-analysis/verdict.json')
+assert verdict['stage'] == 'S1B'
+assert verdict['release_blake2b_128'] == digest(root / 'release.json')
+assert verdict['open_record_blake2b_128'] == digest(open_root / 'reports/slot-loop-v1/s1b/open.json')
+assert verdict['sample_index_blake2b_128'] == digest(root / 'confirmation/index.json')
+assert verdict['unseen'] == {'status': 'not run'}
+assert set(verdict['contrasts']) == {'S4-S1', 'M4-M1', 'S4-M4'}
+assert verdict['resamples'] == 10000
+
+# This independent dev artifact audit calls only the frozen descriptive helpers.
+# No dev scores enter the already written confirmation verdict or a selection.
+index = read(root / 'dev-depth-sweep/index.json')
+lock = read(root / 'manifest.lock.json')
+release = read(root / 'release.json')
+selection = read(root / 'dev-selection/selection.json')
+assert index['purpose'] == 'dev' and index['open_record_blake2b_128'] is None
+assert index['release_blake2b_128'] == digest(root / 'release.json')
+expected = {f'{arm}/{seed}@{depth}' for arm in ('M1', 'M4', 'S1', 'S4')
+    for seed in (17, 29, 43) for depth in ((1, 2, 4, 8) if arm.endswith('4') else (1,))}
+assert set(index['entries']) == expected
+main, sweeps, audit = {}, {}, []
+reference_ids = None
+for key, entry in index['entries'].items():
+    label, depth_text = key.split('@')
+    arm, seed_text = label.split('/')
+    seed, depth = int(seed_text), int(depth_text)
+    path = root / 'dev-depth-sweep' / entry['file']
+    assert digest(path) == entry['blake2b_128']
+    samples, provenance = load_samples(path)
+    statistics.validate_samples(samples, lock['manifest']['ids']['dev'])
+    statistics.validate_trajectories(samples, depth)
+    assert np.array_equal(samples['correct'], samples['prediction'] == samples['answer'])
+    assert provenance['label'] == label and provenance['evaluated_depth'] == depth
+    assert provenance['trained_depth'] == int(arm[1])
+    assert provenance['checkpoint_blake2b_128'] == selection['selected_checkpoints'][label]
+    assert provenance['release_blake2b_128'] == digest(root / 'release.json')
+    assert provenance['lock_blake2b_128'] == digest(root / 'manifest.lock.json')
+    assert provenance['read'] == release['arms'][arm]['read']
+    assert provenance['task_digest'] == data.LAYOUT_DIGEST and provenance['trace_agrees'] is True
+    assert provenance['trajectory_order'] == ['episode', 'hop', 'step', 'feature']
+    if reference_ids is None:
+        reference_ids = samples['episode_id'].copy()
+    assert np.array_equal(samples['episode_id'], reference_ids)
+    compact = {name: samples[name] for name in ('episode_id', 'hops', 'correct', 'nll')}
+    if depth == int(arm[1]):
+        main[arm, seed] = compact
+    if arm.endswith('4'):
+        sweeps[arm, seed, depth] = compact
+    audit.append(dict(label=key, status='passed', file=str(path), bytes=path.stat().st_size,
+        blake2b_128=entry['blake2b_128'], checkpoint_blake2b_128=provenance['checkpoint_blake2b_128'],
+        episodes=len(samples['episode_id']), hops=samples['hops'].tolist(),
+        trajectory_shapes={name: list(samples['trajectory_' + name].shape) for name in ('q', 'm', 'z')},
+        trace_agrees=True))
+    del samples
+assert len(main) == 12 and len(sweeps) == 24 and len(audit) == 30
+summary = statistics.descriptive_tables(main, sweeps, release['branch'])
+summary.update(stage='S1B-A1-DEV-SWEEP', purpose='descriptive dev only',
+    affects_decisions=False, source_commit='258f5f5a24eae684f640a9fd62679bb643470a76',
+    release_blake2b_128=digest(root / 'release.json'),
+    selection_blake2b_128=digest(root / 'dev-selection/selection.json'),
+    sample_index_blake2b_128=digest(root / 'dev-depth-sweep/index.json'))
+(root / 'descriptive-dev').mkdir()
+dump(root / 'descriptive-dev/summary.json', summary)
+dump(root / 'descriptive-dev/audit.json', dict(stage='S1B-A1-DEV-SWEEP-AUDIT',
+    status='complete', job_id=os.environ['PBS_JOBID'], host=os.uname().nodename,
+    source_commit='258f5f5a24eae684f640a9fd62679bb643470a76', entries=audit))
+assert digest(root / 'confirmation-analysis/verdict.json') == read(root / 'confirmation-analysis/source_index.json')['output_blake2b_128']
+receipt = dict(status='complete', stage='S1B-A1-FINAL-ANALYSIS',
+    job_id=os.environ['PBS_JOBID'], host=os.uname().nodename,
+    source_commit='258f5f5a24eae684f640a9fd62679bb643470a76',
+    release_blake2b_128=digest(root / 'release.json'),
+    open_record_blake2b_128=digest(open_root / 'reports/slot-loop-v1/s1b/open.json'),
+    payload_blake2b_128=digest(root / 'verdict-job/payload.py'),
+    frozen_confirmation_seconds=frozen_seconds, total_seconds=time.perf_counter() - tick,
+    confirmation_sample_sets=30, dev_sample_sets=30,
+    outputs={name: digest(root / name) for name in (
+        'confirmation-analysis/verdict.json', 'confirmation-analysis/verdict.md',
+        'confirmation-analysis/source_index.json', 'descriptive-dev/summary.json', 'descriptive-dev/audit.json')})
+dump(root / 'verdict-job/analysis-audit.json', receipt)
+print(json.dumps(dict(stage=receipt['stage'], status='complete',
+    confirmation_sample_sets=30, dev_sample_sets=30,
+    audit_blake2b_128=digest(root / 'verdict-job/analysis-audit.json'))), flush=True)

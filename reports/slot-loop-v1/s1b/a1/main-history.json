@@ -1,0 +1,127 @@
+{
+ "jobs": [
+  {
+   "elapsed_seconds": 3397,
+   "job_id": "3730250",
+   "job_name": "s1b-a1-M1-s17",
+   "nodes": 1,
+   "queue": "small-g",
+   "start_date": "10/30 02:48:46",
+   "status": "FINISH"
+  },
+  {
+   "elapsed_seconds": 3322,
+   "job_id": "3730251",
+   "job_name": "s1b-a1-M1-s29",
+   "nodes": 1,
+   "queue": "small-g",
+   "start_date": "10/30 02:48:46",
+   "status": "FINISH"
+  },
+  {
+   "elapsed_seconds": 3468,
+   "job_id": "3730252",
+   "job_name": "s1b-a1-M1-s43",
+   "nodes": 1,
+   "queue": "small-g",
+   "start_date": "10/30 02:48:46",
+   "status": "FINISH"
+  },
+  {
+   "elapsed_seconds": 5482,
+   "job_id": "3730253",
+   "job_name": "s1b-a1-M4-s17",
+   "nodes": 1,
+   "queue": "small-g",
+   "start_date": "10/30 02:48:46",
+   "status": "FINISH"
+  },
+  {
+   "elapsed_seconds": 6322,
+   "job_id": "3730254",
+   "job_name": "s1b-a1-M4-s29",
+   "nodes": 1,
+   "queue": "small-g",
+   "start_date": "10/30 02:50:31",
+   "status": "FINISH"
+  },
+  {
+   "elapsed_seconds": 5674,
+   "job_id": "3730255",
+   "job_name": "s1b-a1-M4-s43",
+   "nodes": 1,
+   "queue": "small-g",
+   "start_date": "10/30 02:50:31",
+   "status": "FINISH"
+  },
+  {
+   "elapsed_seconds": 3637,
+   "job_id": "3730256",
+   "job_name": "s1b-a1-S1-s17",
+   "nodes": 1,
+   "queue": "small-g",
+   "start_date": "10/30 02:48:46",
+   "status": "FINISH"
+  },
+  {
+   "elapsed_seconds": 3652,
+   "job_id": "3730257",
+   "job_name": "s1b-a1-S1-s29",
+   "nodes": 1,
+   "queue": "small-g",
+   "start_date": "10/30 02:48:46",
+   "status": "FINISH"
+  },
+  {
+   "elapsed_seconds": 3815,
+   "job_id": "3730258",
+   "job_name": "s1b-a1-S1-s43",
+   "nodes": 1,
+   "queue": "small-g",
+   "start_date": "10/30 02:50:31",
+   "status": "FINISH"
+  },
+  {
+   "elapsed_seconds": 6663,
+   "job_id": "3730259",
+   "job_name": "s1b-a1-S4-s17",
+   "nodes": 1,
+   "queue": "small-g",
+   "start_date": "10/30 02:50:31",
+   "status": "FINISH"
+  },
+  {
+   "elapsed_seconds": 6799,
+   "job_id": "3730260",
+   "job_name": "s1b-a1-S4-s29",
+   "nodes": 1,
+   "queue": "small-g",
+   "start_date": "10/30 02:53:42",
+   "status": "FINISH"
+  },
+  {
+   "elapsed_seconds": 7013,
+   "job_id": "3730261",
+   "job_name": "s1b-a1-S4-s43",
+   "nodes": 1,
+   "queue": "small-g",
+   "start_date": "10/30 02:53:42",
+   "status": "FINISH"
+  }
+ ],
+ "notices": [
+  "Miyabi scheduled stop time: 2026/11/25(Wed) 09:00:00 (Remain: 26days 03:59:09)"
+ ],
+ "observed_at": "2026-10-29T20:00:52.030317+00:00",
+ "ok": true,
+ "query_command": [
+  "qstat",
+  "-ll",
+  "-H",
+  "--hday",
+  "1",
+  "--hnum",
+  "100"
+ ],
+ "schema_version": 1
+}
