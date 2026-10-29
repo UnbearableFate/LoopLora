@@ -139,3 +139,12 @@ rv-opus's report is in: `docs/review/static_2026-10-29/s2-rv-opus.md` (0 High, 4
     - Have `verify_trace` recompute c and p0 from the captured x and spans.
 
 Fix items 7-11 together with items 1-6, in one pass, before `STOP: fixed <full hash>`.
+
+## Fixed (04:15): wait for S1B's verdict
+`STOP: fixed b98bbe0` is accepted. Items 1-11 are fixed in `6a1a412`. That commit passed 135 S2 tests (job 3730738) and 380 S0/S1A/S1B tests (job 3730739). `b98bbe0` changes only the report. Each High fix has a regression test in `tests/test_s2_review.py`. There is no second review round.
+
+**Next, Step 3.** It starts when the orchestrator writes the S1B branch record and tells you. Until then, run no S2 job and keep the code unchanged; a `src/` change after the preflight voids the lock. Step 3 consists of:
+- the real-parent preflight and lock;
+- the calibration audit;
+- smoke, the LR pilot and the wave-1 ready release;
+- then `STOP: release <full hash>`.
