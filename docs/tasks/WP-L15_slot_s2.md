@@ -121,3 +121,21 @@ Fix these on wp/slot. Each fix gets a test that fails without it.
    Add a fixture with distinguishable costs that checks the main total and the over-cap STOP.
 
 Then run all S2 tests plus the S0, S1A and S1B test modules on compute, update `docs/reports/WP-L15.md`, and end with `STOP: fixed <full hash>`. There is no second review round. The fixes are checked by tests only (user, 2026-10-29).
+
+## Review (03:55): rv-opus items 7-11
+rv-opus's report is in: `docs/review/static_2026-10-29/s2-rv-opus.md` (0 High, 4 Medium, 2 Low). F1 repeats item 2 (S2-C02). F2 is item 4 (S2-C04) with one addition. The rest are new. The orchestrator checked F3 in the code (`s2_analysis.py:107`).
+
+7. **F2 addition to item 4.** The audit also checks that changing only the named relation changes the question text and c. The calibration job saves the audit: trajectory diagnostics at budget 1 over hops 1-3, split by relation, and a decode of the raw read through the parent's frozen value head. Capture that value head before `prepare()` drops it.
+8. **F3 (exact thresholds).** Compare the terminal screens, coverage screens and every other registered threshold exactly from integer counts: integer cross-multiplication or `fractions.Fraction`, never averaged floats. §10 requires this. Test the exact-boundary cases, 5 % and 80 %.
+9. **F4 (registered descriptive outputs).** Add these to the locked code:
+   - **+Null pilot and dev:** save a soft budget-4 sample file next to the hard one.
+   - **Relation-switch probe:** paired changes over all queries, plus the byte-identical question re-render control.
+   - **`analyze_s2.py` tables:** per-hop and per-seed EM and NLL, per-relation counts and metrics, the UNKNOWN prediction rate, soft-hard differences, and anchor versus free-rollout NULL head accuracy.
+10. **F5 (N/A, not 0).** For Base-old and Base-budget, semantic metrics are N/A: bridge, value-to-query and p interventions. Never write them as zeros.
+11. **F6 (preflight checks that can fail).**
+    - Perturb labels before `prepare()`.
+    - Compare B = 0 logits with the parent's adapter-free frozen base forward.
+    - Report question isolation as N/A for base arms, or run it for them; never hard-code True.
+    - Have `verify_trace` recompute c and p0 from the captured x and spans.
+
+Fix items 7-11 together with items 1-6, in one pass, before `STOP: fixed <full hash>`.
