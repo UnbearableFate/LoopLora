@@ -1,0 +1,70 @@
+{
+ "arm": "M4",
+ "export_blake2b_128": "ce3edb9816ff6241305f1819dffd7865",
+ "metadata": {
+  "amendment_blake2b_128": "341d3c71f9334a1384a102b097e7ad75",
+  "arm": "M4",
+  "branch": "advance",
+  "control": "shared",
+  "eps": 1e-06,
+  "feature_map": "dpfp-nu3-unit",
+  "key_dim": 768,
+  "parent_writer_blake2b_128": "3994a5631021de03b2039974ac934e56",
+  "prereg_blake2b_128": "6f2e776f2c6cfde131380fb343854784",
+  "read": {
+   "capacity": 12,
+   "gain": 1.0,
+   "kind": "matrix",
+   "recency": false,
+   "scope": "all_valid_question",
+   "tau": null
+  },
+  "science_hash": "2291b336d3f85417cbadba11498c209a",
+  "seed": 17,
+  "source_commit": "258f5f5a24eae684f640a9fd62679bb643470a76",
+  "stage": "S1B",
+  "step": 20,
+  "task": {
+   "E": 12,
+   "Q": 4,
+   "V": 1024,
+   "base": null,
+   "chain_lengths": [
+    8,
+    4
+   ],
+   "head_sharing": 0.3,
+   "hops": [
+    1,
+    2,
+    3
+   ],
+   "missing_rate": 0.5,
+   "n_distract": 0,
+   "n_rel": 4,
+   "n_updates": 2,
+   "name": "t2_chain_end",
+   "seen": [
+    0,
+    768
+   ],
+   "unseen": [
+    768,
+    1024
+   ],
+   "update_query_rate": 0.5
+  },
+  "task_digest": "f556c1b91252b0b74d3ff674717be37c",
+  "trainable": [
+   "Q",
+   "R",
+   "U",
+   "B"
+  ],
+  "trained_depth": 4,
+  "value_dim": 128
+ },
+ "original_smoke_samples_blake2b_128": "cff499aced20ac82705699f5e1421c79",
+ "passed": true,
+ "reload_basis": "ede5da36d6621f5d99f682fe3f38f362"
+}

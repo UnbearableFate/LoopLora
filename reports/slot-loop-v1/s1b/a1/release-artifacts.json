@@ -1,0 +1,57 @@
+{
+ "archive": {
+  "candidate.json": {
+   "blake2b_128": "377912afbbec7b804af21bcb3ca8ae9a",
+   "bytes": 9756,
+   "source": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/candidate.json"
+  },
+  "release-job.log": {
+   "blake2b_128": "90a6c0784083e3287858f6efce040103",
+   "bytes": 3318,
+   "source": "/work/xg24i002/x10041/LoopLora/logs/pbs/s1b-a1-release-20261030-021236-1562889.log"
+  },
+  "release-job.spec.json": {
+   "blake2b_128": "9d9da1b63765cbf3307895645f0feb77",
+   "bytes": 2474,
+   "source": "/work/xg24i002/x10041/LoopLora/logs/pbs/specs/s1b-a1-release-20261030-021236-1562889.json"
+  },
+  "release.json": {
+   "blake2b_128": "d1ccbb7ff4c31fa53abfd7a3cc9ad572",
+   "bytes": 9947,
+   "source": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/release.json"
+  },
+  "reload/M1/reload.json": {
+   "blake2b_128": "e700412e78ecb1b1094ba46820aa1705",
+   "bytes": 1393,
+   "source": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/reload/M1/reload.json"
+  },
+  "reload/M4/reload.json": {
+   "blake2b_128": "6293b3e231890ba4742f799bb991606a",
+   "bytes": 1393,
+   "source": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/reload/M4/reload.json"
+  },
+  "reload/S1/reload.json": {
+   "blake2b_128": "d676516984d7f6daf337b57976d777fc",
+   "bytes": 1390,
+   "source": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/reload/S1/reload.json"
+  },
+  "reload/S4/reload.json": {
+   "blake2b_128": "1e671699eaaf00405b61cdcf10bfccf4",
+   "bytes": 1390,
+   "source": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/reload/S4/reload.json"
+  }
+ },
+ "candidate_blake2b_128": "377912afbbec7b804af21bcb3ca8ae9a",
+ "cumulative_actual_node_hours": 0.9561111111111111,
+ "exit": 0,
+ "host": "mg0013",
+ "job_id": "3730094.opbs",
+ "main_training": "held for orchestrator approval.json",
+ "node_hours": 0.04472222222222222,
+ "release_blake2b_128": "d1ccbb7ff4c31fa53abfd7a3cc9ad572",
+ "source_blake2b_128": "d7e7ff0fb5987d5e5abfc312c82c449c",
+ "source_commit": "258f5f5a24eae684f640a9fd62679bb643470a76",
+ "stage": "S1B-A1",
+ "status": "ready",
+ "wall_seconds": 161
+}

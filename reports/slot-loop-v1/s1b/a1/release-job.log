@@ -1,0 +1,37 @@
+[job] host=mg0013 job=3730094.opbs spec=/work/xg24i002/x10041/LoopLora/logs/pbs/specs/s1b-a1-release-20261030-021236-1562889.json start=2026-10-30T02:30:10+09:00
+[job] source=commit:258f5f5a24eae684f640a9fd62679bb643470a76
+[job] argv=-c import json, subprocess, sys
+from pathlib import Path
+from looplora.llm import s1b_artifacts as a, s1b_data as d
+root=Path('/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587')
+common=["--mode","release","--manifest",str(root/"manifest.lock.json"),"--branch-record",str(root/"branch.json"),"--read-settings",str(root/"read-settings.json"),"--pilot",str(root/"pilot/pilot.json"),"--smoke",str(root/"smoke/smoke.json"),"--science-commit","258f5f5a24eae684f640a9fd62679bb643470a76"]
+subprocess.run([sys.executable,"scripts/prepare_s1b.py",*common,"--out",str(root/"candidate.json")],check=True)
+candidate_digest=d.old.file_digest(root/"candidate.json")
+assert a.read(root/"candidate.json")["status"]=="pending_reload"
+reloads=[]
+for arm in ("M1","M4","S1","S4"):
+    out=root/"reload"/arm
+    subprocess.run([sys.executable,"-m","looplora.llm.s1b_run","--mode","reload-check","--manifest",str(root/"manifest.lock.json"),"--release",str(root/"candidate.json"),"--export",str(root/"smoke"/arm/"selected.pt"),"--predictions",str(root/"smoke"/arm/"reload_samples.npz"),"--arm",arm,"--out",str(out)],check=True)
+    reloads.extend(["--reload",arm+"="+str(out/"reload.json")])
+subprocess.run([sys.executable,"scripts/prepare_s1b.py",*common,*reloads,"--out",str(root/"release.json")],check=True)
+assert d.old.file_digest(root/"candidate.json")==candidate_digest
+_,release=a.require_release(root/"release.json",root/"manifest.lock.json")
+smoke=a.read(root/"smoke/smoke.json")
+for arm in release["arms"]:
+    assert a.read(root/"reload"/arm/"reload.json")["export_blake2b_128"]==smoke["arms"][arm]["selected_checkpoint_blake2b_128"]
+assert release["status"]=="ready" and len(release["config_hashes"])==12 and release["steps"]==18000
+assert all(v["walltime_seconds"]<=16*3600 for v in release["arms"].values())
+print(json.dumps(dict(stage="S1B-A1",status="ready",reloads=4,configs=12,release_blake2b_128=d.old.file_digest(root/"release.json"))),flush=True)
+[job] torch 2.14.0+cu132 cuda True
+S1B release: wrote /work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/candidate.json
+`torch_dtype` is deprecated! Use `dtype` instead!
+{"mode": "reload-check", "status": "complete", "out": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/reload/M1"}
+`torch_dtype` is deprecated! Use `dtype` instead!
+{"mode": "reload-check", "status": "complete", "out": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/reload/M4"}
+`torch_dtype` is deprecated! Use `dtype` instead!
+{"mode": "reload-check", "status": "complete", "out": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/reload/S1"}
+`torch_dtype` is deprecated! Use `dtype` instead!
+{"mode": "reload-check", "status": "complete", "out": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/reload/S4"}
+S1B release: wrote /work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/release.json
+{"stage": "S1B-A1", "status": "ready", "reloads": 4, "configs": 12, "release_blake2b_128": "d1ccbb7ff4c31fa53abfd7a3cc9ad572"}
+[job] exit=0 end=2026-10-30T02:32:50+09:00
