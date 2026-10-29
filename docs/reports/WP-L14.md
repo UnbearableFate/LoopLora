@@ -1,6 +1,6 @@
 # WP-L14: S1B implementation and validation
 
-**A1 smoke and all four original-instance reload comparisons pass.** The source has 191 passing tests and all eleven real-parent preflight checks; the [A1 lock](../../reports/slot-loop-v1/s1b/a1/manifest.lock.json) binds `d7e7ff0fb5987d5e5abfc312c82c449c`. Every arm uses the transferred S1A reads with shared frozen A, and the main/control budget remains 18,000 updates. Next is the equal LR pilot, then candidate/reload/ready release for approval. Calibration is not repeated. Cumulative actual cost including failures/retries: **0.591667 node·h**. The current ledger follows at the end.
+**A1 LR pilot passes all 12 candidates; the registered selection is LR 0.003 for every arm.** The source has 191 passing tests, all eleven real-parent preflight checks and four passing smoke/original-instance reloads. The [A1 lock](../../reports/slot-loop-v1/s1b/a1/manifest.lock.json) binds `d7e7ff0fb5987d5e5abfc312c82c449c`. Pilot-based main-run requests are 1h30m / 2h40m / 1h40m / 3h for M1/M4/S1/S4, each within the 16 node·h cap at N=18,000. Candidate/CLI reload/ready release follow before approval; no main training is submitted. Calibration is not repeated. Cumulative actual cost including failures/retries: **0.911389 node·h**. The current ledger follows at the end.
 
 Worker wk-loop, branch `wp/loop`, login/control plane `miyabi-g2` (aarch64), no PBS allocation. Merged master **once**, as instructed: fast-forward `2f7abbc` → `8f4bb1da18d146d5979a6ae0fe9ea5c5dac27e1f`; only the task file/worker registry changed. No push.
 
@@ -280,3 +280,31 @@ Run the registered grid once: four arms × LR {3e-4,1e-3,3e-3} ×200 updates, ea
 Walltime from measured smoke parts: `3 ×200 ×sum(arm step_seconds)` = **722.657 s**; two pilot evaluations per LR, scaling each arm's slowest 64-episode evaluation by 1000/64, gives **252.257 s**; measured setup/final/export/support overhead scaled to three candidates adds **16.560 s**. Allow **120 s** for twelve parent instances, fresh prefetched-worker startup and one-time registry/module overhead. Expected **1,111.474 s**, ×1.5 = **1,667.212 s**, rounded to **00:30:00**, one node/debug-g (**0.500000 requested node·h**), well below 16 node·h. The pilot's own 200-step measurements, including the slowest finite candidate per arm, will determine the N=18,000 main-run release walltimes; an indivisible run above the cap stops. Output `a1-8457587/pilot/` is new. No main training submitted and no source changes, extra merge, push, sleep or polling.
 
 Submitted **3729954.opbs**, `s1b-a1-pilot`, immutable science commit **`258f5f5a24eae684f640a9fd62679bb643470a76`**, one node/debug-g/00:30:00. Log `/work/xg24i002/x10041/LoopLora/logs/pbs/s1b-a1-pilot-20261030-014906-1343462.log`; output `/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/pilot`. Outcome/actual cost pending. Inspect every candidate and the per-arm registered choice on completion, then build the exact candidate release and perform its independent CLI reload checks before ready/STOP.
+
+Verified **3729954.opbs exit 0, pilot complete**, mg0008, log 2026-10-30 01:49:10–02:08:20 JST (1,150 s); reported PBS walltime **00:19:11 = 1,151 s / 0.319722 node·h**, including the one-second allocation-accounting difference. Source/argv, CUDA, completion and separate exit marker checked; only inherited `torch_dtype` warning. **All twelve candidates are finite, none excluded/skipped**, each exactly 200 updates / 6,400 episodes, same registered pilot stream and 1,000-episode shard. All preserve frozen bytes/support and change trainables. All four LR choices independently reproduced with the registered .01-nat tie rule, and every winning NLL is below step 0. Pilot JSON blake2b-128 **`5a1c2b090772bb4348b1d5d6566e4a9f`**. Full [pilot record](../../reports/slot-loop-v1/s1b/a1/pilot/pilot.json) and per-candidate histories archived; all twelve actual pilot-export digests verified and retained on persistent storage, never used to initialize main runs. Cumulative actual **(2130+1151)/3600 = 0.911389 node·h**.
+
+| arm | step-0 NLL | LR .0003 NLL | LR .001 NLL | LR .003 NLL | selected LR |
+| --- | --- | --- | --- | --- | --- |
+| M1 | 10.542903 | 6.782494 | 6.440166 | 6.366551 | .003 |
+| M4 | 22.516058 | 8.551318 | 6.933272 | 6.663716 | .003 |
+| S1 | 9.778330 | 6.620500 | 6.428880 | 6.347167 | .003 |
+| S4 | 22.312346 | 8.215011 | 6.788721 | 6.641147 | .003 |
+
+The release uses each arm's **slowest finite candidate** for step/evaluation/load/overhead. Main request is `ceil_to_600s(1.5 × (load + 18000×step + 11×evaluation + overhead))`; N and the ten dev checkpoints are not adapted to pilot scores. Every indivisible one-node run fits the 16 node·h cap; no budget is reduced.
+
+| arm | step (s) | evaluation (s) | load (s) | overhead (s) | time with 1.5× margin (s) | one-node request |
+| --- | --- | --- | --- | --- | --- | --- |
+| M1 | 0.192734 | 8.040816 | 1.361697 | 5.460390 | 5346.711 | 01:30:00 (1.500000 node·h) |
+| M4 | 0.335047 | 10.966011 | 0.430269 | 3.450730 | 9233.038 | 02:40:00 (2.666667 node·h) |
+| S1 | 0.214682 | 8.672139 | 0.666512 | 3.415585 | 5945.638 | 01:40:00 (1.666667 node·h) |
+| S4 | 0.391021 | 13.159213 | 0.435913 | 3.422765 | 10780.477 | 03:00:00 (3.000000 node·h) |
+
+Requested total for the twelve main runs, **if later approved**, is **26.5 node·h**. They remain held. No main dev/confirmation/unseen payload is generated or read during pilot/release preparation.
+
+### A1 candidate and independent CLI reloads
+
+Next one compute job invokes the existing `prepare_s1b.py --mode release` builder against the exact lock/branch/transferred reads/pilot/smoke and common science commit. Candidate is `pending_reload`, never trainable. Run **four separate Python CLI processes** (`-m looplora.llm.s1b_run --mode reload-check`), each loading its real smoke export and comparing all original IDs/predictions/correctness/NLL plus complete buffers/backend/projection/depth metadata against that exact candidate. Only after all four pass, rebuild the release with their four reports and require `status: ready`; run the reviewed release validator. No approval record is created. Optional unseen is fixed **false** for this release, using the registered default and avoiding extra evaluation; all mandatory main/depth-sweep contrasts remain unchanged.
+
+Walltime model: prior 79-second smoke includes eight model instances, 80 training updates, repeated metadata checks and sixteen small evaluations. The release job removes training but adds repeated full-prefix lock/read/source reconciliation and four independent interpreter startups; allow approximately **180 s** for these measured loading/evaluation and metadata paths, ×1.5 = **270 s**, rounded up to **00:10:00**, one node/debug-g (**0.166667 requested node·h**). New paths `a1-8457587/candidate.json`, `reload/{M1,M4,S1,S4}/` and `release.json` were absent. No source changes after tests/preflight, no extra merge, push, sleep or polling. Stop at the committed ready-release artifacts for orchestrator `approval.json`.
+
+Submitted **3730094.opbs**, `s1b-a1-release`, common immutable science commit **`258f5f5a24eae684f640a9fd62679bb643470a76`**, one node/debug-g/00:10:00. Log `/work/xg24i002/x10041/LoopLora/logs/pbs/s1b-a1-release-20261030-021236-1562889.log`; the persistent spec captures candidate builder → four independent CLI processes → ready builder → release-validator payload. Outcome/actual cost pending. On completion, inspect all four reports and exact candidate/ready bindings, archive the release and evidence, update the ledger, commit and STOP release; main training stays held for approval.
