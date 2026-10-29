@@ -1,7 +1,7 @@
 # WP-L13 state: SLOT-LOOP-v1, S0 R2 and S1A release ready
 
 Branch `wp/slot` (worktree `LoopLora-wt/slot`), master merged through `8632497` after handover at `ccdcc96`; not merged into master, not pushed. Task: `docs/tasks/WP-L13_slot_loop.md`; registration `docs/prereg/SLOT-LOOP-v1.md` (blake2b-128 `56e8c611c01e0ef9b7ae32db97b0e334`, registered on master at `5f04a5c`, unchanged); S0 results are in `docs/reports/SLOT-LOOP-v1.md`.
-**Status: ready release approved in 1114287; all six main arm-seed jobs submitted.** Next: verify results, S1A-DEV, conditional registered ablation, then STOP: S1A selected. Confirmation/unseen remain sealed. No source or science-setting changes.
+**Status: all six approved main jobs complete; frozen S1A-DEV analysis submitted.** Six logs/records/checkpoints passed step, finite, freeze, config and approved-release checks. Conditional ablation awaits the registered trigger; confirmation/unseen remain sealed.
 
 ## What the code does
 New files only, except four typed-dispatch edits (below). Every new option is off in the old paths.
@@ -368,3 +368,17 @@ Approval: `reports/slot-loop-v1/approval.json`, committed by the orchestrator at
 | 3729053.opbs | soft_slot_L1 | 43 | submitted; watcher pending | pending |
 
 Exact log/spec/source paths are committed in `reports/slot-loop-v1/s1a-main-jobs.json`. No polling or sleeps. After watcher completion inspect all six logs/records: 6000 steps, eleven dev rows, finite losses/norms, correct source/config/release hashes, fixed writer/support digests, selected exports and no confirmation access. Then S1A-DEV selection; the seed-17 two-arm ablation and S1A-ABL run only if the registered stable-dev trigger fires. End with STOP: S1A selected. Confirmation/unseen evaluation is outside this approval and remains sealed.
+
+
+All six main runs accepted: N=6000, 11 dev rows (0 and every 600), 121 expected log rows, finite losses/norms and evaluations, Q/R/U/B gradients finite/nonzero, exact trainable/frozen counts, frozen/support digests unchanged, and selected.pt digests equal records. Every record uses the same approved release digest, correct science commit/config hash and registered dev ids; confirmation_accessed=false. Runtime measured from each job log:
+
+| job | arm | seed | seconds | node·h | selected step |
+| --- | --- | ---: | ---: | ---: | ---: |
+| 3729048.opbs | matrix_L1 | 17 | 989 | 0.274722 | 5400 |
+| 3729049.opbs | matrix_L1 | 29 | 1039 | 0.288611 | 6000 |
+| 3729050.opbs | matrix_L1 | 43 | 1070 | 0.297222 | 5400 |
+| 3729051.opbs | soft_slot_L1 | 17 | 1101 | 0.305833 | 5400 |
+| 3729052.opbs | soft_slot_L1 | 29 | 1015 | 0.281944 | 6000 |
+| 3729053.opbs | soft_slot_L1 | 43 | 1087 | 0.301944 | 4200 |
+
+Main-run total 6301/3600 = 1.750278 node·h. S1A including preparation 1.947222 node·h; whole study cumulative 2.725500 node·h. All per-job runs <0.5 node·h. S1A-DEV job 3729237.opbs uses science commit 1523b19c7949673ddcd1d89cc1e5fe518736805c, one node debug-g 00:01:00, and writes $R/s1a-selection. Log: /work/xg24i002/x10041/LoopLora/logs/pbs/slot-s1a-dev-20261029-235708-3765921.log. Outcome/runtime pending. The frozen script checks selection, stability, shared release digest and the mean-dev-gap trigger. Only if outcome=ablation submit the two seed-17 ablation jobs; otherwise proceed to STOP: S1A selected. No confirmation/unseen data opened.
