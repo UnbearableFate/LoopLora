@@ -1,4 +1,4 @@
-# WP-L10 (B8W) state — step 2 up to the checkpoint lock (2026-10-29)
+# WP-L10 (B8W) state — continuations done and verified, authorization committed, no test episode generated (2026-10-29)
 
 Author: sn-p1l (Claude Sonnet 5.5), branch `wp/p1l`. Prereg (registered, master 3c9c396): `docs/prereg/B8W.md`, blake2b-128
 `7414b6e0118d8d53a913467d6e7848b2`. No test episode was generated or read; the equality gate and the smoke use the validation split.
@@ -30,5 +30,20 @@ bitwise equal, fp32 adapter read equal. Start hash c90d23ff…, converted 1f0c56
 Continuation 6 × 2,000 steps ≈ 0.64 node·h (+ about 0.05 start-up, gate and saves; one job per seed, about 14 min each, request 30 min),
 evaluation about 0.12, finalizer 0.02: **about 1.05 node·h in total** including the 0.20 spent (budget 1.0-2.0); a rerun of one continuation job adds about 0.25.
 
-## Next (after the orchestrator checks `reports/b8w/checkpoint-lock.json`)
-Three continuation jobs (`scripts/run_b8w.py main --seed S`), verification, authorization, `scripts/evaluate_b8w.py` and `scripts/finalize_b8w.py` (not written yet).
+## Continuations (lock approved at 70bb12c; jobs pinned to 70bb12c7a46833f5e436582ae6434d5a47485135, regular-g, 1 node, 30 min)
+| Job | Name | Exit | Walltime used | node·h |
+| --- | --- | ---: | --- | ---: |
+| 3724077 / 3724078 / 3724079 | `tr-b8w-s17/29/43` | 0 / 0 / 0 | 14:13 / 14:07 / 13:56 | 0.237 / 0.235 / 0.232 |
+| 3724117 | `t-b8w-pipeline` (`tests/test_b8w_pipeline.py` + `tests/test_b8w.py`: 59 passed, no F, E or skip) | 0 | 0:44 | 0.012 |
+Equality gate at full scale, every seed: passed, logits (bf16) `torch.equal`, argmax equal, control equal, max |difference| 0.0
+(start hashes c90d23ff / 59e293ee / 37a7baf0; converted 1f0c56ae / 6f62abbe / 9c623e91). Steady step times shared / untied: seed 17
+0.2000 / 0.2009 s, seed 29 0.1978 / 0.1982 s, seed 43 0.1915 / 0.1993 s; peak memory 7.69 GB. Total so far (ledger, 7 jobs): 0.92 node·h.
+`scripts/make_b8w_manifest.py --source 70bb12c…` verified all six continuations (records complete, 21 logged rows ending at step 2000,
+lr 0.003, `data_start_step` 17000, start-checkpoint hashes (shared = locked M1-L4; untied = the gate's converted checkpoint), P1-L stream
+`data_seed`, first-step losses identical in both arms, configs identical apart from name and variant, one source, not dirty, oracle writer
+hash equal to P1-L's, exit-0 receipts) and wrote `reports/b8w/continuation-manifest.json` and `reports/b8w/confirmation-authorization.json`.
+Training loss (logged batch loss, training data only; not a decision input): step 2000 shared / untied: seed 17 2.989 / 3.169,
+seed 29 3.781 / 3.595, seed 43 2.800 / 2.656; mean of the last five logged steps (1600-2000): 2.789 / 2.736, 3.423 / 3.301, 2.968 / 2.872.
+
+## Next (after the orchestrator checks the authorization)
+Authorization check job (`evaluate_b8w.py --check-only`), then 15 evaluations in one or two jobs, `finalize_b8w.py`, decision record and report.

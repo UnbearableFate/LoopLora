@@ -1,7 +1,7 @@
 {
   "accounting": "qstat observed elapsed_seconds times nodes; failed jobs included; live totals provisional",
-  "allocated_node_hours": 0.20166666666666666,
-  "allocated_node_seconds": 726,
+  "allocated_node_hours": 0.9183333333333333,
+  "allocated_node_seconds": 3306,
   "budget_rule": "B8W: 1.0-2.0 node-h in total including tests and smokes; per-job 1 node x 1 h",
   "final": true,
   "jobs": [
@@ -84,6 +84,101 @@
       "source": {
         "kind": "commit",
         "ref": "0a5b2c91a05b970faa0f700a0c67d528d285afaa"
+      },
+      "status": "FINISH"
+    },
+    {
+      "allocated_seconds": 853,
+      "argv": [
+        "scripts/run_b8w.py",
+        "main",
+        "--seed",
+        "17",
+        "--out",
+        "/work/xg24i002/x10041/LoopLora/runs/b8w/main/s17"
+      ],
+      "exit_code": 0,
+      "host": "mg0399",
+      "job_id": "3724077.opbs",
+      "log": "/work/xg24i002/x10041/LoopLora/logs/pbs/tr-b8w-s17-20261029-132956-872001.log",
+      "name": "tr-b8w-s17",
+      "node_hours": 0.23694444444444446,
+      "nodes": 1,
+      "requested_walltime": "00:30:00",
+      "source": {
+        "kind": "commit",
+        "ref": "70bb12c7a46833f5e436582ae6434d5a47485135"
+      },
+      "status": "FINISH"
+    },
+    {
+      "allocated_seconds": 847,
+      "argv": [
+        "scripts/run_b8w.py",
+        "main",
+        "--seed",
+        "29",
+        "--out",
+        "/work/xg24i002/x10041/LoopLora/runs/b8w/main/s29"
+      ],
+      "exit_code": 0,
+      "host": "mg0407",
+      "job_id": "3724078.opbs",
+      "log": "/work/xg24i002/x10041/LoopLora/logs/pbs/tr-b8w-s29-20261029-132956-872011.log",
+      "name": "tr-b8w-s29",
+      "node_hours": 0.23527777777777778,
+      "nodes": 1,
+      "requested_walltime": "00:30:00",
+      "source": {
+        "kind": "commit",
+        "ref": "70bb12c7a46833f5e436582ae6434d5a47485135"
+      },
+      "status": "FINISH"
+    },
+    {
+      "allocated_seconds": 836,
+      "argv": [
+        "scripts/run_b8w.py",
+        "main",
+        "--seed",
+        "43",
+        "--out",
+        "/work/xg24i002/x10041/LoopLora/runs/b8w/main/s43"
+      ],
+      "exit_code": 0,
+      "host": "mg0412",
+      "job_id": "3724079.opbs",
+      "log": "/work/xg24i002/x10041/LoopLora/logs/pbs/tr-b8w-s43-20261029-132957-872018.log",
+      "name": "tr-b8w-s43",
+      "node_hours": 0.23222222222222222,
+      "nodes": 1,
+      "requested_walltime": "00:30:00",
+      "source": {
+        "kind": "commit",
+        "ref": "70bb12c7a46833f5e436582ae6434d5a47485135"
+      },
+      "status": "FINISH"
+    },
+    {
+      "allocated_seconds": 44,
+      "argv": [
+        "-m",
+        "pytest",
+        "-q",
+        "tests/test_b8w_pipeline.py",
+        "tests/test_b8w.py"
+      ],
+      "exit_code": 0,
+      "host": "mg0032",
+      "job_id": "3724117.opbs",
+      "log": "/work/xg24i002/x10041/LoopLora/logs/pbs/t-b8w-pipeline-20261029-133331-895366.log",
+      "name": "t-b8w-pipeline",
+      "node_hours": 0.012222222222222223,
+      "nodes": 1,
+      "requested_walltime": "00:20:00",
+      "source": {
+        "kind": "commit",
+        "ref": "44cfcb3fa1474f94ae1bd663a13e7df6fda38c96"
       },
       "status": "FINISH"
     }

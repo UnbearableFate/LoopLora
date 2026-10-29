@@ -1,0 +1,20 @@
+{
+  "confidence": 0.95,
+  "confirmation_window": "b8w",
+  "gated_conditions": 1,
+  "lock": {
+    "hash": "998ecf829fa6cc1f46a0efb1a9e35e25",
+    "path": "reports/b8w/checkpoint-lock.json"
+  },
+  "manifest": "/work/xg24i002/x10041/LoopLora-wt/p1l/reports/b8w/continuation-manifest.json",
+  "manifest_hash": "a756817b26daa88b945e6045361674b9",
+  "orchestrator_decision": "docs/prereg/B8W.md registered by the orchestrator (master 3c9c396, 2026-10-29): after the six continuations are verified, evaluate the 15 groups on test [108000, 110000) once. This file is committed for the orchestrator's check; no evaluation job is submitted before the orchestrator replies.",
+  "prereg": {
+    "hash": "7414b6e0118d8d53a913467d6e7848b2",
+    "path": "docs/prereg/B8W.md"
+  },
+  "release_rule": "Verify the six continuations (records, logs of 2000 steps, gates, start hashes, one source, exit-0 receipts), then create this authorization; no confirmation episode before the orchestrator's check.",
+  "status": "allowed",
+  "study": "b8w",
+  "training_source": "70bb12c7a46833f5e436582ae6434d5a47485135"
+}
