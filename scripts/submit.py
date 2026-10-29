@@ -1,10 +1,9 @@
 #!/usr/bin/python3
 """Submit a LoopLora compute job (login node, stdlib only).
 
-Enforces the current-stage cap from the user (2026-10-26): one experiment may
-use at most 8 nodes x 1 h, or 8 nodes x 2 h when results already obtained
-support scaling up (pass --scale-up with the decision/prereg that justifies it).
-The cap is a check, not the request; size walltime from measured runs.
+Enforces the user's per-job cap (2026-10-29): nodes x walltime <= 16 node-h.
+Budgets written in plans and preregs do not cap jobs. The cap is a check, not
+the request; size walltime from measured runs.
 
 Examples:
   scripts/submit.py --name pytest --walltime 00:15:00 --worktree . --wait -- -m pytest -q tests
@@ -26,9 +25,7 @@ REPO = Path("/work/xg24i002/x10041/LoopLora")
 LOG_ROOT = REPO / "logs" / "pbs"
 JOB_SCRIPT = REPO / "scripts" / "pbs" / "job.pbs"
 GROUP = "xg24i002"
-MAX_NODES = 8          # user cap: <= 8 nodes per experiment
-MAX_WALLTIME_S = 3600  # user cap: <= 1 h per experiment
-SCALE_UP_WALLTIME_S = 7200  # user cap with --scale-up: <= 2 h when earlier results justify it
+MAX_NODE_SECONDS = 16 * 3600  # user cap (2026-10-29): <= 16 node-h per job
 QUEUES = {"debug-g": 1800, "regular-g": None}
 
 
@@ -38,6 +35,13 @@ def parse_walltime(text: str) -> int:
         raise SystemExit(f"walltime must be HH:MM:SS, got {text!r}")
     h, m, s = parts
     return h * 3600 + m * 60 + s
+
+
+def check_cap(nodes: int, wall: int) -> None:
+    if nodes < 1:
+        raise SystemExit(f"nodes={nodes} must be at least 1")
+    if nodes * wall > MAX_NODE_SECONDS:
+        raise SystemExit(f"{nodes} node(s) x {wall} s exceeds the per-job cap of 16 node-h")
 
 
 def resolve_commit(ref: str) -> str:
@@ -58,7 +62,7 @@ def main() -> int:
     ap.add_argument("--nodes", type=int, default=1)
     ap.add_argument("--walltime", required=True, help="HH:MM:SS")
     ap.add_argument("--scale-up", metavar="DOC",
-                    help="repo path of the decision/prereg whose results justify a job above 1 h (<= 2 h)")
+                    help="repo path of the decision/prereg that justifies a long job (optional, recorded in the spec)")
     src = ap.add_mutually_exclusive_group(required=True)
     src.add_argument("--commit", help="git ref to snapshot (experiments)")
     src.add_argument("--worktree", help="run a working tree in place (tests/development only)")
@@ -73,13 +77,9 @@ def main() -> int:
     if not argv:
         raise SystemExit("missing python argv after --")
     wall = parse_walltime(a.walltime)
-    if not 1 <= a.nodes <= MAX_NODES:
-        raise SystemExit(f"nodes={a.nodes} violates the cap (1..{MAX_NODES})")
+    check_cap(a.nodes, wall)
     if a.scale_up and not (REPO / a.scale_up).is_file():
         raise SystemExit(f"--scale-up document {a.scale_up!r} does not exist in {REPO}")
-    if wall > (SCALE_UP_WALLTIME_S if a.scale_up else MAX_WALLTIME_S):
-        raise SystemExit(f"walltime {a.walltime} exceeds the per-experiment cap "
-                         f"({'2 h with --scale-up' if a.scale_up else '1 h; 2 h needs --scale-up'})")
     qmax = QUEUES[a.queue]
     if qmax is not None and wall > qmax:
         raise SystemExit(f"walltime {a.walltime} exceeds {a.queue} limit")

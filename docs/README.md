@@ -37,8 +37,9 @@ docs/                    notation, tasks, worker reports
   It prints the log tail and returns the job's exit code. Keep test runs short (< 10 min).
 - Environment: shared venv `/work/xg24i002/x10041/LoopLora/.venv` (python 3.13, torch 2.14.0+cu132,
   transformers 4.57.6). Do not modify `pyproject.toml`/`uv.lock`; ask the orchestrator for new dependencies.
-- Resource cap (user, current stage; "experiment" = one PBS job, study totals may be relaxed, 2026-10-27): one job ≤ 8 nodes × 1 h; up to 8 nodes × 2 h when results
-  already obtained support scaling up (`submit.py --scale-up <decision/prereg>`; the orchestrator decides). `submit.py` enforces it.
+- Resource cap (user, 2026-10-29: "不必在意文档中描述的预算, 保持每单个run在16 node * h即可"): each job ≤ 16 node·h
+  (nodes × walltime); budgets written in plans and preregs do not cap jobs. `submit.py` enforces it. Size walltime from
+  measured runs (about 1.5×).
 - HF models: `HF_HOME=/work/xg24i002/x10041/hf_home`, offline in jobs (`HF_HUB_OFFLINE=1`).
 
 ## Code rules

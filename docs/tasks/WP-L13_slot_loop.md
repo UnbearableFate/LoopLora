@@ -208,3 +208,16 @@ Fix all four now, before the preflight. Defects 1-3 change `src/`, and M-F2 bind
 - The optional common-fixed-LR comparison has no config hash in the release, so `run_train` would refuse it (rv-opus). It is optional and descriptive. If it is ever run, it first needs a release entry.
 
 Then run the changed test files on compute, update the state file, and end with `STOP: review <hash>`. Both reviewers then check the fix diff `2438599..<hash>` before the preflight.
+
+## Budget (user, 2026-10-29 21:44 JST)
+The user lifted the written budgets: "不必在意文档中描述的预算, 保持每单个run在16 node * h即可".
+- **No longer binding** (the prereg's caps):
+  - S0 ≤ 1.0 and S1A ≤ 4.5 node·h;
+  - the rule that a job which would pass a cap waits for the orchestrator;
+  - the orchestrator's OK for the 2 h arm walltime.
+- **Still applies:**
+  - each job ≤ 16 node·h, which `scripts/submit.py` on master checks;
+  - walltime sized from measurements × 1.5;
+  - node·h recorded per job in the state file;
+  - the release review and every other gate.
+- **The prereg file:** do not edit it, because its blake2b is bound in code. This section and the plan's execution record replace its budget section.
