@@ -297,7 +297,9 @@ S1A follow-up GREEN snapshot: `18995b97dd685f3c306436ae11da40346324a947`.
 
 | job | tests | requested | result | node·h |
 | --- | --- | --- | --- | --- |
-| 3728741.opbs | analysis, round2 integration/extraction, complete runbook parser | 1 node, debug-g, 00:02:00 | pending | pending |
-| 3728742.opbs | experiment suite including direct run-record parser | 1 node, debug-g, 00:05:00 | pending | pending |
+| 3728741.opbs | analysis, round2 integration/extraction, complete runbook parser | 1 node, debug-g, 00:02:00 | 158 passed on mg0019, 37 s, exit 0 | 0.010278 |
+| 3728742.opbs | experiment suite including direct run-record parser | 1 node, debug-g, 00:05:00 | 48 passed on mg0020, 170 s, exit 0 | 0.047222 |
 
 Logs: `/work/xg24i002/x10041/LoopLora/logs/pbs/slot-s1a-tests-20261029-223049-3437042.log`, `/work/xg24i002/x10041/LoopLora/logs/pbs/slot-s1a-exp-20261029-223049-3437054.log`. Next: inspect both logs; if successful, stage unchanged manifest/config plus frozen analysis in persistent paths and submit the real 20-step-per-arm S1A smoke. Wait through the orchestrator watcher; no polling.
+
+S1A follow-ups passed on compute: both GREEN jobs reached 100% without failures/skips; expected full commit/argv and exit markers verified. All 206 cases pass, including submit and target parser checks for every executable runbook submission and the direct parser consumer. No src change. Test cost GREEN 207 / 3,600 = 0.057500 node·h; S1A preparation including RED 0.062500; whole-study cumulative 0.840778. Staged exact lock/config copies at $R/manifest.lock.json and $R/s1a.json, and prereg/frozen analysis under $R/open-root. Analysis blake2b-128: `843d2ff4d1a03224ccd16e68720ba344`. This script is now frozen for the release and later confirmation analysis. No opening record is present or written. Real smoke is next.
