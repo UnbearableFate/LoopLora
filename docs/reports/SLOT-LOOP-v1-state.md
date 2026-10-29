@@ -1,7 +1,7 @@
 # WP-L13 state: SLOT-LOOP-v1, S0 complete (R2)
 
 Branch `wp/slot` (worktree `LoopLora-wt/slot`), master merged through `8632497` after handover at `ccdcc96`; not merged into master, not pushed. Task: `docs/tasks/WP-L13_slot_loop.md`; registration `docs/prereg/SLOT-LOOP-v1.md` (blake2b-128 `56e8c611c01e0ef9b7ae32db97b0e334`, registered on master at `5f04a5c`, unchanged); S0 results are in `docs/reports/SLOT-LOOP-v1.md`.
-**Status: S0 complete, decision R2; preflight, lock, S0, frozen analysis and artifact verification passed.** S1A is unstarted and waits for the orchestrator. Reviewed src unchanged; no sealed S1A data opened. Review rounds are closed; the two S1A follow-ups are deferred. Written stage caps are superseded by the 16 node·h per-job cap. Earlier test/review entries below are historical.
+**Status: S0 accepted (R2); S1A follow-ups, smoke, pilot and release preparation authorized.** Stop after the ready release is committed for approval.json. No training or sealed evaluation is authorized before the later gates. No src changes; the preflight source binding remains valid.
 
 ## What the code does
 New files only, except four typed-dispatch edits (below). Every new option is off in the old paths.
@@ -77,7 +77,7 @@ Cumulative against the S0 cap of 1.0 node·h: 0.503 used, 0.497 left for the pre
 2. **Matrix read error in S0 uses the SQ2 report's einsum form** (`read_fix.question_terms`, `bij,bqj->bqi`), so the old-range replay reproduces 0.19612866640090942 exactly. The deployed per-token read is a matmul; the preflight checks that the Matrix backend's logits equal Native's bitwise, which is the claim that matters for training and decoding. A bitwise difference between the two forms in the diagnostic alone would not change any logit.
 3. **Stage configs are JSON** (`configs/slot_loop_v1/s0.json`, `s1a.json`), written by `scripts/prepare_slot_manifest.py --write-configs` from `slot_rules.stage_config`, and refused by the runner and by the manifest script when they differ from it. The repository's other studies use YAML for run configs; these are frozen renderings of registered values, not editable inputs.
 4. **Support under `torch.no_grad()` in S1A training.** The writer is frozen, so the support keys, values and matrix are constants of a step; no gradient reaches the trainable set Q, R, U, B through the write path (A is frozen and shared). Check (iv) confirms that Q, R, U, B have finite non-zero gradients and the frozen tensors have none, after the first backward.
-5. **Sealed sets.** The confirmation and unseen-name sets are defined by their own base seeds in `slot_data.py` alone (a source scan test requires that no other file under `src/`, `scripts/`, `tests/`, `configs/` contains them); `slot_data.eval_set` refuses them without the `OpenToken` that `load_open_token` builds from the orchestrator's `reports/slot-loop-v1/s1a-open.json` (registered prereg digest, the frozen analysis script's digest, six selected checkpoints). `slot_run.evaluate_entries` evaluates a sealed set only for a checkpoint digest the token names and prints counts and digests, never metrics. The old `CONFIRMATION_WINDOWS` are pinned by a test and not extended.
+5. **Sealed sets.** The confirmation and unseen-name sets are defined by their own base seeds in `slot_data.py` alone (a source scan test requires that no other file under `src/`, `scripts/`, `tests/`, `configs/` contains them); `slot_data.eval_set` refuses them without the `OpenToken` that `load_open_token` builds from the orchestrator's `reports/slot-loop-v1/s1a-open.json` (registered prereg digest, analysis script digest equal to the ready release and file, six selected checkpoints, plus locked reference digest/read configs). `slot_run.evaluate_entries` evaluates a sealed set only for a checkpoint digest the token names and prints counts and digests, never metrics. The old `CONFIRMATION_WINDOWS` are pinned by a test and not extended.
 6. **Locked manifest.** Every science mode refuses without `manifest.lock.json`: registry and episode-id disjointness re-derived and equal to the lock's, the real parents' file digests equal to the lock's inventory, and a passed preflight. `prepare_slot_manifest.py` writes the lock only from a preflight report whose required checks all passed, on the files and configuration now on disk.
 7. **Matrix against Native is a stop, not a warning.** `matrix_equals_native` is a required preflight check with the maximum absolute logit difference in the report; `prepare_slot_manifest.py` refuses a lock without it (decision 5).
 8. **Fix container and buffers.** The WP-L3 fix container (`_WriterFix`) loads its initial adapter's state dict before it registers `input_mean` and `input_std`; `SlotFixAdapter` therefore builds from a view of the loaded adapter without the two buffers and then loads the complete state dict strictly, so weights and buffers equal the loaded S-RE's exactly.
@@ -120,6 +120,7 @@ The orchestrator writes the following JSON at `ABS_ROOT/reports/slot-loop-v1/s1a
 {
   "prereg_blake2b_128": "56e8c611c01e0ef9b7ae32db97b0e334",
   "analysis_script_blake2b_128": "<32 lowercase hex digits frozen in the release>",
+  "release_blake2b_128": "<blake2b-128 of the exact ready-release file>",
   "selected_checkpoints": {
     "matrix_L1/17": "<digest>", "matrix_L1/29": "<digest>", "matrix_L1/43": "<digest>",
     "soft_slot_L1/17": "<digest>", "soft_slot_L1/29": "<digest>", "soft_slot_L1/43": "<digest>"
@@ -128,10 +129,78 @@ The orchestrator writes the following JSON at `ABS_ROOT/reports/slot-loop-v1/s1a
 ```
 `load_open_token(ABS_ROOT, lock["inventory"], ready_release)` also admits the S-RE `writer.pt` digest from the already checked locked inventory; no seventh digest is needed in the open record. Saved-run evaluation entries are `{label, export: ABS_PATH, checkpoint_blake2b_128}`. Reference entries are `{label, parent_writer_blake2b_128, read}`: `s_re_native` uses `read: null`; `matrix_step0` and `soft_step0` use the calibrated arm read configs from the release, all with the locked S-RE writer digest. Each evaluated set requires all six main labels (`<arm>_s<seed>`) and these three references.
 
-### S1A release and reload runbook (after S0 and orchestrator approval)
-Use `/work/xg24i002/x10041/LoopLora/.venv/bin/python scripts/prepare_slot_release.py --help` for the metadata builder. It writes a candidate release (`pending_reload`) from the locked manifest, S0 metrics, pilot, smoke and full science commit; repeat with both arm reload reports to obtain `ready`. Candidate preparation is reversible metadata work. Never train from `pending_reload`.
-The release carries `science_commit`, `prereg_blake2b_128`, `analysis_script_blake2b_128`, manifest/inventory digests, `steps`, `walltime_seconds`, `parent.writer_blake2b_128`, per-arm `arms.<arm>.{read,lr}`, six main config hashes `<arm>/<seed>` plus two `<arm>/17/ablation` hashes, per-arm freeze and reload checks, and `smoke_configs` (the exact smoke-export slot metadata). Builder checks registered calibration/LR/timing choices and consistency before writing.
-Smoke reports include each selected export's `export_config`. For each arm run reload-check through `scripts/submit.py --commit C -- -m looplora.llm.slot_run --mode reload-check --manifest LOCK --release CANDIDATE --export R/smoke/ARM/selected.pt --predictions R/smoke/ARM/smoke_predictions.npz --out R/reload-ARM.json`. Reload must reproduce episode ids/predictions/correctness/NLL and match the candidate's exact slot config and calibrated read; its report records the export digest. Final builder validation consumes both reports, then STOP for `approval.json` as before. These are future commands; this round executes none of them.
+### S1A execution runbook (current preparation; later commands remain gated)
+Resolve the full tested head once before the smoke. Freeze the analysis script through the release. All artifacts use persistent absolute paths; fresh outputs must not already exist. The shared parent/inventory and source-bound lock are reused unchanged.
+
+```bash
+R=/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1
+W=/work/xg24i002/x10041/LoopLora-wt/slot
+cd "$W"
+SCIENCE_COMMIT="$(git rev-parse HEAD)"
+OPEN_ROOT="$R/open-root"
+cp "$W/reports/slot-loop-v1/manifest.lock.json" "$R/manifest.lock.json"
+cp "$W/configs/slot_loop_v1/s1a.json" "$R/s1a.json"
+mkdir -p "$OPEN_ROOT/docs/prereg" "$OPEN_ROOT/scripts" "$OPEN_ROOT/reports/slot-loop-v1"
+cp "$W/docs/prereg/SLOT-LOOP-v1.md" "$OPEN_ROOT/docs/prereg/SLOT-LOOP-v1.md"
+cp "$W/scripts/analyze_slot_study.py" "$OPEN_ROOT/scripts/analyze_slot_study.py"
+scripts/submit.py --name slot-s1a-smoke --queue debug-g --walltime 00:02:00 --commit "$SCIENCE_COMMIT" -- -m looplora.llm.slot_run --mode smoke --config "$R/s1a.json" --manifest "$R/manifest.lock.json" --s0-metrics "$R/s0/metrics.json" --out "$R/s1a-smoke"
+```
+
+Wait for the orchestrator watcher, then verify both 20-step arms, all frozen/support/gradient checks, finite losses/norms, selected exports and smoke predictions. Derive pilot walltime from the larger measured per-step time and 1,000-episode evaluation timing (the S0/preflight measurements supply the initial evaluation estimate); include all six 200-step candidates and load/setup with a 1.5 margin. The initial pilot request below is 10 minutes; update it to the measured estimate if needed, keeping debug-g at most 30 minutes.
+
+```bash
+scripts/submit.py --name slot-s1a-pilot --queue debug-g --walltime 00:10:00 --commit "$SCIENCE_COMMIT" -- -m looplora.llm.slot_run --mode pilot --config "$R/s1a.json" --manifest "$R/manifest.lock.json" --s0-metrics "$R/s0/metrics.json" --out "$R/s1a-pilot"
+```
+
+After completion, inspect all candidates, exclusion records, LR selection, S/Ev/Ld, N and walltime. A registered STOP remains a STOP; do not silently alter N/LR. Build a candidate, wait for its self-checks, then reload each arm against that persisted JSON.
+
+```bash
+scripts/submit.py --name slot-s1a-cand --queue debug-g --walltime 00:01:00 --commit "$SCIENCE_COMMIT" -- scripts/prepare_slot_release.py --manifest "$R/manifest.lock.json" --pilot "$R/s1a-pilot/pilot.json" --s0-metrics "$R/s0/metrics.json" --smoke "$R/s1a-smoke/smoke.json" --science-commit "$SCIENCE_COMMIT" --out "$R/s1a-candidate.json"
+for arm in matrix_L1 soft_slot_L1; do
+  scripts/submit.py --name "slot-reload-$arm" --queue debug-g --walltime 00:01:00 --commit "$SCIENCE_COMMIT" -- -m looplora.llm.slot_run --mode reload-check --manifest "$R/manifest.lock.json" --release "$R/s1a-candidate.json" --export "$R/s1a-smoke/$arm/selected.pt" --predictions "$R/s1a-smoke/$arm/smoke_predictions.npz" --out "$R/reload-$arm.json"
+done
+```
+
+After both reports pass exact config and prediction checks, create the ready release. Copy the candidate/final release, pilot/smoke summaries and reload reports into reports/slot-loop-v1, commit on wp/slot and STOP: release with the full commit. Do not train before approval.json.
+
+```bash
+scripts/submit.py --name slot-s1a-release --queue debug-g --walltime 00:01:00 --commit "$SCIENCE_COMMIT" -- scripts/prepare_slot_release.py --manifest "$R/manifest.lock.json" --pilot "$R/s1a-pilot/pilot.json" --s0-metrics "$R/s0/metrics.json" --smoke "$R/s1a-smoke/smoke.json" --science-commit "$SCIENCE_COMMIT" --reload-check "matrix_L1=$R/reload-matrix_L1.json" --reload-check "soft_slot_L1=$R/reload-soft_slot_L1.json" --out "$R/s1a-release.json"
+```
+
+The following complete commands are for later, after approval and the registered gates. The ready release fixes science_commit; continue using that exact resolved commit, even if docs/release artifacts were committed afterward. TRAIN_WALLTIME and TRAIN_QUEUE come from measured walltime in the ready release. The orchestrator's approval.json is required before this loop; at most six jobs are active.
+
+```bash
+SCIENCE_COMMIT="$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["science_commit"])' "$R/s1a-release.json")"
+TRAIN_WALLTIME="$(python3 -c 'import json,sys; s=json.load(open(sys.argv[1]))["walltime_seconds"]; print(f"{s//3600:02d}:{s//60%60:02d}:{s%60:02d}")' "$R/s1a-release.json")"
+TRAIN_QUEUE="$(python3 -c 'import json,sys; print("debug-g" if json.load(open(sys.argv[1]))["walltime_seconds"]<=1800 else "regular-g")' "$R/s1a-release.json")"
+for arm in matrix_L1 soft_slot_L1; do
+  for seed in 17 29 43; do
+    scripts/submit.py --name "slot-$arm-s$seed" --queue "$TRAIN_QUEUE" --walltime "$TRAIN_WALLTIME" --commit "$SCIENCE_COMMIT" -- -m looplora.llm.slot_run --mode train --config "$R/s1a.json" --manifest "$R/manifest.lock.json" --release "$R/s1a-release.json" --arm "$arm" --seed "$seed" --out "$R/s1a/$arm/s$seed"
+  done
+done
+```
+
+After the six jobs finish and records are checked, run dev selection. It must show one shared release_blake2b_128. If the registered stable-dev trigger requests the one interface ablation, use the two seed-17 ablation hashes already in this same release, wait for both runs, then analyze them. Otherwise skip the ablation commands. Do not open confirmation yet.
+
+```bash
+scripts/submit.py --name slot-s1a-dev --queue debug-g --walltime 00:01:00 --commit "$SCIENCE_COMMIT" -- scripts/analyze_slot_study.py --stage S1A-DEV --manifest "$R/manifest.lock.json" --records "$R/s1a" --out "$R/s1a-selection"
+for arm in matrix_L1 soft_slot_L1; do
+  scripts/submit.py --name "slot-abl-$arm" --queue "$TRAIN_QUEUE" --walltime "$TRAIN_WALLTIME" --commit "$SCIENCE_COMMIT" -- -m looplora.llm.slot_run --mode train --config "$R/s1a.json" --manifest "$R/manifest.lock.json" --release "$R/s1a-release.json" --arm "$arm" --seed 17 --ablation --out "$R/s1a/ablation/$arm/s17"
+done
+scripts/submit.py --name slot-s1a-abl --queue debug-g --walltime 00:01:00 --commit "$SCIENCE_COMMIT" -- scripts/analyze_slot_study.py --stage S1A-ABL --manifest "$R/manifest.lock.json" --records "$R/s1a" --out "$R/s1a-ablation"
+```
+
+STOP: S1A selected after registered dev/ablation selection. The independent reviewer re-runs the frozen dev analysis. The orchestrator verifies the ready release's file digest against all six training records before writing the opening record at $OPEN_ROOT/reports/slot-loop-v1/s1a-open.json. It includes release_blake2b_128, the frozen script digest, registered prereg digest and selected arm/seed checkpoint map. Prepare $R/s1a-entries.json with the six selected exports and three registered references, each label once, with absolute export paths. Only after that opening authorization run sealed evaluation; unseen is optional, confirmation required.
+
+```bash
+for set_name in confirmation unseen; do
+  scripts/submit.py --name "slot-eval-$set_name" --queue debug-g --walltime 00:05:00 --commit "$SCIENCE_COMMIT" -- -m looplora.llm.slot_run --mode evaluate --manifest "$R/manifest.lock.json" --release "$R/s1a-release.json" --set "$set_name" --entries "$R/s1a-entries.json" --open-root "$OPEN_ROOT" --out "$R/s1a-evaluation/$set_name"
+done
+scripts/submit.py --name slot-s1a-analysis --queue debug-g --walltime 00:01:00 --commit "$SCIENCE_COMMIT" -- scripts/analyze_slot_study.py --stage S1A --manifest "$R/manifest.lock.json" --open-record "$OPEN_ROOT/reports/slot-loop-v1/s1a-open.json" --release "$R/s1a-release.json" --records "$R/s1a-evaluation" --out "$R/s1a-summary"
+```
+
+Inspect all outputs and account node·h before each gate. Copy persistent summary/selection/release artifacts into the repository before each required stop. The optional common-fixed-LR comparison has no release entry and is not authorized by these commands.
+
 
 
 ### Review-round-1 validation ledger
@@ -158,7 +227,7 @@ RED regression snapshot `29b171a8229be723744e901dcaa09201fc56f345` contains test
 Round-2 changes validated on compute:
 1. `save_export` serializes the complete slot metadata into a JSON-shaped value before torch persistence; reload equality remains strict. New integration regression uses a one-layer synthetic backbone with the registered adapter dimensions, runs the real 20-step smoke per arm, reads smoke.json, invokes the release builder, reads its JSON candidate and invokes the reload CLI. Parent weights and all data remain synthetic/ordinary smoke; no real preflight is run.
 2. `OpenToken` preserves the exact six selected arm/seed digests and the locked reference digest, plus the reference reads from the ready release. Sealed `evaluate_entries` requires exactly six main labels and the three reference labels, each once. Main digest/export metadata/read must match its label and released arm; references use only the locked parent digest and their specified reads. NPZ files add scalar Unicode `checkpoint_blake2b_128` and scalar Unicode `read` (JSON, null for Native). Confirmation analysis refuses mismatched provenance and retains validated identity/read in summary rows.
-3. Sealed evaluation now requires `--release READY_JSON`. The token requires open-record analysis digest = ready-release digest = script file under the absolute opening root. Stage S1A requires `--open-record ABS_JSON --release ABS_READY_JSON` and checks its own script digest against both, also recording those inputs in source_index. Earlier analysis stages do not accept these S1A-only flags. Example future analysis argv (submitted through submit.py): `-- scripts/analyze_slot_study.py --stage S1A --manifest ABS_LOCK --open-record ABS_OPEN --release ABS_READY --records ABS_EVAL --out ABS_SUMMARY`.
+3. Sealed evaluation now requires `--release READY_JSON`. The token requires open-record analysis digest = ready-release digest = script file under the absolute opening root. Stage S1A requires `--open-record ABS_JSON --release ABS_READY_JSON` and checks its own script digest against both, also recording those inputs in source_index. Earlier analysis stages do not accept these S1A-only flags. The complete parser-checked S1A command is in the execution runbook above.
 4. Runbook steps 1–4 above now resolve full reviewed/post-lock commit variables separately, use persistent absolute artifact paths, submit analysis without a second interpreter, and copy decision files into the worktree after completion.
 No registered numerical rule changed. The optional common-fixed-LR run remains unregistered in the release; if later requested, it first needs a release entry. The D-F4 seal remains a workflow guard. All src edits in this round occur before the first real preflight, as required by source binding.
 
@@ -216,3 +285,7 @@ Frozen analysis job 3728547.opbs completed on mg0022, 22:19:28–22:19:34 JST (6
 | 3728547.opbs | analysis | 6 | 0.001667 | R2, artifacts verified |
 
 Execution total 277 / 3,600 = 0.076944 node·h. Cumulative including tests/retries: inherited 0.503 + (420 + 294 + 277) / 3,600 = 0.778278 node·h. Written caps no longer bind; every job is below 16 node·h. No src changes or sealed S1A data access. Next: STOP: S0 done and await the orchestrator. Before S1A, complete the two Review round 3 analysis/runbook follow-ups without src changes or another review round.
+
+
+## S1A follow-ups and release preparation
+S0 accepted by the orchestrator. Step 3 authorized through the release stop; no new review round. RED snapshot e6c98b69fbc6a813afdafac51536397a45e7905f, job 3728718.opbs (one node, debug-g, requested 00:01:00), runs the rebuilt-release, mismatched-record-release and complete-runbook-parser regressions before fixes. Log: /work/xg24i002/x10041/LoopLora/logs/pbs/slot-s1a-red-20261029-222707-3411194.log. Result/node·h pending watcher notification. Production changes are analysis-only: shared training-record release digest and exact ready-release-file digest binding. The open-record token still checks script=release=file, while the orchestrator checks its release digest against all six records before opening, per task Review round 3. All S1A submission commands now include complete submit/target argv and persistent paths. The old round-2 step-1 RED was a command-extraction artifact; the improved extraction test selects the submission itself.

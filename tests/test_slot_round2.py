@@ -145,7 +145,9 @@ def test_round2_runbook_uses_persistent_paths_and_the_right_snapshot(step):
     import shlex
     state = (ROOT / 'docs/reports/SLOT-LOOP-v1-state.md').read_text()
     line = next(line for line in state.splitlines() if line.startswith(f'  {step}. '))
-    command = line.split('`')[1]
+    import re
+    command = next(span for span in re.findall(r'`([^`]+)`', line)
+                   if span.startswith(('scripts/submit.py ', '/work/xg24i002/x10041/LoopLora/.venv/bin/python ')))
     argv = shlex.split(command)
     if step == 2:
         assert argv[:2] == ['/work/xg24i002/x10041/LoopLora/.venv/bin/python', 'scripts/prepare_slot_manifest.py']

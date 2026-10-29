@@ -584,9 +584,24 @@ def test_round3_release_binding_refuses_six_training_records_with_one_other_rele
     refused('the six records differ in release_blake2b_128', '--stage', 'S1A-DEV', '--records', root, '--out', tmp_path / 'out')
 
 
+@pytest.mark.parametrize('value', [None, '', '0' * 31, '0' * 33, 'A' * 32, 'g' * 32])
+def test_dev_requires_each_training_release_digest_to_be_valid_lowercase_hex(tmp_path, value):
+    root = dev_tree(tmp_path / 'dev', mutate=lambda arm, seed, record: record.update(release_blake2b_128=value))
+    refused('release_blake2b_128 is not 32 lowercase hex digits', '--stage', 'S1A-DEV', '--records', root, '--out', tmp_path / 'out')
+
+
+def test_dev_requires_each_training_record_to_name_its_release(tmp_path):
+    def omit_release(arm, seed, record):
+        if (arm, seed) == ('soft_slot_L1', 43):
+            record.pop('release_blake2b_128')
+    root = dev_tree(tmp_path / 'dev', mutate=omit_release)
+    refused("lacks 'release_blake2b_128'", '--stage', 'S1A-DEV', '--records', root, '--out', tmp_path / 'out')
+
+
 def test_dev_trigger_boundary_is_exact_integer_arithmetic(tmp_path):
     d = run_dev(tmp_path, soft_extra=(30, 30, 30))          # sum of count differences 90: 90 * 100 == 9 * 1000, not below
     assert d['outcome'] == 'no_trigger' and d['differences']['sum_d_correct'] == 90 and d['differences']['mean_pp'] == 3.0
+    assert d['release_blake2b_128'] == blake(b'synthetic ready release')
     d = run_dev(tmp_path, out='b', soft_extra=(30, 30, 29))
     assert d['outcome'] == 'ablation' and d['differences']['sum_d_correct'] == 89 and d['reasons'] == []
     assert d['differences']['per_seed']['43'] == dict(d_correct=29, pp=2.9)
@@ -996,6 +1011,24 @@ def test_round3_release_binding_refuses_rebuilt_ready_release_even_with_matching
     manifest = json.loads((root / 'manifest.lock.json').read_text())
     with pytest.raises(SystemExit, match='refused: .*release.*digest.*open record'):
         slot.stage_s1a(src, manifest)
+
+
+@pytest.mark.parametrize('change', ['missing_open_digest', 'whitespace'])
+def test_s1a_release_binding_requires_the_exact_bytes_named_by_the_open_record(tmp_path, change):
+    root = tmp_path / 'tree'
+    s1a_tree(root, 400, ADVANCE)
+    if change == 'missing_open_digest':
+        path = root / 's1a-open.json'
+        opened = json.loads(path.read_text())
+        del opened['release_blake2b_128']
+        path.write_text(json.dumps(opened))
+    else:
+        path = root / 's1a-release.json'
+        original = path.read_text()
+        path.write_text(original + '\n')
+        assert json.loads(path.read_text()) == json.loads(original)
+    with pytest.raises(SystemExit, match='refused: .*release.*digest.*open record'):
+        direct_s1a(root)
 
 
 @pytest.mark.parametrize('bad', ['missing_key', 'duplicate_digest', 'reference_digest', 'prereg', 'pending', 'open_script'])
