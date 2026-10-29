@@ -1,0 +1,180 @@
+{
+ "bootstrap_seed": 2079281455337892545,
+ "calibration": {
+  "choice": "lowest NLL; ties: gain nearest 1 by |g - 1|, then the larger tau",
+  "grid": [
+   {
+    "gain": 0.5,
+    "kind": "matrix",
+    "tau": null
+   },
+   {
+    "gain": 1.0,
+    "kind": "matrix",
+    "tau": null
+   },
+   {
+    "gain": 2.0,
+    "kind": "matrix",
+    "tau": null
+   },
+   {
+    "gain": 0.5,
+    "kind": "soft",
+    "tau": 0.03
+   },
+   {
+    "gain": 1.0,
+    "kind": "soft",
+    "tau": 0.03
+   },
+   {
+    "gain": 2.0,
+    "kind": "soft",
+    "tau": 0.03
+   },
+   {
+    "gain": 0.5,
+    "kind": "soft",
+    "tau": 0.1
+   },
+   {
+    "gain": 1.0,
+    "kind": "soft",
+    "tau": 0.1
+   },
+   {
+    "gain": 2.0,
+    "kind": "soft",
+    "tau": 0.1
+   },
+   {
+    "gain": 0.5,
+    "kind": "soft",
+    "tau": 0.3
+   },
+   {
+    "gain": 1.0,
+    "kind": "soft",
+    "tau": 0.3
+   },
+   {
+    "gain": 2.0,
+    "kind": "soft",
+    "tau": 0.3
+   },
+   {
+    "gain": 0.5,
+    "kind": "soft",
+    "tau": 1.0
+   },
+   {
+    "gain": 1.0,
+    "kind": "soft",
+    "tau": 1.0
+   },
+   {
+    "gain": 2.0,
+    "kind": "soft",
+    "tau": 1.0
+   },
+   {
+    "gain": 0.5,
+    "kind": "hard",
+    "tau": null
+   },
+   {
+    "gain": 1.0,
+    "kind": "hard",
+    "tau": null
+   },
+   {
+    "gain": 2.0,
+    "kind": "hard",
+    "tau": null
+   }
+  ],
+  "tie_nats": 0.0001
+ },
+ "capacity": 16,
+ "chunk": 16,
+ "conditions": [
+  "native",
+  "matrix_uncal",
+  "matrix_cal",
+  "soft_uncal",
+  "soft_cal",
+  "hard_uncal",
+  "hard_cal",
+  "soft_rec_uncal",
+  "soft_rec_cal",
+  "clean_final"
+ ],
+ "decision": {
+  "em_threshold_pp": 5.0,
+  "rule": "(c_a - c_b) * 20 >= n and lower mean read error"
+ },
+ "layout_digest": "b7f93c1ca56e5dd1f79a9dccfe2f6054",
+ "loop_steps": 1,
+ "parent": {
+  "files": [
+   "writer.pt",
+   "checkpoint.pt"
+  ],
+  "name": "S-RE"
+ },
+ "prereg": "docs/prereg/SLOT-LOOP-v1.md",
+ "prereg_blake2b_128": "56e8c611c01e0ef9b7ae32db97b0e334",
+ "recheck": {
+  "files": [
+   "writer.pt",
+   "checkpoint.pt"
+  ],
+  "name": "D128-3"
+ },
+ "scopes": {
+  "diagnostic": "final_only",
+  "primary": "all_valid_question"
+ },
+ "sets": {
+  "calibration": {
+   "base_seed": 7872142726734868149,
+   "count": 2048,
+   "split": "val",
+   "start": 0
+  },
+  "dev": {
+   "base_seed": 4206094924762162946,
+   "count": 1000,
+   "split": "val",
+   "start": 0
+  },
+  "smoke": {
+   "base_seed": 8726904610828922277,
+   "count": 64,
+   "split": "train",
+   "start": 0
+  }
+ },
+ "stage": "S0",
+ "study": "slot-loop-v1",
+ "task": {
+  "E": 16,
+  "Q": 4,
+  "V": 1024,
+  "head_sharing": 0.3,
+  "hops": [
+   1
+  ],
+  "n_rel": 4,
+  "name": "t1",
+  "seen": [
+   0,
+   768
+  ],
+  "unseen": [
+   768,
+   1024
+  ]
+ }
+}

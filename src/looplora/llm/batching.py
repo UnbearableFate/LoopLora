@@ -6,6 +6,7 @@ from dataclasses import dataclass, fields
 import torch
 from torch import Tensor
 
+from looplora.core.memory_backend import MemoryRead
 from looplora.data.relations import EpisodeArrays
 from looplora.data.render import NamePool, load_name_pool, render_episodes
 from .protocols import SupportSnapshot
@@ -102,7 +103,8 @@ def repeat_snapshot(snapshot: SupportSnapshot, queries: int) -> SupportSnapshot:
     """Episode-major B,Q flattening; retain the support autograd graph."""
     if queries < 1:
         raise ValueError("queries must be positive")
-    states = {layer: state.repeat_interleave(queries, dim=0)
+    # A MemoryRead (slot or explicit matrix backend) only repeats its owner map; a tensor state is copied as always.
+    states = {layer: state.expand(queries) if isinstance(state, MemoryRead) else state.repeat_interleave(queries, dim=0)
               for layer, state in snapshot.states.items()}
     cache = None if snapshot.past_key_values is None else tuple(
         (key.repeat_interleave(queries, dim=0), value.repeat_interleave(queries, dim=0))

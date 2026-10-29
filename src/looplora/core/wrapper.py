@@ -8,6 +8,7 @@ import torch
 from torch import Tensor, nn
 
 from .adapters import AdapterBase
+from .memory_backend import MemoryRead
 
 
 @dataclass
@@ -19,7 +20,7 @@ class MemoryContext:
     retains its dtype. Fork states explicitly for independent questions/depths.
     """
 
-    state: Tensor | None = None
+    state: Tensor | MemoryRead | None = None
     loop_steps: int = 1
     valid: Tensor | None = None
     write: Tensor | None = None

@@ -1,0 +1,13 @@
+{
+  "inputs": {
+    "/work/xg24i002/x10041/LoopLora-wt/slot/reports/slot-loop-v1/manifest.lock.json": "5af7a9872827630280fa34218ffabde6",
+    "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/preflight/preflight.json": "dc44d4df45d49d7c37abef247454a025",
+    "metrics.json": "e2c3c8d15ff4c8ebbadeda48cc9b4db9",
+    "samples.npz": "99cd12483ecdbfc34f6766d3da5bc882"
+  },
+  "manifest": "/work/xg24i002/x10041/LoopLora-wt/slot/reports/slot-loop-v1/manifest.lock.json",
+  "manifest_blake2b_128": "5af7a9872827630280fa34218ffabde6",
+  "script": "analyze_slot_study.py",
+  "script_blake2b_128": "b7eda1b606c809e244cfa1e127a2ea1c",
+  "stage": "S0"
+}

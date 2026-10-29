@@ -1,0 +1,163 @@
+{
+ "candidates": [
+  {
+   "correct": 1374,
+   "gain": 0.5,
+   "kind": "matrix",
+   "nll": 1.8757342325853585,
+   "seconds": 6.253904355078703,
+   "tau": null
+  },
+  {
+   "correct": 1448,
+   "gain": 1.0,
+   "kind": "matrix",
+   "nll": 1.6909761705009387,
+   "seconds": 5.972431636037072,
+   "tau": null
+  },
+  {
+   "correct": 1418,
+   "gain": 2.0,
+   "kind": "matrix",
+   "nll": 1.7667318049634702,
+   "seconds": 5.972187354127527,
+   "tau": null
+  },
+  {
+   "correct": 1615,
+   "gain": 0.5,
+   "kind": "soft",
+   "nll": 1.8337329213476252,
+   "seconds": 6.536750947023393,
+   "tau": 0.03
+  },
+  {
+   "correct": 1624,
+   "gain": 1.0,
+   "kind": "soft",
+   "nll": 1.8230990227393384,
+   "seconds": 6.522919770039152,
+   "tau": 0.03
+  },
+  {
+   "correct": 1579,
+   "gain": 2.0,
+   "kind": "soft",
+   "nll": 1.9156404466203156,
+   "seconds": 6.501021715026582,
+   "tau": 0.03
+  },
+  {
+   "correct": 1539,
+   "gain": 0.5,
+   "kind": "soft",
+   "nll": 1.5553333288991666,
+   "seconds": 6.489789093044237,
+   "tau": 0.1
+  },
+  {
+   "correct": 1564,
+   "gain": 1.0,
+   "kind": "soft",
+   "nll": 1.515452040645826,
+   "seconds": 6.46046131500043,
+   "tau": 0.1
+  },
+  {
+   "correct": 1491,
+   "gain": 2.0,
+   "kind": "soft",
+   "nll": 1.64986524375486,
+   "seconds": 6.518772194976918,
+   "tau": 0.1
+  },
+  {
+   "correct": 679,
+   "gain": 0.5,
+   "kind": "soft",
+   "nll": 3.774785309177787,
+   "seconds": 6.505472135002492,
+   "tau": 0.3
+  },
+  {
+   "correct": 732,
+   "gain": 1.0,
+   "kind": "soft",
+   "nll": 3.4391751433472564,
+   "seconds": 6.445524101072806,
+   "tau": 0.3
+  },
+  {
+   "correct": 610,
+   "gain": 2.0,
+   "kind": "soft",
+   "nll": 3.6863098025387444,
+   "seconds": 6.4964737389818765,
+   "tau": 0.3
+  },
+  {
+   "correct": 28,
+   "gain": 0.5,
+   "kind": "soft",
+   "nll": 6.798727189889178,
+   "seconds": 6.471549022986437,
+   "tau": 1.0
+  },
+  {
+   "correct": 48,
+   "gain": 1.0,
+   "kind": "soft",
+   "nll": 6.637938260799274,
+   "seconds": 6.441733047016896,
+   "tau": 1.0
+  },
+  {
+   "correct": 50,
+   "gain": 2.0,
+   "kind": "soft",
+   "nll": 7.025215378787834,
+   "seconds": 6.473339625139488,
+   "tau": 1.0
+  },
+  {
+   "correct": 1595,
+   "gain": 0.5,
+   "kind": "hard",
+   "nll": 2.3380636333272307,
+   "seconds": 6.641995816011331,
+   "tau": null
+  },
+  {
+   "correct": 1623,
+   "gain": 1.0,
+   "kind": "hard",
+   "nll": 2.3101403258391784,
+   "seconds": 6.620067191979615,
+   "tau": null
+  },
+  {
+   "correct": 1601,
+   "gain": 2.0,
+   "kind": "hard",
+   "nll": 2.411094188827267,
+   "seconds": 6.639397070961422,
+   "tau": null
+  }
+ ],
+ "ids_blake2b_128": "46d5f8d4e039c279b4625e8692143311",
+ "n": 2048,
+ "prepare_seconds": 8.154303211034858,
+ "selected": {
+  "hard": {
+   "gain": 1.0
+  },
+  "matrix": {
+   "gain": 1.0
+  },
+  "soft": {
+   "gain": 1.0,
+   "tau": 0.1
+  }
+ }
+}

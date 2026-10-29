@@ -1,0 +1,38 @@
+{
+ "analysis_job": "3728547.opbs",
+ "files": {
+  "calibration.json": {
+   "blake2b_128": "f8821fd6b260a3eeacc294d3c0c8fd2a",
+   "bytes": 2797
+  },
+  "d128_3_samples.npz": {
+   "blake2b_128": "ceb4df84305032856cb025469f8bc180",
+   "bytes": 122936
+  },
+  "decision_s0.json": {
+   "blake2b_128": "39df8317a83aafa0e8151f62cdf55655",
+   "bytes": 18692
+  },
+  "decision_s0.md": {
+   "blake2b_128": "56624c5f09e33a1a76ac669c493d51e2",
+   "bytes": 5969
+  },
+  "metrics.json": {
+   "blake2b_128": "e2c3c8d15ff4c8ebbadeda48cc9b4db9",
+   "bytes": 12355
+  },
+  "samples.npz": {
+   "blake2b_128": "99cd12483ecdbfc34f6766d3da5bc882",
+   "bytes": 418345
+  },
+  "source_index.json": {
+   "blake2b_128": "69949a17696255f6d836b8a789439373",
+   "bytes": 643
+  }
+ },
+ "preflight_job": "3728339.opbs",
+ "run_job": "3728354.opbs",
+ "source_commit": "2f22aba2f6e93029198d1126ede2b9528cd3eef4",
+ "stage": "S0",
+ "version": 1
+}

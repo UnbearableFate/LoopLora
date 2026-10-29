@@ -1,0 +1,45 @@
+{
+ "parents": {
+  "D128-3": {
+   "files": {
+    "checkpoint.pt": "b6acff8b772a692311e630293add553f",
+    "record.json": "bbe6a76f05cfc146c655279d77743381",
+    "training.json": "fb7ec770b0dd427abfe5f2e74c08a070",
+    "val-22370/samples.npz": "292fb80308d5ecfe59fe7c25bc52d2b1",
+    "writer.pt": "31d98c01c604c05a54bc20e4b4c4f436"
+   },
+   "format": "read_fix_version 1 inference export",
+   "loader": "looplora.llm.dpfp_run.load_inference",
+   "old_range_replay": {
+    "correct": 608,
+    "loss_float32": 2.1291537284851074,
+    "relative_read_error": 0.36268818378448486
+   },
+   "registered": {
+    "checkpoint.pt": "b6acff8b772a692311e630293add553f",
+    "writer.pt": "31d98c01c604c05a54bc20e4b4c4f436"
+   },
+   "role": "S0 delta-store recheck"
+  },
+  "S-RE": {
+   "files": {
+    "checkpoint.pt": "455bf733b9acccc7a38cfd51aa8a1ede",
+    "record.json": "816570a0882ed6952b4f851b67d4ef9f",
+    "training.json": "b918151ab8fa5c7d03ab9e767954cd4a",
+    "val-6000/samples.npz": "1bd24adac61f0ce147a159fac30bf56b",
+    "writer.pt": "3994a5631021de03b2039974ac934e56"
+   },
+   "format": "read_fix_version 1 inference export (adapter, signature, config)",
+   "loader": "looplora.llm.sq2.load_inference",
+   "old_range_replay": {
+    "correct": 723,
+    "loss_float32": 1.642127275466919,
+    "relative_read_error": 0.19612866640090942
+   },
+   "registered": "no: first digests recorded by this study (job SQ2 3724486.opbs wrote them)",
+   "role": "S0 parent; both S1A arms start from its writer.pt"
+  }
+ },
+ "study": "slot-loop-v1",
+ "version": 1
+}

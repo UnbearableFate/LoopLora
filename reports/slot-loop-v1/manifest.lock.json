@@ -1,0 +1,225 @@
+{
+ "config_hashes": {
+  "S0": "acb7adfe0416aa8ceadb6cf8b4a3becd",
+  "S1A": "ebc66636a015c59d0eedbf57c01ffe83"
+ },
+ "inventory": {
+  "D128-3": {
+   "checkpoint.pt": "b6acff8b772a692311e630293add553f",
+   "record.json": "bbe6a76f05cfc146c655279d77743381",
+   "training.json": "fb7ec770b0dd427abfe5f2e74c08a070",
+   "val-22370/samples.npz": "292fb80308d5ecfe59fe7c25bc52d2b1",
+   "writer.pt": "31d98c01c604c05a54bc20e4b4c4f436"
+  },
+  "S-RE": {
+   "checkpoint.pt": "455bf733b9acccc7a38cfd51aa8a1ede",
+   "record.json": "816570a0882ed6952b4f851b67d4ef9f",
+   "training.json": "b918151ab8fa5c7d03ab9e767954cd4a",
+   "val-6000/samples.npz": "1bd24adac61f0ce147a159fac30bf56b",
+   "writer.pt": "3994a5631021de03b2039974ac934e56"
+  }
+ },
+ "manifest": {
+  "base_seed": 20261029,
+  "batch": 32,
+  "bootstrap": {
+   "S0": 2079281455337892545,
+   "S1A": 9056755664197379988
+  },
+  "generator_version": "relations-v1",
+  "ids": {
+   "eval/S0/calibration": {
+    "count": 2048,
+    "ids_blake2b_128": "46d5f8d4e039c279b4625e8692143311"
+   },
+   "eval/S0/dev": {
+    "count": 1000,
+    "ids_blake2b_128": "b95cca63a34624b13fd57ad3abd4a628"
+   },
+   "eval/S0/smoke": {
+    "count": 64,
+    "ids_blake2b_128": "c3d6a1b2599bd7db9696db4561d23701"
+   },
+   "eval/S1A/confirmation": {
+    "count": 2000,
+    "ids_blake2b_128": "3cd75bc09be400623e523da95d11f10b"
+   },
+   "eval/S1A/dev": {
+    "count": 1000,
+    "ids_blake2b_128": "6bf2f42455e065ce309af6cd7fc79541"
+   },
+   "eval/S1A/pilot": {
+    "count": 1000,
+    "ids_blake2b_128": "a1504d873fa0a4ffed25b44eeb91e667"
+   },
+   "eval/S1A/smoke": {
+    "count": 64,
+    "ids_blake2b_128": "42da0a1db21acf00d705450b1b218e7f"
+   },
+   "eval/S1A/unseen": {
+    "count": 2000,
+    "ids_blake2b_128": "10df09f596dbce1e23567f67ed6be852"
+   },
+   "train/S1A/17": {
+    "count": 192000,
+    "ids_blake2b_128": "15acfd1a80e0cbec065a620137020794"
+   },
+   "train/S1A/29": {
+    "count": 192000,
+    "ids_blake2b_128": "604047786b4f315534d032fdd5e41790"
+   },
+   "train/S1A/43": {
+    "count": 192000,
+    "ids_blake2b_128": "b0d3528019f2118889ec2e7fb715731e"
+   },
+   "train/S1A/pilot": {
+    "count": 6400,
+    "ids_blake2b_128": "88ab5de05c5f28237320d33f8a69d34c"
+   }
+  },
+  "layout_digest": "b7f93c1ca56e5dd1f79a9dccfe2f6054",
+  "old_train": [
+   [
+    7003109974603132079,
+    715840
+   ],
+   [
+    292578375307266510,
+    192000
+   ]
+  ],
+  "old_windows": [
+   [
+    "val",
+    4242,
+    0,
+    3000
+   ],
+   [
+    "val",
+    4242,
+    200000,
+    4000
+   ],
+   [
+    "test",
+    4242,
+    100000,
+    12000
+   ]
+  ],
+  "prereg": "docs/prereg/SLOT-LOOP-v1.md",
+  "prereg_blake2b_128": "56e8c611c01e0ef9b7ae32db97b0e334",
+  "sets": {
+   "S0/calibration": {
+    "base_seed": 7872142726734868149,
+    "count": 2048,
+    "query_seed": 7872142726734868149,
+    "sealed": false,
+    "split": "val",
+    "start": 0
+   },
+   "S0/dev": {
+    "base_seed": 4206094924762162946,
+    "count": 1000,
+    "query_seed": 4206094924762162946,
+    "sealed": false,
+    "split": "val",
+    "start": 0
+   },
+   "S0/smoke": {
+    "base_seed": 8726904610828922277,
+    "count": 64,
+    "query_seed": 8726904610828922277,
+    "sealed": false,
+    "split": "train",
+    "start": 0
+   },
+   "S1A/confirmation": {
+    "count": 2000,
+    "sealed": true,
+    "split": "test",
+    "start": 0
+   },
+   "S1A/dev": {
+    "base_seed": 6518772247750212169,
+    "count": 1000,
+    "query_seed": 6518772247750212169,
+    "sealed": false,
+    "split": "val",
+    "start": 0
+   },
+   "S1A/pilot": {
+    "base_seed": 2691891574861457280,
+    "count": 1000,
+    "query_seed": 2691891574861457280,
+    "sealed": false,
+    "split": "val",
+    "start": 0
+   },
+   "S1A/smoke": {
+    "base_seed": 5181101083092932984,
+    "count": 64,
+    "query_seed": 5181101083092932984,
+    "sealed": false,
+    "split": "train",
+    "start": 0
+   },
+   "S1A/unseen": {
+    "count": 2000,
+    "sealed": true,
+    "split": "test_unseen",
+    "start": 0
+   }
+  },
+  "study": "slot-loop-v1",
+  "task": {
+   "E": 16,
+   "Q": 4,
+   "V": 1024,
+   "head_sharing": 0.3,
+   "hops": [
+    1
+   ],
+   "n_rel": 4,
+   "name": "t1",
+   "seen": [
+    0,
+    768
+   ],
+   "unseen": [
+    768,
+    1024
+   ]
+  },
+  "train_base": {
+   "S1A/17": 5113975105655166458,
+   "S1A/29": 9197923827134630300,
+   "S1A/43": 5009954469258593308,
+   "S1A/pilot": 2442741374644229280
+  }
+ },
+ "preflight": {
+  "checks": {
+   "bytes": true,
+   "capacity": true,
+   "d128_3_replay": true,
+   "feature_consistency": true,
+   "frozen_set": true,
+   "isolation": true,
+   "matrix_equals_native": true,
+   "native_replay": true,
+   "owner_mask": true
+  },
+  "git_commit": "7febf58c3440483fe081e99c263f68ad62512b10",
+  "job_id": "3728339.opbs",
+  "matrix_max_abs_difference": 0.0,
+  "passed": true,
+  "report_blake2b_128": "dc44d4df45d49d7c37abef247454a025",
+  "source_blake2b_128": "fe548da4c06d77b7f4a8ae65349650f9"
+ },
+ "prereg_blake2b_128": "56e8c611c01e0ef9b7ae32db97b0e334",
+ "status": "locked",
+ "study": "slot-loop-v1",
+ "version": 1
+}

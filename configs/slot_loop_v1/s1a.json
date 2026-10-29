@@ -1,0 +1,147 @@
+{
+ "ablation": {
+  "seed": 17,
+  "trainable": [
+   "A_query",
+   "Q",
+   "R",
+   "U",
+   "B"
+  ]
+ },
+ "arms": [
+  "matrix_L1",
+  "soft_slot_L1"
+ ],
+ "batch": 32,
+ "bootstrap_seed": 9056755664197379988,
+ "buffers": [
+  "input_mean",
+  "input_std"
+ ],
+ "capacity": 16,
+ "checkpoints": 10,
+ "chunk": 16,
+ "clip": 1.0,
+ "frozen": [
+  "A",
+  "K",
+  "V",
+  "a_lambda",
+  "a_beta"
+ ],
+ "layout_digest": "b7f93c1ca56e5dd1f79a9dccfe2f6054",
+ "log_every": 50,
+ "loop_steps": 1,
+ "lr_grid": [
+  0.0003,
+  0.001,
+  0.003
+ ],
+ "optimizer": {
+  "betas": [
+   0.9,
+   0.999
+  ],
+  "eps": 1e-08,
+  "name": "adamw",
+  "weight_decay": 0.01
+ },
+ "parent": {
+  "files": [
+   "writer.pt",
+   "checkpoint.pt"
+  ],
+  "name": "S-RE"
+ },
+ "pilot": {
+  "steps": 200,
+  "stream_seed": 2442741374644229280,
+  "tie_nats": 0.01
+ },
+ "prereg": "docs/prereg/SLOT-LOOP-v1.md",
+ "prereg_blake2b_128": "56e8c611c01e0ef9b7ae32db97b0e334",
+ "sealed_sets": {
+  "confirmation": {
+   "count": 2000,
+   "sealed": true,
+   "split": "test",
+   "start": 0
+  },
+  "unseen": {
+   "count": 2000,
+   "sealed": true,
+   "split": "test_unseen",
+   "start": 0
+  }
+ },
+ "seeds": [
+  17,
+  29,
+  43
+ ],
+ "selection": {
+  "tie_nats": 1e-06
+ },
+ "sets": {
+  "dev": {
+   "base_seed": 6518772247750212169,
+   "count": 1000,
+   "split": "val",
+   "start": 0
+  },
+  "pilot": {
+   "base_seed": 2691891574861457280,
+   "count": 1000,
+   "split": "val",
+   "start": 0
+  },
+  "smoke": {
+   "base_seed": 5181101083092932984,
+   "count": 64,
+   "split": "train",
+   "start": 0
+  }
+ },
+ "stage": "S1A",
+ "steps_rule": {
+  "evaluations": 11,
+  "margin": 1.5,
+  "max_steps": 6000,
+  "minimum": 3000,
+  "reserve": 90,
+  "wall_seconds": 3600
+ },
+ "study": "slot-loop-v1",
+ "task": {
+  "E": 16,
+  "Q": 4,
+  "V": 1024,
+  "head_sharing": 0.3,
+  "hops": [
+   1
+  ],
+  "n_rel": 4,
+  "name": "t1",
+  "seen": [
+   0,
+   768
+  ],
+  "unseen": [
+   768,
+   1024
+  ]
+ },
+ "train_base": {
+  "17": 5113975105655166458,
+  "29": 9197923827134630300,
+  "43": 5009954469258593308
+ },
+ "trainable": [
+  "Q",
+  "R",
+  "U",
+  "B"
+ ],
+ "warmup": 20
+}

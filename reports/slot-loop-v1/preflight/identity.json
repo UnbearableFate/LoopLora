@@ -1,0 +1,59 @@
+{
+ "D128-3": {
+  "differences": {},
+  "passed": true,
+  "per_sample_bitwise": {
+   "correct": true,
+   "episode_id": true,
+   "key_margin": true,
+   "key_top1": true,
+   "nll": true,
+   "prediction": true,
+   "relative_read_error": true
+  },
+  "recorded": {
+   "correct": 608,
+   "loss_float32": 2.1291537284851074,
+   "relative_read_error": 0.36268818378448486
+  },
+  "replayed": {
+   "correct": 608,
+   "loss_float32": 2.1291537284851074,
+   "relative_read_error": 0.36268818378448486
+  },
+  "seconds": 6.163802312003099
+ },
+ "S-RE": {
+  "differences": {},
+  "passed": true,
+  "per_sample_bitwise": {
+   "correct": true,
+   "episode_id": true,
+   "key_margin": true,
+   "key_top1": true,
+   "nll": true,
+   "prediction": true,
+   "relative_read_error": true
+  },
+  "recorded": {
+   "correct": 723,
+   "loss_float32": 1.642127275466919,
+   "relative_read_error": 0.19612866640090942
+  },
+  "replayed": {
+   "correct": 723,
+   "loss_float32": 1.642127275466919,
+   "relative_read_error": 0.19612866640090942
+  },
+  "seconds": 8.589526284908061
+ },
+ "matrix_gradients": {
+  "bitwise": true,
+  "max_abs_difference": {
+   "B": 0.0,
+   "Q": 0.0,
+   "R": 0.0,
+   "U": 0.0
+  }
+ }
+}
