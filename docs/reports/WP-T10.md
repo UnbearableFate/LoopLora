@@ -242,3 +242,41 @@ parameter-matched (+24.3% at 1.7B, +31.0% at 0.6B), latency a cost and not compa
 4. `reports/p5l/` and the record give cost components that I took from the decision record; the total (16.1247 node-h) is from `jobs.json`.
 
 WP-T10 part 4 done
+
+# WP-T10 part 5: DPFP-X descriptive rows next to DPFP
+
+Base: master 8508d83 merged into wp/paper. Docs only, no compute. Numbers come from `reports/p1l-dpfp-x/` (`decision.json`, `audit.json`, records) and
+[DPFP-X.md](DPFP-X.md); `python3 scripts/analyze_dpfp_x.py` (run without `-I`, which hides its sibling module) reproduces every report table.
+
+## What changed where
+
+**[evidence_llm.md](../paper/evidence_llm.md).** Four rows after DP3, before PD1:
+DP4 (not supported: neither arm passes the 0.80 writer gate; X256 Qwen3-0.6B-Base r=256 nu=3 662/1000 = 66.2% at 22,780 steps, 13.8 pp below;
+X17 Qwen3-1.7B-Base `ea980cb0...` r=128 nu=3 593/1000 = 59.3% at 21,980 steps, 20.7 pp below; `decision.json`: candidates empty, e8_retrain false,
+line stopped, x256 no_writer, x17_candidate false; X17 vs D128-3 -1.5 pp "not distinguished", threshold 5 pp, standard error about 2.2 pp; limits: one seed,
+one learning rate, fixed budget, no longer run, validation only; X17 differs from D128-3 in backbone only and is a diagnostic, not a scaling test);
+DP5 (descriptive: curves at 20/40/60/80/100% and matched-fraction differences; both still rising in the last interval, +3.5 and +2.3 pp against +0.6 for D128-3; no extrapolation);
+DP6 (descriptive: NLL, normalized read error 0.397/0.377/0.363, read-value head 50.7/47.3/51.0%, clean-value head 92.9/85.8/90.6%, value SIR; X256's higher EM
+comes with neither a lower read error nor a better read-value head and the report gives no explanation, nor do I);
+DP7 (descriptive: zero/shuffled-memory audit at most 0.4% EM, inference parameters 1,114,114 and 606,210 against 475,138, state per episode 1.5 and 0.375 MiB, cost 3.053 node-h).
+Also: source key DPXE, V-L10 population extended, PD1 evidence now cites the stop decisions of DP1 and DP4, DPFP rows scope "DP1-DP7", intro no longer calls DPFP the last
+registered writer screen, a must-not-say bullet (rank 256 or the 1.7B backbone fixes the learned writer; DPFP-X selects a writer; extrapolating the rising curves;
+a scaling claim from X17; an explanation of X256's higher EM; any learned-writer or end-to-end claim at either rank or backbone), audit-boundary and header notes.
+
+**[draft.md](../paper/draft.md).** Section 8.5: the DPFP paragraph keeps every stop statement and gains two sentences on DPFP-X (neither arm reaches 0.80, the learned-writer line stays
+stopped, X17 -1.5 pp not distinguished and a diagnostic, curves rising but not extrapolated, no explanation of X256, audit at most 0.4%), tagged DP4-DP7. Appendix B gets a DPFP-X
+row; Appendix C's writer-screen row now says "DPFP and DPFP-X screens" with the DPFP-X result; reading rules list DP5-DP7 as descriptive and the pending bullet reads
+"DPFP with DPFP-X (P1L-D not run)". Wording that called DPFP "the last registered" screen (abstract, Section 8.5) or "the only one left" (Section 8.3) was adjusted. Abstract, Section 1 and Section 9
+needed no change beyond that.
+
+## Checks
+
+Tag resolution (no unresolved tags), no duplicate DP/PD/LP/PC ids, table column counts, links and anchors, `git diff --check`: all clean. Number audit of DP4-DP7 and the new draft text
+against the report and `dpfpx.txt`: every number appears there, except 20.7 pp, which is 80.0 - 59.3 and derived by me.
+
+## Notes
+
+1. The report's smoke deviation (smokes ran 1,800 steps, 7.9% and 8.2% of the released steps rather than 10%; accepted by the orchestrator) is not entered in the ledger, which records no cost deviations.
+2. X256 and X17 are descriptive; neither selects a writer and nothing about the learned writer, end-to-end use or scaling is claimed.
+
+WP-T10 part 5 done
