@@ -132,7 +132,10 @@ def test_conversion_maps_keys_copies_values_and_leaves_the_input_alone():
         for step in range(4):
             assert torch.equal(state[f"{key}.{step}"], record["adapter"][key])
             assert state[f"{key}.{step}"].data_ptr() != record["adapter"][key].data_ptr()
-    assert converted["writer"] == record["writer"] and converted["signature"] == record["signature"]
+    assert converted["writer"].keys() == record["writer"].keys()
+    assert all(torch.equal(converted["writer"][k], record["writer"][k]) for k in record["writer"])
+    assert converted["writer"]["codes"].data_ptr() != record["writer"]["codes"].data_ptr()      # a copy, not a shared tensor
+    assert converted["signature"] == record["signature"]
     assert converted["summary"]["converted_from"] == dict(variant="M1", name="p1l-r128-M1-L4-s17")
     assert torch.equal(record["adapter"]["R"], before["adapter"]["R"]) and record["config"] == before["config"]
     # the converted state dict loads into a real UnsharedAdapter strictly
