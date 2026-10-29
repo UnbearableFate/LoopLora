@@ -17,8 +17,12 @@ PROTOCOLS = ("memory_only", "context_retained")
 ORACLE_WRITERS = ("oracle_random", "oracle_rot", "oracle_shared")
 # Registered start of the confirmation window in the `test` split, by study. A window is named, never a free integer:
 # `eval.confirmation` (optional, absent = "p1l") selects it, so resolved configs without it keep their hashes.
-CONFIRMATION_WINDOWS = {"p1l": 100000, "p1l-s": 110000, "p5l": 104000}
+CONFIRMATION_WINDOWS = {"p1l": 100000, "p1l-s": 110000, "p5l": 104000, "b8w": 108000}
 OPTIONAL_EVAL = ("confirmation",)
+# Optional `train.data_start_step` (docs/prereg/B8W.md): the first step of the training stream a continued run reads
+# (episodes start_step * batch_size onward). Absent = 0, the original stream; not in DEFAULTS, so resolved configs
+# without it keep their hashes.
+OPTIONAL_TRAIN = ("data_start_step",)
 # Optional top-level `backbone` ({"id", "revision"}): another cached backbone of the Qwen3 family (docs/prereg/P5L.md).
 # Absent = the pinned Qwen3-0.6B-Base of `llm.inject`; like `eval.confirmation` it is not in DEFAULTS, so resolved
 # configs without it keep their hashes.
@@ -91,7 +95,8 @@ def resolve_config(mapping: Mapping[str, Any]) -> dict[str, Any]:
         if group in mapping and not isinstance(mapping[group], Mapping):
             raise ValueError(f"{group} must be a mapping")
         if group != "task" and group in mapping:
-            unknown = set(mapping[group]) - set(DEFAULTS[group]) - (set(OPTIONAL_EVAL) if group == "eval" else set())
+            optional = {"eval": OPTIONAL_EVAL, "train": OPTIONAL_TRAIN}.get(group, ())
+            unknown = set(mapping[group]) - set(DEFAULTS[group]) - set(optional)
             if unknown:
                 raise ValueError(f"unknown {group} fields: {sorted(unknown)}")
     config = recursive_merge(DEFAULTS, mapping)
@@ -148,6 +153,8 @@ def resolve_config(mapping: Mapping[str, Any]) -> dict[str, Any]:
     for key in ("steps", "batch_size", "log_every"):
         _integer(config["train"][key], f"train.{key}")
     _integer(config["train"]["warmup_steps"], "train.warmup_steps", 0)
+    if "data_start_step" in config["train"]:
+        _integer(config["train"]["data_start_step"], "train.data_start_step", 0)
     _integer(config["train"]["prefetch_workers"], "train.prefetch_workers", 0)
     _distinct(config["train"]["depths"], "train.depths", 1)
     if stage in ("writer", "lora_ctx") or variant == "B4":
