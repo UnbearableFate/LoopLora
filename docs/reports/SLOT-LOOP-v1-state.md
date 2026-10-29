@@ -127,3 +127,14 @@ The orchestrator writes the following JSON at `ABS_ROOT/reports/slot-loop-v1/s1a
 Use `/work/xg24i002/x10041/LoopLora/.venv/bin/python scripts/prepare_slot_release.py --help` for the metadata builder. It writes a candidate release (`pending_reload`) from the locked manifest, S0 metrics, pilot, smoke and full science commit; repeat with both arm reload reports to obtain `ready`. Candidate preparation is reversible metadata work. Never train from `pending_reload`.
 The release carries `science_commit`, `prereg_blake2b_128`, `analysis_script_blake2b_128`, manifest/inventory digests, `steps`, `walltime_seconds`, `parent.writer_blake2b_128`, per-arm `arms.<arm>.{read,lr}`, six main config hashes `<arm>/<seed>` plus two `<arm>/17/ablation` hashes, per-arm freeze and reload checks, and `smoke_configs` (the exact smoke-export slot metadata). Builder checks registered calibration/LR/timing choices and consistency before writing.
 Smoke reports include each selected export's `export_config`. For each arm run reload-check through `scripts/submit.py --commit C -- -m looplora.llm.slot_run --mode reload-check --manifest LOCK --release CANDIDATE --export R/smoke/ARM/selected.pt --predictions R/smoke/ARM/smoke_predictions.npz --out R/reload-ARM.json`. Reload must reproduce episode ids/predictions/correctness/NLL and match the candidate's exact slot config and calibrated read; its report records the export digest. Final builder validation consumes both reports, then STOP for `approval.json` as before. These are future commands; this round executes none of them.
+
+
+### Review-round-1 validation ledger (pending)
+Test snapshot: `b78245003f2f75afc6f15055fb7d7d0acaf9f9b6`. Both jobs use `scripts/submit.py --commit` (one node, debug-g), no `--wait`; the orchestrator watcher supplies the next wake-up. No polling or science execution.
+
+| job | files | requested walltime | result | actual node·h |
+| --- | --- | --- | --- | --- |
+| 3728078.opbs | test_slot_data.py, test_analyze_slot_study.py, test_slot_release.py | 00:03:00 | submitted; pending logs | pending |
+| 3728079.opbs | test_slot_experiment.py | 00:05:00 | submitted; pending logs | pending |
+
+Logs: `/work/xg24i002/x10041/LoopLora/logs/pbs/slot-r1-meta-20261029-205152-3029969.log` and `/work/xg24i002/x10041/LoopLora/logs/pbs/slot-r1-exp-20261029-205152-3029979.log`. Previous measured validation predicts about 0.07–0.09 node·h combined; requested ceiling is 0.133 node·h, inside S0's 0.497 node·h remaining at handover. Update actual elapsed node·h from the job logs on completion; historical cumulative remains 0.503 until then. Next: read logs and outputs, resolve any failures, update this ledger, then `STOP: review <full hash>` for cross-review. Preflight/lock/S0 remain on hold.
