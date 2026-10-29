@@ -1,6 +1,6 @@
 # Study LSR: label-free stop rules on the r = 128 M1-L4 checkpoints at two backbones, pre-registered
 
-Registered 2026-10-29 13:15 JST by the orchestrator, before any LSR code, run, validation score or test episode. Drafted by
+Registered 2026-10-29 13:09 JST by the orchestrator, before any LSR code, run, validation score or test episode. Drafted by
 sn-core (Claude Sonnet 5.5; WP-L9 step 1, `docs/tasks/WP-L9_stop_rules.md`, wp/core `e206189`) on the login node from code and
 committed files only. The user approved G1–G4 on 2026-10-29 13:00 JST ("OK,启动接下来的G1-G4"; `plan/followup_2026-10-29.md` §4).
 Proposal R1 of `docs/review/rv-fable_2026-10-29.md`. Evaluation only: no training, no gradient step, no new checkpoint. The
