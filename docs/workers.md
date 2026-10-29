@@ -9,6 +9,9 @@
   reasoning effort xhigh, own herdr tab, read-only) and an Opus-5.5 subagent of the main session (effort xhigh). Each
   gets the code and the spec, not the other's findings or the orchestrator's view. The orchestrator compares the two
   reports, commits both, and sends the worker the fixes.
+- Review scope (user, 2026-10-29 21:53: "不要搞这么多次review,核心代码没问题就行"):
+  - one cross-review per change of core code (models, data, training, analysis rules, sealed-set guards);
+  - fixes, runbooks and docs get no further review round: the worker's tests check fixes, and the orchestrator reads the diff.
 - The weekly-quota rule still holds: below 20 % left, roles go back to Sonnet subagents after the current task.
 
 **Handover (2026-10-27 07:27 JST, user: "提前启动交接过程,关闭所有的codex worker").** All seven codex workers are

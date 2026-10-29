@@ -227,15 +227,22 @@ The user lifted the written budgets: "不必在意文档中描述的预算, 保�
 - rv-code: `docs/review/static_2026-10-29/round3-rv-code.md`, 0 High, 1 Medium.
 - rv-opus: `docs/review/static_2026-10-29/round3-rv-opus.md`, 0 High, 0 Medium, 1 Low.
 
-Both say the preflight may start. Fixes 1-3 are done, and fix 4 is done for the S0 steps. The two items below come first, because item 1 changes `src/`. Merge master first: it has the budget change (section "Budget") and the new `scripts/submit.py`.
+Both say the preflight may start. Fixes 1-3 are done, and fix 4 is done for the S0 steps.
+
+**User decision (2026-10-29 21:53 JST):** "不要搞这么多次review,核心代码没问题就行".
+- The review rounds end here, and the preflight starts now on the reviewed `src/`.
+- The two items below are follow-ups for S1A. Neither changes `src/`, and neither gets a review round; the worker's tests check them.
+- Item 1 is done in the analysis script only. The `load_open_token` part is dropped. Instead, when the orchestrator writes `s1a-open.json`, it checks the release digest against the six training records.
+- Merge master first: it has the budget change (section "Budget") and the new `scripts/submit.py`.
 
 1. **The release is not bound by digest** (rv-opus R3-1).
    - Failure: a release rebuilt at a new path, with an edited analysis script, passes the token and stage `S1A`. Each training record stores `release_blake2b_128`, but nothing reads it.
    - Fix:
      - the open record carries `release_blake2b_128`;
      - stage `S1A-DEV` requires the six training records to share one `release_blake2b_128`;
-     - `load_open_token` and `s1a_provenance` refuse unless the digest of the `--release` file equals the open record's.
-   - Test: the rebuilt-release case is refused at evaluation and at analysis. The test must fail before the fix.
+     - `s1a_provenance` refuses unless the digest of the `--release` file equals the open record's.
+   - Test: the rebuilt-release case is refused at analysis. The test must fail before the fix.
+   - When: before the S1A release.
 2. **The S1A runbook commands cannot run as written** (rv-code R3-C1; rv-opus noted the same).
    - Rewrite every S1A command in the state file the way the S0 steps now read: smoke, pilot, release builder, reload checks, arm runs, dev analysis, sealed evaluation and S1A analysis. Each needs:
      - resolved commit variables;
@@ -246,9 +253,10 @@ Both say the preflight may start. Fixes 1-3 are done, and fix 4 is done for the 
    - The test must pick out the command itself, not the first backticked span. Step 1's red failure came from the token `debug-g` (rv-code).
    - Correct the state file's claim that every red test failed for its intended defect, and add the release to the token summary (rv-opus, line 80).
 
-Then:
-1. Run the changed test files on compute.
-2. Update the state file.
-3. End with `STOP: review <hash>`.
+   - When: before the S1A smoke.
 
-Both reviewers check `8c28334..<hash>`, and then the preflight starts.
+**Now:** follow runbook steps 1-4 in the state file.
+1. The preflight.
+2. The lock: commit it on wp/slot yourself if every required check passes, including Matrix bitwise equal to Native. Otherwise `STOP:` before any calibration or dev data.
+3. S0.
+4. `decision_s0.md`, then `STOP: S0 done`.
