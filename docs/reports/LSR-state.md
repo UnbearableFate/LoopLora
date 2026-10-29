@@ -1,6 +1,7 @@
 # LSR state (WP-L9 step 2; sn-core, wp/core). Registered `docs/prereg/LSR.md`, blake2b-128 `63da9c626d699252c239cc86e149f1ad` (with Clarification C1, master ad1a9b5; the validation runs recorded the pre-C1 hash `91235d80a38f200e3a7b3bec907c1f1e`, which `design.json` lists in `earlier_prereg_hashes`)
 
-Status 2026-10-29: code, tests and smoke done; validation jobs running. No test episode has been generated.
+Status 2026-10-29: thresholds locked (`reports/lsr/thresholds.json`, awaiting the orchestrator's check). No test episode has been generated.
+node·h so far: 0.288 (cap 0.8; projected test jobs about 0.15-0.2 including the latency audit).
 
 ## Code (commit `5348211`, plus the commit that carries this file)
 - `src/looplora/llm/lsr_rules.py` (numpy only): grid, rules R1/R2/R3, reads, selection (`select_thresholds`), constants and the six checkpoints.
@@ -19,7 +20,8 @@ Status 2026-10-29: code, tests and smoke done; validation jobs running. No test 
 | 3724051 | `lsr-debug` | 0.002 | wrong path, exit 2 |
 | 3724055 | `lsr-debug` | 0.006 | diagnosis of the audit failure (development worktree, nothing kept) |
 | 3724062 / 3724063 | `lsr-smoke-06` / `-17` | 0.018 / 0.018 | smoke after the audit change; exit 0 |
-| 3724070 / 3724071 | `lsr-val-0.6b` / `-1.7b` | pending | validation [1000, 3000), 3 seeds each |
+| 3724070 / 3724071 | `lsr-val-0.6b` / `-1.7b` | 0.076 / 0.083 | validation [1000, 3000), 3 seeds each, exit 0 (4 min 35 s / 4 min 59 s) |
+| 3724125 | `lsr-select` | 0.002 | `analyze_lsr.py select`; wrote `reports/lsr/thresholds.json` |
 
 ## Smoke (val [0, 64), seed 17; timing and audits only, not used for any decision)
 - 64 episodes scan in 5.3 s (both backbones) including warm-up; the per-checkpoint job took 46 s with the latency audit.
@@ -42,3 +44,14 @@ Status 2026-10-29: code, tests and smoke done; validation jobs running. No test 
 The audit change above, the placement of the latency audit in the test job on val [1000, 1128), the val [0, 64) smoke observations as
 information seen before the lock, and the unchanged handling of infeasible rules are registered. `design.json` is re-locked with the new
 prereg hash; `analyze_lsr.py select` accepts validation records carrying either hash (no rule and no code changed with C1).
+
+## Validation selection (val [1000, 3000), 2,000 episodes x 3 seeds per backbone; `reports/lsr/thresholds.json`, status locked)
+Validation EM (%) of fixed L = 4 by hop 1..8: 0.6B 48.1 / 34.4 / 19.6 / 7.2 / 4.4 / 4.6 / 5.4 / 5.2; 1.7B 58.1 / 43.1 / 23.1 / 5.9 / 3.5 / 4.1 / 4.4 / 4.5.
+- **R1 and R3: no feasible grid value at either backbone** (hop-1 loss against L = 4 beyond the 8 pp pooled / 10 pp per-seed margins at every
+  tau). They fail as registered and their test statistics are never computed. Best pooled hop-1 change counts (of 6,000 questions): R1 0.6B
+  -441 (k = -8, mean depth 4.8, hops 4-8 6.8%), R1 1.7B -1,229; R3 -596 / -1,525 (its read ratio never falls below 1 at 0.6B, grows to about 10 at 1.7B;
+  tau below 1 never fires, above 1 stops at s = 1).
+- **R2 (no parameter): feasible at both**: hop 1 54.4% / 63.2% against 48.1% / 58.1% at L = 4, hops 4-8 mean 9.0% (0.6B) and 10.3% (1.7B)
+  against 5.3% and 4.5% at L = 4, mean 5.6 / 5.7 reads. Validation numbers only; the test decides.
+- **L_c = 4 at both backbones** (the best fixed depth under the same constraint is the deployed one: L = 5 and deeper lose more than the margin on hop 1).
+- O1 (best fixed L per hop on validation): [2, 4, 5, 6, 8, 8, 8, 8] at both backbones.
