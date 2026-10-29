@@ -1,6 +1,6 @@
-# Study SLOT-LOOP-v1: explicit key-value slots against the matrix store, read by the learned low-dimensional reader (WP-L13; S0 and S1A registered here, S1B, S2, S3 by addenda), pre-registered (DRAFT)
+# Study SLOT-LOOP-v1: explicit key-value slots against the matrix store, read by the learned low-dimensional reader (WP-L13; S0 and S1A registered here, S1B, S2, S3 by addenda), pre-registered
 
-Status: draft for registration, written on the login node before any implementation, test, smoke or run. Drafted by sn-slot (Claude Sonnet 5.5; WP-L13 step 1, wp/slot). Design source: `plan/looplora_diagnosis_and_execution_plan_2026-10-29.md`
+Status: registered 2026-10-29 by the orchestrator (decisions at the end), before any implementation, test, smoke or run. Drafted on the login node by sn-slot (Claude Sonnet 5.5; WP-L13 step 1, wp/slot). Design source: `plan/looplora_diagnosis_and_execution_plan_2026-10-29.md`
 (4e6778a, written against a255e81; "the plan"), a reference and not an authority: where it disagrees with the code the code wins, and the differences are under "Plan against code". Authorization (user, 2026-10-29): all stages S0 to S3, "按计划推进"
 (`docs/tasks/WP-L13_slot_loop.md`, 8259878). The old verdicts (P1L, SQ2, LSQT, DPFP, the 0.80 writer gate) stay as they are. No old test or confirmation window is read; the old `val[0,1000)` at seed 4242 serves only the identity replays below.
 
@@ -208,4 +208,16 @@ Task cautions: S2 first checks `t2_typed` and `n_distract` in `data/relations.py
 4. The added `S1A selected` stop (D11): keep, or let the worker open the confirmation set on its own after dev selection?
 
 ## Decisions at registration (orchestrator)
-(to be filled at registration; the registered digest goes into the release)
+1. **Deviations 1 to 11 are accepted as written.** Decision 2 replaces this draft's reading of the S1B gate in the stage table, deviation 1 and open question 1.
+2. **S1B gate (answers open question 1).** An S1B addendum may follow any S1A that is valid on its dev with the confirmation set isolated (plan §0.3), whatever its verdict. S1A sets which arms it has:
+   - **S1A ADVANCE:** the full 2x2, Matrix and SoftSlot at L1 and L4 (plan §8.1).
+   - **NOT ADVANCED, and the §7.4 ablation not run or not flagged:** slot expansion stops (§7.4, §14.3). S1B runs Matrix-L1 against Matrix-L4 only. That is the loop question on a learned writer, which the plan does not make depend on slots winning (§8.3: the aim is to verify a working mechanism, with no storage presumed to win). Claims shrink accordingly.
+   - **NOT ADVANCED, and the ablation flagged (dev >= +3.0 pp):** the S1B addendum decides whether slot arms enter with the `A_query` copy. They are judged on the addendum's own confirmation set, and the S1A verdict is unchanged.
+   In no case does S1B reuse S1A's confirmation or unseen sets. S1B is a new study on a fixed parent. It does not revisit the 0.80 writer gate or any old verdict.
+3. **Open questions 2 and 3.** Accepted: D3 (S0 thresholds), D4 (20-step warmup), D5 (separate pilot shard), D6 (D128-3 identity replay of a recorded number, no selection) and D8 (`A_query` ablation).
+4. **Open question 4.** The `S1A selected` stop stays. Before the orchestrator writes `s1a-open.json`, an independent reviewer re-runs the frozen analysis script on the S1A dev records and checks the selection.
+5. **Matrix identity is bitwise, as written.** If the new path cannot be made bitwise identical, STOP before any calibration or dev data are read, with the measured maximum difference and its cause. A tolerance needs a registered clarification.
+6. **Code review before the preflight.** After the step-2 tests pass on compute, STOP for the orchestrator's static review of the new code (task WP-L13).
+7. **Budget confirmed.** S0 <= 1.0 node·h, S1A <= 4.5 node·h. The 2 h scale-up for the six arm jobs needs the orchestrator's OK at the release, as written. No other job exceeds 1 h.
+8. **Gradient record (plan §2.5).** Every S1A run logs the pre-clip global gradient norm at each logged step and the fraction of clipped steps. Descriptive only.
+9. **Seed paths checked.** The orchestrator re-derived every base seed in the data table and the layout digest with stdlib blake2b at registration, and all match. The LR-pilot stream is `train_base("S1A", "pilot")`.
