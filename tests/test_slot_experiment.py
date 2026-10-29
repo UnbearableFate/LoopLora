@@ -567,7 +567,7 @@ def release_for(tiny_study, tmp_path, steps=20, **edit):
 
 
 def test_an_arm_seed_run_records_dev_selection_gradient_and_clipping_statistics_and_its_export_evaluates_to_the_same_numbers(
-        tiny_study, tmp_path):
+        tiny_study, model, tokenizer, tmp_path):
     release = release_for(tiny_study, tmp_path)
     record = slot_run.run_train(tmp_path / 'run', release, 'soft_slot_L1', 29, config_path=tiny_study['config'],
                                 manifest_path=tiny_study['manifest'])
@@ -584,7 +584,7 @@ def test_an_arm_seed_run_records_dev_selection_gradient_and_clipping_statistics_
     out = tmp_path / 'dev'
     report = slot_run.evaluate_entries(('S1A', 'dev'), [
         dict(label='soft_slot_L1_29', export=str(export), checkpoint_blake2b_128=record['selected_checkpoint_blake2b_128']),
-        dict(label='native', parent_writer_blake2b_128=PARENT_DIGESTS['writer.pt'], read=None)], out)
+        dict(label='native', parent_writer_blake2b_128=PARENT_DIGESTS['writer.pt'], read=None)], out, model=model, tokenizer=tokenizer)
     assert set(report) == {'soft_slot_L1_29', 'native'} and report['native']['n'] == 48
     arm = np.load(out / 'soft_slot_L1_29.npz')
     selected_row = next(r for r in record['dev'] if r['step'] == record['selected_step'])

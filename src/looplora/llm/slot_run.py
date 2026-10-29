@@ -438,14 +438,14 @@ def run_train(out, release_path, arm: str, seed: int, *, ablation: bool = False,
 
 # ------------------------------------------------------------------------------------------- S1A: guarded evaluation
 
-def evaluate_entries(set_name: tuple[str, str], entries: list[dict], out, *, token=None) -> dict:
+def evaluate_entries(set_name: tuple[str, str], entries: list[dict], out, *, token=None, model=None, tokenizer=None) -> dict:
     """Evaluate each entry on one registered set and save its per-sample arrays as `<label>.npz`; prints and returns counts and
     digests only. An entry is {label, export, checkpoint_blake2b_128} (a saved arm checkpoint) or {label,
     parent_writer_blake2b_128, read} (the unmodified S-RE through a read; `read` None = its native read). A sealed set opens
     only for a checkpoint the token names."""
     out = Path(out)
     out.mkdir(parents=True, exist_ok=False)
-    report, arrays, model, tokenizer = {}, None, None, None
+    report, arrays = {}, None  # model and tokenizer: given, or loaded with the first entry and shared by the rest
     for entry in entries:
         digest = entry.get("checkpoint_blake2b_128") or entry.get("parent_writer_blake2b_128")
         eval_set = slot_data.eval_set(*set_name, token=token, checkpoint_digest=digest)
