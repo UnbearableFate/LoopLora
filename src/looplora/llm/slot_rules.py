@@ -55,7 +55,7 @@ def choose_candidate(rows: list[dict], kind: str) -> dict:
 def choose_lr(rows: list[dict], step0_nll: float) -> dict:
     """Lowest pilot-shard NLL; within LR_TIE of the best, the lower LR. Non-finite candidates are excluded; if every candidate
     is worse than the arm's step 0 the orchestrator decides (the grid is not extended)."""
-    pool = [r for r in rows if math.isfinite(r["nll"])]
+    pool = [r for r in rows if r["nll"] is not None and math.isfinite(r["nll"]) and r.get("all_finite", True)]
     if not pool or all(r["nll"] > step0_nll for r in pool):
         raise StopForOrchestrator("every LR candidate is non-finite or worse than step 0")
     best = min(r["nll"] for r in pool)

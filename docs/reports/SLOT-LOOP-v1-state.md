@@ -1,7 +1,7 @@
-# WP-L13 state: SLOT-LOOP-v1 (S0, S1A), step 2: implementation, tests, awaiting review
+# WP-L13 state: SLOT-LOOP-v1 (S0, S1A), step 2: review round 1 fixes
 
-Branch `wp/slot` (worktree `LoopLora-wt/slot`), based on master `177a4fe`; not merged into master, not pushed. Task: `docs/tasks/WP-L13_slot_loop.md`; registration `docs/prereg/SLOT-LOOP-v1.md` (blake2b-128 `56e8c611c01e0ef9b7ae32db97b0e334`, registered on master at `5f04a5c`, unchanged); results will go to `docs/reports/SLOT-LOOP-v1.md`.
-**Status: code written, all slot tests and the existing suite green on compute; no preflight, no S0 data, no S1A data touched.** The next action is the orchestrator's static review (`STOP: review`); then the preflight, the manifest lock and S0.
+Branch `wp/slot` (worktree `LoopLora-wt/slot`), master `c0bbbd5` merged after handover at `ccdcc96`; not merged into master, not pushed. Task: `docs/tasks/WP-L13_slot_loop.md`; registration `docs/prereg/SLOT-LOOP-v1.md` (blake2b-128 `56e8c611c01e0ef9b7ae32db97b0e334`, registered on master at `5f04a5c`, unchanged); results will go to `docs/reports/SLOT-LOOP-v1.md`.
+**Status: wk-slot has implemented review-round-1 fixes 1–10; updated compute validation pending.** Earlier compute results below cover the pre-review implementation. No real preflight, manifest lock, S0 or S1A science run has started. After validation, STOP for the orchestrator’s cross-review before those steps.
 
 ## What the code does
 New files only, except four typed-dispatch edits (below). Every new option is off in the old paths.
@@ -81,19 +81,49 @@ Cumulative against the S0 cap of 1.0 node·h: 0.503 used, 0.497 left for the pre
 6. **Locked manifest.** Every science mode refuses without `manifest.lock.json`: registry and episode-id disjointness re-derived and equal to the lock's, the real parents' file digests equal to the lock's inventory, and a passed preflight. `prepare_slot_manifest.py` writes the lock only from a preflight report whose required checks all passed, on the files and configuration now on disk.
 7. **Matrix against Native is a stop, not a warning.** `matrix_equals_native` is a required preflight check with the maximum absolute logit difference in the report; `prepare_slot_manifest.py` refuses a lock without it (decision 5).
 8. **Fix container and buffers.** The WP-L3 fix container (`_WriterFix`) loads its initial adapter's state dict before it registers `input_mean` and `input_std`; `SlotFixAdapter` therefore builds from a view of the loaded adapter without the two buffers and then loads the complete state dict strictly, so weights and buffers equal the loaded S-RE's exactly.
-9. **Frozen analysis script** (`scripts/analyze_slot_study.py`; stdlib and numpy; stages `S0`, `S1A-DEV`, `S1A`; written by a Sonnet 5.5 subagent from the registered rules, reviewed here; blake2b-128 not frozen until the release). Choices the prereg leaves open:
+9. **Frozen analysis script** (`scripts/analyze_slot_study.py`; stdlib and numpy; stages `S0`, `S1A-DEV`, `S1A-ABL`, `S1A`; written by a Sonnet 5.5 subagent from the registered rules, reviewed here; blake2b-128 not frozen until the release). Choices the prereg leaves open:
    (a) R0 requires all nine preflight checks (`native_replay`, `matrix_equals_native`, `owner_mask`, `isolation`, `frozen_set`, `bytes`, `capacity`, `feature_consistency`, `d128_3_replay`), as the runner's report lists them; a missing or false one gives R0 and no S0 data are opened.
    (b) The 10,000 bootstrap index rows are drawn as 20 sequential blocks of `rng.integers(0, n, size=(500, n))` from `default_rng(seed)`, one index matrix shared by every vector; this equals a single `(10000, n)` draw (pinned by a test). The percentile interval is numpy's linear interpolation at 2.5 and 97.5, evaluated exactly (`L > 0` is an exact test); thresholds (+5.0 pp, +3.0 pp) are integer comparisons.
    (c) A non-`complete` arm-seed record is refused (nonzero exit); `stop_unstable` is the outcome for a complete record with non-finite training, no finite selectable checkpoint, or a selected dev NLL above its step-0 NLL (equality is stable).
    (d) The calibration and checkpoint ties are compared exactly on the recorded doubles; the runner compares floats. They can differ only within about one ulp of 1e-4 or 1e-6, and then the script refuses ("differs from the registered rule") instead of repairing.
-   (e) Not scripted: the dev comparison of the section 7.4 ablation (two records, seed 17); to be added before the release if the ablation is triggered, as the script is frozen only at the release.
+   (e) Superseded by Review round 1 item 6: the ablation comparison is now in the frozen script before release.
+   (f) **Registered by Review round 1 item 6.** `S1A-ABL` reads the six main records (`ablation: false`) and `ablation/{matrix_L1,soft_slot_L1}/s17/record.json` (`complete`, `ablation: true`). Counts and dev id digests must agree with each other and the locked manifest. Each arm uses its dev-NLL-selected checkpoint under the main selection rule. Flag iff `(c_soft - c_matrix) * 100 >= 3 n`, using integers. Stdout carries counts and the flag; outputs contain no confirmation information.
    Tests: `tests/test_analyze_slot_study.py` (70 cases, numpy and pytest only) and two cross-checks in `tests/test_slot_experiment.py` that feed the runner's own S0 output and arm-seed record to the script.
 
 ## Not done / next
-- Orchestrator's static review of the new code (this stop).
+- Complete changed-file compute tests, then STOP for two-reviewer cross-review. Do not begin preflight, lock or S0 before the orchestrator sends the result.
 - After the review, in this order (R = `/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1`, C = the full 40-hex commit of the reviewed tree):
   1. Preflight, one `debug-g` job (about 0.05 node·h): `scripts/submit.py --name slot-preflight --queue debug-g --walltime 00:20:00 --commit C -- -m looplora.llm.slot_run --mode preflight --config configs/slot_loop_v1/s0.json --out R/preflight`. It reads no calibration or dev data. A failed required check, or a Matrix-Native difference (the report carries the maximum absolute logit difference), ends in `STOP` before anything else runs.
-  2. Lock, login node: `scripts/prepare_slot_manifest.py --configs configs/slot_loop_v1 --preflight-report R/preflight/preflight.json --out reports/slot-loop-v1/manifest.lock.json --inventory-out reports/slot-loop-v1/checkpoint_inventory.json`; commit the lock, the inventory and the preflight report on `wp/slot`.
+  2. Lock, login node: `/work/xg24i002/x10041/LoopLora/.venv/bin/python scripts/prepare_slot_manifest.py --configs configs/slot_loop_v1 --preflight-report R/preflight/preflight.json --out reports/slot-loop-v1/manifest.lock.json --inventory-out reports/slot-loop-v1/checkpoint_inventory.json`; commit the lock, the inventory and the preflight report on `wp/slot`.
   3. S0, one job on the lock commit (estimated 0.15 node·h): `... -m looplora.llm.slot_run --mode s0 --config configs/slot_loop_v1/s0.json --manifest reports/slot-loop-v1/manifest.lock.json --out R/s0` (18 calibration candidates on 2,048 episodes, 13 dev conditions, the D128-3 recheck).
-  4. Decision, login node (numpy only): `scripts/analyze_slot_study.py --stage S0 --records R/s0 --out reports/slot-loop-v1/s0 --preflight R/preflight/preflight.json`; then `decision_s0.md`, `docs/reports/SLOT-LOOP-v1.md`, this file; `STOP: S0 done <hash>` with the decision row and the S1A choices it implies.
+  4. Decision, compute job (numpy only): `python3 scripts/analyze_slot_study.py --stage S0 --records R/s0 --out reports/slot-loop-v1/s0 --preflight R/preflight/preflight.json --manifest reports/slot-loop-v1/manifest.lock.json`; submit this Python argv through `scripts/submit.py --commit C` (the wrapper supplies the interpreter); then `decision_s0.md`, `docs/reports/SLOT-LOOP-v1.md`, this file; `STOP: S0 done <hash>` with the decision row and the S1A choices it implies.
 - S1A (smoke, pilot, release, six arm-seed runs, analysis) only after the orchestrator's OK.
+
+
+## Review round 1 changes and contracts (wk-slot)
+- D-F5: S0 gives R0 if Native and uncalibrated Matrix differ in any per-episode correctness or NLL. Analysis requires `--manifest` for every stage, records its file digest in `source_index.json`, and refuses any count or ordered-id digest mismatch against the lock (S0 calibration/dev, S1A dev/confirmation/unseen). References `s_re_native`, `matrix_step0`, `soft_step0` are mandatory in each evaluated sealed set. An entirely absent unseen set is reported as `not run`; a partial set is refused.
+- M-F2: preflight writes `source_blake2b_128`; lock creation requires that digest to equal the current `src/` contents and stores it in `preflight.source_blake2b_128`. Every science mode, including reload-check, checks it. Sorted relative paths and file bytes are hashed with blake2b-128; generated bytecode is excluded. Scripts/docs edits do not invalidate this check. **After any `src/` change, rerun preflight before science work.**
+- D-F4: sealed registry objects carry `opened: false`; `eval_set` returns an opened copy only with a valid token and allowed checkpoint. `raw_episodes` and `episodes` reject the unopened object. Manifest set metadata omits sealed `base_seed` and `query_seed`, retaining counts and id digests.
+- M-F1: non-finite loss, gradient, gradient norm, or dev NLL is a `FloatingPointError`. The pilot alone catches it and writes `{arm, lr, nll: null, all_finite: false, error}`. It excludes these candidates from LR selection and from S/Ev timing maxima; the first load still supplies Ld. Other runtime errors propagate. If no finite candidate remains for an arm, `pilot.json` is written and the runner stops.
+- M-F4: no numerical rule changed. A first load long enough to make the registered N rule conflict with the 3,600 s walltime cap produces a STOP; the worker does not reduce N or extend walltime on its own.
+- Only slot-specific modules changed imports; no existing non-slot test file imports the modified modules. The previous full existing-suite results remain the evidence for unchanged legacy paths; changed slot tests and the new release-builder tests run again in this round.
+
+### Open-record schema and evaluation entries
+The orchestrator writes the following JSON at `ABS_ROOT/reports/slot-loop-v1/s1a-open.json` after independent dev analysis and selection. `ABS_ROOT` also holds the registered prereg and the frozen analysis script. Use an explicit **absolute** `--open-root ABS_ROOT`; there is no default (a commit snapshot will usually predate this record).
+
+```json
+{
+  "prereg_blake2b_128": "56e8c611c01e0ef9b7ae32db97b0e334",
+  "analysis_script_blake2b_128": "<32 lowercase hex digits frozen in the release>",
+  "selected_checkpoints": {
+    "matrix_L1/17": "<digest>", "matrix_L1/29": "<digest>", "matrix_L1/43": "<digest>",
+    "soft_slot_L1/17": "<digest>", "soft_slot_L1/29": "<digest>", "soft_slot_L1/43": "<digest>"
+  }
+}
+```
+`load_open_token(ABS_ROOT, lock["inventory"])` also admits the S-RE `writer.pt` digest from the already checked locked inventory; no seventh digest is needed in the open record. Saved-run evaluation entries are `{label, export: ABS_PATH, checkpoint_blake2b_128}`. Reference entries are `{label, parent_writer_blake2b_128, read}`: `s_re_native` uses `read: null`; `matrix_step0` and `soft_step0` use the calibrated arm read configs from the release, all with the locked S-RE writer digest. Each evaluated set requires all six main labels (`<arm>_s<seed>`) and these three references.
+
+### S1A release and reload runbook (after S0 and orchestrator approval)
+Use `/work/xg24i002/x10041/LoopLora/.venv/bin/python scripts/prepare_slot_release.py --help` for the metadata builder. It writes a candidate release (`pending_reload`) from the locked manifest, S0 metrics, pilot, smoke and full science commit; repeat with both arm reload reports to obtain `ready`. Candidate preparation is reversible metadata work. Never train from `pending_reload`.
+The release carries `science_commit`, `prereg_blake2b_128`, `analysis_script_blake2b_128`, manifest/inventory digests, `steps`, `walltime_seconds`, `parent.writer_blake2b_128`, per-arm `arms.<arm>.{read,lr}`, six main config hashes `<arm>/<seed>` plus two `<arm>/17/ablation` hashes, per-arm freeze and reload checks, and `smoke_configs` (the exact smoke-export slot metadata). Builder checks registered calibration/LR/timing choices and consistency before writing.
+Smoke reports include each selected export's `export_config`. For each arm run reload-check through `scripts/submit.py --commit C -- -m looplora.llm.slot_run --mode reload-check --manifest LOCK --release CANDIDATE --export R/smoke/ARM/selected.pt --predictions R/smoke/ARM/smoke_predictions.npz --out R/reload-ARM.json`. Reload must reproduce episode ids/predictions/correctness/NLL and match the candidate's exact slot config and calibrated read; its report records the export digest. Final builder validation consumes both reports, then STOP for `approval.json` as before. These are future commands; this round executes none of them.

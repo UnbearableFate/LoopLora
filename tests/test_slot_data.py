@@ -117,8 +117,9 @@ def test_a_sealed_set_needs_the_open_token_and_a_named_checkpoint(tmp_path):
                   analysis_script_blake2b_128=slot_data.file_digest(tmp_path / slot_data.ANALYSIS_SCRIPT))
     path = tmp_path / slot_data.OPEN_RECORD
     path.write_text(json.dumps(record))
-    token = slot_data.load_open_token(tmp_path)
+    token = slot_data.load_open_token(tmp_path, {"S-RE": {"writer.pt": "e" * 32}})
     chosen = next(iter(selected.values()))
+    assert slot_data.eval_set("S1A", "confirmation", token=token, checkpoint_digest="e" * 32).opened
     assert slot_data.eval_set('S1A', 'confirmation', token=token, checkpoint_digest=chosen).count == 2000
     assert slot_data.eval_set('S1A', 'unseen', token=token, checkpoint_digest=chosen).split == 'test_unseen'
     with pytest.raises(slot_data.SealedSetError):  # a checkpoint the record does not name
@@ -132,11 +133,11 @@ def test_a_sealed_set_needs_the_open_token_and_a_named_checkpoint(tmp_path):
                    dict(record, selected_checkpoints={**selected, 'matrix_L1/17': 'short'})):
         path.write_text(json.dumps(broken))
         with pytest.raises(slot_data.SealedSetError):
-            slot_data.load_open_token(tmp_path)
+            slot_data.load_open_token(tmp_path, {"S-RE": {"writer.pt": "e" * 32}})
     path.write_text(json.dumps(record))
     (tmp_path / slot_data.ANALYSIS_SCRIPT).write_text('print("edited after the record")\n')
     with pytest.raises(slot_data.SealedSetError):
-        slot_data.load_open_token(tmp_path)
+        slot_data.load_open_token(tmp_path, {"S-RE": {"writer.pt": "e" * 32}})
 
 
 def test_the_registered_prereg_is_the_file_on_disk():
@@ -308,7 +309,7 @@ def passed_report(tmp_path, monkeypatch, **override):
     checks['matrix_equals_native']['max_abs_difference'] = 0.0
     report = dict(status='complete', passed=True, required=required, checks=checks, inventory=inventory,
                   config_hash=manifest_script.check_configs(ROOT / 'configs' / 'slot_loop_v1')['S0'], job_id='1.opbs',
-                  git_commit='c' * 40)
+                  git_commit='c' * 40, source_blake2b_128=slot_data.source_digest())
     report.update(override)
     path = tmp_path / 'preflight.json'
     path.write_text(json.dumps(report))
@@ -329,7 +330,7 @@ def test_the_lock_needs_a_passed_preflight_on_the_files_and_configuration_on_dis
     assert slot_run.require_lock(lock_path)['status'] == 'locked'
 
 
-@pytest.mark.parametrize('defect', ['failed_check', 'missing_check', 'not_passed', 'other_files', 'other_config', 'incomplete'])
+@pytest.mark.parametrize('defect', ['failed_check', 'missing_check', 'not_passed', 'other_files', 'other_config', 'incomplete', 'other_source'])
 def test_the_lock_is_refused_unless_every_required_check_passed_on_these_files(tmp_path, monkeypatch, defect):
     path, report = passed_report(tmp_path, monkeypatch)
     if defect == 'failed_check':
@@ -342,8 +343,38 @@ def test_the_lock_is_refused_unless_every_required_check_passed_on_these_files(t
         report['inventory'] = {'S-RE': {'writer.pt': 'f' * 32}, 'D128-3': {'writer.pt': 'b' * 32}}
     elif defect == 'other_config':
         report['config_hash'] = '0' * 32
+    elif defect == 'other_source':
+        report['source_blake2b_128'] = '0' * 32
     else:
         report['status'] = 'running'
     path.write_text(json.dumps(report))
     with pytest.raises(SystemExit):
         manifest_script.lock(ROOT / 'configs' / 'slot_loop_v1', path)
+
+
+def test_the_manifest_omits_sealed_seeds_but_keeps_their_counts_and_id_digests():
+    manifest = slot_data.manifest()
+    for purpose in ("confirmation", "unseen"):
+        row = manifest["sets"][f"S1A/{purpose}"]
+        assert row["sealed"] and row["count"] == 2000
+        assert "base_seed" not in row and "query_seed" not in row
+        assert manifest["ids"][f"eval/S1A/{purpose}"]["count"] == row["count"]
+
+
+def test_source_digest_changes_with_source_paths_and_bytes_but_allows_docs_and_scripts(tmp_path):
+    (tmp_path / "src").mkdir()
+    source = tmp_path / "src" / "one.py"
+    source.write_text("x = 1\n")
+    original = slot_data.source_digest(tmp_path)
+    (tmp_path / "docs").mkdir()
+    (tmp_path / "docs" / "state.md").write_text("updated")
+    (tmp_path / "scripts").mkdir()
+    (tmp_path / "scripts" / "analysis.py").write_text("updated")
+    (tmp_path / "src" / "__pycache__").mkdir()
+    (tmp_path / "src" / "__pycache__" / "one.pyc").write_bytes(b"cache")
+    assert slot_data.source_digest(tmp_path) == original
+    source.write_text("x = 2\n")
+    changed = slot_data.source_digest(tmp_path)
+    assert changed != original
+    source.rename(tmp_path / "src" / "two.py")
+    assert slot_data.source_digest(tmp_path) not in {original, changed}

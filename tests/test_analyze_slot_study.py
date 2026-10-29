@@ -31,13 +31,24 @@ def blake(data):
     return hashlib.blake2b(data, digest_size=16).hexdigest()
 
 
+def arguments(argv):
+    argv = [str(a) for a in argv]
+    if '--manifest' not in argv:
+        root = Path(argv[argv.index('--records') + 1])
+        path = root / 'manifest.lock.json'
+        if not path.exists():
+            write_manifest(root)
+        argv += ['--manifest', str(path)]
+    return argv
+
+
 def run(*argv):
-    assert slot.main([str(a) for a in argv]) == 0
+    assert slot.main(arguments(argv)) == 0
 
 
 def refused(match, *argv):
     with pytest.raises(SystemExit, match=match) as caught:
-        slot.main([str(a) for a in argv])
+        slot.main(arguments(argv))
     assert str(caught.value).startswith('refused: ') and '\n' not in str(caught.value)
 
 
@@ -75,6 +86,21 @@ def ids_digest(ids):
     return blake(np.asarray(ids).astype('<i8').tobytes())
 
 
+def write_manifest(root, s1a_n=400, s0_n=N, dev_n=1000, dev_ids='cd' * 16):
+    """A locked synthetic registry, fixed independently of the result files under test."""
+    values = {'S0/calibration': (2048, '1' * 32), 'S0/dev': (s0_n, ids_digest(episode_ids(s0_n))),
+              'S1A/dev': (dev_n, dev_ids),
+              'S1A/confirmation': (s1a_n, ids_digest(np.arange(s1a_n, dtype=np.int64) + 1000)),
+              'S1A/unseen': (s1a_n, ids_digest(np.arange(s1a_n, dtype=np.int64) + 10 ** 6))}
+    locked = dict(version=1, status='locked', study='slot-loop-v1',
+                  manifest=dict(sets={key: dict(count=n) for key, (n, _) in values.items()},
+                                ids={f'eval/{key}': dict(count=n, ids_blake2b_128=own) for key, (n, own) in values.items()}))
+    root.mkdir(parents=True, exist_ok=True)
+    path = root / 'manifest.lock.json'
+    path.write_text(json.dumps(locked))
+    return path
+
+
 def s0_metrics(correct=None, rel_err=None, selected=SELECTED, nll=None, n=N, d128=None):
     """A consistent S0 record. Every condition has 700 correct and read error 0.20 (decision row R5) unless 'role/scope' says otherwise."""
     correct, rel_err = correct or {}, rel_err or {}
@@ -102,6 +128,10 @@ def s0_samples(metrics, seed=0):
         arrays[f'{key}/correct'] = rng.permutation(n) < row['correct']
         arrays[f'{key}/nll'] = rng.uniform(0.5, 3.0, n)
         arrays[f'{key}/rel_err'] = rng.uniform(0.0, 1.0, n)
+    native, matrix = f'native/{AV}', f'matrix_uncal/{AV}'
+    if metrics['conditions'][native]['correct'] == metrics['conditions'][matrix]['correct']:
+        arrays[f'{matrix}/correct'] = arrays[f'{native}/correct'].copy()
+    arrays[f'{matrix}/nll'] = arrays[f'{native}/nll'].copy()
     return arrays
 
 
@@ -110,7 +140,7 @@ def passing(**changes):
 
 
 def write_s0(root, metrics, preflight=None, arrays=None):
-    root.mkdir(parents=True, exist_ok=True)
+    write_manifest(root)
     (root / 'metrics.json').write_text(json.dumps(metrics))
     np.savez(root / 'samples.npz', **(s0_samples(metrics) if arrays is None else arrays))
     (root / 'preflight.json').write_text(json.dumps(passing() if preflight is None else preflight))
@@ -183,13 +213,42 @@ def test_r0_for_each_failing_missing_or_non_boolean_required_check(tmp_path, nam
     d = json.loads((tmp_path / 'out' / 'decision_s0.json').read_text())
     assert d['row'] == 'R0' and d['preflight']['failed'] == [name] and d['preflight']['required'][name] is False
     index = json.loads((tmp_path / 'out' / 'source_index.json').read_text())
-    assert list(index['inputs']) == [str((root / 'preflight.json').resolve())]
+    assert sorted(index['inputs']) == sorted([str((root / 'preflight.json').resolve()), str((root / 'manifest.lock.json').resolve())])
 
 
 def test_r0_lists_every_missing_check_and_wins_over_a_good_comparison(tmp_path):
     d = run_s0(tmp_path, s0_metrics({'soft_cal/all_valid_question': 800}, {'soft_cal/all_valid_question': 0.05}), preflight=dict(passed=True))
     assert d['row'] == 'R0' and d['preflight']['failed'] == list(CHECKS)
     assert 'differences' not in d and 'conditions' not in d
+
+
+@pytest.mark.parametrize('field', ['correct', 'nll'])
+def test_s0_dev_per_sample_native_matrix_mismatch_is_r0_even_with_equal_aggregate_means(tmp_path, field):
+    m = s0_metrics({'soft_cal/all_valid_question': 800}, {'soft_cal/all_valid_question': 0.05})
+    arrays = s0_samples(m)
+    key = f'matrix_uncal/{AV}/{field}'
+    a = arrays[key]
+    if field == 'correct':
+        i, j = np.flatnonzero(a)[0], np.flatnonzero(~a)[0]
+    else:
+        i, j = 0, 1
+    a[[i, j]] = a[[j, i]]
+    d = run_s0(tmp_path, m, arrays=arrays)
+    assert d['row'] == 'R0' and d['s1a'] is None
+    assert d['native_matrix_identity'][field] is False
+    assert 'differences' not in d and 'tests' not in d
+    assert 'differ per sample on S0 dev' in (tmp_path / 'out' / 'decision_s0.md').read_text()
+
+
+def test_s0_native_matrix_nll_identity_has_no_tolerance_and_requires_both_arrays(tmp_path):
+    m = s0_metrics()
+    arrays = s0_samples(m)
+    arrays[f'matrix_uncal/{AV}/nll'][0] = np.nextafter(arrays[f'native/{AV}/nll'][0], np.inf)
+    assert run_s0(tmp_path, m, arrays=arrays)['row'] == 'R0'
+    del arrays[f'matrix_uncal/{AV}/nll']
+    root = write_s0(tmp_path / 'missing', m, arrays=arrays)
+    refused('lacks.*matrix_uncal/all_valid_question/nll', '--stage', 'S0', '--records', root,
+            '--preflight', root / 'preflight.json', '--out', tmp_path / 'missing-out')
 
 
 def test_the_five_point_threshold_is_exact_integer_arithmetic():
@@ -462,12 +521,12 @@ def test_the_episode_ids_of_samples_must_match_the_digest_of_metrics_json(tmp_pa
     root = write_s0(tmp_path / 'absent', absent)
     refused('episode ids of samples.npz do not match', '--stage', 'S0', '--records', root, '--preflight', root / 'preflight.json',
             '--out', tmp_path / 'absent-out')
-    # a coherent set of other ids (every condition carries them, with their own digest) is accepted: the check is a match, not a fixed set
+    # A coherent replacement set still differs from the independent locked registry and must be refused.
     other = ids[::-1].copy()
     arrays = {k: (other if k.endswith('/episode_id') else v) for k, v in s0_samples(good).items()}
     root = write_s0(tmp_path / 'other', dict(good, ids_blake2b_128=ids_digest(other)), arrays=arrays)
-    run('--stage', 'S0', '--records', root, '--preflight', root / 'preflight.json', '--out', tmp_path / 'other-out')
-    assert json.loads((tmp_path / 'other-out' / 'decision_s0.json').read_text())['ids_blake2b_128'] == ids_digest(other)
+    refused('S0/dev: ids digest differs from locked manifest', '--stage', 'S0', '--records', root,
+            '--preflight', root / 'preflight.json', '--out', tmp_path / 'other-out')
 
 
 # -------------------------------------------------------------------------------------------------------------------- S1A-DEV
@@ -476,7 +535,7 @@ def dev_record(arm, seed, nll, correct, steps=1000, **over):
     """One run record. `nll` and `correct` hold step 0 and the ten selectable rows; the registered rule picks `selected_step`."""
     marks = [0] + [steps * k // 10 for k in range(1, 11)]
     rows = [dict(step=m, selectable=m >= 1, n=1000, correct=c, nll=v, em=c / 1000) for m, v, c in zip(marks, nll, correct)]
-    rec = dict(status='complete', arm=arm, seed=seed, steps=steps, dev=rows, selected_step=None, selected_checkpoint_blake2b_128='ab' * 16,
+    rec = dict(status='complete', ablation=False, arm=arm, seed=seed, steps=steps, dev=rows, selected_step=None, selected_checkpoint_blake2b_128='ab' * 16,
                dev_ids_blake2b_128='cd' * 16, training=dict(all_finite=True, clipped_fraction=0.1, grad_norm_max=3.0))
     rec.update(over)
     return rec
@@ -488,6 +547,7 @@ COUNTS = [600, 650, 655, 660, 665, 670, 675, 680, 685, 690, 695]
 
 def dev_tree(root, soft_extra=(30, 30, 30), mutate=None, nll=FALLING):
     """Six records; the soft arm gains `soft_extra[seed]` correct at every selectable step."""
+    write_manifest(root)
     for arm in ('matrix_L1', 'soft_slot_L1'):
         for i, seed in enumerate((17, 29, 43)):
             extra = soft_extra[i] if arm == 'soft_slot_L1' else 0
@@ -671,6 +731,84 @@ def test_dev_refuses_incomplete_missing_or_mismatched_records(tmp_path):
     attempt('flag', 'all_finite is not a boolean', flag)
 
 
+# ----------------------------------------------------------------------------------------------------------------- S1A-ABL
+
+def ablation_tree(root, gap=30, n=1000):
+    dev_tree(root)
+    write_manifest(root, dev_n=n)
+    for path in root.glob('*/s*/record.json'):
+        rec = json.loads(path.read_text())
+        for row in rec['dev']:
+            row.update(n=n, correct=10)
+        path.write_text(json.dumps(rec))
+    for arm in slot.ARMS:
+        # The last row has the largest EM, but dev NLL selects step 100, earlier on a micro-nat tie.
+        rec = dev_record(arm, 17, [2.0, 1.0, 0.9999995] + [1.2] * 8,
+                         [10, 10 + (gap if arm == 'soft_slot_L1' else 0)] + [n] * 9,
+                         selected_step=100, ablation=True)
+        for row in rec['dev']:
+            row['n'] = n
+        path = root / 'ablation' / arm / 's17' / 'record.json'
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(json.dumps(rec))
+    return root
+
+
+@pytest.mark.parametrize('n,gap,flag', [(1000, 30, True), (1000, 29, False), (101, 3, False), (101, 4, True), (1000, -1, False)])
+def test_ablation_uses_nll_selected_checkpoint_and_exact_three_point_boundary(tmp_path, capsys, n, gap, flag):
+    root = ablation_tree(tmp_path / 'tree', gap, n)
+    run('--stage', 'S1A-ABL', '--records', root, '--out', tmp_path / 'out')
+    result = json.loads((tmp_path / 'out' / 's1a-ablation.json').read_text())
+    assert result == dict(stage='S1A-ABL', n=n, correct=dict(matrix_L1=10, soft_slot_L1=10 + gap), flag=flag)
+    assert capsys.readouterr().out.splitlines() == [f'n {n}', 'matrix_L1 correct 10', f'soft_slot_L1 correct {10 + gap}', f'flag {str(flag).lower()}']
+    index = read_index(tmp_path / 'out')
+    assert len(index['inputs']) == 9  # six main records, two ablation records, locked manifest
+
+
+@pytest.mark.parametrize('value', [True, None, 0, 'false'])
+def test_six_main_records_require_the_exact_false_ablation_flag(tmp_path, value):
+    root = dev_tree(tmp_path / 'tree', mutate=lambda arm, seed, rec: rec.update(ablation=value))
+    refused('ablation must be False', '--stage', 'S1A-DEV', '--records', root, '--out', tmp_path / 'out')
+    root = ablation_tree(tmp_path / 'abl')
+    path = root / 'matrix_L1' / 's17' / 'record.json'
+    rec = json.loads(path.read_text())
+    rec.pop('ablation')
+    path.write_text(json.dumps(rec))
+    refused("lacks 'ablation'", '--stage', 'S1A-ABL', '--records', root, '--out', tmp_path / 'abl-out')
+
+
+@pytest.mark.parametrize('failure', ['missing_main', 'missing_ablation', 'failed', 'flag', 'ids', 'n', 'selection'])
+def test_ablation_refuses_incomplete_mislabelled_mismatched_or_wrong_selected_inputs(tmp_path, failure):
+    root = ablation_tree(tmp_path / 'tree')
+    path = root / 'ablation' / 'soft_slot_L1' / 's17' / 'record.json'
+    rec = json.loads(path.read_text())
+    if failure == 'missing_main':
+        (root / 'matrix_L1' / 's29' / 'record.json').unlink()
+        match = 'cannot read matrix_L1/s29/record.json'
+    elif failure == 'missing_ablation':
+        path.unlink()
+        match = 'cannot read ablation/soft_slot_L1/s17/record.json'
+    else:
+        if failure == 'failed':
+            rec['status'] = 'failed'
+            match = "not complete"
+        elif failure == 'flag':
+            rec['ablation'] = False
+            match = 'ablation must be True'
+        elif failure == 'ids':
+            rec['dev_ids_blake2b_128'] = '0' * 32
+            match = 'S1A/dev: ids digest differs'
+        elif failure == 'n':
+            for row in rec['dev']:
+                row['n'] = 1001
+            match = 'S1A/dev: n .* differs'
+        else:
+            rec['selected_step'] = 200
+            match = 'selected_step differs'
+        path.write_text(json.dumps(rec))
+    refused(match, '--stage', 'S1A-ABL', '--records', root, '--out', tmp_path / 'out')
+
+
 # ---------------------------------------------------------------------------------------------------------------------- S1A
 
 def correctness(n, counts, shift=0):
@@ -697,6 +835,7 @@ def write_set(directory, ids, correct, rel_err=True, seed=5):
 
 def s1a_tree(root, n, counts, shift=0, unseen=None, references=True):
     """confirmation/ and unseen/ with the six labels (+ the three references); returns the confirmation correctness arrays."""
+    write_manifest(root, s1a_n=n)
     confirmation = correctness(n, counts, shift)
     extras = {label: np.random.default_rng(i).random(n) < 0.6 for i, label in enumerate(slot.REFERENCES)} if references else {}
     write_set(root / 'confirmation', np.arange(n, dtype=np.int64) + 1000, dict(confirmation, **extras))
@@ -822,12 +961,10 @@ def test_s1a_outputs_are_byte_identical_between_runs_and_carry_the_reference_row
     assert arm['nll'] is not None and arm['rel_err'] is not None
     md = (tmp_path / 'a' / 'verdict.md').read_text()
     assert md.startswith('# S1A verdict: ADVANCE') and 's_re_native' in md and 'descriptive, no verdict' in md
-    # references are optional; without them (and without read errors) the same required labels give the same contrast
+    # All three references are mandatory for each opened set.
     plain = tmp_path / 'plain'
     s1a_tree(plain, 400, ADVANCE, shift=37, references=False)
-    run('--stage', 'S1A', '--records', plain, '--out', tmp_path / 'c')
-    t = json.loads((tmp_path / 'c' / 'summary.json').read_text())
-    assert t['confirmation']['references'] == {} and t['confirmation']['contrast'] == s['confirmation']['contrast']
+    refused('confirmation/s_re_native.npz is missing', '--stage', 'S1A', '--records', plain, '--out', tmp_path / 'c')
 
 
 def test_s1a_stdout_is_blinded(tmp_path, capsys):
@@ -843,7 +980,73 @@ def test_s1a_stdout_is_blinded(tmp_path, capsys):
     assert not re.search(r'\d+\.\d+', out)                          # no decimal number: no metric, no interval, no EM
     for value in (c['delta_pp'], c['lower_pp'], c['upper_pp'], c['seeds']['17']['delta_pp'], c['seeds']['17']['lower_pp']):
         assert repr(value) not in out and f'{value:.1f}' not in out and f'{value:.3f}' not in out
-    assert 'confirmation n 400 expected 2000 files 9' in out        # counts are allowed, and a different n is reported, not refused
+    assert 'confirmation n 400 expected 400 files 9' in out         # matches this synthetic locked manifest; wrong n is refused below
+
+
+def test_unseen_is_optional_only_when_all_its_files_are_absent(tmp_path, capsys):
+    root = tmp_path / 'tree'
+    s1a_tree(root, 400, ADVANCE)
+    for path in (root / 'unseen').glob('*.npz'):
+        path.unlink()
+    run('--stage', 'S1A', '--records', root, '--out', tmp_path / 'out')
+    result = json.loads((tmp_path / 'out' / 'summary.json').read_text())
+    assert result['unseen'] == dict(status='not run') and result['verdict'] == 'ADVANCE'
+    assert 'unseen not run' in capsys.readouterr().out
+    assert 'not run' in (tmp_path / 'out' / 'verdict.md').read_text()
+    write_set(root / 'unseen', np.arange(400, dtype=np.int64) + 10 ** 6, {'s_re_native': np.zeros(400, bool)})
+    refused('unseen/matrix_L1_s17.npz is missing', '--stage', 'S1A', '--records', root, '--out', tmp_path / 'partial')
+
+
+@pytest.mark.parametrize('name', ['confirmation', 'unseen'])
+@pytest.mark.parametrize('label', slot.REFERENCES)
+def test_each_reference_is_required_for_each_opened_set(tmp_path, name, label):
+    root = tmp_path / 'tree'
+    s1a_tree(root, 400, ADVANCE)
+    (root / name / f'{label}.npz').unlink()
+    refused(f'{name}/{label}.npz is missing', '--stage', 'S1A', '--records', root, '--out', tmp_path / 'out')
+
+
+@pytest.mark.parametrize('name', ['S0/calibration', 'S0/dev', 'S1A/dev', 'S1A/confirmation', 'S1A/unseen'])
+@pytest.mark.parametrize('field', ['count', 'ids_blake2b_128'])
+def test_each_analysis_input_set_must_match_the_independent_locked_count_and_ids(tmp_path, name, field):
+    root = tmp_path / 'tree'
+    if name.startswith('S0/'):
+        write_s0(root, s0_metrics())
+        argv = ['--stage', 'S0', '--preflight', root / 'preflight.json']
+    elif name == 'S1A/dev':
+        dev_tree(root)
+        argv = ['--stage', 'S1A-DEV']
+    else:
+        s1a_tree(root, 400, ADVANCE)
+        argv = ['--stage', 'S1A']
+    path = root / 'manifest.lock.json'
+    locked = json.loads(path.read_text())
+    ids = locked['manifest']['ids'][f'eval/{name}']
+    if field == 'count':
+        ids['count'] += 1
+        locked['manifest']['sets'][name]['count'] += 1
+        match = f'{name}: n .* differs from locked manifest count'
+    else:
+        ids[field] = '0' * 32
+        match = f'{name}: ids digest differs from locked manifest'
+    path.write_text(json.dumps(locked))
+    refused(match, *argv, '--records', root, '--out', tmp_path / 'out')
+
+
+def test_analysis_requires_a_locked_manifest_and_rejects_pending_or_inconsistent_locks(tmp_path):
+    root = dev_tree(tmp_path / 'tree')
+    argv = ['--stage', 'S1A-DEV', '--records', str(root), '--out', str(tmp_path / 'out')]
+    with pytest.raises(SystemExit):
+        slot.main(argv)  # --manifest has no default
+    path = root / 'manifest.lock.json'
+    locked = json.loads(path.read_text())
+    locked['status'] = 'pending'
+    path.write_text(json.dumps(locked))
+    refused('not a version 1 locked', *argv)
+    locked['status'] = 'locked'
+    locked['manifest']['ids']['eval/S1A/dev']['count'] += 1
+    path.write_text(json.dumps(locked))
+    refused('inconsistent or empty count', *argv)
 
 
 def test_s1a_refuses_missing_labels_mismatched_ids_and_bad_arrays(tmp_path):
@@ -930,13 +1133,14 @@ def test_source_index_lists_the_script_and_every_input_digest(tmp_path):
     index = read_index(tmp_path / 'o1')
     files = sorted(p.relative_to(root).as_posix() for p in root.rglob('*.npz'))
     assert index['stage'] == 'S1A' and index['script'] == 'analyze_slot_study.py' and index['script_blake2b_128'] == expected_script
-    assert sorted(index['inputs']) == files and len(files) == 18
+    assert sorted(index['inputs']) == sorted(files + [str((root / 'manifest.lock.json').resolve())]) and len(files) == 18
+    assert index['manifest_blake2b_128'] == blake((root / 'manifest.lock.json').read_bytes())
     assert all(index['inputs'][name] == blake((root / name).read_bytes()) for name in files)
     # S0: metrics and samples relative, the preflight absolute
     root = write_s0(tmp_path / 's0', s0_metrics())
     run('--stage', 'S0', '--records', root, '--preflight', root / 'preflight.json', '--out', tmp_path / 'o0')
     index = read_index(tmp_path / 'o0')
-    assert sorted(index['inputs']) == sorted(['metrics.json', 'samples.npz', str((root / 'preflight.json').resolve())])
+    assert sorted(index['inputs']) == sorted(['metrics.json', 'samples.npz', str((root / 'preflight.json').resolve()), str((root / 'manifest.lock.json').resolve())])
     assert index['inputs']['metrics.json'] == blake((root / 'metrics.json').read_bytes())
     assert index['inputs']['samples.npz'] == blake((root / 'samples.npz').read_bytes())
     assert index['inputs'][str((root / 'preflight.json').resolve())] == blake((root / 'preflight.json').read_bytes())
@@ -946,7 +1150,7 @@ def test_source_index_lists_the_script_and_every_input_digest(tmp_path):
     run('--stage', 'S1A-DEV', '--records', root, '--out', tmp_path / 'o2')
     index = read_index(tmp_path / 'o2')
     names = sorted(p.relative_to(root).as_posix() for p in root.rglob('record.json'))
-    assert sorted(index['inputs']) == names and len(names) == 6 and index['stage'] == 'S1A-DEV'
+    assert sorted(index['inputs']) == sorted(names + [str((root / 'manifest.lock.json').resolve())]) and len(names) == 6 and index['stage'] == 'S1A-DEV'
     assert all(index['inputs'][name] == blake((root / name).read_bytes()) for name in names)
 
 

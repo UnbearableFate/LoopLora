@@ -452,7 +452,7 @@ def test_arms_read_with_their_calibrated_values():
 def test_the_runner_refuses_without_a_valid_lock(tmp_path, monkeypatch):
     monkeypatch.setattr(slot_data, 'inventory', lambda: {'S-RE': {'writer.pt': 'a' * 32}})
     monkeypatch.setattr(slot_data, 'manifest', lambda: {'ids': {'x': 1}})
-    good = dict(status='locked', prereg_blake2b_128=slot_data.PREREG_BLAKE2B_128, preflight=dict(passed=True),
+    good = dict(status='locked', prereg_blake2b_128=slot_data.PREREG_BLAKE2B_128, preflight=dict(passed=True, source_blake2b_128=slot_data.source_digest()),
                 manifest={'ids': {'x': 1}}, inventory={'S-RE': {'writer.pt': 'a' * 32}})
     path = tmp_path / 'lock.json'
 
@@ -462,7 +462,7 @@ def test_the_runner_refuses_without_a_valid_lock(tmp_path, monkeypatch):
 
     assert check()['status'] == 'locked'
     for edit in (dict(status='pending'), dict(prereg_blake2b_128='0' * 32), dict(preflight=dict(passed=False)), dict(preflight={}),
-                 dict(manifest={'ids': {'x': 2}}), dict(inventory={'S-RE': {'writer.pt': 'b' * 32}})):
+                 dict(preflight=dict(passed=True, source_blake2b_128='0' * 32)), dict(manifest={'ids': {'x': 2}}), dict(inventory={'S-RE': {'writer.pt': 'b' * 32}})):
         with pytest.raises(slot_run.StopRun):
             check(**edit)
 
@@ -516,6 +516,10 @@ def tiny_study(monkeypatch, model, tokenizer, tmp_path):
                                                                                     passed=True))
     metrics = tmp_path / 's0_metrics.json'
     metrics.write_text(json.dumps(dict(calibration=dict(selected=SELECTED))))
+    registry = dict(sets={s.name: dict(count=s.count) for s in sets.values()},
+                    ids={f'eval/{s.name}': dict(count=s.count, ids_blake2b_128=slot_data.ids_digest(s.episode_ids()))
+                         for s in sets.values()})
+    (tmp_path / 'lock.json').write_text(json.dumps(dict(version=1, study=slot_data.STUDY, status='locked', manifest=registry)))
     return dict(config=ROOT / 'configs' / 'slot_loop_v1' / 's1a.json', manifest=tmp_path / 'lock.json', s0=metrics, sets=sets)
 
 
@@ -527,6 +531,8 @@ def test_the_smoke_trains_both_arms_under_the_freeze_checks_and_its_exports_relo
         assert report['all_finite'] and report['freeze']['digests']['frozen_unchanged'] and report['freeze']['support']['equal']
         assert [row['step'] for row in report['dev']] == [0, 6] and report['selected_checkpoint_blake2b_128']
         check = slot_run.reload_check(tmp_path / 'smoke' / arm / 'selected.pt', tmp_path / 'smoke' / arm / 'smoke_predictions.npz', arrays,
+                                      release=dict(arms={arm: {"read": report["read"]}},
+                                                   smoke_configs={arm: report["export_config"]}),
                                       model=model, tokenizer=tokenizer)
         assert check['passed'] and all(check['equal'].values()) and check['read']['kind'] == slot_rules.ARM_KIND[arm]
 
@@ -567,7 +573,7 @@ def release_for(tiny_study, tmp_path, steps=20, **edit):
     hashes = {f'{arm}/{seed}': slot_rules.science_hash(slot_rules.science_config(
         arm, seed, steps=steps, lr=1e-3, read=arms[arm]['read'], parent_digest=PARENT_DIGESTS['writer.pt']))
         for arm in slot_rules.ARMS for seed in slot_data.RUN_SEEDS}
-    release = dict(science_commit=slot_run.provenance()['git_commit'], prereg_blake2b_128=slot_data.PREREG_BLAKE2B_128, steps=steps,
+    release = dict(status='ready', science_commit=slot_run.provenance()['git_commit'], prereg_blake2b_128=slot_data.PREREG_BLAKE2B_128, steps=steps,
                    parent=dict(writer_blake2b_128=PARENT_DIGESTS['writer.pt']), arms=arms, config_hashes=hashes)
     release.update(edit)
     path = tmp_path / 'release.json'
@@ -602,7 +608,7 @@ def test_an_arm_seed_run_records_dev_selection_gradient_and_clipping_statistics_
     assert np.array_equal(arm['episode_id'], np.load(out / 'native.npz')['episode_id'])
 
 
-@pytest.mark.parametrize('defect', ['commit', 'prereg', 'parent', 'science_config', 'unknown_run'])
+@pytest.mark.parametrize('defect', ['commit', 'prereg', 'parent', 'science_config', 'unknown_run', 'pending_reload'])
 def test_a_run_that_differs_from_its_release_does_not_start(tiny_study, tmp_path, defect):
     release = json.loads(release_for(tiny_study, tmp_path).read_text())
     seed = 17
@@ -614,6 +620,8 @@ def test_a_run_that_differs_from_its_release_does_not_start(tiny_study, tmp_path
         release['parent']['writer_blake2b_128'] = 'f' * 32
     elif defect == 'science_config':
         release['arms']['matrix_L1']['lr'] = 3e-3  # the hash in the release is of lr 1e-3
+    elif defect == 'pending_reload':
+        release['status'] = 'pending_reload'
     else:
         release['config_hashes'].pop('matrix_L1/17')
     path = tmp_path / 'edited.json'
@@ -640,7 +648,7 @@ def test_what_the_runner_writes_for_s0_is_what_the_frozen_analysis_reads(tiny_st
     assert metrics['n'] == 32 and metrics['calibration']['n'] == 32 and len(metrics['calibration']['candidates']) == 18
     preflight = tmp_path / 'preflight.json'
     preflight.write_text(json.dumps(dict(passed=True, checks={name: dict(passed=True) for name in analysis.CHECKS})))
-    assert analysis.main(['--stage', 'S0', '--records', str(out), '--out', str(tmp_path / 'decision'), '--preflight', str(preflight)]) == 0
+    assert analysis.main(['--stage', 'S0', '--records', str(out), '--out', str(tmp_path / 'decision'), '--preflight', str(preflight), '--manifest', str(tiny_study['manifest'])]) == 0
     decision = json.loads((tmp_path / 'decision' / 'decision_s0.json').read_text())
     assert decision['row'] in {'R1', 'R2', 'R3', 'R4', 'R5'} and decision['n'] == 32 and decision['preflight']['failed'] == []
     assert decision['calibration']['selected'] == metrics['calibration']['selected']
@@ -649,7 +657,7 @@ def test_what_the_runner_writes_for_s0_is_what_the_frozen_analysis_reads(tiny_st
     # the engineering gate: a failed check ends in R0 without reading any S0 data
     preflight.write_text(json.dumps(dict(passed=False, checks={**{name: dict(passed=True) for name in analysis.CHECKS},
                                                               'matrix_equals_native': dict(passed=False)})))
-    assert analysis.main(['--stage', 'S0', '--records', str(tmp_path), '--out', str(tmp_path / 'gate'), '--preflight', str(preflight)]) == 0
+    assert analysis.main(['--stage', 'S0', '--records', str(tmp_path), '--out', str(tmp_path / 'gate'), '--preflight', str(preflight), '--manifest', str(tiny_study['manifest'])]) == 0
     assert json.loads((tmp_path / 'gate' / 'decision_s0.json').read_text())['row'] == 'R0'
 
 
@@ -662,3 +670,118 @@ def test_the_run_record_is_what_the_frozen_analysis_reads_for_the_dev_selection(
     assert parsed['steps'] == 20 and parsed['n'] == 48 and parsed['ids'] == record['dev_ids_blake2b_128']
     assert parsed['selected']['step'] == record['selected_step'] and parsed['checkpoint'] == record['selected_checkpoint_blake2b_128']
     assert parsed['training']['clipped_fraction'] == record['training']['clipped_fraction']
+
+
+@pytest.mark.parametrize("purpose", ["confirmation", "unseen"])
+def test_direct_generation_of_a_sealed_registry_entry_is_refused(purpose):
+    for generate_set in (raw_episodes, episodes):
+        with pytest.raises(slot_data.SealedSetError, match="has not been opened"):
+            generate_set(slot_data.SETS["S1A", purpose])
+
+
+@pytest.mark.parametrize("open_root", [None, "relative/root"])
+def test_sealed_cli_requires_an_explicit_absolute_open_root(open_root, tmp_path):
+    argv = ["--mode", "evaluate", "--set", "confirmation", "--out", str(slot_run.RUNS / "test-open-root")]
+    if open_root is not None:
+        argv += ["--open-root", open_root]
+    with pytest.raises(SystemExit) as error:
+        slot_run.main(argv)
+    assert error.value.code == 2
+
+
+def test_the_pilot_excludes_a_nonfinite_candidate_records_it_and_continues(tiny_study, tmp_path, monkeypatch):
+    calls = []
+
+    def candidate(experiment, spec, **kwargs):
+        calls.append((spec.kind, kwargs["lr"]))
+        if len(calls) == 1:
+            raise FloatingPointError("non-finite loss at step 3")
+        return dict(dev=[dict(step=0, nll=2.0, seconds=7.0), dict(step=200, nll=1.0, seconds=7.0)],
+                    step_seconds_mean=0.2, clipped_fraction=0.0, all_finite=True, loss=dict(first=2.0, last=1.0))
+
+    monkeypatch.setattr(slot_run, "fit", candidate)
+    result = slot_run.run_pilot(tmp_path / "diverging-pilot", tiny_study["config"], tiny_study["manifest"], tiny_study["s0"])
+    assert len(calls) == len(result["runs"]) == 6 and result["stop"] is None
+    failed = result["runs"][0]
+    assert failed["nll"] is None and failed["all_finite"] is False and "non-finite loss" in failed["error"]
+    assert result["lr"] == dict(matrix_L1=1e-3, soft_slot_L1=3e-4)
+    assert result["step_seconds"] == 0.2 and result["eval_seconds"] == 7.0
+    assert result["steps"] == slot_rules.schedule_steps(0.2, 7.0, result["load_seconds"])
+    assert json.loads((tmp_path / "diverging-pilot" / "pilot.json").read_text()) == result
+
+
+def test_the_pilot_stops_with_a_record_if_every_candidate_is_nonfinite(tiny_study, tmp_path, monkeypatch):
+    def candidate(*args, **kwargs):
+        raise FloatingPointError("non-finite gradient")
+    monkeypatch.setattr(slot_run, "fit", candidate)
+    out = tmp_path / "nonfinite-pilot"
+    with pytest.raises(slot_run.StopRun, match="no finite LR candidate"):
+        slot_run.run_pilot(out, tiny_study["config"], tiny_study["manifest"], tiny_study["s0"])
+    result = json.loads((out / "pilot.json").read_text())
+    assert len(result["runs"]) == 6 and result["step_seconds"] is result["eval_seconds"] is None
+    assert result["lr"] == dict(matrix_L1=None, soft_slot_L1=None)
+
+
+def test_the_pilot_does_not_exclude_unrelated_runtime_errors(tiny_study, tmp_path, monkeypatch):
+    def broken(*args, **kwargs):
+        raise RuntimeError("wrong owner")
+    monkeypatch.setattr(slot_run, "fit", broken)
+    with pytest.raises(RuntimeError, match="wrong owner"):
+        slot_run.run_pilot(tmp_path / "bad-interface", tiny_study["config"], tiny_study["manifest"], tiny_study["s0"])
+
+
+def test_reload_requires_the_config_implied_by_the_release(experiment, model, tokenizer, tmp_path):
+    spec, arrays = ReadSpec("soft", tau=0.3), eval_arrays(8)
+    export = tmp_path / "export.pt"
+    save_export(experiment, export, arm="soft_slot_L1", spec=spec, step=0, parent={}, run={})
+    samples = evaluate(experiment, arrays, {"read": spec}, diagnostics=False)["samples"]["read"]
+    predictions = tmp_path / "predictions.npz"
+    np.savez_compressed(predictions, **samples)
+    payload = torch.load(export, map_location="cpu", weights_only=True)
+    release = dict(arms={"soft_slot_L1": dict(read=spec.as_dict())}, smoke_configs={"soft_slot_L1": payload["slot"]})
+    experiment.close()
+    check = slot_run.reload_check(export, predictions, arrays, release=release, model=model, tokenizer=tokenizer)
+    assert check["passed"] and check["config_matches_release"] and check["checkpoint_blake2b_128"] == slot_data.file_digest(export)
+    release["smoke_configs"]["soft_slot_L1"]["loop_steps"] = 4
+    with pytest.raises(slot_run.StopRun, match="config differs"):
+        slot_run.reload_check(export, predictions, arrays, release=release, model=model, tokenizer=tokenizer)
+
+
+@pytest.mark.parametrize("nonfinite", ["gradient", "dev"])
+def test_nonfinite_gradient_or_dev_is_classified_for_pilot_exclusion(experiment, tmp_path, monkeypatch, nonfinite):
+    if nonfinite == "gradient":
+        experiment.adapter.B.register_hook(lambda grad: torch.full_like(grad, float("inf")))
+        with pytest.raises(FloatingPointError, match="non-finite gradient"):
+            fit(experiment, ReadSpec("matrix"), steps=2, lr=1e-3, stream_seed=1, out=tmp_path, workers=0)
+    else:
+        from looplora.llm import slot_train
+        monkeypatch.setattr(slot_train, "summarize", lambda samples: dict(nll=float("nan")))
+        with pytest.raises(FloatingPointError, match="non-finite dev NLL"):
+            dev_row(experiment, ReadSpec("matrix"), eval_arrays(8), 0, False)
+
+
+
+def test_a_reference_entry_uses_the_locked_parent_permission_without_generating_sealed_data(tiny_study, model, tokenizer,
+                                                                                          tmp_path, monkeypatch):
+    import shutil
+    root = tmp_path / "open-root"
+    (root / "docs" / "prereg").mkdir(parents=True)
+    (root / "scripts").mkdir()
+    (root / "reports" / "slot-loop-v1").mkdir(parents=True)
+    shutil.copy(ROOT / slot_data.PREREG, root / slot_data.PREREG)
+    shutil.copy(ROOT / slot_data.ANALYSIS_SCRIPT, root / slot_data.ANALYSIS_SCRIPT)
+    record = dict(prereg_blake2b_128=slot_data.PREREG_BLAKE2B_128,
+                  analysis_script_blake2b_128=slot_data.file_digest(root / slot_data.ANALYSIS_SCRIPT),
+                  selected_checkpoints={f"{arm}/{seed}": f"{index:032x}" for index, (arm, seed) in enumerate(
+                      (arm, seed) for arm in slot_rules.ARMS for seed in slot_data.RUN_SEEDS)})
+    (root / slot_data.OPEN_RECORD).write_text(json.dumps(record))
+    token = slot_data.load_open_token(root, {"S-RE": PARENT_DIGESTS})
+    ordinary_arrays = episodes(tiny_study["sets"]["S1A", "dev"])
+    def synthetic_arrays(s):
+        assert s.sealed and s.opened
+        return ordinary_arrays
+    monkeypatch.setattr(slot_run, "episodes", synthetic_arrays)
+    monkeypatch.setattr(slot_run, "ids_record", lambda s, arrays: "synthetic")
+    report = slot_run.evaluate_entries(("S1A", "confirmation"), [dict(label="s_re_native", read=None,
+        parent_writer_blake2b_128=PARENT_DIGESTS["writer.pt"])], tmp_path / "reference", token=token, model=model, tokenizer=tokenizer)
+    assert report["s_re_native"]["n"] == 48

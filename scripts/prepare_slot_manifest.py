@@ -5,9 +5,9 @@ numpy and the standard library only (no torch, no model, no run). `looplora.llm.
 registered integer (a mismatch is an error), the episode ids and their digests, and the disjointness of all registered sets and
 train streams from the old protected ones; `inventory()` hashes the real parent files.
 
-    scripts/prepare_slot_manifest.py --write-configs configs/slot_loop_v1
-    scripts/prepare_slot_manifest.py --configs configs/slot_loop_v1 --out reports/slot-loop-v1/manifest.pending.json
-    scripts/prepare_slot_manifest.py --configs configs/slot_loop_v1 --preflight-report PREFLIGHT.json \\
+    /work/xg24i002/x10041/LoopLora/.venv/bin/python scripts/prepare_slot_manifest.py --write-configs configs/slot_loop_v1
+    /work/xg24i002/x10041/LoopLora/.venv/bin/python scripts/prepare_slot_manifest.py --configs configs/slot_loop_v1 --out reports/slot-loop-v1/manifest.pending.json
+    /work/xg24i002/x10041/LoopLora/.venv/bin/python scripts/prepare_slot_manifest.py --configs configs/slot_loop_v1 --preflight-report PREFLIGHT.json \\
         --out reports/slot-loop-v1/manifest.lock.json --inventory-out reports/slot-loop-v1/checkpoint_inventory.json
 
 The lock is what `looplora.llm.slot_run` requires before any science mode runs: it refuses unless the preflight passed.
@@ -68,8 +68,10 @@ def lock(configs: Path, report_path: Path) -> tuple[dict, dict]:
         raise SystemExit("a required preflight check did not pass: no lock")
     if report.get("inventory") != inventory or report.get("config_hash") != base["config_hashes"]["S0"]:
         raise SystemExit("the preflight ran on other parent files or another configuration than the ones now on disk")
+    if report.get("source_blake2b_128") != slot_data.source_digest():
+        raise SystemExit("the source differs from the source that passed the preflight: rerun preflight")
     locked = dict(base, status="locked", inventory=inventory,
-                  preflight=dict(passed=True, report_blake2b_128=slot_data.file_digest(report_path),
+                  preflight=dict(passed=True, source_blake2b_128=report["source_blake2b_128"], report_blake2b_128=slot_data.file_digest(report_path),
                                  job_id=report.get("job_id"), git_commit=report.get("git_commit"),
                                  checks={name: report["checks"][name]["passed"] for name in sorted(required)},
                                  matrix_max_abs_difference=report["checks"]["matrix_equals_native"]["max_abs_difference"]))

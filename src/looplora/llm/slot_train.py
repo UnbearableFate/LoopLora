@@ -34,6 +34,8 @@ def dev_row(experiment, spec: ReadSpec, arrays, step: int, selectable: bool) -> 
     result = evaluate(experiment, arrays, {"read": spec}, diagnostics=False)
     synchronize(experiment.device)
     summary = summarize(result["samples"]["read"])
+    if not math.isfinite(summary["nll"]):
+        raise FloatingPointError(f"non-finite dev NLL at step {step}")
     return dict(step=step, selectable=selectable, n=summary["n"], correct=summary["correct"], em=summary["em"],
                 nll=summary["nll"], loss_float32=summary["loss_float32"], seconds=time.perf_counter() - tick)
 
@@ -85,9 +87,16 @@ def fit(experiment, spec: ReadSpec, *, steps: int, lr: float, stream_seed: int, 
             if not bool(torch.isfinite(loss)):
                 raise FloatingPointError(f"non-finite loss at step {step}")
             loss.backward()
+            if any(p.grad is not None and not bool(torch.isfinite(p.grad).all()) for p in params):
+                raise FloatingPointError(f"non-finite gradient at step {step}")
             if step == 1:
                 freeze["gradients"] = gradient_report(experiment, trainable)
-            grad = torch.nn.utils.clip_grad_norm_(params, CLIP, error_if_nonfinite=True)  # the pre-clip global norm
+            try:
+                grad = torch.nn.utils.clip_grad_norm_(params, CLIP, error_if_nonfinite=True)  # the pre-clip global norm
+            except RuntimeError as error:
+                if "non-finite" not in str(error):
+                    raise
+                raise FloatingPointError(f"non-finite gradient norm at step {step}") from error
             optimizer.step()
             synchronize(device)
             duration = time.perf_counter() - tick

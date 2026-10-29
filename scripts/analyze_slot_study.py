@@ -1,9 +1,10 @@
 """Frozen analysis of SLOT-LOOP-v1 (docs/prereg/SLOT-LOOP-v1.md): the S0 decision, the S1A dev selection with the section-7.4
-trigger, and the S1A confirmation verdict. Standard library and numpy only; no clock, no environment: outputs are byte-deterministic.
+trigger, the S1A interface ablation and the S1A confirmation verdict. Standard library and numpy only; no clock, no environment: outputs are byte-deterministic.
 
-usage: python scripts/analyze_slot_study.py --stage {S0,S1A-DEV,S1A} --records DIR --out DIR [--preflight FILE]
+usage: python3 scripts/analyze_slot_study.py --stage {S0,S1A-DEV,S1A-ABL,S1A} --manifest LOCK --records DIR --out DIR [--preflight FILE]
   S0       DIR/metrics.json, DIR/samples.npz and --preflight FILE  -> decision_s0.json, decision_s0.md
   S1A-DEV  DIR/ARM/sSEED/record.json (2 arms x 3 seeds)            -> s1a-selection.json, s1a-selection.md
+  S1A-ABL  Six main records and DIR/ablation/ARM/s17/record.json   -> s1a-ablation.json, s1a-ablation.md
   S1A      DIR/confirmation/LABEL.npz, DIR/unseen/LABEL.npz        -> summary.json, verdict.md (stdout: counts, names, digests, verdict)
 Every stage also writes source_index.json (blake2b-128 of each input file and of this script). A defect in the inputs ends the run
 with SystemExit('refused: ...'); data are never repaired. Thresholds are integer comparisons; ties and interval ends are exact.
@@ -37,7 +38,6 @@ OLD_RANGE = dict(correct=608, n=1000, loss_float32=2.1291537284851074)
 ARMS, SEEDS = ('matrix_L1', 'soft_slot_L1'), (17, 29, 43)
 REFERENCES = ('s_re_native', 'matrix_step0', 'soft_step0')
 REQUIRED = tuple(f'{a}_s{s}' for a in ARMS for s in SEEDS)
-EXPECTED_N = 2000
 LABELS = {
     'R0': 'stop, fix the interface, no comparison, no S1A',
     'R1': 'full adaptation',
@@ -108,7 +108,10 @@ class Sources:
 
     def index(self, stage):
         script = Path(__file__)
-        return dict(stage=stage, script=script.name, script_blake2b_128=digest(script.read_bytes()), inputs=dict(self.digests))
+        result = dict(stage=stage, script=script.name, script_blake2b_128=digest(script.read_bytes()), inputs=dict(self.digests))
+        if hasattr(self, 'manifest_path'):
+            result.update(manifest=self.manifest_path, manifest_blake2b_128=self.digests[self.manifest_path])
+        return result
 
 
 def get(record, key, where):
@@ -127,6 +130,31 @@ def whole(x, where, high=None):
     if isinstance(x, bool) or not isinstance(x, int) or x < 0 or (high is not None and x > high):
         refuse(f'{where} is not an integer in [0, {high}]')
     return x
+
+
+def manifest_set(manifest, stage, purpose):
+    """Use the locked count and ordered-id digest, independently of the result files."""
+    if manifest.get('version') != 1 or manifest.get('status') != 'locked' or manifest.get('study') != 'slot-loop-v1':
+        refuse('the manifest is not a version 1 locked slot-loop-v1 manifest')
+    registry = get(manifest, 'manifest', 'locked manifest')
+    name = f'{stage}/{purpose}'
+    spec = get(get(registry, 'sets', 'manifest'), name, 'manifest.sets')
+    ids = get(get(registry, 'ids', 'manifest'), f'eval/{name}', 'manifest.ids')
+    n = whole(get(spec, 'count', name), f'manifest {name} count')
+    own = get(ids, 'ids_blake2b_128', f'manifest eval/{name}')
+    if n < 1 or get(ids, 'count', f'manifest eval/{name}') != n:
+        refuse(f'manifest {name}: inconsistent or empty count')
+    if not isinstance(own, str) or len(own) != 32 or any(c not in '0123456789abcdef' for c in own):
+        refuse(f'manifest {name}: ids digest is not 32 hex digits')
+    return n, own
+
+
+def check_set(manifest, stage, purpose, n, ids):
+    expected_n, expected_ids = manifest_set(manifest, stage, purpose)
+    if n != expected_n:
+        refuse(f'{stage}/{purpose}: n {n} differs from locked manifest count {expected_n}')
+    if ids != expected_ids:
+        refuse(f'{stage}/{purpose}: ids digest differs from locked manifest')
 
 
 def flags(a, where):
@@ -382,17 +410,26 @@ def soft_rec_vs_soft(conditions):
     return dict(pairs, largest_abs_d_correct=max(abs(p['d_correct']) for p in pairs.values()))
 
 
-def stage_s0(src, preflight):
+def stage_s0(src, preflight, manifest):
     gate = read_preflight(src.json(preflight, absolute=True))
     if gate['failed']:   # the gate failed: no comparison, and no S0 data are opened
         decision = dict(stage='S0', row='R0', label=LABELS['R0'], s1a=None, preflight=gate)
         return {'decision_s0.json': dumps(decision), 'decision_s0.md': render_s0(decision)}, ['stage S0', 'row R0']
     m = parse_s0(src.json('metrics.json'))
     n, conditions = m['n'], m['conditions']
-    ids, correct = parse_samples(src.npz('samples.npz'), n, conditions)
+    samples = src.npz('samples.npz')
+    ids, correct = parse_samples(samples, n, conditions)
     own = digest(ids.astype('<i8').tobytes())
     if own != m['ids']:
         refuse('the episode ids of samples.npz do not match ids_blake2b_128 of metrics.json (blake2b-128 of little-endian int64)')
+    check_set(manifest, 'S0', 'dev', n, own)
+    check_set(manifest, 'S0', 'calibration', m['calibration']['n'], m['calibration']['ids_blake2b_128'])
+    native, matrix = f'native/{AV}', f'matrix_uncal/{AV}'
+    nll = {key: floats(get(samples, f'{key}/nll', 'samples.npz'), f'samples.npz {key}/nll') for key in (native, matrix)}
+    identity = dict(correct=np.array_equal(correct[native], correct[matrix]), nll=np.array_equal(nll[native], nll[matrix]))
+    if not all(identity.values()):
+        decision = dict(stage='S0', row='R0', label=LABELS['R0'], s1a=None, preflight=gate, native_matrix_identity=identity)
+        return {'decision_s0.json': dumps(decision), 'decision_s0.md': render_s0(decision)}, ['stage S0', 'row R0']
     row, tests = decide_s0(conditions, n)
     selected, rec, notes = m['calibration']['selected'], soft_rec_vs_soft(conditions), []
     if selected['soft']['tau'] == 0.03:
@@ -423,8 +460,10 @@ def select_step(rows):
     return best
 
 
-def parse_run(raw, arm, seed):
-    where = f'{arm}/s{seed}/record.json'
+def parse_run(raw, arm, seed, ablation=False):
+    where = ('ablation/' if ablation else '') + f'{arm}/s{seed}/record.json'
+    if get(raw, 'ablation', where) is not ablation:
+        refuse(f'{where}: ablation must be {ablation!r}')
     if get(raw, 'status', where) != 'complete':
         reason = raw.get('failure_reason')
         first = reason.strip().splitlines()[0][:120] if isinstance(reason, str) and reason.strip() else ''
@@ -472,11 +511,18 @@ def parse_run(raw, arm, seed):
                 all_finite=training['all_finite'], training=dict(extra, all_finite=training['all_finite']))
 
 
-def stage_dev(src):
+def read_main_runs(src, manifest):
     runs = {(arm, seed): parse_run(src.json(f'{arm}/s{seed}/record.json'), arm, seed) for arm in ARMS for seed in SEEDS}
     for field, what in (('ids', 'dev_ids_blake2b_128'), ('n', 'dev n'), ('steps', 'steps')):
         if len({r[field] for r in runs.values()}) != 1:
             refuse(f'the six records differ in {what}')
+    for r in runs.values():
+        check_set(manifest, 'S1A', 'dev', r['n'], r['ids'])
+    return runs
+
+
+def stage_dev(src, manifest):
+    runs = read_main_runs(src, manifest)
     n, reasons = next(iter(runs.values()))['n'], []
     for (arm, seed), r in runs.items():
         label = f'{arm}/s{seed}'
@@ -503,17 +549,33 @@ def stage_dev(src):
     return {'s1a-selection.json': dumps(summary), 's1a-selection.md': render_dev(summary)}, lines
 
 
+def stage_ablation(src, manifest):
+    """Interpretation 9(f): the selected-checkpoint dev count contrast, without a confirmation verdict."""
+    main = read_main_runs(src, manifest)
+    runs = {arm: parse_run(src.json(f'ablation/{arm}/s17/record.json'), arm, 17, ablation=True) for arm in ARMS}
+    for arm, r in runs.items():
+        check_set(manifest, 'S1A', 'dev', r['n'], r['ids'])
+        if any(r[field] != next(iter(main.values()))[field] for field in ('n', 'ids', 'steps')):
+            refuse(f'ablation/{arm}/s17/record.json differs from the six main records in n, dev ids or steps')
+        if r['selected'] is None:
+            refuse(f'ablation/{arm}/s17/record.json: no finite selectable dev row')
+    n = runs['matrix_L1']['n']
+    counts = {arm: r['selected']['correct'] for arm, r in runs.items()}
+    flag = (counts['soft_slot_L1'] - counts['matrix_L1']) * 100 >= 3 * n
+    summary = dict(stage='S1A-ABL', n=n, correct=counts, flag=flag)
+    lines = [f'n {n}', f'matrix_L1 correct {counts["matrix_L1"]}', f'soft_slot_L1 correct {counts["soft_slot_L1"]}', f'flag {str(flag).lower()}']
+    return {'s1a-ablation.json': dumps(summary), 's1a-ablation.md': '\n'.join(lines) + '\n'}, lines
+
+
 # ------------------------------------------------------------------------------------------------------------------ S1A
 
 def read_set(src, name):
-    """The per-label arrays of one set (required labels in every set, references where present); ids identical across files."""
+    """The six main labels and three required references, with identical ids across files."""
     labels, ids, first = {}, None, None
     for label in REQUIRED + REFERENCES:
         path = f'{name}/{label}.npz'
         if not src.exists(path):
-            if label in REQUIRED:
-                refuse(f'{path} is missing')
-            continue
+            refuse(f'{path} is missing')
         z = src.npz(path)
         eid = get(z, 'episode_id', path)
         if eid.dtype != np.int64 or eid.ndim != 1:
@@ -534,7 +596,7 @@ def read_set(src, name):
     return ids, labels
 
 
-def analyze_set(ids, labels):
+def analyze_set(ids, labels, expected_n):
     """Per-label means and the primary contrast SoftSlot-L1 minus Matrix-L1 (three seeds) with paired bootstrap intervals."""
     n = len(ids)
     rows = {label: dict(correct=int(v['correct'].sum()), em=int(v['correct'].sum()) / n, nll=mean(v['nll']),
@@ -554,24 +616,31 @@ def analyze_set(ids, labels):
         errors = [r['rel_err'] for r in seeds.values()]
         arms[arm] = dict(seeds=seeds, em=float(Fraction(sum(r['correct'] for r in seeds.values()), 3 * n)),
                          nll=math.fsum(r['nll'] for r in seeds.values()) / 3, rel_err=None if None in errors else math.fsum(errors) / 3)
-    return dict(n=n, expected_n=EXPECTED_N, episode_ids_blake2b_128_le_int64=digest(ids.astype('<i8').tobytes()), arms=arms,
+    return dict(n=n, expected_n=expected_n, episode_ids_blake2b_128_le_int64=digest(ids.astype('<i8').tobytes()), arms=arms,
                 references={label: rows[label] for label in REFERENCES if label in rows},
                 contrast=dict(pooled, lower_end_positive=positive, seeds={str(s): stats(str(s), int(diff[s].sum()), n)[0] for s in SEEDS}))
 
 
-def stage_s1a(src):
-    sets = {name: read_set(src, name) for name in ('confirmation', 'unseen')}
-    if np.intersect1d(sets['confirmation'][0], sets['unseen'][0]).size:
+def stage_s1a(src, manifest):
+    names = ['confirmation']
+    if any(src.exists(f'unseen/{label}.npz') for label in REQUIRED + REFERENCES):
+        names.append('unseen')
+    sets = {name: read_set(src, name) for name in names}
+    if 'unseen' in sets and np.intersect1d(sets['confirmation'][0], sets['unseen'][0]).size:
         refuse('the confirmation and unseen sets share episode ids')
-    results = {name: analyze_set(*sets[name]) for name in sets}
+    for name, (ids, _) in sets.items():
+        check_set(manifest, 'S1A', name, len(ids), digest(ids.astype('<i8').tobytes()))
+    results = {name: analyze_set(*sets[name], manifest_set(manifest, 'S1A', name)[0]) for name in sets}
     c = results['confirmation']
     tests = dict(delta_at_least_3pp=c['contrast']['sum_delta_correct'] * 100 >= 9 * c['n'],   # Delta >= +3.0 pp, exact
                  lower_end_positive=c['contrast']['lower_end_positive'],
                  seeds_all_positive=all(s['delta_correct'] > 0 for s in c['contrast']['seeds'].values()))
     verdict = 'ADVANCE' if all(tests.values()) else 'NOT ADVANCED'
-    summary = dict(stage='S1A', verdict=verdict, tests=tests, confirmation=c, unseen=results['unseen'],
+    summary = dict(stage='S1A', verdict=verdict, tests=tests, confirmation=c, unseen=results.get('unseen', dict(status='not run')),
                    bootstrap=dict(seed=BOOTSTRAP['S1A'], resamples=BLOCKS * BLOCK, block=BLOCK, interval='percentile 95 %'))
-    lines = ['stage S1A'] + [f'{name} n {r["n"]} expected {EXPECTED_N} files {len(sets[name][1])}' for name, r in results.items()]
+    lines = ['stage S1A'] + [f'{name} n {r["n"]} expected {r["expected_n"]} files {len(sets[name][1])}' for name, r in results.items()]
+    if 'unseen' not in results:
+        lines.append('unseen not run')
     return {'summary.json': dumps(summary), 'verdict.md': render_s1a(summary)}, lines + [f'verdict {verdict}']
 
 
@@ -592,6 +661,10 @@ def render_s0(d):
     lines += table(['check', 'passed'], [[k, 'yes' if v else 'NO'] for k, v in gate['required'].items()])
     if gate['failed']:
         return '\n'.join(lines + ['', 'Failed: ' + ', '.join(gate['failed']) + '. No comparison is made, S1A: none; no S0 data were opened.', ''])
+    if d['row'] == 'R0':
+        failed = [key for key, ok in d['native_matrix_identity'].items() if not ok]
+        return '\n'.join(lines + ['', 'Native and matrix_uncal differ per sample on S0 dev: ' + ', '.join(failed) + '.',
+                                  'No comparison is made; S1A: none.', ''])
     n, s1a = d['n'], d['s1a']
     lines += ['', f'S1A: arms Matrix-L1 and SoftSlot-L1; Matrix g = {s1a["matrix"]["gain"]:g}; SoftSlot g = {s1a["soft_slot"]["gain"]:g}, '
               f'tau = {s1a["soft_slot"]["tau"]:g}.', '', f'n = {n} dev episodes; calibration n = {d["calibration"]["n"]}.', '',
@@ -655,6 +728,9 @@ def render_s1a(s):
              'and C_soft > C_matrix for each of seeds 17, 29, 43.', '']
     lines += table(['test', 'met'], [[k, v] for k, v in s['tests'].items()]) + ['']
     for name in ('confirmation', 'unseen'):
+        if s[name].get('status') == 'not run':
+            lines += [f'## {name} (descriptive, no verdict)', '', 'not run', '']
+            continue
         r, k = s[name], s[name]['contrast']
         lines += [f'## {name}' + (' (primary)' if name == 'confirmation' else ' (descriptive, no verdict)'), '',
                   f'n = {r["n"]} (expected {r["expected_n"]}); episode ids blake2b-128 {r["episode_ids_blake2b_128_le_int64"]} (little-endian int64).', '']
@@ -682,12 +758,13 @@ def emit(out, stage, files, src, lines):
         data = files[name].encode()
         (out / name).write_bytes(data)
         digests[name] = digest(data)
-    print('\n'.join(lines + [f'{name} {digests[name]}' for name in sorted(digests)]))
+    print('\n'.join(lines if stage == 'S1A-ABL' else lines + [f'{name} {digests[name]}' for name in sorted(digests)]))
 
 
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0], allow_abbrev=False)
-    parser.add_argument('--stage', required=True, choices=('S0', 'S1A-DEV', 'S1A'))
+    parser.add_argument('--stage', required=True, choices=('S0', 'S1A-DEV', 'S1A-ABL', 'S1A'))
+    parser.add_argument('--manifest', required=True)
     parser.add_argument('--records', required=True)
     parser.add_argument('--out', required=True)
     parser.add_argument('--preflight')
@@ -695,12 +772,18 @@ def main(argv=None):
     if (args.stage == 'S0') != (args.preflight is not None):
         refuse('--preflight belongs to stage S0 and only to it')
     src = Sources(args.records)
+    src.manifest_path = str(Path(args.manifest).resolve())
+    manifest = src.json(args.manifest, absolute=True)
+    for stage, purpose in (('S0', 'calibration'), ('S0', 'dev'), ('S1A', 'dev'), ('S1A', 'confirmation'), ('S1A', 'unseen')):
+        manifest_set(manifest, stage, purpose)
     if args.stage == 'S0':
-        files, lines = stage_s0(src, args.preflight)
+        files, lines = stage_s0(src, args.preflight, manifest)
     elif args.stage == 'S1A-DEV':
-        files, lines = stage_dev(src)
+        files, lines = stage_dev(src, manifest)
+    elif args.stage == 'S1A-ABL':
+        files, lines = stage_ablation(src, manifest)
     else:
-        files, lines = stage_s1a(src)
+        files, lines = stage_s1a(src, manifest)
     emit(args.out, args.stage, files, src, lines)
     return 0
 

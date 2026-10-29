@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 import os
 import socket
 import time
@@ -67,6 +68,8 @@ def require_lock(path) -> dict:
         raise StopRun(f"{path} is not a locked manifest of the registered prereg")
     if lock.get("preflight", {}).get("passed") is not True:
         raise StopRun("the preflight did not pass; no science runs")
+    if lock.get("preflight", {}).get("source_blake2b_128") != slot_data.source_digest():
+        raise StopRun("the source differs from the source that passed the preflight; rerun preflight")
     if lock.get("manifest") != json.loads(json.dumps(slot_data.manifest())):
         raise StopRun("the registry differs from the locked manifest")
     if lock.get("inventory") != slot_data.inventory():
@@ -241,7 +244,7 @@ def run_preflight(out, config_path) -> dict:
     report = dict(version=1, status="complete", passed=all(c["passed"] for c in checks.values()), checks=checks,
                   required=["native_replay", "matrix_equals_native", "owner_mask", "isolation", "frozen_set", "bytes", "capacity",
                             "feature_consistency", "d128_3_replay"], config_hash=config["hash"], inventory=inv,
-                  manifest_ids=manifest["ids"], load_seconds=load_seconds, **provenance())
+                  manifest_ids=manifest["ids"], source_blake2b_128=slot_data.source_digest(), load_seconds=load_seconds, **provenance())
     write_json(out / "preflight.json", report)
     write_json(out / "identity.json", identity)
     return report
@@ -304,7 +307,8 @@ def run_smoke(out, config_path, manifest_path, s0_metrics_path, *, lr: float = 1
             np.savez_compressed(out / arm / "smoke_predictions.npz", **samples)
             report[arm] = dict(read=spec.as_dict(), selected_checkpoint_blake2b_128=summary["selected_checkpoint_blake2b_128"],
                                freeze=summary["freeze"], clipped_fraction=summary["clipped_fraction"], all_finite=summary["all_finite"],
-                               dev=summary["dev"])
+                               dev=summary["dev"],
+                               export_config=torch.load(out / arm / "selected.pt", map_location="cpu", weights_only=True)["slot"])
         finally:
             experiment.close()
     result = dict(version=1, stage="S1A-smoke", config_hash=config["hash"], lr=lr, steps=steps, arms=report, **provenance())
@@ -312,14 +316,20 @@ def run_smoke(out, config_path, manifest_path, s0_metrics_path, *, lr: float = 1
     return result
 
 
-def reload_check(export, predictions, arrays, *, model=None, tokenizer=None) -> dict:
+def reload_check(export, predictions, arrays, *, release: dict, model=None, tokenizer=None) -> dict:
     """The export reloads (adapter, buffers, backend settings, scope) and a fresh evaluation reproduces the saved predictions."""
     experiment = load_export(export, model=model, tokenizer=tokenizer)
     try:
+        arm = experiment.slot["arm"]
+        config_matches = (release.get("smoke_configs", {}).get(arm) == experiment.slot
+                          and release.get("arms", {}).get(arm, {}).get("read") == experiment.read_spec.as_dict())
+        if not config_matches:
+            raise StopRun("the reloaded export config differs from the release")
         samples = evaluate(experiment, arrays, {"read": experiment.read_spec}, diagnostics=False)["samples"]["read"]
         saved = np.load(predictions, allow_pickle=False)
         same = {k: bool(np.array_equal(samples[k], saved[k])) for k in ("episode_id", "prediction", "correct", "nll")}
-        return dict(passed=all(same.values()), equal=same, read=experiment.read_spec.as_dict(), slot=dict(experiment.slot))
+        return dict(passed=all(same.values()), equal=same, read=experiment.read_spec.as_dict(), slot=dict(experiment.slot),
+                    config_matches_release=config_matches, checkpoint_blake2b_128=file_digest(export))
     finally:
         experiment.close()
 
@@ -350,22 +360,32 @@ def run_pilot(out, config_path, manifest_path, s0_metrics_path) -> dict:
             try:
                 summary = fit(experiment, spec, steps=steps, lr=lr, stream_seed=stream_seed, out=out / arm / f"lr{lr:g}", dev=arrays,
                               dev_steps=(steps,))
+            except FloatingPointError as error:
+                runs.append(dict(arm=arm, lr=lr, nll=None, all_finite=False, error=str(error)))
+                continue
             finally:
                 experiment.close()
+            if not summary["all_finite"] or not math.isfinite(summary["dev"][1]["nll"]):
+                runs.append(dict(arm=arm, lr=lr, nll=None, all_finite=False, error="non-finite candidate summary"))
+                continue
             runs.append(dict(arm=arm, lr=lr, step0=summary["dev"][0], final=summary["dev"][1], nll=summary["dev"][1]["nll"],
                              step_seconds_mean=summary["step_seconds_mean"], clipped_fraction=summary["clipped_fraction"],
                              all_finite=summary["all_finite"], loss=summary["loss"]))
     choice, stop = {}, None
     for arm in slot_rules.ARMS:
-        rows = [r for r in runs if r["arm"] == arm]
+        rows = [r for r in runs if r["arm"] == arm and r["all_finite"]]
         try:
+            if not rows:
+                raise slot_rules.StopForOrchestrator(f"{arm}: no finite LR candidate")
             choice[arm] = slot_rules.choose_lr(rows, rows[0]["step0"]["nll"])["lr"]
         except slot_rules.StopForOrchestrator as error:
             choice[arm], stop = None, str(error)
-    step_seconds = max(r["step_seconds_mean"] for r in runs)
-    eval_seconds = max(r[k]["seconds"] for r in runs for k in ("step0", "final"))
+    finite = [r for r in runs if r["all_finite"]]
+    step_seconds = max((r["step_seconds_mean"] for r in finite), default=None)
+    eval_seconds = max((r[k]["seconds"] for r in finite for k in ("step0", "final")), default=None)
     result = dict(version=1, stage="S1A-pilot", config_hash=config["hash"], shard_ids_blake2b_128=ids, runs=runs, lr=choice,
-                  step_seconds=step_seconds, eval_seconds=eval_seconds, load_seconds=load_seconds, stop=stop, **provenance())
+                  step_seconds=step_seconds, eval_seconds=eval_seconds, load_seconds=load_seconds, stop=stop,
+                  timing_candidates="finite completed candidates only", **provenance())
     if stop is None:
         try:
             result["steps"] = slot_rules.schedule_steps(step_seconds, eval_seconds, load_seconds)
@@ -388,6 +408,8 @@ def run_train(out, release_path, arm: str, seed: int, *, ablation: bool = False,
     record the analysis reads."""
     out = Path(out)
     release = json.loads(Path(release_path).read_text())
+    if release.get("status") != "ready":
+        raise StopRun("the release has not passed its reload checks")
     config_hash = check_config(config_path, "S1A")["hash"]
     lock = require_lock(manifest_path)
     meta = provenance()
@@ -486,11 +508,15 @@ def main(argv=None) -> int:
     parser.add_argument("--ablation", action="store_true")
     parser.add_argument("--set", dest="set_name", choices=("dev", "confirmation", "unseen"))
     parser.add_argument("--entries", type=Path, help="JSON list of evaluation entries (see evaluate_entries)")
-    parser.add_argument("--open-root", type=Path, default=Path("."))
+    parser.add_argument("--open-root", type=Path)
     parser.add_argument("--export", type=Path)
     parser.add_argument("--predictions", type=Path)
     parser.add_argument("--out", type=Path, required=True)
     args = parser.parse_args(argv)
+    if args.open_root is not None and not args.open_root.is_absolute():
+        parser.error("--open-root must be absolute")
+    if args.mode == "evaluate" and args.set_name in {"confirmation", "unseen"} and args.open_root is None:
+        parser.error("sealed evaluation requires an absolute --open-root")
     if not args.out.is_absolute() or RUNS not in (args.out, *args.out.parents):
         raise SystemExit(f"--out must be an absolute path under {RUNS}")
     try:
@@ -508,11 +534,13 @@ def main(argv=None) -> int:
             run_train(args.out, args.release, args.arm, args.seed, ablation=args.ablation, config_path=args.config,
                       manifest_path=args.manifest)
         elif args.mode == "evaluate":
-            require_lock(args.manifest)
-            token = slot_data.load_open_token(args.open_root) if args.set_name in {"confirmation", "unseen"} else None
+            lock = require_lock(args.manifest)
+            token = slot_data.load_open_token(args.open_root, lock["inventory"]) if args.set_name in {"confirmation", "unseen"} else None
             evaluate_entries(("S1A", args.set_name), json.loads(args.entries.read_text()), args.out, token=token)
         else:
-            check = reload_check(args.export, args.predictions, episodes(slot_data.eval_set("S1A", "smoke")))
+            require_lock(args.manifest)
+            check = reload_check(args.export, args.predictions, episodes(slot_data.eval_set("S1A", "smoke")),
+                                 release=json.loads(args.release.read_text()))
             write_json(args.out, check)
             return 0 if check["passed"] else 2
     except (StopRun, slot_rules.StopForOrchestrator) as stop:

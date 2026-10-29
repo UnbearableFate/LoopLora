@@ -75,6 +75,8 @@ def load_value_head(name: str, device):
 
 def raw_episodes(eval_set: slot_data.EvalSet):
     """The set's episodes with the generator's four questions each (the training format)."""
+    if eval_set.sealed and not eval_set.opened:
+        raise slot_data.SealedSetError(f"{eval_set.name} has not been opened through eval_set")
     return generate(slot_data.task_spec(), eval_set.split, eval_set.start, eval_set.count, eval_set.base_seed)
 
 
