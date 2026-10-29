@@ -1,0 +1,47 @@
+{
+  "analysis_script_blake2b_128": "78f001a232595acce6d38091f0e4895b",
+  "authorization": "S1B confirmation set opened for the twelve selected checkpoints, with the registered trained-L4 depth sweep, then the frozen S1B analysis; unseen stays off (release unseen false)",
+  "branch": "advance",
+  "contrasts": [
+    "S4-S1",
+    "M4-M1",
+    "S4-M4"
+  ],
+  "docs/prereg/SLOT-LOOP-v1-S1B-A1.md": "341d3c71f9334a1384a102b097e7ad75",
+  "docs/prereg/SLOT-LOOP-v1-S1B.md": "6f2e776f2c6cfde131380fb343854784",
+  "docs/prereg/SLOT-LOOP-v1.md": "56e8c611c01e0ef9b7ae32db97b0e334",
+  "independent_rerun": {
+    "job": "3730976.opbs",
+    "report": "docs/review/static_2026-10-29/s1b-selection-rerun.md (master fee4bfa17accaba01d0eb4d9f20a81efd4f8adb1)",
+    "result": "selection reproduced: selection.json and source_index.json byte-identical to job 3730962; independent checks of the twelve runs passed"
+  },
+  "inventory_blake2b_128": "2e2ae18648e56b41eabe89b0bb3ad3ac",
+  "lock_blake2b_128": "2309d5a8ebae91332f32bbd85e5eeb8a",
+  "opened_by": "orchestrator (Opus-5.5, main agent)",
+  "recorded_at": "2026-10-30T05:18:12+09:00",
+  "release_blake2b_128": "d1ccbb7ff4c31fa53abfd7a3cc9ad572",
+  "science_commit": "258f5f5a24eae684f640a9fd62679bb643470a76",
+  "selected_checkpoints": {
+    "M1/17": "ccc6effb3ec8cbd5c7d1413a7a7443bf",
+    "M1/29": "b1723115c2fb1742a3b8460e3f4395cb",
+    "M1/43": "e99b56e151f3fa85db7fb337f6265ddc",
+    "M4/17": "aa8e49d3bb9a9ab15142a029dd5d4ee1",
+    "M4/29": "5c8644809202acb95b6b1a273defa41a",
+    "M4/43": "e74fda78e2211e5b583cc97256d03760",
+    "S1/17": "0f3e7d002221df8870135b59b6207a80",
+    "S1/29": "c919668733bcd33d5e34258eca24ab70",
+    "S1/43": "f55950e835b0da7ef91c8e9eac6294ca",
+    "S4/17": "85f44ffb2253ddb7894028ffd927162d",
+    "S4/29": "bbd85b3b27941058edb92829cf041831",
+    "S4/43": "a3220bcd77b86669d592e07f80ab2594"
+  },
+  "selection": "wp/loop fe5320e8604f1a906505b7c382567c8965338b00: frozen DEV selection job 3730962, /work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/dev-selection/selection.json (blake2b-128 e3f269db39cd9b431d27e0a5eb528d6e)",
+  "stage": "S1B",
+  "study": "slot-loop-v1",
+  "verified": [
+    "all twelve record.json carry release_blake2b_128 d1ccbb7ff4c31fa53abfd7a3cc9ad572, the file digest of /work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/release.json, with status complete and steps 18000",
+    "each selected.pt file digest equals its selected checkpoint above and the record's selected_checkpoint_blake2b_128",
+    "lock /work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/a1-8457587/manifest.lock.json is 2309d5a8ebae91332f32bbd85e5eeb8a, the release's lock_blake2b_128; inventory stable_hash equals the release's",
+    "open-root copies of scripts/analyze_s1b.py and the three preregistration files, taken from 258f5f5, equal the registered and released digests"
+  ]
+}
