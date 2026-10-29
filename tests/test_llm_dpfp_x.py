@@ -127,13 +127,14 @@ def test_the_e8_retrain_config_and_the_wp_l4_references_keep_their_recorded_conf
         record = recorded(f'reports/p1l-dpfp/refs/{label}/record.json')
         cfg = read_fix.configuration('R', record['config']['train']['steps'], E=16, rank=rank)
         assert 'backbone' not in cfg and 'dpfp' not in cfg and 'dpfp_nu' not in cfg['model']
-        # These WP-L4 records predate the two config defaults `writer` and `oracle_seed` (WP-L6), so their hash cannot be
-        # compared; the configs agree on everything else and the two later keys hold their defaults. The hash itself is
-        # pinned against master by the test above.
-        later = {key: as_json(cfg).pop(key) for key in ('writer', 'oracle_seed')}
-        assert later == {'writer': 'learned', 'oracle_seed': 17}
-        rest = {key: value for key, value in as_json(cfg).items() if key not in later}
-        assert rest == record['config']
+        # The R-r32 record was written by an older commit (0b03d60, before `writer` and `oracle_seed` were config defaults); the
+        # R-r128 record (be07f7f) holds them. Current code adds exactly these two default-valued keys to the older config; with
+        # them removed, config and stored hash are reproduced exactly, and where the record holds them nothing is removed.
+        current, expected = as_json(cfg), record['config']
+        if 'writer' not in expected:
+            assert label == 'R-r32' and 'oracle_seed' not in expected
+            assert {key: current.pop(key) for key in ('writer', 'oracle_seed')} == {'writer': 'learned', 'oracle_seed': 17}
+        assert current == expected and stable_hash(current) == record['config_hash'], label
 
 
 def test_the_default_backbone_stays_the_pinned_06b_and_the_rank_guard_is_lifted_only_for_x256():
