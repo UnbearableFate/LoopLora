@@ -1,5 +1,16 @@
 # Workers: long-lived codex agents with fixed roles (AGENTS.md)
 
+**Codex reopened (2026-10-29 20:45 JST, user: "在本次静态评审结束后,将worker任务重新分派给在 /herdr 新tab里启动的codex
+(gpt-6.1-sol high) , 代码审查则使用单独的codex (gpt-6-astra xhigh) 和 opus-5.5 xhigh subagent进行交叉评审").**
+- Worker tasks go to codex workers (GPT-6.1-sol, reasoning effort high), each in its own herdr tab, worktree and
+  branch, one per role and reused across tasks (policy below). The active role moved first: sn-slot → wk-slot
+  (table below). An idle Sonnet role moves to a codex worker when it gets its next task.
+- Code reviews are cross-reviews of the same commit by two independent reviewers: a codex reviewer (GPT-6-Astra,
+  reasoning effort xhigh, own herdr tab, read-only) and an Opus-5.5 subagent of the main session (effort xhigh). Each
+  gets the code and the spec, not the other's findings or the orchestrator's view. The orchestrator compares the two
+  reports, commits both, and sends the worker the fixes.
+- The weekly-quota rule still holds: below 20 % left, roles go back to Sonnet subagents after the current task.
+
 **Handover (2026-10-27 07:27 JST, user: "提前启动交接过程,关闭所有的codex worker").** All seven codex workers are
 closed. Each role passes, unchanged (same worktree, branch and context docs), to a Claude Sonnet-5.5 subagent of
 the main session, spawned on demand with its role row, the task file and the WP state file; subagents report by
@@ -9,13 +20,13 @@ wake-ups cancelled).
 
 | subagent | role | worktree, branch | state |
 | --- | --- | --- | --- |
-| sn-llm | wk-llm: LLM module experiments (learned writer line) | LoopLora-wt/llm, wp/llm | WP-L5 step 1 done (8eb24ab); WP-L7 step 1 done (9588998); RFX and LSQ registered on master (077bb81, 64f3e54); WP-L7 step 1b done (17b27c2: code to the registered rules, tests unrun); static review: no defect (docs/review/static_2026-10-27/rfxlsq.md); step 1c done (0a3048a: entity-EM guard, stdlib release scripts); second review (docs/review/static_2026-10-27/release.md): no defect; step 1d done (b79e0f8: restricted argmax breaks ties as the full argmax; smoke reload check before a release); WP-L7 step 2: tests fixed (efadc36, fixture rank), DPFP release 1dd1869, RFX verdicts store+query/store+query/none (379fccd, report faacd37), LSQ not triggered; merged d4de948; DPFP E16 arms 39.0/58.0/60.8% -> registered E8 retrain of D128-3 (orchestrator lock 72ed469) 73.0% < 80%: **stop**, no writer, P1L-D not run; zero/shuffle audit, overrun record (2b75fcf); merged 711d1ac; WP-L7 step 2 done; WP-L8 done (DPFP-X, `docs/reports/DPFP-X.md`): X256 66.2 %, X17 59.3 % (−1.5 pp against D128-3, not distinguished), neither reaches 0.80, learned-writer line stays stopped; 3.05 node·h; merged e86bdfe; WP-L12 (G5) SQ2 done (does not advance: S-RC − S-DE +4.1 pp, read-error ratio 0.554; best cell S-RE 72.3 %) and LSQT done (best ridge arm LT-RG001 46.1 %, band 40 % to < 48.5 %: line open, W3 not triggered); merged 1e28bed; active: LSQT-U control (release 71a6f1c, approval a0eaddd, job 3725694; descriptive only) |
+| sn-llm | wk-llm: LLM module experiments (learned writer line) | LoopLora-wt/llm, wp/llm | WP-L5 step 1 done (8eb24ab); WP-L7 step 1 done (9588998); RFX and LSQ registered on master (077bb81, 64f3e54); WP-L7 step 1b done (17b27c2: code to the registered rules, tests unrun); static review: no defect (docs/review/static_2026-10-27/rfxlsq.md); step 1c done (0a3048a: entity-EM guard, stdlib release scripts); second review (docs/review/static_2026-10-27/release.md): no defect; step 1d done (b79e0f8: restricted argmax breaks ties as the full argmax; smoke reload check before a release); WP-L7 step 2: tests fixed (efadc36, fixture rank), DPFP release 1dd1869, RFX verdicts store+query/store+query/none (379fccd, report faacd37), LSQ not triggered; merged d4de948; DPFP E16 arms 39.0/58.0/60.8% -> registered E8 retrain of D128-3 (orchestrator lock 72ed469) 73.0% < 80%: **stop**, no writer, P1L-D not run; zero/shuffle audit, overrun record (2b75fcf); merged 711d1ac; WP-L7 step 2 done; WP-L8 done (DPFP-X, `docs/reports/DPFP-X.md`): X256 66.2 %, X17 59.3 % (−1.5 pp against D128-3, not distinguished), neither reaches 0.80, learned-writer line stays stopped; 3.05 node·h; merged e86bdfe; WP-L12 (G5) SQ2 done (does not advance: S-RC − S-DE +4.1 pp, read-error ratio 0.554; best cell S-RE 72.3 %) and LSQT done (best ridge arm LT-RG001 46.1 %, band 40 % to < 48.5 %: line open, W3 not triggered); merged 1e28bed; LSQT-U control done (LT-U 36.0 %; RG001 over R-r128 +12.6 pp splits into +2.5 pp unit query and +10.1 pp store; one seed, descriptive; 1.452 node·h), merged b60f144; idle |
 | sn-p1l | wk-p1l: P1-L main study | LoopLora-wt/p1l, wp/p1l (wp/p1l merged into master as ca85a40) | WP-P1LC step A done (wp/p1l c5de5c2: B7 check in finalize, P1L-C code and tests, unrun); static review: two low findings (docs/review/static_2026-10-27/p1l.md); step A2 done (02fc561: master merged, one source in the P1L-C audit, launcher deadline removed, interrupted-run rule); step B done (395e309: confirmation, B7 r32 fail / r128 pass, G1-L fail, G2-L pass, B6 met at r128; `reports/decisions/P1L.md`); step C done (2d9bb1d: P1L-C, no causal-bridge claim); merged 16e4fca, 28e122f; WP-P5L done (755201e: Qwen3-1.7B-Base, B7 pass, B6 met +25.78 pp, equal-parameter result holds at a second scale; 16.12 node·h); merged c6b5275; WP-L10 done (B8W, `reports/decisions/B8W.md`, c04a608): untying keeps the solution, Delta untied@4 - shared@4 on hops 2-3 +0.90 pp [0.09, 1.71], no seed loses; B8 gets no equal-parameter status, G1-L stays failed; shared arm +5.09 pp over the start (reader not converged); 1.004 node·h; merged 6f3511d; idle |
 | sn-oracle | new (2026-10-27): LLM oracle code designs, WP-L6 and P1L-S | LoopLora-wt/oracle, wp/oracle | WP-L6 step 1 done (wp/oracle 3a788b1; preregs WP-L6 and P1L-S registered 4ac2410); static review: one low finding plus P1L-S traps (docs/review/static_2026-10-27/oracle.md); step 1b done (7175e09: runner executable, P1L-S implementation plan); step 1c done (4dcc6b3: P1L-S pipeline and tests on top of wp/p1l 02fc561, P1-L defaults unchanged; pilot stays at 7175e09); step 2 done (98d048c): registered decision **stop** (hop-1 EM O-rot 0.1%, O-shared 11.8% < 30%), P1L-S not run; merged ddfcbc2; WP-L11 done (CTC, `docs/reports/CTC.md`, 7b69f60): candidate flagged, arm CE, p = 1.0 (12,000 of 12,000 facts), M1-L4@4 hop 1 50.7 %, +24.05 pp [21.8, 26.3] over B4@1 on hops 2-3, equal to the oracle reference within 0.2 pp; entities read at their own tokens and the relation is constant, so it nearly restates the oracle result (not a learned writer); confirmation only by user decision; 1.028 node·h; merged 525ab32; idle |
 | sn-sym | wk-sym/wk-symf: symbolic studies | LoopLora-wt/sym, wp/sym | WP-S9 step 1 done (c443e01); IVD, CVH, TSM, UNS, NCR registered on master (40ddf08); WP-S9 step 1b done (be2a972); TSM Clarifications C1 (3477526) and C2 (d488b78); steps 1c and 1d done (87746bf); static review: F1 Medium, others Low (docs/review/static_2026-10-27/tsm.md); TSM Clarification C3 (master d335fe7, wp/sym 3ca4d89); step 1e done (09be205: F1-F8 and C3 in the TSM scripts); second review (docs/review/static_2026-10-27/tsm2.md) -> TSM Clarification C4 (master d6ceb6a, wp/sym 76a00b3); step 1f done (d32463e: C4 in the TSM scripts, stopping child and heartbeat notes); step 2 done (70bfdfc; locks IVD 2a8d063, CVH 8a13c45, CVH theta 19c5613, UNS a836928, TSM 1bf689b; about 1.8 node·h); step 3 done (39b5875: reports IVD, CVH, TSM, UNS, NCR); merged into master d689235 |
-| sn-paper | wk-theory/T-tasks: paper and claim contract | LoopLora-wt/paper, wp/paper | WP-T9 done, merged 1cc0e16; WP-T10 parts 1, 2, 3a, 3b, 4, 5 merged (8a1f14a, cfb50a9, 172edba, 047fe8f, f4cd105, 15f9ec8); WP-T11 done and merged 8b2ed97 (G1 revision a12ed8f; LaTeX manuscript `docs/paper/tex/`, PDF `docs/paper/paper.pdf`, 54 pages, d6dab2d); WP-T12 part 1 done (a472386: ledger LS1-LS4, BW1-BW3, CT1-CT3; §3.4, §4.4, App. I; PDF 60 pages), merged; part 2 done (6cec11f, fix ea95759: ledger SQ1-SQ3, LQ1-LQ3; §4.2 and App. I; PDF 64 pages), merged dc5cbdf; part 3 (U sentence) waits for LSQT-U; idle |
+| sn-paper | wk-theory/T-tasks: paper and claim contract | LoopLora-wt/paper, wp/paper | WP-T9 done, merged 1cc0e16; WP-T10 parts 1, 2, 3a, 3b, 4, 5 merged (8a1f14a, cfb50a9, 172edba, 047fe8f, f4cd105, 15f9ec8); WP-T11 done and merged 8b2ed97 (G1 revision a12ed8f; LaTeX manuscript `docs/paper/tex/`, PDF `docs/paper/paper.pdf`, 54 pages, d6dab2d); WP-T12 part 1 done (a472386: ledger LS1-LS4, BW1-BW3, CT1-CT3; §3.4, §4.4, App. I; PDF 60 pages), merged; part 2 done (6cec11f, fix ea95759: ledger SQ1-SQ3, LQ1-LQ3; §4.2 and App. I; PDF 64 pages), merged dc5cbdf; part 3 done (5019752: ledger LQ4, LQ3 open -> narrowed; §4.2 U paragraph, Tables 12-13 and 41; PDF 66 pages), merged b932ef4; idle |
 | sn-core | wk-core: stopping and readers (2026-10-29: G2) | LoopLora-wt/core, wp/core | WP-L9 done (LSR, `docs/reports/LSR.md`, 302aa4a; prereg 63da9c62 after C1): R2 logit-lens stability passes at 0.6B and 1.7B (hops 4-8 +3.90 / +5.68 pp over L = 4, hop 1 +6.3 / +4.7; hop 2 -10.8 / -12.3, below L = 8 on hops 4-8, 5.6-5.7 reads, no efficiency claim); R1, R3 infeasible on validation; 0.50 node·h; merged 975bb6a; idle |
-| sn-slot | new (2026-10-29): SLOT-LOOP-v1 (plan/looplora_diagnosis_and_execution_plan_2026-10-29.md), S0 to S3 by gates | LoopLora-wt/slot, wp/slot | active: WP-L13 step 2 (implement, compute tests, then STOP for static review); prereg registered 5f04a5c |
+| sn-slot | new (2026-10-29): SLOT-LOOP-v1 (plan/looplora_diagnosis_and_execution_plan_2026-10-29.md), S0 to S3 by gates | LoopLora-wt/slot, wp/slot | prereg registered 5f04a5c; WP-L13 step 2 done (ccdcc96: implementation, compute tests, state file; 0.503 node·h); static review round 1: no high (`docs/review/static_2026-10-29/slot-*.md`, 6c21e19); handed over to codex wk-slot 2026-10-29 20:45 |
 | (on demand) | wk-data, wk-theory | — | no pending work |
 | rv-fable | external reviewer, Claude Fable 5.1 (max), herdr tab w1:t17 (user request 2026-10-27) | — | done (c370e22); tab closed after the report |
 | rv-astra | external reviewer, Codex GPT-6-Astra (max, web search), herdr tab w1:t18 (user request 2026-10-27) | — | done 08:18 (6179f3a); codex closed, tab closed |
@@ -30,18 +41,21 @@ context is low or stale (repeated compaction, or before a large unrelated task),
 (`/new` in the codex TUI; record the new session id here) and re-injects context with one message:
 "Read docs/README.md, your role row in docs/workers.md, the listed context docs, then docs/tasks/<task>.md".
 
-Monitoring (user rule, 2026-10-26 23:45; narrowed by the user 2026-10-29): the 20-minute check applied to the herdr
-codex workers. In-session subagents get no timed check: each stop reaches the orchestrator as a notification, and the
-orchestrator arms a background watcher (`wait_jobs.sh`) for every `WAIT <job ids>` line and resumes the subagent when
-it exits. A subagent that stopped unexpectedly (model/stream error, interrupted turn, idle mid-task without a done,
-WAIT or STOP line) gets "continue".
+Monitoring (user rule, 2026-10-26 23:45; narrowed by the user 2026-10-29): no timed checks. In-session subagents
+reach the orchestrator by notification at each stop. Each codex worker gets one background `herdr agent wait <name>`
+after every prompt; it returns on idle, done or blocked, and the orchestrator reads the pane's last lines. For every
+`WAIT <job ids>` line the orchestrator arms a background watcher (`wait_jobs.sh`) and prompts the worker when it
+exits. A worker that stopped unexpectedly (model/stream error, interrupted turn, idle mid-task without a done, WAIT
+or STOP line) gets "continue". A blocked approval or question UI goes to the user.
 
-Model: sessions opened or resumed from 2026-10-26 19:36 use GPT-6.1-sol xhigh; wk-sym still runs its original
-GPT-6-Astra xhigh session until its next clear (switched by resume at 03:46 on 2026-10-27; all workers now GPT-6.1-sol).
+Model: workers opened from 2026-10-29 use GPT-6.1-sol with reasoning effort high (user), reviewers GPT-6-Astra
+xhigh. The sessions closed on 2026-10-27 ran GPT-6.1-sol xhigh (wk-sym: GPT-6-Astra xhigh until 03:46 on 2026-10-27).
 
-Open or resume (new tab, worktree cwd):
+Open or resume (new tab, worktree cwd; a reviewer's cwd is the main checkout):
 `herdr tab create --workspace w1 --cwd <worktree> --label <name> --no-focus`, then
-`herdr agent start <name> --kind codex --pane <pane> -- [resume <session-id>] -m gpt-6.1-sol -c model_reasoning_effort=xhigh`.
+`herdr agent start <name> --kind codex --pane <pane> -- [resume <session-id>] -m gpt-6.1-sol -c model_reasoning_effort=high`
+(reviewers: `-m gpt-6-astra -c model_reasoning_effort=xhigh`). Codex 0.163.0 opens with an update prompt (0.165.0):
+the orchestrator skips it (esc) and leaves updating to the user.
 
 | worker | role (owns) | worktree, branch | context to inject | session | state |
 | --- | --- | --- | --- | --- | --- |
@@ -52,6 +66,7 @@ Open or resume (new tab, worktree cwd):
 | wk-data | data generators, rendering, real-task preprocessing: `src/looplora/data` | LoopLora-wt/data, wp/data | `docs/reports/WP-B.md`, `docs/tasks/WP-B_contract.md` | 01a1779d-96b3-7431-8fb7-0458e768764e (resumed 21:19, GPT-6.1-sol) | closed 2026-10-27 07:27 (handover) |
 | wk-symf | symbolic follow-up studies (capacity/rank, later P2-S budget matching): runs under `runs/p1s/f1`, `reports/p1s-f1` | LoopLora-wt/symf, wp/symf | `docs/prereg/P1S.md`, `docs/prereg/P1S-F1.md`, `docs/reports/P1S-pilot.md` | 01a17828-31b5-75f0-89b3-6bfbcb4d89a5 (GPT-6.1-sol, opened 21:24) | closed 2026-10-27 07:27 (handover) |
 | wk-p1l | P1-L main study (Pilot-2, main runs, confirmation, analysis): `configs/p1l` run sets, runs under `runs/p1l/main`, `reports/p1l` | LoopLora-wt/p1l, wp/p1l | `docs/prereg/P1L.md`, `docs/reports/WP-C7.md`, `docs/reports/WP-C6.md`, `configs/p1l/README.md` | 01a17999-7c19-7ac2-a6d2-cf6aee2583c0 (opened 04:05 2026-10-27, GPT-6.1-sol) | closed 2026-10-27 07:27 (handover) |
+| wk-slot | SLOT-LOOP-v1, S0 to S3 by gates: `src/looplora/llm/slot_*.py`, `src/looplora/core/memory_backend.py`, `configs/slot_loop_v1`, runs under `runs/slot-loop-v1` (took over from sn-slot at ccdcc96) | LoopLora-wt/slot, wp/slot | `docs/prereg/SLOT-LOOP-v1.md`, `docs/tasks/WP-L13_slot_loop.md`, `docs/reports/SLOT-LOOP-v1-state.md` (wp/slot), `plan/looplora_diagnosis_and_execution_plan_2026-10-29.md` | opened 20:40 2026-10-29, GPT-6.1-sol high, herdr tab w1:t1B (session id recorded after its first turn) | active: WP-L13 review round 1 fixes, then STOP for the cross-review |
 
 ## Task history
 | task | worker | merged into master |
@@ -111,6 +126,10 @@ Open or resume (new tab, worktree cwd):
 | WP-L12 G5 SQ2 (does not advance) and LSQT (band open, line neither closed nor triggered) | sn-llm | 1e28bed |
 | master test after the WP-L12 merge (job 3725533 at 1e28bed: 2957 passed, 1 skipped) | orchestrator | 1e28bed |
 | WP-T12 part 2 (G5 SQ2 and LSQT into the ledger, LaTeX manuscript and PDF; 64 pages) | sn-paper | dc5cbdf |
+| WP-L12 LSQT-U control (descriptive; U 36.0 %, split +2.5 pp unit query / +10.1 pp store) | sn-llm | b60f144 |
+| master test after the cleanup of finished smoke/pilot weights (job 3727237 at 177a4fe: 2957 passed, 1 skipped; `docs/review/cleanup_2026-10-29.md`) | orchestrator | 177a4fe |
+| WP-T12 part 3 (LSQT U control in the ledger, manuscript and PDF; LQ4, LQ3 narrowed) | sn-paper | b932ef4 |
+| master test after the LSQT-U merge (job 3727608 at 37abbfc: 2960 passed, 1 skipped; +3 = `tests/test_analyze_lsqt_u.py`) | orchestrator | 37abbfc |
 | Merged master full test suite after DPFP-X (job 3723646, exit 0, 2717 passed, 1 expected skip) | orchestrator | e86bdfe |
 | Merged master full test suite after P5L (job 3722062, exit 0, 2676 passed, 1 expected skip) | orchestrator | c6b5275 |
 | Merged master full test suite (job 3721356, exit 0, 1 expected skip) | orchestrator | d4de948 |

@@ -1,0 +1,64 @@
+{
+  "E": 16,
+  "config_hashes": {
+    "LT-U": "a88fe73a30cec96112ee21f7fa45aa9c"
+  },
+  "etas": {
+    "LT-U": null
+  },
+  "max_job_seconds": 7200,
+  "prereg_blake2b_128": "94ed7364da460aeec18cbd5da6b086ff",
+  "primary_eval_steps_by_arm": {
+    "LT-U": [
+      4912,
+      9824,
+      14736,
+      19648,
+      24560
+    ]
+  },
+  "scale_up": "docs/prereg/LSQT.md",
+  "science_commit": "c07452bfb04af2e95f3abb07629d5654041b1842",
+  "sizing_by_arm": {
+    "LT-U": {
+      "eval1000_seconds": 9.176651150046382,
+      "evaluations": 5,
+      "expected_seconds_with_margin": 7199.870759195146,
+      "margin": 1.5,
+      "setup_reserve_seconds": 90,
+      "smoke_fraction_of_fixed_steps": 0.09771986970684039,
+      "step_seconds": 0.19112502376682408
+    }
+  },
+  "smoke": {
+    "evaluation_episodes": 100,
+    "quality_scores_exposed": false,
+    "rows": [
+      {
+        "arm": "LT-U",
+        "eval100_seconds": [
+          0.9176651150046382,
+          0.7457903610047651,
+          0.7397097159991972,
+          0.7534259480016772,
+          0.7512105390051147
+        ],
+        "git_commit": "c07452bfb04af2e95f3abb07629d5654041b1842",
+        "host": "mg0011",
+        "job_id": "3725519.opbs",
+        "source_hash": "327ae5f213b940290577f1da5ad07dd5",
+        "steady_step_mean_seconds": 0.19112502376682408,
+        "step_p95_seconds": 0.19541715339801158,
+        "steps": 2400,
+        "total_seconds": 479.0628285779967
+      }
+    ],
+    "steps": 2400
+  },
+  "status": "released_after_smoke_timing_gate",
+  "steps_by_arm": {
+    "LT-U": 24560
+  },
+  "study": "LSQT-U",
+  "walltime": "02:00:00"
+}

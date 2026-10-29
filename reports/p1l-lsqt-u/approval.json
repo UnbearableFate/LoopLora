@@ -1,0 +1,29 @@
+{
+  "approval": "LSQT-U schedule release approved for the conditional U control science job (docs/prereg/LSQT.md decision 2: the best registered arm, LT-RG001, reached 46.1 % >= 40 %); reviewed against docs/prereg/LSQT.md; descriptive only, enters neither outcome 1 nor outcome 2",
+  "approved_by": "orchestrator (Opus-5.5, main agent)",
+  "conditions_checked": {
+    "byte_identical": "cmp of reports/p1l-lsqt-u/release.json and the runs-dir release: identical",
+    "reload_check": "3725676: exit 0, config_equal, reload_identical, prediction_mismatches 0, quality_scores_exposed false, checked at the science commit",
+    "tests": "3725518 at c07452b: exit 0 (238 dots, 0 failures, as reported by sn-llm)",
+    "science_path": "c07452b differs from the LSQT science commit dd5e4c8 in src only in lsqt_release.scheduled_steps (release gating for study LSQT-U); the training path is unchanged"
+  },
+  "prereg_blake2b_128": "94ed7364da460aeec18cbd5da6b086ff",
+  "recorded_at": "2026-10-29T16:04:43+09:00",
+  "release": "reports/p1l-lsqt-u/release.json",
+  "release_blake2b_128": "ca9113dbfa2f8ee4e587a2740d811a84",
+  "release_committed_in": "71a6f1c129ce715a4ec2d4bc78b9d61fc0375ef9",
+  "science_commit": "c07452bfb04af2e95f3abb07629d5654041b1842",
+  "scope": {
+    "etas": {
+      "LT-U": null
+    },
+    "jobs": "one job, LT-U alone",
+    "projected_node_hours": 1.4,
+    "schedule": "--schedule /work/xg24i002/x10041/LoopLora/runs/p1l/lsqt-u/release.json",
+    "steps": {
+      "LT-U": 24560
+    },
+    "walltime": "02:00:00, queue regular-g, --scale-up docs/prereg/LSQT.md"
+  },
+  "study": "LSQT-U"
+}

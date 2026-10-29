@@ -97,3 +97,34 @@ The same rules as Part 1 apply: committed stdlib scripts only, no torch on the l
 
 Checks as in Part 1. Append a "Part 2" section to `docs/reports/WP-T12.md` with the page count and the PDF size, and commit
 on wp/paper. STOP with `WP-T12 part 2 done` and the commit hash. No merge, no push.
+
+## Part 3: the LSQT U control, appended 2026-10-29 19:35 JST
+Merge master (37abbfc or later; the U control merged at b60f144) into wp/paper first. Sources:
+- `docs/reports/LSQT.md`, section "U control", and `docs/reports/LSQT-state.md`;
+- `reports/p1l-lsqt-u/split.json`, `record` and `audit.json`;
+- `docs/prereg/LSQT.md`, decision 2 at registration (U is descriptive and enters neither outcome);
+- `plan/followup_2026-10-29.md` §6.
+
+The same rules as Parts 1 and 2 apply: committed stdlib scripts only, no torch on the login node, and no new data.
+
+1. **Ledger.** Add one row with a new ID for the U control. Give its source, its role (a descriptive control, one seed, not a registered test, outside both registered outcomes) and the exact limits from the report.
+2. **Replace the LQ3 sentence** in `sec_writers.tex` ("…cannot be split between the store and the unit query; that split is untested"). The new text gives the descriptive split from `split.json`:
+   - U reached 36.0 % with read error 0.589, below 0.80. Its final checkpoint is the registered selection and also its highest.
+   - Point estimates of RG001's +12.6 pp over R-r128: +2.5 pp for the unit query (U − R-r128, standard error 2.1) and +10.1 pp for the store (RG001 − U, standard error 2.2).
+   - Put these limits next to the numbers:
+     - one seed;
+     - the standard errors cover only the sampling of the 1,000 episodes, unpaired;
+     - the split goes through U, and no ridge store with a learned query was trained, so an interaction cannot be separated;
+     - the step counts differ. Add the matched-fraction fact: RG001 is above U at all five fractions, and already at 22,404 steps.
+   - State that the registered LSQT decision is unchanged.
+3. **Table.** Add U as a descriptive row and the split to the G5 tables. Extend `scripts/paper_tables_g5.py` and regenerate `docs/paper/g5_tables.txt` and `docs/paper/tex/g5_tables.tex`. The committed script must reproduce every new number.
+4. **Must-not-say.**
+   - Remove Part 2's "any attribution of LSQT's gain to the store before U reports". Allow the split only as the descriptive one through U, with its limits.
+   - Add:
+     - "the store causes (or explains) LSQT's gain" without the through-U and one-seed limits;
+     - "the unit query helps" or "does not matter" as a finding. +2.5 pp with standard error 2.1 separates from neither zero nor a few pp.
+     - U called a registered test or an outcome of LSQT.
+5. **Abstract, introduction and limits.** Change them only where U changes a sentence.
+6. **Build.** Rebuild the PDF as in Part 1. Use the `/write` skill for the new prose.
+
+Checks as in Part 1. Append a "Part 3" section to `docs/reports/WP-T12.md` with the page count and the PDF size, and commit on wp/paper. STOP with `WP-T12 part 3 done` and the commit hash. No merge, no push.

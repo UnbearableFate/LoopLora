@@ -101,3 +101,50 @@ Master `f2c438d` merged first. Text only: no training, no compute, no torch, no 
 - The early dip of the SQ2 ridge arms is now described as consistent with starting from AdamW moments of another objective (registered deviation 2), cause not tested
   (`sec_writers.tex`, ledger row SQ2). "Because" and "explains" are removed.
 - W3 is no longer called a retraining: it is a separate ridge-plus-DPFP study that would need its own registration (`sec_writers.tex`, ledger row LQ1); no other place calls it a retraining.
+
+# WP-T12 part 3 - the LSQT U control (descriptive split) in the ledger, the LaTeX manuscript and the PDF
+
+Master `ff77119` merged first (the U control is on master at `b60f144`). Text only: no training, no compute, no torch, no data read beyond committed CSV and JSON.
+
+## What changed
+
+- `scripts/paper_tables_g5.py` (stdlib): now also reads `reports/p1l-lsqt-u/` (`split.json`, `audit.json`, `arms/LT-U/`) and the R-r128 record with its five checkpoint metrics. It recomputes the split of each arm's gain over R-r128 through LT-U
+  from the integer correct counts and the unpaired binomial standard error (the formula of `scripts/analyze_lsqt_u.py`), and asserts every value against `split.json` and the figures the report states: LT-U 360 correct (36.0%, read error 0.589,
+  clean head 93.7%, read head 21.6%, NLL 3.382), its five EM and read-error checkpoints (the final one is the highest), the parts add up exactly, the matched-fraction differences, the sizes of the parts in standard errors (1.2, 1.1, 4.6, 3.0),
+  RG001 above U at all five fractions and at 22,404 steps, RG1 at 22,596 steps, the audit (2 and 0 correct under zero and shuffled memory, original equal to the record), the gradient clip (493 of 493), the compute facts, and that the recorded
+  configurations of LT-U and R-r128 differ only in `model.unit_query` and the step count. A mismatch stops it. `--tex` now writes `\lsqttable` with the LT-U row, a new `\lsqtsplittable` (main text) and a new `\lsqtmatchtable` (Appendix I).
+  Outputs `docs/paper/g5_tables.txt` and `docs/paper/tex/g5_tables.tex` are regenerated.
+- `docs/paper/evidence_llm.md`: new row LQ4 (the U control: its numbers, the split with standard errors, the matched fractions, and the limits); LQ3 status moved from `open` to `narrowed` (see note 1); population V-L15 and the G5 section
+  introduction extended; source key LSQUE added and G5T updated; the scope statement for the G5 rows; must-not-say: the Part 2 bullet that left the split untested is replaced by "the store causes (or explains) LSQT's gain" without the
+  through-U and one-seed limits, and two bullets are added ("the unit query helps" or "does not matter" as a finding; LT-U called a registered test, a registered outcome or a result that changes the decision); a Part 3 header paragraph and
+  an audit paragraph. LQ1, LQ2 and every other row are unchanged.
+- `docs/paper/tex/sec_writers.tex`: the LQ3 sentence "that split is untested" is replaced by a new paragraph "LSQT: the U control and the split of the gain" and Table 13 (`tab:lsqt-split`). The U row is added to Table 12. The limits sit next to the numbers:
+  one seed, each part a difference of two single evaluations; unpaired standard errors that cover the sampling of the 1,000 episodes only; no ridge store with a learned query, so no interaction is separated (the store part is measured with the
+  unit query in place, the unit-query part with the delta store); different step counts, with the matched-fraction fact (RG001 above U at all five fractions, +7.7 to +14.1 pp, and 46.9% at 22,404 steps against U's final 36.0% at 24,560; RG1 also above U
+  at all five, but its final lead rests on its last interval). The registered LSQT decision is stated as unchanged. The unit-query part (+2.5 pp, standard error 2.1, about 1.2 standard errors) is stated as separated neither from zero nor from a few pp.
+- `docs/paper/tex/sec_limits.tex`: the "does not claim" item on the LSQT gain now allows only the descriptive split through U with its limits, and a new item says the unit query is neither shown to help nor to not matter; the one-seed sentence names the U control.
+  `app_B.tex` (LSQT design row), `app_C.tex` (claim row, comparator and evidence cells) and `app_I.tex` (U rows in the trajectory table, a "The U control" paragraph, Table 41 of matched-fraction differences, the limits) are updated.
+- Abstract, introduction and conclusion are unchanged: none of them mentions the unit query or the split, so U changes no sentence there. The negative-intervention table row for LSQT is unchanged (LT-U is a control without a criterion of its own).
+- `docs/paper/paper.pdf` rebuilt with `timeout 600 tectonic -X compile docs/paper/tex/paper.tex --outdir docs/paper`: 66 pages, 544,151 bytes (about 531 KiB), no undefined references or citations (64 pages and 536,238 bytes before).
+
+## Where each registered statement stands
+
+- LSQT decision (LQ1) unchanged: no arm reaches 0.80, the best ridge arm LT-RG001 (46.1%) lies in the open band 40% to below 48.5%, the trained-LSQ line stays open, W3 is not triggered, the learned-writer line stays stopped.
+- U control (LQ4, descriptive): LT-U 36.0%, read error 0.589, below 0.80; its final checkpoint is the registered selection and also its highest. It is a conditional descriptive control (registration decision 2), not a registered test, and it enters neither outcome.
+- Split (LQ3, narrowed): LT-RG001's +12.6 pp over R-r128 is +2.5 pp for the unit query (standard error 2.1) and +10.1 pp for the store (standard error 2.2); LT-K4 +4.8 = +2.5 + 2.3; LT-RG1 +9.1 = +2.5 + 6.6. Limits as listed above.
+- Must-not-say: "the store causes (or explains) LSQT's gain" without the limits; "the unit query helps" or "does not matter" as a finding; U called a registered test or an outcome of LSQT.
+
+## Checks run
+
+`scripts/check_paper_tex.py` (125 tex tags resolve; all 108 draft tags present; no number outside draft, ledgers and generated tables; no dash; refs.bib 76 = 76), the ledger md check (tags resolve, columns match in every table, links and anchors resolve; its
+duplicate-ID list holds only the known reader and amendment names), `scripts/paper_tables_g5.py` (all internal assertions and report cross-checks pass), the Punctuation Gate (`--lang en`) on every added line of the tex sources and the ledger (ok),
+`git diff --check` (clean), pages 13, 14, 62 and 63 rendered and inspected.
+
+## Notes and limits
+
+1. LQ3 changes status (`open` to `narrowed`). Part 2 said the split was untested until U reports and that Part 3 would replace the sentence, so the placeholder row is updated rather than left `open` beside a sentence that now states a split. The header
+   paragraph of the ledger declares it. If the coordinator prefers LQ3 to stay `open`, only that cell and the matching words in the Part 3 header paragraph change.
+2. The split uses the final checkpoints as registered; LT-RG001's 80% checkpoint (46.9%) is used only in the matched-fraction fact. The sizes of the parts in standard errors (1.2, 1.1, 4.6, 3.0) are printed as size references and labelled so, not as tests.
+3. The standard errors are the unpaired ones of the report; the paired standard error was not computed, and training-seed variation was not measured. The two parts of one arm share the sampling error of U.
+4. Remaining overfull boxes are the same small ones as in Part 2 (largest about 21 pt in a landscape Appendix C table, 14 pt in one Appendix E table, 12 pt in one Appendix I table); none was added.
+5. Rounding is half up on the stored value, as in Part 2; the U trajectory and split cells show no exact-5 case.
