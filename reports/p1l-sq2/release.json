@@ -1,0 +1,243 @@
+{
+  "E": 16,
+  "config_hashes": {
+    "S-DC": "497c7994c2cb8faa8f9214a69b9b7a29",
+    "S-DE": "c4a6f8291c4a96683577fde974e7ce5f",
+    "S-RC": "b8f6c8bb5b8ce045f28df8f15acbaccb",
+    "S-RE": "1bfb72b7d87bc0aff743c1e018e8680e"
+  },
+  "max_job_seconds": 3600,
+  "numerics": {
+    "eta": 0.0001,
+    "eta_curve": [
+      {
+        "error": 0.29295489591361795,
+        "eta": 1e-06
+      },
+      {
+        "error": 0.2929554247807209,
+        "eta": 1e-05
+      },
+      {
+        "error": 0.2929607275693725,
+        "eta": 0.0001
+      },
+      {
+        "error": 0.29301515696323555,
+        "eta": 0.001
+      },
+      {
+        "error": 0.2936900719000618,
+        "eta": 0.01
+      },
+      {
+        "error": 0.30794704056151384,
+        "eta": 0.1
+      },
+      {
+        "error": 0.481554555429121,
+        "eta": 1.0
+      },
+      {
+        "error": 0.8453052173402954,
+        "eta": 10.0
+      }
+    ],
+    "file_blake2b_128": "7f6f369802a20e3f4b303a5fc69fecc9",
+    "gradient_ratio_median": 0.898264381347168,
+    "path": "reports/p1l-sq2/numerics.json",
+    "ridge_store_gradient_ratio_median": 0.8317484554798431,
+    "w_c": 1.0
+  },
+  "parent": {
+    "arm": "D128-3",
+    "config_hash": "2207a847e4967fb8e60d1663237fd979",
+    "digests": {
+      "checkpoint.pt": "b6acff8b772a692311e630293add553f",
+      "writer.pt": "31d98c01c604c05a54bc20e4b4c4f436"
+    },
+    "steps": 22370
+  },
+  "prereg": "docs/prereg/SQ2.md",
+  "prereg_blake2b_128": "9f725a62e918ac668dd70220873038c5",
+  "primary_eval_steps_by_arm": {
+    "S-DC": [
+      1200,
+      2400,
+      3600,
+      4800,
+      6000
+    ],
+    "S-DE": [
+      1200,
+      2400,
+      3600,
+      4800,
+      6000
+    ],
+    "S-RC": [
+      1200,
+      2400,
+      3600,
+      4800,
+      6000
+    ],
+    "S-RE": [
+      1200,
+      2400,
+      3600,
+      4800,
+      6000
+    ]
+  },
+  "scale_up": null,
+  "science_commit": "3d543b430a2533df0057647081b07d874de893db",
+  "sizing_by_arm": {
+    "S-DC": {
+      "eval1000_seconds": 7.78847429988673,
+      "evaluations": 6,
+      "expected_seconds_with_margin": 2077.999576200959,
+      "largest_steps_in_one_hour": 10760,
+      "margin": 1.5,
+      "setup_reserve_seconds": 90,
+      "smoke_fraction_of_fixed_steps": 0.1,
+      "step_seconds": 0.21310036750021982
+    },
+    "S-DE": {
+      "eval1000_seconds": 7.822201080125524,
+      "evaluations": 6,
+      "expected_seconds_with_margin": 1983.696652072069,
+      "largest_steps_in_one_hour": 11315,
+      "margin": 1.5,
+      "setup_reserve_seconds": 90,
+      "smoke_fraction_of_fixed_steps": 0.1,
+      "step_seconds": 0.20258853803899324
+    },
+    "S-RC": {
+      "eval1000_seconds": 8.114491979940794,
+      "evaluations": 6,
+      "expected_seconds_with_margin": 1996.4682723548694,
+      "largest_steps_in_one_hour": 11245,
+      "margin": 1.5,
+      "setup_reserve_seconds": 90,
+      "smoke_fraction_of_fixed_steps": 0.1,
+      "step_seconds": 0.20371531605948912
+    },
+    "S-RE": {
+      "eval1000_seconds": 7.771293709956808,
+      "evaluations": 6,
+      "expected_seconds_with_margin": 1988.1950915155917,
+      "largest_steps_in_one_hour": 11285,
+      "margin": 1.5,
+      "setup_reserve_seconds": 90,
+      "smoke_fraction_of_fixed_steps": 0.1,
+      "step_seconds": 0.2031392720139978
+    }
+  },
+  "smoke": {
+    "evaluation_episodes": 100,
+    "quality_scores_exposed": false,
+    "rows": [
+      {
+        "arm": "S-DE",
+        "eval100_seconds": [
+          0.7822201080125524,
+          0.7719935180066386,
+          0.7706735730025684,
+          0.7773109179979656,
+          0.7757759640080621
+        ],
+        "git_commit": "3d543b430a2533df0057647081b07d874de893db",
+        "host": "mg0002",
+        "job_id": "3724382.opbs",
+        "source_hash": "71f9fc67ab98f02fee7325873969f3af",
+        "steady_step_mean_seconds": 0.20258853803899324,
+        "step_p95_seconds": 0.20662611054285662,
+        "steps": 600,
+        "total_seconds": 141.61963463800203
+      },
+      {
+        "arm": "S-DC",
+        "eval100_seconds": [
+          0.7563561689894414,
+          0.7695795149920741,
+          0.778847429988673,
+          0.7764756719989236,
+          0.7583418610010995
+        ],
+        "git_commit": "3d543b430a2533df0057647081b07d874de893db",
+        "host": "mg0033",
+        "job_id": "3724381.opbs",
+        "source_hash": "71f9fc67ab98f02fee7325873969f3af",
+        "steady_step_mean_seconds": 0.21310036750021982,
+        "step_p95_seconds": 0.21550909924699227,
+        "steps": 600,
+        "total_seconds": 148.32903057899966
+      },
+      {
+        "arm": "S-RE",
+        "eval100_seconds": [
+          0.771912334006629,
+          0.7576443059951998,
+          0.7771293709956808,
+          0.7761281230050372,
+          0.7733047790097771
+        ],
+        "git_commit": "3d543b430a2533df0057647081b07d874de893db",
+        "host": "mg0032",
+        "job_id": "3724380.opbs",
+        "source_hash": "71f9fc67ab98f02fee7325873969f3af",
+        "steady_step_mean_seconds": 0.2031392720139978,
+        "step_p95_seconds": 0.20535810615765512,
+        "steps": 600,
+        "total_seconds": 141.68091716698837
+      },
+      {
+        "arm": "S-RC",
+        "eval100_seconds": [
+          0.784356005009613,
+          0.7851265670033172,
+          0.81139761400118,
+          0.8114491979940794,
+          0.807002849993296
+        ],
+        "git_commit": "3d543b430a2533df0057647081b07d874de893db",
+        "host": "mg0031",
+        "job_id": "3724379.opbs",
+        "source_hash": "71f9fc67ab98f02fee7325873969f3af",
+        "steady_step_mean_seconds": 0.20371531605948912,
+        "step_p95_seconds": 0.20903056885726984,
+        "steps": 600,
+        "total_seconds": 142.5255324759928
+      }
+    ],
+    "steps": 600
+  },
+  "status": "released_after_smoke_timing_gate",
+  "step0": {
+    "arm": "S-DE",
+    "check": "step0",
+    "checked_at_commit": "dd5e4c89b40a345289aa53647718da56dc3bbb12",
+    "correct": 608,
+    "job_id": "3724338.opbs",
+    "nll": 2.1291537284851074,
+    "nll_bit_identical": true,
+    "parent_correct": 608,
+    "parent_digests": {
+      "checkpoint.pt": "b6acff8b772a692311e630293add553f",
+      "writer.pt": "31d98c01c604c05a54bc20e4b4c4f436"
+    },
+    "parent_nll": 2.1291537284851074,
+    "passed": true,
+    "predictions_identical": true,
+    "study": "SQ2"
+  },
+  "steps_by_arm": {
+    "S-DC": 6000,
+    "S-DE": 6000,
+    "S-RC": 6000,
+    "S-RE": 6000
+  },
+  "study": "SQ2",
+  "walltime": "01:00:00"
+}
