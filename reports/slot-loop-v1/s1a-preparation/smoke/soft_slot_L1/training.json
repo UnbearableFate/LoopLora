@@ -1,0 +1,131 @@
+{
+ "all_finite": true,
+ "batch": 32,
+ "clip": 1.0,
+ "clipped_fraction": 0.0,
+ "clipped_steps": 0,
+ "dev": [
+  {
+   "correct": 43,
+   "em": 0.671875,
+   "loss_float32": 2.2679858207702637,
+   "n": 64,
+   "nll": 2.2679858144820173,
+   "seconds": 0.4119633419904858,
+   "selectable": false,
+   "step": 0
+  },
+  {
+   "correct": 50,
+   "em": 0.78125,
+   "loss_float32": 1.8642332553863525,
+   "n": 64,
+   "nll": 1.8642331327610009,
+   "seconds": 0.443565547990147,
+   "selectable": true,
+   "step": 20
+  }
+ ],
+ "freeze": {
+  "digests": {
+   "after": {
+    "A": "0c566731fe973cd6ddd0ad1bca50908e",
+    "B": "ff3c0e9f1c627101745cbac3e1fd4078",
+    "K": "da979c0681fefbf058d579a1f5bcbb4c",
+    "Q": "2f555490c7456d2fa76d85c9511f3131",
+    "R": "0c3e7c6a233848018fae8d6d44d1030c",
+    "U": "c64ec53a343a740340d01e4ed4ec3161",
+    "V": "f4d888dda54c5b4ef304e0f0691cf608",
+    "a_beta": "fbfaf77c42f4578e329f9df9c277dbc4",
+    "a_lambda": "fb77a59a351a8275408931dc1453be4a",
+    "input_mean": "bd3b0d805ffe99d2500ca9459fc16b66",
+    "input_std": "05cbee6fbb80bdf8ad1a8b746fe2222e"
+   },
+   "before": {
+    "A": "0c566731fe973cd6ddd0ad1bca50908e",
+    "B": "be668ef20f8283fbd307f974f1cbc6ad",
+    "K": "da979c0681fefbf058d579a1f5bcbb4c",
+    "Q": "748c44575b25dfbc4d7b57b151c9cb63",
+    "R": "e379a4ce3fad0e2e5feb23edc072aa3f",
+    "U": "e1131ad12c47972eacc08f0cda1aacc5",
+    "V": "f4d888dda54c5b4ef304e0f0691cf608",
+    "a_beta": "fbfaf77c42f4578e329f9df9c277dbc4",
+    "a_lambda": "fb77a59a351a8275408931dc1453be4a",
+    "input_mean": "bd3b0d805ffe99d2500ca9459fc16b66",
+    "input_std": "05cbee6fbb80bdf8ad1a8b746fe2222e"
+   },
+   "frozen_unchanged": true,
+   "trainable_changed": true
+  },
+  "gradients": {
+   "trainable_grad_norms": {
+    "B": 0.33221763372421265,
+    "Q": 0.4185771346092224,
+    "R": 0.12806755304336548,
+    "U": 0.5052251219749451
+   }
+  },
+  "support": {
+   "after": "39c2d16d22a93d8aee9a83b906dba731",
+   "before": "39c2d16d22a93d8aee9a83b906dba731",
+   "equal": true
+  },
+  "trainable": {
+   "buffers": [
+    "input_mean",
+    "input_std"
+   ],
+   "frozen": [
+    "A",
+    "K",
+    "V",
+    "a_beta",
+    "a_lambda"
+   ],
+   "frozen_parameters": 294914,
+   "trainable": [
+    "Q",
+    "R",
+    "U",
+    "B"
+   ],
+   "trainable_parameters": 180224
+  }
+ },
+ "frozen_parameters": 294914,
+ "grad_norm": {
+  "max": 0.9648422598838806,
+  "mean": 0.7126801013946533,
+  "median": 0.714394211769104,
+  "p95": 0.9499464631080627
+ },
+ "loss": {
+  "first": 1.2858314514160156,
+  "last": 0.9102792739868164
+ },
+ "lr": 0.001,
+ "optimizer": {
+  "betas": [
+   0.9,
+   0.999
+  ],
+  "eps": 1e-08,
+  "name": "adamw",
+  "weight_decay": 0.01
+ },
+ "selected_checkpoint_blake2b_128": "01906513a2c5a6be685822f868828924",
+ "selected_step": 20,
+ "step_seconds_mean": 0.19155443210329395,
+ "step_seconds_p95": 0.19350828245005686,
+ "steps": 20,
+ "stream_seed": 5181101083092932984,
+ "train_seconds": 4.305489610007498,
+ "trainable": [
+  "Q",
+  "R",
+  "U",
+  "B"
+ ],
+ "trainable_parameters": 180224,
+ "warmup": 20
+}

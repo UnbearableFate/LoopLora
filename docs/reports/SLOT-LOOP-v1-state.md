@@ -1,7 +1,7 @@
-# WP-L13 state: SLOT-LOOP-v1, S0 complete (R2)
+# WP-L13 state: SLOT-LOOP-v1, S0 R2 and S1A release ready
 
 Branch `wp/slot` (worktree `LoopLora-wt/slot`), master merged through `8632497` after handover at `ccdcc96`; not merged into master, not pushed. Task: `docs/tasks/WP-L13_slot_loop.md`; registration `docs/prereg/SLOT-LOOP-v1.md` (blake2b-128 `56e8c611c01e0ef9b7ae32db97b0e334`, registered on master at `5f04a5c`, unchanged); S0 results are in `docs/reports/SLOT-LOOP-v1.md`.
-**Status: S0 accepted (R2); S1A follow-ups, smoke, pilot and release preparation authorized.** Stop after the ready release is committed for approval.json. No training or sealed evaluation is authorized before the later gates. No src changes; the preflight source binding remains valid.
+**Status: S1A release ready; both follow-ups, tests, real smoke, LR/timing pilot and exact reloads passed.** Awaiting approval.json. No formal training, dev selection or sealed evaluation has started. Science commit 1523b19c7949673ddcd1d89cc1e5fe518736805c; source remains identical to the accepted preflight.
 
 ## What the code does
 New files only, except four typed-dispatch edits (below). Every new option is off in the old paths.
@@ -329,3 +329,26 @@ Both reload jobs use science commit `1523b19c7949673ddcd1d89cc1e5fe518736805c`, 
 
 Both real reloads accepted: passed/config_matches_release true, all episode_id/prediction/correct/NLL equality flags true, full loaded slot metadata/read exactly equal the persisted candidate, actual checkpoint file digests equal smoke and reload records. Matrix export blake2b-128 `2751f9f87cb16b89c1bae5db8b95b253`; SoftSlot `01906513a2c5a6be685822f868828924`. Reload cost 51 / 3,600 = 0.014167 node·h; S1A preparation cumulative 0.195000; whole-study cumulative 0.973278.
 Ready-release builder job 3729009.opbs (one node, debug-g, 00:01:00; science commit `1523b19c7949673ddcd1d89cc1e5fe518736805c`) repeats all self-checks with both actual reload reports and writes `$R/s1a-release.json`. Log: `/work/xg24i002/x10041/LoopLora/logs/pbs/slot-s1a-release-20261029-230901-3540812.log`. Outcome/runtime pending. Next: inspect status ready, verify final digests/config hashes/inputs, archive release and evidence, update state/report/costs, commit on wp/slot and STOP: release for approval.json. No formal run, dev selection or sealed evaluation is started.
+
+
+
+## S1A release ready: STOP for approval.json
+Final builder 3729009.opbs passed on mg0027, 23:09:07–23:09:14 (7 s = 0.001944 node·h). Status ready; all candidate science/config/arm/timing/freeze/input settings are unchanged, and both actual reload reports are embedded exactly. Every config hash, frozen analysis/prereg/manifest digest and persistent opening-root script was verified again.
+Committed release path: `reports/slot-loop-v1/s1a-release.json`; exact blake2b-128 `523d11d57a08a2491893ebe7cedc86a7`. Persistent release is `$R/s1a-release.json` with identical bytes. Science commit remains `1523b19c7949673ddcd1d89cc1e5fe518736805c`; use that exact commit for later training even when the artifact commit is newer. Frozen analysis digest: `843d2ff4d1a03224ccd16e68720ba344`.
+Released schedule: 6,000 updates for both arms and seeds 17/29/43; Matrix LR=0.001, g=1; SoftSlot LR=0.003, g=1/tau=0.1; all valid question tokens; 1,800 s per single-node job on debug-g. Six main plus two seed-17 ablation config hashes are present. Fresh AdamW and the registered freeze/checkpoint/selection protocol remain unchanged. The six formal jobs request 3 node·h total (each 0.5); projected actual main-run compute about 1.74 node·h from pilot timings.
+Archived 32 exact release/preparation files plus artifacts.json: candidate/ready releases, smoke/pilot summaries, all training summaries/logs/per-step loss-and-norm arrays, smoke predictions and both reload reports. Both selected smoke weight files remain in persistent runs, with digests/paths retained in artifacts.json. Preparation report: `docs/reports/SLOT-LOOP-v1-release.md`. No raw weights are added to Git.
+
+| job | phase | actual seconds | node·h | outcome |
+| --- | --- | ---: | ---: | --- |
+| 3728718.opbs | RED regressions | 18 | 0.005000 | three intended failures reproduced |
+| 3728741.opbs | GREEN analysis/runbook/integration | 37 | 0.010278 | 158 passed |
+| 3728742.opbs | GREEN experiments | 170 | 0.047222 | 48 passed |
+| 3728762.opbs | real smoke | 36 | 0.010000 | both 20-step arms passed |
+| 3728825.opbs | pilot | 384 | 0.106667 | all six 200-step candidates passed |
+| 3728950.opbs | candidate builder | 6 | 0.001667 | pending_reload |
+| 3728988.opbs | Matrix reload | 26 | 0.007222 | exact config/predictions |
+| 3728990.opbs | SoftSlot reload | 25 | 0.006944 | exact config/predictions |
+| 3729009.opbs | ready builder | 7 | 0.001944 | ready |
+
+S1A preparation total 709/3,600 = 0.196944 node·h. Whole-study total inherited 0.503 + (420 + 294 + 277 + 709)/3,600 = 0.975222 node·h. Written stage caps remain lifted; all per-job requests stay within 16 node·h.
+Next: STOP: release with the artifact commit, await approval.json. No formal arm-seed runs, dev selection, ablation or sealed confirmation/unseen evaluation has started. No src changes since preflight; the two round-3 analysis/runbook follow-ups and their tests are complete, without another review round. The orchestrator will later compare the ready-release file digest with all six training records before writing s1a-open.json; analysis enforces shared record hashes and opening-record/release-file equality.

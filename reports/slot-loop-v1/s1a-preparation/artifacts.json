@@ -1,0 +1,192 @@
+{
+ "archived_files": {
+  "s1a-candidate.json": {
+   "blake2b_128": "2a8654a5d9ce0420998f7a591195cb52",
+   "bytes": 17677,
+   "source": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1a-candidate.json"
+  },
+  "s1a-preparation/pilot.json": {
+   "blake2b_128": "800e2ac58001e3f3d77975d9a1691f03",
+   "bytes": 4922,
+   "source": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1a-pilot/pilot.json"
+  },
+  "s1a-preparation/pilot/matrix_L1/lr0.0003/train_log.jsonl": {
+   "blake2b_128": "68d9494fe5a1f894496949c8ee1ce67a",
+   "bytes": 1010,
+   "source": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1a-pilot/matrix_L1/lr0.0003/train_log.jsonl"
+  },
+  "s1a-preparation/pilot/matrix_L1/lr0.0003/train_steps.npz": {
+   "blake2b_128": "6f061a12b0fd6a729a4aa9ffa86764d0",
+   "bytes": 1883,
+   "source": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1a-pilot/matrix_L1/lr0.0003/train_steps.npz"
+  },
+  "s1a-preparation/pilot/matrix_L1/lr0.0003/training.json": {
+   "blake2b_128": "25c2b83f928977a770aa32e3d237fc16",
+   "bytes": 2862,
+   "source": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1a-pilot/matrix_L1/lr0.0003/training.json"
+  },
+  "s1a-preparation/pilot/matrix_L1/lr0.001/train_log.jsonl": {
+   "blake2b_128": "503333155d329ab97a5ac5175ce1b957",
+   "bytes": 993,
+   "source": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1a-pilot/matrix_L1/lr0.001/train_log.jsonl"
+  },
+  "s1a-preparation/pilot/matrix_L1/lr0.001/train_steps.npz": {
+   "blake2b_128": "e22f5e6ec48ab412995e532be1376831",
+   "bytes": 1876,
+   "source": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1a-pilot/matrix_L1/lr0.001/train_steps.npz"
+  },
+  "s1a-preparation/pilot/matrix_L1/lr0.001/training.json": {
+   "blake2b_128": "cec36ce6f6a043c44f3661852c7265ca",
+   "bytes": 2862,
+   "source": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1a-pilot/matrix_L1/lr0.001/training.json"
+  },
+  "s1a-preparation/pilot/matrix_L1/lr0.003/train_log.jsonl": {
+   "blake2b_128": "c3b676fa4e799dbbb9472868f2ebb0a2",
+   "bytes": 1007,
+   "source": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1a-pilot/matrix_L1/lr0.003/train_log.jsonl"
+  },
+  "s1a-preparation/pilot/matrix_L1/lr0.003/train_steps.npz": {
+   "blake2b_128": "b15db59b0cf36362bb070f076eed96f7",
+   "bytes": 1878,
+   "source": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1a-pilot/matrix_L1/lr0.003/train_steps.npz"
+  },
+  "s1a-preparation/pilot/matrix_L1/lr0.003/training.json": {
+   "blake2b_128": "6c29767b3aae2ffac3846318d46c11cc",
+   "bytes": 2860,
+   "source": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1a-pilot/matrix_L1/lr0.003/training.json"
+  },
+  "s1a-preparation/pilot/soft_slot_L1/lr0.0003/train_log.jsonl": {
+   "blake2b_128": "53e792e89892338bf744f98650a48307",
+   "bytes": 1009,
+   "source": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1a-pilot/soft_slot_L1/lr0.0003/train_log.jsonl"
+  },
+  "s1a-preparation/pilot/soft_slot_L1/lr0.0003/train_steps.npz": {
+   "blake2b_128": "8e292de214742bc9125464abab4c852c",
+   "bytes": 1876,
+   "source": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1a-pilot/soft_slot_L1/lr0.0003/train_steps.npz"
+  },
+  "s1a-preparation/pilot/soft_slot_L1/lr0.0003/training.json": {
+   "blake2b_128": "2f62ed96cb1b78b3a4f09a7247ffb984",
+   "bytes": 2861,
+   "source": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1a-pilot/soft_slot_L1/lr0.0003/training.json"
+  },
+  "s1a-preparation/pilot/soft_slot_L1/lr0.001/train_log.jsonl": {
+   "blake2b_128": "ad116a4571e79ffa6d74812cc6bffeee",
+   "bytes": 990,
+   "source": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1a-pilot/soft_slot_L1/lr0.001/train_log.jsonl"
+  },
+  "s1a-preparation/pilot/soft_slot_L1/lr0.001/train_steps.npz": {
+   "blake2b_128": "61bcb235f87bc2da466e22e0e50e618a",
+   "bytes": 1888,
+   "source": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1a-pilot/soft_slot_L1/lr0.001/train_steps.npz"
+  },
+  "s1a-preparation/pilot/soft_slot_L1/lr0.001/training.json": {
+   "blake2b_128": "844cf5ed42d146b73617bc826558c8c5",
+   "bytes": 2861,
+   "source": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1a-pilot/soft_slot_L1/lr0.001/training.json"
+  },
+  "s1a-preparation/pilot/soft_slot_L1/lr0.003/train_log.jsonl": {
+   "blake2b_128": "26e7a1ade77d3d3252cd4a68147051ed",
+   "bytes": 1006,
+   "source": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1a-pilot/soft_slot_L1/lr0.003/train_log.jsonl"
+  },
+  "s1a-preparation/pilot/soft_slot_L1/lr0.003/train_steps.npz": {
+   "blake2b_128": "59a12bc8b8e2fcae7bfa254d79d551a5",
+   "bytes": 1880,
+   "source": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1a-pilot/soft_slot_L1/lr0.003/train_steps.npz"
+  },
+  "s1a-preparation/pilot/soft_slot_L1/lr0.003/training.json": {
+   "blake2b_128": "e82e621787f4a9e5fed6f023c7c03ad8",
+   "bytes": 2860,
+   "source": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1a-pilot/soft_slot_L1/lr0.003/training.json"
+  },
+  "s1a-preparation/reload-matrix_L1.json": {
+   "blake2b_128": "4d0a05404cb596931c6cc0ee5518d7ff",
+   "bytes": 1334,
+   "source": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/reload-matrix_L1.json"
+  },
+  "s1a-preparation/reload-soft_slot_L1.json": {
+   "blake2b_128": "8185207d88334f2826f5da90682f7ef3",
+   "bytes": 1331,
+   "source": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/reload-soft_slot_L1.json"
+  },
+  "s1a-preparation/smoke.json": {
+   "blake2b_128": "eb904fc6c4dca0850358e580a3afb8bc",
+   "bytes": 7888,
+   "source": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1a-smoke/smoke.json"
+  },
+  "s1a-preparation/smoke/matrix_L1/smoke_predictions.npz": {
+   "blake2b_128": "e21a739f6edb871b300b777efedb44e0",
+   "bytes": 2268,
+   "source": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1a-smoke/matrix_L1/smoke_predictions.npz"
+  },
+  "s1a-preparation/smoke/matrix_L1/train_log.jsonl": {
+   "blake2b_128": "c5e2780748a0a2461f451927faaa46a8",
+   "bytes": 392,
+   "source": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1a-smoke/matrix_L1/train_log.jsonl"
+  },
+  "s1a-preparation/smoke/matrix_L1/train_steps.npz": {
+   "blake2b_128": "a90d67d3481f7ab4c80b54205986c2ec",
+   "bytes": 561,
+   "source": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1a-smoke/matrix_L1/train_steps.npz"
+  },
+  "s1a-preparation/smoke/matrix_L1/training.json": {
+   "blake2b_128": "9271279607a65fc87c9654bc25848a95",
+   "bytes": 3005,
+   "source": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1a-smoke/matrix_L1/training.json"
+  },
+  "s1a-preparation/smoke/soft_slot_L1/smoke_predictions.npz": {
+   "blake2b_128": "6568d891e7cf324f84472e1f5745c396",
+   "bytes": 2261,
+   "source": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1a-smoke/soft_slot_L1/smoke_predictions.npz"
+  },
+  "s1a-preparation/smoke/soft_slot_L1/train_log.jsonl": {
+   "blake2b_128": "20e1df49c6b4b860e2bab338ab8c5a12",
+   "bytes": 394,
+   "source": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1a-smoke/soft_slot_L1/train_log.jsonl"
+  },
+  "s1a-preparation/smoke/soft_slot_L1/train_steps.npz": {
+   "blake2b_128": "b6f8487a2ab87e92b53edb2070769571",
+   "bytes": 561,
+   "source": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1a-smoke/soft_slot_L1/train_steps.npz"
+  },
+  "s1a-preparation/smoke/soft_slot_L1/training.json": {
+   "blake2b_128": "7b0920ddc2969df280889c2221d304cc",
+   "bytes": 3006,
+   "source": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1a-smoke/soft_slot_L1/training.json"
+  },
+  "s1a-release.json": {
+   "blake2b_128": "523d11d57a08a2491893ebe7cedc86a7",
+   "bytes": 20661,
+   "source": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1a-release.json"
+  }
+ },
+ "jobs": {
+  "candidate": "3728950.opbs",
+  "experiment_tests": "3728742.opbs",
+  "pilot": "3728825.opbs",
+  "red": "3728718.opbs",
+  "release": "3729009.opbs",
+  "reload_matrix": "3728988.opbs",
+  "reload_soft": "3728990.opbs",
+  "smoke": "3728762.opbs",
+  "tests": "3728741.opbs"
+ },
+ "persistent_smoke_exports": {
+  "matrix_L1": {
+   "blake2b_128": "2751f9f87cb16b89c1bae5db8b95b253",
+   "bytes": 1925267,
+   "path": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1a-smoke/matrix_L1/selected.pt",
+   "retain_for": "release/reload evidence through study completion"
+  },
+  "soft_slot_L1": {
+   "blake2b_128": "01906513a2c5a6be685822f868828924",
+   "bytes": 1925267,
+   "path": "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1a-smoke/soft_slot_L1/selected.pt",
+   "retain_for": "release/reload evidence through study completion"
+  }
+ },
+ "release_blake2b_128": "523d11d57a08a2491893ebe7cedc86a7",
+ "science_commit": "1523b19c7949673ddcd1d89cc1e5fe518736805c",
+ "version": 1
+}

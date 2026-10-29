@@ -1,6 +1,6 @@
 # SLOT-LOOP-v1 S0 (WP-L13): frozen read replacement
 
-**Decision: R2, full S1A adaptation.** HardSlot improves EM by 6.1 pp over Matrix with lower read error on the registered 1,000-episode dev set. Calibrated SoftSlot improves EM by 2.5 pp, below the exploratory 5 pp threshold. S1A choices: **Matrix-L1 g=1; SoftSlot-L1 g=1, tau=0.1**, all valid question tokens. HardSlot remains diagnostic. S1A is unstarted and waits for the orchestrator.
+**Decision: R2, full S1A adaptation.** HardSlot improves EM by 6.1 pp over Matrix with lower read error on the registered 1,000-episode dev set. Calibrated SoftSlot improves EM by 2.5 pp, below the exploratory 5 pp threshold. S1A choices: **Matrix-L1 g=1; SoftSlot-L1 g=1, tau=0.1**, all valid question tokens. HardSlot remains diagnostic. Formal S1A runs are unstarted; preparation is complete and waits for approval.json.
 
 Calibration used the registered 2,048 episodes, all 18 candidates and fixed NLL selection. Matrix and HardSlot selected g=1; SoftSlot selected g=1/tau=0.1. Uncalibrated SoftSlot (tau=1) reached 2.1% EM, so temperature is consequential. No dev setting or recency variant replaced the registered selection.
 
@@ -24,3 +24,5 @@ The separate final-only table gives Matrix 72.0%, SoftSlot 75.5%, HardSlot 80.3%
 Execution adds 0.076944 node·h; cumulative including tests/retries is 0.778278 node·h (inherited accounting 0.503). Written stage budgets were lifted; every job is below 16 node·h. Preflight commit: `7febf58c3440483fe081e99c263f68ad62512b10`; lock/S0/analysis commit: `2f22aba2f6e93029198d1126ede2b9528cd3eef4`; source blake2b-128: `fe548da4c06d77b7f4a8ae65349650f9`.
 
 Artifacts: [decision](../../reports/slot-loop-v1/s0/decision_s0.md), [metrics and samples inventory](../../reports/slot-loop-v1/s0/artifacts.json), [lock](../../reports/slot-loop-v1/manifest.lock.json), [preflight](../../reports/slot-loop-v1/preflight/preflight.json), [detailed state](SLOT-LOOP-v1-state.md). Persistent originals: `/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/`. Deferred S1A follow-ups are task Review round 3: analysis-only release-file digest binding and complete S1A runbook/parser tests; no further review round. No deviation from registered S0 science rules.
+
+S1A preparation is recorded separately in [the release report](SLOT-LOOP-v1-release.md); the costs above describe the earlier S0 stop.
