@@ -1,7 +1,7 @@
 # LSR state (WP-L9 step 2; sn-core, wp/core). Registered `docs/prereg/LSR.md`, blake2b-128 `63da9c626d699252c239cc86e149f1ad` (with Clarification C1, master ad1a9b5; the validation runs recorded the pre-C1 hash `91235d80a38f200e3a7b3bec907c1f1e`, which `design.json` lists in `earlier_prereg_hashes`)
 
-Status 2026-10-29: thresholds locked (`reports/lsr/thresholds.json`, awaiting the orchestrator's check). No test episode has been generated.
-node·h so far: 0.288 (cap 0.8; projected test jobs about 0.15-0.2 including the latency audit).
+Status 2026-10-29: done. Thresholds locked at `47d9110`; test scans and analysis run; report `docs/reports/LSR.md`. R2 passes at both backbones; R1 and R3 are infeasible (no test statistic).
+Total 0.50 node·h (cap 0.8).
 
 ## Code (commit `5348211`, plus the commit that carries this file)
 - `src/looplora/llm/lsr_rules.py` (numpy only): grid, rules R1/R2/R3, reads, selection (`select_thresholds`), constants and the six checkpoints.
@@ -22,6 +22,9 @@ node·h so far: 0.288 (cap 0.8; projected test jobs about 0.15-0.2 including the
 | 3724062 / 3724063 | `lsr-smoke-06` / `-17` | 0.018 / 0.018 | smoke after the audit change; exit 0 |
 | 3724070 / 3724071 | `lsr-val-0.6b` / `-1.7b` | 0.076 / 0.083 | validation [1000, 3000), 3 seeds each, exit 0 (4 min 35 s / 4 min 59 s) |
 | 3724125 | `lsr-select` | 0.002 | `analyze_lsr.py select`; wrote `reports/lsr/thresholds.json` |
+| 3724166 / 3724188 | `lsr-tests2` / `-tests3` | 0.007 / 0.002 | `test_lsr_stats.py` + `test_lsr.py` (one fix to my own table-order assertion), then `test_lsr_stats.py` again; passed |
+| 3724191 / 3724192 | `lsr-test-0.6b` / `-1.7b` | 0.096 / 0.104 | test [106000, 108000), 3 seeds each, with the latency audit; exit 0 (5 min 44 s / 6 min 17 s); source `270ac8e` |
+| 3724253 | `lsr-analysis` | 0.003 | `analyze_lsr.py test` at `270ac8e`; wrote `results.json` and the CSV tables |
 
 ## Smoke (val [0, 64), seed 17; timing and audits only, not used for any decision)
 - 64 episodes scan in 5.3 s (both backbones) including warm-up; the per-checkpoint job took 46 s with the latency audit.
@@ -55,3 +58,12 @@ Validation EM (%) of fixed L = 4 by hop 1..8: 0.6B 48.1 / 34.4 / 19.6 / 7.2 / 4.
   against 5.3% and 4.5% at L = 4, mean 5.6 / 5.7 reads. Validation numbers only; the test decides.
 - **L_c = 4 at both backbones** (the best fixed depth under the same constraint is the deployed one: L = 5 and deeper lose more than the margin on hop 1).
 - O1 (best fixed L per hop on validation): [2, 4, 5, 6, 8, 8, 8, 8] at both backbones.
+
+## Test run
+- Authorization `reports/lsr/test-authorization.json` (commit `270ac8e`): prereg `63da9c62...`, thresholds blake2b `a9f1d50ec806a506fe6866378547eab9`,
+  window `lsr`, k = 6, 99.17%. Analysis code committed at `4a52120` before any test scan; unit tests on synthetic traces passed on compute first.
+- Records checked before the analysis: six complete test records, window test [106000, 108000) x 2,000, checkpoint hashes equal to `design.json`,
+  one source commit, not dirty. The test scans took 86-97 s per checkpoint.
+- Result (details in `docs/reports/LSR.md`): R2 hops 4-8 gain +3.90 pp [3.35, 4.43] at 0.6B and +5.68 [5.09, 6.25] at 1.7B, hop 1 +6.28 / +4.70, every
+  seed positive on both; mean reads 5.60 / 5.66 and 6.60 / 6.66 upper-layer passes; hop 2 -10.8 / -12.3 pp and hops 1-3 pooled -2.61 / -3.74 pp
+  (95%) against L = 4. R1 and R3: infeasible, no test statistic. No deviation beyond Clarification C1.
