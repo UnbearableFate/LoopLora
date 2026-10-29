@@ -60,6 +60,13 @@
   - 冻结的 S-RE writer 是在 T1 上训练的，迁移到 T2 未经验证。由 preflight 把关；另设一个停止条件：校准后的 Matrix-L1 若 hop-1 EM 低于 10 %，就在 pilot 前停止。
   - 确认循环增益的条件：L4−L1 的 Δ ≥ 3 pp，校正后的区间下界 > 0，每个 seed 的差都 > 0，hop-1 下降不超过 2 pp。四臂分支有三个对比，用 Bonferroni 98⅓ % 区间。
   - wk-loop 是新开的 codex worker，在 wp/loop 上并行实现。S1A 完成前，wp/loop 与 wp/slot 不互相合并。
+- **2026-10-30 00:36 JST** S1A 完成，判定 **ADVANCE**（wp/slot 81e8996，合并为 master 650dc3e）。
+  - **确认集**（2,000 个 episode）：SoftSlot-L1 − Matrix-L1 = **+3.73 pp**，95 % 区间 [+2.70, +4.82]；三个 seed 分别为 +3.5、+4.2、+3.5 pp。EM 为 86.00 % 对 82.27 %。
+  - **unseen 集**（描述性）：+2.98 pp。
+  - **dev 选择**：no_trigger，dev 差 +3.5 pp，所以没有消融。rv-code 独立重跑冻结分析（job 3729280），输出逐字节相同。之后 orchestrator 才写入 `s1a-open.json`。
+  - **release 与成本**：release 523d11d5，N = 6000，LR 为 Matrix 1e-3、SoftSlot 3e-3。6 个 run 每个 16.5–18.4 min，合计 1.75 node·h。
+  - **S1B 分支**：由此为 advance，即 M1、M4、S1、S4，共享冻结的 A。
+  - **S1B 进度**：交叉评审（rv-code 1H 4M，rv-opus 1H 1M 4L）的九项修复已完成；179 项测试通过；preflight 通过，lock bd4e24f（src bb60b89c）。wk-loop 接着做校准、smoke、pilot 和 release。
 
 ---
 
