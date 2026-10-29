@@ -1,7 +1,7 @@
-# WP-L13 state: SLOT-LOOP-v1 (S0, S1A), step 2: review round 1 fixes
+# WP-L13 state: SLOT-LOOP-v1, S0 complete (R2)
 
-Branch `wp/slot` (worktree `LoopLora-wt/slot`), master `c0bbbd5` merged after handover at `ccdcc96`; not merged into master, not pushed. Task: `docs/tasks/WP-L13_slot_loop.md`; registration `docs/prereg/SLOT-LOOP-v1.md` (blake2b-128 `56e8c611c01e0ef9b7ae32db97b0e334`, registered on master at `5f04a5c`, unchanged); results will go to `docs/reports/SLOT-LOOP-v1.md`.
-**Status: real-parent preflight passed; manifest lock committed after all gates passed; S0 complete, frozen decision analysis submitted.** All four round-2 fixes are complete and 268 affected tests passed. Master 8632497 merged; reviewed src unchanged. Written stage budgets are superseded by the user’s per-job cap of 16 node·h. S1A follow-ups remain deferred. Earlier compute results below cover the pre-review implementation. No real preflight, manifest lock, S0 or S1A science run has started. After validation, STOP for the orchestrator’s cross-review before those steps.
+Branch `wp/slot` (worktree `LoopLora-wt/slot`), master merged through `8632497` after handover at `ccdcc96`; not merged into master, not pushed. Task: `docs/tasks/WP-L13_slot_loop.md`; registration `docs/prereg/SLOT-LOOP-v1.md` (blake2b-128 `56e8c611c01e0ef9b7ae32db97b0e334`, registered on master at `5f04a5c`, unchanged); S0 results are in `docs/reports/SLOT-LOOP-v1.md`.
+**Status: S0 complete, decision R2; preflight, lock, S0, frozen analysis and artifact verification passed.** S1A is unstarted and waits for the orchestrator. Reviewed src unchanged; no sealed S1A data opened. Review rounds are closed; the two S1A follow-ups are deferred. Written stage caps are superseded by the 16 node·h per-job cap. Earlier test/review entries below are historical.
 
 ## What the code does
 New files only, except four typed-dispatch edits (below). Every new option is off in the old paths.
@@ -91,7 +91,7 @@ Cumulative against the S0 cap of 1.0 node·h: 0.503 used, 0.497 left for the pre
    Tests: `tests/test_analyze_slot_study.py` (70 cases, numpy and pytest only) and two cross-checks in `tests/test_slot_experiment.py` that feed the runner's own S0 output and arm-seed record to the script.
 
 ## Not done / next
-- Reviews closed: execute steps 1–4 now. Commit the lock on wp/slot only after every required preflight check passes, including bitwise Matrix–Native identity; otherwise STOP before calibration/dev. End S0 with STOP: S0 done.
+- Reviews closed: steps 1–4 completed; retain the commands below as the execution runbook. Commit the lock on wp/slot only after every required preflight check passes, including bitwise Matrix–Native identity; otherwise STOP before calibration/dev. End S0 with STOP: S0 done.
 - After cross-review approval, use these commands from this worktree. These steps are now authorized by the user. Set `R=/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1`, `W=/work/xg24i002/x10041/LoopLora-wt/slot`, then `cd "$W"` and `REVIEW_COMMIT="$(git rev-parse HEAD)"` on the reviewed head. Replace no hashes with `HEAD` in `submit.py`; the variables below hold full resolved hashes.
   1. Preflight (one node, debug-g, estimated 0.05 node·h): `scripts/submit.py --name slot-preflight --queue debug-g --walltime 00:20:00 --commit "$REVIEW_COMMIT" -- -m looplora.llm.slot_run --mode preflight --config "$W/configs/slot_loop_v1/s0.json" --out "$R/preflight"`. It reads no calibration/dev data. Wait through the orchestrator, then inspect the complete log and required checks; failure or any Matrix–Native difference ends in STOP before the lock.
   2. Lock (login metadata only, after passed preflight): `/work/xg24i002/x10041/LoopLora/.venv/bin/python scripts/prepare_slot_manifest.py --configs "$W/configs/slot_loop_v1" --preflight-report "$R/preflight/preflight.json" --out "$W/reports/slot-loop-v1/manifest.lock.json" --inventory-out "$W/reports/slot-loop-v1/checkpoint_inventory.json"`. Copy the preflight report into the worktree, commit it with the lock and inventory on wp/slot, and only then set `LOCK_COMMIT="$(git rev-parse HEAD)"`. Any src change requires a new preflight.
@@ -199,3 +199,20 @@ Lock command completed successfully with the shared venv interpreter: re-derived
 
 S0 outputs inspected after job completion: correct lock commit and stage config hash, 2,048 calibration and 1,000 dev ids/counts matching the lock, all 18 candidates, 13 dev conditions and four D128-3 rows present, finite aggregate metrics, and D128-3 old replay passed. Calibration selects Matrix g=1, SoftSlot g=1/tau=0.1, HardSlot g=1. No manual selection or threshold change.
 Frozen analysis job 3728547.opbs (debug-g, one node, requested 00:03:00) is pinned to lock commit `2f22aba2f6e93029198d1126ede2b9528cd3eef4`; Python argv starts `scripts/analyze_slot_study.py` with no extra interpreter. It validates per-sample Native/Matrix identity, sample ids and registered calibration choice, computes the registered descriptive bootstrap, and writes persistent decision files at `/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s0/decision`. Log: `/work/xg24i002/x10041/LoopLora/logs/pbs/slot-s0-analysis-20261029-221922-3381749.log`. Outcome/node·h pending. Next: inspect decision and source index, archive raw S0/decision artifacts, write the one-page S0 report, update costs, commit and STOP: S0 done. S1A remains unstarted.
+
+
+
+## S0 complete: R2
+Frozen analysis job 3728547.opbs completed on mg0022, 22:19:28–22:19:34 JST (6 s = 0.001667 node·h), lock commit `2f22aba2f6e93029198d1126ede2b9528cd3eef4`, exit/log marker 0. Output: R2; all nine gates true; 1,000 dev and 2,048 calibration episodes match the lock. Native/Matrix per-sample correctness/NLL identity and registered calibration choices passed before the decision and 10,000 paired descriptive bootstrap resamples.
+- Main table, all valid question tokens: Matrix 720/1,000 (NLL 1.577648, read error 0.183978); SoftSlot 745/1,000 (1.505075, 0.092405), +2.5 pp, descriptive CI [0.6, 4.4]; HardSlot 781/1,000 (2.434278, 0.137009), +6.1 pp [3.8, 8.4]. Soft is below the exploratory 5 pp threshold; Hard meets it with lower read error, so the first matching row is R2.
+- S1A choices: full adaptation, Matrix-L1 g=1 and SoftSlot-L1 g=1/tau=0.1, all valid question tokens. HardSlot stays diagnostic. Calibration by NLL supplies these fixed settings. No S1A work has started.
+- Final-only table stays separate: Matrix 72.0%, SoftSlot 75.5%, HardSlot 80.3%, Clean-final oracle 92.6%. D128-3 at S-RE's settings: Matrix 63.3%, SoftSlot 73.7%, HardSlot 74.8%, same direction. Recency SoftSlot 74.6% is descriptive.
+- All source-index input digests, the script digest and three output digests printed by the job matched. Raw metrics/calibration and both sample files, decision JSON/Markdown and source_index were copied byte-for-byte into `reports/slot-loop-v1/s0/`. `artifacts.json` records all seven file sizes and blake2b-128 digests. Report: `docs/reports/SLOT-LOOP-v1.md`.
+
+| job | phase | actual seconds | actual node·h | outcome |
+| --- | --- | ---: | ---: | --- |
+| 3728339.opbs | preflight | 53 | 0.014722 | all checks passed, Matrix bitwise Native |
+| 3728354.opbs | S0 | 218 | 0.060556 | complete calibration/dev/recheck |
+| 3728547.opbs | analysis | 6 | 0.001667 | R2, artifacts verified |
+
+Execution total 277 / 3,600 = 0.076944 node·h. Cumulative including tests/retries: inherited 0.503 + (420 + 294 + 277) / 3,600 = 0.778278 node·h. Written caps no longer bind; every job is below 16 node·h. No src changes or sealed S1A data access. Next: STOP: S0 done and await the orchestrator. Before S1A, complete the two Review round 3 analysis/runbook follow-ups without src changes or another review round.
