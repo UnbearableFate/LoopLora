@@ -38,7 +38,7 @@ def fit(experiment, spec, *, arm, seed, lr, steps, out, dev, dev_steps, support,
     freeze = dict(trainable=trainable_report(experiment, optimizer, names))
     reference = tensor_digests(experiment.adapter)
     before = support_digest(experiment, support)
-    rows, durations, losses, norms, costs = [], [], [], [], [], []
+    rows, durations, losses, norms, costs = [], [], [], [], []
     export_seconds = []
     checkpoint_overhead = []
     best, best_step, selected_digest = math.inf, None, None

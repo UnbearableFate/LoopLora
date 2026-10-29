@@ -28,7 +28,7 @@ def matrix_identity(experiment, arrays):
         gradients[label] = {n: getattr(experiment.adapter, n).grad.detach().clone() for n in rules.TRAINABLE}
     gaps = {n: float((gradients["native"][n] - gradients["matrix"][n]).abs().max()) for n in rules.TRAINABLE}
     return dict(passed=torch.equal(logits["native"], logits["matrix"]) and all(v == 0 for v in gaps.values()),
-                max_abs_difference=float((logits["native"] - logits["matrix"]).abs().max()), gradients=gaps)
+                max_abs_difference=float((logits["native"] - logits["matrix"]).detach().abs().max()), gradients=gaps)
 
 
 def trajectory_check(experiment, arrays):

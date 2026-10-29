@@ -22,14 +22,28 @@ Tests target the registered data/seal boundaries, three branches, source/release
 
 Login validation: AST parsing of all new Python files without importing application code, registered-addendum blake2b check, and `git diff --check`. Compute test results and exact snapshot/job ledger follow below. Dependencies and old source files remain unchanged. The next gate after passing tests is the single core-code cross-review; preflight/lock remain deferred until that review/fix validation.
 
-### Compute test ledger (submitted; results pending)
+### Compute test ledger (initial snapshot)
 
 Snapshot **`a731d6dcbb94f06cf5fe0999b522f872653b6fef`** contains implementation, tests and this report's implementation record. Each command uses `/usr/bin/python3 -I scripts/submit.py --queue debug-g --nodes 1 --commit a731d6dcbb94f06cf5fe0999b522f872653b6fef`; no `--wait`, sleep or polling. The three payloads are `-m pytest -q` followed by the files below. Walltime basis: earlier slot metadata tests took 83–84 s and experiment tests 167–177 s; new actual-forward depth-eight tracing and the four-arm synthetic smoke merit the longer model shard. Requests include approximately 1.5× margin and remain below the per-job cap. No S1B science output is created.
 
 | job | payload files | requested walltime / node·h | outcome / actual node·h |
 | --- | --- | --- | --- |
-| 3728953.opbs | test_s1b_data_analysis.py, test_s1b_artifacts.py | 00:05:00 / 0.083333 | pending / pending |
-| 3728954.opbs | test_s1b_model.py, test_s1b_integration.py | 00:08:00 / 0.133333 | pending / pending |
-| 3728955.opbs | test_slot_experiment.py, test_slot_backend.py, test_slot_data.py | 00:07:00 / 0.116667 | pending / pending |
+| 3728953.opbs | test_s1b_data_analysis.py, test_s1b_artifacts.py | 00:05:00 / 0.083333 | exit 1, 34 passed / 1 failed, mg0002, 24 s / 0.006667 |
+| 3728954.opbs | test_s1b_model.py, test_s1b_integration.py | 00:08:00 / 0.133333 | exit 1, 9 passed / 3 failed, mg0014, 27 s / 0.007500 |
+| 3728955.opbs | test_slot_experiment.py, test_slot_backend.py, test_slot_data.py | 00:07:00 / 0.116667 | exit 0, 113 passed, mg0028, 235 s / 0.065278 |
 
-Persistent logs under `/work/xg24i002/x10041/LoopLora/logs/pbs/`: `s1b-t-meta-20261029-230438-3532112.log`, `s1b-t-model-20261029-230438-3532117.log`, `s1b-t-legacy-20261029-230438-3532120.log`. Combined requested ceiling 0.333333 node·h; actual total is not yet known. Next: orchestrator watcher wakes wk-loop after all three leave PBS; inspect full failures/counts, source/argv and exit markers, fix defects if necessary, update this ledger, then `STOP: review <full hash>`. No real-parent preflight or manifest lock before that review.
+Persistent logs under `/work/xg24i002/x10041/LoopLora/logs/pbs/`: `s1b-t-meta-20261029-230438-3532112.log`, `s1b-t-model-20261029-230438-3532117.log`, `s1b-t-legacy-20261029-230438-3532120.log`. Combined requested ceiling 0.333333 node·h; actual total **286 / 3600 = 0.079444 node·h**. Sources/argv, CUDA availability, complete progress, full failure tracebacks and `.exit` markers checked. No real-parent preflight or manifest lock before review.
+
+### Initial failure and skip audit
+
+The watcher message reported metadata “2 failed, 1 error” and model “6 failed, 3 errors, 15 skipped”. These counts do **not** match the named canonical `.log` files or their PBS `.log.pbs` copies. Actual pytest progress is metadata `...............................F...` (35 cases: 34 passed / 1 failed), model `........FF.F` (12 cases: 9 passed / 3 failed), and legacy 113 dots (113 passed). None contains `s`, `SKIPPED`, a fixture-error section or a skipped-test reason. The wrapper's `[ERROR] job.pbs failed at line 69` records pytest's nonzero process exit; it is not another pytest error.
+
+**Skipped tests: 0 in each of these three jobs.** There are no individual skip reasons to enumerate. In particular, the reported fifteen skips are not present in either model log copy, and no S1B test contains a skip/xfail marker. The three training cases failed at the same initialization line; they were not skipped. Retries explicitly request pytest `-ra` and persistent JUnit XML so every actual skip, if any, has a named reason in the log and XML.
+
+Diagnoses and focused corrections:
+
+- Metadata: `test_calibration_writes_sanity_evidence_before_stopping` raises `NameError: np is not defined` before calling production code. Restored the test's NumPy import. Its <10% sanity-stop assertion is unchanged.
+- Model: both parameterized matched-training/export round trips and the smoke→builder→CLI-reload integration raise `ValueError: too many values to unpack (expected 5)` in `s1b_train.fit`: five history variables received six lists. Corrected the initializer to five lists. This fixes a production startup error that the existing behavior tests exposed; no assertion, registered rule or training schedule changed.
+- Detached the native-versus-Matrix logit-gap tensor before converting the diagnostic maximum to a float, resolving the observed autograd scalar-conversion warning without changing logits, gradients or the bitwise assertion.
+
+Retry the two affected S1B shards in full. Existing S0/S1A source imports and test files did not change; the passed 113-case legacy shard remains applicable. Review stop still waits for successful training/export/integration execution. Current checks on login: AST parsing and diff whitespace only; all runtime work remains in PBS.
