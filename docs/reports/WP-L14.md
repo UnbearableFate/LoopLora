@@ -1,6 +1,6 @@
 # WP-L14: S1B implementation and validation
 
-**S1B calibration hit its registered sanity stop; release preparation is stopped and diagnosis is authorized.** The selected Matrix-L1 hop-1 EM is **104/2048 = 5.078125%**, below 10%. No smoke or S1B pilot was submitted. Earlier validation remains green: **179 tests, zero failures/errors/skips**, and all eleven real-parent preflight checks. The committed [lock](../../reports/slot-loop-v1/s1b/manifest.lock.json) binds unchanged source blake2b-128 `bb60b89c78ee840a940c5ec855455604`. Cumulative actual cost including calibration and all prior failures/retries: **0.379722 node·h**. The current diagnostic scope and ledger follow at the end.
+**Diagnosis complete: recommend (b), a prompt/position mismatch in transferring the T1 parent to T2.** The S1B evaluator reproduces the T1 reference exactly. On identical T2 hop-1 facts and targets, a diagnostic change to T1 question wording raises Matrix EM **5.08% → 31.49%** and final-query key top-1 **14.79% → 59.47%**; the true-written-value oracle reaches **79.49%** under the original T2 prompt. Residual transfer loss remains; this is not a reading-limit result or authorization to amend the task. Calibration's registered sanity stop remains in force; no smoke or S1B pilot was submitted. Earlier **179 tests / zero skips** and all eleven preflight checks remain applicable to unchanged `src/`, source digest `bb60b89c78ee840a940c5ec855455604`. Cumulative actual cost, including calibration, diagnosis and all failures/retries: **0.432222 node·h**. Full evidence and limitations follow at the end.
 
 Worker wk-loop, branch `wp/loop`, login/control plane `miyabi-g2` (aarch64), no PBS allocation. Merged master **once**, as instructed: fast-forward `2f7abbc` → `8f4bb1da18d146d5979a6ae0fe9ea5c5dac27e1f`; only the task file/worker registry changed. No push.
 
@@ -165,3 +165,52 @@ Five fixed T2 calibration prompts and five T1 reference prompts, with separate s
 Walltime model uses the measured maximum calibration-candidate evaluation **16.092340426 s** for 2048×3 questions. Two exact reproduction passes, five one-hop conditions on each of two T2 wordings, and five T1 reference conditions scale to approximately 99 s; allow another 30 s for native/reference comparisons, 100 s for actual per-token capture/invariant checks and 30 s startup/input verification: approximately 259 s ×1.5 = 389 s, rounded up to **00:10:00**, one node/debug-g (**0.166667 requested node·h**), within the task's 30-minute limit. Only AST/whitespace/source-diff metadata checks run on login. No sleep/polling or additional master merge; existing calibration/lock files remain untouched.
 
 Submitted **3729676.opbs**, `s1b-diagnosis`, immutable snapshot **`685504858921ff3dc2b6f5bf29051ca15aaee6a1`**, one node/debug-g/00:10:00. Log `/work/xg24i002/x10041/LoopLora/logs/pbs/s1b-diagnosis-20261030-010221-630526.log`; output `/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/diagnosis-6855048`. Outcome/actual cost pending. No other job is submitted. After completion notification, inspect the replay, prompts/targets, per-token keys and oracle/off comparisons; archive evidence, recommend (a), (b) or (c) with measured support, and stop at a diagnosis commit.
+
+### Completed diagnosis and recommendation
+
+**3729676.opbs completed with exit 0**, host **mg0009**, 2026-10-30 01:09:08–01:12:17 JST: **189 s / 0.052500 node·h** (diagnostic application 171.642913 s). Requested 600 s; no timeout, retry, skipped condition or extra job. The canonical log and exit marker confirm the intended snapshot/argv, CUDA, complete status and `t1_reference_matches: true`; only the inherited `torch_dtype` deprecation appears. Cumulative actual for all eleven jobs is **(1127+240+189)/3600 = 0.432222 node·h**.
+
+**Recommendation (b): prompt/position mismatch is the main demonstrated cause of the sanity failure.** The evidence does not show a general S1B evaluator bug: on the non-sealed T1 reference the S1B path gives **733/1000, NLL 1.4211350753479493**, exactly the recorded step 0, with zero NLL gap. Its IDs, predictions, correctness, targets and NLL agree with inherited native/Matrix paths; the four per-sample scoring fields are bitwise equal. Both selected three-hop T2 calibration results reproduce **exactly**, including every recorded hop summary. All adapter parameter/buffer digests remain unchanged, and the original source lock still matches.
+
+The diagnostic conditions below use the same prepared support within each set, L1, full-vocabulary next-token EM, and the unadapted parent. T1 uses its recorded Matrix g=1 / SoftSlot g=1,tau=.1; both T2 wordings use the stopped calibration's Matrix g=1 / SoftSlot g=1,tau=.3 with no reselection. T2's third column changes **only the read-question wording/positions** to T1's template on the same 2,048 hop-1 supports, queried edges, targets and IDs. No new T2 data or training is introduced.
+
+| diagnostic condition | T1 reference: correct/1000; EM; NLL (nats) | T2 original: correct/2048; EM; NLL (nats) | same T2 with T1 wording: correct/2048; EM; NLL (nats) |
+| --- | --- | --- | --- |
+| selected Matrix | 733; 73.30%; 1.4211 | 104; 5.0781%; 9.8989 | 645; 31.4941%; 4.7496 |
+| selected SoftSlot | 770; 77.00%; 1.3486 | 26; 1.2695%; 8.5227 | 200; 9.7656%; 5.7588 |
+| S0 clean-final oracle | 924; 92.40%; 0.3574 | 1628; 79.4922%; 0.8338 | 1695; 82.7637%; 0.7794 |
+| additional all-token oracle | 908; 90.80%; 0.4893 | 1595; 77.8809%; 0.9377 | 1648; 80.4688%; 0.8863 |
+| memory off | 3; 0.30%; 9.9666 | 4; 0.1953%; 13.2631 | 4; 0.1953%; 10.0705 |
+
+Clean-final supplies the **actual written value of the true hop-1 next edge as m**, gain 1, at the final valid question token; earlier tokens retain the native Matrix g=1 read, exactly S0's clean condition. Thus it is one common oracle comparison, not a SoftSlot-specific earlier-token path. The all-token oracle supplies that same value at every valid question token. Memory off means **m=0 at every token**, retaining the same L1 reader R/U/B path; it does not remove the reader branch. The hop-1-only diagnostic has a different question-batch shape from the original three-hop calibration: its NLLs differ slightly (Matrix 9.89894329 versus calibration 9.89880873; SoftSlot 8.52272525 versus 8.52317691), while counts match. The original three-hop replay is exact, so these two layouts are explicitly kept separate in the artifacts.
+
+Actual captured query diagnostics support a query-transfer failure. For each token, scores are dot products against the **written** unit DPFP keys; signed margin is true-edge score minus the largest other-edge score. At L1 the query is computed before the read, so Matrix and SoftSlot have the same query/key results. Per-token owner/index coverage and trace/forward consistency passed, with no substitution of a recomputed query for these metrics.
+
+| actual-read statistic | T1 reference | T2 original | same T2 with T1 wording |
+| --- | --- | --- | --- |
+| final token key top-1 | 894/1000 = 89.40% | 303/2048 = 14.7949% | 1218/2048 = 59.4727% |
+| final token mean signed margin | +0.246934 | −0.177465 | +0.040025 |
+| final token median signed margin | +0.227712 | −0.184593 | +0.048921 |
+| all valid token key top-1 | 19.4813% over 16,000 reads | 9.3598% over 59,392 reads | 16.3147% over 32,768 reads |
+| all valid token mean signed margin | −0.107138 | −0.166334 | −0.123559 |
+| final Matrix relative read error (mean) | 0.178568 | 0.575341 | 0.350337 |
+| final SoftSlot relative read error (mean) | 0.077224 | 0.470142 | 0.358762 |
+
+The archive includes key top-1 and margin distributions at **every actual valid read position**. Near the T2 answer, key top-1 at offsets −3/−2/−1 is 10.4980% / 12.4023% / 14.7949%; there is no nearby earlier position with T1-like retrieval. The maximum over all 29 T2 positions is only 16.1621%, at offset −27. Read-owner expansion, true-edge→answer matching, 12 writes and original writer spans all pass. This provides no evidence for an off-by-one answer-index implementation bug.
+
+The five requested original T2 and five T1 prompts, including both backends' top-five next tokens and exact target token IDs, are in the committed [prompts.md](../../reports/slot-loop-v1/s1b/diagnosis-6855048/prompts.md); [diagnosis.json](../../reports/slot-loop-v1/s1b/diagnosis-6855048/diagnosis.json) additionally includes every question token and fact-write position. T2 uses `Starting from …, keep following … until there is no further fact … Which person is reached?\nAnswer:` (29 tokens); T1 uses `Which person is linked from … by the relation …?\nAnswer:` (16 tokens). Both score after the final **`:`** at zero-based positions **28 / 15**, respectively. Targets round-trip as one leading-space token, and writes align to each fact's final `.\n` token, matching the inherited rule. The first original T2 example targets ` Nigel` (token 65816), but Matrix's top five are ` Jo`, ` Ann`, ` Chan`, ` Joan`, ` Allen`; the paired T1-worded version makes ` Nigel` top-1. The first five paired examples have identical support text, target tokens and recorded write positions.
+
+The paired change raises Matrix EM by **26.4160 pp** and key top-1 by **44.6777 pp** without changing the writer. Meanwhile, the oracle raises original-prompt T2 EM from 5.08% to 79.49%. These observations localize most of the collapse to prompt-conditioned query/read transfer. They do **not** establish that wording alone, rather than its associated token positions/representations, causes it: the intervention changes both. They also do not establish perfect writer transfer. The diagnostic training-only S-RE value head decodes true written targets at **934/1000 = 93.40%, NLL 0.5317** on T1 versus **1713/2048 = 83.6426%, NLL 2.1421** on T2, identical under both T2 wordings; reworded T2 Matrix remains below T1 (31.49% versus 73.30%). There is residual graph/writer/query domain shift, but the evidence does not support (c), a writer-only failure, as the principal diagnosis.
+
+**Disposition:** retain the sanity stop and the stopped calibration unchanged. The T1-worded hop-1 counterfactual is diagnostic only; its one-edge question cannot simply replace the registered chain-end question at higher hops. Recommend that the orchestrator decide an amendment/transfer strategy addressing query wording/positions while retaining the intended chain-end semantics before authorizing more science. No source fix, new calibration, smoke, LR pilot, candidate release, confirmation or main training is performed or implied by this report.
+
+Archived metadata/prompts/inputs/job evidence are byte-identical to their persistent outputs; all **22** produced-file blake2b digests were checked. The 17 NPZ sample/position files remain at the persistent diagnostic output, named and hashed in [provenance.json](../../reports/slot-loop-v1/s1b/diagnosis-6855048/provenance.json) and [artifacts.json](../../reports/slot-loop-v1/s1b/diagnosis-6855048/artifacts.json). No sample files were deleted.
+
+| evidence | blake2b-128 |
+| --- | --- |
+| diagnosis.json | `2ad225aa70f09940ff68b56c214ae0d3` |
+| prompts.md | `63bde55472147b9957b4a5d3135abc18` |
+| provenance.json | `92bdec3c3572aa5d61dae7cd066ecd71` |
+| diagnostic script | `c84e3d88970dbfb9879241b3a6803aa3` |
+
+Final metadata checks confirm byte-identical stopped calibration, branch/lock bindings, archived inputs, original registered prereg, unchanged sorted-source digest and no diff in `src/` or the lock relative to `bd4e24f`. The only executable added is the authorized diagnostic under `scripts/`, and its exact committed snapshot ran successfully on compute. `git diff --check` passes. No additional master merge, push, sleep or polling. Stop at the diagnosis commit for the orchestrator's design decision.

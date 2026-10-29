@@ -1,0 +1,22 @@
+{
+ "name": "s1b-diagnosis",
+ "queue": "debug-g",
+ "nodes": 1,
+ "walltime": "00:10:00",
+ "scale_up": null,
+ "source": {
+  "kind": "commit",
+  "ref": "685504858921ff3dc2b6f5bf29051ca15aaee6a1"
+ },
+ "argv": [
+  "scripts/diagnose_s1b_transfer.py",
+  "--preparation",
+  "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/release-prep-bd4e24f",
+  "--t1-reference",
+  "/work/xg24i002/x10041/LoopLora/reports/slot-loop-v1/s1a-preparation/pilot.json",
+  "--out",
+  "/work/xg24i002/x10041/LoopLora/runs/slot-loop-v1/s1b/diagnosis-6855048"
+ ],
+ "log": "/work/xg24i002/x10041/LoopLora/logs/pbs/s1b-diagnosis-20261030-010221-630526.log",
+ "submitted": "2026-10-30T01:02:21.707079"
+}
