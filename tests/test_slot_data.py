@@ -115,9 +115,14 @@ def test_a_sealed_set_needs_the_open_token_and_a_named_checkpoint(tmp_path):
     selected = {f'{arm}/{seed}': f'{i:032x}' for i, (arm, seed) in enumerate((a, s) for a in slot_rules.ARMS for s in slot_data.RUN_SEEDS)}
     record = dict(prereg_blake2b_128=slot_data.PREREG_BLAKE2B_128, selected_checkpoints=selected,
                   analysis_script_blake2b_128=slot_data.file_digest(tmp_path / slot_data.ANALYSIS_SCRIPT))
+    release = dict(status="ready", prereg_blake2b_128=slot_data.PREREG_BLAKE2B_128,
+                   analysis_script_blake2b_128=record["analysis_script_blake2b_128"],
+                   parent=dict(writer_blake2b_128="e" * 32),
+                   arms={arm: dict(read={"kind": kind}) for arm, kind in slot_rules.ARM_KIND.items()})
     path = tmp_path / slot_data.OPEN_RECORD
     path.write_text(json.dumps(record))
-    token = slot_data.load_open_token(tmp_path, {"S-RE": {"writer.pt": "e" * 32}})
+    token = slot_data.load_open_token(tmp_path, {"S-RE": {"writer.pt": "e" * 32}}, release)
+    assert token.selected_checkpoints == selected
     chosen = next(iter(selected.values()))
     assert slot_data.eval_set("S1A", "confirmation", token=token, checkpoint_digest="e" * 32).opened
     assert slot_data.eval_set('S1A', 'confirmation', token=token, checkpoint_digest=chosen).count == 2000
@@ -133,11 +138,11 @@ def test_a_sealed_set_needs_the_open_token_and_a_named_checkpoint(tmp_path):
                    dict(record, selected_checkpoints={**selected, 'matrix_L1/17': 'short'})):
         path.write_text(json.dumps(broken))
         with pytest.raises(slot_data.SealedSetError):
-            slot_data.load_open_token(tmp_path, {"S-RE": {"writer.pt": "e" * 32}})
+            slot_data.load_open_token(tmp_path, {"S-RE": {"writer.pt": "e" * 32}}, release)
     path.write_text(json.dumps(record))
     (tmp_path / slot_data.ANALYSIS_SCRIPT).write_text('print("edited after the record")\n')
     with pytest.raises(slot_data.SealedSetError):
-        slot_data.load_open_token(tmp_path, {"S-RE": {"writer.pt": "e" * 32}})
+        slot_data.load_open_token(tmp_path, {"S-RE": {"writer.pt": "e" * 32}}, release)
 
 
 def test_the_registered_prereg_is_the_file_on_disk():

@@ -233,10 +233,16 @@ class SealedSetError(PermissionError):
 class OpenToken:
     prereg: str
     analysis_script: str
-    checkpoints: frozenset
+    selected_checkpoints: dict[str, str]
+    reference_checkpoint: str
+    reference_reads: dict
+
+    @property
+    def checkpoints(self) -> frozenset:
+        return frozenset([*self.selected_checkpoints.values(), self.reference_checkpoint])
 
 
-def load_open_token(root, inventory: dict) -> OpenToken:
+def load_open_token(root, inventory: dict, release: dict) -> OpenToken:
     """The token of the orchestrator's open record: valid only if the registered prereg, the frozen analysis script and the six
     selected checkpoints of the record are what is on disk and in the registry."""
     root = Path(root)
@@ -247,11 +253,17 @@ def load_open_token(root, inventory: dict) -> OpenToken:
     if (record.get("prereg_blake2b_128") != PREREG_BLAKE2B_128 or file_digest(root / PREREG) != PREREG_BLAKE2B_128
             or set(selected) != {f"{arm}/{seed}" for arm in ("matrix_L1", "soft_slot_L1") for seed in RUN_SEEDS}
             or any(not isinstance(v, str) or len(v) != 32 or any(c not in "0123456789abcdef" for c in v) for v in selected.values())
+            or len(set(selected.values())) != 6
+            or release.get("status") != "ready" or release.get("prereg_blake2b_128") != PREREG_BLAKE2B_128
+            or record.get("analysis_script_blake2b_128") != release.get("analysis_script_blake2b_128")
             or record.get("analysis_script_blake2b_128") != file_digest(root / ANALYSIS_SCRIPT)):
         raise SealedSetError("the open record does not match the registered prereg, the analysis script or six checkpoints")
     reference = inventory["S-RE"]["writer.pt"]
-    allowed = frozenset([*selected.values(), reference])
-    return OpenToken(PREREG_BLAKE2B_128, record["analysis_script_blake2b_128"], allowed)
+    if reference in selected.values() or release.get("parent", {}).get("writer_blake2b_128") != reference:
+        raise SealedSetError("the ready release reference differs from the locked inventory")
+    reads = {"s_re_native": None, "matrix_step0": release["arms"]["matrix_L1"]["read"],
+             "soft_step0": release["arms"]["soft_slot_L1"]["read"]}
+    return OpenToken(PREREG_BLAKE2B_128, record["analysis_script_blake2b_128"], dict(selected), reference, reads)
 
 
 def eval_set(stage: str, purpose: str, *, token: OpenToken | None = None, checkpoint_digest: str | None = None) -> EvalSet:

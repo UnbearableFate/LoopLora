@@ -465,15 +465,30 @@ def evaluate_entries(set_name: tuple[str, str], entries: list[dict], out, *, tok
     digests only. An entry is {label, export, checkpoint_blake2b_128} (a saved arm checkpoint) or {label,
     parent_writer_blake2b_128, read} (the unmodified S-RE through a read; `read` None = its native read). A sealed set opens
     only for a checkpoint the token names."""
+    sealed = slot_data.SETS[set_name].sealed
+    expected = {f"{arm}_s{seed}": (arm, seed) for arm in slot_rules.ARMS for seed in slot_data.RUN_SEEDS}
+    if sealed:
+        if token is None:
+            raise slot_data.SealedSetError("sealed evaluation requires the open token")
+        labels = [entry["label"] for entry in entries]
+        if len(labels) != 9 or set(labels) != set(expected) | set(token.reference_reads):
+            raise StopRun("sealed entries must name each of the six selected runs and three references exactly once")
+        for entry in entries:
+            label = entry["label"]
+            if label in expected:
+                arm, seed = expected[label]
+                if ("export" not in entry or "parent_writer_blake2b_128" in entry
+                        or entry.get("checkpoint_blake2b_128") != token.selected_checkpoints[f"{arm}/{seed}"]):
+                    raise StopRun(f"{label}: checkpoint differs from the selected arm/seed")
+            elif ("export" in entry or entry.get("parent_writer_blake2b_128") != token.reference_checkpoint
+                  or entry.get("read") != token.reference_reads[label]):
+                raise StopRun(f"{label}: reference checkpoint or read differs from the ready release")
     out = Path(out)
     out.mkdir(parents=True, exist_ok=False)
     report, arrays = {}, None  # model and tokenizer: given, or loaded with the first entry and shared by the rest
     for entry in entries:
         digest = entry.get("checkpoint_blake2b_128") or entry.get("parent_writer_blake2b_128")
         eval_set = slot_data.eval_set(*set_name, token=token, checkpoint_digest=digest)
-        if arrays is None:
-            arrays = episodes(eval_set)
-            ids_record(eval_set, arrays)
         if "export" in entry:
             if file_digest(entry["export"]) != entry["checkpoint_blake2b_128"]:
                 raise StopRun(f"{entry['label']}: the checkpoint differs from its recorded digest")
@@ -484,10 +499,22 @@ def evaluate_entries(set_name: tuple[str, str], entries: list[dict], out, *, tok
             spec = None if entry["read"] is None else ReadSpec.from_dict(entry["read"])
         model, tokenizer = experiment.model, experiment.tokenizer
         try:
+            if sealed and entry["label"] in expected:
+                arm, seed = expected[entry["label"]]
+                run = experiment.slot.get("run", {})
+                expected_read = token.reference_reads["matrix_step0" if arm == "matrix_L1" else "soft_step0"]
+                if (experiment.slot.get("arm") != arm or run.get("seed") != seed or run.get("ablation") is not False
+                        or spec.as_dict() != expected_read):
+                    raise StopRun(f"{entry['label']}: export arm, seed, ablation or read does not match its label")
+            if arrays is None:
+                arrays = episodes(eval_set)
+                ids_record(eval_set, arrays)
             samples = evaluate(experiment, arrays, {"read": spec}, diagnostics=True)["samples"]["read"]
         finally:
             experiment.close()
         keep = {k: v for k, v in samples.items() if k in {"episode_id", "answer", "prediction", "correct", "nll", "rel_err"}}
+        keep.update(checkpoint_blake2b_128=np.asarray(digest),
+                    read=np.asarray(json.dumps(None if spec is None else spec.as_dict(), sort_keys=True, allow_nan=False)))
         np.savez_compressed(out / f"{entry['label']}.npz", **keep)
         report[entry["label"]] = dict(n=int(len(samples["correct"])), file_blake2b_128=file_digest(out / f"{entry['label']}.npz"))
         print(json.dumps({entry["label"]: report[entry["label"]]}), flush=True)
@@ -517,6 +544,8 @@ def main(argv=None) -> int:
         parser.error("--open-root must be absolute")
     if args.mode == "evaluate" and args.set_name in {"confirmation", "unseen"} and args.open_root is None:
         parser.error("sealed evaluation requires an absolute --open-root")
+    if args.mode == "evaluate" and args.set_name in {"confirmation", "unseen"} and args.release is None:
+        parser.error("sealed evaluation requires --release")
     if not args.out.is_absolute() or RUNS not in (args.out, *args.out.parents):
         raise SystemExit(f"--out must be an absolute path under {RUNS}")
     try:
@@ -535,7 +564,7 @@ def main(argv=None) -> int:
                       manifest_path=args.manifest)
         elif args.mode == "evaluate":
             lock = require_lock(args.manifest)
-            token = slot_data.load_open_token(args.open_root, lock["inventory"]) if args.set_name in {"confirmation", "unseen"} else None
+            token = slot_data.load_open_token(args.open_root, lock["inventory"], json.loads(args.release.read_text())) if args.set_name in {"confirmation", "unseen"} else None
             evaluate_entries(("S1A", args.set_name), json.loads(args.entries.read_text()), args.out, token=token)
         else:
             require_lock(args.manifest)

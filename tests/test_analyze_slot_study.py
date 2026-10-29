@@ -961,6 +961,72 @@ def test_round2_analysis_changed_script_matching_open_record_is_refused_by_ready
         direct_s1a(root)
 
 
+@pytest.mark.parametrize('bad', ['missing_key', 'duplicate_digest', 'reference_digest', 'prereg', 'pending', 'open_script'])
+def test_s1a_requires_a_complete_distinct_open_map_and_registered_ready_release(tmp_path, bad):
+    root = tmp_path / 'tree'
+    s1a_tree(root, 400, ADVANCE)
+    opened_path, release_path = root / 's1a-open.json', root / 's1a-release.json'
+    opened, release = json.loads(opened_path.read_text()), json.loads(release_path.read_text())
+    if bad == 'missing_key':
+        del opened['selected_checkpoints']['matrix_L1/17']
+        match = 'exactly the six main checkpoints'
+    elif bad == 'duplicate_digest':
+        opened['selected_checkpoints']['matrix_L1/29'] = opened['selected_checkpoints']['matrix_L1/17']
+        match = 'checkpoints must be distinct'
+    elif bad == 'reference_digest':
+        opened['selected_checkpoints']['matrix_L1/29'] = 'f' * 32
+        match = 'exclude the reference checkpoint'
+    elif bad == 'prereg':
+        release['prereg_blake2b_128'] = '0' * 32
+        match = 'registered prereg'
+    elif bad == 'pending':
+        release['status'] = 'pending_reload'
+        match = 'ready S1A release'
+    else:
+        opened['analysis_script_blake2b_128'] = '0' * 32
+        match = 'analysis script differs'
+    opened_path.write_text(json.dumps(opened))
+    release_path.write_text(json.dumps(release))
+    with pytest.raises(SystemExit, match='refused: .*' + match):
+        direct_s1a(root)
+
+
+@pytest.mark.parametrize('field', ['checkpoint_blake2b_128', 'read'])
+@pytest.mark.parametrize('bad', ['missing', 'vector', 'bytes', 'malformed'])
+def test_s1a_npz_requires_scalar_unicode_checkpoint_and_json_read(tmp_path, field, bad):
+    root = tmp_path / 'tree'
+    s1a_tree(root, 400, ADVANCE)
+    path = root / 'confirmation' / 'matrix_L1_s17.npz'
+    with np.load(path, allow_pickle=False) as archive:
+        arrays = {key: archive[key] for key in archive.files}
+    if bad == 'missing':
+        del arrays[field]
+        match = f"lacks '{field}'"
+    elif bad == 'vector':
+        arrays[field] = arrays[field].reshape(1)
+        match = f'{field} is not a scalar unicode string'
+    elif bad == 'bytes':
+        arrays[field] = arrays[field].astype('S')
+        match = f'{field} is not a scalar unicode string'
+    else:
+        arrays[field] = np.asarray('invalid')
+        match = 'checkpoint digest differs' if field == 'checkpoint_blake2b_128' else 'read is not valid JSON'
+    np.savez(path, **arrays)
+    with pytest.raises(SystemExit, match='refused: .*' + match):
+        direct_s1a(root)
+
+
+@pytest.mark.parametrize('missing', ['--open-record', '--release'])
+def test_s1a_cli_requires_open_record_and_release_without_defaults(tmp_path, missing):
+    root = tmp_path / 'tree'
+    s1a_tree(root, 400, ADVANCE)
+    argv = arguments(['--stage', 'S1A', '--records', root, '--out', tmp_path / 'out'])
+    index = argv.index(missing)
+    del argv[index:index + 2]
+    with pytest.raises(SystemExit, match='refused: S1A requires --open-record and --release'):
+        slot.main(argv)
+
+
 def test_s1a_advances_at_exactly_three_points_with_every_seed_positive_and_the_lower_end_above_zero(tmp_path):
     s, _ = run_s1a(tmp_path, 400, ADVANCE, shift=37)
     c = s['confirmation']['contrast']
@@ -1067,6 +1133,14 @@ def test_s1a_outputs_are_byte_identical_between_runs_and_carry_the_reference_row
     arm = s['confirmation']['arms']['soft_slot_L1']
     assert sorted(arm['seeds']) == ['17', '29', '43'] and arm['em'] == pytest.approx(sum(v['correct'] for v in arm['seeds'].values()) / 1200)
     assert arm['nll'] is not None and arm['rel_err'] is not None
+    for name in ('confirmation', 'unseen'):
+        for arm_name in slot.ARMS:
+            for seed, row in s[name]['arms'][arm_name]['seeds'].items():
+                assert row['checkpoint_blake2b_128'] == SELECTED_CHECKPOINTS[f'{arm_name}/{seed}']
+                assert row['read'] == READS[arm_name]
+        for label, row in s[name]['references'].items():
+            checkpoint, read = provenance(label)
+            assert row['checkpoint_blake2b_128'] == checkpoint and row['read'] == read
     md = (tmp_path / 'a' / 'verdict.md').read_text()
     assert md.startswith('# S1A verdict: ADVANCE') and 's_re_native' in md and 'descriptive, no verdict' in md
     # All three references are mandatory for each opened set.
@@ -1241,8 +1315,11 @@ def test_source_index_lists_the_script_and_every_input_digest(tmp_path):
     index = read_index(tmp_path / 'o1')
     files = sorted(p.relative_to(root).as_posix() for p in root.rglob('*.npz'))
     assert index['stage'] == 'S1A' and index['script'] == 'analyze_slot_study.py' and index['script_blake2b_128'] == expected_script
-    assert sorted(index['inputs']) == sorted(files + [str((root / 'manifest.lock.json').resolve())]) and len(files) == 18
+    metadata = [str((root / name).resolve()) for name in ('manifest.lock.json', 's1a-open.json', 's1a-release.json')]
+    assert sorted(index['inputs']) == sorted(files + metadata) and len(files) == 18
     assert index['manifest_blake2b_128'] == blake((root / 'manifest.lock.json').read_bytes())
+    assert index['open_record_blake2b_128'] == blake((root / 's1a-open.json').read_bytes())
+    assert index['release_blake2b_128'] == blake((root / 's1a-release.json').read_bytes())
     assert all(index['inputs'][name] == blake((root / name).read_bytes()) for name in files)
     # S0: metrics and samples relative, the preflight absolute
     root = write_s0(tmp_path / 's0', s0_metrics())

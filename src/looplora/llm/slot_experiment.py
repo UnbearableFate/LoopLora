@@ -7,6 +7,7 @@ here calls `WriterFixExperiment.standardize()`, which would overwrite `input_mea
 from __future__ import annotations
 
 import hashlib
+import json
 import time
 from pathlib import Path
 
@@ -261,6 +262,7 @@ def save_export(experiment, path, *, arm: str, spec: ReadSpec, step: int, parent
                   key_dim=adapter.cfg.key_dim, value_dim=adapter.cfg.r_mem, feature_map=f"dpfp-nu{adapter.cfg.dpfp_nu}-unit",
                   eps=adapter.cfg.eps, layout_digest=slot_data.LAYOUT_DIGEST, task=dict(slot_data.TASK),
                   source_commit=source_metadata()["git_commit"], prereg_blake2b_128=slot_data.PREREG_BLAKE2B_128))
+    payload["slot"] = json.loads(json.dumps(payload["slot"], allow_nan=False))
     torch.save(payload, path)
     return file_digest(path)
 

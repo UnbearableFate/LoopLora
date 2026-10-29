@@ -771,18 +771,39 @@ def test_a_reference_entry_uses_the_locked_parent_permission_without_generating_
     (root / "reports" / "slot-loop-v1").mkdir(parents=True)
     shutil.copy(ROOT / slot_data.PREREG, root / slot_data.PREREG)
     shutil.copy(ROOT / slot_data.ANALYSIS_SCRIPT, root / slot_data.ANALYSIS_SCRIPT)
+    selected, entries = {}, []
+    reads = {arm: slot_run.arm_spec(arm, SELECTED).as_dict() for arm in slot_rules.ARMS}
+    for arm in slot_rules.ARMS:
+        for seed in slot_data.RUN_SEEDS:
+            path = tmp_path / f"{arm}-{seed}.pt"
+            experiment = slot_run.load_parent("S-RE", expected=PARENT_DIGESTS)
+            try:
+                digest = save_export(experiment, path, arm=arm, spec=ReadSpec.from_dict(reads[arm]), step=1,
+                                     parent={}, run=dict(seed=seed, ablation=False))
+            finally:
+                experiment.close()
+            selected[f"{arm}/{seed}"] = digest
+            entries.append(dict(label=f"{arm}_s{seed}", export=str(path), checkpoint_blake2b_128=digest))
     record = dict(prereg_blake2b_128=slot_data.PREREG_BLAKE2B_128,
                   analysis_script_blake2b_128=slot_data.file_digest(root / slot_data.ANALYSIS_SCRIPT),
-                  selected_checkpoints={f"{arm}/{seed}": f"{index:032x}" for index, (arm, seed) in enumerate(
-                      (arm, seed) for arm in slot_rules.ARMS for seed in slot_data.RUN_SEEDS)})
+                  selected_checkpoints=selected)
     (root / slot_data.OPEN_RECORD).write_text(json.dumps(record))
-    token = slot_data.load_open_token(root, {"S-RE": PARENT_DIGESTS})
+    release = dict(status="ready", prereg_blake2b_128=slot_data.PREREG_BLAKE2B_128,
+                   analysis_script_blake2b_128=record["analysis_script_blake2b_128"],
+                   parent=dict(writer_blake2b_128=PARENT_DIGESTS["writer.pt"]),
+                   arms={arm: dict(read=read) for arm, read in reads.items()})
+    token = slot_data.load_open_token(root, {"S-RE": PARENT_DIGESTS}, release)
     ordinary_arrays = episodes(tiny_study["sets"]["S1A", "dev"])
     def synthetic_arrays(s):
         assert s.sealed and s.opened
         return ordinary_arrays
     monkeypatch.setattr(slot_run, "episodes", synthetic_arrays)
     monkeypatch.setattr(slot_run, "ids_record", lambda s, arrays: "synthetic")
-    report = slot_run.evaluate_entries(("S1A", "confirmation"), [dict(label="s_re_native", read=None,
-        parent_writer_blake2b_128=PARENT_DIGESTS["writer.pt"])], tmp_path / "reference", token=token, model=model, tokenizer=tokenizer)
+    entries += [dict(label=label, read=read, parent_writer_blake2b_128=PARENT_DIGESTS["writer.pt"])
+                for label, read in token.reference_reads.items()]
+    report = slot_run.evaluate_entries(("S1A", "confirmation"), entries, tmp_path / "reference", token=token,
+                                       model=model, tokenizer=tokenizer)
     assert report["s_re_native"]["n"] == 48
+    with np.load(tmp_path / "reference" / "s_re_native.npz", allow_pickle=False) as saved:
+        assert saved["checkpoint_blake2b_128"].item() == PARENT_DIGESTS["writer.pt"]
+        assert json.loads(saved["read"].item()) is None

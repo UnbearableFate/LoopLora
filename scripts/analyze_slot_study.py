@@ -6,6 +6,7 @@ usage: python3 scripts/analyze_slot_study.py --stage {S0,S1A-DEV,S1A-ABL,S1A} --
   S1A-DEV  DIR/ARM/sSEED/record.json (2 arms x 3 seeds)            -> s1a-selection.json, s1a-selection.md
   S1A-ABL  Six main records and DIR/ablation/ARM/s17/record.json   -> s1a-ablation.json, s1a-ablation.md
   S1A      DIR/confirmation/LABEL.npz, DIR/unseen/LABEL.npz        -> summary.json, verdict.md (stdout: counts, names, digests, verdict)
+           Requires --open-record FILE and --release FILE, the ready release that froze this script.
 Every stage also writes source_index.json (blake2b-128 of each input file and of this script). A defect in the inputs ends the run
 with SystemExit('refused: ...'); data are never repaired. Thresholds are integer comparisons; ties and interval ends are exact.
 """
@@ -38,6 +39,7 @@ OLD_RANGE = dict(correct=608, n=1000, loss_float32=2.1291537284851074)
 ARMS, SEEDS = ('matrix_L1', 'soft_slot_L1'), (17, 29, 43)
 REFERENCES = ('s_re_native', 'matrix_step0', 'soft_step0')
 REQUIRED = tuple(f'{a}_s{s}' for a in ARMS for s in SEEDS)
+PREREG_BLAKE2B_128 = '56e8c611c01e0ef9b7ae32db97b0e334'
 LABELS = {
     'R0': 'stop, fix the interface, no comparison, no S1A',
     'R1': 'full adaptation',
@@ -111,6 +113,10 @@ class Sources:
         result = dict(stage=stage, script=script.name, script_blake2b_128=digest(script.read_bytes()), inputs=dict(self.digests))
         if hasattr(self, 'manifest_path'):
             result.update(manifest=self.manifest_path, manifest_blake2b_128=self.digests[self.manifest_path])
+        for name in ('open_record', 'release'):
+            if hasattr(self, name + '_path'):
+                path = getattr(self, name + '_path')
+                result.update({name: path, name + '_blake2b_128': self.digests[path]})
         return result
 
 
@@ -569,7 +575,55 @@ def stage_ablation(src, manifest):
 
 # ------------------------------------------------------------------------------------------------------------------ S1A
 
-def read_set(src, name):
+def s1a_provenance(src, manifest):
+    """Bind the checkpoint labels and reads to the opening record and the release's frozen analysis."""
+    if not hasattr(src, 'open_record_path') or not hasattr(src, 'release_path'):
+        refuse('S1A requires --open-record and --release')
+    opened = src.json(src.open_record_path, absolute=True)
+    release = src.json(src.release_path, absolute=True)
+    if (release.get('version') != 1 or release.get('study') != 'slot-loop-v1'
+            or release.get('stage') != 'S1A' or release.get('status') != 'ready'):
+        refuse('S1A requires a version 1 ready S1A release')
+    own = digest(Path(__file__).read_bytes())
+    if opened.get('analysis_script_blake2b_128') != own or release.get('analysis_script_blake2b_128') != own:
+        refuse('the analysis script differs from the ready release or open record')
+    if any(record.get('prereg_blake2b_128') != PREREG_BLAKE2B_128 for record in (manifest, release, opened)):
+        refuse('the open record, ready release or locked manifest differs from the registered prereg')
+    selected = get(opened, 'selected_checkpoints', 'open record')
+    keys = {f'{arm}/{seed}' for arm in ARMS for seed in SEEDS}
+    if not isinstance(selected, dict) or set(selected) != keys:
+        refuse('the open record must name exactly the six main checkpoints by arm/seed')
+    reference = get(get(get(manifest, 'inventory', 'locked manifest'), 'S-RE', 'inventory'), 'writer.pt', 'inventory.S-RE')
+    valid = lambda value: isinstance(value, str) and len(value) == 32 and all(c in '0123456789abcdef' for c in value)
+    if not valid(reference) or not all(valid(value) for value in selected.values()):
+        refuse('an open checkpoint or locked reference digest is not 32 lowercase hex digits')
+    if len(set(selected.values())) != 6 or reference in selected.values():
+        refuse('the six selected checkpoints must be distinct and exclude the reference checkpoint')
+    arms = get(release, 'arms', 'ready release')
+    if not isinstance(arms, dict) or set(arms) != set(ARMS):
+        refuse('the ready release must name both main arms')
+    reads = {arm: get(arms[arm], 'read', f'release arms.{arm}') for arm in ARMS}
+    for arm, kind in zip(ARMS, ('matrix', 'soft')):
+        read = reads[arm]
+        if (not isinstance(read, dict) or read.get('kind') != kind or read.get('scope') != AV
+                or read.get('recency') is not False):
+            refuse(f'the released read for {arm} differs from the registered arm')
+    expected = {f'{arm}_s{seed}': dict(checkpoint_blake2b_128=selected[f'{arm}/{seed}'], read=reads[arm])
+                for arm in ARMS for seed in SEEDS}
+    expected.update({label: dict(checkpoint_blake2b_128=reference,
+                                 read=None if label == 's_re_native' else reads['matrix_L1' if label == 'matrix_step0' else 'soft_slot_L1'])
+                     for label in REFERENCES})
+    return expected
+
+
+def scalar_text(z, field, path):
+    value = get(z, field, path)
+    if value.ndim != 0 or value.dtype.kind != 'U':
+        refuse(f'{path}: {field} is not a scalar unicode string')
+    return value.item()
+
+
+def read_set(src, name, expected):
     """The six main labels and three required references, with identical ids across files."""
     labels, ids, first = {}, None, None
     for label in REQUIRED + REFERENCES:
@@ -590,6 +644,16 @@ def read_set(src, name):
                    rel_err=floats(z['rel_err'], f'{path} rel_err') if 'rel_err' in z else None)
         if any(v is not None and len(v) != len(ids) for v in row.values()):
             refuse(f'{path}: an array has another n than episode_id')
+        checkpoint = scalar_text(z, 'checkpoint_blake2b_128', path)
+        if checkpoint != expected[label]['checkpoint_blake2b_128']:
+            refuse(f'{path}: checkpoint digest differs from the open record or locked reference')
+        try:
+            read = json.loads(scalar_text(z, 'read', path), object_pairs_hook=unique)
+        except ValueError as error:
+            refuse(f'{path}: read is not valid JSON ({error})')
+        if read != expected[label]['read']:
+            refuse(f'{path}: read differs from the ready release or native reference')
+        row.update(checkpoint_blake2b_128=checkpoint, read=read)
         labels[label] = row
     if len(set(ids.tolist())) != len(ids):
         refuse(f'{name}: duplicate episode ids')
@@ -600,7 +664,8 @@ def analyze_set(ids, labels, expected_n):
     """Per-label means and the primary contrast SoftSlot-L1 minus Matrix-L1 (three seeds) with paired bootstrap intervals."""
     n = len(ids)
     rows = {label: dict(correct=int(v['correct'].sum()), em=int(v['correct'].sum()) / n, nll=mean(v['nll']),
-                        rel_err=None if v['rel_err'] is None else mean(v['rel_err'])) for label, v in labels.items()}
+                        rel_err=None if v['rel_err'] is None else mean(v['rel_err']),
+                        checkpoint_blake2b_128=v['checkpoint_blake2b_128'], read=v['read']) for label, v in labels.items()}
     diff = {s: labels[f'soft_slot_L1_s{s}']['correct'] - labels[f'matrix_L1_s{s}']['correct'] for s in SEEDS}
     sums = resample_sums({**{str(s): d for s, d in diff.items()}, 'pooled': sum(diff.values())}, n, BOOTSTRAP['S1A'])
 
@@ -622,10 +687,11 @@ def analyze_set(ids, labels, expected_n):
 
 
 def stage_s1a(src, manifest):
+    expected = s1a_provenance(src, manifest)
     names = ['confirmation']
     if any(src.exists(f'unseen/{label}.npz') for label in REQUIRED + REFERENCES):
         names.append('unseen')
-    sets = {name: read_set(src, name) for name in names}
+    sets = {name: read_set(src, name, expected) for name in names}
     if 'unseen' in sets and np.intersect1d(sets['confirmation'][0], sets['unseen'][0]).size:
         refuse('the confirmation and unseen sets share episode ids')
     for name, (ids, _) in sets.items():
@@ -768,10 +834,20 @@ def main(argv=None):
     parser.add_argument('--records', required=True)
     parser.add_argument('--out', required=True)
     parser.add_argument('--preflight')
+    parser.add_argument('--open-record')
+    parser.add_argument('--release')
     args = parser.parse_args(argv)
     if (args.stage == 'S0') != (args.preflight is not None):
         refuse('--preflight belongs to stage S0 and only to it')
+    if args.stage == 'S1A':
+        if args.open_record is None or args.release is None:
+            refuse('S1A requires --open-record and --release')
+    elif args.open_record is not None or args.release is not None:
+        refuse('--open-record and --release belong only to stage S1A')
     src = Sources(args.records)
+    if args.stage == 'S1A':
+        src.open_record_path = str(Path(args.open_record).resolve())
+        src.release_path = str(Path(args.release).resolve())
     src.manifest_path = str(Path(args.manifest).resolve())
     manifest = src.json(args.manifest, absolute=True)
     for stage, purpose in (('S0', 'calibration'), ('S0', 'dev'), ('S1A', 'dev'), ('S1A', 'confirmation'), ('S1A', 'unseen')):
