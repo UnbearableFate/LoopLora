@@ -1,0 +1,49 @@
+{
+  "answer_weight": 0.0,
+  "arm": "ce",
+  "batch_size": 64,
+  "data_seed": 3519187748936421394,
+  "depth": null,
+  "final": {
+    "accuracy_head": 1.0,
+    "accuracy_relation": 1.0,
+    "accuracy_tail": 1.0,
+    "grad_norm": 0.0003010001382790506,
+    "joint_accuracy": 1.0,
+    "loss": 0.00019854136917274445,
+    "loss_head": 0.0,
+    "loss_relation": 0.00019854136917274445,
+    "loss_tail": 0.0,
+    "lr": 0.0010000003469782751,
+    "step": 8000,
+    "step_seconds": 0.06485055400116835
+  },
+  "grad_clip": 1.0,
+  "host": "mg0219",
+  "job_id": "3724123.opbs",
+  "lr": 0.01,
+  "plan": {
+    "head": {
+      "form": "rank64",
+      "position": "head_last",
+      "site": "h14"
+    },
+    "relation": {
+      "form": "full",
+      "position": "head_last",
+      "site": "h14"
+    },
+    "tail": {
+      "form": "rank64",
+      "position": "tail",
+      "site": "h14"
+    }
+  },
+  "reader_state_hash": null,
+  "steps": 8000,
+  "train_seconds": 533.1265087609936,
+  "train_step_p95_seconds": 0.06684952459181659,
+  "train_step_seconds": 0.06506691161298113,
+  "warmup_steps": 20,
+  "writer_parameters": 268292
+}

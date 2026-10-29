@@ -1,0 +1,55 @@
+{
+  "commit": "4e93b9e2f206038bb1515e060267e4bfa1242735",
+  "evaluation_smoke": {
+    "b3_memory_independent": true,
+    "episodes": 32,
+    "perfect_lookup_equals_oracle": {
+      "ce": true,
+      "ceans": true
+    },
+    "seconds": 14.535507770007825,
+    "timing": {
+      "reader_B3-L4": 0.2626378880086122,
+      "reader_B4": 0.8943382800061954,
+      "reader_M1-L4": 9.456807367008878,
+      "writer_ce": 2.0916546149965143,
+      "writer_ceans": 0.15950084499490913
+    }
+  },
+  "note": "time only; smoke scores are not read (Stage A smoke: train [0,256), val [2000,2128); Stage B smoke: 200 steps from the smoke lock; evaluation smoke: val [2000,2032))",
+  "projection_8000_steps": {
+    "ce_seconds": 633.6056604015175,
+    "ceans_seconds": 2360.791192998877,
+    "ceans_walltime_at_1p5x_seconds": 3541.186789498315,
+    "evaluation_1000_episodes_seconds": 462.4091489067723
+  },
+  "stage_a_registered": {
+    "fits": 80,
+    "job": "3724058.opbs",
+    "seconds": 92.47699708399887,
+    "stage_seconds": {
+      "extract": 19.55749719099549,
+      "load": 1.3545543530053692
+    }
+  },
+  "stage_a_smoke": {
+    "fits": 80,
+    "seconds": 73.945421092998,
+    "stage_seconds": {
+      "extract": 2.749567674996797,
+      "load": 1.2861824220017297
+    }
+  },
+  "stage_b_ce": {
+    "step_p95_seconds": 0.06991896340041422,
+    "step_seconds": 0.0792007075501897,
+    "steps": 200,
+    "train_seconds": 28.509292392001953
+  },
+  "stage_b_ceans": {
+    "step_p95_seconds": 0.2854379294505634,
+    "step_seconds": 0.2950988991248596,
+    "steps": 200,
+    "train_seconds": 71.73013909099973
+  }
+}
