@@ -20,16 +20,13 @@ from . import dpfp_run, slot_data, sq2
 from .evaluate import _slice
 from .run import source_metadata
 from .slot_read import ReadSpec, attach_slot_reader, bind_batch, final_query, final_read
+from .slot_rules import BUFFERS, FROZEN, TRAINABLE
 from .sq2_release import PARENT as D128_3
 from .train import make_task_spec, synchronize
 from .writer_fix import true_fact_indices
 
 PARENT_FOLDERS = {"S-RE": "/work/xg24i002/x10041/LoopLora/runs/p1l/sq2/arms/S-RE", "D128-3": D128_3["folder"]}
 CHUNK = 16  # `read_fix_run.validate`'s evaluation batch: the identity replays use the same batches
-PARAMETERS = ("A", "K", "V", "Q", "R", "U", "B", "a_lambda", "a_beta")
-FROZEN = ("A", "K", "V", "a_lambda", "a_beta")
-BUFFERS = ("input_mean", "input_std")
-TRAINABLE = ("Q", "R", "U", "B")
 EXPORT_VERSION = 1
 
 
@@ -39,6 +36,15 @@ def file_digest(path) -> str:
 
 def _refuse_standardize():
     raise RuntimeError("standardize() would overwrite input_mean/input_std; the slot study keeps the parent's buffers")
+
+
+def adopt(experiment):
+    """Give a loaded S-RE / D128-3 experiment the slot reader and forbid `standardize()` (it would overwrite the buffers)."""
+    attach_slot_reader(experiment)
+    experiment.value_head = None
+    experiment.standardize = _refuse_standardize
+    experiment.read_spec = None
+    return experiment
 
 
 def load_parent(name: str, *, model=None, tokenizer=None, expected: dict | None = None):
@@ -51,11 +57,9 @@ def load_parent(name: str, *, model=None, tokenizer=None, expected: dict | None 
     loader = {"S-RE": sq2.load_inference, "D128-3": dpfp_run.load_inference}[name]
     experiment = loader(folder / "writer.pt", model=model, tokenizer=tokenizer)
     try:
-        attach_slot_reader(experiment)
         if make_task_spec(experiment.config) != slot_data.task_spec():
             raise ValueError(f"{name}: its task is not the registered T1/E16 layout")
-        experiment.standardize = _refuse_standardize
-        experiment.read_spec = None
+        adopt(experiment)
     except BaseException:
         experiment.close()
         raise
@@ -70,11 +74,14 @@ def load_value_head(name: str, device):
     return head.to(device).eval()
 
 
+def raw_episodes(eval_set: slot_data.EvalSet):
+    """The set's episodes with the generator's four questions each (the training format)."""
+    return generate(slot_data.task_spec(), eval_set.split, eval_set.start, eval_set.count, eval_set.base_seed)
+
+
 def episodes(eval_set: slot_data.EvalSet):
     """The set's episodes with one question each (T1, hop 1); the query seed is the set's own base seed."""
-    spec = slot_data.task_spec()
-    return stratify_queries(generate(spec, eval_set.split, eval_set.start, eval_set.count, eval_set.base_seed),
-                            spec, [1], eval_set.base_seed)
+    return stratify_queries(raw_episodes(eval_set), slot_data.task_spec(), [1], eval_set.base_seed)
 
 
 @torch.no_grad()
@@ -82,7 +89,8 @@ def evaluate(experiment, arrays, conditions: dict, *, chunk: int = CHUNK, diagno
     """Per-sample records of every condition on the same prepared batches (support encoded once per chunk).
 
     `conditions` maps a name to a ReadSpec, or to None for the unbound native read. Returns {"samples": name -> field -> array,
-    "common": the fields that do not depend on the read (key top-1 and margin), "seconds": name -> bind and score time}.
+    "common": the fields that do not depend on the read (key top-1 and margin), "seconds": name -> bind and score time,
+    "prepare_seconds": the support encoding time}.
     """
     if arrays.q_start.shape[1] != 1:
         raise ValueError("evaluation has one question per episode")
@@ -90,14 +98,18 @@ def evaluate(experiment, arrays, conditions: dict, *, chunk: int = CHUNK, diagno
     count = len(arrays.episode_seed)
     samples = {name: {} for name in conditions}
     common: dict[str, list] = {}
-    seconds = dict.fromkeys(conditions, 0.0)
+    seconds, prepare_seconds = dict.fromkeys(conditions, 0.0), 0.0
 
     def keep(store: dict, field: str, value) -> None:
         store.setdefault(field, []).append(np.asarray(value.detach().cpu() if torch.is_tensor(value) else value).ravel())
 
     for begin in range(0, count, chunk):
         part = _slice(arrays, slice(begin, min(begin + chunk, count)))
+        synchronize(device)
+        tick = time.perf_counter()
         batch = experiment.prepare(part)
+        synchronize(device)
+        prepare_seconds += time.perf_counter() - tick
         answers = torch.as_tensor(part.answer[:, 0], device=device, dtype=torch.long)
         target = true_fact_indices(part, device)
         for index, (name, spec) in enumerate(conditions.items()):
@@ -130,7 +142,8 @@ def evaluate(experiment, arrays, conditions: dict, *, chunk: int = CHUNK, diagno
                 keep(common, "key_top1", scores.argmax(-1) == target)
                 keep(common, "key_margin", actual - other)
     pack = lambda store: {field: np.concatenate(parts) for field, parts in store.items()}
-    return dict(samples={name: pack(store) for name, store in samples.items()}, common=pack(common), seconds=seconds, count=count)
+    return dict(samples={name: pack(store) for name, store in samples.items()}, common=pack(common), seconds=seconds,
+                prepare_seconds=prepare_seconds, count=count)
 
 
 def summarize(samples: dict) -> dict:
@@ -267,12 +280,10 @@ def load_export(path, *, model=None, tokenizer=None):
     try:
         if payload["signature"] != experiment.writer_signature():
             raise ValueError("slot export signature mismatch")
-        attach_slot_reader(experiment)
+        adopt(experiment)
         if slot["query_projection"] == "copy":
             experiment.adapter.add_query_projection()
         experiment.adapter.load_state_dict(payload["adapter"], strict=True)
-        experiment.value_head = None
-        experiment.standardize = _refuse_standardize
         experiment.read_spec = ReadSpec.from_dict(slot["read"])
         experiment.slot = slot
     except BaseException:

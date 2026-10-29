@@ -6,8 +6,20 @@ selection.
 """
 from __future__ import annotations
 
+import json
 import math
 
+from looplora.infra.seeds import stable_hash
+from . import slot_data
+
+ARMS = ("matrix_L1", "soft_slot_L1")
+ARM_KIND = {"matrix_L1": "matrix", "soft_slot_L1": "soft"}
+TRAINABLE = ("Q", "R", "U", "B")
+FROZEN = ("A", "K", "V", "a_lambda", "a_beta")
+BUFFERS = ("input_mean", "input_std")
+ABLATION_TRAINABLE = ("A_query", *TRAINABLE)
+OPTIMIZER = dict(name="adamw", betas=(0.9, 0.999), eps=1e-8, weight_decay=0.01)
+CLIP, WARMUP, CHECKPOINTS, LOG_EVERY = 1.0, 20, 10, 50
 CALIBRATION_TIE = 1e-4   # nats: candidates within this of the minimum NLL are tied
 LR_TIE = 0.01            # nats on the pilot shard
 SELECTION_TIE = 1e-6     # nats on dev: a later checkpoint must beat the best so far by more than this
@@ -87,3 +99,66 @@ def checkpoint_steps(steps: int, count: int = 10) -> list[int]:
     if steps % count:
         raise ValueError("N must be a multiple of the number of checkpoints")
     return [steps * k // count for k in range(1, count + 1)]
+
+
+def science_config(arm: str, seed: int, *, steps: int, lr: float, read: dict, parent_digest: str, ablation: bool = False,
+                   stage: str = "S1A") -> dict:
+    """Everything that defines one arm-seed run except the commit: the release stores its `stable_hash`, and the run
+    recomputes it from the release's values before it trains."""
+    if arm not in ARMS or seed not in slot_data.RUN_SEEDS or steps % CHECKPOINTS or steps < CHECKPOINTS:
+        raise ValueError("a run is one registered arm and seed with N a multiple of the number of checkpoints")
+    if read["kind"] != ARM_KIND[arm] or read.get("scope") != "all_valid_question" or read.get("recency"):
+        raise ValueError("the arm's read must be its own kind at all_valid_question without recency")
+    return dict(study=slot_data.STUDY, stage=stage, arm=arm, seed=seed, steps=steps, lr=lr, read=dict(read), ablation=ablation,
+                loop_steps=1, optimizer=dict(OPTIMIZER), clip=CLIP, warmup=WARMUP, batch=slot_data.BATCH, checkpoints=CHECKPOINTS,
+                trainable=list(ABLATION_TRAINABLE if ablation else TRAINABLE), frozen=list(FROZEN), buffers=list(BUFFERS),
+                train_base_seed=slot_data.TRAIN_BASE[stage, seed], dev=slot_data.SETS[stage, "dev"].name,
+                dev_base_seed=slot_data.SETS[stage, "dev"].base_seed, parent_writer_blake2b_128=parent_digest,
+                prereg_blake2b_128=slot_data.PREREG_BLAKE2B_128, layout_digest=slot_data.LAYOUT_DIGEST, task=dict(slot_data.TASK))
+
+
+def science_hash(config: dict) -> str:
+    return stable_hash(config)
+
+
+def _set_rows(stage: str, *, sealed: bool = False) -> dict:
+    """The registered evaluation sets of a stage; sealed ones are named only (their seeds live in slot_data alone)."""
+    rows = {}
+    for (name, purpose), s in slot_data.SETS.items():
+        if name == stage and s.sealed == sealed:
+            rows[purpose] = dict(sealed=True, split=s.split, start=s.start, count=s.count) if sealed else dict(
+                split=s.split, start=s.start, count=s.count, base_seed=s.base_seed)
+    return rows
+
+
+def stage_config(stage: str) -> dict:
+    """The frozen stage configuration (`configs/slot_loop_v1/<stage>.json`): the registered values the runner executes, as the
+    JSON it is written in. The runner refuses a file that differs from this rendering, so an edited config cannot change a
+    stage silently."""
+    return json.loads(json.dumps(_stage_config(stage)))
+
+
+def _stage_config(stage: str) -> dict:
+    common = dict(study=slot_data.STUDY, prereg=slot_data.PREREG, prereg_blake2b_128=slot_data.PREREG_BLAKE2B_128,
+                  layout_digest=slot_data.LAYOUT_DIGEST, task=dict(slot_data.TASK), loop_steps=1, capacity=16, chunk=16,
+                  parent=dict(name="S-RE", files=["writer.pt", "checkpoint.pt"]))
+    if stage == "S0":
+        return dict(common, stage="S0", recheck=dict(name="D128-3", files=["writer.pt", "checkpoint.pt"]),
+                    sets=_set_rows("S0"), scopes=dict(primary="all_valid_question", diagnostic="final_only"),
+                    calibration=dict(grid=calibration_grid(), tie_nats=CALIBRATION_TIE,
+                                     choice="lowest NLL; ties: gain nearest 1 by |g - 1|, then the larger tau"),
+                    conditions=["native", "matrix_uncal", "matrix_cal", "soft_uncal", "soft_cal", "hard_uncal", "hard_cal",
+                                "soft_rec_uncal", "soft_rec_cal", "clean_final"],
+                    decision=dict(em_threshold_pp=5.0, rule="(c_a - c_b) * 20 >= n and lower mean read error"),
+                    bootstrap_seed=slot_data.BOOTSTRAP["S0"])
+    if stage == "S1A":
+        return dict(common, stage="S1A", arms=list(ARMS), seeds=list(slot_data.RUN_SEEDS), trainable=list(TRAINABLE),
+                    frozen=list(FROZEN), buffers=list(BUFFERS), optimizer=dict(OPTIMIZER), clip=CLIP, warmup=WARMUP,
+                    batch=slot_data.BATCH, checkpoints=CHECKPOINTS, log_every=LOG_EVERY, lr_grid=list(LR_GRID),
+                    pilot=dict(steps=slot_data.PILOT_STEPS, stream_seed=slot_data.TRAIN_BASE["S1A", "pilot"], tie_nats=LR_TIE),
+                    steps_rule=dict(max_steps=slot_data.MAX_STEPS, wall_seconds=WALL_SECONDS, margin=MARGIN, reserve=RESERVE,
+                                    evaluations=EVALUATIONS, minimum=N_MIN_OK),
+                    selection=dict(tie_nats=SELECTION_TIE), sets=_set_rows("S1A"), sealed_sets=_set_rows("S1A", sealed=True),
+                    train_base={str(seed): slot_data.TRAIN_BASE["S1A", seed] for seed in slot_data.RUN_SEEDS},
+                    ablation=dict(trainable=list(ABLATION_TRAINABLE), seed=17), bootstrap_seed=slot_data.BOOTSTRAP["S1A"])
+    raise ValueError(f"no registered stage {stage}")

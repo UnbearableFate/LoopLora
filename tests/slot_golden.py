@@ -101,10 +101,12 @@ def child(source):
     return json.loads(run.stdout.strip().splitlines()[-1])
 
 
+REPO = '/work/xg24i002/x10041/LoopLora'  # the object store job.pbs archives from (a snapshot has no .git)
+
+
 def capture(old_commit, out):
-    root = Path(__file__).resolve().parents[1]
     with tempfile.TemporaryDirectory(dir=os.environ.get('LL_SCRATCH')) as scratch:
-        archive = subprocess.run(['git', '-C', str(root), 'archive', old_commit, 'src'], check=True, capture_output=True).stdout
+        archive = subprocess.run(['git', '-C', REPO, 'archive', old_commit, 'src'], check=True, capture_output=True).stdout
         subprocess.run(['tar', '-x', '-C', scratch], input=archive, check=True)
         old, again = child(scratch), child(scratch)
     current = child(None)
