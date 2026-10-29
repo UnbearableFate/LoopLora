@@ -33,12 +33,19 @@ def blake(data):
 
 def arguments(argv):
     argv = [str(a) for a in argv]
+    root = Path(argv[argv.index('--records') + 1])
     if '--manifest' not in argv:
-        root = Path(argv[argv.index('--records') + 1])
         path = root / 'manifest.lock.json'
         if not path.exists():
             write_manifest(root)
         argv += ['--manifest', str(path)]
+    if argv[argv.index('--stage') + 1] == 'S1A':
+        if not (root / 's1a-open.json').exists():
+            write_open_metadata(root)
+        if '--open-record' not in argv:
+            argv += ['--open-record', str(root / 's1a-open.json')]
+        if '--release' not in argv:
+            argv += ['--release', str(root / 's1a-release.json')]
     return argv
 
 
@@ -93,6 +100,8 @@ def write_manifest(root, s1a_n=400, s0_n=N, dev_n=1000, dev_ids='cd' * 16):
               'S1A/confirmation': (s1a_n, ids_digest(np.arange(s1a_n, dtype=np.int64) + 1000)),
               'S1A/unseen': (s1a_n, ids_digest(np.arange(s1a_n, dtype=np.int64) + 10 ** 6))}
     locked = dict(version=1, status='locked', study='slot-loop-v1',
+                  prereg_blake2b_128=blake((ROOT / 'docs/prereg/SLOT-LOOP-v1.md').read_bytes()),
+                  inventory={'S-RE': {'writer.pt': 'f' * 32}},
                   manifest=dict(sets={key: dict(count=n) for key, (n, _) in values.items()},
                                 ids={f'eval/{key}': dict(count=n, ids_blake2b_128=own) for key, (n, own) in values.items()}))
     root.mkdir(parents=True, exist_ok=True)
@@ -811,6 +820,47 @@ def test_ablation_refuses_incomplete_mislabelled_mismatched_or_wrong_selected_in
 
 # ---------------------------------------------------------------------------------------------------------------------- S1A
 
+READS = {arm: dict(kind=kind, gain=1.0, tau=tau, scope=AV, recency=False, capacity=16)
+         for arm, kind, tau in (('matrix_L1', 'matrix', None), ('soft_slot_L1', 'soft', 0.3))}
+SELECTED_CHECKPOINTS = {f'{arm}/{seed}': blake(f'{arm}/{seed}'.encode()) for arm in slot.ARMS for seed in slot.SEEDS}
+
+
+def provenance(label):
+    if label in slot.REQUIRED:
+        arm, seed = label.rsplit('_s', 1)
+        return SELECTED_CHECKPOINTS[f'{arm}/{seed}'], READS[arm]
+    read = None if label == 's_re_native' else READS['matrix_L1' if label == 'matrix_step0' else 'soft_slot_L1']
+    return 'f' * 32, read
+
+
+def write_open_metadata(root):
+    prereg = blake((ROOT / 'docs/prereg/SLOT-LOOP-v1.md').read_bytes())
+    analysis = blake(SCRIPT.read_bytes())
+    opened = dict(prereg_blake2b_128=prereg, analysis_script_blake2b_128=analysis,
+                  selected_checkpoints=SELECTED_CHECKPOINTS)
+    release = dict(version=1, study='slot-loop-v1', stage='S1A', status='ready',
+                   prereg_blake2b_128=prereg, analysis_script_blake2b_128=analysis,
+                   manifest_blake2b_128=blake((root / 'manifest.lock.json').read_bytes()),
+                   arms={arm: dict(read=read, lr=1e-3) for arm, read in READS.items()})
+    (root / 's1a-open.json').write_text(json.dumps(opened))
+    (root / 's1a-release.json').write_text(json.dumps(release))
+
+
+def direct_s1a(root):
+    """Exercise the current stage itself: malformed provenance must fail, independently of new CLI parsing."""
+    src = slot.Sources(root)
+    src.open_record_path = str((root / 's1a-open.json').resolve())
+    src.release_path = str((root / 's1a-release.json').resolve())
+    manifest = json.loads((root / 'manifest.lock.json').read_text())
+    return slot.stage_s1a(src, manifest)
+
+
+def replace_npz(path, **changes):
+    with np.load(path, allow_pickle=False) as archive:
+        arrays = {key: archive[key] for key in archive.files}
+    arrays.update(changes)
+    np.savez(path, **arrays)
+
 def correctness(n, counts, shift=0):
     """counts: seed -> (both correct, only soft correct, only matrix correct); episodes are rolled by `shift` per seed index."""
     out = {}
@@ -827,7 +877,9 @@ def write_set(directory, ids, correct, rel_err=True, seed=5):
     directory.mkdir(parents=True, exist_ok=True)
     rng = np.random.default_rng(seed)
     for label, c in correct.items():
-        arrays = dict(episode_id=ids, correct=c, nll=rng.uniform(0.5, 2.0, len(ids)))
+        checkpoint, read = provenance(label)
+        arrays = dict(episode_id=ids, correct=c, nll=rng.uniform(0.5, 2.0, len(ids)),
+                      checkpoint_blake2b_128=np.asarray(checkpoint), read=np.asarray(json.dumps(read, sort_keys=True)))
         if rel_err:
             arrays['rel_err'] = rng.uniform(0.0, 1.0, len(ids))
         np.savez(directory / f'{label}.npz', **arrays)
@@ -836,6 +888,7 @@ def write_set(directory, ids, correct, rel_err=True, seed=5):
 def s1a_tree(root, n, counts, shift=0, unseen=None, references=True):
     """confirmation/ and unseen/ with the six labels (+ the three references); returns the confirmation correctness arrays."""
     write_manifest(root, s1a_n=n)
+    write_open_metadata(root)
     confirmation = correctness(n, counts, shift)
     extras = {label: np.random.default_rng(i).random(n) < 0.6 for i, label in enumerate(slot.REFERENCES)} if references else {}
     write_set(root / 'confirmation', np.arange(n, dtype=np.int64) + 1000, dict(confirmation, **extras))
@@ -851,6 +904,61 @@ def run_s1a(tmp_path, n, counts, out='out', name='s1a', **kw):
 
 
 ADVANCE = {17: (200, 14, 0), 29: (200, 12, 0), 43: (200, 10, 0)}        # n = 400: 36 correct more in total = exactly +3.0 pp
+
+
+@pytest.mark.parametrize('mistake', ['swapped', 'duplicated', 'reference_under_main'])
+def test_round2_analysis_refuses_checkpoint_rows_not_named_by_open_record(tmp_path, mistake):
+    root = tmp_path / 'tree'
+    s1a_tree(root, 400, ADVANCE)
+    matrix = root / 'confirmation' / 'matrix_L1_s17.npz'
+    if mistake == 'swapped':
+        soft = root / 'confirmation' / 'soft_slot_L1_s17.npz'
+        original = matrix.read_bytes()
+        matrix.write_bytes(soft.read_bytes())
+        soft.write_bytes(original)
+    elif mistake == 'duplicated':
+        (root / 'confirmation' / 'matrix_L1_s29.npz').write_bytes(matrix.read_bytes())
+    else:
+        matrix.write_bytes((root / 'confirmation' / 's_re_native.npz').read_bytes())
+    with pytest.raises(SystemExit, match='refused: .*checkpoint'):
+        direct_s1a(root)
+
+
+@pytest.mark.parametrize('label', slot.REFERENCES)
+def test_round2_analysis_binds_each_reference_to_locked_parent_digest(tmp_path, label):
+    root = tmp_path / 'tree'
+    s1a_tree(root, 400, ADVANCE)
+    replace_npz(root / 'confirmation' / f'{label}.npz',
+                checkpoint_blake2b_128=np.asarray(SELECTED_CHECKPOINTS['matrix_L1/17']))
+    with pytest.raises(SystemExit, match='refused: .*checkpoint'):
+        direct_s1a(root)
+
+
+@pytest.mark.parametrize('label', ['matrix_L1_s17', 's_re_native', 'matrix_step0', 'soft_step0'])
+def test_round2_analysis_binds_npz_read_to_released_arm_or_reference_read(tmp_path, label):
+    root = tmp_path / 'tree'
+    s1a_tree(root, 400, ADVANCE)
+    wrong = READS['soft_slot_L1'] if label != 'soft_step0' else None
+    replace_npz(root / 'confirmation' / f'{label}.npz', read=np.asarray(json.dumps(wrong)))
+    with pytest.raises(SystemExit, match='refused: .*read'):
+        direct_s1a(root)
+
+
+def test_round2_analysis_changed_script_matching_open_record_is_refused_by_ready_release(tmp_path, monkeypatch):
+    root = tmp_path / 'tree'
+    s1a_tree(root, 400, ADVANCE)
+    changed = tmp_path / 'analyze_changed.py'
+    changed.write_bytes(SCRIPT.read_bytes() + b'\n# Changed after the release.\n')
+    opened_path = root / 's1a-open.json'
+    opened = json.loads(opened_path.read_text())
+    opened['analysis_script_blake2b_128'] = blake(changed.read_bytes())
+    opened_path.write_text(json.dumps(opened))
+    release = json.loads((root / 's1a-release.json').read_text())
+    assert opened['analysis_script_blake2b_128'] == blake(changed.read_bytes())
+    assert release['status'] == 'ready' and release['analysis_script_blake2b_128'] != blake(changed.read_bytes())
+    monkeypatch.setattr(slot, '__file__', str(changed))
+    with pytest.raises(SystemExit, match='refused: .*analysis script.*release'):
+        direct_s1a(root)
 
 
 def test_s1a_advances_at_exactly_three_points_with_every_seed_positive_and_the_lower_end_above_zero(tmp_path):
@@ -1076,7 +1184,7 @@ def test_s1a_refuses_missing_labels_mismatched_ids_and_bad_arrays(tmp_path):
     np.savez(root / 'unseen' / 's_re_native.npz', **z)
     attempt(root, 'unseen/s_re_native.npz: episode_id differs')
     root = tree('length')
-    z = {k: v[:-1] for k, v in np.load(root / 'confirmation' / 'soft_slot_L1_s17.npz').items()}
+    z = {k: v[:-1] if v.ndim else v for k, v in np.load(root / 'confirmation' / 'soft_slot_L1_s17.npz').items()}
     np.savez(root / 'confirmation' / 'soft_slot_L1_s17.npz', **z)
     attempt(root, 'n differs')
     root = tree('overlap')                                          # the two sets must be different episodes
